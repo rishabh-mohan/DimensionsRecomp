@@ -90,7 +90,9 @@ struct DrawPreparationContext {
 constexpr unsigned char kPinTexture = 0, kPinBuffer = 1, kPinDeclaration = 2;
 std::shared_ptr<void> FindPinnedOwner(unsigned char kind, u32 address);
 
-DrawPreparationContext* CurrentDrawPreparation();
+// Defined in device.cpp. Inline: draws and texture lookups call this per use.
+extern thread_local DrawPreparationContext* t_draw_preparation;
+inline DrawPreparationContext* CurrentDrawPreparation() { return t_draw_preparation; }
 class DrawPreparationScope {
   DrawPreparationContext* previous_;
  public:
@@ -156,6 +158,9 @@ class HostDevice {
   static bool PresentTexture(plume::RenderTexture* texture,
                              u32 descriptor_index, float sample_offset_x = 0,
                              float sample_offset_y = 0);
+  // Opt-in (LEGO_NATIVE_UNLOCKED_PACING): sleep most of the frame-rate cap
+  // gap before SwapHook takes the recording gate. Takes no lock.
+  static void PaceFrameBeforeLock();
   // Recorder-ordered snapshot of the original XDK-converted display ramp.
   static void SetDisplayGamma(const DisplayGammaTable& table);
   // Exact texel color scale into UNORM16 storage or a float32 sampling mirror.

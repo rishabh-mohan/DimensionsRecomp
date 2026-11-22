@@ -252,6 +252,7 @@ struct State {
   std::shared_ptr<PresentGammaSurface> gamma_surface;
   DisplayGammaTable gamma_table;
   bool gamma_table_valid = false;
+  bool gamma_identity = false;  // DisplayGammaIsIdentity(gamma_table)
   std::unique_ptr<plume::RenderShader> resolve_pixel_shader;
   std::unique_ptr<plume::RenderShader> scaled_resolve_pixel_shader;
   std::array<std::unique_ptr<plume::RenderPipeline>, 5> resolve_pipelines;
@@ -311,6 +312,9 @@ struct State {
   std::vector<bool> texture_slots;
   DescriptorRetirement retired_descriptors{65536, command_slot_count};
   Backend backend = Backend::kD3D12;
+  // LEGO_NATIVE_FRAMES_IN_FLIGHT: present submission serial by present number.
+  std::array<u64, 8> present_serials{};
+  bool latency_configured = false;
 };
 
 constexpr u32 kBindlessTextureCount = 65536;
@@ -749,7 +753,6 @@ plume::RenderCommandList* BeginFrameCommandsLocked(State& state) {
 }  // namespace
 
 thread_local DrawPreparationContext* t_draw_preparation = nullptr;
-DrawPreparationContext* CurrentDrawPreparation() { return t_draw_preparation; }
 std::shared_ptr<void> FindPinnedOwner(unsigned char kind, u32 address) {
   if (!t_draw_preparation || !address) return {};
   for (const auto& pin : t_draw_preparation->pinned)
@@ -1676,6 +1679,109 @@ int32_t ReadConfigInt(const char* name, int32_t fallback) {
   return fallback;
 }
 
+// The ramp buffer is R10G10B10A2_UNORM and the pass writes RGBA8: output i
+// is exact when |255 * level - 1023 * i| <= 409 (under 0.4 ULP) for every
+// entry and channel, which holds for a linear ramp rounded to 10 bits. The
+// pass then copies RGB exactly; its alpha 1 only reaches back-buffer alpha,
+// which presentation ignores (overlays blend with their own source alpha).
+bool DisplayGammaIsIdentity(const DisplayGammaTable& table) {
+  for (int i = 0; i < 256; ++i) {
+    for (const int shift : {20, 10, 0}) {
+      const int level = int((table.words[i] >> shift) & 0x3FF);
+      if (std::abs(255 * level - 1023 * i) > 409) return false;
+    }
+  }
+  return true;
+}
+
+// LEGO_NATIVE_FRAMES_IN_FLIGHT=1..6 (default off): after each present, wait
+// until the present submitted that many presents earlier has completed. It
+// caps queued frames when LEGO_NATIVE_COMMAND_SLOTS=12 lets guest kickoffs
+// use more slots. It only waits; ring bookkeeping is unchanged.
+u32 NativeFramesInFlight() {
+  static const u32 frames = [] {
+    const char* value = std::getenv("LEGO_NATIVE_FRAMES_IN_FLIGHT");
+    const int parsed = value ? std::atoi(value) : 0;
+    const u32 result = parsed >= 1 && parsed <= 6 ? u32(parsed) : 0;
+    if (value) REXLOG_INFO("Native GPU: frames-in-flight cap={} (0 = off)", result);
+    return result;
+  }();
+  return frames;
+}
+
+struct PresentThrottle {
+  ID3D12Fence* fence = nullptr;  // AddRef'd by FindPresentThrottleLocked
+  u64 value = 0;
+};
+
+PresentThrottle FindPresentThrottleLocked(const State& state, u64 serial) {
+  if (!serial || serial <= state.completed_submission || state.backend != Backend::kD3D12) return {};
+  for (u32 slot = 0; slot < state.command_slot_count; ++slot) {
+    if (!state.frame_submitted[slot] || state.slot_submission[slot] != serial) continue;
+    auto* fence = static_cast<plume::D3D12CommandFence*>(state.frame_fences[slot].get());
+    if (!fence || !fence->d3d || fence->fenceValue <= 1) return {};
+    fence->d3d->AddRef();
+    return {fence->d3d, fence->fenceValue - 1};
+  }
+  // A slot is reused only after a verified wait, so that submission is done.
+  return {};
+}
+
+void WaitPresentThrottle(const PresentThrottle& throttle, u32 frames_in_flight) {
+  static HANDLE event = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+  static u32 presents = 0, waits = 0;
+  static double waited_ms = 0;
+  if (throttle.fence) {
+    const u64 completed = throttle.fence->GetCompletedValue();
+    if (event && completed != UINT64_MAX && completed < throttle.value) {
+      const auto start = std::chrono::steady_clock::now();
+      ResetEvent(event);
+      if (SUCCEEDED(throttle.fence->SetEventOnCompletion(throttle.value, event)))
+        WaitForSingleObject(event, 1000);
+      ++waits;
+      waited_ms += std::chrono::duration<double, std::milli>(
+          std::chrono::steady_clock::now() - start).count();
+    }
+    throttle.fence->Release();
+  }
+  if (++presents == 600) {
+    REXLOG_INFO("Native GPU: frames-in-flight cap={} waited on {} of the last 600 presents, {:.2f} ms total",
+                frames_in_flight, waits, waited_ms);
+    presents = waits = 0;
+    waited_ms = 0;
+  }
+}
+
+// LEGO_NATIVE_LATENCY_WAIT=1..3 (default off): set the swap chain's maximum
+// frame latency and wait on its waitable object after each present.
+u32 NativeLatencyWait() {
+  static const u32 frames = [] {
+    const char* value = std::getenv("LEGO_NATIVE_LATENCY_WAIT");
+    const int parsed = value ? std::atoi(value) : 0;
+    const u32 result = parsed >= 1 && parsed <= 3 ? u32(parsed) : 0;
+    if (value) REXLOG_INFO("Native GPU: swap-chain latency wait={} (0 = off)", result);
+    return result;
+  }();
+  return frames;
+}
+
+// Published by PublishFramePace for HostDevice::PaceFrameBeforeLock.
+std::atomic<int64_t> g_pace_next{0};  // steady_clock ticks of the next deadline
+std::atomic<int32_t> g_pace_limit{0};
+
+// LEGO_NATIVE_UNLOCKED_PACING=1 (2 ms margin) or 500..20000 microseconds;
+// unset or 0 (the default) turns HostDevice::PaceFrameBeforeLock off.
+int64_t UnlockedPacingMarginUs() {
+  static const int64_t margin = [] {
+    const char* value = std::getenv("LEGO_NATIVE_UNLOCKED_PACING");
+    const long long parsed = value ? std::atoll(value) : 0;
+    const int64_t result = parsed <= 0 ? 0 : parsed == 1 ? 2000 : std::clamp<long long>(parsed, 500, 20000);
+    if (value) REXLOG_INFO("Native GPU: unlocked frame pacing margin={}us (0 = off)", result);
+    return result;
+  }();
+  return margin;
+}
+
 // Legacy resolver is used only without the coordinated native-menu runtime.
 int32_t LegacyFrameRateLimit() {
   static const int32_t override_limit = [] {
@@ -1714,6 +1820,24 @@ void LimitFrameRate(int32_t limit) {
   // Do not bank time after a slow frame: never schedule in the past.
   next = (std::max)(next + period, now);
 }
+
+// Mirrors LimitFrameRate's schedule for HostDevice::PaceFrameBeforeLock,
+// outside its body (tools/gpu-aot/test_frame_rate_settings.py compiles that
+// body alone). On both of its branches LimitFrameRate sets next to
+// max(next + period, now); with now replaced by the time it was entered,
+// this copy is never later, and earlier only by the gap between the reads.
+void PublishFramePace(int32_t limit, std::chrono::steady_clock::time_point entered) {
+  using clock = std::chrono::steady_clock;
+  static clock::time_point next;
+  static int32_t previous_limit = -1;
+  if (previous_limit != limit) { next = entered; previous_limit = limit; }
+  g_pace_limit.store(limit, std::memory_order_relaxed);
+  if (limit <= 0) return;
+  const auto period = std::chrono::duration_cast<clock::duration>(
+      std::chrono::duration<double>(1.0 / limit));
+  next = (std::max)(next + period, entered);
+  g_pace_next.store(next.time_since_epoch().count(), std::memory_order_release);
+}
 }  // namespace
 
 void HostDevice::SetDisplayGamma(const DisplayGammaTable& table) {
@@ -1722,8 +1846,30 @@ void HostDevice::SetDisplayGamma(const DisplayGammaTable& table) {
   if (!g_state || (g_state->gamma_table_valid && g_state->gamma_table == table)) return;
   g_state->gamma_table = table;
   g_state->gamma_table_valid = true;
-  REXLOG_INFO("Native GPU: display gamma updated from title ramp black={:08X} mid={:08X} white={:08X}",
-              table.words[0], table.words[128], table.words[255]);
+  g_state->gamma_identity = DisplayGammaIsIdentity(table);
+  REXLOG_INFO("Native GPU: display gamma updated from title ramp black={:08X} mid={:08X} white={:08X} identity={}",
+              table.words[0], table.words[128], table.words[255], g_state->gamma_identity);
+}
+
+void HostDevice::PaceFrameBeforeLock() {
+  // Opt-in (UnlockedPacingMarginUs): sleep the bulk of the frame-rate gap
+  // before SwapHook takes the recording gate. LimitFrameRate still waits for
+  // the same deadline under the gate; presents keep their schedule while the
+  // work from here to the limiter fits in the margin. Takes no lock.
+  const int64_t margin_us = UnlockedPacingMarginUs();
+  if (!margin_us || g_pace_limit.load(std::memory_order_relaxed) <= 0) return;
+  using clock = std::chrono::steady_clock;
+  const auto wake = clock::time_point(clock::duration(g_pace_next.load(std::memory_order_acquire))) -
+                    std::chrono::microseconds(margin_us);
+  const auto now = clock::now();
+  if (wake <= now) return;
+  const auto sleep_for = (std::min)(wake - now, clock::duration(std::chrono::seconds(1)));
+  static thread_local HANDLE timer = CreateWaitableTimerExW(nullptr, nullptr,
+      CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_ALL_ACCESS);
+  LARGE_INTEGER due;
+  due.QuadPart = -std::chrono::duration_cast<std::chrono::nanoseconds>(sleep_for).count() / 100;
+  if (timer && SetWaitableTimer(timer, &due, 0, nullptr, nullptr, FALSE))
+    WaitForSingleObject(timer, INFINITE);
 }
 
 bool HostDevice::PresentTexture(plume::RenderTexture* texture,
@@ -1733,7 +1879,10 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
   const auto settings_frame = settings_runtime ? settings_runtime->Active() : nullptr;
   const auto* settings = settings_frame ? &settings_frame->values : nullptr;
   const int32_t fps_limit = settings ? settings->fps_limit : LegacyFrameRateLimit();
+  const bool publish_pace = UnlockedPacingMarginUs() != 0;
+  const auto pace_entered = publish_pace ? std::chrono::steady_clock::now() : std::chrono::steady_clock::time_point{};
   LimitFrameRate(fps_limit);
+  if (publish_pace) PublishFramePace(fps_limit, pace_entered);
   const int32_t requested_anisotropy = settings ? settings->anisotropy : NativeAnisotropicRequested();
   if (g_anisotropic_override.exchange(requested_anisotropy, std::memory_order_acq_rel) != requested_anisotropy)
     REXLOG_INFO("Native GPU: texture filtering changed to {} at presentation boundary", requested_anisotropy);
@@ -1749,7 +1898,21 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
   }
   SnapshotTexture(texture, "present", false);
 
-  std::lock_guard lock(g_mutex);
+  // Window queries enter win32k; make them before g_mutex. This relies on
+  // g_state and its swap chain being replaced only under the full recording
+  // gate (Create, Shutdown), which is held above. Replacing them under
+  // g_mutex alone (e.g. device-lost recovery) would make these reads race.
+  HWND presentation_window = nullptr;
+  bool presentation_focused = false, presentation_borderless = false;
+  HMONITOR presentation_monitor = nullptr;
+  if (g_state && g_state->swap_chain) {
+    presentation_window = g_state->swap_chain->getWindow();
+    presentation_focused = GetForegroundWindow() == presentation_window;
+    presentation_borderless = (GetWindowLongPtrW(presentation_window, GWL_STYLE) & WS_POPUP) != 0;
+    presentation_monitor = MonitorFromWindow(presentation_window, MONITOR_DEFAULTTONEAREST);
+  }
+
+  std::unique_lock lock(g_mutex);
   if (!g_state || !g_state->copy_pipeline || !TextureSlotLive(*g_state, descriptor_index)) {
     return false;
   }
@@ -1801,7 +1964,13 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
   // The reference renderer applies the display ramp before spatial output
   // scaling. Keep FSR 1 and FSR 3's scene processing unchanged and apply the
   // original XDK-converted ramp once to the resolved input of presentation.
-  if (state.gamma_table_valid) {
+  // An identity ramp makes that pass an exact RGB copy, so present the input
+  // directly (DisplayGammaIsIdentity); LEGO_NATIVE_FORCE_GAMMA_PASS=1 restores it.
+  static const bool force_gamma_pass = [] {
+    const char* value = std::getenv("LEGO_NATIVE_FORCE_GAMMA_PASS");
+    return value && *value == '1';
+  }();
+  if (state.gamma_table_valid && (!state.gamma_identity || force_gamma_pass)) {
     const auto input = static_cast<plume::D3D12Texture*>(texture)->d3d->GetDesc();
     const bool supported = input.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE2D &&
         input.DepthOrArraySize == 1 && input.MipLevels == 1 && input.SampleDesc.Count == 1 &&
@@ -1876,10 +2045,20 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
   const auto source_desc = static_cast<plume::D3D12Texture*>(texture)->d3d->GetDesc();
   const auto present_rect = FitPresentRect(u32(source_desc.Width), source_desc.Height,
                                          width, height);
-  // Clear the whole acquired image, including bars left by a previous size.
-  commands->clearColor(0, plume::RenderColor(0.0f, 0.0f, 0.0f, 1.0f));
-  bool spatial_presented = false;
   const bool fsr1_requested = !NativeFsr3Enabled() && (settings ? settings->fsr1 : rex::cvar::GetFlagByName("present_effect") == "fsr");
+  // Clear the whole acquired image, including bars left by a previous size.
+  // Skip it when the copy below covers every texel: viewport equals the
+  // image, opaque blend, full write mask, no discard. FSR 1 keeps the clear;
+  // LEGO_NATIVE_FULL_PRESENT_CLEAR=1 always clears.
+  static const bool always_clear = [] {
+    const char* value = std::getenv("LEGO_NATIVE_FULL_PRESENT_CLEAR");
+    return value && *value == '1';
+  }();
+  const auto back_desc = static_cast<plume::D3D12Texture*>(back)->d3d->GetDesc();
+  if (always_clear || fsr1_requested || !PresentRectCoversTarget(present_rect, width, height) ||
+      back_desc.Width != width || back_desc.Height != height)
+    commands->clearColor(0, plume::RenderColor(0.0f, 0.0f, 0.0f, 1.0f));
+  bool spatial_presented = false;
   if (fsr1_requested) {
     if (!state.fsr1_presenter) state.fsr1_presenter = std::make_unique<Fsr1Presenter>();
     const double requested = settings ? settings->fsr1_sharpness_reduction : rex::cvar::Query<double>("present_fsr_sharpness_reduction");
@@ -1947,6 +2126,15 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
         x += 12;
         divisor /= 10;
       } while (divisor);
+      // Touching cells clear as one rect: the same pixels in each colour, fewer clears.
+      // LEGO_NATIVE_FPS_CELL_RECTS=1 keeps one clear per cell.
+      static const bool cell_rects = std::getenv("LEGO_NATIVE_FPS_CELL_RECTS") != nullptr;
+      if (!cell_rects) {
+        used = MergeTouchingRects(pixels.data(), used);
+        for (u32 i = 0; i < used; ++i)
+          shadows[i] = plume::RenderRect(pixels[i].left + 1, pixels[i].top + 1,
+                                         pixels[i].right + 1, pixels[i].bottom + 1);
+      }
       static const bool batched = std::getenv("LEGO_NATIVE_FPS_OVERLAY_BATCHED") != nullptr;
       if (batched) {
         commands->clearColor(0, plume::RenderColor(0, 0, 0, 1), shadows.data(), used);
@@ -1998,12 +2186,18 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
   const bool requested_vsync = settings ? settings->vsync : NativeVsyncRequested();
   state.swap_chain->setVsyncEnabled(requested_vsync);
   auto* presentation_chain = static_cast<plume::D3D12SwapChain*>(state.swap_chain.get());
-  const auto presentation_window = presentation_chain->getWindow();
-  const bool presentation_focused = GetForegroundWindow() ==
-      presentation_window;
-  const bool presentation_borderless =
-      (GetWindowLongPtrW(presentation_window, GWL_STYLE) & WS_POPUP) != 0;
-  const auto presentation_monitor = MonitorFromWindow(presentation_window, MONITOR_DEFAULTTONEAREST);
+  if (!state.latency_configured) {
+    // Plume requests maxFrameLatency 0 at creation; record what DXGI kept.
+    state.latency_configured = true;
+    UINT latency = 0;
+    const HRESULT queried = presentation_chain->d3d->GetMaximumFrameLatency(&latency);
+    HRESULT configured = S_FALSE;
+    if (NativeLatencyWait()) configured = presentation_chain->d3d->SetMaximumFrameLatency(NativeLatencyWait());
+    REXLOG_INFO("Native GPU: swap-chain max frame latency={} query={:08X} waitable={} latency_wait={} set={:08X}",
+                latency, u32(queried), presentation_chain->waitableObject != nullptr,
+                NativeLatencyWait(), u32(configured));
+  }
+  const HANDLE latency_waitable = NativeLatencyWait() ? presentation_chain->waitableObject : nullptr;
   // Stable small IDs retain monitor identity in numeric CSV readers without
   // converting a pointer-sized HMONITOR to an imprecise floating-point value.
   static std::vector<HMONITOR> presentation_monitors;
@@ -2078,6 +2272,8 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
     rex::perf::SetCounter(rex::perf::CounterId::kFrameTimeUs,int64_t(frame_ms*1000.0+0.5));
     rex::perf::SetCounter(rex::perf::CounterId::kFps,int64_t(fps));
     rex::perf::ResetFrameCounters();
+    // Profiler::Flip() also writes the --perf_log_csv row (no-op without it).
+    rex::perf::WriteCsvFrame();
   }
   if (state.gpu_timestamps)
     state.gpu_timestamps->PresentResult(slot, presented);
@@ -2204,11 +2400,20 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
   state.snapshot_number = 0;
   state.snapshot_draw_number = 0;
   state.frame_slot = (slot + 1) % state.command_slot_count;
+  PresentThrottle throttle;
+  const u32 frames_in_flight = NativeFramesInFlight();
+  if (frames_in_flight) {
+    state.present_serials[state.present_number % state.present_serials.size()] = state.slot_submission[slot];
+    if (state.present_number > frames_in_flight)
+      throttle = FindPresentThrottleLocked(state,
+          state.present_serials[(state.present_number - frames_in_flight) % state.present_serials.size()]);
+  }
   if (!presented) {
     LongProbeEvent("present_failed", true, "frame=", state.present_number);
     REXLOG_ERROR("Native GPU: swap-chain present failed");
   }
-  if (std::getenv("LEGO_NATIVE_GPU_DEBUG")) {
+  static const bool gpu_debug = std::getenv("LEGO_NATIVE_GPU_DEBUG") != nullptr;
+  if (gpu_debug) {
     auto* native = static_cast<plume::D3D12Device*>(state.device.get());
     ID3D12InfoQueue* info = nullptr;
     if (SUCCEEDED(native->d3d->QueryInterface(IID_PPV_ARGS(&info)))) {
@@ -2227,6 +2432,11 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
       info->Release();
     }
   }
+  // Optional throttles wait after g_mutex is released, still under the
+  // recording gate like the frame-rate limiter.
+  lock.unlock();
+  if (frames_in_flight) WaitPresentThrottle(throttle, frames_in_flight);
+  if (latency_waitable && presented) WaitForSingleObjectEx(latency_waitable, 1000, FALSE);
   return presented;
 }
 

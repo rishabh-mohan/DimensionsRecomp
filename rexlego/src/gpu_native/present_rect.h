@@ -20,4 +20,10 @@ constexpr PresentRect FitPresentRect(uint32_t source_width, uint32_t source_heig
     height = std::max(1u, uint32_t(uint64_t(window_width) * source_height / source_width));
   return {(window_width - width) / 2, (window_height - height) / 2, width, height};
 }
+
+// True when a presentation viewport covers the whole target, so a draw that
+// writes every viewport texel leaves nothing of the previous contents.
+constexpr bool PresentRectCoversTarget(PresentRect rect, uint32_t width, uint32_t height) {
+  return rect.x == 0 && rect.y == 0 && rect.width == width && rect.height == height;
+}
 } // namespace legodimensions::gpu_native

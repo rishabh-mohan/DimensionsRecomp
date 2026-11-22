@@ -15,6 +15,10 @@ namespace legodimensions::gpu_native {
 template <typename Buffer>
 class UploadBufferPool {
  public:
+  static constexpr uint64_t kDefaultBudget=192*1024*1024;
+  // budget caps the idle bytes kept for reuse; each buffer is charged at least 64 KB.
+  UploadBufferPool():UploadBufferPool(kDefaultBudget) {}
+  explicit UploadBufferPool(uint64_t budget):state_(std::make_shared<State>(budget)) {}
   struct Counters {uint64_t hits=0,misses=0,bytes=0,count=0;};
   template <typename Create>
   std::shared_ptr<Buffer> Acquire(uint32_t length,uint8_t kind,Create create) {
@@ -38,7 +42,7 @@ class UploadBufferPool {
     return std::shared_ptr<Buffer>(buffer.release(),[state,key,charge](Buffer* pointer) {
       std::unique_ptr<Buffer> owner(pointer);
       std::lock_guard lock(state->mutex);
-      if (!state->alive || charge>kBudget || state->stats.bytes>kBudget-charge ||
+      if (!state->alive || charge>state->budget || state->stats.bytes>state->budget-charge ||
           state->stats.count>=4096) return;
       auto& free=state->free[key];
       if (free.size()>=256) return;
@@ -53,16 +57,17 @@ class UploadBufferPool {
     }
     // Older in-flight owners retain the dead state. Releasing them after a
     // device reset cannot place an old device's buffer into the new pool.
-    state_=std::make_shared<State>();
+    state_=std::make_shared<State>(state_->budget);
   }
  private:
-  static constexpr uint64_t kBudget=192*1024*1024;
   struct State {
+    explicit State(uint64_t limit):budget(limit) {}
+    const uint64_t budget;
     std::mutex mutex;
     bool alive=true;
     Counters stats;
     std::unordered_map<uint64_t,std::vector<std::unique_ptr<Buffer>>> free;
   };
-  std::shared_ptr<State> state_=std::make_shared<State>();
+  std::shared_ptr<State> state_;
 };
 }

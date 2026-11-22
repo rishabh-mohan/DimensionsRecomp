@@ -74,6 +74,7 @@ def main():
         (root / "tools/gpu-aot/patches/plume-buffer-address.patch", "Native Plume cached buffer addresses"),
         (root / "tools/gpu-aot/patches/plume-adapter-query.patch", "Native Plume adapter query fixes"),
         (root / "tools/gpu-aot/patches/plume-graphics-read.patch", "Native Plume graphics shader read states"),
+        (root / "tools/gpu-aot/patches/plume-winsdk-compat.patch", "Native Plume Windows SDK compatibility fixes"),
     )
 
     def git(*arguments, check=False):

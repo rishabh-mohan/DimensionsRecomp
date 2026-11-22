@@ -6,13 +6,27 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "legodimensions_funcs.154.h"
-#include "legodimensions_funcs.254.h"
-#include "legodimensions_funcs.302.h"
-#include "legodimensions_funcs.389.h"
-#include "legodimensions_funcs.393.h"
-#include "legodimensions_funcs.395.h"
-#include "legodimensions_funcs.410.h"
+DECLARE_REX_FUNC(__imp__RtlEnterCriticalSection);
+DECLARE_REX_FUNC(__imp__RtlLeaveCriticalSection);
+DECLARE_REX_FUNC(__restgprlr_24);
+DECLARE_REX_FUNC(__restgprlr_27);
+DECLARE_REX_FUNC(__restgprlr_29);
+DECLARE_REX_FUNC(__savegprlr_24);
+DECLARE_REX_FUNC(__savegprlr_27);
+DECLARE_REX_FUNC(__savegprlr_29);
+DECLARE_REX_FUNC(sub_82A296D8);
+DECLARE_REX_FUNC(sub_82A29A28);
+DECLARE_REX_FUNC(sub_82A2C930);
+DECLARE_REX_FUNC(sub_82A2CAB0);
+DECLARE_REX_FUNC(sub_82A2CC20);
+DECLARE_REX_FUNC(sub_82A33D28);
+DECLARE_REX_FUNC(sub_82A34208);
+DECLARE_REX_FUNC(sub_82A347C8);
+DECLARE_REX_FUNC(sub_82A3C8B0);
+DECLARE_REX_FUNC(sub_82A4A538);
+DECLARE_REX_FUNC(sub_82A4C508);
+DECLARE_REX_FUNC(sub_83F99290);
+DECLARE_REX_FUNC(sub_83F9ABE0);
 
 extern "C" void __imp__sub_82A2CAB0(PPCContext& __restrict ctx, uint8_t* base);
 extern "C" void __imp__sub_82A2CC20(PPCContext& __restrict ctx, uint8_t* base);
@@ -35,7 +49,7 @@ bool Enabled() {
 u64 LockElidedMsr() { return ppc_global_lock_count_().load() ? 0 : 0x8000; }
 }
 
-// sub_82A2CAB0 from legodimensions_recomp.254.cpp, body sha256 814d21ddd7f64c23.
+// sub_82A2CAB0, body sha256 814d21ddd7f64c23.
 static void Elided_82A2CAB0(PPCContext& __restrict ctx, uint8_t* base) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
@@ -310,7 +324,7 @@ REX_HOOK_RAW(sub_82A2CAB0) {
   Elided_82A2CAB0(ctx, base);
 }
 
-// sub_82A2CC20 from legodimensions_recomp.393.cpp, body sha256 b0301511f0cd78a9.
+// sub_82A2CC20, body sha256 b0301511f0cd78a9.
 static void Elided_82A2CC20(PPCContext& __restrict ctx, uint8_t* base) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
@@ -508,7 +522,7 @@ REX_HOOK_RAW(sub_82A2CC20) {
   Elided_82A2CC20(ctx, base);
 }
 
-// sub_82A34E28 from legodimensions_recomp.154.cpp, body sha256 60176cf1abeb4fd5.
+// sub_82A34E28, body sha256 60176cf1abeb4fd5.
 static void Elided_82A34E28(PPCContext& __restrict ctx, uint8_t* base) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
@@ -795,7 +809,7 @@ REX_HOOK_RAW(sub_82A34E28) {
   Elided_82A34E28(ctx, base);
 }
 
-// sub_82A34FE8 from legodimensions_recomp.410.cpp, body sha256 0140728541209ee1.
+// sub_82A34FE8, body sha256 0140728541209ee1.
 static void Elided_82A34FE8(PPCContext& __restrict ctx, uint8_t* base) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
@@ -1052,7 +1066,7 @@ REX_HOOK_RAW(sub_82A34FE8) {
   Elided_82A34FE8(ctx, base);
 }
 
-// sub_82A4CA18 from legodimensions_recomp.395.cpp, body sha256 a20bb6c51e170973.
+// sub_82A4CA18, body sha256 a20bb6c51e170973.
 static void Elided_82A4CA18(PPCContext& __restrict ctx, uint8_t* base) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
@@ -1598,7 +1612,7 @@ REX_HOOK_RAW(sub_82A4CA18) {
   Elided_82A4CA18(ctx, base);
 }
 
-// sub_82A35D28 from legodimensions_recomp.389.cpp, body sha256 65d8ac24da1f70fa.
+// sub_82A35D28, body sha256 65d8ac24da1f70fa.
 static void Elided_82A35D28(PPCContext& __restrict ctx, uint8_t* base) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
@@ -1828,7 +1842,7 @@ REX_HOOK_RAW(sub_82A35D28) {
   Elided_82A35D28(ctx, base);
 }
 
-// sub_83F99CB8 from legodimensions_recomp.302.cpp, body sha256 b7da9037b9eb87c4.
+// sub_83F99CB8, body sha256 b7da9037b9eb87c4.
 static void Elided_83F99CB8(PPCContext& __restrict ctx, uint8_t* base) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};

@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cstdint>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <utility>
@@ -14,6 +15,25 @@ struct StateCallCounts {
   uint64_t layouts = 0, equal_layouts = 0;
   uint64_t pipelines = 0, equal_pipelines = 0;
   std::array<uint64_t, 4> descriptors{}, equal_descriptors{};
+  // skipped_* count calls LEGO_NATIVE_ELIDE_STATE_CALLS actually left out.
+  uint64_t framebuffers = 0, equal_framebuffers = 0;
+  uint64_t index_buffers = 0, equal_index_buffers = 0, skipped_index_buffers = 0;
+  uint64_t blend_factors = 0, equal_blend_factors = 0, skipped_blend_factors = 0;
+  uint64_t viewports = 0, equal_viewports = 0;
+  uint64_t scissors = 0, equal_scissors = 0;
+};
+
+// The last value requested in this recording, compared bytewise as the API receives it.
+template <class T>
+struct LastRequest {
+  T value{};
+  bool set = false;
+  bool Same(const T& next) {
+    const bool same = set && std::memcmp(&value, &next, sizeof(T)) == 0;
+    value = next;
+    set = true;
+    return same;
+  }
 };
 
 class StateCallLedger {
@@ -31,6 +51,11 @@ class StateCallLedger {
       serial_ = serial;
       layout_ = pipeline_ = nullptr;
       descriptors_.fill(nullptr);
+      framebuffer_ = {};
+      index_ = {};
+      blend_ = {};
+      viewport_ = {};
+      scissor_ = {};
     }
     return true;
   }
@@ -53,6 +78,28 @@ class StateCallLedger {
     if (pipeline_ && pipeline_ == pipeline) ++counts_.equal_pipelines;
     pipeline_ = pipeline;
   }
+  void Framebuffer(const void* framebuffer) {
+    ++counts_.framebuffers;
+    if (framebuffer_.Same(framebuffer)) ++counts_.equal_framebuffers;
+  }
+  void IndexBuffer(uint64_t address, uint32_t size, uint32_t format) {
+    ++counts_.index_buffers;
+    if (index_.Same({address, size, format})) ++counts_.equal_index_buffers;
+  }
+  void SkippedIndexBuffer() { ++counts_.skipped_index_buffers; }
+  void BlendFactor(const std::array<float, 4>& value) {
+    ++counts_.blend_factors;
+    if (blend_.Same(value)) ++counts_.equal_blend_factors;
+  }
+  void SkippedBlendFactor() { ++counts_.skipped_blend_factors; }
+  void Viewport(const std::array<float, 6>& value) {
+    ++counts_.viewports;
+    if (viewport_.Same(value)) ++counts_.equal_viewports;
+  }
+  void Scissor(const std::array<int32_t, 4>& value) {
+    ++counts_.scissors;
+    if (scissor_.Same(value)) ++counts_.equal_scissors;
+  }
   const StateCallCounts& Counts() const { return counts_; }
   void Reset() { *this = {}; }
 
@@ -63,6 +110,11 @@ class StateCallLedger {
   const void* layout_ = nullptr;
   const void* pipeline_ = nullptr;
   std::array<const void*, 4> descriptors_{};
+  LastRequest<const void*> framebuffer_;
+  LastRequest<std::array<uint64_t, 3>> index_;
+  LastRequest<std::array<float, 4>> blend_;
+  LastRequest<std::array<float, 6>> viewport_;
+  LastRequest<std::array<int32_t, 4>> scissor_;
 };
 
 // One finite capture per process. Optional trigger arms the next present
@@ -97,10 +149,14 @@ class StateCallCapture {
       if (!file_) { exhausted_ = true; return; }
       file_ << "# scope=guest_draw_requests;equal=adjacent_guest_request;"
                "unobserved_helper_compute_ray_or_external_calls_not_measured;"
+               "skipped=elided_by_LEGO_NATIVE_ELIDE_STATE_CALLS;"
                "max_frames=120;max_draws_per_frame=4096\n"
                "frame,draws,dropped_draws,recordings,layout_calls,layout_equal,"
                "pso_calls,pso_equal,table0_calls,table0_equal,table1_calls,table1_equal,"
-               "table2_calls,table2_equal,table3_calls,table3_equal\n";
+               "table2_calls,table2_equal,table3_calls,table3_equal,"
+               "framebuffer_calls,framebuffer_equal,index_calls,index_equal,index_skipped,"
+               "blend_calls,blend_equal,blend_skipped,viewport_calls,viewport_equal,"
+               "scissor_calls,scissor_equal\n";
     }
     const auto& count = ledger_.Counts();
     file_ << frame << ',' << count.draws << ',' << count.dropped_draws << ','
@@ -108,6 +164,12 @@ class StateCallCapture {
           << ',' << count.pipelines << ',' << count.equal_pipelines;
     for (size_t i = 0; i < count.descriptors.size(); ++i)
       file_ << ',' << count.descriptors[i] << ',' << count.equal_descriptors[i];
+    file_ << ',' << count.framebuffers << ',' << count.equal_framebuffers
+          << ',' << count.index_buffers << ',' << count.equal_index_buffers
+          << ',' << count.skipped_index_buffers << ',' << count.blend_factors
+          << ',' << count.equal_blend_factors << ',' << count.skipped_blend_factors
+          << ',' << count.viewports << ',' << count.equal_viewports
+          << ',' << count.scissors << ',' << count.equal_scissors;
     file_ << '\n';
     file_.flush();
     ledger_.Reset();

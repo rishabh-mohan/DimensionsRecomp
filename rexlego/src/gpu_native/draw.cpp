@@ -1,5 +1,6 @@
 #include "gpu_native/native_recording.h"
 #include "gpu_native/draw_work_pool.h"
+#include "gpu_native/pipeline_async.h"
 #include "gpu_native/pipeline_creation_gate.h"
 #include "gpu_native/preparation_dependencies.h"
 #include "gpu_native/guest_metadata.h"
@@ -102,6 +103,9 @@
 #include "gpu_native/renderdoc_probe.h"
 #include "gpu_native/vertex_declarations.h"
 #include "gpu_native/state_call_diagnostic.h"
+#include "gpu_native/draw_cached_flag.h"
+#include "gpu_native/draw_log_throttle.h"
+#include "gpu_native/draw_state_shadow.h"
 
 REXCVAR_DEFINE_BOOL(gpu_native_buffer_windows, false, "GPU",
     "Upload and retain only the vertex buffer ranges fetched by native draws")
@@ -118,23 +122,29 @@ namespace {
 
 TemporalDrawHistory g_temporal_draw_history;
 TemporalCameraAuthority g_temporal_camera_authority;
+// Each Select_g_*(preparation) overload takes the caller's CurrentDrawPreparation(). That value is fixed
+// for a draw (only DrawPreparationScope in device.cpp changes it), so hot paths read it once instead of
+// paying an out-of-line call and a TLS access per use. Each object still lives in one function.
 QuadIndexCache<plume::RenderBuffer> g_quad_indices_serial;
-QuadIndexCache<plume::RenderBuffer>& Select_g_quad_indices() {
-  if (CurrentDrawPreparation()) { static thread_local QuadIndexCache<plume::RenderBuffer> state; return state; }
+QuadIndexCache<plume::RenderBuffer>& Select_g_quad_indices(const DrawPreparationContext* preparation) {
+  if (preparation) { static thread_local QuadIndexCache<plume::RenderBuffer> state; return state; }
   return g_quad_indices_serial;
 }
+QuadIndexCache<plume::RenderBuffer>& Select_g_quad_indices() { return Select_g_quad_indices(CurrentDrawPreparation()); }
 #define g_quad_indices Select_g_quad_indices()
 VertexBindingCache g_vertex_bindings_serial;
-VertexBindingCache& Select_g_vertex_bindings() {
-  if (CurrentDrawPreparation()) { static thread_local VertexBindingCache state; return state; }
+VertexBindingCache& Select_g_vertex_bindings(const DrawPreparationContext* preparation) {
+  if (preparation) { static thread_local VertexBindingCache state; return state; }
   return g_vertex_bindings_serial;
 }
+VertexBindingCache& Select_g_vertex_bindings() { return Select_g_vertex_bindings(CurrentDrawPreparation()); }
 #define g_vertex_bindings Select_g_vertex_bindings()
 VertexInputUsageCache g_vertex_input_usage_serial;
-VertexInputUsageCache& Select_g_vertex_input_usage() {
-  if (CurrentDrawPreparation()) { static thread_local VertexInputUsageCache state; return state; }
+VertexInputUsageCache& Select_g_vertex_input_usage(const DrawPreparationContext* preparation) {
+  if (preparation) { static thread_local VertexInputUsageCache state; return state; }
   return g_vertex_input_usage_serial;
 }
+VertexInputUsageCache& Select_g_vertex_input_usage() { return Select_g_vertex_input_usage(CurrentDrawPreparation()); }
 #define g_vertex_input_usage Select_g_vertex_input_usage()
 bool g_vertex_binding_backend_ready = false, g_vertex_binding_cache_enabled = false;
 TemporalSceneDepth g_temporal_scene_depth;
@@ -307,10 +317,11 @@ struct PreparedDrawState {
   void Reset() { constants.Reset(); pipeline.Reset(); vertex_layout.Reset(); }
 };
 PreparedDrawState g_prepared_draw_serial;
-PreparedDrawState& Select_g_prepared_draw() {
-  if (CurrentDrawPreparation()) { static thread_local PreparedDrawState state; return state; }
+PreparedDrawState& Select_g_prepared_draw(const DrawPreparationContext* preparation) {
+  if (preparation) { static thread_local PreparedDrawState state; return state; }
   return g_prepared_draw_serial;
 }
+PreparedDrawState& Select_g_prepared_draw() { return Select_g_prepared_draw(CurrentDrawPreparation()); }
 #define g_prepared_draw Select_g_prepared_draw()
 
 struct CapturedMultiRateInput;
@@ -411,25 +422,33 @@ PipelineCreationGate<PipelineKey, PipelineKeyHash> g_temporal_pipeline_creation;
 std::unordered_map<PipelineKey, std::unique_ptr<plume::RenderPipeline>,
                    PipelineKeyHash>
     g_pipelines;
+// LEGO_NATIVE_PSO_ASYNC: g_pipelines compiles in flight (pipeline_async.h).
+AsyncPipelineTable<PipelineKey, PipelineKeyHash> g_async_pipelines;
 std::unordered_map<PipelineKey, std::unique_ptr<plume::RenderPipeline>, PipelineKeyHash> g_temporal_pipelines;
 std::atomic<u32> g_unsupported_draw_logs{0};
 DrawTiming g_draw_timing_serial;
-DrawTiming& Select_g_draw_timing() {
-  if (CurrentDrawPreparation()) { static thread_local DrawTiming state; return state; }
+DrawTiming& Select_g_draw_timing(const DrawPreparationContext* preparation) {
+  if (preparation) { static thread_local DrawTiming state; return state; }
   return g_draw_timing_serial;
 }
+DrawTiming& Select_g_draw_timing() { return Select_g_draw_timing(CurrentDrawPreparation()); }
 #define g_draw_timing Select_g_draw_timing()
 bool g_seen_tiled_pass = false; // Serialized by LockRecording; diagnostics only.
 
+// Process-constant opt-in diagnostics (env read on first use): when off, each check on the per-draw
+// path is one load and one predictable branch (see draw_cached_flag.h).
+bool TimingEnabled() { return CachedProcessFlag<NativeTextureTimingEnabled>(); }
+bool PortraitProbeOn() { return CachedProcessFlag<PortraitProbeEnabled>(); }
+
 struct DrawTimer {
-  bool enabled = NativeTextureTimingEnabled();
+  bool enabled = TimingEnabled();
   size_t stage = 0;
   std::chrono::steady_clock::time_point last;
   std::array<double, 7> elapsed{};
-  DrawTimer() {
+  explicit DrawTimer(const DrawPreparationContext* preparation) {
     // Keep workload counts available to the per-present cadence probe even
     // when detailed per-draw clocks are disabled.
-    ++g_draw_timing.calls;
+    ++Select_g_draw_timing(preparation).calls;
     if (enabled) {
       last = std::chrono::steady_clock::now();
     }
@@ -460,7 +479,7 @@ struct DrawTimer {
 
 enum class ConstantCost : size_t { kShadow, kUpload, kBindings, kTextures, kRestore };
 struct ConstantTimer {
-  bool enabled = !t_preparing_draw && NativeTextureTimingEnabled();
+  bool enabled = TimingEnabled() && !t_preparing_draw;
   ConstantCost stage;
   std::chrono::steady_clock::time_point last;
   explicit ConstantTimer(ConstantCost initial) : stage(initial) {
@@ -562,6 +581,78 @@ void BindNativeDrawPipeline(plume::RenderCommandList* commands,
                             plume::RenderPipeline* pipeline, StateCallLedger* diagnostic) {
   if (diagnostic) diagnostic->Pipeline(pipeline);
   commands->setPipeline(pipeline);
+}
+
+bool ReadElideStateCalls() {
+  char* value = nullptr;
+  size_t length = 0;
+  _dupenv_s(&value, &length, "LEGO_NATIVE_ELIDE_STATE_CALLS");
+  const bool enabled = value && value[0] == '1' && !value[1];
+  std::free(value);
+  return enabled;
+}
+
+// Opt-in (LEGO_NATIVE_ELIDE_STATE_CALLS=1) skipping of repeated index buffer and blend factor
+// calls by inline draws. DispatchDraw without preparation records under LockRecording or
+// NativeRecordingMutex, so one shadow serves every such caller. Full preparation replays tapes onto
+// the same list, so the shadow is off there; prepared lists are not D3D12CommandList and bypass it.
+struct InlineStateShadow {
+  DrawStateShadow state;
+  const plume::D3D12CommandList* list = nullptr;
+  const ID3D12RootSignature* root_signature = nullptr;
+};
+InlineStateShadow g_inline_state_shadow;
+
+// begin(), end() and both notify*WasChangedExternally() clear these plume flags, and binding another
+// root signature replaces the cached one: each means the list may now hold other state.
+void CheckInlineStateShadow(DrawStateShadow* shadow) {
+  const auto* list = g_inline_state_shadow.list;
+  if (shadow && (!list->descriptorHeapsSet || !list->cachedGraphicsRootValid ||
+      list->cachedGraphicsRootSignature != g_inline_state_shadow.root_signature)) {
+    shadow->Invalidate();
+  }
+}
+
+DrawStateShadow* InlineDrawStateShadow(const DrawPreparationContext* preparation,
+                                       plume::RenderCommandList* commands,
+                                       const DrawDeviceView& view) {
+  if (!CachedProcessFlag<ReadElideStateCalls>() || preparation ||
+      CachedProcessFlag<NativeFullDrawPreparationEnabled>()) return nullptr;
+  auto& shadow = g_inline_state_shadow;
+  if (shadow.state.Begin(commands, view.recording_serial, view.pipeline_layout)) {
+    shadow.list = dynamic_cast<const plume::D3D12CommandList*>(commands);
+    shadow.root_signature =
+        static_cast<const plume::D3D12PipelineLayout*>(view.pipeline_layout)->rootSignature;
+  }
+  if (!shadow.list) return nullptr;
+  CheckInlineStateShadow(&shadow.state);
+  return &shadow.state;
+}
+
+// Feeds the opt-in diagnostic; true when the shadow proves `view` is already bound.
+bool SameDrawIndexBuffer(DrawStateShadow* shadow, StateCallLedger* diagnostic,
+                         const plume::RenderIndexBufferView& view) {
+  if (!shadow && !diagnostic) [[likely]] return false;
+  const auto* buffer = static_cast<const plume::D3D12Buffer*>(view.buffer.ref);
+  const DrawStateShadow::IndexBuffer bound{buffer ? buffer->gpuVA + view.buffer.offset : 0,
+                                           view.size, u32(view.format)};
+  if (diagnostic) diagnostic->IndexBuffer(bound.address, bound.size, bound.format);
+  if (!shadow) return false;
+  CheckInlineStateShadow(shadow);
+  if (!shadow->SameIndexBuffer(bound)) return false;
+  if (diagnostic) diagnostic->SkippedIndexBuffer();
+  return true;
+}
+
+bool SameDrawBlendFactor(DrawStateShadow* shadow, StateCallLedger* diagnostic,
+                         const std::array<float, 4>& value) {
+  if (!shadow && !diagnostic) [[likely]] return false;
+  if (diagnostic) diagnostic->BlendFactor(value);
+  if (!shadow) return false;
+  CheckInlineStateShadow(shadow);
+  if (!shadow->SameBlendFactor(value)) return false;
+  if (diagnostic) diagnostic->SkippedBlendFactor();
+  return true;
 }
 
 // Included inside draw.cpp's existing namespace. Private integration candidate.
@@ -795,7 +886,8 @@ void BindNativeDrawVertexBuffers(plume::RenderCommandList* commands,
     const DrawDeviceView& view,
     const std::array<plume::RenderVertexBufferView,kNativeVertexStreams>& buffers,
     const std::array<plume::RenderInputSlot,kNativeVertexStreams>& slots) {
-  if (CurrentDrawPreparation()) {
+  const DrawPreparationContext* const preparation = CurrentDrawPreparation();
+  if (preparation) {
     commands->setVertexBuffers(0, buffers.data(), buffers.size(), slots.data());
     return;
   }
@@ -808,7 +900,7 @@ void BindNativeDrawVertexBuffers(plume::RenderCommandList* commands,
   if (!g_vertex_binding_cache_enabled) {
     commands->setVertexBuffers(0,buffers.data(),buffers.size(),slots.data());return;
   }
-  g_vertex_bindings.Bind(commands,view.recording_serial,buffers,slots,
+  Select_g_vertex_bindings(preparation).Bind(commands,view.recording_serial,buffers,slots,
       [&](u32 first,u32 count) {
         commands->setVertexBuffers(first,buffers.data()+first,count,slots.data()+first);
       });
@@ -1575,6 +1667,27 @@ void PrepareDrawWork(ParallelDrawWork& work) {
   if (!work.geometry_ready) work.geometry_valid = PrepareDrawGeometry(work);
 }
 
+// Post-create checks shared by the synchronous and async paths of GetPipeline.
+// Null when D3D12 rejected the pipeline.
+std::unique_ptr<plume::RenderPipeline> FinishPipeline(std::unique_ptr<plume::RenderPipeline> pipeline,
+    const plume::RenderGraphicsPipelineDesc& desc, const PipelineKey& key) {
+    if (!pipeline || !static_cast<plume::D3D12GraphicsPipeline*>(pipeline.get())->d3d) {
+      static std::atomic<u32> failed_pipeline_logs{0};
+      if (failed_pipeline_logs.fetch_add(1) < 16)
+        REXLOG_ERROR("Native GPU: D3D12 rejected pipeline VS=0x{:08X} PS=0x{:08X} decl=0x{:08X}",
+                     key.vertex_shader, key.pixel_shader, key.declaration);
+      return nullptr;
+  }
+  SetNativePipelineStencilReference(pipeline.get(), desc);
+  static std::atomic<u32> mrt_logs{0};
+  if (desc.renderTargetCount > 1 && mrt_logs.fetch_add(1, std::memory_order_relaxed) < 16)
+    REXLOG_INFO("Native GPU: MRT pipeline targets={} formats={},{},{},{} masks={:04X} blends={:08X},{:08X},{:08X},{:08X}",
+        desc.renderTargetCount, key.render_target_formats[0], key.render_target_formats[1],
+        key.render_target_formats[2], key.render_target_formats[3], key.color_write_mask,
+        key.blend_controls[0], key.blend_controls[1], key.blend_controls[2], key.blend_controls[3]);
+  return pipeline;
+}
+
 plume::RenderPipeline* GetPipeline(
     const PipelineKey& key, const VertexDeclarationView& declaration,
     plume::RenderPrimitiveTopology topology, plume::RenderFormat depth_format) {
@@ -1582,12 +1695,23 @@ plume::RenderPipeline* GetPipeline(
   if (const auto it = g_pipelines.find(key); it != g_pipelines.end()) {
     return it->second.get();
   }
+  // LEGO_NATIVE_PSO_ASYNC (default off): join a compile already in flight.
+  const bool async = AsyncPipelineCompileEnabled();
+  if (auto compile = async ? g_async_pipelines.Find(key) : nullptr)
+    return AwaitAsyncPipeline(lock, g_pipelines, key, std::move(compile));
   lock.unlock();
   auto creation = g_pipeline_creation.Acquire(key);
   lock.lock();
   if (const auto it = g_pipelines.find(key); it != g_pipelines.end()) {
     return it->second.get();
   }
+  if (auto compile = async ? g_async_pipelines.Find(key) : nullptr) {
+    creation.Release();
+    return AwaitAsyncPipeline(lock, g_pipelines, key, std::move(compile));
+  }
+  // The posted compile keeps the shaders resolved below alive.
+  ShaderBindingsSnapshot owners;
+  if (async) owners = CurrentShaderOwners();
   const bool float_indices = FloatBlendIndicesInput({declaration.elements, declaration.element_count}) &&
       bool(FindFloatBlendIndicesDxil(key.vertex_shader_hash, key.spec_constants));
   const bool precise_position = bool(FindPositionPrecisionDxil(key.vertex_shader_hash, key.spec_constants));
@@ -1728,27 +1852,24 @@ plume::RenderPipeline* GetPipeline(
   // Variant resolution above remains serialized, but the expensive driver
   // compile need not exclude workers building an unrelated pipeline.
   auto* device = HostDevice::Device();
+  if (async) {
+    // The entry is visible before the lock drops, so the lease can go now.
+    // The job owns its arrays and shader owners; it never touches g_draw_timing.
+    creation.Release();
+    return CompilePipelineAsync(lock, g_pipelines, g_async_pipelines, key,
+        [device, key, owned = OwnedPipelineDesc(desc), owners] {
+          return FinishPipeline(device->createGraphicsPipeline(owned.desc), owned.desc, key);
+        });
+  }
   lock.unlock();
   const auto creation_start = std::chrono::steady_clock::now();
   auto pipeline = device->createGraphicsPipeline(desc);
   ++g_draw_timing.pipeline_creations;
   g_draw_timing.pipeline_creation_ms += std::chrono::duration<double, std::milli>(
       std::chrono::steady_clock::now() - creation_start).count();
-    if (!pipeline || !static_cast<plume::D3D12GraphicsPipeline*>(pipeline.get())->d3d) {
-      static std::atomic<u32> failed_pipeline_logs{0};
-      if (failed_pipeline_logs.fetch_add(1) < 16)
-        REXLOG_ERROR("Native GPU: D3D12 rejected pipeline VS=0x{:08X} PS=0x{:08X} decl=0x{:08X}",
-                     key.vertex_shader, key.pixel_shader, key.declaration);
-      return nullptr;
-  }
-  SetNativePipelineStencilReference(pipeline.get(), desc);
+  pipeline = FinishPipeline(std::move(pipeline), desc, key);
+  if (!pipeline) return nullptr;
   auto* result = pipeline.get();
-  static std::atomic<u32> mrt_logs{0};
-  if (desc.renderTargetCount > 1 && mrt_logs.fetch_add(1, std::memory_order_relaxed) < 16)
-    REXLOG_INFO("Native GPU: MRT pipeline targets={} formats={},{},{},{} masks={:04X} blends={:08X},{:08X},{:08X},{:08X}",
-        desc.renderTargetCount, key.render_target_formats[0], key.render_target_formats[1],
-        key.render_target_formats[2], key.render_target_formats[3], key.color_write_mask,
-        key.blend_controls[0], key.blend_controls[1], key.blend_controls[2], key.blend_controls[3]);
   lock.lock();
   g_pipelines.emplace(key, std::move(pipeline));
   return result;
@@ -2368,7 +2489,9 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
 #if defined(LEGODIMENSIONS_TT_LOCK_TRACE)
   legodimensions::tt_lock_trace::NativeDrawScope native_draw_trace;
 #endif
-  DrawTimer timing;
+  // Fixed for the whole draw: DrawPreparationScope is never opened or closed inside DispatchDraw.
+  DrawPreparationContext* const preparation = CurrentDrawPreparation();
+  DrawTimer timing(preparation);
   auto cpu_trace = BeginCpuDrawDiagnostic(device, primitive_type, indexed, start, count, base_vertex);
   const u32 mesh_trace = TraceMeshDraw(device, primitive_type, indexed, start, count, base_vertex);
   // Report early exits as well as successful submissions for each sample.
@@ -2387,7 +2510,7 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
       float(device->viewport.height) == 0.0f) return true;
   // Trace attempted bindings before shader/declaration/pipeline early exits.
   // A mask on a rejected draw is diagnostic evidence, not a submitted draw.
-  if (PortraitProbeEnabled()) {
+  if (PortraitProbeOn()) {
     const auto portrait_bindings = SnapshotDrawBindings();
     for (u32 i = 0; i < kNativeTextureSlots; ++i)
       TracePortraitDraw(portrait_bindings.textures[i], i,
@@ -2511,15 +2634,15 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
       }
     }
   } composition_guard{&mesh_result.submitted,composition_input.has_value(),g_probe_frame.load()};
-  if (auto* prepared = CurrentDrawPreparation(); prepared && prepared->alias_decided) {
+  if (preparation && preparation->alias_decided) {
     // Full preparation enqueued its initialization before draw validation.
   } else if (!ApplySurfaceColorAliases(DecideSurfaceColorAliases(bindings.render_targets))) return false;
   std::array<TextureResourceView, kNativeRenderTargets> colors;
   for (u32 i = 0; i < colors.size(); ++i)
     colors[i] = ResolveTextureResource(bindings.render_targets[i]);
   const auto& color = colors[0];
-  if (auto* prepared = CurrentDrawPreparation(); prepared && prepared->alias_decided) {
-    if (!ApplySurfaceDepthAlias(prepared->alias)) return false;
+  if (preparation && preparation->alias_decided) {
+    if (!ApplySurfaceDepthAlias(preparation->alias)) return false;
   } else if (!PrepareSurfaceDepthAlias(bindings.depth_stencil)) return false;
   const auto depth = ResolveTextureResource(bindings.depth_stencil);
   // Shadow maps and depth prepasses may have no color attachment. Raster
@@ -2552,11 +2675,11 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
     if (!index_metadata.mirror_address || !index_window) return false;
   }
   timing.Next();
-  auto* commands = CurrentDrawPreparation() ? CurrentDrawPreparation()->view.commands : HostDevice::BeginFrameCommands();
+  auto* commands = preparation ? preparation->view.commands : HostDevice::BeginFrameCommands();
   if (!commands) {
     return false;
   }
-  const auto draw_device = CurrentDrawPreparation() ? CurrentDrawPreparation()->view : HostDevice::CurrentDrawDeviceView();
+  const auto draw_device = preparation ? preparation->view : HostDevice::CurrentDrawDeviceView();
   if (draw_device.commands != commands || !draw_device.recording_serial ||
       !draw_device.pipeline_layout || !draw_device.texture_descriptors ||
       !draw_device.sampler_descriptors || !draw_device.null_vertex_buffer) return false;
@@ -2577,6 +2700,7 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
   }
   commands->barriers(plume::RenderBarrierStage::GRAPHICS,
                      texture_barriers.data(), barrier_count);
+  if (state_calls) state_calls->Framebuffer(framebuffer);
   commands->setFramebuffer(framebuffer);
 
   PipelineKey key;
@@ -2651,7 +2775,7 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
     key.blend_controls[i] = *reinterpret_cast<const be_u32*>(
         reinterpret_cast<const u8*>(device) + blend_offsets[i]) & 0x1FFF1FFFu;
   static std::atomic<u32> depth_state_logs{0};
-  if (depth_state_logs.fetch_add(1) < 32)
+  if (TakeLogBudget(depth_state_logs, 32))
     REXLOG_INFO("Native GPU: draw depth-control=0x{:02X} target=0x{:08X}",
                 key.depth_control, bindings.depth_stencil);
   key.topology = static_cast<u32>(topology);
@@ -2700,7 +2824,7 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
           !UploadNativeMultiRateInput(*captured_draw->multi_rate_input,draw_device.null_vertex_buffer,
               multi_rate_draw,captured_draw->multi_rate_upload,captured_draw->multi_rate_upload_capacity)) return false;
     } else {
-      if (CurrentDrawPreparation()) return false; // missing coordinator capture
+      if (preparation) return false; // missing coordinator capture
       if (!PrepareNativeMultiRateGather(device,bindings,declaration,index_metadata,
               indexed,start,count,base_vertex,quads,draw_device.null_vertex_buffer,multi_rate_draw)) return false;
     }
@@ -2749,7 +2873,7 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
             count, std::span(declaration.elements, declaration.element_count));
     }
     static std::atomic<u32> instanced_logs{0};
-    if (instanced_logs.fetch_add(1) < 16)
+    if (TakeLogBudget(instanced_logs, 16))
       REXLOG_INFO("Native GPU: instanced fetch VS={:016X} N={} first={} count={} sequential={} -> {}",
           key.vertex_shader_hash, vertices_per_instance, first, count, sequential,
           !instanced_fetch ? "unchanged" : instanced_fetch.expand ? "expanded" : "instanced");
@@ -2758,9 +2882,9 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
   if (t_recording_draw) t_recording_draw->pipeline_recorded = false;
   const auto prepare_pipeline = [&] { return GetPipeline(key, declaration, topology, depth.format); };
   auto* pipeline = RetainedDrawPreparationEnabled()
-      ? g_prepared_draw.pipeline.Resolve(key, prepare_pipeline) : prepare_pipeline();
+      ? Select_g_prepared_draw(preparation).pipeline.Resolve(key, prepare_pipeline) : prepare_pipeline();
   if (!pipeline) {
-    g_prepared_draw.pipeline.Reset();
+    Select_g_prepared_draw(preparation).pipeline.Reset();
     LongProbeEvent("draw_pipeline_unavailable", true, "VS=", key.vertex_shader_hash,
         "PS=", key.pixel_shader_hash, "decl_hash=", key.declaration_hash,
         "guest_vs=", key.vertex_shader, "guest_ps=", key.pixel_shader,
@@ -2771,6 +2895,8 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
     return false;
   }
   timing.Next();
+  // Before this draw's binds, which revalidate the plume flags the shadow checks.
+  DrawStateShadow* draw_shadow = InlineDrawStateShadow(preparation, commands, draw_device);
 
   {
     ConstantTimer constant_timing(ConstantCost::kBindings);
@@ -2850,7 +2976,8 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
   const float blend_factor[] = {guest_blend_factor[0], guest_blend_factor[1],
                                guest_blend_factor[2], guest_blend_factor[3]};
   const std::array<float, 4> recorded_blend{blend_factor[0], blend_factor[1], blend_factor[2], blend_factor[3]};
-  SetNativeBlendFactor(commands, recorded_blend);
+  if (!SameDrawBlendFactor(draw_shadow, state_calls, recorded_blend))
+    SetNativeBlendFactor(commands, recorded_blend);
 
   commands->setViewports(plume::RenderViewport(
       screen_space ? 0.0f : float(device->viewport.x)*raster_scale_x + temporal_jitter_x,
@@ -2879,6 +3006,22 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
       key.raster_control, polygonal));
   std::array<plume::RenderVertexBufferView, kNativeVertexStreams> views;
   std::array<plume::RenderInputSlot, kNativeVertexStreams> slots;
+  if (state_calls) {
+    // Mirrors the setViewports/setScissors arguments above (test_viewport_shadow.py compiles those alone).
+    const plume::RenderViewport viewport(
+        screen_space ? 0.0f : float(device->viewport.x)*raster_scale_x + temporal_jitter_x,
+        screen_space ? 0.0f : float(device->viewport.y)*raster_scale_y + temporal_jitter_y,
+        screen_space ? float(raster_target.width) : viewport_width*raster_scale_x,
+        screen_space ? float(raster_target.height) : viewport_height*raster_scale_y,
+        screen_space ? 0.0f : static_cast<float>(device->viewport.min_z),
+        screen_space ? 1.0f : static_cast<float>(device->viewport.max_z));
+    state_calls->Viewport({viewport.x, viewport.y, viewport.width, viewport.height,
+                           viewport.minDepth, viewport.maxDepth});
+    const plume::RenderRect scissor = CullDrawScissor(plume::RenderRect(
+        effective_scissor.left, effective_scissor.top, scissor_right, scissor_bottom),
+        key.raster_control, polygonal);
+    state_calls->Scissor({scissor.left, scissor.top, scissor.right, scissor.bottom});
+  }
   if (!color.texture) {
     static thread_local u32 depth_only_logs = 0;
     if (depth_only_logs++ < 16)
@@ -2903,7 +3046,7 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
   VertexLayoutPlan legacy_layout;
   const auto& layout = t_recording_draw && t_recording_draw->geometry_ready ? *t_recording_draw->layout :
       RetainedDrawPreparationEnabled() && declaration.content_hash
-      ? g_prepared_draw.vertex_layout.Resolve({declaration.content_hash, declaration.element_count,
+      ? Select_g_prepared_draw(preparation).vertex_layout.Resolve({declaration.content_hash, declaration.element_count,
           declaration.reversed_byte_elements, declaration.half_swapped_elements,
           declaration.half_swapped_wide_elements}, prepare_layout)
       : (legacy_layout = prepare_layout());
@@ -2957,7 +3100,7 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
       const char* value=std::getenv("LEGO_NATIVE_INPUT_SIGNATURE_CACHE");
       return !value || !*value || value[0]!='0';
     }();
-    const auto required_inputs=g_vertex_input_usage.Get(
+    const auto required_inputs=Select_g_vertex_input_usage(preparation).Get(
         {key.vertex_shader_hash,input_usage_cache_enabled?declaration.content_hash:0,
          key.spec_constants,declaration.element_count},
         [&]() -> std::optional<u64> {
@@ -3405,7 +3548,7 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
     const u32 element_size = source.guest_format == 1 ? 2 : 4;
     if (indexed && (!source.buffer || !DrawIndexWindow(source_start, count, element_size, source.length)))
       return false;
-    auto expanded = indexed ? nullptr : g_quad_indices.Find(source_start,count);
+    auto expanded = indexed ? nullptr : Select_g_quad_indices(preparation).Find(source_start,count);
     if (!expanded) {
       expanded = std::shared_ptr<plume::RenderBuffer>(HostDevice::Device()->createBuffer(
           plume::RenderBufferDesc::IndexBuffer(u64(expanded_count) * sizeof(u32),
@@ -3429,13 +3572,14 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
       }
       if (indexed) source.buffer->unmap();
       expanded->unmap();
-      if (!indexed) g_quad_indices.Remember(source_start,count,
+      if (!indexed) Select_g_quad_indices(preparation).Remember(source_start,count,
           u64(expanded_count)*sizeof(u32),expanded,
           [](auto old) {HostDevice::RetireResource(std::move(old));});
     }
     const plume::RenderIndexBufferView index_view(expanded->at(0),
         u64(expanded_count) * sizeof(u32), plume::RenderFormat::R32_UINT);
-    commands->setIndexBuffer(&index_view);
+    if (!SameDrawIndexBuffer(draw_shadow, state_calls, index_view))
+      commands->setIndexBuffer(&index_view);
     if (!bind_temporal_previous(source)) return false;
     {
       QueryDrawScope query_scope(commands, query_sample_scale);
@@ -3461,7 +3605,8 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
                                 : plume::RenderFormat::R32_UINT;
     const plume::RenderIndexBufferView index_view(index.buffer->at(0),
                                                   index.length, index_format);
-    commands->setIndexBuffer(&index_view);
+    if (!SameDrawIndexBuffer(draw_shadow, state_calls, index_view))
+      commands->setIndexBuffer(&index_view);
     if (!bind_temporal_previous(index)) return false;
     {
     QueryDrawScope query_scope(commands, query_sample_scale);
@@ -3522,7 +3667,7 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
           std::to_string(key.pixel_shader), true);
   }
   static std::atomic<u32> issued_draw_logs{0};
-  if (issued_draw_logs.fetch_add(1) < 8)
+  if (TakeLogBudget(issued_draw_logs, 8))
     REXLOG_INFO("Native GPU: issued draw primitive={} count={} indexed={} decl=0x{:08X}",
                  primitive_type, count, indexed, bindings.vertex_declaration);
   mesh_result.submitted = true;
@@ -3549,8 +3694,8 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
       if ((mask >> (i * 4)) & 15u) MarkSurfaceWritten(targets[i]);
     if (writes_depth) MarkSurfaceWritten(depth_target);
   };
-  if (auto* prepared = CurrentDrawPreparation()) {
-    if (!prepared->writes_marked) RecordNativeCommand(commands, [mark_writes](auto*) { mark_writes(); });
+  if (preparation) {
+    if (!preparation->writes_marked) RecordNativeCommand(commands, [mark_writes](auto*) { mark_writes(); });
   } else mark_writes();
   return true;
 }
@@ -3745,10 +3890,18 @@ std::shared_ptr<D3DDevice> SnapshotDevice(const D3DDevice* device) {
   }
   auto copy = AcquireDeviceSnapshot();
   // Streaming stores: the copy is read on another core, so filling this core's cache first is wasted.
+#if defined(__AVX2__)
   static_assert(kSnapshotBytes % 32 == 0);
   auto* to = reinterpret_cast<__m256i*>(copy.get());
   const auto* from = reinterpret_cast<const __m256i*>(device);
   for (size_t i = 0; i < kSnapshotBytes / 32; ++i) _mm256_stream_si256(to + i, _mm256_loadu_si256(from + i));
+#else
+  // Builds without AVX2 (x86-64-v2): the same copy in SSE2 16-byte lanes.
+  static_assert(kSnapshotBytes % 16 == 0);
+  auto* to = reinterpret_cast<__m128i*>(copy.get());
+  const auto* from = reinterpret_cast<const __m128i*>(device);
+  for (size_t i = 0; i < kSnapshotBytes / 16; ++i) _mm_stream_si128(to + i, _mm_loadu_si128(from + i));
+#endif
   _mm_sfence();
   return copy;
 }
@@ -3797,6 +3950,7 @@ DrawSnapshot SnapshotDrawDevice(const D3DDevice* device) {
   static thread_local std::shared_ptr<D3DDevice> kept_full;
   static thread_local u64 kept_sequence = 0;
   static_assert(kVertexConstantsBegin % 64 == 0 && kVertexConstantsEnd % 64 == 0 && kSnapshotBytes % 64 == 0);
+#if defined(__AVX2__)
   const auto* from = reinterpret_cast<const __m256i*>(device);
   auto* previous = reinterpret_cast<__m256i*>(kept.data());
   // Loads only, back to front, so the bindings and shaders at the end are compared first.
@@ -3809,10 +3963,28 @@ DrawSnapshot SnapshotDrawDevice(const D3DDevice* device) {
     }
     return true;
   };
+#else
+  // Builds without AVX2 (x86-64-v2): the same loops in SSE2. Indices stay in 32-byte units, two
+  // 16-byte lanes each, so the code below is shared.
+  const auto* from = reinterpret_cast<const __m128i*>(device);
+  auto* previous = reinterpret_cast<__m128i*>(kept.data());
+  const auto equal = [&](size_t begin, size_t end) {
+    for (size_t i = end * 2; i > begin * 2; i -= 4) {
+      const __m128i differs = _mm_or_si128(
+          _mm_or_si128(_mm_xor_si128(_mm_loadu_si128(from + i - 4), _mm_loadu_si128(previous + i - 4)),
+                       _mm_xor_si128(_mm_loadu_si128(from + i - 3), _mm_loadu_si128(previous + i - 3))),
+          _mm_or_si128(_mm_xor_si128(_mm_loadu_si128(from + i - 2), _mm_loadu_si128(previous + i - 2)),
+                       _mm_xor_si128(_mm_loadu_si128(from + i - 1), _mm_loadu_si128(previous + i - 1))));
+      if (_mm_movemask_epi8(_mm_cmpeq_epi8(differs, _mm_setzero_si128())) != 0xFFFF) return false;
+    }
+    return true;
+  };
+#endif
   const bool same = kept_sequence && equal(kVertexConstantsEnd / 32, kSnapshotBytes / 32) &&
       equal(0, kVertexConstantsBegin / 32);
   DrawSnapshot result{AcquireDeviceSnapshot(), sequences.fetch_add(1, std::memory_order_relaxed) + 1};
   // Streaming stores: the copy is read on another core.
+#if defined(__AVX2__)
   auto* to = reinterpret_cast<__m256i*>(result.device.get());
   const auto copy = [&](size_t begin, size_t end, bool keep) {
     for (size_t i = begin; i < end; ++i) {
@@ -3821,6 +3993,16 @@ DrawSnapshot SnapshotDrawDevice(const D3DDevice* device) {
       _mm256_stream_si256(to + i, value);
     }
   };
+#else
+  auto* to = reinterpret_cast<__m128i*>(result.device.get());
+  const auto copy = [&](size_t begin, size_t end, bool keep) {
+    for (size_t i = begin * 2; i < end * 2; ++i) {
+      const __m128i value = _mm_loadu_si128(from + i);
+      if (keep) _mm_storeu_si128(previous + i, value);
+      _mm_stream_si128(to + i, value);
+    }
+  };
+#endif
   copy(kVertexConstantsBegin / 32, kVertexConstantsEnd / 32, false);
   if (same && kept_full && DeltaSnapshotsEnabled()) {
     BlockOf(result.device.get()).base = kept_full;
@@ -4607,7 +4789,7 @@ u32 DrawMergeRun() {
 // Per-draw traces and probes expect to see every draw.
 bool DrawMergeBlocked() {
   static const bool traces = std::getenv("LEGO_NATIVE_MESH_TRACE") || std::getenv("LEGO_GPU_SNAPSHOT_DIR");
-  return traces || g_logo_capture_api || PortraitProbeEnabled();
+  return traces || g_logo_capture_api || PortraitProbeOn();
 }
 
 void MarkDrawWrites(const u8* bytes, const DrawBindings& bindings) {
@@ -5191,6 +5373,7 @@ u32 ResolveHook(D3DDevice* device, u32 flags, u32 source_rect,
 
 u32 SwapHook(D3DDevice* /*device*/, u32 front_buffer, u32 /*parameters*/) {
   HostDevice::PollCompletionCallbacks();
+  HostDevice::PaceFrameBeforeLock();
   auto recording = HostDevice::LockRecording();
   PollDrawBenchmarkMode();
   PollFullDrawBatchLimit();
@@ -5528,6 +5711,7 @@ DrawTiming ConsumeDrawTiming() {
 }
 
 void ResetDrawResources() {
+  DrainAsyncPipelineJobs();  // posted compiles publish under g_pipeline_mutex
   std::lock_guard lock(g_pipeline_mutex);
   g_prepared_draw.Reset();
   pass_profile::Reset();
@@ -5540,6 +5724,7 @@ void ResetDrawResources() {
   g_temporal_scene_depth_surface = 0;
   g_temporal_scene_depth_dirty = false;
   g_pipelines.clear();
+  g_async_pipelines.Clear();
   g_pipeline_creation.ClearAfterDrain();
   g_quad_indices.Clear();
   g_temporal_pipelines.clear();

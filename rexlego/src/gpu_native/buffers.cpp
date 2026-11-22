@@ -14,6 +14,7 @@
 #include "gpu_native/memory_watch.h"
 #include "gpu_native/vertex_upload.h"
 #include "gpu_native/upload_buffer_pool.h"
+#include "gpu_native/upload_legacy_paths.h"
 
 #include <cstring>
 #include <cstdlib>
@@ -150,25 +151,11 @@ void TraceBufferAllocation(const BufferResource& resource, const VertexByteOrder
 
 void ByteSwapElements(void* destination, const void* source, size_t size,
                       u32 element_size) {
-  auto* dst = static_cast<u8*>(destination);
-  const auto* src = static_cast<const u8*>(source);
-  size_t offset = 0;
-  if (element_size == 2) {
-    for (; offset + 2 <= size; offset += 2) {
-      dst[offset + 0] = src[offset + 1];
-      dst[offset + 1] = src[offset + 0];
-    }
-  } else {
-    for (; offset + 4 <= size; offset += 4) {
-      dst[offset + 0] = src[offset + 3];
-      dst[offset + 1] = src[offset + 2];
-      dst[offset + 2] = src[offset + 1];
-      dst[offset + 3] = src[offset + 0];
-    }
-  }
-  if (offset != size) {
-    std::memcpy(dst + offset, src + offset, size - offset);
-  }
+  // SSSE3/AVX2 shuffles in vertex_upload.h, byte-identical to the old scalar
+  // loop: 16-bit swaps for element_size 2, 32-bit swaps otherwise, and a
+  // trailing partial element copied unchanged. The buffers never overlap.
+  SwapUploadElementBytes(static_cast<u8*>(destination), static_cast<const u8*>(source), size,
+                         element_size);
 }
 
 }  // namespace
@@ -493,14 +480,18 @@ plume::RenderBuffer* ResolveBufferContents(const std::shared_ptr<BufferResource>
     // UPLOAD heaps can be write-combined. Read/modify/write there (the packed
     // vertex swizzle below) is extremely slow. Transform in cacheable CPU RAM,
     // then perform a sequential write-only copy into the new GPU version.
-    std::vector<u8> converted;
+    // Not zero-filled: ByteSwapElements writes every byte (whole elements plus
+    // the copied tail) before ApplyVertexByteOrder permutes within the range.
+    std::unique_ptr<u8[]> converted;
     void* conversion_target = mapped;
     const bool fused_upload = kind == BufferKind::kVertex &&
         WriteAlignedVertexUpload(static_cast<u8*>(mapped), conversion_source, resource->length, conversion_order);
     if (!fused_upload) {
       if (kind == BufferKind::kVertex && !byte_order.reversed_elements.empty()) {
-        converted.resize(resource->length);
-        conversion_target = converted.data();
+        // LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD=1 (in-game A/B): zero-filled, as the old vector was.
+        converted.reset(LegacyUploadPathsEnabled() ? new u8[resource->length]()
+                                                   : new u8[resource->length]);
+        conversion_target = converted.get();
       }
       ByteSwapElements(conversion_target, conversion_source, resource->length, element_size);
     }
@@ -512,7 +503,7 @@ plume::RenderBuffer* ResolveBufferContents(const std::shared_ptr<BufferResource>
                   byte_order.stride);
       return nullptr;
     }
-    if (!converted.empty()) std::memcpy(mapped, converted.data(), converted.size());
+    if (converted && resource->length) std::memcpy(mapped, converted.get(), resource->length);
     next_buffer->unmap();
     // UPLOAD memory can be write-combined. Flush stores before another CPU
     // preparation job may consume this immutable allocation through the cache.

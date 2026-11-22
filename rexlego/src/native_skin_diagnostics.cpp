@@ -6,10 +6,10 @@
 #include <rex/system/kernel_state.h>
 #include "native_heap_journal.h"
 #include "slot_growth.h"
+#include <algorithm>
 #include <array>
 #include <atomic>
-#include <iomanip>
-#include <sstream>
+#include <string>
 
 REXCVAR_DEFINE_BOOL(native_scene_diagnostics, true, "Development",
     "Log NuCpuSkin scene teardown ownership in this diagnostic development build.")
@@ -38,9 +38,14 @@ bool ReadWords(uint32_t address, uint32_t* words, uint32_t count) {
   return true;
 }
 std::string HexWords(const uint32_t* words, uint32_t count) {
-  std::ostringstream text; text << std::hex << std::setfill('0');
-  for (uint32_t i=0;i<count;++i) { if(i)text << ',';text << std::setw(8) << words[i]; }
-  return text.str();
+  // The text an ostringstream gave with hex, setfill('0') and setw(8): eight
+  // lowercase digits per word, comma separated, without a stream per call.
+  static constexpr char kDigits[] = "0123456789abcdef";
+  std::string text(size_t(count)*9, ',');
+  for (uint32_t i=0;i<count;++i)
+    for (uint32_t d=0;d<8;++d) text[size_t(i)*9+d]=kDigits[(words[i]>>(28-4*d))&15];
+  if (count) text.pop_back();
+  return text;
 }
 void LogSkin(uint32_t self, uint32_t caller) {
   std::array<uint32_t,84> cache{};

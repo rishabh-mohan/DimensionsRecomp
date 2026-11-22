@@ -21,6 +21,14 @@ class PipelineCreationGate {
     Lease(Lease&&) = default;
     Lease& operator=(Lease&&) = delete;
 
+    // Unlocks early, once the key's work is visible to other workers (the
+    // async PSO path). Safe to call once; the destructor then does nothing.
+    void Release() {
+      if (lock_.owns_lock()) lock_.unlock();
+      lock_ = std::unique_lock<std::mutex>();
+      mutex_.reset();
+    }
+
    private:
     // The lock must be destroyed before its mutex owner.
     std::shared_ptr<std::mutex> mutex_;

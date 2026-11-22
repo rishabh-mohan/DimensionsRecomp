@@ -48,4 +48,32 @@ class NativeFpsCounter {
   uint32_t value_ = 0;
   bool started_ = false;
 };
+
+// Joins rects that share a whole edge: first along rows (same top and bottom, left meets the
+// previous right), then down columns (same left and right, top meets an earlier bottom). Each
+// join replaces two rects by their union, which is a rect, so the covered pixels don't change.
+// Returns the new count. The FPS meter uses it to clear touching digit cells together.
+template <typename Rect>
+uint32_t MergeTouchingRects(Rect* rects, uint32_t count) {
+  uint32_t rows = 0;
+  for (uint32_t i = 0; i < count; ++i) {
+    if (rows && rects[rows - 1].top == rects[i].top && rects[rows - 1].bottom == rects[i].bottom &&
+        rects[rows - 1].right == rects[i].left)
+      rects[rows - 1].right = rects[i].right;
+    else
+      rects[rows++] = rects[i];
+  }
+  uint32_t merged = 0;
+  for (uint32_t i = 0; i < rows; ++i) {
+    uint32_t j = 0;
+    while (j < merged && !(rects[j].left == rects[i].left && rects[j].right == rects[i].right &&
+                           rects[j].bottom == rects[i].top))
+      ++j;
+    if (j < merged)
+      rects[j].bottom = rects[i].bottom;
+    else
+      rects[merged++] = rects[i];
+  }
+  return merged;
+}
 }  // namespace legodimensions::gpu_native

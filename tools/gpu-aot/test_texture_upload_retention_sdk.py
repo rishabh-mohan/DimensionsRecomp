@@ -1,8 +1,9 @@
 """Retained upload bytes through actual native decode loops and SDK layouts/mappings; CPU only."""
 from pathlib import Path
 import argparse,hashlib,json,os,shutil,subprocess
-p=argparse.ArgumentParser(__doc__);p.add_argument('output',type=Path);p.add_argument('--runtime-dir',required=True,type=Path);p.add_argument('--previous-textures',required=True,type=Path);a=p.parse_args()
-root=Path(__file__).resolve().parents[2];src=root/'rexlego/src';sdk=root.parent/'dev-assets/sdk-install';out=a.output.resolve();out.mkdir(parents=True,exist_ok=True)
+p=argparse.ArgumentParser(__doc__);p.add_argument('output',type=Path);p.add_argument('--runtime-dir',required=True,type=Path);p.add_argument('--previous-textures',required=True,type=Path)
+p.add_argument('--sdk',type=Path,help='SDK install with include/ and lib/rexruntime.lib (default: dev-assets/sdk-install beside DimensionsRecomp)');a=p.parse_args()
+root=Path(__file__).resolve().parents[2];src=root/'rexlego/src';sdk=(a.sdk or root.parent/'dev-assets/sdk-install').resolve();out=a.output.resolve();out.mkdir(parents=True,exist_ok=True)
 text=(src/'gpu_native/textures.cpp').read_text();format_text=(src/'gpu_native/format.cpp').read_text();fixture=Path(__file__).with_suffix('.cpp')
 def block(text,signature):
     start=text.index(signature);end=text.index('{',start)+1;depth=1
@@ -10,11 +11,13 @@ def block(text,signature):
     return text[start:end]
 helpers='\n'.join([block(text,s) for s in ['bool ReadableUploadSpan(','bool CopyTextureUploadSpan(','u32 AlignUp(','u32 MipDimension(',
  'u32 RowPitch(','u32 RowCount(','u32 LevelSize(']]+[block(format_text,s) for s in ['bool IsBlockCompressedFormat(','u32 FormatBlockBytes(']])
-def decode(text):
-    upload=block(text,'bool UploadTextureResourceStorage(');start=upload.index('    u32 destination_offset = 0;',upload.index('std::vector<u8> decoded(upload_size)'))
+def decode(text):  # the decode loop after the CPU decode buffer (an uninitialised per-thread scratch since agent5 item 2)
+    upload=block(text,'bool UploadTextureResourceStorage(');anchor=[s for s in ['TextureDecodeScratch decoded(upload_size)','std::vector<u8> decoded(upload_size)'] if s in upload][0]
+    start=upload.index('    u32 destination_offset = 0;',upload.index(anchor))
     return upload[start:upload.index('    DumpTextureUpload',start)]
 header=(src/'gpu_native/texture_upload_source.h').read_text();records=[]
-for name in ['rexruntime.dll','amd_fidelityfx_dx12.dll']:shutil.copy2(a.runtime_dir/name,out/name)
+for name in ['rexruntime.dll','amd_fidelityfx_dx12.dll']:  # runtimes built without FidelityFX ship no FFX DLL
+    if name=='rexruntime.dll' or (a.runtime_dir/name).exists():shutil.copy2(a.runtime_dir/name,out/name)
 def run(label,loop,source_header=header,copy_helpers=helpers):
     (out/'source-under-test.h').write_text(source_header);(out/'retained-helpers.inc').write_text(copy_helpers);(out/'retained-decode.inc').write_text(loop)
     exe=out/(label+'.exe');r=subprocess.run(['clang-cl',str(fixture),'/std:c++latest','/O2','/MD','/EHsc','/D_CRT_SECURE_NO_WARNINGS',

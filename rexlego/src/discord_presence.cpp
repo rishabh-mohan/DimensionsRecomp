@@ -18,9 +18,11 @@
 
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
 #include <cstdint>
 #include <cstring>
 #include <ctime>
+#include <mutex>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -283,6 +285,9 @@ class IpcConnection {
 
 std::atomic<bool> g_running{false};
 std::thread g_thread;
+// Stop() notifies this, so the thread never sits out the rest of a 2 s wait.
+std::mutex g_wake_mutex;
+std::condition_variable g_wake;
 
 // Handshake, then the activity. Returns true once Discord has acknowledged the
 // activity. On any failure the connection is dropped so the caller retries from
@@ -384,11 +389,11 @@ void ThreadMain() {
       }
     }
 
-    // Reconnect attempts and keepalive pumping both sit at 2 s, sliced so
-    // Stop() does not wait out a long sleep.
-    for (int i = 0; i < 20 && g_running.load(std::memory_order_relaxed); ++i) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
+    // Reconnect attempts and keepalive pumping both sit at 2 s. One timed wait
+    // rather than 100 ms slices: Stop() wakes it, so nothing needs to poll.
+    std::unique_lock<std::mutex> lock(g_wake_mutex);
+    g_wake.wait_for(lock, std::chrono::seconds(2),
+                    [] { return !g_running.load(std::memory_order_relaxed); });
   }
 }
 
@@ -407,9 +412,15 @@ void Start() {
 }
 
 void Stop() {
-  if (!g_running.exchange(false, std::memory_order_relaxed)) {
-    return;
+  {
+    // Cleared under the wake mutex, so the thread cannot test the flag and
+    // then start waiting after the notify has gone.
+    std::lock_guard<std::mutex> lock(g_wake_mutex);
+    if (!g_running.exchange(false, std::memory_order_relaxed)) {
+      return;
+    }
   }
+  g_wake.notify_all();
   if (g_thread.joinable()) {
     g_thread.join();
   }

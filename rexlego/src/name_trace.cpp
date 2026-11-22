@@ -30,8 +30,12 @@ REXCVAR_DEFINE_STRING(trace_file_names, "", "Runtime",
 
 REX_HOOK_RAW(sub_82A3D980) {
   const std::string& filter = REXCVAR_GET(trace_file_names);
+  if (filter.empty()) {  // off (the default): no name to build or match
+    __imp__sub_82A3D980(ctx, base);
+    return;
+  }
   std::string name;
-  if (!filter.empty()) {
+  {
     uint32_t record = ctx.r3.u32;
     uint32_t ptr;
     uint16_t len;

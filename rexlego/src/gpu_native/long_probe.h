@@ -14,6 +14,8 @@
 #include <string_view>
 #include <unordered_set>
 
+#include "draw_cached_flag.h"
+
 namespace legodimensions::gpu_native {
 inline const std::filesystem::path& LongProbeDirectory() {
   static const std::filesystem::path path = [] {
@@ -24,7 +26,9 @@ inline const std::filesystem::path& LongProbeDirectory() {
   }();
   return path;
 }
-inline bool LongProbeEnabled() { return !LongProbeDirectory().empty(); }
+inline bool LongProbeDirectorySet() { return !LongProbeDirectory().empty(); }
+// Checked on per-draw paths: with tracing off this is one byte load and one predictable branch.
+inline bool LongProbeEnabled() { return CachedProcessFlag<LongProbeDirectorySet>(); }
 inline std::atomic<uint32_t> g_probe_frame{0};
 inline std::atomic<bool> g_probe_capture_requested{false};
 inline double LongProbeMilliseconds() {

@@ -34,6 +34,10 @@ struct ShaderBindingsSnapshot {
 };
 ShaderBindingsSnapshot CaptureShaderBindings();
 ShaderBindingsSnapshot CaptureShaderBindings(u32 vertex, u32 pixel);
+// Side-effect free: the snapshot in scope, else the current bindings, as
+// ResolveBoundShader sees them. Holding it keeps those shaders, and so their
+// resolved variants (never erased), alive.
+ShaderBindingsSnapshot CurrentShaderOwners();
 class ShaderBindingsScope {
   const ShaderBindingsSnapshot* previous_;
  public:

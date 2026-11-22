@@ -37,6 +37,7 @@ def main():
     buffer_patch = root / "tools/gpu-aot/patches/plume-buffer-address.patch"
     adapter_patch = root / "tools/gpu-aot/patches/plume-adapter-query.patch"
     graphics_read_patch = root / "tools/gpu-aot/patches/plume-graphics-read.patch"
+    winsdk_patch = root / "tools/gpu-aot/patches/plume-winsdk-compat.patch"
     git_executable = shutil.which("git")
     if git_executable is None:
         parser.error("Git is required for the offline public-source fixture")
@@ -93,7 +94,7 @@ def main():
         git(expected, "apply", str(cache_patch))
         git(expected, "apply", "--check", str(readback_patch))
         git(expected, "apply", str(readback_patch))
-        for extra_patch in (buffer_patch, adapter_patch, graphics_read_patch):
+        for extra_patch in (buffer_patch, adapter_patch, graphics_read_patch, winsdk_patch):
             git(expected, "apply", "--check", str(extra_patch))
             git(expected, "apply", str(extra_patch))
         expected_vulkan_sha = digest(expected / "plume_vulkan.cpp")
@@ -285,6 +286,27 @@ runpy.run_path(preparer, run_name='__main__')
             raise AssertionError("Graphics-read upgrade differs from independent real patch")
         checks.append("graphics-read missing/false-success checks and exact upgrade")
 
+        winsdk_noop = clone("successful-no-op-winsdk-compat-git")
+        for earlier in (patch, cache_patch, readback_patch, buffer_patch, adapter_patch, graphics_read_patch):
+            git(winsdk_noop, "apply", str(earlier))
+        winsdk_before = digest(winsdk_noop / "plume_d3d12.cpp")
+        prepare(winsdk_noop, "--check", expect=2,
+                oracle="Native Plume Windows SDK compatibility fixes are missing or incomplete")
+        if digest(winsdk_noop / "plume_d3d12.cpp") != winsdk_before:
+            raise AssertionError("Missing Windows SDK compatibility --check modified source")
+        winsdk_wrapper = wrapper.replace("and 'apply' in argv:",
+            "and 'apply' in argv and any('plume-winsdk-compat.patch' in str(v) for v in argv):")
+        for mode in ("already", "apply"):
+            command([sys.executable, "-c", winsdk_wrapper, mode, str(preparer), str(winsdk_noop)], unrelated,
+                    expect=2, oracle="Native Plume source verification failed: missing patched hunk")
+            if digest(winsdk_noop / "plume_d3d12.cpp") != winsdk_before:
+                raise AssertionError("Windows SDK compatibility no-op fixture modified source")
+        prepare(winsdk_noop, oracle="Applied native fence/resize/command-allocation fixes")
+        prepare(winsdk_noop, "--check", oracle="PASS: public Plume")
+        if digest(winsdk_noop / "plume_d3d12.cpp") != expected_sha:
+            raise AssertionError("Windows SDK compatibility upgrade differs from independent real patch")
+        checks.append("winsdk-compat missing/false-success checks and exact upgrade")
+
 
     after = {
         "head": git(source, "rev-parse", "HEAD").stdout,
@@ -303,6 +325,7 @@ runpy.run_path(preparer, run_name='__main__')
               "buffer_address_patch_sha256": digest(buffer_patch),
               "adapter_query_patch_sha256": digest(adapter_patch),
               "graphics_read_patch_sha256": digest(graphics_read_patch),
+              "winsdk_compat_patch_sha256": digest(winsdk_patch),
               "patched_vulkan_sha256": expected_vulkan_sha,
               "public_source_sha256": hashlib.sha256(public_blob).hexdigest(),
               "patched_source_sha256": expected_sha,

@@ -10,11 +10,18 @@ extern "C" void __imp__sub_82A2A138(PPCContext& __restrict ctx, u8* base);
 extern "C" void __imp__sub_82A2A0E8(PPCContext& __restrict ctx, u8* base);
 
 namespace {
+// Latched on first use rather than at static init, because ConfigureNative-
+// DirectStartup applies native-environment.ini with _putenv_s after static
+// init. A plain atomic instead of a magic static keeps the thread-safe-static
+// guard check off these very hot hooks; racing first calls read the same value.
+std::atomic<int8_t> g_enabled{-1};
+
 bool Enabled() {
-  static const bool enabled = [] {
-    const char* value = std::getenv("LEGO_NATIVE_ATOMICS");
-    return !value || std::strcmp(value, "0") != 0;
-  }();
+  const int8_t latched = g_enabled.load(std::memory_order_relaxed);
+  if (latched >= 0) [[likely]] return latched != 0;
+  const char* value = std::getenv("LEGO_NATIVE_ATOMICS");
+  const bool enabled = !value || std::strcmp(value, "0") != 0;
+  g_enabled.store(enabled ? 1 : 0, std::memory_order_relaxed);
   return enabled;
 }
 

@@ -34,6 +34,10 @@ constexpr int kScanNew = 0;
 constexpr int kScanExact = 1;
 constexpr int kScanCompare = 2;
 
+// Leading results cached when a filtering scan finishes. The menu lists 200;
+// TakeResults walks the bitmap only for a longer list than this.
+constexpr size_t kCachedResults = 1024;
+
 double LoadValue(const uint8_t* p, CheatEngine::ValueType type) {
   switch (type) {
     case CheatEngine::ValueType::kUInt8:
@@ -128,7 +132,12 @@ CheatEngine::CheatEngine(rex::memory::Memory* memory, std::filesystem::path save
 CheatEngine::~CheatEngine() {
   // Stop the freeze thread first: it runs continuously and touches memory_,
   // snapshot_ and the mutex, all of which must not be live when Join() runs.
-  freeze_running_ = false;
+  // The flag changes under the mutex so the thread cannot miss the notify.
+  {
+    std::lock_guard<std::mutex> lock(apply_mutex_);
+    freeze_running_ = false;
+  }
+  freeze_cv_.notify_all();
   if (freeze_thread_.joinable()) {
     freeze_thread_.join();
   }
@@ -289,6 +298,7 @@ void CheatEngine::RunScan(int kind, double value, CompareOp op) {
     ResetMask();
     unfiltered_ = true;
     result_count_ = 0;
+    cached_results_.clear();
     TakeSnapshot();
     scanning_ = false;
     return;
@@ -355,6 +365,9 @@ void CheatEngine::RunScan(int kind, double value, CompareOp op) {
   }
 
   result_count_ = kept;
+  // Published with the results by the scanning_ store below.
+  cached_results_.clear();
+  CollectResults(kCachedResults, cached_results_);
   TakeSnapshot();
   scanning_ = false;
 }
@@ -364,6 +377,19 @@ std::vector<uint32_t> CheatEngine::TakeResults(size_t limit) const {
   if (scanning_ || unfiltered_ || mask_.empty()) {
     return out;
   }
+  // The cache holds the first min(kCachedResults, result_count_) addresses, so
+  // it answers any request no longer than itself, and every request once it
+  // holds them all.
+  if (limit <= cached_results_.size() || cached_results_.size() == result_count_.load()) {
+    out.assign(cached_results_.begin(),
+               cached_results_.begin() + std::min(limit, cached_results_.size()));
+    return out;
+  }
+  CollectResults(limit, out);
+  return out;
+}
+
+void CheatEngine::CollectResults(size_t limit, std::vector<uint32_t>& out) const {
   const uint32_t value_size = uint32_t(ValueTypeSize(scan_type_));
   out.reserve(std::min<size_t>(limit, size_t(result_count_.load())));
   for (size_t word_index = 0; word_index < mask_.size() && out.size() < limit; ++word_index) {
@@ -374,7 +400,6 @@ std::vector<uint32_t> CheatEngine::TakeResults(size_t limit) const {
       out.push_back(uint32_t(((uint64_t(word_index) << 6) + uint64_t(bit)) * value_size));
     }
   }
-  return out;
 }
 
 // ---------------------------------------------------------------------------
@@ -408,6 +433,7 @@ void CheatEngine::SetFrozen(uint32_t phys_addr, ValueType type, double value, bo
     } else {
       frozen_.push_back({phys_addr, type, value});
     }
+    freeze_cv_.notify_one();
   } else if (it != frozen_.end()) {
     frozen_.erase(it);
   }
@@ -442,6 +468,7 @@ void CheatEngine::AddCheat(const std::string& name, uint32_t phys_addr, ValueTyp
   cheat.enabled = true;
   cheat.writes.push_back({phys_addr, type, value});
   cheats_.push_back(std::move(cheat));
+  freeze_cv_.notify_one();
 }
 
 void CheatEngine::RemoveCheat(size_t index) {
@@ -455,31 +482,43 @@ void CheatEngine::SetCheatEnabled(size_t index, bool enabled) {
   std::lock_guard<std::mutex> lock(apply_mutex_);
   if (index < cheats_.size()) {
     cheats_[index].enabled = enabled;
+    if (enabled) {
+      freeze_cv_.notify_one();
+    }
   }
 }
 
 void CheatEngine::FreezeMain() {
+  // Same 50 ms cadence as a sleep loop while there is anything to apply. With
+  // nothing to apply it waits for a notify (new work or shutdown) instead of
+  // waking 20 times a second; the mutex is released while it waits.
+  std::unique_lock<std::mutex> lock(apply_mutex_);
   while (freeze_running_) {
-    {
-      std::lock_guard<std::mutex> lock(apply_mutex_);
-      auto apply = [&](const CheatWrite& write) {
-        if (IsWritableAddress(write.phys_addr, ValueTypeSize(write.type))) {
-          StoreValue(memory_->physical_membase() + write.phys_addr, write.type, write.value);
-        }
-      };
-      for (const CheatWrite& write : frozen_) {
+    bool has_work = false;
+    auto apply = [&](const CheatWrite& write) {
+      // Unwritable addresses still count: they are retried every tick, as before.
+      has_work = true;
+      if (IsWritableAddress(write.phys_addr, ValueTypeSize(write.type))) {
+        StoreValue(memory_->physical_membase() + write.phys_addr, write.type, write.value);
+      }
+    };
+    for (const CheatWrite& write : frozen_) {
+      apply(write);
+    }
+    for (const Cheat& cheat : cheats_) {
+      if (!cheat.enabled) {
+        continue;
+      }
+      for (const CheatWrite& write : cheat.writes) {
         apply(write);
       }
-      for (const Cheat& cheat : cheats_) {
-        if (!cheat.enabled) {
-          continue;
-        }
-        for (const CheatWrite& write : cheat.writes) {
-          apply(write);
-        }
-      }
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    if (has_work) {
+      // Only shutdown ends this wait early; new work waits for the next tick.
+      freeze_cv_.wait_for(lock, std::chrono::milliseconds(50), [this] { return !freeze_running_; });
+    } else {
+      freeze_cv_.wait(lock);
+    }
   }
 }
 
@@ -545,6 +584,7 @@ void CheatEngine::Load() {
       cheats_.push_back(std::move(cheat));
     }
   }
+  freeze_cv_.notify_one();
 }
 
 }  // namespace legodimensions::cheats

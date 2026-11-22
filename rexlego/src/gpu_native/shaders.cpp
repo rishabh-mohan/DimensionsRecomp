@@ -631,6 +631,12 @@ ShaderBindingsSnapshot CaptureShaderBindings(u32 vertex, u32 pixel) {
   return result;
 }
 
+ShaderBindingsSnapshot CurrentShaderOwners() {
+  if (t_shader_bindings) return *t_shader_bindings;
+  std::lock_guard lock(g_registry_mutex);
+  return {{g_bound_shaders[0], g_bound_shaders[1]}, g_bound_shader_addresses};
+}
+
 ShaderBindingsScope::ShaderBindingsScope(const ShaderBindingsSnapshot& bindings) : previous_(t_shader_bindings) {
   t_shader_bindings = &bindings;
 }

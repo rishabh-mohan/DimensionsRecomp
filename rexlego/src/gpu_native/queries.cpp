@@ -34,6 +34,10 @@ struct Query {
 };
 std::mutex mutex;
 std::unordered_map<u32, std::shared_ptr<Query>> queries;
+// Number of entries in `queries` whose `active` is set. Changed only under `mutex`, at most once per
+// critical section. QueryDrawScope reads it before locking: draws are ordered after BEGIN/END by the
+// recording lock or, with full preparation, by the recorder barrier IssueQueryQueued submits.
+std::atomic<size_t> active_queries{0};
 std::unordered_map<u32, unsigned> pending_issues;
 // Query generations retain samples through every submission that uses them.
 // The pool's sole reference is therefore proof that both GPU work and readers
@@ -106,7 +110,9 @@ u32 IssueQuery(u32 address, u32 flags) {
     HostDevice::RetireResource(query);
     {
       std::lock_guard lock(mutex);
-      queries[address] = std::move(next);
+      auto& slot = queries[address];
+      if (!slot || !slot->active) ++active_queries;
+      slot = std::move(next);
     }
     return 0;
   }
@@ -115,6 +121,8 @@ u32 IssueQuery(u32 address, u32 flags) {
     std::lock_guard lock(mutex);
     if (!query->active) return kInvalid;
     query->active = false;
+    // Not counted any more if ResetQueryResources has dropped it from the map.
+    if (const auto it = queries.find(address); it != queries.end() && it->second == query) --active_queries;
   }
   // Each draw has already ended/resolved its query. Submit before signaling.
   const bool submitted = HostDevice::SubmitRecordedWork();
@@ -200,6 +208,7 @@ u32 ReleaseQuery(u32 address) {
     const u32 refs = Header(address)[3];
     if (refs > 1) { Header(address)[3] = refs - 1; return refs - 1; }
     released = std::move(queries[address]);
+    if (released->active) --active_queries;
     released->active = false;
     queries.erase(address);
   }
@@ -217,11 +226,12 @@ struct QueryDrawScope::Impl {
   std::vector<std::shared_ptr<Query>> consumers;
 };
 QueryDrawScope::QueryDrawScope(plume::RenderCommandList* commands, double sample_scale) {
+  // Most draws are outside every BEGIN/END: skip the lock and the walk over all created queries.
+  if (active_queries.load(std::memory_order_acquire) == 0) return;
   std::unique_ptr<Impl> scope;
   {
     std::lock_guard lock(mutex);
-    if (std::none_of(queries.begin(),queries.end(),
-        [](const auto& entry) { return entry.second->active; })) return;
+    if (active_queries.load(std::memory_order_relaxed) == 0) return;
     scope = std::make_unique<Impl>();
     for (const auto& [address, query] : queries)
       if (query->active) scope->consumers.push_back(query);
@@ -298,6 +308,7 @@ void ResetQueryResources() {
   std::lock_guard lock(mutex);
   for (const auto& [address, query] : queries) REX_KERNEL_MEMORY()->SystemHeapFree(address);
   queries.clear();
+  active_queries.store(0);
   pending_issues.clear();
   sample_pool.clear();
   query_completion.Reset();

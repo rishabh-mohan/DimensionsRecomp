@@ -1,0 +1,24 @@
+// Process-constant opt-in diagnostic flags read on per-draw paths. Standalone (bench/agent4 tests it).
+#pragma once
+#include <atomic>
+#include <cstdint>
+
+namespace legodimensions::gpu_native {
+
+// Caches `Read()`, which must return the same value for the whole process. When the flag is off a
+// check is one byte load and one predictable branch: the state is constant-initialised, so unlike a
+// function-local `static const bool` there is no thread-safe-init guard (a TLS epoch compare under
+// the MSVC ABI) and no out-of-line call. `Read` runs on the first check, as the uncached call did;
+// threads racing that first check each call it and store the same value.
+template <bool (*Read)()>
+inline bool CachedProcessFlag() {
+  static std::atomic<std::uint8_t> state{2};  // 0 = off, 1 = on, 2 = not read yet
+  const std::uint8_t value = state.load(std::memory_order_relaxed);
+  if (value == 0) [[likely]] return false;
+  if (value == 1) return true;
+  const bool enabled = Read();
+  state.store(enabled ? 1 : 0, std::memory_order_relaxed);
+  return enabled;
+}
+
+}  // namespace legodimensions::gpu_native

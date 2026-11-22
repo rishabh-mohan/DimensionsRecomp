@@ -19,6 +19,7 @@
 #include <fstream>
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -46,6 +47,8 @@
 #include "gpu_native/texture_upload_publication.h"
 #include "gpu_native/texture_volume_upload.h"
 #include "gpu_native/texture_alpha4_upload.h"
+#include "gpu_native/texture_scratch.h"
+#include "gpu_native/upload_buffer_pool.h"
 #include "gpu_native/long_probe.h"
 #include "gpu_native/memory_watch.h"
 #include "gpu_native/depth_alias.h"
@@ -172,6 +175,56 @@ struct TextureResource {
 };
 
 TextureUploadPublicationCache g_texture_upload_publications(128ull * 1024 * 1024);
+
+// LEGO_NATIVE_TEXTURE_STAGING_POOL=1 (default OFF) recycles the committed
+// UPLOAD buffers that stage texture uploads of up to 64 MB instead of creating
+// one per upload. A staging buffer reaches the pool only at its last owner's
+// release (the publication LRU above and RetireResource's fence slots), exactly
+// where the default path destroys it, so reuse is as safe as destruction. Each
+// use rewrites every byte its copy footprints read. The LRU still charges the
+// requested size; capacities round up to a power of two (at most 2x), plus at
+// most 64 MB idle. Unlocked draw-preparation uploads Acquire without the
+// recording lock, so a shared lock orders Acquire against Reset's state swap.
+// Start/ResetTextureResources reset it before the device that created its
+// buffers goes away; buffers released after a Reset are destroyed, not kept.
+constexpr u64 kTextureStagingPoolBudget = 64ull * 1024 * 1024;
+UploadBufferPool<plume::RenderBuffer> g_texture_staging_pool(kTextureStagingPoolBudget);
+std::shared_mutex g_texture_staging_pool_mutex;
+
+bool TextureStagingPoolEnabled() {
+  static const bool enabled = [] {
+    const char* value = std::getenv("LEGO_NATIVE_TEXTURE_STAGING_POOL");
+    const bool selected = value && value[0] && value[0] != '0';
+    if (selected) REXLOG_INFO("Native texture staging pool: enabled, 64 MB idle budget");
+    return selected;
+  }();
+  return enabled;
+}
+
+// Larger uploads keep a dedicated buffer: the pool would never retain them.
+bool UseTextureStagingPool(u64 bytes) {
+  return TextureStagingPoolEnabled() && bytes && bytes <= kTextureStagingPoolBudget;
+}
+
+std::shared_ptr<plume::RenderBuffer> AcquireTextureStaging(plume::RenderDevice* device, u32 bytes) {
+  std::shared_lock lock(g_texture_staging_pool_mutex);
+  auto buffer = g_texture_staging_pool.Acquire(bytes, 0, [&](u64 capacity) {
+    return device->createBuffer(plume::RenderBufferDesc::UploadBuffer(capacity));
+  });
+  static std::atomic<u64> calls{0};
+  if (++calls % 256 == 0) {
+    const auto stats = g_texture_staging_pool.Stats();
+    REXLOG_INFO("Native texture staging pool: hits={} misses={} idle_bytes={} idle_buffers={}",
+        stats.hits, stats.misses, stats.bytes, stats.count);
+  }
+  return buffer;
+}
+
+void ResetTextureStagingPool() {
+  if (!TextureStagingPoolEnabled()) return;
+  std::unique_lock lock(g_texture_staging_pool_mutex);
+  g_texture_staging_pool.Reset();
+}
 
 // Caller holds the resource mutex. Every cache consumer records its version;
 // the final recording stream decides whether that version needs a GPU copy.
@@ -2188,13 +2241,18 @@ bool UploadTextureResourceStorage(u32 guest_address,
     const u32 upload_size = static_cast<u32>(upload_size_wide);
     // Untiling, diagnostics and the decoded-content hash need CPU reads.
     // Keep those in normal RAM; UPLOAD memory must be a write-only destination.
-    std::vector<u8> decoded(upload_size);
+    // The per-thread scratch is not zero-filled: the loop zeroes each 512-byte
+    // alignment gap, and each level's row padding and tail before its copier
+    // runs, since every byte is hashed and staged.
+    TextureDecodeScratch decoded(upload_size);
     auto* mapped = decoded.data();
     u32 destination_offset = 0;
     for (u32 subresource = 0; subresource < faces * resource->levels; ++subresource) {
       const u32 face = subresource / resource->levels;
       const u32 level = subresource % resource->levels;
-      destination_offset = AlignUp(destination_offset, 512);
+      const u32 aligned_offset = AlignUp(destination_offset, 512);
+      std::memset(mapped + destination_offset, 0, aligned_offset - destination_offset);
+      destination_offset = aligned_offset;
       const u32 packed_level = std::min(level, layout.packed_level);
       const auto& guest_level = level == 0 ? layout.base : layout.mips[packed_level];
       const u64 base_wide = (level == 0 ? u64(u32(fetch.base_address) << 12)
@@ -2220,6 +2278,8 @@ bool UploadTextureResourceStorage(u32 guest_address,
       const u32 height = MipDimension(resource->height, level);
       const u32 pitch = RowPitch(resource->format, width);
       if (alpha4) {
+        ZeroTextureRowPadding({mapped + destination_offset, LevelSize(*resource, level)}, pitch,
+            width, u64(height) * (volume ? MipDimension(resource->depth, level) : 1));
         const bool copied = CopyTextureAlpha4Blocks(
             {source, TextureEndianExtent(guest_level.array_slice_data_extent_bytes,endian_xor)},
             {mapped + destination_offset, LevelSize(*resource, level)},
@@ -2240,6 +2300,9 @@ bool UploadTextureResourceStorage(u32 guest_address,
       }
       if (volume) {
         const u32 block_height = format_info->block_height;
+        ZeroTextureRowPadding({mapped + destination_offset, LevelSize(*resource, level)}, pitch,
+            u64((width + block_width - 1) / block_width) * block_bytes,
+            u64((height + block_height - 1) / block_height) * MipDimension(resource->depth, level));
         const bool copied = CopyTextureVolumeBlocks(
             {source, TextureEndianExtent(guest_level.array_slice_data_extent_bytes,endian_xor)},
             {mapped + destination_offset, LevelSize(*resource, level)},
@@ -2259,15 +2322,20 @@ bool UploadTextureResourceStorage(u32 guest_address,
         destination_offset += LevelSize(*resource, level);
         continue;
       }
+      ZeroTextureRowPadding({mapped + destination_offset, LevelSize(*resource, level)}, pitch,
+          u64((width + block_width - 1) / block_width) * block_bytes,
+          (height + format_info->block_height - 1) / format_info->block_height);
       // The checked block copier also handles one 2D/cube slice. Validate each
       // computed address, including endian XOR and packed-mip offsets, against
-      // the same guest extent whose residency was checked above.
-      const bool copied = CopyTextureVolumeBlocks(
+      // the same guest extent whose residency was checked above. The layout
+      // lets it copy whole tile runs/rows; the callback is the reference path.
+      const bool copied = CopyTexture2DBlocks(
           {source, TextureEndianExtent(guest_level.array_slice_data_extent_bytes,endian_xor)},
           {mapped + destination_offset, LevelSize(*resource, level)},
           (width + block_width - 1) / block_width,
           (height + format_info->block_height - 1) / format_info->block_height,
-          1, block_bytes, pitch, endian_xor,
+          block_bytes, pitch, endian_xor,
+          {fetch.tiled != 0, offset_x, offset_y, guest_level.row_pitch_bytes},
           [&](u32 x, u32 y, u32) -> int64_t {
             if (fetch.tiled)
               return tu::GetTiledOffset2D(x + offset_x, y + offset_y,
@@ -2297,8 +2365,10 @@ bool UploadTextureResourceStorage(u32 guest_address,
       resource->cpu_stamp = std::move(cpu_stamp);
       return true;
     }
-    auto upload = std::shared_ptr<plume::RenderBuffer>(HostDevice::Device()->createBuffer(
-        plume::RenderBufferDesc::UploadBuffer(upload_size)).release());
+    auto upload = UseTextureStagingPool(upload_size)
+        ? AcquireTextureStaging(HostDevice::Device(), upload_size)
+        : std::shared_ptr<plume::RenderBuffer>(HostDevice::Device()->createBuffer(
+              plume::RenderBufferDesc::UploadBuffer(upload_size)).release());
     if (!upload) return false;
     auto* upload_bytes = upload->map();
     if (!upload_bytes) return false;
@@ -2367,9 +2437,11 @@ bool UploadTextureResourceStorage(u32 guest_address,
   if (!device || upload_size == 0 || upload_size > UINT32_MAX) {
     return false;
   }
-  auto upload = std::shared_ptr<plume::RenderBuffer>(
-      device->createBuffer(plume::RenderBufferDesc::UploadBuffer(upload_size))
-          .release());
+  auto upload = UseTextureStagingPool(upload_size)
+      ? AcquireTextureStaging(device, static_cast<u32>(upload_size))
+      : std::shared_ptr<plume::RenderBuffer>(
+            device->createBuffer(plume::RenderBufferDesc::UploadBuffer(upload_size))
+                .release());
   if (!upload) {
     REXLOG_ERROR("Native GPU: texture upload allocation failed ({} bytes)",
                  upload_size);
@@ -3073,14 +3145,14 @@ plume::RenderFramebuffer* ResolveFramebuffer(
   // Plume requires contiguous color attachments. Reject a gap rather than
   // renumbering shader outputs or dereferencing a null texture in Plume.
   for (u32 i = 0; i < color_count; ++i) if (!colors[i]) return nullptr;
-  const auto depth = FindTexture(depth_stencil);
+  const auto depth = depth_stencil ? FindTexture(depth_stencil) : std::shared_ptr<TextureResource>{};
   if (!color_count && (!depth || !depth->texture)) {
     return nullptr;
   }
   if (depth && !IsDepthFormat(depth->format)) {
     return nullptr;
   }
-  const auto owner = depth ? depth : colors[0];
+  const auto& owner = depth ? depth : colors[0];
   FramebufferKey key{render_targets, depth_stencil};
   for (u32 i = 0; i < colors.size(); ++i) key.color_owners[i] = colors[i].get();
   key.depth_owner = depth.get();
@@ -3254,11 +3326,14 @@ std::shared_ptr<void> FindTextureOwner(u32 guest_address) {
 
 void StartTextureResources() {
   g_texture_upload_publications.Reset();
+  ResetTextureStagingPool();
   surface_pool::Start();
 }
 
 void ResetTextureResources() {
   auto recording = HostDevice::LockRecording();
+  // Stop staging reuse first: staging buffers released from here on are destroyed.
+  ResetTextureStagingPool();
   g_texture_upload_publications.Reset();
   // Disable recycling before clearing registries. Retained submitted-frame
   // references may be destroyed later in HostState teardown; they must not

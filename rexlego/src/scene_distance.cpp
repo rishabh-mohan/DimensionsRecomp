@@ -54,7 +54,8 @@ u32 LevelSettings(u32 level,u8* base){
 REX_HOOK_RAW(sub_82C6F428) {
   const u32 instance=ctx.r3.u32;
   std::unique_lock lock(distance_mutex);
-  Restore(instance_distances,instance,base);
+  // Nothing is recorded at the default scale; skip the two hash lookups.
+  if(!instance_distances.empty())Restore(instance_distances,instance,base);
   lock.unlock();
   __imp__sub_82C6F428(ctx,base);
   const double scale=legodimensions::SceneDistanceScale(REXCVAR_GET(native_scene_draw_distance_scale));

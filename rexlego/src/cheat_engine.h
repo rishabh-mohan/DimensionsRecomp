@@ -15,6 +15,7 @@
 #pragma once
 
 #include <atomic>
+#include <condition_variable>
 #include <cstdint>
 #include <filesystem>
 #include <mutex>
@@ -79,15 +80,17 @@ class CheatEngine {
   bool unfiltered() const { return unfiltered_; }
   ValueType scan_type() const { return scan_type_; }
   uint64_t result_count() const { return result_count_; }
-  // First |limit| matching addresses. Cheap enough to call per frame once the
-  // count is small; returns nothing while a scan is running.
+  // First |limit| matching addresses. The scan thread caches the leading ones
+  // as it finishes, so a per-frame call does not walk the bitmap; returns
+  // nothing while a scan is running.
   std::vector<uint32_t> TakeResults(size_t limit) const;
 
   // --- Direct access ---
   double ReadValue(uint32_t phys_addr, ValueType type) const;
   void WriteValue(uint32_t phys_addr, ValueType type, double value);
 
-  // --- Freezing (re-applied ~20x a second by a worker thread) ---
+  // --- Freezing (re-applied ~20x a second by a worker thread that sleeps
+  // while there is nothing to apply) ---
   void SetFrozen(uint32_t phys_addr, ValueType type, double value, bool on);
   bool IsFrozen(uint32_t phys_addr) const;
   void ClearFrozen();
@@ -118,6 +121,8 @@ class CheatEngine {
   void MaskSet(uint64_t slot, bool on);
 
   void RunScan(int kind, double value, CompareOp op);
+  // Appends the first |limit| set bits of mask_ as addresses, lowest first.
+  void CollectResults(size_t limit, std::vector<uint32_t>& out) const;
   void Join();
   void FreezeMain();
 
@@ -131,6 +136,8 @@ class CheatEngine {
   bool unfiltered_ = true;
   std::vector<uint8_t> snapshot_;
   std::vector<uint64_t> mask_;
+  // CollectResults(kCachedResults) as of the end of the last filtering scan.
+  std::vector<uint32_t> cached_results_;
   std::atomic<uint64_t> result_count_{0};
   std::atomic<bool> scanning_{false};
   std::thread scan_thread_;
@@ -139,6 +146,9 @@ class CheatEngine {
   mutable std::mutex apply_mutex_;
   std::vector<CheatWrite> frozen_;
   std::vector<Cheat> cheats_;
+  // Wakes the freeze thread when there may be something new to apply, and on
+  // shutdown. Waited on with apply_mutex_.
+  std::condition_variable freeze_cv_;
 
   std::atomic<bool> freeze_running_{true};
   std::thread freeze_thread_;

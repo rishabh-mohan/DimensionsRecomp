@@ -195,15 +195,21 @@ class CheatMenuDialog final : public rex::ui::ImGuiDialog {
       return;
     }
     ImGui::BeginChild("##scan_results", ImVec2(0.0f, 150.0f), true);
-    for (int i = 0; i < int(results_.size()); ++i) {
-      const uint32_t address = results_[size_t(i)];
-      const double current = engine->ReadValue(address, engine->scan_type());
-      char label[64];
-      std::snprintf(label, sizeof(label), "%08X = %.6g%s", address, current,
-                    engine->IsFrozen(address) ? "  [frozen]" : "");
-      if (ImGui::Selectable(label, selected_address_ == int64_t(address))) {
-        selected_address_ = int64_t(address);
-        std::snprintf(edit_value_text_, sizeof(edit_value_text_), "%g", current);
+    // Only the visible rows are submitted: each one reads guest memory behind
+    // a VirtualQuery and takes the freeze lock.
+    ImGuiListClipper clipper;
+    clipper.Begin(int(results_.size()));
+    while (clipper.Step()) {
+      for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i) {
+        const uint32_t address = results_[size_t(i)];
+        const double current = engine->ReadValue(address, engine->scan_type());
+        char label[64];
+        std::snprintf(label, sizeof(label), "%08X = %.6g%s", address, current,
+                      engine->IsFrozen(address) ? "  [frozen]" : "");
+        if (ImGui::Selectable(label, selected_address_ == int64_t(address))) {
+          selected_address_ = int64_t(address);
+          std::snprintf(edit_value_text_, sizeof(edit_value_text_), "%g", current);
+        }
       }
     }
     if (engine->result_count() > results_.size()) {

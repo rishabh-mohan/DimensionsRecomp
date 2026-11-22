@@ -17,6 +17,8 @@ namespace legodimensions::gpu_native {
 // LEGO_NATIVE_PSO_CACHE=0 disables it for A/B comparisons.
 void StartPipelineLibrary(plume::RenderDevice* device);
 // Prepares previously recorded graphics pipelines before the guest starts.
+// LEGO_NATIVE_PSO_PREPARE_THREADS=<n> (default 1) runs the loads and compiles
+// on n threads; results are still applied in recipe order.
 void PreparePipelineLibrary(plume::RenderPipelineLayout* layout);
 bool StartupPipelinePreparationEnabled();
 // Auxiliary passes describe themselves at startup and have their own roots.
@@ -34,5 +36,8 @@ struct PipelineLibraryStats {
   uint64_t hits = 0, misses = 0, stored = 0, saves = 0;
 };
 PipelineLibraryStats GetPipelineLibraryStats();
+// Logs the PSO stats summary now. A no-op unless LEGO_NATIVE_PSO_STATS=1 (see
+// pipeline_stats.h); creating <exe>/cache/pso-stats.now does the same.
+void LogPipelineStats();
 
 }  // namespace legodimensions::gpu_native
