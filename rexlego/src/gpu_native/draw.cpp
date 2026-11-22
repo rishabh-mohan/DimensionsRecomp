@@ -1496,6 +1496,11 @@ bool PrepareDrawGeometryLegacy(ParallelDrawWork& work, bool resolve_misses = fal
 }
 
 bool PrepareDrawGeometry(ParallelDrawWork& work, bool resolve_misses = false) {
+  // DispatchDraw drops a draw whose vertex shader failed to bind, so its geometry is never used.
+  // Planning it anyway looks up hash 0 (one shader cache miss warning per lookup).
+  bool vertex_binding_failed = false;
+  BoundShaderAddress(ShaderStage::kVertex, &vertex_binding_failed);
+  if (vertex_binding_failed) return false;
   const auto& declaration = work.declaration;
   static const bool input_usage_cache_enabled = [] {
     const char* value = std::getenv("LEGO_NATIVE_INPUT_SIGNATURE_CACHE");
