@@ -100,7 +100,10 @@ void AssertOwner(std::thread::id owner) {
 Values ReadRegistryValues() {
   Values result;
   for (const auto& spec : catalog) {
-    const auto raw = rex::cvar::GetFlagByName(spec.key);
+    auto raw = rex::cvar::GetFlagByName(spec.key);
+    // A cvar this build does not register (the FSR 1 presenter settings exist
+    // only in REX_HAS_FIDELITYFX_SDK builds) reads as its catalog default.
+    if (raw.empty() && !rex::cvar::GetFlagInfo(spec.key)) raw = spec.default_value;
     if (raw.empty()) throw std::runtime_error("Native setting is not registered: " + std::string(spec.key));
     auto normalized = Canonical(spec, raw, false);
     if (!normalized.valid) throw std::runtime_error(normalized.error);
@@ -197,7 +200,7 @@ Backend MakeNativeRegistryBackend(std::filesystem::path config_path, SettingAvai
         // change must not silently change them. Temporary explicit overrides
         // and unsupported legacy choices are not new player preferences.
         for (const auto& spec : catalog) {
-          if (!NativeSettingOverrideReason(spec.key).empty()) continue;
+          if (!NativeSettingOverrideReason(spec.key).empty() || !rex::cvar::GetFlagInfo(spec.key)) continue;
           auto normalized = Canonical(spec, current.at(std::string(spec.key)), true);
           if (normalized.valid) patch.push_back({std::string(spec.key), spec.type, std::move(normalized.value)});
         }

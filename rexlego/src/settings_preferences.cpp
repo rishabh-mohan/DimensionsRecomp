@@ -67,8 +67,10 @@ PreferencesResult LoadNativePreferences(const std::filesystem::path& path, Backe
     baseline = backend.read();  // Also enforces the backend's owning thread.
     for (const auto& [key, value] : proposal) {
       const auto source = rex::cvar::GetFlagSource(key);
+      // A cvar this build does not register cannot take a saved value; it keeps
+      // its catalog default (see ReadRegistryValues), so skip it like an override.
       if (source == rex::cvar::Source::kEnvironment || source == rex::cvar::Source::kCommandLine ||
-          !NativeSettingOverrideReason(key).empty()) {
+          !NativeSettingOverrideReason(key).empty() || !rex::cvar::GetFlagInfo(key)) {
         result.overridden.push_back(key);
         continue;
       }
