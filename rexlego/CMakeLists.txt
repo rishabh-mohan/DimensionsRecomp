@@ -153,6 +153,19 @@ if(LEGODIMENSIONS_TT_LOCK_TRACE)
     endif()
 endif()
 
+# Scene-walk call-count probe (S4 #30): a separate diagnostic build, never
+# timed; no probe hooks in a normal build. Turning it on needs
+# src/scene_walk_probe.cpp, and the configure stops if that file is missing.
+option(LEGODIMENSIONS_SCENE_WALK_PROBE "Build the scene-walk call-count probe" OFF)
+if(LEGODIMENSIONS_SCENE_WALK_PROBE)
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/scene_walk_probe.cpp")
+        message(FATAL_ERROR "LEGODIMENSIONS_SCENE_WALK_PROBE: src/scene_walk_probe.cpp is missing (S4 #30)")
+    endif()
+    list(APPEND LEGODIMENSIONS_SOURCES src/scene_walk_probe.cpp)
+    set_property(SOURCE src/native_memops.cpp src/native_skin_diagnostics.cpp
+        APPEND PROPERTY COMPILE_DEFINITIONS LEGODIMENSIONS_SCENE_WALK_PROBE=1)
+endif()
+
 # Research probes: a guard-page watchpoint on the area flags and the failed
 # attempt at forcing the 3D portrait. They are off in a release because one of
 # them single-steps every read of a watched page, which is slow enough to look
@@ -163,6 +176,15 @@ if(LEGODIMENSIONS_DEV_PROBES)
     list(APPEND LEGODIMENSIONS_SOURCES src/icon_probe.cpp src/hub_portrait.cpp
         src/area_watch.cpp)
     add_compile_definitions(LEGODIMENSIONS_DEV_PROBES)
+endif()
+
+# GPU-wait back-off (S4 #24): pass-through hooks on the fence and query polls,
+# Xenos builds only (native builds never reach those waits). Off unless
+# LEGO_GPU_WAIT_BACKOFF_US is set: unset, every hook calls __imp__ at once.
+if(NOT LEGODIMENSIONS_NATIVE_GPU)
+    list(APPEND LEGODIMENSIONS_SOURCES src/gpu_wait_backoff.cpp)
+    set_property(SOURCE src/gpu_wait_backoff.cpp APPEND PROPERTY
+        COMPILE_DEFINITIONS LEGO_GPU_WAIT_HOOK_GETDATA=1)
 endif()
 
 if(WIN32)
