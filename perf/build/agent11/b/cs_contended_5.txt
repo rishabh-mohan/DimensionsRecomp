@@ -1,0 +1,22 @@
+﻿[status pre] 18:57:41 BatteryStatus=2 (2=AC) LoadPercentage=68
+[cmd] bench_cs.exe contended 7 100 2000,5000 old,timecas:5000 none,pp,ee 200
+[power] ACLineStatus=1 (1=AC, 0=battery) BatteryFlag=0x01 battery=100%
+contended: 2 threads, 100 ms x 7 reps, gap 200 ns. Medians; ns/op is wall time per acquire (both threads), cpu = QueryThreadCycleTime.
+aff   hold variant         ns/op       min       max  kwait/1M   kset/1M cpu_ns/op   util    gtt   spin%  fair
+none  2000 old           25040.9   16833.8   37651.0    982740    982740   17114.9    0.68   0.70    0.0 0.495
+none  2000 timecas:5000    4079.2    3071.7    7372.5     72416     72416    5945.1    1.43   1.47   92.4 0.489
+none  5000 old           29523.9   22671.8   41771.5    989199    989199   20518.0    0.71   0.74    0.0 0.497
+none  5000 timecas:5000   15054.4   10477.4   16858.6    325618    325618   16060.8    1.08   1.14   61.4 0.481
+pp    2000 old           22434.3   15478.9  275143.4    923441    923441    9585.5    0.43   0.30    0.0 0.473
+pp    2000 timecas:5000    5012.9    3819.7   15846.0     71929     71929    5200.9    1.15   0.87   87.7 0.492
+pp    5000 old           25474.5   18725.7  912961.4    960791    960791   12868.3    0.51   0.45    0.0 0.480
+pp    5000 timecas:5000   14541.5   12810.4   80842.5    551265    551265   15265.4    1.05   0.73   41.2 0.465
+ee    2000 old           31237.1   27421.6   44284.6    944198    944198   20903.8    0.68   0.44    0.0 0.490
+ee    2000 timecas:5000    5873.8    5618.8    8297.1    128640    128640    7495.2    1.28   1.33   86.3 0.498
+ee    5000 old           36390.8   30344.3   48718.4    993690    993690   24795.7    0.71   0.71    0.0 0.499
+ee    5000 timecas:5000   19822.6   16178.1   29006.1    569221    569221   20791.0    1.06   0.89   41.4 0.499
+mutual exclusion check: OK
+[cpu] process CPU time 8.41 s
+[exit] 0
+[wall] 10.6 s
+[status post] 18:57:53 BatteryStatus=2 (2=AC) LoadPercentage=99

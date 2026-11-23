@@ -1,0 +1,160 @@
+# Pause state lines (asked 01:20, due 01:35)
+
+- **A12 (01:21):**
+  - Done since 23:00:
+    - #22: replica 1000 runs x 6 cases. NEW: 0 hung / 0 crashed. OLD case h: 429 hung + 171 crashed. Accepted 23:56.
+    - Window-3 ON bundle sent to A8 (23:23).
+    - Audio flip staged, NOT applied: build/agent12/s3flip (audio_system.cpp C281FA86 -> 4331A312, diff BF399E59, 11/11 PASS). Script: bench/agent12/s3flip_stage.ps1 -Check/-Apply/-Revert; s3flip_syntax.ps1 compares pristine vs live.
+    - Found the Copy-Item timestamp issue in A11's staging scripts; A11 fixed it at 00:07.
+    - A10 rated safeorder SAFE.
+  - First step after the restart:
+    - Read the RESUME block in perf-notes/agent12-io-memory.md.
+    - Run both -Check (expect pristine), then wait for my GO.
+    - At GO: both -Apply, -Check, then s3flip_syntax.ps1 -Live and safeorder_syntax.ps1 -Live. Hashes go to A1/A2/A10.
+  - Running: none.
+  - Live edits since 23:15: none. Unchanged:
+    - src/audio/audio_system.cpp C281FA86...
+    - include/rex/audio/audio_system.h 4836B139...
+    - src/ui/rex_app.cpp E1569868... (the SDK path is src/ui/rex_app.cpp)
+- **A5 (01:22):**
+  - Done since 23:00 (read-only, no code):
+    - Run 8's dump in matrix 1 was fakedimensions.exe, not the game (told A8).
+    - Confirmed native2-bin contains batch 2, and sized the uploads A/B.
+    - The native crash is not in upload code: the throw comes after device.cpp:918 (end of HostDevice::Create, after StartTextureResources returned, before the guest starts).
+    - RESUME block updated.
+  - First step after the restart: hold until a native build boots clean (native3). Then take back bench/agent5/matrix-native-uploads.json, point its 6 bin fields at that build, re-check with -PlanOnly, and tell A8.
+  - Running: none.
+  - Live source edits since 23:15: none (last source write 21:13). Notes only: perf-notes/agent5-uploads.md c560c8e3...
+- **A6 (01:22):**
+  - Done since 23:00:
+    - native-bin crash triage: the cause is confirmed in the WER dump (uncaught "Native setting is not registered: present_fsr_sharpness_reduction"). Notes: perf-notes/agent6-crash-triage.md.
+    - Fix A: build/agent6/fix-a/fix-a.patch, sha256 71AEFF3D... Checked only on scratch copies: apply and -R check pass, clang -fsyntax-only rc=0, no new warnings. Sent to A7.
+  - First step after the restart, at my GO: apply fix-a as a hash-guarded copy of build/agent6/fix-a/new/* into the live tree. No git writes. Then re-verify the hashes and report to A1/A2/A10. The commands are in the last section of the notes.
+    - **GAME repo, not the SDK:** rexlego/src/settings_registry.cpp A3733700 -> 8BA19C5F, rexlego/src/settings_preferences.cpp C78112AA -> 9CBE6DBF.
+  - Running: none. Live edits since 23:15: none (only perf-notes/agent6-crash-triage.md and build/agent6/**).
+  - S3 scope FYI: OFF builds also compile both files, but the only callers (legodimensions_app.h:128,133) are inside #ifdef LEGODIMENSIONS_NATIVE_GPU (lines 105-170). So OFF builds never run the changed lines.
+- **A3 (01:23):**
+  - Done since 23:00:
+    - Runner guard harness/guard.ps1: run-game refuses to start while a matrix/timing runner is active.
+    - Report §3.1 on headroom: framerate_limit=0 is the only cap on OFF builds, which became the window-3 metric.
+    - -GpuLog: GPU logging through NVML P/Invoke (harness/nvml.cs), plus a GPU and first-frame summary in runstats.
+    - nvidia-smi -f loses its buffered data when killed, so A8's thread-cpu.ps1 now uses nvml.cs.
+    - Fixed the profile trigger (it was deleted ~1 s late). Self-test 16/16 at 23:34.
+  - First step after the restart:
+    - Re-read the RESUME block in perf-notes/agent3-run-harness.md, check the guard, and confirm no game is running.
+    - On A8's ping: the 2 baseline-bin runs (180 s with -GpuLog, then -Profile; ~7 min). Then fill in §6.2 and send @@done 2.
+  - Running: none.
+  - Edited since 23:15 (workspace harness/, NOT in a repo): guard.ps1 7a71e720, nvml.cs 9f6e6e3b, run-game.ps1 dd3e756a, runstats.py 5b889eff, selftest/selftest.ps1 91d40de4, agent3-run-harness.md dc9739ff.
+- **A7 (01:24):**
+  - Done since 23:00:
+    - Found the native boot crash (~23:32): the unregistered present_fsr_sharpness_reduction throws at rexlego/src/settings_registry.cpp:104, because every SDK build has FFX OFF.
+    - S3 proposal with A6 and A2 (perf-notes/agent7-s3-proposal.md: v3 at 00:01, recommended (a) at 00:20, my decision added at 01:22).
+    - ODR/layout check of (b): perf-notes/agent7-odr-ffx.md (00:20). Sent to me, and to A10 together with (a).
+    - Logged A2's S(b) corrections. RESUME block rewritten at 01:22.
+  - First step after the restart:
+    - Re-read the RESUME block in perf-notes/agent7-present.md.
+    - At <=2 threads, summarise the window-3 native run dirs with bench/agent7/native_frames_summary.py, unless A8 already has.
+    - Help A6 and A2 check native3 with (a): frontend on, no throw, bilinear present.
+  - Running: none.
+  - Live edits since 23:15: none. gpu_native is unchanged since 20:48 (re-hashed 01:23): device.h 703939AA, device.cpp 3D01E631, fps_counter.h E05D6A55.
+  - Notes edited: agent7-present.md 6CAE8191, agent7-s3-proposal.md AAAF51FB, agent7-odr-ffx.md 9EA96B22 (new).
+- **A9 (01:24):**
+  - Done since 23:00:
+    - Final tool build/agent9/bin/rexglue.exe 37B32713 (23:16). Fixture D PASS. T8: 1515 tests per config, only the existing vupkd3d128 failure. T1 off4 = pin. Heavy TUs: .text at 84% of baseline.
+    - skip_lr dropped 23:51 (host code reads ctx.lr; A10 R4).
+      - Config: build/agent9/configs/batch-nolr.toml E60EAF1C.
+      - Install: build/agent9/install/batch-nolr (872 files, 430 TUs, gate 432, SHA256SUMS 24CE1493).
+    - Generated code -1.83% bytes, ctx refs -13.1%. batch vs batch-nolr differ only in ctx.lr lines (A10 r5 confirmed).
+    - Notes, recipe and run spec are final. @@done 8 sent 00:12; files released.
+  - First step after the restart:
+    - Read RESUME in perf-notes/agent9-codegen.md and delete bench/agent9/QUIET.
+    - Support A2's B build and A8's gate. Rollback = recipe step 9.
+    - Optional: a 9-key T8 run.
+  - Running: none.
+  - Live edits since 23:15: none. The newest file in A9's former roots is 22:13 (tests/regression/emit_interior_entries.cpp). legodimensions_config.toml was never edited (7F775847). Only notes (agent9-codegen.md 4E8E86DB) and build/agent9 outputs changed.
+- **A4 (01:25):**
+  - Done since 23:00:
+    - Decoded the native-bin crash from the WER dump: the runtime_error is thrown from ReadRegistryValues inside the NativeSettingsRuntime constructor. Not draw.cpp (notes §2.13).
+    - Sent A8 the N1-N3 commands with native_settings_frontend=false. A8 runs them on native2-bin after the relaunch.
+    - bench/agent4/matrix-native-threaded.json now points at native2-bin with the flag, no frame cap and the thread-cpu driver. -PlanOnly OK: 21 runs, **~63 min**, which is too long for one window; trim it to <=45 min for window 4.
+  - **CORRECTION to the window-3 report:**
+    - n0's "FASTER -5.1%" vs d0 is not like-for-like. n0 is timed from native-frames.csv, d0 from perf.csv (run.json frames.source).
+    - The fps column goes the other way: 143 vs 163, so native has 12% fewer frames.
+    - n0 is not GPU-bound (GPU 43-50%); Main XThread is 74-77% busy.
+  - First step after the restart: confirm draw.cpp is still 50AA3B1D, then check A8's N1-N3 game.logs against §2.12.
+  - Running: none.
+  - Live edits since S2: none (draw.cpp 50AA3B1D = S2, unchanged since 21:24:30). Outside the tree only perf-notes/agent4-draw-path.md and bench/agent4/matrix-native-threaded.json B858C76C.
+- **A10 (01:28):**
+  - Fix A rated (agent10-batch2-review.md §12):
+    - fix-a.patch SAFE. Hunks 1+2 are inseparable.
+    - **fix-a-commit.patch is SAFE and RECOMMENDED**: it stops Save from overwriting FFX-saved FSR1 values.
+    - Verified on scratch copies: apply/-R rc=0, results = A6's 8BA19C5F / 9CBE6DBF / 4EC71328.
+    - No SDK rebuild needed: GetFlagInfo is already exported by rexruntime.dll.
+    - Compile evidence so far is only A6's -fsyntax-only.
+  - **Behaviour change:** non-FFX builds now apply a saved native-settings.toml. Keep --native_settings_load=false in every S3 arm (it is already a standard flag).
+  - A7's one-line alternative is NOT SAFE: Restore defaults would always fail.
+  - (b): ODR agreed, plus 2 hazards for S4.
+  - Done since 23:00: #15 Review 4 (skip_lr UNSAFE for LEGO), #22 condition met (§8), batch-nolr LR-only confirmed (r5 lrdiff), B game-gate proposal (end of agent10-codegen-review.md), pause_safe_order ON SAFE (§11), §12.
+  - First after the restart: re-hash the fix-a live files after A6 applies them, rate A12's two flips (audio ON vs §8, safeorder vs §11), then the S3 TSV for A2 and the B gate verdict.
+  - Running: none. Live edits: none (no DimensionsRecomp edits since 18:50).
+- **A11 (01:28):**
+  - Done since 23:00:
+    - #27 landed 23:19 (lint/syntax/unit test PASS before, -Live checks PASS after); @@done 27.
+    - #23 control re-run with a dump (23:21-23:23): FAIL as intended, and the dump shows the deadlock; @@done 23.
+    - pause_safe_order default-ON staged 23:48; A10 rated it SAFE (~00:13).
+    - #27's files re-stamped 00:06:15 (mtime only). Stage scripts now stamp the copy time (sandbox 17/17).
+  - First step after the restart:
+    - Add the opt-in 'default' run to bench/agent11/testg_session.ps1 (perf-notes/agent11-kernel.md "S3 default check"), then self-test with -CheckOnly (devoff2 must refuse).
+    - Then `-BinDir build\agent2\devoff3-bin -Only default` in A8's slot right after the devoff3 boot (~3 min). It refuses unless devoff3 carries the default-ON change, so A12's safeorder landing must be in S3.
+  - Running: none.
+  - Live edits since S2 (both #27): rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_hal.cpp AB359E1D..., rexglue-sdk/src/kernel/xam/xam_ui.cpp 0A314946... rex_app.cpp is untouched (pristine E1569868 at 01:21).
+- MISSING at 01:28: A2 (live-vs-S2 list + plume), A8 (recheck + 2x-split analysis, due 01:40).
+- **A2 (01:27):**
+  - Done since 23:00:
+    - S2 applied 23:15:03 (verify PASS).
+    - devoff2-bin staged 23:18:53 (49/49, MANIFEST B87DC2D2).
+    - native2-bin staged 23:22:38 (72/72, MANIFEST D6E7F14F, fingerprint b7cc74f980e016c3).
+    - B tools prepared, but nothing has run: snapB doesn't exist, and nothing was built from install/batch.
+    - §(b) build-side correction in agent7-s3-proposal.md (00:33). Checkpoint in perf-notes/agent2-baseline.md (1DF876B5).
+  - First step after the relaunch: finish the B tool prep WITHOUT building (compile codegen-frozen2.exe, run patch-b-tools.py and diff it against *.pre-B, then a default-mode gen-check and snap-gate on snap1). Then B (batch-nolr) or S3, in my order.
+  - Running: none.
+  - A2's own live edits since 23:15: none. Its only live edit is still plume_d3d12.cpp (21:57:57, 564568D4, before the cut).
+  - **LIVE vs S2** (snap1/PLAN-CHK-0122.txt 8E133F63):
+    - 23,843 files walked: 23,821 same, 22 differ, 0 new, 0 deleted since the cut. The 48 native inputs are all the same.
+    - Changed since the cut: only #27 (both at 00:06:15): rexglue-sdk/src/kernel/xam/xam_ui.cpp 0a314946, rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_hal.cpp ab359e1d.
+    - The other 20 are A9's codegen files held back at S2 and unchanged since: 17 modified + 3 new untracked (flush_mode.h, tests/ppc/asm/instr_cr_so_fold.s, tests/ppc/opt_config.toml).
+    - Every other untracked file has the same hash in S2: threading_*.h, rotate_mask.h, the gpu_native headers, plume-winsdk-compat.patch, tools/native-cpu.
+    - rexlego/generated = the baseline junction (887 files, newest 18:15:54 on 11-21).
+  - **PLUME:** HEAD e0c8871 is prepare_plume.py's PIN (line 9). ceaeeee isn't in the public zolaware/plume clone (not a valid object). It was cloned and checked out to the pin at setup on 11-21 (16:06-16:20), before the sprint.
+    - Dirty files: plume_d3d12.h and plume_vulkan.cpp come from prepare_plume at setup; plume_d3d12.cpp (564568D4) is S1+p2 = S2.
+    - -> Do NOT commit the plume pointer.
+- ALL IN except A8 (due 01:40).
+- ORDER after the relaunch (decided 01:30): **B first, on snap1 = S2.** That gives a clean A/B vs devoff2-bin and is exactly A10's gate baseline ("an S2 build with S1 codegen"). Meanwhile the S3 inputs land in the live tree (A6 fix-a + fix-a-commit, A12 flips, A10 ratings + TSV). Then the S3 build (devoff3, native3), then A11's default check on devoff3. S3's changes are perf-neutral on the OFF title path, so B vs devoff2 is the window-4 primary.
+- **A8 (01:33):**
+  - Done since 23:00:
+    - native-bin start crash root-caused (present_fsr_* not registered; workaround --native_settings_frontend=false).
+    - native2/base/d11 functional boots OK.
+    - Runner fixes: proc.csv file sharing, NVML gpu.csv driver, keep-display-on request.
+    - Window-3 matrix 19/19, plus the recheck and the thread/2x-split analysis in perf-notes/agent8-window3.md.
+  - First step after the restart: Agent 4's N1-N3 functional run on native2-bin (matrix-native-functional.json -Only n1,n2,n3), then Agent 3's slot.
+  - Running: none (no game, runner or driver; subagent idle).
+  - Edits since 23:15 (sha256, first 12 hex). No source or SDK files.
+    - bench/agent8/run/drivers/thread-cpu.ps1 cfdc5d790cdd
+    - run/matrix_recheck.py 7b49c93ece34
+    - run/matrix-native-functional.json 7e94c186d29a
+    - run/matrix-native-threaded.json 1dc45800e933
+    - run/matrix-window3.json de293d9621fe
+    - run/run-matrix.ps1 3554a520005a
+    - run/run-timing.ps1 bcbf954dc146
+    - RUN-WINDOW3.cmd baccb7856776
+    - perf-notes/agent8-first-boot.md 2d267ad6ce1b
+    - perf-notes/agent8-window3.md 29255d975179
+  - **W3 analysis:** the 2x split is game state, not clocks.
+    - Every run starts on a light title phase and switches to heavy 30-40 s after the first frame.
+    - Same clocks in both phases. Heavy = 2x CPU and 2.4x GPU per frame.
+    - The cold runs looked fast because their windows began ~13 s after the first frame.
+    - d11-r1 stayed light for 300 s, with no INSTALL lines. Open: user input or a Toypad race.
+    - Per-thread busy, % of one core (main / GPU Commands / TimerQueue / audio): d0 48.4/86.8/62.0/6.1, n0 75.7/none/52.4/3.3.
+    - Medians mislead for the bimodal builds: n0 vs d0 = -5.1% median, -12.1% mean fps.
+    - Window-4 driver: sys.csv, every window >= 60 s after the first frame, light-run flags.
+- ALL 11 IN at 01:33.

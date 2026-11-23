@@ -1,0 +1,42 @@
+# sub2 vs Agent 2: comparison written AFTER sub2's own result
+# sub2 report: build/agent2/s4b/checks/sub2/mapcheck-devoff4b-sub2.txt (sha256 EA3E9878BC78FE1E, 19657 B; RESULT: PASS)
+# script: build/agent2/s4b/checks/sub2/mapcheck_sub2.py (sha256 D3CC68B02BF851B4), own parser written without reading
+#         mapcheck-s4c.py, build/agent9/mapcmp.py or build/agent9/maplines.py
+# Agent 2 report: build/agent2/s4b/checks/mapcheck-devoff4b.txt (20:50:58, RESULT: PASS (31 hooked))
+maps: NEW devoff4b-bin 39181442 B sha256 52155274A978A946 | REF devoff4-bin 39162310 B sha256 DCC51E2B7A0040E2 (same in both reports)
+
+Agreement: every number and verdict in Agent 2's report matches sub2's result
+  publics NEW 353058 / REF 353031; sub_ 164786 and __imp__sub_ 164786 in both; hooked 31 / 27
+  sub_ and __imp__sub_ name sets equal; hooked == REF 27 + 4 moved == the 31 names on expected-map.txt line 40
+  4 targets: sub_ in gpu_wait_backoff.cpp.obj, __imp__ stays in legodimensions_recomp.248/.107/.422/.232.cpp.obj
+  the 27 REF-hooked names keep both objects
+  per-object sub_ sets: 448 objects, 0 differ after the 4 moves; per-object __imp__sub_ sets: 438 objects, 0 differ
+  NEW unhooked 164755, all with sub_ and __imp__ in one object (sub2 also checked REF: 164759, 0 split)
+  gpu_wait_backoff.cpp.obj defines exactly the 4 sub_ publics; its 24 publics are the same list in both reports
+Disagreements: none.
+
+Covered by sub2 but not in Agent 2's report
+  - gpu_wait_backoff.cpp.obj is absent from REF (0 publics, 0 statics, no lib:object of that name)
+  - REF hooked == expected-map.txt lines 5-13 (27 names)
+  - parser self-checks: 0 unparsed lines, 0 lld re-format mismatches, 0 f/i flags, sec:off and Rva+Base agree on hookedness
+  - whole-map (name, object) diff: only in NEW 26, only in REF 0, object changed 7
+      (1) 4 targets; (2) 19 new gpu_wait_backoff.cpp.obj names (4 spdlog logger::log_ templates, 13 ??_C@ strings, 2 __xmm@)
+      (3) 1 COMDAT constant: __real@408f400000000000 (1000.0) rex_app.cpp.obj -> gpu_wait_backoff.cpp.obj (rex_app 243 -> 242 publics)
+      (4) 9, all CRT / import / linker; no rexlego/runtime project object and no recompiled TU changes besides (1) and (3):
+          msvcrt:tlsdyn.obj newly linked: __dyn_tls_init, __dyn_tls_on_demand_init, __tls_guard (only in NEW),
+            __dyn_tls_init_callback <common> -> msvcrt:tlsdyn.obj, @vol.md <absolute> x49 -> x50 (tlsdyn's marker),
+            new sections .CRT$XDA .CRT$XDU .CRT$XDZ .CRT$XLC -> on-demand dynamic TLS init/dtor; the new TU has a
+            thread_local with a dynamic dtor (static ??__Ft_timer@?A0x14AD3790@@YAXXZ)
+          __imp_SwitchToThread (kernel32:KERNEL32.dll 90 -> 91) - back-off yield
+          __imp_strtoul (ucrt:api-ms-win-crt-convert-l1-1-0.dll 1 -> 2) - env var parsing (LEGO_GPU_WAIT_SPIN_US / _BACKOFF_US strings)
+          __CxxFrameHandler4 + __imp___CxxFrameHandler4 from vcruntime:VCRUNTIME140_1.dll, a NEW import DLL of the exe
+            (REF imports nothing from it). Most likely pulled in by msvcrt:tlsdyn.obj (MSVC-built, FH4 EH tables
+            $cppxdata$/$ip2state$__dyn_tls_init); not proven from the map. Packaging note: the exe now also needs
+            VCRUNTIME140_1.dll (VC++ 2019+ redistributable, or app-local copy).
+  - statics: REF 10139 -> NEW 10238, +99 / -0, only gpu_wait_backoff.cpp.obj (+90) and msvcrt:tlsdyn.obj (+9)
+  - memory_watch: 0 publics/statics match /memory_?watch/ in either map; rexruntime:rexruntime.dll import names identical
+    (812, none added/removed/moved). The C1 v3 SDK change sits inside rexruntime.dll and is not visible in the exe map.
+
+Reuse (same mode = identical hooked sets and objects):
+  cmd /c "start /belownormal /b /wait python build\agent2\s4b\checks\sub2\mapcheck_sub2.py --new NEW.map --ref REF.map
+          --out build\agent2\s4b\checks\sub2\<name>.txt [--expect-count 164786] [--find REGEX] > <name>.stdout.txt 2>&1"

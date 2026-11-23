@@ -1,0 +1,38 @@
+== native3 boot check: <workspace>\build\agent7\native3-check-test\cli-true  bin dir <workspace>\build\agent2\native2-bin
+   bin_dir in run.json: <workspace>\build\agent2\native2-bin; tag n0-r1; start 2026-11-22 00:30:40.583
+A. frontend on (NativeSettingsRuntime is built)
+  PASS effective native_settings_frontend=true from the command line '--native_settings_frontend=true', which outranks run-dir legodimensions.toml:72 'native_settings_frontend = false'
+  INFO also on the command line: --native_settings_load=false (the saved-settings load is skipped)
+B. no throw (it boots past NativeSettingsRuntime and presents)
+  PASS game.log: 484 lines, none matching the 7 throw/fatal patterns
+  PASS present line at L128, after 'Native write tracking' at L44 (the S2 throw point): [2026-11-22 00:30:53.298] [info] [core] [t8744] Native GPU: display gamma updated from title ramp black=00000000 mid=...
+  PASS run.json: status=OK exited_early=False werfault_seen=False exit_code=0
+  PASS no *.dmp or wer-* files in the run dir or in run.json artifacts
+  PASS native-frames.csv: 27308 rows (at least 600)
+C. bilinear present (no FSR 1, no native FSR 3)
+  PASS spatial_fsr_presented = 0 on all 27308 rows
+  PASS fsr_enabled = 0 on all 27308 rows
+  INFO first row: scene 1920x1080, present source 1920x1080, output 2240x1294
+  PASS no 'Native FSR 1:' warnings (FSR 1 was not requested)
+  INFO [2026-11-22 00:30:53.306] [info] [core] [t8744] Native GPU: presented internal texture 1920x1080 (before swap-chain copy)
+  INFO run-dir toml has present_effect = 'fsr' (accepted only by an SDK with the FidelityFX headers)
+  INFO build\agent2\native2-bin\rexruntime.dll (sha256 1C45C86977EC594C): a non-FFX SDK (present_effect is there, the FSR 1 cvars aren't), so present_effect is bilinear-only and the toml's 'fsr' is rejected
+D. build identity, frame accounting, present path (info)
+  INFO build\agent7\native3-check-test\cli-true\MANIFEST.txt: # build/agent2/native2-bin - Agent 2 (Agent 1's batch schedule). native build 2: NATIVE_GPU=ON with Agent 6's AOT inp...
+  WARN MANIFEST lists no settings_registry.cpp patch, so fix (a) isn't in this build (pre-S3?)
+  WARN MANIFEST lists no settings_preferences.cpp patch, so fix (a) isn't in this build (pre-S3?)
+  PASS native GPU fingerprint: MANIFEST b7cc74f980e016c3, game.log b7cc74f980e016c3
+  PASS rows: perf.csv 27309, native-frames.csv 27308 (perf - native = +1; expect +1, perf.csv's leading 0 row)
+  PASS native frame column 2..27309, 0 gap(s)
+  INFO game.log native GPU fingerprint b7cc74f980e016c3
+  INFO L42: D3D12 ready on 'NVIDIA GeForce MX570' (2240x1294, 3 images)
+  INFO L43: threaded recording off
+  INFO L26: swap chain ready (vsync off)
+  INFO L135: swap-chain max frame latency=1 query=00000000 waitable=true latency_wait=0 set=00000001
+  INFO L128: display gamma updated from title ramp black=00000000 mid=21485214 white=3FFFFFFF identity=false
+  INFO L134: presentation cap override=-1 (-1 uses live native_fps_limit)
+  INFO L133: presented internal texture 1920x1080 (before swap-chain copy)
+  INFO L138: present override sync=-1 flags=0
+  INFO interval_ms, runner window rows 12263-19431: n=7169 fps=143.38 mean=6.974 sd=1.399 p50=6.691 p99=11.374 p99.9=14.113 max=16.345 ms; >33ms=0 >100ms=0
+  INFO window means: swap_present_cpu_ms=1.012 present_cpu_ms=0.000 draw_calls=8.000
+VERDICT A=PASS B=PASS C=PASS D=PASS(2 WARN) -> PASS (exit 0)

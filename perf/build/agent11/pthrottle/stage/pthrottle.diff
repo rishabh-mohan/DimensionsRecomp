@@ -1,0 +1,108 @@
+diff --git a/DimensionsRecomp/rexglue-sdk/include/rex/threading_timing.h b/DimensionsRecomp/rexglue-sdk/include/rex/threading_timing.h
+index 402b558..22d4916 100644
+--- a/DimensionsRecomp/rexglue-sdk/include/rex/threading_timing.h
++++ b/DimensionsRecomp/rexglue-sdk/include/rex/threading_timing.h
+@@ -21,6 +21,10 @@ struct HostTimingConfig {
+   // Keep honouring the request while the window is occluded or minimized
+   // (Windows 11 EcoQoS: PROCESS_POWER_THROTTLING_IGNORE_TIMER_RESOLUTION).
+   bool keep_timer_resolution_in_background = false;
++  // Opt out of execution speed throttling (PROCESS_POWER_THROTTLING_EXECUTION_SPEED),
++  // which Windows may apply to a process without a focused window: efficiency
++  // cores and low clock speeds (EcoQoS).
++  bool keep_execution_speed_in_background = false;
+   // There is deliberately no option for high-resolution Timer objects:
+   // SetWaitableTimer rejects a completion routine on a
+   // CREATE_WAITABLE_TIMER_HIGH_RESOLUTION timer (ERROR_INVALID_PARAMETER),
+diff --git a/DimensionsRecomp/rexglue-sdk/src/core/threading_win.cpp b/DimensionsRecomp/rexglue-sdk/src/core/threading_win.cpp
+index 7f04d5f..62df04e 100644
+--- a/DimensionsRecomp/rexglue-sdk/src/core/threading_win.cpp
++++ b/DimensionsRecomp/rexglue-sdk/src/core/threading_win.cpp
+@@ -117,6 +117,8 @@ std::atomic<uint32_t> timer_period_ms_{0};
+ // information class, spelled out so that older SDK headers also build.
+ constexpr ULONG kPowerThrottlingIgnoreTimerResolution = 0x4;
+ constexpr int kProcessPowerThrottlingClass = 4;
++// PROCESS_POWER_THROTTLING_EXECUTION_SPEED (EcoQoS), likewise.
++constexpr ULONG kPowerThrottlingExecutionSpeed = 0x1;
+ 
+ using TimePeriodFn = UINT(WINAPI*)(UINT);
+ 
+@@ -133,7 +135,9 @@ TimePeriodFn GetTimePeriodFn(const char* name) {
+ 
+ // Windows 11 ignores the timer resolution a process requested while its
+ // windows are minimized or occluded (EcoQoS); ask it to always honour ours.
+-bool KeepTimerResolutionInBackground() {
++// Each call replaces the whole throttling state, so `control_mask` carries
++// every mechanism to opt out of (controlled and off).
++bool OptOutOfPowerThrottling(ULONG control_mask) {
+   struct PowerThrottlingState {  // PROCESS_POWER_THROTTLING_STATE
+     ULONG Version;
+     ULONG ControlMask;
+@@ -150,8 +154,8 @@ bool KeepTimerResolutionInBackground() {
+   }
+   PowerThrottlingState state = {};
+   state.Version = 1;  // PROCESS_POWER_THROTTLING_CURRENT_VERSION
+-  state.ControlMask = kPowerThrottlingIgnoreTimerResolution;
+-  state.StateMask = 0;  // Controlled and off: never ignore our request.
++  state.ControlMask = control_mask;
++  state.StateMask = 0;  // Controlled and off: no throttling by these mechanisms.
+   return set_process_information(GetCurrentProcess(), kProcessPowerThrottlingClass, &state,
+                                  sizeof(state)) != FALSE;
+ }
+@@ -225,13 +229,32 @@ SleepResult AlertableSleepPrecise(std::chrono::microseconds duration) {
+ 
+ void ConfigureHostTiming(const HostTimingConfig& config) {
+   bool background_optout = false;
++  bool execution_optout = false;
+   if (config.keep_timer_resolution_in_background) {
+-    background_optout = KeepTimerResolutionInBackground();
++    // Both opt-outs in one call: each call replaces the whole throttling state.
++    ULONG mask = kPowerThrottlingIgnoreTimerResolution;
++    if (config.keep_execution_speed_in_background) {
++      mask |= kPowerThrottlingExecutionSpeed;
++    }
++    background_optout = OptOutOfPowerThrottling(mask);
++    execution_optout = background_optout && config.keep_execution_speed_in_background;
+     if (!background_optout) {
+       // Expected before Windows 11, which introduced the flag.
+       spdlog::debug("Timer resolution power throttling opt-out failed (0x{:08X})", GetLastError());
+     }
+   }
++  if (config.keep_execution_speed_in_background) {
++    // On its own, or again on its own if the call above failed: Windows 10
++    // rejects the timer flag but has execution speed throttling.
++    if (!execution_optout) {
++      execution_optout = OptOutOfPowerThrottling(kPowerThrottlingExecutionSpeed);
++    }
++    if (execution_optout) {
++      spdlog::info("Execution speed power throttling opt-out on");
++    } else {
++      spdlog::warn("Execution speed power throttling opt-out failed (0x{:08X})", GetLastError());
++    }
++  }
+   const uint32_t period = config.timer_resolution_ms;
+   if (!period) {
+     return;
+diff --git a/DimensionsRecomp/rexglue-sdk/src/system/runtime.cpp b/DimensionsRecomp/rexglue-sdk/src/system/runtime.cpp
+index 32759dd..45e5f2c 100644
+--- a/DimensionsRecomp/rexglue-sdk/src/system/runtime.cpp
++++ b/DimensionsRecomp/rexglue-sdk/src/system/runtime.cpp
+@@ -41,6 +41,11 @@ REXCVAR_DEFINE_UINT32(host_timer_resolution_ms, 0, "Runtime",
+                       "1 recommended)");
+ REXCVAR_DEFINE_BOOL(host_timer_throttling_optout, false, "Runtime",
+                     "Keep the host timer resolution while the window is minimized or occluded");
++// Default off (behavior changes ship off until rated SAFE); perf-notes/agent11-kernel.md,
++// "S4 staging (task #19)", has the tests.
++REXCVAR_DEFINE_BOOL(host_execution_throttling_optout, false, "Runtime",
++                    "Opt out of Windows execution speed throttling (EcoQoS), which may run the "
++                    "game on efficiency cores at low clock speeds while it has no focused window");
+ 
+ REXCVAR_DECLARE(std::string, perf_log_csv);
+ 
+@@ -141,6 +146,7 @@ X_STATUS Runtime::Setup(RuntimeConfig config) {
+     thread::HostTimingConfig timing;
+     timing.timer_resolution_ms = REXCVAR_GET(host_timer_resolution_ms);
+     timing.keep_timer_resolution_in_background = REXCVAR_GET(host_timer_throttling_optout);
++    timing.keep_execution_speed_in_background = REXCVAR_GET(host_execution_throttling_optout);
+     thread::ConfigureHostTiming(timing);
+     host_timing_owner_ = this;
+   }

@@ -1,0 +1,219 @@
+﻿diff --git "a/<workspace>/build/agent11/launcher-review/v2-924321AE/run-night.ps1" "b/<workspace>/build/agent11/launcher-review/v3-163D7659/run-night.ps1"
+index 071fac0..9b2f873 100644
+--- "a/<workspace>/build/agent11/launcher-review/v2-924321AE/run-night.ps1"
++++ "b/<workspace>/build/agent11/launcher-review/v3-163D7659/run-night.ps1"
+@@ -25,4 +25,6 @@ param(
+ $ErrorActionPreference = 'Stop'
+ Set-StrictMode -Version 2
++# No [CmdletBinding()]: a mistyped parameter (e.g. -DryRunn) would land in $args and run REAL mode, so refuse it.
++if ($args.Count) { Write-Host "refused: unknown argument(s) '$($args -join ' ')'. README.md lists the parameters." -ForegroundColor Red; exit 2 }
+ 
+ $Repo = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
+@@ -32,4 +34,7 @@ $PsExe = Join-Path $PSHOME 'powershell.exe'
+ $Inv = [Globalization.CultureInfo]::InvariantCulture
+ $AllowedEnv = @('REX_TIMER_WAIT_BLOCKING', 'LEGO_GPU_WAIT_STATS')
++# The only arm drivers (bench\agent8\run\drivers, as plain "drivers/<name>.ps1" strings without args). None of them starts anything.
++$AllowedDrivers = @('thread-cpu.ps1', 'io-counters.ps1', 'pso-stats-at-end.ps1')
++$MaxRunHours = 14     # refuse to start when the end (07:30) is further away than this, i.e. when started after 07:30
+ $GateProcs = @('MsMpEng', 'OfficeClickToRun', 'CrossDeviceService')
+ # The runner's build list (timing-env.ps1 Get-BuildProcRegex) plus legodimensions; clangd / clang-format excluded.
+@@ -41,4 +46,7 @@ $CloseNames = @('ChatGPT', 'Copilot', 'Microsoft.Copilot', 'Roblox', 'RobloxPlay
+                 'wallpaper32', 'wallpaper64', 'webwallpaper32', 'webwallpaper64')
+ $CloseWallpaperUi = @('ui32', 'ui64')
++# Closed only when the exe path matches: the Copilot app (not, say, a copilot.exe command-line tool), Wallpaper Engine's ui32/ui64.
++$CopilotRx = '\\WindowsApps\\Microsoft\.(Copilot|Windows\.Ai\.Copilot)_'
++$CloseByPath = @{ 'Copilot' = $CopilotRx; 'Microsoft.Copilot' = $CopilotRx; 'ui32' = 'wallpaper_engine'; 'ui64' = 'wallpaper_engine' }
+ $MinRamGB = 6.0; $MinDiskGB = 6.0; $QuietCores = 0.1; $RelaxMaxCores = 1.2; $RelaxSpread = 0.2; $DeadlineSlackMin = 10
+ 
+@@ -66,5 +74,7 @@ $script:WinLog = $null
+ 
+ function Now { return (Get-Date) }
+-function Ts([datetime]$T) { return $T.ToString('yyyy-MM-dd HH:mm:ss') }
++function Ts([datetime]$T) { return $T.ToString('yyyy-MM-dd HH:mm:ss', $Inv) }
++# For the final clean-up: one failing step must not skip the others.
++function Try-Step([string]$Name, [scriptblock]$Do) { try { & $Do } catch { try { Log "!!! $($Name) failed: $($_.Exception.Message)" 'Red' } catch { } } }
+ function Add-Text([string]$Path, [string]$Text) {
+     for ($k = 0; $k -lt 20; $k++) { try { [IO.File]::AppendAllText($Path, $Text + "`r`n", (New-Object Text.UTF8Encoding $false)); return } catch { Start-Sleep -Milliseconds 100 } }
+@@ -264,5 +274,12 @@ function Test-Matrix($Go, [string]$Path) {
+             $dp = if ($dr -is [string]) { $dr } else { [string](Get-P $dr 'script') }
+             $full = Resolve-Driver $dp
+-            if (-not (Test-Path -LiteralPath $full -PathType Leaf) -or -not (Test-Pinned $full)) { $why.Add("arm '$id': driver '$dp' is not one of the pinned runner files") }
++            # Only a plain "drivers/<name>.ps1" string for one of $AllowedDrivers in bench\agent8\run\drivers (pinned), and
++            # no args: any other runner file as a driver could start a game, bin, env or matrix that was never checked.
++            $okDrv = $false
++            if ($dr -is [string] -and $dr -cmatch '^drivers[/\\]([A-Za-z0-9_-]+\.ps1)$' -and $AllowedDrivers -contains $Matches[1]) {
++                $want = Join-Path $RunDir ('drivers\' + $Matches[1]); $fp = ''; try { $fp = [IO.Path]::GetFullPath($full) } catch { }
++                $okDrv = [string]::Equals($fp, $want, [StringComparison]::OrdinalIgnoreCase) -and (Test-Path -LiteralPath $want -PathType Leaf) -and (Test-Pinned $want)
++            }
++            if (-not $okDrv) { $why.Add("arm '$id': driver must be the plain string drivers/<name>.ps1, without args, for one of $($AllowedDrivers -join ', ') in bench\agent8\run\drivers (it is '$(if ($dr -is [string]) { $dr } else { $dr | ConvertTo-Json -Compress -Depth 4 })')") }
+         }
+     }
+@@ -427,5 +444,5 @@ function Save-Screensaver {
+     $k = Get-ItemProperty -LiteralPath $DeskKey
+     $hasExe = $null -ne $k.PSObject.Properties['SCRNSAVE.EXE']
+-    $script:SsSaved = @{ active = [string]$k.ScreenSaveActive; has_exe = $hasExe; exe = $(if ($hasExe) { [string]$k.'SCRNSAVE.EXE' } else { '' }) }
++    $script:SsSaved = @{ active = [string](Get-P $k 'ScreenSaveActive'); has_exe = $hasExe; exe = $(if ($hasExe) { [string]$k.'SCRNSAVE.EXE' } else { '' }) }
+     Set-Text $SsFile ("saved $(Ts (Now)) from $DeskKey by launcher pid $PID`r`nScreenSaveActive=$($script:SsSaved.active)`r`nSCRNSAVE.EXE present=$hasExe value='$($script:SsSaved.exe)'")
+     return "ScreenSaveActive=$($script:SsSaved.active), SCRNSAVE.EXE $(if ($hasExe) { "'$($script:SsSaved.exe)'" } else { 'absent' })"
+@@ -437,5 +454,5 @@ function Set-ScreensaverNone {
+     if ($script:SsSaved.has_exe) { Remove-ItemProperty -LiteralPath $DeskKey -Name 'SCRNSAVE.EXE' -ErrorAction SilentlyContinue }
+     $k = Get-ItemProperty -LiteralPath $DeskKey
+-    Log "screensaver: set to (None) (was $was; now ScreenSaveActive=$($k.ScreenSaveActive), SCRNSAVE.EXE $(if ($k.PSObject.Properties['SCRNSAVE.EXE']) { 'present' } else { 'absent' }))"
++    Log "screensaver: set to (None) (was $was; now ScreenSaveActive=$([string](Get-P $k 'ScreenSaveActive')), SCRNSAVE.EXE $(if ($k.PSObject.Properties['SCRNSAVE.EXE']) { 'present' } else { 'absent' }))"
+ }
+ function Restore-Screensaver {
+@@ -446,5 +463,5 @@ function Restore-Screensaver {
+         [void][LdNight]::SystemParametersInfoW(0x0011, $(if ($script:SsSaved.active -eq '1') { 1 } else { 0 }), [IntPtr]::Zero, 3)
+         $k = Get-ItemProperty -LiteralPath $DeskKey
+-        Log "screensaver: restored (ScreenSaveActive=$($k.ScreenSaveActive), SCRNSAVE.EXE $(if ($k.PSObject.Properties['SCRNSAVE.EXE']) { "'$($k.'SCRNSAVE.EXE')'" } else { 'absent' }))"
++        Log "screensaver: restored (ScreenSaveActive=$([string](Get-P $k 'ScreenSaveActive')), SCRNSAVE.EXE $(if ($k.PSObject.Properties['SCRNSAVE.EXE']) { "'$($k.'SCRNSAVE.EXE')'" } else { 'absent' }))"
+         Add-Text $SsFile "restored $(Ts (Now))"
+         $script:SsSaved = $null
+@@ -465,10 +482,17 @@ function Close-Programs([string]$When) {
+     $found = @()
+     try {
++        $left = New-Object System.Collections.Generic.List[string]
++        $mySess = [Diagnostics.Process]::GetCurrentProcess().SessionId
+         $found = @(foreach ($p in [Diagnostics.Process]::GetProcesses()) {
+-            $n = $p.ProcessName
+-            if ($CloseNames -contains $n) { $p }
+-            elseif ($CloseWallpaperUi -contains $n) { $path = ''; try { $path = $p.MainModule.FileName } catch { }; if ($path -match 'wallpaper_engine') { $p } }
++            $n = $p.ProcessName; $sess = -1; try { $sess = $p.SessionId } catch { }
++            if ($sess -ne $mySess) { continue }     # this user's session only
++            if ($CloseByPath.ContainsKey($n)) {
++                $path = ''; try { $path = $p.MainModule.FileName } catch { }
++                if ($path -match $CloseByPath[$n]) { $p } elseif ($CloseNames -contains $n) { $left.Add("$n pid $($p.Id) ($(if ($path) { $path } else { 'path unknown' }))") }
++            }
++            elseif ($CloseNames -contains $n) { $p }
+         })
+     } catch { Log "programs ($When): could not list the processes ($($_.Exception.Message)); going on" 'Yellow'; return }
++    foreach ($x in $left) { Log "programs ($When): left alone (not the Copilot app): $x" }
+     if (-not $found.Count) { Log "programs ($When): none of ChatGPT, Copilot, Roblox, Task Manager, Wallpaper Engine running"; return }
+     foreach ($p in $found) {
+@@ -542,5 +566,17 @@ function Clear-Hold {
+     try {
+         $st = Get-HoldState
+-        if ($st.kind -eq 'ours') { Remove-Item -LiteralPath $HoldFile -Force; Log 'HOLD removed' }
++        if ($st.kind -eq 'ours') {
++            # A reader that opened the file without delete sharing can make one try fail: retry, but stop as soon as it
++            # is no longer ours (the hold manager may take it over meanwhile).
++            $err = ''
++            for ($k = 0; $k -lt 5; $k++) {
++                try { Remove-Item -LiteralPath $HoldFile -Force -ErrorAction Stop; $err = ''; break } catch { $err = $_.Exception.Message; Start-Sleep -Milliseconds 500 }
++                if ((Get-HoldState).kind -ne 'ours') { break }
++            }
++            $st2 = Get-HoldState
++            if ($st2.kind -eq 'none') { Log 'HOLD removed' }
++            elseif ($st2.kind -eq 'ours') { Log "!!! HOLD remove failed after 5 tries ($err): delete $HoldFile by hand" 'Red' }
++            else { Log "HOLD is not this window's any more (the hold manager took it over): left as it is" }
++        }
+         elseif ($st.kind -eq 'none') { Log 'HOLD already gone (the hold manager removed it)' }
+         else { Log "HOLD is not this window's any more (the hold manager took it over): left as it is" }
+@@ -576,5 +612,5 @@ function Refuse([string]$Raw, [string]$Why, [string]$Stage = 'GO') {
+ }
+ function Write-GateLine([string]$Text) {
+-    $line = "$((Now).ToString('HH:mm:ss')) quiet gate: $Text"     # format agreed with Agent 12 (w6_env_record.py)
++    $line = "$((Now).ToString('HH:mm:ss', $Inv)) quiet gate: $Text"     # format agreed with Agent 12 (w6_env_record.py)
+     $script:GateLine = $line
+     Write-Host $line -ForegroundColor Cyan; Add-Text $LogFile $line; if ($script:WinLog) { Add-Text $script:WinLog $line }
+@@ -619,4 +655,13 @@ function Wait-Quiet($Go, $Plan, [datetime]$Accepted) {
+ }
+ function Start-Window($Go, [string]$MPath, $Plan, [string]$WTag) {
++    # Programs are closed first, so that the last checks come right before the runner starts.
++    Close-Programs 'window start'
++    # Real mode: the matrix json stays open from the last checks until the runner ends. Others may read it; nobody may
++    # change or delete it.
++    $lock = $null
++    if (-not $DryRun) { try { $lock = [IO.File]::Open($MPath, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::Read) } catch { Refuse $Go.raw "the matrix json could not be opened for the run: $($_.Exception.Message)" 'START'; return } }
++    try { Start-WindowLocked $Go $MPath $Plan $WTag } finally { if ($lock) { $lock.Dispose() } }
++}
++function Start-WindowLocked($Go, [string]$MPath, $Plan, [string]$WTag) {
+     $why = New-Object System.Collections.Generic.List[string]
+     $diff = Compare-Pins $script:Pins (Get-Pins); if ($diff.Count) { $why.Add("pinned files changed since the start: $($diff -join '; ')") }
+@@ -624,4 +669,11 @@ function Start-Window($Go, [string]$MPath, $Plan, [string]$WTag) {
+     if (-not $mw.Count) { $bd = Compare-Pins $Go.bins (Get-BinHashes $Go $MPath); if ($bd.Count) { $why.Add("bin files changed since the GO: $($bd -join '; ')") } }
+     if ((Now).AddMinutes($Plan.min + $DeadlineSlackMin) -gt $script:Deadline) { $why.Add("deadline: $($Plan.min) + $DeadlineSlackMin min would end after $(Ts $script:Deadline)") }
++    # The session checks again (the last gate sample may be a minute old).
++    $soft = New-Object System.Collections.Generic.List[string]
++    $desk = Get-DesktopName; if ($desk -ine 'WinSta0\Default') { $soft.Add("this is desktop '$desk', not the user's own desktop WinSta0\Default") }
++    if (Test-LogonUI) { $soft.Add('the PC is locked (LogonUI is running)') }
++    $pw = Get-Power; if (-not $pw.ac) { $soft.Add("not on AC power: $($pw.text)") }
++    if ($soft.Count -and $DryRun -and $SkipStartChecks) { Log "last checks would refuse: $($soft -join '; ') (ignored: -DryRun -SkipStartChecks)" 'Yellow' }
++    else { foreach ($w in $soft) { $why.Add($w) } }
+     $hw = ''; try { $hw = Sync-Hold $Go.id } catch { $hw = "the HOLD file could not be written ($($_.Exception.Message))" }
+     if ($hw) { $why.Add($hw) }
+@@ -631,5 +683,4 @@ function Start-Window($Go, [string]$MPath, $Plan, [string]$WTag) {
+     $pc = 'n/a'; try { $pc = ((@(& powercfg.exe /getactivescheme) | ForEach-Object { "$_".Trim() } | Where-Object { $_ }) -join ' ') } catch { }
+     Log "power scheme at the start: $pc"
+-    Close-Programs 'window start'
+     $rArgs = Get-RunnerArgs $MPath $Go
+     $cmd = "`"$PsExe`" " + ((@($rArgs) | ForEach-Object { if ($_ -match '\s') { "`"$_`"" } else { $_ } }) -join ' ')
+@@ -644,5 +695,5 @@ function Start-Window($Go, [string]$MPath, $Plan, [string]$WTag) {
+     $t0 = Now
+     Set-State 'running' @{ window = $Go.id; started = (Ts $t0); est_end = (Ts $t0.AddMinutes($Plan.min)); runner_log = $rlog }
+-    Log "window $($Go.id) START (estimate $($Plan.min) min, about $($t0.AddMinutes($Plan.min).ToString('HH:mm'))): $cmd" 'Green'
++    Log "window $($Go.id) START (estimate $($Plan.min) min, about $($t0.AddMinutes($Plan.min).ToString('HH:mm', $Inv))): $cmd" 'Green'
+     $code = $null; $old = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+     try { & $PsExe @rArgs 2>&1 | ForEach-Object { $l = "$_"; Add-Text $rlog $l; $l } | Out-Host; $code = $LASTEXITCODE }
+@@ -652,14 +703,16 @@ function Start-Window($Go, [string]$MPath, $Plan, [string]$WTag) {
+     $od = @(Get-Content -LiteralPath $rlog -ErrorAction SilentlyContinue | Where-Object { $_ -match '^out dir: ' } | Select-Object -Last 1)
+     $outDir = if ($od.Count) { $od[0].Substring(9) } else { '(none: the runner started no run)' }
+-    $after = Compare-Pins $script:Pins (Get-Pins)
+-    $jsonNow = (Get-FileHash -LiteralPath $MPath -Algorithm SHA256).Hash
+-    $susp = @(); if ($after.Count) { $susp += "pinned files changed during the run: $($after -join '; ')" }; if ($jsonNow -ne $Go.sha) { $susp += "matrix json changed during the run ($jsonNow)" }
++    # Each check on its own: a failure here must not lose the END line or last-result.txt.
++    $susp = @()
++    try { $after = Compare-Pins $script:Pins (Get-Pins); if ($after.Count) { $susp += "pinned files changed during the run: $($after -join '; ')" } } catch { $susp += "the pins could not be checked after the run ($($_.Exception.Message))" }
++    try { $jsonNow = (Get-FileHash -LiteralPath $MPath -Algorithm SHA256).Hash; if ($jsonNow -ne $Go.sha) { $susp += "matrix json changed during the run ($jsonNow)" } } catch { $susp += "the matrix json could not be hashed after the run ($($_.Exception.Message))" }
++    try { $bd = Compare-Pins $Go.bins (Get-BinHashes $Go $MPath); if ($bd.Count) { $susp += "bin files changed during the run: $($bd -join '; ')" } } catch { $susp += "the bin files could not be hashed after the run ($($_.Exception.Message))" }
+     $meaning = switch ($code) { 0 { 'all runs OK' } 1 { 'some run not OK' } 2 { 'matrix/preflight error, nothing or not all started' } default { 'unknown' } }
+     Log "window $($Go.id) END: runner exit $code ($meaning) after $mins min; out dir $outDir$(if ($susp.Count) { '; SUSPECT: ' + ($susp -join '; ') })" $(if ($code -eq 0 -and -not $susp.Count) { 'Green' } else { 'Yellow' })
+-    Write-LastResult "GO       $($Go.raw)`r`nresult   runner exit $code ($meaning)`r`nstarted  $(Ts $t0)`r`nminutes  $mins`r`nout dir  $outDir`r`nrunner   $rlog`r`nsuspect  $(if ($susp.Count) { $susp -join '; ' } else { 'no (pins and matrix unchanged)' })"
++    Write-LastResult "GO       $($Go.raw)`r`nresult   runner exit $code ($meaning)`r`nstarted  $(Ts $t0)`r`nminutes  $mins`r`nout dir  $outDir`r`nrunner   $rlog`r`nsuspect  $(if ($susp.Count) { $susp -join '; ' } else { 'no (pins, matrix and bins unchanged)' })"
+ }
+ function Invoke-Go {
+     $fi = Get-Item -LiteralPath $GoFile -ErrorAction SilentlyContinue
+-    if (-not $fi) { return }
++    if (-not $fi -or $fi -isnot [IO.FileInfo]) { return }
+     $sig = "$($fi.LastWriteTimeUtc.Ticks)|$($fi.Length)"
+     if ($script:Stuck -eq $sig) { return }    # a GO we already read but could not delete
+@@ -668,7 +721,10 @@ function Invoke-Go {
+     if ($t1 -cne $t2) { Log 'GO file is still being written: read again at the next poll'; return }
+     $script:GoReadAt = Now
+-    try { Remove-Item -LiteralPath $GoFile -Force; $script:Stuck = '' } catch { $script:Stuck = $sig; Log "!!! GO file could not be deleted ($($_.Exception.Message)); this GO is used once and then ignored" 'Red' }
++    $delErr = ''
++    try { Remove-Item -LiteralPath $GoFile -Force -ErrorAction Stop; $script:Stuck = '' } catch { $script:Stuck = $sig; $delErr = $_.Exception.Message }
+     $script:GoCount++
+     $go = Parse-Go $t2
++    # Every GO it uses is deleted: one that cannot be deleted is refused, and ignored until the file changes.
++    if ($delErr) { Log "GO read: '$($go.raw)'"; Refuse $go.raw "the GO file could not be deleted ($delErr): it is not used, and it is ignored until it changes (delete it by hand)"; return }
+     Log "GO read and deleted: '$($go.raw)'"
+     if (-not $go.ok) { Refuse $go.raw ($go.why -join '; '); return }
+@@ -737,4 +793,5 @@ try {
+     else { foreach ($w in $soft) { $why.Add($w) } }
+     if (Test-Stop) { $why.Add("$StopFile exists: delete it first") }
++    if (($script:Deadline - (Now)).TotalHours -gt $MaxRunHours) { $why.Add("it would run until $(Ts $script:Deadline), more than $MaxRunHours h from now (it is past 07:30): start it in the evening") }
+     $script:Pins = Get-Pins
+     $miss = @($script:Pins.Keys | Where-Object { $script:Pins[$_] -eq 'MISSING' })
+@@ -757,5 +814,5 @@ try {
+             if (Test-Stop) { Use-Stop 'waiting for a GO'; $endHow = 'STOP file'; break }
+             if ((Now) -ge $script:Deadline) { Log "it is $(Ts $script:Deadline): the launcher ends" 'Cyan'; $endHow = 'deadline'; break }
+-            if (Test-Path -LiteralPath $GoFile) {
++            if (Test-Path -LiteralPath $GoFile -PathType Leaf) {
+                 try { Invoke-Go }
+                 catch {
+@@ -777,9 +834,10 @@ try {
+     Log "!!! launcher error at line $($_.InvocationInfo.ScriptLineNumber): $($_.Exception.Message)" 'Red'
+ } finally {
+-    Clear-Hold
+-    Set-Awake $false
+-    Restore-Screensaver
++    # Each step on its own, so that one failure doesn't skip the others; the screensaver first.
++    Try-Step 'screensaver restore' { Restore-Screensaver }
++    Try-Step 'HOLD clear' { Clear-Hold }
++    Try-Step 'keep-awake release' { Set-Awake $false }
+     $script:WinLog = $null
+-    if ($begun -or $exitCode -eq 3) { Set-State 'ended' @{ exit = $exitCode; how = $endHow } }
++    Try-Step 'state' { if ($begun -or $exitCode -eq 3) { Set-State 'ended' @{ exit = $exitCode; how = $endHow } } }
+     if ($haveMutex) { try { $mutex.ReleaseMutex() } catch { } }
+     $mutex.Dispose()

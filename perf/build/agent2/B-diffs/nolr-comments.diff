@@ -1,0 +1,56 @@
+# patch-b-tools.py.pre-nolr (2B21FE6631EF9D7F) -> patch-b-tools.py (D164288B00E25AEC): +5 -5 lines
+--- patch-b-tools.py.pre-nolr
++++ patch-b-tools.py
+@@ -9,11 +9,11 @@
+ #   powershell -NoProfile -ExecutionPolicy Bypass -File build\agent2\build-snap.ps1 -Phase sdk|game|all
+ #       [-Jobs 10] [-Affinity F] [-SkipConfigure] [-KeepGoing]''',
+          r'''# Build B (Agent 9's codegen option; run-b.ps1 drives it, prep-b.py prepares it): -Phase game -Tag snapB
+-#   -SnapDir build\agent2\snapB\DimensionsRecomp (a copy of snap1 at S2 with Agent 9's batch rexlego/generated and
++#   -SnapDir build\agent2\snapB\DimensionsRecomp (a copy of snap1 at S2 with Agent 9's batch-nolr rexlego/generated and
+ #   legodimensions_config.toml) -GameDir build\agent2\snapB-off -CodegenExe build\agent2\codegen-frozen\codegen-frozen2.exe
+-#   (checks every source sources.cmake lists) -GenBase build\agent9\install\batch\generated (gen-check's reference). The
+-#   SDK stays snap1-sdk/install: an -SnapDir run refuses the sdk phase and the snap1-off/snap1-on trees. The gate gets
+-#   --snap-dir (allowed root, and the TU list from that sources.cmake).
++#   (checks every source sources.cmake lists) -GenBase build\agent9\install\batch-nolr\generated (gen-check's reference;
++#   never install\batch, which has skip_lr). The SDK stays snap1-sdk/install: an -SnapDir run refuses the sdk phase and
++#   the snap1-off/snap1-on trees. The gate gets --snap-dir (allowed root, and the TU list from that sources.cmake).
+ # Run as a run_command background task:
+ #   powershell -NoProfile -ExecutionPolicy Bypass -File build\agent2\build-snap.ps1 -Phase sdk|game|all
+ #       [-Jobs 10] [-Affinity F] [-SkipConfigure] [-KeepGoing] [-NoBuild] [-SnapDir D -GameDir D -CodegenExe F -GenBase D]'''),
+@@ -69,7 +69,7 @@
+ param([ValidateSet('off', 'native')][string]$Variant = 'off', [string]$SnapTag = 'S1', [string]$BuildTag = '',
+     [string[]]$ExeStrings = @(), [string[]]$RuntimeStrings = @())''',
+          r'''#        [-SnapTag S1] [-BuildTag snap1] [-ExeStrings 'literal of 16+ chars', ...] [-RuntimeStrings '...', ...]
+-# Build B (run-b.ps1): -GameTree build\agent2\snapB-off -OutDir build\agent2\codegen1-bin -GameSnap
++# Build B (run-b.ps1): -GameTree build\agent2\snapB-off -OutDir build\agent2\devoffB-bin -GameSnap
+ #   build\agent2\snapB\DimensionsRecomp (the game's source copy: the game-tree freshness checks and FiraSans use it, and
+ #   every patched file's copy there must hash-equal its PATCHES row; the SDK, its out tree and the PATCHES/STATE records
+ #   stay snap1's) -CompareBin build\agent2\devoff2-bin (A: every staged file but the exe and map must be identical to
+# gen-check.py.pre-nolr (25382FF9EFC7BD8F) -> gen-check.py (0E830AED27901CCA): +3 -3 lines
+--- gen-check.py.pre-nolr
++++ gen-check.py
+@@ -13,9 +13,9 @@
+     resolve under build/agent2 (the live rexlego/generated is a junction to baseline/: never rewrite through it).
+ Defaults (unchanged): reference baseline/DimensionsRecomp/rexlego/generated, snapshot
+ build/agent2/snap1/DimensionsRecomp/rexlego/generated, --base-rex baseline/DimensionsRecomp/rexlego.
+-Build B: --base build/agent9/install/batch/generated (Agent 9's batch output in baseline layout, with baseline's
+-rexglue.cmake and codegen.d, so --base-rex stays the default) --snap build/agent2/snapB/DimensionsRecomp/rexlego/generated
+-(--snap-rex defaults to the parent of --snap).
++Build B: --base build/agent9/install/batch-nolr/generated (Agent 9's batch-nolr output in baseline layout, with
++baseline's rexglue.cmake and codegen.d, so --base-rex stays the default; never install/batch, which has skip_lr) --snap
++build/agent2/snapB/DimensionsRecomp/rexlego/generated (--snap-rex defaults to the parent of --snap).
+ Exit 0 and 'RESULT: PASS', or exit 1 and 'RESULT: FAIL'.
+ Usage: python build\\agent2\\gen-check.py [--base DIR] [--snap DIR] [--snap-rex DIR] [--base-rex DIR]
+ """
+# snap-gate.py.pre-nolr (D3EBA52989D24485) -> snap-gate.py (6F8B4CD18A43D7D0): +1 -1 lines
+--- snap-gate.py.pre-nolr
++++ snap-gate.py
+@@ -7,7 +7,7 @@
+   3. installed SDK headers hash-equal the snap1 sources the SDK was built from (include/rex/** and the fmt/spdlog/simde
+      copies); configure_file outputs (include/rex/version.h) hash-equal snap1-sdk's own configure output instead;
+   4. the DB's generated TUs are exactly the sources listed in <snapshot>/rexlego/generated/default/sources.cmake
+-     (snap1: 440 = 438 TUs + init + register; Agent 9's batch: 414), and their include dirs contain
++     (snap1: 440 = 438 TUs + init + register; Agent 9's batch-nolr: 432), and their include dirs contain
+      snap1-sdk/install/include. (Until 23:40 this was a fixed count of 440.)
+ Usage: python build\\agent2\\snap-gate.py [game_tree] [--snap-dir DIR]
+   defaults: game tree build/agent2/snap1-off; snapshot build/agent2/snap1/DimensionsRecomp (allowed root build/agent2/snap1)

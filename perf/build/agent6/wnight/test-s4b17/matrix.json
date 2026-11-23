@@ -1,0 +1,31 @@
+{
+ "title": "TEST ONLY (Agent 6, task #19): expect-w9.json on Agent 3 devoff4b functional runs s4b17, s4b18, s4b-01",
+ "reference": "off",
+ "notes": [
+  "Not a timed window. Arms p1 and q250s are gate-only arms (not W9 arms); off is s4b-01-off (menus route).",
+  "cvars [] and env {} for every arm, because Agent 3's run.json records cvars {} and keeps the env under 'env', not 'env_set', so the kit reads {} for both. The real W9 arms are in bench/agent8/run/matrix-window9.json."
+ ],
+ "arms": [
+  {
+   "id": "off",
+   "bin": "build/agent2/devoff4b-bin",
+   "cvars": [],
+   "env": {},
+   "note": "s4b-01-off: no LEGO_GPU_WAIT_* key"
+  },
+  {
+   "id": "p1",
+   "bin": "build/agent2/devoff4b-bin",
+   "cvars": [],
+   "env": {},
+   "note": "s4b17: LEGO_GPU_WAIT_STATS=1 (real env)"
+  },
+  {
+   "id": "q250s",
+   "bin": "build/agent2/devoff4b-bin",
+   "cvars": [],
+   "env": {},
+   "note": "s4b18: BACKOFF_US=250 + STATS=1 (real env)"
+  }
+ ]
+}

@@ -1,0 +1,34 @@
+sub_82FE70C0: classes cr=5 decl=1 tail=2; SO writers: none
+== prologue differs (decl)
+  A| REX_FUNC_PROLOGUE();
+  A| PPCRegister temp{};
+  B| REX_FUNC_PROLOGUE();
+  B| PPCCRRegister cr6{};
+  B| PPCRegister temp{};
+[1] cmpwi cr6,r5,2   (cr)
+  A| ctx.cr6.compare<int32_t>(ctx.r5.s32, 2, ctx.xer);
+  B| cr6.compare<int32_t>(ctx.r5.s32, 2, {});
+[3] cmpwi cr6,r5,5   (cr)
+  A| ctx.cr6.compare<int32_t>(ctx.r5.s32, 5, ctx.xer);
+  B| cr6.compare<int32_t>(ctx.r5.s32, 5, {});
+[8] cmplwi cr6,r10,0   (cr)
+  A| ctx.cr6.compare<uint32_t>(ctx.r10.u32, 0, ctx.xer);
+  B| cr6.compare<uint32_t>(ctx.r10.u32, 0, {});
+[13] cmplwi cr6,r10,0   (cr)
+  A| ctx.cr6.compare<uint32_t>(ctx.r10.u32, 0, ctx.xer);
+  B| cr6.compare<uint32_t>(ctx.r10.u32, 0, {});
+[26] cmplwi cr6,r10,0   (cr)
+  A| ctx.cr6.compare<uint32_t>(ctx.r10.u32, 0, ctx.xer);
+  B| cr6.compare<uint32_t>(ctx.r10.u32, 0, {});
+[30] b 0x82fe6f98   (tail)
+  A| sub_82FE6F98(ctx, base);
+  A| return;
+  A| loc_82FE7138:
+  B| [[clang::musttail]] return sub_82FE6F98(ctx, base);
+  B| loc_82FE7138:
+[31] b 0x82fd4868   (tail)
+  A| sub_82FD4868(ctx, base);
+  A| return;
+  A| }
+  B| [[clang::musttail]] return sub_82FD4868(ctx, base);
+  B| }

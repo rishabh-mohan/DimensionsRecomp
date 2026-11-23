@@ -1,0 +1,17 @@
+﻿diff --git a/baseline/DimensionsRecomp/rexlego/src/gpu_native/shaders.h b/DimensionsRecomp/rexlego/src/gpu_native/shaders.h
+index e6e7131..2faa97c 100644
+--- a/baseline/DimensionsRecomp/rexlego/src/gpu_native/shaders.h
++++ b/DimensionsRecomp/rexlego/src/gpu_native/shaders.h
+@@ -33,8 +33,12 @@ struct ShaderBindingsSnapshot {
+   std::array<u32, 2> addresses{};
+ };
+ ShaderBindingsSnapshot CaptureShaderBindings();
+ ShaderBindingsSnapshot CaptureShaderBindings(u32 vertex, u32 pixel);
++// Side-effect free: the snapshot in scope, else the current bindings, as
++// ResolveBoundShader sees them. Holding it keeps those shaders, and so their
++// resolved variants (never erased), alive.
++ShaderBindingsSnapshot CurrentShaderOwners();
+ class ShaderBindingsScope {
+   const ShaderBindingsSnapshot* previous_;
+  public:
+   explicit ShaderBindingsScope(const ShaderBindingsSnapshot& bindings);

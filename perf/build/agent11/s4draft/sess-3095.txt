@@ -1,0 +1,31 @@
+﻿L3095: ## 22:44 Agent 1: s4b17 passes, so W9 runs tonight; gate B counts for W6; my claim that W6 tests finding 10 was wrong
+L3096: - **s4b17 (W9's third gate): PASS** (Agent 3).
+L3097:   - Run: devoff4b, back-off OFF, stats ON, attract-long, 420 s cap. Exit 0, 79/91 steps when the cap hit.
+L3098:   - No dumps, no STUCK-LOCK. TimerQueue never stalled.
+L3099:   - logdiff vs RA: NEW 0 / MORE 0 apart from the allowed GPU-wait lines.
+L3100:   - Stats: l2_tries 21524 > 0, sleep_fail 0.
+L3101:   - WM_CLOSE took 40.75 s under the -j8 load, a new max but under 60 s, so it counts as clean.
+L3102:   - **W9 is in tonight.** Agent 8 promotes it now. The order stays W6 → W9 → W5b → W4c, with the latest-GO times unchanged.
+L3103: - **Correction on gate B (Agent 3):** w6gB's 3 tags were never placed.
+L3104:   - game.log rotated at 22:23:58, before the pad-3 trigger, and the sidecar's tail reopened at the old offset. Its log shows placed=False, load-confirms 0/3.
+L3105:   - Gate B still ran the same story-load → vortex → level frames as s4b20.
+L3106:   - Agent 3 is fixing the sidecar and testing the rotation case without the game.
+L3107: - **My ruling: gate B counts for W6, with a coverage note ("level load without tags").**
+L3108:   - W6's timed runs are title + attract only, with no input script, tags or level load (matrix-window6.json L27, which notes the launcher refuses menu/trigger fields; Agent 6). So a tagless level load already goes beyond what W6 times.
+L3109:   - Tags with C1 are covered to story-load by gate A (3/3 LOADs).
+L3110:   - **For C1 default-ON:** s4bLV (p2fc + verify, cap 1800 s) must run with the fixed sidecar, show 3/3 LOADs and reach the level.
+L3111:   - Agent 10 rates gate B for the record.
+L3112: - **Correction to my 22:25/22:38 notes: W6 does not test finding 10** (Agent 6, build/agent6/hang/cp-state-s4b24-s4b20.md).
+L3113:   - W6 is set up like W5 (title + attract), so it never runs the vpad L route where the hangs happen.
+L3114:   - **Mechanism (inferred, high confidence; no rexgpu symbols):** the CP blocks in IssueDraw → IssueDraw_MemexportReadbackFullPath → AwaitAllQueueOperationsCompletion → CheckSubmissionFence → WaitForSingleObject(fence_completion_event_, INFINITE).
+L3115:     - Each full-path memexport draw costs one submit plus a host↔GPU round trip.
+L3116:     - Meanwhile render tid 0x17 holds CS 0x84959EDC while polling a fence that passes only after those draws.
+L3117:   - It is not hashing, K-checks or hold_global_lock.
+L3118:   - The 5 s detector needs a slow CP. Gate A's CP was slow from verify (kernel 75–86 %); s4b20 and s4b24 were slow from CPU starvation (kernel 3–11 %).
+L3119:   - All 3 hangs Agent 6 analysed happened under the -j8 build. Starvation as the cause is not proven, and not ruled out either.
+L3120:   - **Direct test, first thing after the last window, before any build restarts:** two untimed vpad L-route rows on the quiet host (Agent 3), both with slow_frame_log_ms=1 and tags via the fixed sidecar:
+L3121:     - s4b20's set (C1 OFF);
+L3122:     - w6gB's set (p2fc).
+L3123:   - If both are clean, finding 10 stays a load-only WARN. If either hangs, Agents 6/12 study the full-path sync.
+L3124:   - Later perf candidate (after S4): the memexport readback full-path sync.
+L3125: 

@@ -1,0 +1,25 @@
+native4 check (board run 2, task #6 item 1). Agent 4, 2026-11-22 13:47-13:48. Read-only: hashes, file reads and a byte scan of the exe. Nothing was built, run or written outside build/agent4.
+
+native4-bin: build/agent2/native4-bin (staged 13:37:51; MANIFEST.txt 27,221 B, staged 13:37:32)
+  legodimensions.exe  65432C81D8C7D29A35D80A5D971F2373A1188BC43FF3F92232CD1A8A500FB811  315,811,328 B  13:34:42
+    MANIFEST source: build\agent2\snap1-on\legodimensions.exe
+  native GPU fingerprint (MANIFEST line 12, checked in the exe by Agent 2): 5e3ff55de10f4f64
+  byte scan of the exe, in chunks:
+    LEGO_NATIVE_SHADER_MISS_CACHE        found   (added by the patch)
+    shader_miss_cache_insert             found   (added by the patch)
+    missing_placement_shader_identity    found
+
+applied shaders.cpp: build/agent2/snap1/DimensionsRecomp/rexlego/src/gpu_native/shaders.cpp
+  9567FE3F3B63637D9595D6B74B72567E1CAEA2D1A071E872D12660DFB37E1EFA  51,261 B  13:25:02
+  equals build/agent4/s34/shaders.cpp (the output of build/agent4/s34/shaders-s34.patch): True
+  Agent 2's backup, build/agent2/snap1-backup-S4a/DimensionsRecomp/rexlego/src/gpu_native/shaders.cpp:
+    E87A2DEE43D38D8E...  41,029 B  (the base, the same as live)
+  MANIFEST line 72: S4a A4 rexlego/src/gpu_native/shaders.cpp: E87A2DEE43D38D8E -> 9567FE3F3B63637D
+  MANIFEST line 7: native only; OFF builds compile no gpu_native file, so devoff4 does not contain the patch
+  build/agent2/snap1-on/CMakeFiles/legodimensions.dir/src/gpu_native/shaders.cpp.obj  507,754 B  13:34:24
+    (newer than the 13:25:02 apply, older than the 13:34:42 exe)
+  snap1 vs live rexlego/src/gpu_native: 184 vs 184 files. Only shaders.cpp differs.
+  live shaders.cpp: still the base E87A2DEE... (untouched)
+
+Verdict: OK. native4's shaders.cpp is byte for byte the patch output, and the exe was built from it.
+Reported to Agent 2 and Agent 1 (@@done 6).

@@ -1,0 +1,14 @@
+INFO bench=discord variant=old pid=88256 window_s=2.0 stop_samples=2
+INFO new_threads=2
+CHECK discord old discord_thread_found PASS tid=35580 new_threads=2
+RESULT discord old wakeups_10s 94.4878 switches
+RESULT discord old wakeups_per_s 9.44878 switches/s
+RESULT discord old kcycles_per_s 276.054 kcycles/s
+RESULT discord old createfile_calls_10s 0 calls
+RESULT discord old stop_ms_first 47.7255 ms
+RESULT discord old stop_ms_median 73.1746 ms
+RESULT discord old stop_ms_min 47.7255 ms
+RESULT discord old stop_ms_max 103.262 ms
+SAMPLES stop_ms 47.725 103.262 73.175
+CHECK discord old no_real_discord_connection PASS calls=30 redirected=30 refused=0 opened=0
+INFO calls=30 redirected=30 refused=0 opened=0

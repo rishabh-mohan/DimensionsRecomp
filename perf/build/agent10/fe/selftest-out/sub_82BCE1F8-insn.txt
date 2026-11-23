@@ -1,0 +1,4 @@
+sub_82BCE1F8: differing insns flow=0 body=1 seq=0
+[6] rlwinm r8,r3,3,0,28   (body)
+  A| ctx.r8.u64 = __builtin_rotateleft64(ctx.r3.u32 | (ctx.r3.u64 << 32), 3) & 0xFFFFFFF8;
+  B| ctx.r8.u64 = ctx.r3.u32 << 3;

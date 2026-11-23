@@ -1,0 +1,76 @@
+﻿# build/agent2/native-bin - Agent 2 (task #1 follow-on, Agent 1's schedule). native build: NATIVE_GPU=ON with Agent 6's AOT inputs; Release, game x86-64-v3, SDK x86-64-v2.
+# staged 2026-11-21 21:47:56. Source: snapshot build/agent2/snap1/DimensionsRecomp at S1 (MANIFEST-S1-2041.tsv, sha256 F81B1499481EE903428B1EF4C292E54D3AD1035E551CE95A12076785B87535E2); batch-1 patches since then are listed in perf-notes/agent2-baseline.md.
+# SDK: build/agent2/snap1-sdk built from the same snapshot (REXGLUE_BUILD_TESTS=OFF), installed to snap1-sdk/install; game tree build/agent2/snap1-on; codegen 0.0.23.3 (pinned generated output hash-checked against baseline/ by gen-check.py; codegen-frozen.exe stand-in writes nothing).
+# native inputs: NATIVE-INPUTS-N1-2055.tsv (sha256 24E376DA1EA3622DE2236741E90CD4032BF0BF21C8EAB3817A01CB0CE941DB2F).
+# native inputs: NATIVE-INPUTS-N1d-2055.tsv (sha256 E1A4B6EA24F27C93F62B09CCA9660DE034EE20AA28E12A99CA0BA73121D9233E).
+# native inputs: NATIVE-INPUTS-N1i-2055.tsv (sha256 12064B2B492223AA0BCC02E5CD362B3AF06E3CEEFF021B06939FDC1892457415).
+# native flags: build-snap.ps1 -Native. Native GPU fingerprint (native-gpu-build.txt, checked in the exe): LEGO Dimensions native GPU befeb1184e6c7abc.
+# batch-1 patches applied to the snapshot copy (PATCHES-S1.tsv, sha256 74655029008CAFE72595CDA70BE7A85479742022E9E295E12AD157BE7C779499); before -> after sha256 prefixes:
+#   S1+p1 rexlego/src/gpu_native/device.cpp: 4C15043E486A6225 -> 4DC63FA0B804C5FE
+#   S1+p2 thirdparty/plume/plume_d3d12.cpp: B88E4E86DE5E5DEC -> 564568D4D5853F22
+# No PDBs: the exe links without /DEBUG; symbols are in legodimensions.map. Runtime also needs legodimensions.toml in the working dir.
+# TracyClient.dll is staged for parity with build/baseline-bin; no staged binary imports it.
+# name	size	mtime	sha256	source
+legodimensions.exe	315745280	2026-11-21 21:44:10	3B329E9550A1178C080904EEA2FC9C78097B6D04D0318D931CD7F95FCAAC5796	build\agent2\snap1-on\legodimensions.exe
+legodimensions.map	43576778	2026-11-21 21:44:12	48428DB09FF4240284ABF3680409D8421526491C4A9F55F0668FAD192A85DFD1	build\agent2\snap1-on\legodimensions.map
+rexruntime.dll	10883072	2026-11-21 21:44:12	FDB315DCF477318A770067E18E962B8E48220B3991F0503DE2E4C68822B3DCF0	build\agent2\snap1-on\rexruntime.dll
+rexgpu-xenos.dll	3385344	2026-11-21 20:47:11	BFE1DF8BFA8E0FB5269873400F2945B9831EA136755DB59D1AFCCC7EB22B0EA0	build\agent2\snap1-sdk\install\bin\rexgpu-xenos.dll
+TracyClient.dll	233472	2026-11-21 19:51:25	85044850B6C663B5CE8722285D13070381C33C9ABC49D06B3E59BA0277F8FF4E	build\agent2\snap1-sdk\install\bin\TracyClient.dll
+achievement_unlocked.wav	191018	2026-11-21 21:44:13	A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5	build\agent2\snap1-on\achievement_unlocked.wav
+FiraSans-Regular.ttf	456996	2026-11-21 10:55:11	C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23	build\agent2\snap1\DimensionsRecomp\rexlego\res\FiraSans-Regular.ttf
+amd_fidelityfx_dx12.dll	6675664	2026-11-21 21:44:13	12A5081257EC95B0B53AD51B4A87FB3C03F97FE0BBB59F9496968F8D50EF93A6	build\agent2\snap1-on\amd_fidelityfx_dx12.dll
+# imports (llvm-readobj --coff-imports):
+#   legodimensions.exe imports: api-ms-win-crt-convert-l1-1-0.dll, api-ms-win-crt-environment-l1-1-0.dll, api-ms-win-crt-filesystem-l1-1-0.dll, api-ms-win-crt-heap-l1-1-0.dll, api-ms-win-crt-locale-l1-1-0.dll, api-ms-win-crt-math-l1-1-0.dll, api-ms-win-crt-runtime-l1-1-0.dll, api-ms-win-crt-stdio-l1-1-0.dll, api-ms-win-crt-string-l1-1-0.dll, api-ms-win-crt-time-l1-1-0.dll, d3d12.dll, dxgi.dll, KERNEL32.dll, MSVCP140.dll, MSVCP140_ATOMIC_WAIT.dll, ole32.dll, rexruntime.dll, SHELL32.dll, USER32.dll, VCRUNTIME140.dll, VCRUNTIME140_1.dll, WINMM.dll
+#   rexruntime.dll imports: ADVAPI32.dll, api-ms-win-crt-convert-l1-1-0.dll, api-ms-win-crt-environment-l1-1-0.dll, api-ms-win-crt-filesystem-l1-1-0.dll, api-ms-win-crt-heap-l1-1-0.dll, api-ms-win-crt-locale-l1-1-0.dll, api-ms-win-crt-math-l1-1-0.dll, api-ms-win-crt-runtime-l1-1-0.dll, api-ms-win-crt-stdio-l1-1-0.dll, api-ms-win-crt-string-l1-1-0.dll, api-ms-win-crt-time-l1-1-0.dll, api-ms-win-crt-utility-l1-1-0.dll, bcrypt.dll, dxgi.dll, GDI32.dll, HID.DLL, IMM32.dll, KERNEL32.dll, MSVCP140.dll, MSVCP140_ATOMIC_WAIT.dll, ole32.dll, SETUPAPI.dll, SHELL32.dll, USER32.dll, VCRUNTIME140.dll, VCRUNTIME140_1.dll, VERSION.dll, WINMM.dll, WS2_32.dll
+#   rexgpu-xenos.dll imports: api-ms-win-crt-convert-l1-1-0.dll, api-ms-win-crt-environment-l1-1-0.dll, api-ms-win-crt-filesystem-l1-1-0.dll, api-ms-win-crt-heap-l1-1-0.dll, api-ms-win-crt-locale-l1-1-0.dll, api-ms-win-crt-math-l1-1-0.dll, api-ms-win-crt-runtime-l1-1-0.dll, api-ms-win-crt-stdio-l1-1-0.dll, api-ms-win-crt-string-l1-1-0.dll, api-ms-win-crt-time-l1-1-0.dll, KERNEL32.dll, MSVCP140.dll, ole32.dll, rexruntime.dll, VCRUNTIME140.dll
+#   TracyClient.dll imports: ADVAPI32.dll, api-ms-win-crt-convert-l1-1-0.dll, api-ms-win-crt-filesystem-l1-1-0.dll, api-ms-win-crt-heap-l1-1-0.dll, api-ms-win-crt-runtime-l1-1-0.dll, api-ms-win-crt-stdio-l1-1-0.dll, api-ms-win-crt-string-l1-1-0.dll, dbghelp.dll, KERNEL32.dll, MSVCP140.dll, USER32.dll, VCRUNTIME140.dll, WS2_32.dll
+#   amd_fidelityfx_dx12.dll imports: api-ms-win-crt-convert-l1-1-0.dll, api-ms-win-crt-heap-l1-1-0.dll, api-ms-win-crt-math-l1-1-0.dll, api-ms-win-crt-runtime-l1-1-0.dll, api-ms-win-crt-stdio-l1-1-0.dll, api-ms-win-crt-string-l1-1-0.dll, dxgi.dll, KERNEL32.dll, MSVCP140.dll, USER32.dll, VCRUNTIME140.dll, VCRUNTIME140_1.dll, WINMM.dll
+# checks:
+#   PASS source exists: build\agent2\snap1-on\legodimensions.exe
+#   PASS source exists: build\agent2\snap1-on\legodimensions.map
+#   PASS source exists: build\agent2\snap1-on\rexruntime.dll
+#   PASS source exists: build\agent2\snap1-sdk\install\bin\rexgpu-xenos.dll
+#   PASS source exists: build\agent2\snap1-sdk\install\bin\TracyClient.dll
+#   PASS source exists: build\agent2\snap1-on\achievement_unlocked.wav
+#   PASS source exists: build\agent2\snap1\DimensionsRecomp\rexlego\res\FiraSans-Regular.ttf
+#   PASS source exists: build\agent2\snap1-on\amd_fidelityfx_dx12.dll
+#   PASS gate log exists: snap1-native-gate.log
+#   PASS snapshot manifest MANIFEST-S1-*.tsv exists
+#   PASS snap1-native-gate.log says RESULT: PASS
+#   PASS exe 21:44:10 newer than MANIFEST-S1-2041.tsv (20:41:57)
+#   PASS exe 21:44:10 newer than newest obj lego-dxil-cache.cpp.obj 21:44:04
+#   PASS map written with the exe (21:44:12)
+#   PASS map lists native_lock_elide.cpp.obj
+#   PASS snap1-on/rexruntime.dll == snap1-sdk/install/bin/rexruntime.dll
+#   PASS install/bin/rexruntime.dll == SDK out tree rexruntime.dll
+#   PASS install/bin/rexgpu-xenos.dll == SDK out tree rexgpu-xenos.dll
+#   PASS amd_fidelityfx_dx12.dll == the snapshot's PrebuiltSignedDLL copy
+#   PASS legodimensions.exe import table readable (22 DLLs)
+#   PASS legodimensions.exe imports rexruntime.dll (not a system DLL), which is staged
+#   PASS legodimensions.exe does not import TracyClient.dll
+#   PASS rexruntime.dll import table readable (29 DLLs)
+#   PASS rexruntime.dll does not import TracyClient.dll
+#   PASS rexgpu-xenos.dll import table readable (15 DLLs)
+#   PASS rexgpu-xenos.dll imports rexruntime.dll (not a system DLL), which is staged
+#   PASS rexgpu-xenos.dll does not import TracyClient.dll
+#   PASS TracyClient.dll import table readable (13 DLLs)
+#   PASS amd_fidelityfx_dx12.dll import table readable (13 DLLs)
+#   PASS amd_fidelityfx_dx12.dll does not import TracyClient.dll
+#   PASS legodimensions.exe contains 'ui_font'
+#   PASS legodimensions.exe contains 'FiraSans-Regular.ttf'
+#   PASS legodimensions.exe contains 'depth_of_field'
+#   PASS legodimensions.exe contains 'rexruntime.dll'
+#   PASS legodimensions.exe contains 'Pause and unpause the guest without allocating'
+#   PASS legodimensions.exe contains 'befeb1184e6c7abc'
+#   PASS rexgpu-xenos.dll contains 'Use bindless resources where available'
+#   PASS rexgpu-xenos.dll contains 'd3d12_readback_memexport'
+#   PASS rexruntime.dll contains 'rexcrt_heap_enable'
+#   PASS rexruntime.dll contains 'rexcrt_heap_size_mb'
+#   PASS staged copy identical: legodimensions.exe
+#   PASS staged copy identical: legodimensions.map
+#   PASS staged copy identical: rexruntime.dll
+#   PASS staged copy identical: rexgpu-xenos.dll
+#   PASS staged copy identical: TracyClient.dll
+#   PASS staged copy identical: achievement_unlocked.wav
+#   PASS staged copy identical: FiraSans-Regular.ttf
+#   PASS staged copy identical: amd_fidelityfx_dx12.dll

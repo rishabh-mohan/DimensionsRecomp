@@ -1,0 +1,17 @@
+﻿diff --git a/build/agent11/launcher-review/p-2114-CD64BC93/run-night.ps1 b/build/agent11/launcher-review/p-2119-3EFC5312/run-night.ps1
+index 3079698..30f958c 100644
+--- a/build/agent11/launcher-review/p-2114-CD64BC93/run-night.ps1
++++ b/build/agent11/launcher-review/p-2119-3EFC5312/run-night.ps1
+@@ -35,7 +35,11 @@ $RunDir = Join-Path $Repo 'bench\agent8\run'
+ $RunMatrix = Join-Path $RunDir 'run-matrix.ps1'
+ $PsExe = Join-Path $PSHOME 'powershell.exe'
+ $Inv = [Globalization.CultureInfo]::InvariantCulture
+-$AllowedEnv = @('REX_TIMER_WAIT_BLOCKING', 'LEGO_GPU_WAIT_STATS')
++# Env keys an arm may set (exact case), from build/agent8/w8w9/ENV-KEYS-F1.txt (sha256 D1AE6D57...), approved by Agent 1 at 21:14.
++# All of them are also removed from the runner's own environment before it starts.
++$AllowedEnv = @('REX_TIMER_WAIT_BLOCKING', 'LEGO_GPU_WAIT_STATS', 'LEGO_GPU_WAIT_BACKOFF_US', 'LEGO_GPU_WAIT_SPIN_US',
++                'LEGO_NATIVE_FRAME_METRICS', 'LEGO_NATIVE_SHADER_MISS_CACHE', 'LEGO_NATIVE_THREADED', 'LEGO_NATIVE_PREPARE_THREADS',
++                'LEGO_NATIVE_SNAPSHOT_STATE', 'LEGO_NATIVE_FULL_DRAW_PREPARATION', 'LEGO_NATIVE_CHAIN_PRIORITY')
+ $MaxRunHours = 14     # refuse to start when the end (07:30) is further away than this, i.e. when started after 07:30
+ $LatestStartTime = 6.75   # 06:45: no window starts at or after this time on the morning of the end time
+ $GateProcs = @('MsMpEng', 'OfficeClickToRun', 'CrossDeviceService')

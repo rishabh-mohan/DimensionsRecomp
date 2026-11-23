@@ -1,0 +1,13 @@
+# s4fixi_syntax (S4.7 fix (i): physical_protect_hold_global_lock, default OFF)  2026-11-22 07:02:31  config Release  candidate: staged copy
+xmemory.cpp        pristine  exit=0   6.3s diagnostics=1  sha 6E8FA1BA80EF9271 (= HASHES pristine)  <workspace>\build\agent12\s4-fixi\orig\xmemory.cpp
+    | <workspace>\build\agent12\s4-fixi\orig\xmemory.cpp:2273:76: warning: unused parameter 'global_lock_locked_once' [-Wunused-parameter]
+    |  2273 | bool PhysicalHeap::TriggerCallbacks(std::unique_lock<std::recursive_mutex> global_lock_locked_once,
+    |       |                                                                            ^
+    | 1 warning generated.
+xmemory.cpp        candidate exit=0   7.1s diagnostics=1  sha 141FB1A947D59156 (= HASHES staged)  <workspace>\build\agent12\s4-fixi\new\xmemory.cpp
+    | <workspace>\build\agent12\s4-fixi\new\xmemory.cpp:2292:76: warning: unused parameter 'global_lock_locked_once' [-Wunused-parameter]
+    |  2292 | bool PhysicalHeap::TriggerCallbacks(std::unique_lock<std::recursive_mutex> global_lock_locked_once,
+    |       |                                                                            ^
+    | 1 warning generated.
+    no new diagnostics in the candidate
+RESULT: PASS

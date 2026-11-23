@@ -1,0 +1,148 @@
+route-report: <workspace>\build\agent3\test\native-real
+  tag bgate-long-devoff2; bin <workspace>\build\agent2\devoff2-bin; started 2026-11-22T03:17:58.3316569-06:00; pid 88040
+  script <workspace>\harness\routes\b-gate-menus-long.txt (54 steps, sha256 1F3559C8DA2EC0F080991AA6205D16D8F2D13E8020F3C5D23FBF8CD385B2F014)
+
+  scene source: native-frames.csv draw calls (native build: perf.csv has none; 13642 of 13643 perf.csv rows matched by its 'frame' column)
+
+Steps (t = s since launch; perf = s of frame time since the first frame; scene = median draw calls/vertices of the
+30 frames on disk at that point; pad/keys = XInputGetState calls / keystroke events since the previous row):
+   1.73 L0   start                           -> slot 0 connected; 54 ste... | pad +0    keys +0  | perf      - scene -          | log +0
+  12.46 L12  wait_first_frame 240            -> ok after 10.7 s          | pad +63   keys +0  | perf    0.5 scene n0         | log +46
+          | [2026-11-22 02:56:54.656] [info] [core] [t16200] GPU route: direct native D3D-to-RHI; PM4 disabled
+          | [2026-11-22 02:56:54.741] [info] [core] [t16200] UI font loaded: <workspace>\build\agent8\runs\0256-n...
+          | [2026-11-22 02:56:54.742] [info] [core] [t16200] Startup: overlays ready
+          | [2026-11-22 02:56:54.742] [info] [core] [t16200] Startup: dialogs registered
+          | [2026-11-22 02:56:54.742] [info] [core] [t16200] Startup: resolving paths
+          | [2026-11-22 02:56:54.742] [info] [core] [t16200] Startup: constructing the runtime
+          | ... 40 more
+  12.51 L13  mark             first-frame    -> mark                     | pad +4    keys +0  | perf    0.5 scene n0         | log +0
+  62.54 L14  sleep            50             -> ok                       | pad +2954 keys +0  | perf   21.4 scene n0         | log +35
+          | [2026-11-22 02:57:00.489] [info] [core] [t89056] Native GPU: render default setter=83FB7E38 raw=00000000
+          | [2026-11-22 02:57:00.489] [info] [core] [t89056] Native GPU: render default setter=83FB81C8 raw=00000000
+          | [2026-11-22 02:57:00.489] [info] [core] [t89056] Native GPU: render default setter=83FB7F58 raw=00000001
+          | [2026-11-22 02:57:00.489] [info] [core] [t89056] Native GPU: render default setter=83FB7FE8 raw=00000000
+          | [2026-11-22 02:57:00.489] [info] [core] [t89056] Native GPU: render default setter=83FB7EC8 raw=00000000
+          | [2026-11-22 02:57:00.489] [info] [core] [t89056] Native GPU: render default setter=83FB80E8 raw=00000001
+          | ... 29 more
+  62.59 L15  mark             title          -> mark                     | pad +3    keys +0  | perf   21.4 scene n0         | log +0
+  63.42 L16  press            START          -> ok x1                    | pad +50   keys +0  | perf   21.8 scene n1         | log +0
+  71.48 L17  sleep            8              -> ok                       | pad +480  keys +0  | perf   25.8 scene n1         | log +0
+  71.54 L18  mark             after-start    -> mark                     | pad +5    keys +0  | perf   25.8 scene n1         | log +0
+  72.35 L19  press            A              -> ok x1                    | pad +46   keys +0  | perf   26.4 scene n1         | log +76
+          | [2026-11-22 02:57:00.491] [info] [core] [t89056] Native sampler default k=19 setter=83FBA008 value=00000001
+          | [2026-11-22 02:57:00.491] [info] [core] [t89056] Native GPU: initialized 26 sampler fetch shadows
+          | [2026-11-22 02:57:00.492] [info] [core] [t89056] Native GPU: initialized stencil defaults
+          | [2026-11-22 02:57:00.727] [info] [core] [t8308] Skip cutscenes: on (N0CUT5 flag set at AD0EDE54)
+          | [2026-11-22 02:57:03.648] [info] [apu] [t89056] audio endpoint 'Speakers (Realtek(R) Audio)': 2 ch, 48000 Hz, format 0x8120; submitting 2 ch
+          | [2026-11-22 02:57:03.648] [info] [core] [t86444] Toypad: detected frame offset 2 (prefix 0B)
+          | ... 68 more
+  80.39 L20  sleep            8              -> ok                       | pad +464  keys +0  | perf   29.1 scene n0         | log +0
+  80.41 L21  mark             after-a1       -> mark                     | pad +0    keys +0  | perf   29.1 scene n0         | log +0
+  81.29 L22  press            A              -> ok x1                    | pad +50   keys +0  | perf   29.5 scene n0         | log +0
+  89.32 L23  sleep            8              -> ok                       | pad +473  keys +0  | perf   33.4 scene n8         | log +0
+  89.33 L24  mark             after-a2       -> mark                     | pad +1    keys +0  | perf   33.4 scene n8         | log +0
+  90.23 L25  press            A              -> ok x1                    | pad +52   keys +0  | perf   34.2 scene n8         | log +0
+ 102.28 L26  sleep            12             -> ok                       | pad +691  keys +0  | perf   41.1 scene n8         | log +0
+ 102.36 L27  mark             after-a3       -> mark                     | pad +3    keys +0  | perf   41.1 scene n8         | log +0
+ 103.26 L28  press            DOWN           -> ok x1                    | pad +48   keys +0  | perf   41.7 scene n8         | log +0
+ 105.34 L29  sleep            2              -> ok                       | pad +97   keys +0  | perf   42.8 scene n8         | log +0
+ 105.46 L30  mark             down-1         -> mark                     | pad +6    keys +0  | perf   42.8 scene n8         | log +0
+ 106.33 L31  press            DOWN           -> ok x1                    | pad +45   keys +0  | perf   43.1 scene n8         | log +0
+ 108.40 L32  sleep            2              -> ok                       | pad +113  keys +0  | perf   43.7 scene n8         | log +0
+ 108.48 L33  mark             down-2         -> mark                     | pad +4    keys +0  | perf   43.7 scene n8         | log +0
+ 110.17 L34  press            UP 2           -> ok x2                    | pad +93   keys +0  | perf   44.0 scene n8         | log +0
+ 112.24 L35  sleep            2              -> ok                       | pad +122  keys +0  | perf   44.6 scene n8         | log +0
+ 112.30 L36  mark             up-2           -> mark                     | pad +4    keys +0  | perf   44.6 scene n8         | log +0
+ 113.20 L37  press            B              -> ok x1                    | pad +50   keys +0  | perf   44.9 scene n8         | log +0
+ 118.25 L38  sleep            5              -> ok                       | pad +258  keys +0  | perf   46.2 scene n8         | log +0
+ 118.36 L39  mark             back-1         -> mark                     | pad +5    keys +0  | perf   46.2 scene n8         | log +0
+ 119.22 L40  press            B              -> ok x1                    | pad +48   keys +0  | perf   46.9 scene n8         | log +0
+ 124.31 L41  sleep            5              -> ok                       | pad +288  keys +0  | perf   50.1 scene n8         | log +0
+ 124.36 L42  mark             back-2         -> mark                     | pad +3    keys +0  | perf   50.1 scene n8         | log +0
+ 125.23 L43  press            B              -> ok x1                    | pad +43   keys +0  | perf   50.7 scene n8         | log +0
+ 130.28 L44  sleep            5              -> ok                       | pad +301  keys +0  | perf   53.9 scene n8         | log +0
+ 130.29 L45  mark             back-3         -> mark                     | pad +1    keys +0  | perf   53.9 scene n8         | log +0
+ 140.30 L46  sleep            10             -> ok                       | pad +601  keys +0  | perf   59.8 scene n8         | log +0
+ 140.31 L47  mark             idle-10        -> mark                     | pad +0    keys +0  | perf   59.8 scene n8         | log +0
+ 150.31 L48  sleep            10             -> ok                       | pad +600  keys +0  | perf   64.6 scene n8         | log +46
+          | [2026-11-22 02:57:04.059] [info] [core] [t69312] Native GPU: clear #9 flags=71 rt=3019C000,00000000,00000000,00000000 ds=3019E000 color=FF000000 z=1
+          | [2026-11-22 02:57:04.059] [info] [core] [t69312] Native GPU: clear #9 complete
+          | [2026-11-22 02:57:04.060] [info] [core] [t69312] Native GPU: clear #10 flags=70 rt=3019C000,00000000,00000000,00000000 ds=3019E000 color=00000000 z=1
+          | [2026-11-22 02:57:04.060] [info] [core] [t69312] Native GPU: clear #10 complete
+          | [2026-11-22 02:57:04.069] [info] [core] [t69312] Native GPU: clear #11 flags=71 rt=3019C000,00000000,00000000,00000000 ds=3019E000 color=FF000000 z=1
+          | [2026-11-22 02:57:04.069] [info] [core] [t69312] Native GPU: clear #11 complete
+          | ... 40 more
+ 150.32 L49  mark             idle-20        -> mark                     | pad +1    keys +0  | perf   64.6 scene n8         | log +0
+ 160.35 L50  sleep            10             -> ok                       | pad +302  keys +0  | perf   67.6 scene n8         | log +5
+          | [2026-11-22 02:57:04.182] [info] [core] [t69312] Native GPU: clear #31 flags=71 rt=3019C000,00000000,00000000,00000000 ds=3019E000 color=FF000000 z=1
+          | [2026-11-22 02:57:04.182] [info] [core] [t69312] Native GPU: clear #31 complete
+          | [2026-11-22 02:57:04.183] [info] [core] [t69312] Native GPU: clear #32 flags=70 rt=3019C000,00000000,00000000,00000000 ds=3019E000 color=00000000 z=1
+          | [2026-11-22 02:57:04.183] [info] [core] [t69312] Native GPU: clear #32 complete
+          | [2026-11-22 02:57:04.196] [info] [core] [t69312] Native GPU: clear #33 flags=71 rt=3019C000,00000000,00000000,00000000 ds=3019E000 color=FF000000 z=1
+ 160.36 L51  mark             idle-30        -> mark                     | pad +1    keys +0  | perf   67.6 scene n8         | log +0
+ 170.38 L52  sleep            10             -> ok                       | pad +432  keys +0  | perf   72.6 scene n8         | log +0
+ 170.40 L53  mark             idle-40        -> mark                     | pad +0    keys +0  | perf   72.6 scene n8         | log +0
+ 180.42 L54  sleep            10             -> ok                       | pad +483  keys +0  | perf   77.0 scene n8         | log +0
+ 180.48 L55  mark             idle-50        -> mark                     | pad +1    keys +0  | perf   77.0 scene n8         | log +0
+ 190.50 L56  sleep            10             -> ok                       | pad +170  keys +0  | perf   79.0 scene n8         | log +0
+ 190.51 L57  mark             idle-60        -> mark                     | pad +0    keys +0  | perf   79.0 scene n8         | log +0
+ 200.60 L58  sleep            10             -> ok                       | pad +166  keys +0  | perf   80.3 scene n8         | log +0
+ 200.64 L59  mark             idle-70        -> mark                     | pad +1    keys +0  | perf   80.3 scene n8         | log +0
+ 210.68 L60  sleep            10             -> ok                       | pad +14   keys +0  | perf   80.3 scene n8         | log +0
+ 210.74 L61  mark             idle-80        -> mark                     | pad +0    keys +0  | perf   80.3 scene n8         | log +0
+ 220.76 L62  sleep            10             -> ok                       | pad +12   keys +0  | perf   80.3 scene n8         | log +0
+ 220.84 L63  mark             idle-90        -> mark                     | pad +0    keys +0  | perf   80.3 scene n8         | log +0
+ 220.86 L64  mark             end            -> mark                     | pad +0    keys +0  | perf   80.3 scene n8         | log +0
+ 220.86 L65  stop                            -> stop requested           | pad +0    keys +0  | perf   80.3 scene n8         | log +0
+ 222.25 L0   end                             -> steps 54/54; timeouts 0  | pad +0    keys +0  | perf   80.6 scene n5620      | log +3
+          | [2026-11-22 02:57:04.196] [info] [core] [t69312] Native GPU: clear #33 complete
+          | [2026-11-22 02:57:04.196] [info] [core] [t69312] Native GPU: clear #34 flags=70 rt=3019C000,00000000,00000000,00000000 ds=3019E000 color=00000000 z=1
+          | [2026-11-22 02:57:04.196] [info] [core] [t69312] Native GPU: clear #34 complete
+
+Marks (compare devoff2 and devoffB mark by mark):
+  first-frame    t   12.51  perf    0.5  scene n0
+  title          t   62.59  perf   21.4  scene n0
+  after-start    t   71.54  perf   25.8  scene n1
+  after-a1       t   80.41  perf   29.1  scene n0
+  after-a2       t   89.33  perf   33.4  scene n8
+  after-a3       t  102.36  perf   41.1  scene n8
+  down-1         t  105.46  perf   42.8  scene n8
+  down-2         t  108.48  perf   43.7  scene n8
+  up-2           t  112.30  perf   44.6  scene n8
+  back-1         t  118.36  perf   46.2  scene n8
+  back-2         t  124.36  perf   50.1  scene n8
+  back-3         t  130.29  perf   53.9  scene n8
+  idle-10        t  140.31  perf   59.8  scene n8
+  idle-20        t  150.32  perf   64.6  scene n8
+  idle-30        t  160.36  perf   67.6  scene n8
+  idle-40        t  170.40  perf   72.6  scene n8
+  idle-50        t  180.48  perf   77.0  scene n8
+  idle-60        t  190.51  perf   79.0  scene n8
+  idle-70        t  200.64  perf   80.3  scene n8
+  idle-80        t  210.74  perf   80.3  scene n8
+  idle-90        t  220.84  perf   80.3  scene n8
+  end            t  220.86  perf   80.3  scene n8
+
+Scene timeline (native-frames.csv draw calls (native build: perf.csv has none; 13642 of 13643 perf.csv rows matched by its 'frame' column); perf.csv frame time in 5-s buckets, most common scene; runs of equal buckets merged):
+      0-5     s  n0
+      5-10    s  n1
+     10-15    s  n0
+     15-25    s  n1
+     25-30    s  n0
+     30-115   s  n8
+  13643 frame rows, 110.7 s of frame time
+
+Checks:
+  ok   exit: exit 0 (0x00000000); close wm_close in 1.18 s; elapsed 222.27 s; exited_early False
+  ok   no crash: wer_seen False; crash_events 0; dumps 0
+  ok   script ran to the end: 54/54 done; last "done"; stopped by script True; timeouts 0 ; error 
+  FAIL pad DLL loaded by the game from the run dir: pid 88040 (game 88040); <workspace>\build\agent3\runs\20261122-031756-bgate-long-devoff2\xinput1_4.dll; maps 1
+  ok   game polled the pad: XInputGetState 9652 (with input 134); XInputGetKeystroke 0 (events 0); caps 48281; set_state 9673
+  info perf.csv: held unshared by the game while it ran: True; 462363 bytes at the end; 13643 frame rows
+  ok   no "not in any registered module" lines: 0 lines
+  ok   no watchdog/hang lines: 0 lines
+  info crash guard lines (the gate compares kinds with devoff2): 0 lines; kinds: none
+  info unimplemented-instruction lines (the gate compares the count with devoff2): 0 lines
+  FAIL exit sequence in game.log: line numbers 481, missing, 482 (Window closing / Execution complete / Title terminated)
+
+PROBLEMS: pad DLL loaded by the game from the run dir; exit sequence in game.log

@@ -1,0 +1,9 @@
+# snap-patch S3 plan 2026-11-22 02:41:36; rules <workspace>\build\agent2\S3-rules.txt (sha256 92ffba3ba1576868e743e5df9336bdc0613662327ec482869edf0b85b9825c09)
+# base: MANIFEST-S1-2041.tsv + 20 PATCHES row(s) + 48 native-input file(s) + STATE-S2-2315.tsv
+# note: S3 build inputs: game commit 001336f + SDK commit c5fe668 on top of the 01:50 checkpoint (game a0bdaa7, SDK 90e7ccd), plus the uncommitted pre-sprint plume and simde edits, as in S1/S2 (Agent 1, 02:22); from exactly Agent 10's 4 confirmed hashes 11DE333F (rex_app.cpp), 4331A312 (audio_system.cpp), 4EC71328 (settings_registry.cpp), 9CBE6DBF (settings_preferences.cpp); working-tree contents and mtimes unchanged by the commits.
+# note: S3 rules: build/agent10/s3/S3-include.tsv (sha256 A1E7C83F7CFA13728559DEFFEB0B4F43ADEC23A52A3D9679F0712F75F2E3463D, 28 INCLUDE / 0 EXCLUDE vs STATE-S2-2315.tsv) -> build/agent2/S3-rules.txt (make-rules-from-tsv.py) -> snap-patch.py apply S3.
+# note: Generated code: the pinned S1 output (gen-check against baseline/), as in S1/S2; only build B uses install/batch-nolr.
+files: live 23843, snap1 23840; hashed live 8, snap1 0; walk 0.6s, hash 0.0s
+same 23815; differing 28: COPY 28 (488374 bytes), DELETE 0, HELD BACK 0; errors 0, warnings 0
+## APPLIED 02:41:38: copied 28, deleted 0; PATCHES PATCHES-S3.tsv (sha256 2da2ab6ca49e3723afd4e26fa07927511e9c5c9fc71c54701ee599c88430f3b0); STATE STATE-S3-0241.tsv (sha256 4f791c2e80594c03825ed41dd2eab6134cca55e65dfcfdf0d60d0f650165ac9d); wall 3.1s
+diff: <workspace>\build\agent2\snap1\DIFF-S3-0241.txt

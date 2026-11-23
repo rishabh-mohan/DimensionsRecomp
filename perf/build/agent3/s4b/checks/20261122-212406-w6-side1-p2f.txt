@@ -1,0 +1,48 @@
+# s4b_check w6s1 20261122-212406-w6-side1-p2f (off, scenario I260)
+run.json: exit 0 (0x00000000) dumps 0 crash_events 0 wer False; close wm_close 11.58 s; elapsed 272.31 of 260 s; cvars {"framerate_limit": "0", "shared_memory_single_hold_rearm": "true", "physical_protect_hold_global_lock": "true", "shared_memory_upload_hash_log": "true", "slow_frame_log_ms": "1"}; env -; steps None
+summary: verdict RUNNING; first frame 11.0 s; levels {"info": 67435, "warning": 40}; unknown cvars []; errors 0
+log files game.3.log,game.2.log,game.1.log,game.log; levels {"info": 67435, "warning": 40}
+families: c1_any=0 k=0 c1_verify_on=0 c1_verify_f=0 c1_other=0 recovered_stale=0 unhandled_phys=0 protect_failed=0 split_init=0 split=0 deferred_counters=0 gpu_wait=0 memexport=33692 slow_frame=33692 s4_upload_hash=33697 precise_wait=0 miss_cache=0 stuck_lock=0 minidump=0 fatal=0 debug_layer=0 dred=0 d3d12_msg=0 clean_exit=1
+  memexport: [2026-11-22 21:24:18.379] [info] [gpu] [t14728] slow frame #2: 32.6 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.1 (2x), new 3 | texture load 2.1 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | m
+  memexport: [2026-11-22 21:24:18.384] [info] [gpu] [t14728] slow frame #3: 5.1 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | me
+  memexport: [2026-11-22 21:24:18.388] [info] [gpu] [t14728] slow frame #4: 4.1 ms | gpu-thread idle 0.6 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 2x 8 KB (on memexport pages 0x 0 KB) | me
+  memexport: ... (33686 more)
+  memexport: [2026-11-22 21:28:28.566] [info] [gpu] [t14728] slow frame #33696: 5.3 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) 
+  memexport: [2026-11-22 21:28:28.592] [info] [gpu] [t14728] slow frame #33697: 26.0 ms | gpu-thread idle 18.8 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 2x 3848 KB (on memexport pages 0x 0
+  memexport: [2026-11-22 21:28:28.607] [info] [gpu] [t14728] slow frame #33698: 14.6 ms | gpu-thread idle 7.2 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 2x 3848 KB (on memexport pages 0x 0 
+  slow_frame: [2026-11-22 21:24:18.379] [info] [gpu] [t14728] slow frame #2: 32.6 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.1 (2x), new 3 | texture load 2.1 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | m
+  slow_frame: [2026-11-22 21:24:18.384] [info] [gpu] [t14728] slow frame #3: 5.1 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | me
+  slow_frame: [2026-11-22 21:24:18.388] [info] [gpu] [t14728] slow frame #4: 4.1 ms | gpu-thread idle 0.6 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 2x 8 KB (on memexport pages 0x 0 KB) | me
+  slow_frame: ... (33686 more)
+  slow_frame: [2026-11-22 21:28:28.566] [info] [gpu] [t14728] slow frame #33696: 5.3 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) 
+  slow_frame: [2026-11-22 21:28:28.592] [info] [gpu] [t14728] slow frame #33697: 26.0 ms | gpu-thread idle 18.8 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 2x 3848 KB (on memexport pages 0x 0
+  slow_frame: [2026-11-22 21:28:28.607] [info] [gpu] [t14728] slow frame #33698: 14.6 ms | gpu-thread idle 7.2 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 2x 3848 KB (on memexport pages 0x 0 
+  s4_upload_hash: [2026-11-22 21:24:18.366] [info] [gpu] [t14728] S4 upload hash: frame 1 calls 2 ranges 2 pages 921 (3684 KB) first 921 unchanged 0 changed 0 blocks 16 changed_blocks 0 pages_in_changed_blocks 0 u_page -1.0000 u_block -1.0000
+  s4_upload_hash: [2026-11-22 21:24:18.384] [info] [gpu] [t14728] S4 upload hash: frame 2 calls 2 ranges 2 pages 921 (3684 KB) first 921 unchanged 0 changed 0 blocks 17 changed_blocks 0 pages_in_changed_blocks 0 u_page -1.0000 u_block -1.0000
+  s4_upload_hash: [2026-11-22 21:24:18.388] [info] [gpu] [t14728] S4 upload hash: frame 3 calls 1 ranges 1 pages 1 (4 KB) first 1 unchanged 0 changed 0 blocks 1 changed_blocks 0 pages_in_changed_blocks 0 u_page -1.0000 u_block -1.0000
+  s4_upload_hash: ... (33691 more)
+  s4_upload_hash: [2026-11-22 21:28:28.563] [info] [gpu] [t14728] S4 upload hash: frame 33695 calls 2 ranges 2 pages 961 (3844 KB) first 0 unchanged 959 changed 2 blocks 16 changed_blocks 2 pages_in_changed_blocks 65 u_page 0.9979 u_block 0.9324
+  s4_upload_hash: [2026-11-22 21:28:28.587] [info] [gpu] [t14728] S4 upload hash: frame 33696 calls 2 ranges 2 pages 961 (3844 KB) first 0 unchanged 959 changed 2 blocks 17 changed_blocks 2 pages_in_changed_blocks 65 u_page 0.9979 u_block 0.9324
+  s4_upload_hash: [2026-11-22 21:28:28.603] [info] [gpu] [t14728] S4 upload hash: frame 33697 calls 2 ranges 2 pages 961 (3844 KB) first 0 unchanged 959 changed 2 blocks 17 changed_blocks 2 pages_in_changed_blocks 64 u_page 0.9979 u_block 0.9334
+memexport full-buffer: {"lines": 33692, "last_total": 0, "max_total": 0, "sum_x": 0, "lines_x_gt0": 0}
+last slow-frame line (tail): ...exture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 2x 3848 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)
+frames (perf.csv rows) 33698; slow_frame per frame 1.000
+logdiff base 20261122-133730-s4a-udiag: 9 logs joined -> build\agent3\s4b\checks\joined\20261122-133730-s4a-udiag
+logdiff cand: 4 logs joined -> build\agent3\s4b\checks\joined\20261122-212406-w6-side1-p2f
+logdiff vs 20261122-133730-s4a-udiag (base scenario I330): NEW 0 (+0 allowed) MORE 0 (+0 allowed) GONE 28 (0 unexpected) FLAG 0; NEW at info 0 other, 0 allowed; rc 0
+levels cand {"info": 67435, "warning": 40} vs 20261122-133730-s4a-udiag {"info": 149789, "warning": 40}
+scenes (>= 2 s) base: 226/1022:294s 219/226:15s 218/222:15s
+scenes (>= 2 s) cand: 226/1022:220s 219/226:15s 218/222:15s
+  missing in cand: -; extra in cand: -
+threads (% of one core, window [20.0, 249.6] s from the first frame, 229.6 s): GPU Commands (F8000018) x1 62.9 | Main XThread (F800002C) x1 54.7 | rex::thread::TimerQueue x1 31.3 | (unnamed) x32 22.9 | XThread4704 (F80001A8) x1 21.9 | XThread93C4 (F8000144) x1 12.4 | XThread83D0 (F8000114) x1 9.6 | 0xc0550001 x1 7.4 | XThread4FD8 (F800010C) x1 4.4 | GPU VSync (F800001C) x1 4.0
+  TimerQueue ticks (tid 24684): 130 samples over [-8.4, 249.6] s, cycles non-rising in 0 of 129 steps 
+sys.csv slow state: {"rows": 262, "onset_s": null, "slow_pct": 0.0, "e_eff_mhz_median": 1435, "cpu_util_pct_median": 82.2, "slow": false}
+PROOF ok   slow-frame lines 33692
+PROOF ok   the last slow-frame line ends with the memexport suffix: ...n memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)
+PROOF ok   P2 COUNTER: memexport full-buffer total (last line) = 0; max 0; sum Nx 0; lines with Nx > 0: 0 -> closes P2 memexport gate
+PROOF ok   W6 cvars in run.json: single_hold_rearm=true hold_global_lock=true
+PROOF ok   W6 w6s1 cvars in run.json (5 expected): all as W6-GATES.md v2
+PROOF ok   p2f: no C1 line (0)
+PROOF ok   G8 bad lines: "PhysicalHeap::Protect failed" 0, "Recovered stale physical page protection" 0, "Unhandled guest physical write fault" 0
+BASE items missed: none (base scenario differs: scenes/marks/GONE not judged)
+VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row w6s1)

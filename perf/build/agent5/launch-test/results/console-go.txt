@@ -1,0 +1,39 @@
+group go; t-good.json sha256 4D7D689B799F6102E6325B4CED12688E60F1D2FCE82397C06956574B2B025DFD; real perf-notes files: WINDOW-GO.txt=absent WINDOW-HOLD.txt=absent WINDOW-STOP.txt=absent
+PASS  good GO            exit 0        
+PASS  bad hash           exit 0        
+PASS  bin outside agent2 exit 0        
+PASS  disallowed env key exit 0        
+PASS  driver rule x5     exit 0        
+PASS  unknown argument   exit 2        
+PASS  refuse: end > 14 h away exit 2        
+PASS  latest start at GO exit 0        
+PASS  malformed GO x7    exit 0        
+PASS  refuse: not WinSta0\Default exit 2        
+PASS  hooks need -DryRun exit 2        
+PASS  second launcher refused exit 2        
+runner estimate for the test GO: 7 min
+PASS  deadline at GO     exit 0        
+PASS  deadline in gate   exit 0        
+PASS  deadline, no GO    exit 0        
+PASS  latest start in gate exit 0        
+group go, 2026-11-22 22:18:06, run-night.ps1 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31
+
+test                        tag             result exit detail
+----                        ---             ------ ---- ------
+good GO                     t-good          PASS   0    ok    
+bad hash                    t-badhash       PASS   0    ok    
+bin outside agent2          t-badbin        PASS   0    ok    
+disallowed env key          t-badenv        PASS   0    ok    
+driver rule x5              t-driver        PASS   0    ok    
+unknown argument            t-unknownarg    PASS   2    ok    
+refuse: end > 14 h away     t-14h           PASS   2    ok    
+latest start at GO          t-latest-go     PASS   0    ok    
+malformed GO x7             t-badgo         PASS   0    ok    
+refuse: not WinSta0\Default t-startref      PASS   2    ok    
+hooks need -DryRun          t-hooks         PASS   2    ok    
+second launcher refused     t-mutex         PASS   2    ok    
+deadline at GO              t-deadline-go   PASS   0    ok    
+deadline in gate            t-deadline-gate PASS   0    ok    
+deadline, no GO             t-deadline-wait PASS   0    ok    
+latest start in gate        t-latest-gate   PASS   0    ok
+real perf-notes files at the end: WINDOW-GO.txt=absent WINDOW-HOLD.txt=absent WINDOW-STOP.txt=absent

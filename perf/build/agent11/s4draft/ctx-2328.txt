@@ -1,0 +1,34 @@
+F125: 
+F126: ### Questions for you (window 4 doesn't wait on them)
+F127: 1. May Agent 3 use generated virtual Toy Pad tags (Batman, Gandalf, Wyldstyle) in its hidden-desktop test runs? With them, the B check can also cover the pause menu and a level change. Saves stay in the run folder. **Answered 17:27: yes.** Agent 3 may use them in its hidden-desktop test runs under the rules set at 02:11 for its test harness: user mode only, no drivers or system-wide installs, never inside a staged build folder (`build/agent2/*-bin`), saves kept in the run folder, and builds at 2 threads or fewer. So the three level-load runs in the S4b check queue (rows 7, 20 and 23) are back in, and the re-upload fix C1's verify-mode level load, which C1 needs before it can ever be turned on, can now run.
+F128: 2. Should the small `thirdparty/simde` edit (a Windows Clang fix) be committed as a patch file? Until you answer, it stays out.
+F129: 3. For later benchmark windows only: would you add a Windows Defender exclusion for the build folders, or turn off the NVIDIA app's PresentMon? Tonight Defender used 1-5 cores and PresentMon 1 core, which made the heavy-scene runs unusable for timing and made the stuck lock (finding 10) worse. Window 4 keeps both as they are, so that it matches window 3. Until you answer, nobody touches either.
+F130: 4. Will you check the 4 native shaders on screen (finding 9), and when? Packing them changes the image by design, because draws that were skipped come back, so it needs your eyes on a side-by-side with the standard GPU path; the reference screenshot needs your visible desktop. Until then, the native option for S4 is the stopgap that only remembers the miss, which changes nothing visible.
+F131: 5. Would an opt-in mode be acceptable in which objects can be missing for a few frames while their shaders compile, instead of the game freezing? If not, that item and its companion are dropped from S4.
+F132: 
+F133: ## Where things stand
+F134: 
+D179: 3. **The user questions in §4a:** Toy Pad tags (**answered yes**, the user, 17:27), simde, Defender/PresentMon, the native screenshot check and no-wait pop-in.
+D425:    - S4 impact: C1 can't be turned on without a verify-mode level load (b2r §21 A). Without figures, or you at the controls, runs reach only the title screen and the menus.
+D426:    - **Answer (the user, 17:27): yes.** Agent 3 may use them in its hidden-desktop test runs under the 02:11 harness-only rules: user-mode only, no drivers or system-wide installs, never in a staged `build/agent2/*-bin`, saves isolated in the run folder, builds at ≤ 2 threads (SESSION2 L2654). So the S4b queue's level-load rows 7, 20 and 23 are no longer skipped, C1 ON's verify-mode level load (b2r §21 A) can run, and so can fix (i) ON's level load (§2b step 3). Until 17:27 the default was no.
+D427: 2. **simde** (F Q2). Should the small `thirdparty/simde` edit (a Windows Clang fix) be committed as a patch file?
+D428:    - Backup: `build/agent1/simde-dirty-1122.diff`.
+D429:    - Until you answer, S4's commits leave it out, as S3's did.
+D430: 3. **Defender / PresentMon** (F Q3). For later windows only: would you add a Windows Defender exclusion for the build folders, or turn off the NVIDIA app's PresentMon?
+D431:    - Tonight Defender used 1.8-3.7 cores with no game running (06:25-06:55), and PresentMon ~1 core.
+D432:    - S4 impact: the attract benchmark and quiet-vs-loaded comparisons need a quiet machine.
+D433:    - If both stay as they are, S4's windows stay comparable with window 4. Window 3 came before the Windows Update (§2c), so comparisons with it carry that caveat either way.
+D434:    - Until you answer, nobody touches either.
+D435: 4. **Screenshot check for the 4 native shaders (#1).** The pack changes the image by design: the skipped draws come back. So b2r §15.1 gates it as a content fix that needs your visual check.
+D436:    - The standard-path reference screenshot needs your visible desktop (`LEGO_GPU_SNAPSHOT_DIR`).
+D437:    - Will you do this check, and when?
+D438:    - Until then, the native option is the miss cache (#2), which changes nothing visible.
+D439: 5. **No-wait mode pop-in (#33).** Would an opt-in mode be acceptable in which objects can be missing for a few frames, instead of the game freezing while shaders compile?
+D440:    - If not, #33 and #34 are dropped.
+D441: 
+D442: ### 4b. For Agents 1, 10 and 12 (not for the user)
+D34 tail: ...te it after the windows (L3088-3092). At 23:00 (L3164-3168): test-day.ps1 passed 25/25 (22:54) on run-day.ps1 D86F6DE0 and launcher-ctl.ps1 43EC1AB7; the night launcher pins only run-night.ps1, RUN-NIGHT.cmd and the `bench/agent8/run` files and ignores new files under `bench/agent5/`; the day install folder will be `bench/agent5/day/`, with status in `bench/agent5/day/status`, which Agent 12's read-out must read too.
+D44 tail: ...-10 rows, s4bV0, s4bLV, the re-pin rows and the CG26/CTR builds (L3003-3007, L3033). Agent 3 stopped its queue, postcheck and hostload at 22:56, so none of its runs is left tonight, and at 23:01 no game or compiler was running; its morning queue is f10a, then f10b, then rpb0/rpm4, gated by marker files (`build/agent3/s4b/ready-later` and `ready-quiet`) that Agent 3 creates on Agent 1's word after the windows (L3169).
+D237 tail: ...K `d3d12/pipeline_cache.cpp/.h`, optionally `d3d12/command_processor.cpp` | cvar, false (placeholder name `d3d12_async_pipeline_no_wait`) | **not rated** | **YES, visible:** objects whose pipeline isn't ready are skipped for a few frames (pop-in) | C++ (SDK) | E: trades shader-compile freezes for a few frames of missing objects | functional; **the user judges the pop-in by eye** (§4a) | the user's answer | proposed |
+D302 tail: ...- **Native only (rexlego):** #2 miss cache (staged, SAFE; in native4, OFF, 13:04), or the #1 pack instead. The pack needs the s35 output, b2r §15.1 items 1-5 and §4a Q4 first. Bundled, it adds < 1 min, plus 10-15 min of prep.
+D402 tail: ...- the attract benchmark (~42-45 min at 3 runs each). It needs a quiet machine, so it depends on §4a Q3;

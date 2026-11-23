@@ -1,0 +1,26 @@
+# present_microbench 2026-11-21 19:10:01, runs=5, args=['--foreground']
+# machine shared with other agents' builds; numbers are medians, see the cpp header
+[mode] foreground-like: power throttling off (process 1, thread 1), ABOVE_NORMAL priority 1
+[win32] 7 runs x 20000 iterations, ns per call: median (min..max)
+[win32]   all three (per present)                31.4 (   30.3..   43.7)
+[win32]   GetForegroundWindow                     6.4 (    5.6..    7.2)
+[win32]   GetWindowLongPtrW(GWL_STYLE)           14.9 (   14.1..   18.9)
+[win32]   MonitorFromWindow                      14.4 (   11.8..   17.5)
+[timer] high-resolution waitable timer, 5 runs x 200 samples; lateness in us
+[timer]   request  median    p95     p99   p99.9     max   run-medians
+[timer]     500    525.1   849.0  1423.3  1777.0  3583.4   527.4 523.5 525.8 527.3 523.6
+[timer]    1000    518.5  1126.9  1786.6  3796.1  6856.8   392.0 534.4 520.8 520.2 513.8
+[timer]    1500    438.6  1365.2  3881.2  9302.6  17417.3   472.2 399.1 383.4 351.5 514.3
+[timer]    3500    360.1  1681.4  4309.0  9977.3  11116.5   358.6 372.6 387.0 331.3 347.0
+[pace] frame shape: guest 2000 us outside the gate, 600 us under it before the limiter, 400 us after the present; 5 runs per row, medians of per-run values
+[pace]  pub-gap = LimitFrameRate's next minus PublishFramePace's, min..max over all frames and runs (us); never negative means the published deadline is never late
+[pace]  cap  mode            interval-mean  interval-sd  late-p50  late-p99  gate-held-mean  spin/frame   pub-gap-min  pub-gap-max
+[pace]  240  old                  4169.9        535.5       0.4    2546.4          2146.7       156.5             -            -
+[pace]  240  unlocked-2000us       4166.7        507.2       0.5    2156.1          2142.5       143.0         0.000        0.200
+[pace]  240  unlocked-4000us       4183.2        751.9       0.7    4123.8          2142.9       127.2         0.100        0.500
+[pace]  120  old                  8333.3        891.9       0.4    2980.7          6313.4       147.9             -            -
+[pace]  120  unlocked-2000us       8333.3        678.9       0.4    2337.6          2094.5       167.0         0.000        0.200
+[pace]  120  unlocked-4000us       8333.3        666.9       0.4    2527.8          4071.0       155.6         0.100        0.300
+[pace]   60  old                 16666.9        848.3       0.4    2088.6         14650.8       162.8             -            -
+[pace]   60  unlocked-2000us      16666.7        399.0       0.4    1438.1          2099.9       156.9         0.100        0.200
+[pace]   60  unlocked-4000us      16666.7        574.4       0.5    1719.8          4048.6       158.0         0.000        0.200

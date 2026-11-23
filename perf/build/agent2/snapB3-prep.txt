@@ -1,0 +1,11 @@
+04:12:11 START prep-nb: install tree <workspace>\build\agent9\install\batch-nolr, snapshot copy <workspace>\build\agent2\snapB3\DimensionsRecomp
+04:12:11 install END line: 23:54:03 [batch-nolr] END files=872 bytes=481074943 TUs=430 last=legodimensions_recomp.429.cpp config_sha=E60EAF1CEB575572
+04:12:13 install tree: 872 files, 481074943 bytes, every file matches SHA256SUMS.txt (sha256 24ce1493fb8dae37e00b556eb8871d633921e44378d960de4359b104b16cdb8e), 2.1s
+04:12:13 config e60eaf1ceb575572 == configs/batch-nolr.toml == the END line == the pin; rexglue.cmake and codegen.d == baseline's; sources.cmake: 432 sources (430 TUs, last legodimensions_recomp.429.cpp); build/agent9/bin/rexglue.exe 37b32713b7516402 (matches the recipe's 37B32713)
+04:12:13 snapshot tag S3d: PATCHES S1, S2, S3, S3d; newest STATE file STATE-S3d-0342.tsv
+04:12:58 robocopy snap1 -> snapB3 (/E): exit 1, 45.2s
+04:13:15 snapB3 copy verified: 24115 files, 1772557562 bytes, all equal to snap1 in size and mtime (longest path 266 chars); 46 patched files (PATCHES-S1.tsv, PATCHES-S2.tsv, PATCHES-S3.tsv, PATCHES-S3d.tsv) hash-equal their last PATCHES row; 16.5s
+04:13:15 guards: <workspace>\build\agent2\snapB3\DimensionsRecomp\rexlego and <workspace>\build\agent2\snapB3\DimensionsRecomp\rexlego\generated are real directories (generated created) and every target resolves under <workspace>\build\agent2\snapB3
+04:13:16 step 4: config copied first, robocopy /MIR install generated -> snapB3 generated exit 1 (1.5s), touched 871 files at 04:13:16
+04:13:43 gen-check PASS: gen-check 04:13:43: reference 871 files, snapshot 871 files; 870/870 compared files identical (481.1 MB); codegen.d: rewritten to snapshot paths (475 -> 508 bytes); 26.6s
+04:13:43 DONE prep-b in 92.7s; notes <workspace>\build\agent2\snapB3-manifest-notes.txt; free C: 248.7 GB

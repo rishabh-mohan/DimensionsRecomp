@@ -1,0 +1,41 @@
+{
+    "title":  "selftest native + seed chain (fake exe)",
+    "order":  "fixed",
+    "repeats":  1,
+    "cold_run":  false,
+    "quick":  {
+                  "warmup_s":  2,
+                  "measure_s":  3,
+                  "settle_s":  1,
+                  "cooldown_s":  1,
+                  "boot_timeout_s":  30,
+                  "close_timeout_s":  15
+              },
+    "arms":  [
+                 {
+                     "id":  "N1",
+                     "bin":  "<workspace>\\build\\agent8\\run-selftest\\fake-bin",
+                     "frames":  "native",
+                     "group":  "n",
+                     "ref":  true
+                 },
+                 {
+                     "id":  "N2",
+                     "bin":  "<workspace>\\build\\agent8\\run-selftest\\fake-bin",
+                     "frames":  "native",
+                     "group":  "n",
+                     "seed_cache":  "N1"
+                 },
+                 {
+                     "id":  "N3",
+                     "bin":  "<workspace>\\build\\agent8\\run-selftest\\fake-bin",
+                     "frames":  "native",
+                     "group":  "n",
+                     "seed_cache":  "N2",
+                     "seed_recipes_only":  true,
+                     "env":  {
+                                 "LEGO_NATIVE_PSO_CACHE":  "0"
+                             }
+                 }
+             ]
+}

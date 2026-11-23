@@ -1,0 +1,353 @@
+== c_new_clrrwi_4 (3 insns excl. ret)
+  movl	8(%rcx), %eax
+  andl	$-16, %eax
+  movq	%rax, (%rcx)
+  retq
+== c_new_extrwi_4_25 (4 insns excl. ret)
+  movl	8(%rcx), %eax
+  shrl	$3, %eax
+  andl	$15, %eax
+  movq	%rax, (%rcx)
+  retq
+== c_new_inslwi_8_16 (2 insns excl. ret)
+  movzbl	11(%rcx), %eax
+  movb	%al, 1(%rcx)
+  retq
+== c_new_insrwi_8_16 (2 insns excl. ret)
+  movzbl	8(%rcx), %eax
+  movb	%al, 1(%rcx)
+  retq
+== c_new_rlwimi_2_0_29 (6 insns excl. ret)
+  movl	8(%rcx), %eax
+  shll	$2, %eax
+  movabsq	$-4294967293, %rdx              # imm = 0xFFFFFFFF00000003
+  andq	(%rcx), %rdx
+  orq	%rax, %rdx
+  movq	%rdx, (%rcx)
+  retq
+== c_new_rlwimi_8_16_27 (7 insns excl. ret)
+  movl	8(%rcx), %eax
+  shldl	$8, %eax, %eax
+  andl	$65520, %eax                    # imm = 0xFFF0
+  movq	$-65521, %rdx                   # imm = 0xFFFF000F
+  andq	(%rcx), %rdx
+  orq	%rax, %rdx
+  movq	%rdx, (%rcx)
+  retq
+== c_new_rlwnm_16_27 (6 insns excl. ret)
+  movq	%rcx, %rax
+  movl	8(%rcx), %edx
+  movzbl	16(%rcx), %ecx
+  roll	%cl, %edx
+  andl	$65520, %edx                    # imm = 0xFFF0
+  movq	%rdx, (%rax)
+  retq
+== c_new_rlwnm_8_31 (6 insns excl. ret)
+  movq	%rcx, %rax
+  movl	8(%rcx), %edx
+  movzbl	16(%rcx), %ecx
+  roll	%cl, %edx
+  andl	$16777215, %edx                 # imm = 0xFFFFFF
+  movq	%rdx, (%rax)
+  retq
+== c_new_rotmask_8_16_27 (4 insns excl. ret)
+  movl	8(%rcx), %eax
+  shldl	$8, %eax, %eax
+  andl	$65520, %eax                    # imm = 0xFFF0
+  movq	%rax, (%rcx)
+  retq
+== c_new_shlmask_2_20_29 (4 insns excl. ret)
+  movl	8(%rcx), %eax
+  shll	$2, %eax
+  andl	$4092, %eax                     # imm = 0xFFC
+  movq	%rax, (%rcx)
+  retq
+== c_new_slwi_4 (3 insns excl. ret)
+  movl	8(%rcx), %eax
+  shll	$4, %eax
+  movq	%rax, (%rcx)
+  retq
+== c_new_srwi_8 (3 insns excl. ret)
+  movl	8(%rcx), %eax
+  shrl	$8, %eax
+  movq	%rax, (%rcx)
+  retq
+== c_old_clrrwi_4 (3 insns excl. ret)
+  movl	8(%rcx), %eax
+  andl	$-16, %eax
+  movq	%rax, (%rcx)
+  retq
+== c_old_extrwi_4_25 (4 insns excl. ret)
+  movl	8(%rcx), %eax
+  shrl	$3, %eax
+  andl	$15, %eax
+  movq	%rax, (%rcx)
+  retq
+== c_old_inslwi_8_16 (2 insns excl. ret)
+  movzbl	11(%rcx), %eax
+  movb	%al, 1(%rcx)
+  retq
+== c_old_insrwi_8_16 (2 insns excl. ret)
+  movzbl	8(%rcx), %eax
+  movb	%al, 1(%rcx)
+  retq
+== c_old_rlwimi_2_0_29 (6 insns excl. ret)
+  movl	8(%rcx), %eax
+  shll	$2, %eax
+  movabsq	$-4294967293, %rdx              # imm = 0xFFFFFFFF00000003
+  andq	(%rcx), %rdx
+  orq	%rax, %rdx
+  movq	%rdx, (%rcx)
+  retq
+== c_old_rlwimi_8_16_27 (10 insns excl. ret)
+  movl	8(%rcx), %eax
+  movq	8(%rcx), %rdx
+  shlq	$32, %rdx
+  orq	%rax, %rdx
+  shldq	$8, %rdx, %rdx
+  andl	$65520, %edx                    # imm = 0xFFF0
+  movq	$-65521, %rax                   # imm = 0xFFFF000F
+  andq	(%rcx), %rax
+  orq	%rdx, %rax
+  movq	%rax, (%rcx)
+  retq
+== c_old_rlwnm_16_27 (10 insns excl. ret)
+  movq	%rcx, %rax
+  movl	8(%rcx), %ecx
+  movq	8(%rax), %rdx
+  shlq	$32, %rdx
+  orq	%rcx, %rdx
+  movzbl	16(%rax), %ecx
+  andb	$31, %cl
+  rolq	%cl, %rdx
+  andl	$65520, %edx                    # imm = 0xFFF0
+  movq	%rdx, (%rax)
+  retq
+== c_old_rlwnm_8_31 (10 insns excl. ret)
+  movq	%rcx, %rax
+  movl	8(%rcx), %ecx
+  movq	8(%rax), %rdx
+  shlq	$32, %rdx
+  orq	%rcx, %rdx
+  movzbl	16(%rax), %ecx
+  andb	$31, %cl
+  rolq	%cl, %rdx
+  andl	$16777215, %edx                 # imm = 0xFFFFFF
+  movq	%rdx, (%rax)
+  retq
+== c_old_rotmask_8_16_27 (7 insns excl. ret)
+  movl	8(%rcx), %eax
+  movq	8(%rcx), %rdx
+  shlq	$32, %rdx
+  orq	%rax, %rdx
+  shldq	$8, %rdx, %rdx
+  andl	$65520, %edx                    # imm = 0xFFF0
+  movq	%rdx, (%rcx)
+  retq
+== c_old_shlmask_2_20_29 (4 insns excl. ret)
+  movl	8(%rcx), %eax
+  shll	$2, %eax
+  andl	$4092, %eax                     # imm = 0xFFC
+  movq	%rax, (%rcx)
+  retq
+== c_old_slwi_4 (3 insns excl. ret)
+  movl	8(%rcx), %eax
+  shll	$4, %eax
+  movq	%rax, (%rcx)
+  retq
+== c_old_srwi_8 (3 insns excl. ret)
+  movl	8(%rcx), %eax
+  shrl	$8, %eax
+  movq	%rax, (%rcx)
+  retq
+== c_xor_inslwi_8_16 (4 insns excl. ret)
+  movzwl	10(%rcx), %eax
+  xorl	(%rcx), %eax
+  andl	$65280, %eax                    # imm = 0xFF00
+  xorq	%rax, (%rcx)
+  retq
+== c_xor_insrwi_8_16 (5 insns excl. ret)
+  movl	8(%rcx), %eax
+  shll	$8, %eax
+  xorl	(%rcx), %eax
+  andl	$65280, %eax                    # imm = 0xFF00
+  xorq	%rax, (%rcx)
+  retq
+== c_xor_rlwimi_2_0_29 (6 insns excl. ret)
+  movl	(%rcx), %eax
+  movl	8(%rcx), %edx
+  shll	$2, %edx
+  andl	$-4, %eax
+  xorl	%edx, %eax
+  xorq	%rax, (%rcx)
+  retq
+== c_xor_rlwimi_8_16_27 (5 insns excl. ret)
+  movl	8(%rcx), %eax
+  shldl	$8, %eax, %eax
+  xorl	(%rcx), %eax
+  andl	$65520, %eax                    # imm = 0xFFF0
+  xorq	%rax, (%rcx)
+  retq
+== v_new_clrrwi_4 (2 insns excl. ret)
+  movq	%rdx, %rax
+  andl	$-16, %eax
+  retq
+== v_new_extrwi_4_25 (3 insns excl. ret)
+  movq	%rdx, %rax
+  shrl	$3, %eax
+  andl	$15, %eax
+  retq
+== v_new_inslwi_8_16 (4 insns excl. ret)
+  shrl	$16, %edx
+  andl	$65280, %edx                    # imm = 0xFF00
+  andq	$-65281, %rcx                   # imm = 0xFFFF00FF
+  leaq	(%rcx,%rdx), %rax
+  retq
+== v_new_insrwi_8_16 (4 insns excl. ret)
+  shll	$8, %edx
+  movzwl	%dx, %eax
+  andq	$-65281, %rcx                   # imm = 0xFFFF00FF
+  orq	%rcx, %rax
+  retq
+== v_new_rlwimi_2_0_29 (4 insns excl. ret)
+  leal	(,%rdx,4), %edx
+  movabsq	$-4294967293, %rax              # imm = 0xFFFFFFFF00000003
+  andq	%rcx, %rax
+  orq	%rdx, %rax
+  retq
+== v_new_rlwimi_8_16_27 (4 insns excl. ret)
+  shldl	$8, %edx, %edx
+  andl	$65520, %edx                    # imm = 0xFFF0
+  andq	$-65521, %rcx                   # imm = 0xFFFF000F
+  leaq	(%rcx,%rdx), %rax
+  retq
+== v_new_rlwnm_16_27 (4 insns excl. ret)
+  movq	%r8, %rcx
+  movq	%rdx, %rax
+  roll	%cl, %eax
+  andl	$65520, %eax                    # imm = 0xFFF0
+  retq
+== v_new_rlwnm_8_31 (4 insns excl. ret)
+  movq	%r8, %rcx
+  movq	%rdx, %rax
+  roll	%cl, %eax
+  andl	$16777215, %eax                 # imm = 0xFFFFFF
+  retq
+== v_new_rotmask_8_16_27 (3 insns excl. ret)
+  movq	%rdx, %rax
+  shldl	$8, %eax, %eax
+  andl	$65520, %eax                    # imm = 0xFFF0
+  retq
+== v_new_shlmask_2_20_29 (2 insns excl. ret)
+  leal	(,%rdx,4), %eax
+  andl	$4092, %eax                     # imm = 0xFFC
+  retq
+== v_new_slwi_4 (2 insns excl. ret)
+  movq	%rdx, %rax
+  shll	$4, %eax
+  retq
+== v_new_srwi_8 (2 insns excl. ret)
+  movq	%rdx, %rax
+  shrl	$8, %eax
+  retq
+== v_old_clrrwi_4 (2 insns excl. ret)
+  movq	%rdx, %rax
+  andl	$-16, %eax
+  retq
+== v_old_extrwi_4_25 (3 insns excl. ret)
+  movq	%rdx, %rax
+  shrl	$3, %eax
+  andl	$15, %eax
+  retq
+== v_old_inslwi_8_16 (4 insns excl. ret)
+  shrl	$16, %edx
+  andl	$65280, %edx                    # imm = 0xFF00
+  andq	$-65281, %rcx                   # imm = 0xFFFF00FF
+  leaq	(%rcx,%rdx), %rax
+  retq
+== v_old_insrwi_8_16 (4 insns excl. ret)
+  shll	$8, %edx
+  movzwl	%dx, %eax
+  andq	$-65281, %rcx                   # imm = 0xFFFF00FF
+  orq	%rcx, %rax
+  retq
+== v_old_rlwimi_2_0_29 (4 insns excl. ret)
+  leal	(,%rdx,4), %edx
+  movabsq	$-4294967293, %rax              # imm = 0xFFFFFFFF00000003
+  andq	%rcx, %rax
+  orq	%rdx, %rax
+  retq
+== v_old_rlwimi_8_16_27 (7 insns excl. ret)
+  movzbl	%dl, %eax
+  shlq	$32, %rdx
+  orq	%rdx, %rax
+  shldq	$8, %rax, %rax
+  andl	$-16, %eax
+  andq	$-65521, %rcx                   # imm = 0xFFFF000F
+  orq	%rcx, %rax
+  retq
+== v_old_rlwnm_16_27 (7 insns excl. ret)
+  movq	%r8, %rcx
+  movl	%edx, %eax
+  shlq	$32, %rdx
+  orq	%rdx, %rax
+  andb	$31, %cl
+  rolq	%cl, %rax
+  andl	$65520, %eax                    # imm = 0xFFF0
+  retq
+== v_old_rlwnm_8_31 (7 insns excl. ret)
+  movq	%r8, %rcx
+  movl	%edx, %eax
+  shlq	$32, %rdx
+  orq	%rdx, %rax
+  andb	$31, %cl
+  rolq	%cl, %rax
+  andl	$16777215, %eax                 # imm = 0xFFFFFF
+  retq
+== v_old_rotmask_8_16_27 (5 insns excl. ret)
+  movzbl	%dl, %eax
+  shlq	$32, %rdx
+  orq	%rdx, %rax
+  shldq	$8, %rax, %rax
+  andl	$-16, %eax
+  retq
+== v_old_shlmask_2_20_29 (2 insns excl. ret)
+  leal	(,%rdx,4), %eax
+  andl	$4092, %eax                     # imm = 0xFFC
+  retq
+== v_old_slwi_4 (2 insns excl. ret)
+  movq	%rdx, %rax
+  shll	$4, %eax
+  retq
+== v_old_srwi_8 (2 insns excl. ret)
+  movq	%rdx, %rax
+  shrl	$8, %eax
+  retq
+== v_xor_inslwi_8_16 (4 insns excl. ret)
+  shrl	$16, %edx
+  andl	$65280, %edx                    # imm = 0xFF00
+  andq	$-65281, %rcx                   # imm = 0xFFFF00FF
+  leaq	(%rcx,%rdx), %rax
+  retq
+== v_xor_insrwi_8_16 (4 insns excl. ret)
+  shll	$8, %edx
+  movzwl	%dx, %eax
+  andq	$-65281, %rcx                   # imm = 0xFFFF00FF
+  orq	%rcx, %rax
+  retq
+== v_xor_rlwimi_2_0_29 (4 insns excl. ret)
+  leal	(,%rdx,4), %edx
+  movabsq	$-4294967293, %rax              # imm = 0xFFFFFFFF00000003
+  andq	%rcx, %rax
+  orq	%rdx, %rax
+  retq
+== v_xor_rlwimi_8_16_27 (8 insns excl. ret)
+  shldl	$8, %edx, %edx
+  andl	$65520, %edx                    # imm = 0xFFF0
+  movabsq	$-4294967296, %r8               # imm = 0xFFFFFFFF00000000
+  andq	%rcx, %r8
+  movl	%ecx, %eax
+  andl	$-65521, %eax                   # imm = 0xFFFF000F
+  orl	%edx, %eax
+  orq	%r8, %rax
+  retq

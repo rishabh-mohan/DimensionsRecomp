@@ -1,0 +1,502 @@
+{
+ "run": "20261122-131746-s102-r2-warm-devoff3",
+ "kind": "off",
+ "runjson": {
+  "exit_code": 0,
+  "exit_code_hex": "0x00000000",
+  "dumps": [],
+  "crash_events": [],
+  "wer_seen": false,
+  "close_method": "wm_close",
+  "close_seconds": 2.87,
+  "elapsed_s": 368.64,
+  "seconds_requested": 360,
+  "cvars": {},
+  "exited_early": false,
+  "env_extra": {},
+  "script": "attract-long.txt",
+  "steps": "57/91",
+  "peak_threads": 82,
+  "extra_args": []
+ },
+ "seed_storage_log": [
+  "[2026-11-22 13:17:57.935] [info] [core] [t32716] Initializing shader storage for title 5752084B...",
+  "[2026-11-22 13:17:57.964] [info] [gpu] [t7884] Translated 229 shaders from the storage in 25 milliseconds",
+  "[2026-11-22 13:17:59.486] [info] [gpu] [t7884] Created 214 graphics pipelines (not including reading the descriptions) from the storage in 1521 milliseconds"
+ ],
+ "summary": {
+  "verdict": "RUNNING",
+  "first_frame_s": 13.0,
+  "levels": {
+   "info": 322,
+   "warning": 142
+  },
+  "errors": [],
+  "unknown_cvars": []
+ },
+ "greps": {
+  "s4_upload_hash": 0,
+  "slow_frame": 0,
+  "precise_wait": 0,
+  "miss_cache": 0,
+  "protect_failed": 0,
+  "stuck_lock": 0,
+  "minidump": 0,
+  "fatal": 0,
+  "storage": 2,
+  "storage_init": 1,
+  "clean_exit": 1
+ },
+ "grep_first": {
+  "s4_upload_hash": [],
+  "slow_frame": [],
+  "precise_wait": [],
+  "miss_cache": [],
+  "protect_failed": [],
+  "stuck_lock": [],
+  "minidump": [],
+  "fatal": [],
+  "storage": [
+   "[2026-11-22 13:17:57.964] [info] [gpu] [t7884] Translated 229 shaders from the storage in 25 milliseconds",
+   "[2026-11-22 13:17:59.486] [info] [gpu] [t7884] Created 214 graphics pipelines (not including reading the descriptions) from the storage in 1521 milliseconds"
+  ],
+  "storage_init": [
+   "[2026-11-22 13:17:57.935] [info] [core] [t32716] Initializing shader storage for title 5752084B..."
+  ],
+  "clean_exit": [
+   "[2026-11-22 13:23:56.576] [info] [core] [t32716] Title terminated; hard-exiting process."
+  ]
+ },
+ "storage_init_gap_s": 0.029,
+ "log_files": [
+  "game.log"
+ ],
+ "s4_lines_off": 0,
+ "frame_rows": 15153,
+ "logdiff": {
+  "bases": [
+   "20261122-052901-attract-devoff3-warm"
+  ],
+  "NEW": 0,
+  "NEW_allowed": 0,
+  "MORE": 0,
+  "MORE_allowed": 0,
+  "GONE": 19,
+  "GONE_non_toypad": 7,
+  "FLAG": 0,
+  "NEW_info": 50,
+  "NEW_info_non_toypad": 0,
+  "rc": 0,
+  "new": [],
+  "more": [],
+  "gone": [
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [critical] [core] [FATAL] Minidump written to hang-#.dmp",
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [error] [krnl] STUCK-LOCK: GPU thread: executing PM# opcode #x# | read ptr #x#, write ptr #x#",
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [error] [krnl] STUCK-LOCK: critical section #x# still not acquired after #s. owner=guest thread object #x#, lock_count=#, recursion=#; waiting thread is #x#. An owner of #, or one naming a thread that has exited, me",
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [error] [krnl] STUCK-LOCK: owner's callers: #h <- #h <- #h <- #h <- #h <- #h <- #h <- #h <- #h",
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [error] [krnl] STUCK-LOCK: the owner is tid #x# (unnamed), parked at lr=#h with r#=#h. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.",
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [error] [krnl] STUCK-LOCK: waiter's callers: lr=#h <- #h <- #h <- #h <- #h <- #h <- #h",
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [info] [core] Toypad[Read ] #B #C # # # AF #E #E EB # F# # # B# # # # # # # # # # # # # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [info] [core] Toypad[Read ] #B #C # # # C# A# F# # #A D# #D #C CF # # # # # # # # # # # # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [info] [core] Toypad[Write] #B # # # C# # # #E # # #E # # #E # # #E # # #E # # #E # E# # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [info] [core] Toypad[Write] #B # # # C# # # #E # FF #E # # #E # FF #E # # #E # FF #E # DF # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [info] [core] Toypad[Write] #B # # # C# #A # #E # # #E # # #E # # #E # # #E # # #E # E# # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [info] [core] Toypad[Write] #B # # # C# #B # #E # # #E # # #E # # #E # # #E # # #E # #C # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [info] [core] Toypad[Write] #B # # # C# #C # #E # # # # # #E # # # # # #E # # # # E# # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [info] [core] Toypad[Write] #B # # # C# #D # #E # FF # # # #E # FF # # # #E # FF # # E# # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [info] [core] Toypad[Write] #B # # # C# #E # #E # FF # # # #E # FF # # # #E # FF # # #A # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [info] [core] Toypad[Write] #B # # # C# #F # #E # FF #E # # #E # FF #E # # #E # FF #E # E# # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [info] [core] Toypad[Write] #B # # #A B# # E# # # # # # B# # # # # # # # # # # # # # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [info] [core] Toypad[Write] #B # # #A B# # EC # DA # # FC F# # #E # # # # # # # # # # # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-131746-s102-r2-warm-devoff3\\game.log [warning] [krnl] __imp__XNetLogonGetTitleID STUB"
+  ],
+  "flag": [],
+  "new_info": []
+ },
+ "levels_cand_vs_base0": {
+  "cand": {
+   "info": 322,
+   "warning": 142
+  },
+  "base": {
+   "info": 126,
+   "warning": 143,
+   "error": 5,
+   "critical": 1
+  }
+ },
+ "scenes": {
+  "base": "20261122-052901-attract-devoff3-warm",
+  "base_major": {
+   "220/534": 52.8,
+   "218/222": 28.9,
+   "226/1022": 28.5,
+   "219/226": 15.3,
+   "220/528": 11.3,
+   "594/2813": 2.8
+  },
+  "cand_major": {
+   "220/534": 35.2,
+   "226/1022": 29.7,
+   "218/222": 20.5,
+   "766/110956": 20.1,
+   "219/226": 14.9,
+   "790/31625": 9.8,
+   "220/528": 7.9,
+   "788/31613": 3.9,
+   "8127/762167": 3.9,
+   "594/2813": 2.9,
+   "8019/1043795": 2.4
+  },
+  "missing_in_cand": [],
+  "extra_in_cand": [
+   "766/110956",
+   "788/31613",
+   "790/31625",
+   "8019/1043795",
+   "8127/762167"
+  ]
+ },
+ "marks": {
+  "same": 6,
+  "diff": [
+   [
+    "after-a1",
+    "220/528",
+    "220/534"
+   ],
+   [
+    "idle-30",
+    "220/534",
+    "218/222"
+   ],
+   [
+    "idle-40",
+    "220/534",
+    "839/31674"
+   ],
+   [
+    "idle-50",
+    "218/222",
+    "790/31625"
+   ],
+   [
+    "idle-60",
+    "594/2813",
+    "788/31613"
+   ],
+   [
+    "idle-70",
+    "839/31674",
+    "8019/1043795"
+   ],
+   [
+    "idle-80",
+    "800/35657",
+    "5194/879213"
+   ],
+   [
+    "idle-90",
+    "800/35657",
+    "2266/414212"
+   ],
+   [
+    "idle-100",
+    "800/35657",
+    "5120/1264126"
+   ],
+   [
+    "idle-110",
+    "851/50089",
+    "1825/652435"
+   ],
+   [
+    "idle-120",
+    "851/50089",
+    "1140/330362"
+   ],
+   [
+    "idle-130",
+    "5103/1140281",
+    "8440/1055786"
+   ],
+   [
+    "idle-140",
+    "3765/577329",
+    "1818/1081961"
+   ],
+   [
+    "idle-150",
+    "2782/741788",
+    "1946/1147158"
+   ],
+   [
+    "idle-160",
+    "1143/477855",
+    "2427/1117371"
+   ],
+   [
+    "idle-170",
+    "8129/762743",
+    "1634/996155"
+   ],
+   [
+    "idle-180",
+    "8129/762743",
+    "1308/707799"
+   ],
+   [
+    "idle-190",
+    "1944/1132026",
+    "683/46281"
+   ],
+   [
+    "idle-200",
+    "1944/1132026",
+    "770/114604"
+   ],
+   [
+    "idle-210",
+    "1747/853115",
+    "767/111436"
+   ],
+   [
+    "idle-220",
+    "1747/853115",
+    "766/110956"
+   ]
+  ],
+  "cand": {
+   "first-frame": "218/222",
+   "title": "226/1022",
+   "after-start": "226/1022",
+   "after-a1": "220/534",
+   "after-a2": "220/534",
+   "idle-10": "220/534",
+   "idle-20": "220/534",
+   "idle-30": "218/222",
+   "idle-40": "839/31674",
+   "idle-50": "790/31625",
+   "idle-60": "788/31613",
+   "idle-70": "8019/1043795",
+   "idle-80": "5194/879213",
+   "idle-90": "2266/414212",
+   "idle-100": "5120/1264126",
+   "idle-110": "1825/652435",
+   "idle-120": "1140/330362",
+   "idle-130": "8440/1055786",
+   "idle-140": "1818/1081961",
+   "idle-150": "1946/1147158",
+   "idle-160": "2427/1117371",
+   "idle-170": "1634/996155",
+   "idle-180": "1308/707799",
+   "idle-190": "683/46281",
+   "idle-200": "770/114604",
+   "idle-210": "767/111436",
+   "idle-220": "766/110956"
+  }
+ },
+ "threads": {
+  "window_s": 323.7,
+  "window": [
+   20.0,
+   343.7
+  ],
+  "by_name": {
+   "(unnamed)": {
+    "pct": 10.14,
+    "threads": 30
+   },
+   "rex::thread::TimerQueue": {
+    "pct": 38.55,
+    "threads": 1
+   },
+   "DeviceHotplugThread": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "D3D Background Thread 0": {
+    "pct": 0.04,
+    "threads": 1
+   },
+   "D3D Background Thread 1": {
+    "pct": 0.06,
+    "threads": 1
+   },
+   "D3D Background Thread 2": {
+    "pct": 0.06,
+    "threads": 1
+   },
+   "D3D Background Thread 3": {
+    "pct": 0.06,
+    "threads": 1
+   },
+   "0x16c00001": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "0xc0550001": {
+    "pct": 4.26,
+    "threads": 1
+   },
+   "XMA Decoder (F8000010)": {
+    "pct": 1.13,
+    "threads": 1
+   },
+   "Audio Worker (F8000014)": {
+    "pct": 2.14,
+    "threads": 1
+   },
+   "GPU Commands (F8000018)": {
+    "pct": 37.08,
+    "threads": 1
+   },
+   "GPU VSync (F800001C)": {
+    "pct": 1.82,
+    "threads": 1
+   },
+   "D3D12 Pipelines": {
+    "pct": 0.52,
+    "threads": 9
+   },
+   "Kernel Dispatch (F8000028)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "Main XThread (F800002C)": {
+    "pct": 27.86,
+    "threads": 1
+   },
+   "D3D12 Storage writer": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread7E18 (F8000070)": {
+    "pct": 0.43,
+    "threads": 1
+   },
+   "XThread7C94 (F80000F4)": {
+    "pct": 16.68,
+    "threads": 1
+   },
+   "XThread02C8 (F80000FC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread87B4 (F8000104)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread3EF4 (F800010C)": {
+    "pct": 2.7,
+    "threads": 1
+   },
+   "XThread84C8 (F8000114)": {
+    "pct": 3.35,
+    "threads": 1
+   },
+   "XThread71D8 (F8000120)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread23D8 (F8000128)": {
+    "pct": 0.48,
+    "threads": 1
+   },
+   "XThread3E10 (F800012C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread7B6C (F8000140)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread04EC (F8000144)": {
+    "pct": 8.56,
+    "threads": 1
+   },
+   "SDLWASAPIMgmt": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "SDLAudioP19": {
+    "pct": 0.64,
+    "threads": 1
+   },
+   "XThread3784 (F8000164)": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "XThread2C18 (F800016C)": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "XThread3E38 (F8000188)": {
+    "pct": 0.13,
+    "threads": 1
+   },
+   "XThread8A08 (F8000190)": {
+    "pct": 0.6,
+    "threads": 1
+   },
+   "XThread7A18 (F8000198)": {
+    "pct": 0.62,
+    "threads": 1
+   },
+   "XThread48F4 (F80001A8)": {
+    "pct": 89.7,
+    "threads": 1
+   },
+   "XThread866C (F80001BC)": {
+    "pct": 0.24,
+    "threads": 1
+   },
+   "XThread8938 (F800026C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread86F0 (F80002A4)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread68A0 (F80002AC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread3D40 (F80002B4)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread5D78 (F80002C4)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread13D0 (F800030C)": {
+    "pct": 0.01,
+    "threads": 1
+   }
+  },
+  "ticks": {
+   "12032": {
+    "name": "rex::thread::TimerQueue",
+    "samples": 127,
+    "steps": 126,
+    "non_rising": 0,
+    "non_rising_at_s": [],
+    "step_s_median": 2.0,
+    "span_s": [
+     -8.0,
+     349.8
+    ]
+   }
+  }
+ },
+ "slow_state": {
+  "rows": 355,
+  "onset_s": 199.4,
+  "slow_pct": 42.8,
+  "e_eff_mhz_median": 1490,
+  "cpu_util_pct_median": 90.2,
+  "slow": true
+ }
+}

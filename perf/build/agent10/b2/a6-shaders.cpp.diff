@@ -1,0 +1,19 @@
+﻿diff --git a/baseline/DimensionsRecomp/rexlego/src/gpu_native/shaders.cpp b/DimensionsRecomp/rexlego/src/gpu_native/shaders.cpp
+index 5be84db..47a3ede 100644
+--- a/baseline/DimensionsRecomp/rexlego/src/gpu_native/shaders.cpp
++++ b/DimensionsRecomp/rexlego/src/gpu_native/shaders.cpp
+@@ -630,8 +630,14 @@ ShaderBindingsSnapshot CaptureShaderBindings(u32 vertex, u32 pixel) {
+     result.owners[1] = std::move(owner);
+   return result;
+ }
+ 
++ShaderBindingsSnapshot CurrentShaderOwners() {
++  if (t_shader_bindings) return *t_shader_bindings;
++  std::lock_guard lock(g_registry_mutex);
++  return {{g_bound_shaders[0], g_bound_shaders[1]}, g_bound_shader_addresses};
++}
++
+ ShaderBindingsScope::ShaderBindingsScope(const ShaderBindingsSnapshot& bindings) : previous_(t_shader_bindings) {
+   t_shader_bindings = &bindings;
+ }
+ ShaderBindingsScope::~ShaderBindingsScope() { t_shader_bindings = previous_; }

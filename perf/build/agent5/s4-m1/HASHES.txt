@@ -1,0 +1,40 @@
+# S4 M1 (S4-DRAFT #11): cvar shared_memory_upload_nontemporal_copy, default OFF. Agent 5, 2026-11-22, board run 2.
+# SDK c5fe668 (git status: only " m thirdparty/simde"), file src/graphics/d3d12/shared_memory.cpp. All files LF.
+# Made by bench/agent5/s4m1_mkdiff.py; syntax check by bench/agent5/s4m1_syntax.ps1 (keys below are parsed by it).
+orig    B120D07C6709D0D2A7836B532ED06B2032A418CBD4A71808CD318C7E6EB6CFBC  14514 B  orig/shared_memory.cpp = live SDK file (pristine, mtime 11-21 11:04)
+diff7   D290530197427138029FF34EE8B1BBBEDE26340AA85D0AE4EABB00DC0CEE9CEF  build/agent12/s4-diag/upload-hash-log.diff (#7, u diagnostic)
+base    BB0838CE3909E18A63099B47B4E852CB9D2307EB2BF2535C3BC8FF38BFD64587  20888 B  base/shared_memory.cpp = orig + #7 (= build/agent12/s4-diag/new)
+diff    EBECE86E68369C88464F5837ED4882680E712184273FE61F802CD939CEBF30CD   5589 B  m1-nontemporal-copy.diff: 5 hunks, +72 -3, applies to base only (cwd = SDK root)
+staged  2A5ADF13B5E433F1F10B5C6AF9C14F8812527C4E155A5146B166723457B6EBB4  24190 B  new/shared_memory.cpp = base + M1
+# Apply checks, 13:13-13:19, git -c core.autocrlf=false apply in scratch dirs outside any work tree:
+#   orig + #7 = base (BB0838CE...)                         OK
+#   orig -> #7 -> M1 applies cleanly, result == staged      OK
+#   M1 --check on base                                      OK
+#   M1 --check on orig without #7: does not apply           OK (expected: hunks 1-3 need #7's context)
+#   #7 --check on the live SDK (git --no-optional-locks apply --check, cwd = SDK)   OK
+# Order: S4-DRAFT L166 puts #9 P3 before #11 M1 in this file. If P3 lands first, M1 needs a rebase onto base + P3.
+# Syntax-only clang (bench/agent5/s4m1_syntax.ps1, dev-SDK Release flags, PCH dropped), 13:20:55-13:26:16, loaded machine:
+#   control   base   exit 0  249.6 s  12 diagnostics (header warnings)
+#   candidate staged exit 0   42.3 s  12 diagnostics (the same ones); no new diagnostics in the candidate. RESULT: PASS
+syntax  AA8952C4682A349F1E7C3CF63453DB4A5C578D37E7981E750023BAAA84818EC7  10614 B  syntax-20261122-132054.txt
+# Microbench (NOTE.md test plan step 2): staged source only, not built or run (task #7 allows syntax checks only).
+bench   AA3139068F09B28CAB7C3A1FB6710B5D0EEB8BF372EC703466FF9E100CD3A1AC  26979 B  bench/agent5/m1_copybench.cpp (LF, 715 lines; helper L105-L135 = new/shared_memory.cpp L189-L219)
+#   syntax-only clang (bench/agent5/m1_copybench_syntax.ps1 E539F354..., SDK Release language flags + -DNOMINMAX -DWIN32_LEAN_AND_MEAN), 13:43:16-13:43:22:
+#   new/shared_memory.cpp = HASHES staged; helper text MATCH; exit 0, 2.8 s, 0 diagnostics. RESULT: PASS
+bsyntax 33A434DB5E0BA00B4EB450013F86B7744DE8D3163FE752A387A5383205202129    838 B  copybench-syntax-20261122-134316.txt
+# Task #18 (Agent 1, 14:02): M1 correctness gate (functional, not timing). The bench gets a --check-only switch (no rate
+# buffers, no rate part, one PASS/FAIL line per case group); built once and run check-only, 14:10:54-14:12:29.
+bench18   F98B935A8F1A72C9158C9C9859C18FCC4826125709FC5847166B206EEDAB7444  29643 B  bench/agent5/m1_copybench.cpp (LF, 764 lines; helper L109-L139 = new/shared_memory.cpp L189-L219). Key 'bench' = the 13:43 version, kept in bench-prev/
+cdiff     41E6A48821357AEE710C53A8F843E8B3C1A104926A6C1233688EAE55F4D27200  10553 B  copybench-checkonly.diff (bench-prev -> bench18, +83 -34)
+#   syntax-only clang (m1_copybench_syntax.ps1 E539F354..., unchanged), 14:09:42-14:10:07: m1 file = HASHES staged;
+#   helper text MATCH (31 lines); exit 0, 12.4 s, 0 diagnostics. RESULT: PASS
+bsyntax18 7AF9959CBC85781FD197CD1F9FB56CE6F78D59D8E05DEA71D14BF7C497A265DC    838 B  copybench-syntax-20261122-140942.txt
+checkps1  DF475848702113BF38BCE8FD82385163DEDF1B6F6DAB9193A6B567C063099792   4796 B  bench/agent5/m1_copybench_check.ps1 (BelowNormal; build, then --check-only, then the report)
+#   build: one single-file compile, BelowNormal, one clang++ process, link.exe from env\devshell.ps1; 56.1 s, exit 0, 0 diagnostics:
+#   toolchain\llvm-23.1.6\bin\clang++.exe -std=c++23 -O3 -march=x86-64-v2 -fno-strict-aliasing -fms-runtime-lib=dll bench\agent5\m1_copybench.cpp -o build\agent5\m1_copybench.exe
+exe       92C5FF6E201DBEE1F21AD701A8850E14F2D3F934A8CF0009526263DB038C3916  40960 B  build/agent5/m1_copybench.exe (written 14:12:11)
+#   check: build\agent5\m1_copybench.exe --check-only, BelowNormal, 7.9 s, exit 0. Adapter 0 (used) NVIDIA GeForce MX570;
+#   upload heap CPU page property WRITE_COMBINE, pool L0 (system memory).
+#   wb (normal memory): 22/22 groups PASS, 154224 cases, 0 failures, 0 skipped. upload buffer: 18/18 groups PASS,
+#   77168 cases, 0 failures, 0 skipped. RESULT: PASS. Rate part not run (loaded machine; no GB/s figure is valid).
+check     2B5E54B7BF314D1091200D72ACEF04E417EC4B2D5893AA212C08B3C1204CF7CB   5951 B  copybench-check-20261122-141100.txt (CRLF, 57 lines)

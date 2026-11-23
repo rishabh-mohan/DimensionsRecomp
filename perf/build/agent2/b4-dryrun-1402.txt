@@ -1,0 +1,197 @@
+b4-dryrun.py report, 2026-11-22 14:02:38 (read-only); R = <workspace>
+
+[1] the 6 S4a files (table parsed from apply-s4a-live.ps1: 6 rows); level = before / after / other
+  #7 u diag (A12)           rexglue-sdk/src/graphics/d3d12/shared_memory.cpp   snap1 after  snapB3 before snapB before
+  #8 P2 (A12)               rexglue-sdk/src/graphics/shared_memory.cpp         snap1 after  snapB3 before snapB before
+  #5 fix (i) (A12)          rexglue-sdk/src/system/xmemory.cpp                 snap1 after  snapB3 before snapB before
+  #38 precise wait (A11)    rexglue-sdk/src/core/timer_queue.cpp               snap1 after  snapB3 before snapB before
+  #32 warm boot, always on  rexglue-sdk/src/graphics/d3d12/pipeline_cache.cpp  snap1 after  snapB3 before snapB before
+  #2 miss cache (A4)        rexlego/src/gpu_native/shaders.cpp                 snap1 after  snapB3 before snapB before
+
+[2] stage level of every file the S2/S3/S3d/S4a applies changed (pre = that stage's backup in snap1-backup-<stage>; post = the next stage's backup of the file, else snap1 now)
+  WARN snapB3 S2 rexglue-sdk/src/audio/audio_system.cpp: other, expected post
+  FAIL snapB3 S2 rexlego/src/gpu_native/draw.cpp: other, expected post
+  S2   16 files: snapB post 16, snapB3 other 2, snapB3 post 14
+  S3   25 files: snapB pre 25, snapB3 post 25
+  S3d   1 files: snapB pre 1, snapB3 post 1
+  S4a   6 files: snapB pre 6, snapB3 pre 6
+  devoffB4 option B apply list (rexlego files snapB lacks; source = snap1 now, the S4a level):
+   rexlego/src/gpu_native/draw.cpp                    snapB 50AA3B1DEE615678 -> snap1 5EA1F3576DCC2F90
+   rexlego/src/gpu_native/shaders.cpp                 snapB E87A2DEE43D38D8E -> snap1 9567FE3F3B63637D
+   rexlego/src/settings_preferences.cpp               snapB C78112AA6E50F79D -> snap1 9CBE6DBF9CEDA62D
+   rexlego/src/settings_registry.cpp                  snapB A37337001EBDC277 -> snap1 4EC71328043FA6BA
+
+[3] rexlego sources, snapB vs snapB3 (outside generated/ and out/; stat, then sha256 where size or mtime differ)
+  284 files in snapB, 284 in snapB3; 3 differ:
+   src/gpu_native/draw.cpp                                 differs         covered by the option-B apply
+   src/settings_preferences.cpp                            differs         covered by the option-B apply
+   src/settings_registry.cpp                               differs         covered by the option-B apply
+  => after the option-B apply, snapB/rexlego == snapB3/rexlego outside generated/ and out/ (so devoffB4 from snapB-off == a fresh snapB3-off build, source-wise)
+
+[4] B build dirs: CMakeCache.txt
+  snapB-off  CMAKE_HOME_DIRECTORY=imensions-recomp/build/agent2/snapB/DimensionsRecomp/rexlego ok; CMAKE_PREFIX_PATH=/games/lego-dimensions-recomp/build/agent2/snap1-sdk/install ok; LEGODIMENSIONS_NATIVE_GPU=OFF ok; CMAKE_BUILD_TYPE=Release ok; REXGLUE_HOST_CODEGEN_EXECUTABLE=codegen-frozen2.exe ok
+  snapB3-on  CMAKE_HOME_DIRECTORY=mensions-recomp/build/agent2/snapB3/DimensionsRecomp/rexlego ok; CMAKE_PREFIX_PATH=/games/lego-dimensions-recomp/build/agent2/snap1-sdk/install ok; LEGODIMENSIONS_NATIVE_GPU=ON ok; CMAKE_BUILD_TYPE=Release ok; REXGLUE_HOST_CODEGEN_EXECUTABLE=codegen-frozen2.exe ok
+
+[5] SDK install (snap1-sdk/install = the prefix of both B trees), relink/recompile triggers, batch-nolr pin
+  install/bin/rexruntime.dll    870276A6D0E8DE57  devoff4-bin same, native4-bin same
+  install/bin/rexgpu-xenos.dll  59662F767F8B9C7C  devoff4-bin same, native4-bin same
+  install/bin/TracyClient.dll   85044850B6C663B5  devoff4-bin same, native4-bin same
+  newest install .lib: rexgpu-xenos.lib 11-22 13:26:57
+  snapB-off exe 11-22 02:40:03: relink expected (newer SDK .lib); 2 installed header(s) newer than the exe: include/rex/codegen/function_types.h (11-22 02:41), include/rex/codegen/config.h (11-22 02:41)
+  snapB3-on exe 11-22 04:33:29: relink expected (newer SDK .lib); 0 installed header(s) newer than the exe
+  batch-nolr SHA256SUMS.txt 24CE1493FB8DAE37 (pin 24CE1493) ok; legodimensions_config.toml E60EAF1CEB575572 (pin E60EAF1C) ok
+  snapB  config.toml E60EAF1CEB575572 ok; generated/ 871 files vs batch-nolr 871: 870 same size, size differs: default/codegen.d; only in tree: 0; only in batch-nolr: 0
+  snapB3 config.toml E60EAF1CEB575572 ok; generated/ 871 files vs batch-nolr 871: 870 same size, size differs: default/codegen.d; only in tree: 0; only in batch-nolr: 0
+
+[6] bins that must stay byte-identical (W4b inputs + S4a bins): MANIFEST rows vs files (size, link count; sha256 only with --full-hash)
+  devoff2-bin  MANIFEST B87DC2D2CA22379F; exe 7F0B1C1C84BC66FF; 7 files = 7 rows: FiraSans-Regular.ttf: 6 links; TracyClient.dll: 36 links; achievement_unlocked.wav: 6 links; legodimensions.exe: 36 links; legodimensions.map: 36 links; rexgpu-xenos.dll: 36 links; rexruntime.dll: 36 links
+  FAIL devoff2-bin FiraSans-Regular.ttf: 6 links
+  FAIL devoff2-bin TracyClient.dll: 36 links
+  FAIL devoff2-bin achievement_unlocked.wav: 6 links
+  FAIL devoff2-bin legodimensions.exe: 36 links
+  FAIL devoff2-bin legodimensions.map: 36 links
+  FAIL devoff2-bin rexgpu-xenos.dll: 36 links
+  FAIL devoff2-bin rexruntime.dll: 36 links
+  devoffB-bin  MANIFEST 8709476FF4778768 (== 8709476F); exe C3F8686EBDD83340; 7 files = 7 rows: FiraSans-Regular.ttf: 4 links; TracyClient.dll: 9 links; achievement_unlocked.wav: 4 links; legodimensions.exe: 9 links; legodimensions.map: 9 links; rexgpu-xenos.dll: 9 links; rexruntime.dll: 9 links
+  FAIL devoffB-bin FiraSans-Regular.ttf: 4 links
+  FAIL devoffB-bin TracyClient.dll: 9 links
+  FAIL devoffB-bin achievement_unlocked.wav: 4 links
+  FAIL devoffB-bin legodimensions.exe: 9 links
+  FAIL devoffB-bin legodimensions.map: 9 links
+  FAIL devoffB-bin rexgpu-xenos.dll: 9 links
+  FAIL devoffB-bin rexruntime.dll: 9 links
+  devoff3-bin  MANIFEST B9C5175DA1904235 (== B9C5175D); exe 2522D43605D8A9BF; 7 files = 7 rows: FiraSans-Regular.ttf: 8 links; TracyClient.dll: 12 links; achievement_unlocked.wav: 8 links; legodimensions.exe: 12 links; legodimensions.map: 12 links; rexgpu-xenos.dll: 12 links; rexruntime.dll: 12 links
+  FAIL devoff3-bin FiraSans-Regular.ttf: 8 links
+  FAIL devoff3-bin TracyClient.dll: 12 links
+  FAIL devoff3-bin achievement_unlocked.wav: 8 links
+  FAIL devoff3-bin legodimensions.exe: 12 links
+  FAIL devoff3-bin legodimensions.map: 12 links
+  FAIL devoff3-bin rexgpu-xenos.dll: 12 links
+  FAIL devoff3-bin rexruntime.dll: 12 links
+  native3d-bin MANIFEST 368F9CE650EC56CE (== 368F9CE6); exe B90DF683D0A57A21; 8 files = 8 rows: FiraSans-Regular.ttf: 3 links; TracyClient.dll: 10 links; achievement_unlocked.wav: 3 links; amd_fidelityfx_dx12.dll: 10 links; legodimensions.exe: 10 links; legodimensions.map: 10 links; rexgpu-xenos.dll: 10 links; rexruntime.dll: 10 links
+  FAIL native3d-bin FiraSans-Regular.ttf: 3 links
+  FAIL native3d-bin TracyClient.dll: 10 links
+  FAIL native3d-bin achievement_unlocked.wav: 3 links
+  FAIL native3d-bin amd_fidelityfx_dx12.dll: 10 links
+  FAIL native3d-bin legodimensions.exe: 10 links
+  FAIL native3d-bin legodimensions.map: 10 links
+  FAIL native3d-bin rexgpu-xenos.dll: 10 links
+  FAIL native3d-bin rexruntime.dll: 10 links
+  nativeB-bin  MANIFEST E5CBF30A6132B00E (== E5CBF30A); exe 01C4D5A3E36FAC50; 8 files = 8 rows: FiraSans-Regular.ttf: 3 links; TracyClient.dll: 3 links; achievement_unlocked.wav: 3 links; amd_fidelityfx_dx12.dll: 3 links; legodimensions.exe: 3 links; legodimensions.map: 3 links; rexgpu-xenos.dll: 3 links; rexruntime.dll: 3 links
+  FAIL nativeB-bin FiraSans-Regular.ttf: 3 links
+  FAIL nativeB-bin TracyClient.dll: 3 links
+  FAIL nativeB-bin achievement_unlocked.wav: 3 links
+  FAIL nativeB-bin amd_fidelityfx_dx12.dll: 3 links
+  FAIL nativeB-bin legodimensions.exe: 3 links
+  FAIL nativeB-bin legodimensions.map: 3 links
+  FAIL nativeB-bin rexgpu-xenos.dll: 3 links
+  FAIL nativeB-bin rexruntime.dll: 3 links
+  devoff4-bin  MANIFEST 16DCC9399239E577 (== 16DCC939); exe 6BE3C713229232B2; 7 files = 7 rows: FiraSans-Regular.ttf: 5 links; TracyClient.dll: 5 links; achievement_unlocked.wav: 5 links; legodimensions.exe: 5 links; legodimensions.map: 5 links; rexgpu-xenos.dll: 5 links; rexruntime.dll: 5 links
+  FAIL devoff4-bin FiraSans-Regular.ttf: 5 links
+  FAIL devoff4-bin TracyClient.dll: 5 links
+  FAIL devoff4-bin achievement_unlocked.wav: 5 links
+  FAIL devoff4-bin legodimensions.exe: 5 links
+  FAIL devoff4-bin legodimensions.map: 5 links
+  FAIL devoff4-bin rexgpu-xenos.dll: 5 links
+  FAIL devoff4-bin rexruntime.dll: 5 links
+  native4-bin  MANIFEST 00D33D4FFB46776D (== 00D33D4F); exe 65432C81D8C7D29A; 8 files = 8 rows: FiraSans-Regular.ttf: 2 links; TracyClient.dll: 2 links; achievement_unlocked.wav: 2 links; amd_fidelityfx_dx12.dll: 2 links; legodimensions.exe: 2 links; legodimensions.map: 2 links; rexgpu-xenos.dll: 2 links; rexruntime.dll: 2 links
+  FAIL native4-bin FiraSans-Regular.ttf: 2 links
+  FAIL native4-bin TracyClient.dll: 2 links
+  FAIL native4-bin achievement_unlocked.wav: 2 links
+  FAIL native4-bin amd_fidelityfx_dx12.dll: 2 links
+  FAIL native4-bin legodimensions.exe: 2 links
+  FAIL native4-bin legodimensions.map: 2 links
+  FAIL native4-bin rexgpu-xenos.dll: 2 links
+  FAIL native4-bin rexruntime.dll: 2 links
+  snapB-off/legodimensions.exe 153588736 B, 11-22 02:40:03, 1 link(s)
+  snapB3-on/legodimensions.exe 299045376 B, 11-22 04:33:29, 1 link(s)
+
+[7] proposed new folders must not exist yet
+  build/agent2/devoffB4-bin       absent (ok)
+  build/agent2/nativeB4-bin       absent (ok)
+  build/agent2/snapB3-off         absent (ok)
+  build/agent2/snapB-backup-B4    absent (ok)
+  build/agent2/snapB3-backup-S4a  absent (ok)
+
+[8] snapB3-on (nativeB4: the 6 S4a files applied to snapB3): ninja-style dirty prediction from .ninja_deps + stat (compile edges; link/custom edges have no deps rows)
+  log: 1010 outputs, 1 runs; largest run 1010 edges, wall 1151.2 s (ended 11-22 04:33); deps v4: 2447 paths, 524 records, 0 bad
+  drift now (no change applied): 0 edge(s) dirty (+0 no log entry), work 0 s, est compile wall ~0 s
+  with the planned apply (6 file(s) + /native_gpu_build_info.h; 2 dep path(s) matched): 4 edge(s) (+0 no log entry), work 100 s, est compile wall at -j10 ~31 s
+        31.3 s  CMakeFiles/legodimensions.dir/src/gpu_native/device.cpp.obj
+        26.9 s  CMakeFiles/legodimensions.dir/src/gpu_native/pipeline_library.cpp.obj
+        24.4 s  CMakeFiles/legodimensions.dir/src/gpu_native/shaders.cpp.obj
+        17.0 s  CMakeFiles/legodimensions.dir/src/gpu_native/shader_archive.cpp.obj
+  link-side edge (last run):    59.1 s  CMakeFiles/lego_gpu_prelink.dir/out/native-gpu/aot/lego-dxil-cache.cpp.obj
+  link-side edge (last run):    18.5 s  CMakeFiles/lego_gpu_prelink.dir/C_/Users/<user>/.vscode/projects/games/lego-dimensions-recomp/build/agent2/snapB3/DimensionsRecomp/thirdparty/zstd/zstddeclib.c.obj
+  link-side edge (last run):    18.4 s  CMakeFiles/lego_gpu_prelink_runtime.dir/C_/Users/<user>/.vscode/projects/games/lego-dimensions-recomp/build/agent2/snapB3/DimensionsRecomp/thirdparty/zstd/zstddeclib.c.obj
+  link-side edge (last run):    17.6 s  CMakeFiles/lego_gpu_prelink.dir/28c39c9dacae54a0c532762b54fefebc/build/agent2/snapB3/DimensionsRecomp/tools/gpu-aot/prelink_shader_cache.cpp.obj
+
+[8] snapB-off (devoffB4 option B: the rexlego apply list applied to snapB): ninja-style dirty prediction from .ninja_deps + stat (compile edges; link/custom edges have no deps rows)
+  log: 903 outputs, 1 runs; largest run 903 edges, wall 1039.2 s (ended 11-22 02:40); deps v4: 2097 paths, 469 records, 0 bad
+  drift now (no change applied): 1 edge(s) dirty (+0 no log entry), work 21 s, est compile wall ~21 s
+        1 x newer input: <workspace>/build/agent2/snap1-sdk/install/share/rexglue/rex_app.cpp
+  with the planned apply (4 file(s) + no suffix; 2 dep path(s) matched): 3 edge(s) (+0 no log entry), work 58 s, est compile wall at -j10 ~21 s
+        21.4 s  CMakeFiles/legodimensions.dir/C_/Users/<user>/.vscode/projects/games/lego-dimensions-recomp/build/agent2/snap1-sdk/install/share/rexglue/rex_app.cpp.obj
+        20.9 s  CMakeFiles/legodimensions.dir/src/settings_preferences.cpp.obj
+        15.7 s  CMakeFiles/legodimensions.dir/src/settings_registry.cpp.obj
+  link-side edge (last run):     5.5 s  legodimensions.exe
+
+[9] free disk: 266.9 GiB
+
+SUMMARY: 53 FAIL, 1 WARN
+  snapB3-on predicted 4 compile edge(s), est ~31 s at -j10, + exe link (last 4 s); drift alone 0 edge(s); full build for reference: 1010 edges in 1151 s
+  snapB-off predicted 3 compile edge(s), est ~21 s at -j10, + exe link (last 5 s); drift alone 1 edge(s); full build for reference: 903 edges in 1039 s
+  FAIL snapB3 S2 rexlego/src/gpu_native/draw.cpp: other, expected post
+  FAIL devoff2-bin FiraSans-Regular.ttf: 6 links
+  FAIL devoff2-bin TracyClient.dll: 36 links
+  FAIL devoff2-bin achievement_unlocked.wav: 6 links
+  FAIL devoff2-bin legodimensions.exe: 36 links
+  FAIL devoff2-bin legodimensions.map: 36 links
+  FAIL devoff2-bin rexgpu-xenos.dll: 36 links
+  FAIL devoff2-bin rexruntime.dll: 36 links
+  FAIL devoffB-bin FiraSans-Regular.ttf: 4 links
+  FAIL devoffB-bin TracyClient.dll: 9 links
+  FAIL devoffB-bin achievement_unlocked.wav: 4 links
+  FAIL devoffB-bin legodimensions.exe: 9 links
+  FAIL devoffB-bin legodimensions.map: 9 links
+  FAIL devoffB-bin rexgpu-xenos.dll: 9 links
+  FAIL devoffB-bin rexruntime.dll: 9 links
+  FAIL devoff3-bin FiraSans-Regular.ttf: 8 links
+  FAIL devoff3-bin TracyClient.dll: 12 links
+  FAIL devoff3-bin achievement_unlocked.wav: 8 links
+  FAIL devoff3-bin legodimensions.exe: 12 links
+  FAIL devoff3-bin legodimensions.map: 12 links
+  FAIL devoff3-bin rexgpu-xenos.dll: 12 links
+  FAIL devoff3-bin rexruntime.dll: 12 links
+  FAIL native3d-bin FiraSans-Regular.ttf: 3 links
+  FAIL native3d-bin TracyClient.dll: 10 links
+  FAIL native3d-bin achievement_unlocked.wav: 3 links
+  FAIL native3d-bin amd_fidelityfx_dx12.dll: 10 links
+  FAIL native3d-bin legodimensions.exe: 10 links
+  FAIL native3d-bin legodimensions.map: 10 links
+  FAIL native3d-bin rexgpu-xenos.dll: 10 links
+  FAIL native3d-bin rexruntime.dll: 10 links
+  FAIL nativeB-bin FiraSans-Regular.ttf: 3 links
+  FAIL nativeB-bin TracyClient.dll: 3 links
+  FAIL nativeB-bin achievement_unlocked.wav: 3 links
+  FAIL nativeB-bin amd_fidelityfx_dx12.dll: 3 links
+  FAIL nativeB-bin legodimensions.exe: 3 links
+  FAIL nativeB-bin legodimensions.map: 3 links
+  FAIL nativeB-bin rexgpu-xenos.dll: 3 links
+  FAIL nativeB-bin rexruntime.dll: 3 links
+  FAIL devoff4-bin FiraSans-Regular.ttf: 5 links
+  FAIL devoff4-bin TracyClient.dll: 5 links
+  FAIL devoff4-bin achievement_unlocked.wav: 5 links
+  FAIL devoff4-bin legodimensions.exe: 5 links
+  FAIL devoff4-bin legodimensions.map: 5 links
+  FAIL devoff4-bin rexgpu-xenos.dll: 5 links
+  FAIL devoff4-bin rexruntime.dll: 5 links
+  FAIL native4-bin FiraSans-Regular.ttf: 2 links
+  FAIL native4-bin TracyClient.dll: 2 links
+  FAIL native4-bin achievement_unlocked.wav: 2 links
+  FAIL native4-bin amd_fidelityfx_dx12.dll: 2 links
+  FAIL native4-bin legodimensions.exe: 2 links
+  FAIL native4-bin legodimensions.map: 2 links
+  FAIL native4-bin rexgpu-xenos.dll: 2 links
+  FAIL native4-bin rexruntime.dll: 2 links
+  WARN snapB3 S2 rexglue-sdk/src/audio/audio_system.cpp: other, expected post

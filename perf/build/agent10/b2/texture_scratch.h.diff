@@ -1,0 +1,70 @@
+﻿diff --git a/DimensionsRecomp/rexlego/src/gpu_native/texture_scratch.h b/DimensionsRecomp/rexlego/src/gpu_native/texture_scratch.h
+new file mode 100644
+index 0000000..ca5c2cb
+--- /dev/null
++++ b/DimensionsRecomp/rexlego/src/gpu_native/texture_scratch.h
+@@ -0,0 +1,64 @@
++#pragma once
++
++#include <cstddef>
++#include <cstdint>
++#include <memory>
++
++namespace legodimensions::gpu_native {
++
++// Decode buffer for one texture upload. Unlike std::vector<u8>(n), its bytes
++// start UNINITIALISED: the caller must write or zero every byte it later reads,
++// hashes or stages. Requests up to kRetainBytes lease a grow-only block owned
++// by the calling thread, so steady-state uploads neither zero-fill nor fault in
++// fresh pages; larger (or nested, same-thread) requests get a one-off block.
++class TextureDecodeScratch {
++ public:
++  static constexpr size_t kRetainBytes = size_t(16) << 20;
++
++  explicit TextureDecodeScratch(size_t size) : size_(size) {
++    Block& block = ThreadBlock();
++    if (size <= kRetainBytes && !block.leased) {
++      if (block.capacity < size) {
++        block.bytes.reset();  // release first: keep the peak at one block
++        block.capacity = 0;
++        size_t capacity = size_t(64) << 10;
++        while (capacity < size) capacity <<= 1;  // <= kRetainBytes
++        block.bytes.reset(new uint8_t[capacity]);  // default-init: not zeroed
++        block.capacity = capacity;
++      }
++      block.leased = true;
++      lease_ = &block;
++      data_ = block.bytes.get();
++    } else {
++      owned_.reset(new uint8_t[size ? size : 1]);
++      data_ = owned_.get();
++    }
++  }
++  ~TextureDecodeScratch() {
++    if (lease_) lease_->leased = false;
++  }
++  TextureDecodeScratch(const TextureDecodeScratch&) = delete;
++  TextureDecodeScratch& operator=(const TextureDecodeScratch&) = delete;
++
++  uint8_t* data() { return data_; }
++  const uint8_t* data() const { return data_; }
++  size_t size() const { return size_; }
++
++ private:
++  struct Block {
++    std::unique_ptr<uint8_t[]> bytes;
++    size_t capacity = 0;
++    bool leased = false;
++  };
++  static Block& ThreadBlock() {
++    thread_local Block block;
++    return block;
++  }
++
++  Block* lease_ = nullptr;
++  std::unique_ptr<uint8_t[]> owned_;
++  uint8_t* data_ = nullptr;
++  size_t size_ = 0;
++};
++
++}  // namespace legodimensions::gpu_native

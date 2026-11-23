@@ -1,0 +1,136 @@
+﻿diff --git a/DimensionsRecomp/rexlego/src/gpu_native/pipeline_snapshot.h b/DimensionsRecomp/rexlego/src/gpu_native/pipeline_snapshot.h
+new file mode 100644
+index 0000000..d691a2f
+--- /dev/null
++++ b/DimensionsRecomp/rexlego/src/gpu_native/pipeline_snapshot.h
+@@ -0,0 +1,130 @@
++#pragma once
++
++// Copies the D3D12 pipeline library out under its mutex without holding that
++// mutex across the buffer allocation (task #5, report #1).
++//
++// The old autosave held the library mutex across GetSerializedSize, a
++// zero-filled std::vector resize of up to 512 MiB (allocation plus first-touch
++// page faults) and Serialize. Every draw-time load()/store() takes the same
++// mutex, so a PSO miss during an autosave waited for all of it.
++//
++// SnapshotPipelineLibrary allocates and zero-fills the buffer outside the lock
++// and holds the lock only for query() and copy(). If the library grew between
++// the unlocked allocation and the locked query, it retries with a larger
++// buffer. After `unlocked_attempts` locked passes it allocates under the lock
++// exactly as the old code did, so a growing library never starves a save.
++// copy() always receives exactly the size query() returned and the caller
++// writes exactly `size` bytes, so the saved file is byte-identical to the old
++// code's. With unlocked_attempts == 0 this is the old algorithm.
++
++#include <chrono>
++#include <cstddef>
++#include <cstdint>
++#include <memory>
++#include <mutex>
++#include <new>
++
++namespace legodimensions::gpu_native {
++
++struct PipelineSnapshot {
++  enum class Status : uint8_t {
++    kNothing,   // query() returned 0: nothing to save, or out of bounds
++    kFailed,    // copy() failed
++    kNoMemory,  // the buffer could not be allocated
++    kCopied,    // data[0, size) holds the snapshot
++  };
++  Status status = Status::kNothing;
++  std::unique_ptr<uint8_t[]> data;
++  std::size_t size = 0;      // bytes copied: the last query() result
++  std::size_t capacity = 0;  // bytes allocated in data
++  std::size_t wanted = 0;    // the last query() result, also set on kNoMemory
++  uint32_t passes = 0;       // locked query() passes
++  uint32_t retries = 0;      // passes that found the library larger than the buffer
++  bool allocated_under_lock = false;
++  int64_t lock_us = 0;      // total time the mutex was held
++  int64_t max_lock_us = 0;  // longest single hold
++  int64_t copy_us = 0;      // time inside copy()
++  int64_t alloc_us = 0;     // allocation and zero-fill outside the lock
++};
++
++namespace snapshot_detail {
++using Clock = std::chrono::steady_clock;
++inline int64_t Micros(Clock::duration duration) {
++  return std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
++}
++// Headroom so pipelines stored during the unlocked allocation still fit.
++inline std::size_t Capacity(std::size_t wanted) { return wanted + wanted / 16 + (std::size_t{64} << 10); }
++// Zero-filled like std::vector<uint8_t>::resize. This also touches every page
++// before the lock is taken.
++inline std::unique_ptr<uint8_t[]> Allocate(std::size_t bytes) {
++  return std::unique_ptr<uint8_t[]>(new (std::nothrow) uint8_t[bytes]());
++}
++}  // namespace snapshot_detail
++
++// query(): runs with `mutex` held and returns the serialized size, or 0 to stop.
++// copy(uint8_t* destination, std::size_t size): runs in the same hold once the
++// buffer fits and returns false on failure.
++template <class Mutex, class Query, class Copy>
++PipelineSnapshot SnapshotPipelineLibrary(Mutex& mutex, Query&& query, Copy&& copy,
++                                         uint32_t unlocked_attempts = 3) {
++  using namespace snapshot_detail;
++  PipelineSnapshot snapshot;
++  for (;;) {
++    if (snapshot.wanted > snapshot.capacity) {
++      // Outside the lock. Free the old buffer first so the peak stays at one buffer.
++      snapshot.data.reset();
++      snapshot.capacity = 0;
++      const std::size_t bytes = Capacity(snapshot.wanted);
++      const auto start = Clock::now();
++      snapshot.data = Allocate(bytes);
++      snapshot.alloc_us += Micros(Clock::now() - start);
++      if (!snapshot.data) {
++        snapshot.status = PipelineSnapshot::Status::kNoMemory;
++        return snapshot;
++      }
++      snapshot.capacity = bytes;
++    }
++    std::lock_guard lock(mutex);
++    const auto locked = Clock::now();
++    const auto held = [&] {
++      const int64_t micros = Micros(Clock::now() - locked);
++      snapshot.lock_us += micros;
++      if (micros > snapshot.max_lock_us) snapshot.max_lock_us = micros;
++    };
++    ++snapshot.passes;
++    const std::size_t size = query();
++    snapshot.wanted = size;
++    if (!size) {
++      held();
++      snapshot.status = PipelineSnapshot::Status::kNothing;
++      return snapshot;
++    }
++    if (size > snapshot.capacity) {
++      if (snapshot.capacity) ++snapshot.retries;
++      if (snapshot.passes <= unlocked_attempts) {
++        held();
++        continue;  // Allocate outside the lock, then query again.
++      }
++      // The old behaviour: allocate under the lock.
++      snapshot.data.reset();
++      snapshot.capacity = 0;
++      snapshot.data = Allocate(size);
++      if (!snapshot.data) {
++        held();
++        snapshot.status = PipelineSnapshot::Status::kNoMemory;
++        return snapshot;
++      }
++      snapshot.capacity = size;
++      snapshot.allocated_under_lock = true;
++    }
++    const auto copy_start = Clock::now();
++    const bool copied = copy(snapshot.data.get(), size);
++    snapshot.copy_us += Micros(Clock::now() - copy_start);
++    held();
++    snapshot.size = copied ? size : 0;
++    snapshot.status = copied ? PipelineSnapshot::Status::kCopied : PipelineSnapshot::Status::kFailed;
++    return snapshot;
++  }
++}
++
++}  // namespace legodimensions::gpu_native

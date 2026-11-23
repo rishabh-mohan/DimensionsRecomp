@@ -1,0 +1,21 @@
+# present_microbench 2026-11-21 18:55:33, runs=5, args=[]
+# machine shared with other agents' builds; numbers are medians, see the cpp header
+[win32] 7 runs x 20000 iterations, ns per call: median (min..max)
+[win32]   all three (per present)                27.6 (   25.6..   30.4)
+[win32]   GetForegroundWindow                     4.9 (    4.6..    5.0)
+[win32]   GetWindowLongPtrW(GWL_STYLE)           13.3 (   12.5..   16.5)
+[win32]   MonitorFromWindow                      11.5 (   10.0..   12.5)
+[timer] high-resolution waitable timer, 5 runs x 200 samples; lateness in us
+[timer]   request  median    p95     p99   p99.9     max   run-medians
+[timer]     500    532.3  1082.9  1476.5  3282.1  5505.9   539.6 532.6 528.6 529.8 521.9
+[timer]    1000    427.4  1149.2  2335.8  8143.7  11160.7   507.8 278.5 259.8 508.0 501.7
+[timer]    1500    506.9  8835.4  20060.2  31486.8  37509.3   410.3 822.6 530.1 461.8 413.0
+[timer]    3500    659.8  15204.2  23645.3  39417.4  40395.8   386.1 476.7 2300.5 3242.6 451.9
+[pace] frame shape: guest 2000 us outside the gate, 600 us under it before the limiter, 400 us after the present; 5 runs per row, medians of per-run values
+[pace]  cap  mode            interval-mean  interval-sd  late-p50  late-p99  gate-held-mean  spin/frame
+[pace]  240  old                  4397.8       2248.1     101.0   13230.9          2168.3        97.5
+[pace]  240  unlocked-2ms         7283.4       8368.5    2100.5   41201.4          3483.0       103.3
+[pace]  120  old                 12759.0      12982.6    9676.3   69713.1          8451.2         6.2
+[pace]  120  unlocked-2ms        11930.3      10679.8    4059.3   38735.3          2538.7        13.4
+[pace]   60  old                 17427.7      12215.1    9048.4   36844.3         14081.9         5.5
+[pace]   60  unlocked-2ms        17394.2       9569.2    3217.9   34336.5          1827.5        28.9

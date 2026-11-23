@@ -1,0 +1,15 @@
+﻿pristine xboxkrnl_hal.cpp: <workspace>\build\agent11\exitfix\pristine\xboxkrnl_hal.cpp
+  FAIL no CRT exit( call (line 34)
+  FAIL #include <cstdlib>
+  FAIL ends with rex::FlushLogging(); std::_Exit(0); (last two: REXKRNL_ERROR("Game requested shutdown via HalReturnToFirmware"); exit(0);)
+  PASS REXKRNL_ERROR lines kept (1) (found 1, lines 24-35)
+  PASS no "hard-exiting" text
+  PASS hash matches HASHES.txt (sha 4A0F84AE84BC)
+pristine xam_ui.cpp: <workspace>\build\agent11\exitfix\pristine\xam_ui.cpp
+  FAIL no CRT exit( call (line 542)
+  FAIL #include <cstdlib>
+  FAIL ends with rex::FlushLogging(); std::_Exit(1); (last two: } exit(1);)
+  PASS REXKRNL_ERROR lines kept (7) (found 7, lines 519-543)
+  PASS no "hard-exiting" text
+  PASS hash matches HASHES.txt (sha 03E89D1119CB)
+exitfix_check (pristine): 6 check(s) FAILED

@@ -1,0 +1,21 @@
+== arm d11p (6 runs) vs d11 (6 runs)
+  runs\0201-d11p-r1: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 104 lines game.log 11885, 2026-11-23 02:01:18.021..2026-11-23 02:03:12.196 (114 s) | levels info=56 raw=8 warning=40 | Toypad R/W 12/12 (6.3/6.3 per min)
+  runs\0205-d11p-r2: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 100 lines game.log 11241, 2026-11-23 02:05:22.916..2026-11-23 02:07:17.201 (114 s) | levels info=52 raw=8 warning=40 | Toypad R/W 10/10 (5.3/5.3 per min)
+  runs\0209-d11p-r3: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 100 lines game.log 11266, 2026-11-23 02:09:28.033..2026-11-23 02:11:22.331 (114 s) | levels info=52 raw=8 warning=40 | Toypad R/W 10/10 (5.2/5.2 per min)
+  runs\0219-d11p-r4: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 104 lines game.log 11884, 2026-11-23 02:19:40.582..2026-11-23 02:21:34.963 (114 s) | levels info=56 raw=8 warning=40 | Toypad R/W 12/12 (6.3/6.3 per min)
+  runs\0223-d11p-r5: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 104 lines game.log 11920, 2026-11-23 02:23:46.803..2026-11-23 02:25:41.171 (114 s) | levels info=56 raw=8 warning=40 | Toypad R/W 12/12 (6.3/6.3 per min)
+  runs\0227-d11p-r6: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 100 lines game.log 11276, 2026-11-23 02:27:52.113..2026-11-23 02:29:46.198 (114 s) | levels info=52 raw=8 warning=40 | Toypad R/W 10/10 (5.3/5.3 per min)
+gate_logdiff FAIL findings (B = arm run, A = each base run): none
+NEW warning/error/critical keys (in an arm run, in no base run): 0
+MORE (arm run count > base max + max(5, base max)): 0
+GONE (in every base run, missing from an arm run; any level): 0
+Toypad (base: runs\0157-d11-r1 {'info Write': 12, 'info Read': 12}; runs\0207-d11-r2 {'info Write': 10, 'info Read': 10}; runs\0211-d11-r3 {'info Write': 10, 'info Read': 10}; runs\0215-d11-r4 {'info Write': 10, 'info Read': 10}; runs\0225-d11-r5 {'info Write': 10, 'info Read': 10}; runs\0229-d11-r6 {'info Write': 10, 'info Read': 10})
+  runs\0201-d11p-r1: {'info Write': 12, 'info Read': 12}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\0205-d11p-r2: {'info Write': 10, 'info Read': 10}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\0209-d11p-r3: {'info Write': 10, 'info Read': 10}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\0219-d11p-r4: {'info Write': 12, 'info Read': 12}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\0223-d11p-r5: {'info Write': 12, 'info Read': 12}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\0227-d11p-r6: {'info Write': 10, 'info Read': 10}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+ONLY in d11p (any level, not Toypad; in no base run): 1 keys
+  6/6 runs, counts [1, 1, 1, 1, 1, 1], also in -  [info] [core] TimerQueue: precise wait (timer_queue_precise_wait)
+      e.g. [2026-11-23 02:01:18.402] [info] [core] [t26784] TimerQueue: precise wait (timer_queue_precise_wait)

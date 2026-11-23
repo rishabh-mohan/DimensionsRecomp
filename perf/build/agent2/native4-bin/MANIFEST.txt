@@ -1,0 +1,235 @@
+﻿# build/agent2/native4-bin - Agent 2 (Agent 1's batch schedule). native build 4 (S4a = S3d + SDK #7 #8 #5(i) #38 with every new switch OFF + #32 always on + #2 miss cache, OFF by default): NATIVE_GPU=ON with Agent 6 AOT inputs; Release, game x86-64-v3, SDK x86-64-v2.
+# staged 2026-11-22 13:37:32. Source: snapshot build/agent2/snap1/DimensionsRecomp at S4a (STATE-S4a-1325.tsv, sha256 87DB470A7D8BF3179EFD2B22CFAAF135FBB90627B6EA1074411066FF3DD43300); build tag snap4a; every patch applied to the snapshot since S1 is listed below.
+# SDK: build/agent2/snap1-sdk (REXGLUE_BUILD_TESTS=OFF), built from the same snapshot (incrementally after S1) and installed to snap1-sdk/install; game tree build/agent2/snap1-on; codegen 0.0.23.3 (pinned generated output hash-checked against baseline/ by gen-check.py; codegen-frozen.exe stand-in writes nothing).
+# S4a build inputs (task #4, board run 2): snap1 at S3d (STATE-S3d-0342.tsv; the trees behind devoff3-bin and native3d-bin) + 6 files, each made by git apply of the staged diff to the S3d snap1 copy and hash-checked against its staging record (input hash before, output hash after); nothing was copied from live and live was not written.
+# rexglue-sdk, new switches, all OFF by default: #7 u diag (Agent 12, src/graphics/d3d12/shared_memory.cpp, cvar shared_memory_upload_hash_log=false); #8 P2 (Agent 12, src/graphics/shared_memory.cpp, cvar shared_memory_single_hold_rearm=false); #5 fix (i) (Agent 12, src/system/xmemory.cpp, cvar physical_protect_hold_global_lock=false); #38 precise wait (Agent 11, src/core/timer_queue.cpp, cvar timer_queue_precise_wait=false, init only).
+# rexglue-sdk, always on (no switch): #32 warm-boot fix, src/graphics/d3d12/pipeline_cache.cpp L564 creation_thread_original_count -> creation_thread_needed_count in the while (creation_threads_.size() < ...) loop (Agent 10, b2r S27: output-identical, SAFE); 1-line diff build/agent2/s4a/pc-warmboot.diff.
+# Native only: #2 miss cache (Agent 4, build/agent4/s34/shaders-s34.patch on rexlego/src/gpu_native/shaders.cpp, env LEGO_NATIVE_SHADER_MISS_CACHE, default off); OFF builds compile no gpu_native file, so devoff4 does not contain it.
+# Left out of S4a: C1 (#4: changes xmemory.h, a full rebuild), the #24 hook, the P2 counter, #18/#20, #26. Generated code: the pinned S1 output (gen-check against baseline/), as in S1-S3d. Per-file hashes: build/agent2/s4a/HASHES.txt.
+# native inputs: NATIVE-INPUTS-N1-2055.tsv (sha256 24E376DA1EA3622DE2236741E90CD4032BF0BF21C8EAB3817A01CB0CE941DB2F).
+# native inputs: NATIVE-INPUTS-N1d-2055.tsv (sha256 E1A4B6EA24F27C93F62B09CCA9660DE034EE20AA28E12A99CA0BA73121D9233E).
+# native inputs: NATIVE-INPUTS-N1i-2055.tsv (sha256 12064B2B492223AA0BCC02E5CD362B3AF06E3CEEFF021B06939FDC1892457415).
+# native flags: build-snap.ps1 -Native. Native GPU fingerprint (native-gpu-build.txt, checked in the exe): LEGO Dimensions native GPU 5e3ff55de10f4f64.
+# patches in PATCHES-S1.tsv (sha256 74655029008CAFE72595CDA70BE7A85479742022E9E295E12AD157BE7C779499); before -> after sha256 prefixes:
+#   S1+p1 rexlego/src/gpu_native/device.cpp: 4C15043E486A6225 -> 4DC63FA0B804C5FE
+#   S1+p2 thirdparty/plume/plume_d3d12.cpp: B88E4E86DE5E5DEC -> 564568D4D5853F22
+# patches in PATCHES-S2.tsv (sha256 B25547164383CC7514498BBFC1B6EDDC3B505DDA1223B26D3368DEBFF6729C6F); before -> after sha256 prefixes:
+#   S2 A12 rexglue-sdk/include/rex/audio/audio_system.h: 8F8A2E71A05258B0 -> 4836B139802D3438
+#   S2 A12 rexglue-sdk/src/audio/audio_system.cpp: 7E129AF6EA359947 -> C281FA8625435EFE
+#   S2 A5 rexlego/src/gpu_native/buffers.cpp: DB8FE4864DBAF207 -> 75025044C39FF910
+#   S2 A7 rexlego/src/gpu_native/device.cpp: 4DC63FA0B804C5FE -> 3D01E63142DBFB50
+#   S2 A7 rexlego/src/gpu_native/device.h: 12391F5CE364E280 -> 703939AA91EFEA81
+#   S2 A6 (applied by A4) rexlego/src/gpu_native/draw.cpp: 751C219EA5CCCD2F -> 50AA3B1DEE615678
+#   S2 A7 rexlego/src/gpu_native/fps_counter.h: 79FC841E3180CA0D -> E05D6A554042B302
+#   S2 A6 rexlego/src/gpu_native/pipeline_snapshot.h: A0B71DB586139545 -> 42318B849FAE030B
+#   S2 A5 rexlego/src/gpu_native/texture_scratch.h: D1F0A5C3BB8427D6 -> 8F6A12AE70994065
+#   S2 A5 rexlego/src/gpu_native/texture_upload_source.h: E8BD27D3713FFE28 -> FF9E11417227A8BA
+#   S2 A5 rexlego/src/gpu_native/texture_volume_upload.h: 328DFCEC476599C2 -> D0601ECF0150DF8F
+#   S2 A5 (+A4 (a)) rexlego/src/gpu_native/textures.cpp: A6B45772D017F8D4 -> 3011ADD45516123F
+#   S2 A5 rexlego/src/gpu_native/upload_buffer_pool.h: 3EDE3AFC0F6A368E -> 853E6C16BE4082B9
+#   S2 A5 rexlego/src/gpu_native/upload_legacy_paths.h: ABSENT -> 5C823F13B067C93A
+#   S2 A5 rexlego/src/gpu_native/vertex_upload.h: 7FC6952362FF4B8E -> FFD2B023AC4CC6D5
+#   S2 A6 tools/gpu-aot/patches/plume-winsdk-compat.patch: ABSENT -> E03D29D0758E6150
+#   S2 A6 tools/gpu-aot/prepare_plume.py: CED19F81CF923329 -> B3C877379038091E
+#   S2 A6 tools/gpu-aot/test_prepare_plume.py: 82039EBA12F58180 -> DA360ABA28D609A3
+# patches in PATCHES-S3.tsv (sha256 2DA2AB6CA49E3723AFD4E26FA07927511E9C5C9FC71C54701EE599C88430F3B0); before -> after sha256 prefixes:
+#   S3 A1 .gitignore: 09246E1BCE8B929F -> 600E2436DED4671D
+#   S3 A1 (user fork url) .gitmodules: E7D25A2108620FFC -> C6E629165C283832
+#   S3 A9 rexglue-sdk/include/rex/codegen/config.h: 929EEDA15600105B -> D07C575FF2904B87
+#   S3 A9 rexglue-sdk/include/rex/codegen/function_types.h: 7331CDE11B9BFACE -> 3CBD9F6DC3850CD1
+#   S3 A12 rexglue-sdk/src/audio/audio_system.cpp: C281FA8625435EFE -> 4331A312A9FE8F15
+#   S3 A9 rexglue-sdk/src/codegen/builders/builder_context.h: 2168678C8A40CA4B -> 873A69BBC0134BBA
+#   S3 A9 rexglue-sdk/src/codegen/builders/context.cpp: AA887012DA1F7F1D -> 7710107CE9C577CA
+#   S3 A9 rexglue-sdk/src/codegen/builders/control_flow.cpp: 046462FCB7B46677 -> 61538970604512DB
+#   S3 A9 rexglue-sdk/src/codegen/builders/floating_point.cpp: B34B8684A0695F2B -> 348840D2AC86988F
+#   S3 A9 rexglue-sdk/src/codegen/builders/flush_mode.h: ABSENT -> B1A8F81BBC062850
+#   S3 A9 rexglue-sdk/src/codegen/builders/helpers.h: 6B4BB2B7F778B6BA -> 1ABF25FE5A164910
+#   S3 A9 rexglue-sdk/src/codegen/builders/logical.cpp: 530CF95932F271CA -> 6E95AAF361F94536
+#   S3 A9 rexglue-sdk/src/codegen/builders/memory.cpp: ADA82F71017F43DE -> B1B9869852359947
+#   S3 A9 rexglue-sdk/src/codegen/builders/system.cpp: 4F8FAE95CE008A58 -> D1269273636B5A1A
+#   S3 A9 rexglue-sdk/src/codegen/builders/vector.cpp: 527A195F53400EA6 -> D32BB5A253BD1BC1
+#   S3 A9 rexglue-sdk/src/codegen/codegen_writer.cpp: 19094A7BBB07960C -> 8235C8C77CF06B66
+#   S3 A9 rexglue-sdk/src/codegen/config.cpp: 75CEAAB72FC4495C -> 0ED529B7E5F0F4E7
+#   S3 A9 rexglue-sdk/src/codegen/function_graph.cpp: 13BF36159C6115A1 -> 3E4B0E982CC14EB3
+#   S3 A9 rexglue-sdk/src/codegen/test_support.cpp: 6DB0AB3EF551132F -> 688F450CC185EA21
+#   S3 A11 rexglue-sdk/src/kernel/xam/xam_ui.cpp: 03E89D1119CB059D -> 0A314946FDB9FE1E
+#   S3 A11 rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_hal.cpp: 4A0F84AE84BC61B5 -> AB359E1D6C4DA1B9
+#   S3 A9 rexglue-sdk/src/rexglue/commands/test_recompiler.cpp: 36578DBE6F5DF222 -> 30BB9BE432C2FC8C
+#   S3 A11 (landed by A12) rexglue-sdk/src/ui/rex_app.cpp: E1569868E15761D9 -> 11DE333FA4C0541F
+#   S3 A9 rexglue-sdk/tests/ppc/asm/instr_cr_so_fold.s: ABSENT -> F2413015BA36CFB2
+#   S3 A9 rexglue-sdk/tests/ppc/opt_config.toml: ABSENT -> C74CD990C3299AFF
+#   S3 A9 rexglue-sdk/tests/regression/emit_interior_entries.cpp: 9BE38388D871B31C -> 893EEACB7C555BF0
+#   S3 A6 rexlego/src/settings_preferences.cpp: C78112AA6E50F79D -> 9CBE6DBF9CEDA62D
+#   S3 A6 rexlego/src/settings_registry.cpp: A37337001EBDC277 -> 4EC71328043FA6BA
+# patches in PATCHES-S3d.tsv (sha256 0250A3D000CB11C55E21AF6E338C70BDDD311455B9C7DC69BF730C2AFC996C87); before -> after sha256 prefixes:
+#   S3d A4 rexlego/src/gpu_native/draw.cpp: 50AA3B1DEE615678 -> 5EA1F3576DCC2F90
+# patches in PATCHES-S4a.tsv (sha256 B9612DA2A08262F2FA612B6A2E861B431A82C191796BCB2BF2AC60934F6B5AC6); before -> after sha256 prefixes:
+#   S4a A12 rexglue-sdk/src/graphics/d3d12/shared_memory.cpp: B120D07C6709D0D2 -> BB0838CE3909E18A
+#   S4a A12 rexglue-sdk/src/graphics/shared_memory.cpp: 15C89EDB4B197C17 -> 0BE4BADCAC666BEE
+#   S4a A12 rexglue-sdk/src/system/xmemory.cpp: 6E8FA1BA80EF9271 -> 141FB1A947D59156
+#   S4a A11 rexglue-sdk/src/core/timer_queue.cpp: D8724B29C43286B0 -> 015C04A22DACC592
+#   S4a A1 rexglue-sdk/src/graphics/d3d12/pipeline_cache.cpp: 5DBED81F611E25B1 -> DA77744302CFC149
+#   S4a A4 rexlego/src/gpu_native/shaders.cpp: E87A2DEE43D38D8E -> 9567FE3F3B63637D
+# No PDBs: the exe links without /DEBUG; symbols are in legodimensions.map. Runtime also needs legodimensions.toml in the working dir.
+# TracyClient.dll is staged for parity with build/baseline-bin; no staged binary imports it.
+# name	size	mtime	sha256	source
+legodimensions.exe	315811328	2026-11-22 13:34:42	65432C81D8C7D29A35D80A5D971F2373A1188BC43FF3F92232CD1A8A500FB811	build\agent2\snap1-on\legodimensions.exe
+legodimensions.map	43741350	2026-11-22 13:34:46	136CF59158249EED500F3860FB8B49435AE9754786F7BD31C2B97A568F9B8734	build\agent2\snap1-on\legodimensions.map
+rexruntime.dll	10898432	2026-11-22 13:34:48	870276A6D0E8DE570848FB811591BA5B0AFD8B36413A09F154D0BCAF4902AECA	build\agent2\snap1-on\rexruntime.dll
+rexgpu-xenos.dll	3406848	2026-11-22 13:26:57	59662F767F8B9C7CA78C38370EC6ED6CFB499805F833B458543C206254F65BE5	build\agent2\snap1-sdk\install\bin\rexgpu-xenos.dll
+TracyClient.dll	233472	2026-11-21 19:51:25	85044850B6C663B5CE8722285D13070381C33C9ABC49D06B3E59BA0277F8FF4E	build\agent2\snap1-sdk\install\bin\TracyClient.dll
+achievement_unlocked.wav	191018	2026-11-21 21:44:13	A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5	build\agent2\snap1-on\achievement_unlocked.wav
+FiraSans-Regular.ttf	456996	2026-11-21 10:55:11	C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23	build\agent2\snap1\DimensionsRecomp\rexlego\res\FiraSans-Regular.ttf
+amd_fidelityfx_dx12.dll	6675664	2026-11-21 21:44:13	12A5081257EC95B0B53AD51B4A87FB3C03F97FE0BBB59F9496968F8D50EF93A6	build\agent2\snap1-on\amd_fidelityfx_dx12.dll
+# imports (llvm-readobj --coff-imports):
+#   legodimensions.exe imports: api-ms-win-crt-convert-l1-1-0.dll, api-ms-win-crt-environment-l1-1-0.dll, api-ms-win-crt-filesystem-l1-1-0.dll, api-ms-win-crt-heap-l1-1-0.dll, api-ms-win-crt-locale-l1-1-0.dll, api-ms-win-crt-math-l1-1-0.dll, api-ms-win-crt-runtime-l1-1-0.dll, api-ms-win-crt-stdio-l1-1-0.dll, api-ms-win-crt-string-l1-1-0.dll, api-ms-win-crt-time-l1-1-0.dll, d3d12.dll, dxgi.dll, KERNEL32.dll, MSVCP140.dll, MSVCP140_ATOMIC_WAIT.dll, ole32.dll, rexruntime.dll, SHELL32.dll, USER32.dll, VCRUNTIME140.dll, VCRUNTIME140_1.dll, WINMM.dll
+#   rexruntime.dll imports: ADVAPI32.dll, api-ms-win-crt-convert-l1-1-0.dll, api-ms-win-crt-environment-l1-1-0.dll, api-ms-win-crt-filesystem-l1-1-0.dll, api-ms-win-crt-heap-l1-1-0.dll, api-ms-win-crt-locale-l1-1-0.dll, api-ms-win-crt-math-l1-1-0.dll, api-ms-win-crt-runtime-l1-1-0.dll, api-ms-win-crt-stdio-l1-1-0.dll, api-ms-win-crt-string-l1-1-0.dll, api-ms-win-crt-time-l1-1-0.dll, api-ms-win-crt-utility-l1-1-0.dll, bcrypt.dll, dxgi.dll, GDI32.dll, HID.DLL, IMM32.dll, KERNEL32.dll, MSVCP140.dll, MSVCP140_ATOMIC_WAIT.dll, ole32.dll, SETUPAPI.dll, SHELL32.dll, USER32.dll, VCRUNTIME140.dll, VCRUNTIME140_1.dll, VERSION.dll, WINMM.dll, WS2_32.dll
+#   rexgpu-xenos.dll imports: api-ms-win-crt-convert-l1-1-0.dll, api-ms-win-crt-environment-l1-1-0.dll, api-ms-win-crt-filesystem-l1-1-0.dll, api-ms-win-crt-heap-l1-1-0.dll, api-ms-win-crt-locale-l1-1-0.dll, api-ms-win-crt-math-l1-1-0.dll, api-ms-win-crt-runtime-l1-1-0.dll, api-ms-win-crt-stdio-l1-1-0.dll, api-ms-win-crt-string-l1-1-0.dll, api-ms-win-crt-time-l1-1-0.dll, KERNEL32.dll, MSVCP140.dll, ole32.dll, rexruntime.dll, VCRUNTIME140.dll
+#   TracyClient.dll imports: ADVAPI32.dll, api-ms-win-crt-convert-l1-1-0.dll, api-ms-win-crt-filesystem-l1-1-0.dll, api-ms-win-crt-heap-l1-1-0.dll, api-ms-win-crt-runtime-l1-1-0.dll, api-ms-win-crt-stdio-l1-1-0.dll, api-ms-win-crt-string-l1-1-0.dll, dbghelp.dll, KERNEL32.dll, MSVCP140.dll, USER32.dll, VCRUNTIME140.dll, WS2_32.dll
+#   amd_fidelityfx_dx12.dll imports: api-ms-win-crt-convert-l1-1-0.dll, api-ms-win-crt-heap-l1-1-0.dll, api-ms-win-crt-math-l1-1-0.dll, api-ms-win-crt-runtime-l1-1-0.dll, api-ms-win-crt-stdio-l1-1-0.dll, api-ms-win-crt-string-l1-1-0.dll, dxgi.dll, KERNEL32.dll, MSVCP140.dll, USER32.dll, VCRUNTIME140.dll, VCRUNTIME140_1.dll, WINMM.dll
+# checks:
+#   PASS source exists: build\agent2\snap1-on\legodimensions.exe
+#   PASS source exists: build\agent2\snap1-on\legodimensions.map
+#   PASS source exists: build\agent2\snap1-on\rexruntime.dll
+#   PASS source exists: build\agent2\snap1-sdk\install\bin\rexgpu-xenos.dll
+#   PASS source exists: build\agent2\snap1-sdk\install\bin\TracyClient.dll
+#   PASS source exists: build\agent2\snap1-on\achievement_unlocked.wav
+#   PASS source exists: build\agent2\snap1\DimensionsRecomp\rexlego\res\FiraSans-Regular.ttf
+#   PASS source exists: build\agent2\snap1-on\amd_fidelityfx_dx12.dll
+#   PASS gate log exists: snap4a-native-gate.log
+#   PASS snapshot record MANIFEST-S4a-*.tsv or STATE-S4a-*.tsv exists
+#   PASS snap4a-native-gate.log says RESULT: PASS
+#   PASS snap1-sdk/install/include copy of rexglue-sdk/include/rex/audio/audio_system.h == the patched file (4836B139802D3438)
+#   PASS snap1-sdk/install/include copy of rexglue-sdk/include/rex/codegen/config.h == the patched file (D07C575FF2904B87)
+#   PASS snap1-sdk/install/include copy of rexglue-sdk/include/rex/codegen/function_types.h == the patched file (3CBD9F6DC3850CD1)
+#   PASS exe 13:34:42 newer than newest obj device.cpp.obj 13:34:38
+#   PASS map written with the exe (13:34:46)
+#   PASS map lists native_lock_elide.cpp.obj
+#   PASS rexlego/src/gpu_native/device.cpp: 1 object(s) in snap1-on compile or include it, all newer than the patched copy
+#   PASS thirdparty/plume/plume_d3d12.cpp: 1 object(s) in snap1-on compile or include it, all newer than the patched copy
+#   PASS rexglue-sdk/include/rex/audio/audio_system.h: 1 object(s) in snap1-on compile or include it, all newer than the patched copy
+#   NOTE rexglue-sdk/src/audio/audio_system.cpp is not compiled or included in snap1-on
+#   PASS rexlego/src/gpu_native/buffers.cpp: 1 object(s) in snap1-on compile or include it, all newer than the patched copy
+#   PASS rexlego/src/gpu_native/device.h: 18 object(s) in snap1-on compile or include it, all newer than the patched copy
+#   PASS rexlego/src/gpu_native/draw.cpp: 1 object(s) in snap1-on compile or include it, all newer than the patched copy
+#   PASS rexlego/src/gpu_native/fps_counter.h: 1 object(s) in snap1-on compile or include it, all newer than the patched copy
+#   PASS rexlego/src/gpu_native/pipeline_snapshot.h: 1 object(s) in snap1-on compile or include it, all newer than the patched copy
+#   PASS rexlego/src/gpu_native/texture_scratch.h: 1 object(s) in snap1-on compile or include it, all newer than the patched copy
+#   PASS rexlego/src/gpu_native/texture_upload_source.h: 1 object(s) in snap1-on compile or include it, all newer than the patched copy
+#   PASS rexlego/src/gpu_native/texture_volume_upload.h: 1 object(s) in snap1-on compile or include it, all newer than the patched copy
+#   PASS rexlego/src/gpu_native/textures.cpp: 1 object(s) in snap1-on compile or include it, all newer than the patched copy
+#   PASS rexlego/src/gpu_native/upload_buffer_pool.h: 2 object(s) in snap1-on compile or include it, all newer than the patched copy
+#   PASS rexlego/src/gpu_native/upload_legacy_paths.h: 2 object(s) in snap1-on compile or include it, all newer than the patched copy
+#   PASS rexlego/src/gpu_native/vertex_upload.h: 1 object(s) in snap1-on compile or include it, all newer than the patched copy
+#   NOTE tools/gpu-aot/patches/plume-winsdk-compat.patch is not compiled or included in snap1-on
+#   NOTE tools/gpu-aot/prepare_plume.py is not compiled or included in snap1-on
+#   NOTE tools/gpu-aot/test_prepare_plume.py is not compiled or included in snap1-on
+#   NOTE .gitignore is not compiled or included in snap1-on
+#   NOTE .gitmodules is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/include/rex/codegen/config.h is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/include/rex/codegen/function_types.h is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/codegen/builders/builder_context.h is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/codegen/builders/context.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/codegen/builders/control_flow.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/codegen/builders/floating_point.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/codegen/builders/flush_mode.h is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/codegen/builders/helpers.h is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/codegen/builders/logical.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/codegen/builders/memory.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/codegen/builders/system.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/codegen/builders/vector.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/codegen/codegen_writer.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/codegen/config.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/codegen/function_graph.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/codegen/test_support.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/kernel/xam/xam_ui.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_hal.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/rexglue/commands/test_recompiler.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/ui/rex_app.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/tests/ppc/asm/instr_cr_so_fold.s is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/tests/ppc/opt_config.toml is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/tests/regression/emit_interior_entries.cpp is not compiled or included in snap1-on
+#   PASS rexlego/src/settings_preferences.cpp: 1 object(s) in snap1-on compile or include it, all newer than the patched copy
+#   PASS rexlego/src/settings_registry.cpp: 1 object(s) in snap1-on compile or include it, all newer than the patched copy
+#   NOTE rexglue-sdk/src/graphics/d3d12/shared_memory.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/graphics/shared_memory.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/system/xmemory.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/core/timer_queue.cpp is not compiled or included in snap1-on
+#   NOTE rexglue-sdk/src/graphics/d3d12/pipeline_cache.cpp is not compiled or included in snap1-on
+#   PASS rexlego/src/gpu_native/shaders.cpp: 1 object(s) in snap1-on compile or include it, all newer than the patched copy
+#   PASS rexglue-sdk/include/rex/audio/audio_system.h: 5 object(s) in snap1-sdk compile or include it, all newer than the patched copy
+#   PASS rexglue-sdk/src/audio/audio_system.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS rexglue-sdk/include/rex/codegen/config.h: 29 object(s) in snap1-sdk compile or include it, all newer than the patched copy
+#   PASS rexglue-sdk/include/rex/codegen/function_types.h: 42 object(s) in snap1-sdk compile or include it, all newer than the patched copy
+#   PASS rexglue-sdk/src/codegen/builders/builder_context.h: 11 object(s) in snap1-sdk compile or include it, all newer than the patched copy
+#   PASS rexglue-sdk/src/codegen/builders/context.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS rexglue-sdk/src/codegen/builders/control_flow.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS rexglue-sdk/src/codegen/builders/floating_point.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS rexglue-sdk/src/codegen/builders/flush_mode.h: 3 object(s) in snap1-sdk compile or include it, all newer than the patched copy
+#   PASS rexglue-sdk/src/codegen/builders/helpers.h: 9 object(s) in snap1-sdk compile or include it, all newer than the patched copy
+#   PASS rexglue-sdk/src/codegen/builders/logical.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS rexglue-sdk/src/codegen/builders/memory.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS rexglue-sdk/src/codegen/builders/system.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS rexglue-sdk/src/codegen/builders/vector.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS rexglue-sdk/src/codegen/codegen_writer.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS rexglue-sdk/src/codegen/config.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS rexglue-sdk/src/codegen/function_graph.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS rexglue-sdk/src/codegen/test_support.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS rexglue-sdk/src/kernel/xam/xam_ui.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_hal.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS rexglue-sdk/src/rexglue/commands/test_recompiler.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   NOTE rexglue-sdk/src/ui/rex_app.cpp is not compiled or included in snap1-sdk
+#   NOTE rexglue-sdk/tests/ppc/asm/instr_cr_so_fold.s is not compiled or included in snap1-sdk
+#   NOTE rexglue-sdk/tests/ppc/opt_config.toml is not compiled or included in snap1-sdk
+#   NOTE rexglue-sdk/tests/regression/emit_interior_entries.cpp is not compiled or included in snap1-sdk
+#   PASS rexglue-sdk/src/graphics/d3d12/shared_memory.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS rexglue-sdk/src/graphics/shared_memory.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS rexglue-sdk/src/system/xmemory.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS rexglue-sdk/src/core/timer_queue.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS rexglue-sdk/src/graphics/d3d12/pipeline_cache.cpp: 1 object(s) in snap1-sdk compile or include it, all newer than the patched copy; 2 listed object(s) not built (other configurations)
+#   PASS SDK out tree rexruntime.dll 13:26:32 is newer than the 9 rebuilt object(s) linked into it (newest 13:26:12)
+#   PASS exe 13:34:42 relinked after STATE-S4a-1325.tsv (13:25:03); 1 S4a file(s) are compiled or included here
+#   PASS snap1-on/rexruntime.dll == snap1-sdk/install/bin/rexruntime.dll
+#   PASS install/bin/rexruntime.dll == SDK out tree rexruntime.dll
+#   PASS install/bin/rexgpu-xenos.dll == SDK out tree rexgpu-xenos.dll
+#   PASS amd_fidelityfx_dx12.dll == the snapshot's PrebuiltSignedDLL copy
+#   PASS legodimensions.exe import table readable (22 DLLs)
+#   PASS legodimensions.exe imports rexruntime.dll (not a system DLL), which is staged
+#   PASS legodimensions.exe does not import TracyClient.dll
+#   PASS rexruntime.dll import table readable (29 DLLs)
+#   PASS rexruntime.dll does not import TracyClient.dll
+#   PASS rexgpu-xenos.dll import table readable (15 DLLs)
+#   PASS rexgpu-xenos.dll imports rexruntime.dll (not a system DLL), which is staged
+#   PASS rexgpu-xenos.dll does not import TracyClient.dll
+#   PASS TracyClient.dll import table readable (13 DLLs)
+#   PASS amd_fidelityfx_dx12.dll import table readable (13 DLLs)
+#   PASS amd_fidelityfx_dx12.dll does not import TracyClient.dll
+#   PASS legodimensions.exe contains 'ui_font'
+#   PASS legodimensions.exe contains 'FiraSans-Regular.ttf'
+#   PASS legodimensions.exe contains 'depth_of_field'
+#   PASS legodimensions.exe contains 'rexruntime.dll'
+#   PASS legodimensions.exe contains 'Pause and unpause the guest without allocating'
+#   PASS legodimensions.exe contains 'which can hang when the guest pauses'
+#   PASS legodimensions.exe contains 'LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD'
+#   PASS legodimensions.exe contains 'LEGO_NATIVE_FPS_CELL_RECTS'
+#   PASS legodimensions.exe contains 'LEGO_NATIVE_TEXTURE_STAGING_POOL'
+#   PASS legodimensions.exe contains 'LEGO_NATIVE_SHADER_MISS_CACHE'
+#   PASS legodimensions.exe contains '5e3ff55de10f4f64'
+#   PASS rexgpu-xenos.dll contains 'Use bindless resources where available'
+#   PASS rexgpu-xenos.dll contains 'd3d12_readback_memexport'
+#   PASS rexgpu-xenos.dll contains 'shared_memory_upload_hash_log'
+#   PASS rexgpu-xenos.dll contains 'shared_memory_single_hold_rearm'
+#   PASS rexruntime.dll contains 'rexcrt_heap_enable'
+#   PASS rexruntime.dll contains 'rexcrt_heap_size_mb'
+#   PASS rexruntime.dll contains 'audio_shutdown_detach_worker'
+#   PASS rexruntime.dll contains 'leave it running and leak what it can still reach'
+#   PASS rexruntime.dll contains 'physical_protect_hold_global_lock'
+#   PASS rexruntime.dll contains 'timer_queue_precise_wait'
+#   PASS staged copy identical: legodimensions.exe
+#   PASS staged copy identical: legodimensions.map
+#   PASS staged copy identical: rexruntime.dll
+#   PASS staged copy identical: rexgpu-xenos.dll
+#   PASS staged copy identical: TracyClient.dll
+#   PASS staged copy identical: achievement_unlocked.wav
+#   PASS staged copy identical: FiraSans-Regular.ttf
+#   PASS staged copy identical: amd_fidelityfx_dx12.dll

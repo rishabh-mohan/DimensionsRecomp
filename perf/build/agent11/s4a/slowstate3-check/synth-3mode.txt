@@ -1,0 +1,71 @@
+﻿
+matrix        run       arm mode       env pcvar precise ms1 onset_s slow_pct span_s fg  flags               
+------        ---       --- ----       --- ----- ------- --- ------- -------- ------ --  -----               
+20990101-0000 0001-a-r1 a   spin     False  True       0   1 2             70    113 1/0 precise_cvar_no_line
+20990101-0000 0002-b-r1 b   blocking  True  True       0   1 2             70    113 1/0 precise_cvar_no_line
+20990101-0000 0003-c-r1 c   precise  False False       1   1 2             70    113 1/0 precise_line_no_cvar
+20990101-0000 0004-d-r1 d   precise   True  True       1   1 2             70    113 1/0 env+precise         
+20990101-0000 0005-e-r1 e   precise  False  True       2   1 2             70    113 1/0 precise_lines>1     
+20990101-0000 0006-f-r1 f   blocking  True False       0   0 4             78    113 1/0 no_log              
+20990101-0000 0007-g-r1 g   unknown  False  True       0   0 2             70    113 1/0 no_log              
+20990101-0000 0009-x-r1 x   spin     False False       0   0 4             78    113 1/0                     
+20990101-0000 0010-x-r2 x   precise  False  True       1   1 2             70    113 1/0                     
+20990101-0000 0011-j-r1 j   spin     False False       0   1 2             70    113 1/0                     
+20990101-0000 0012-k-r1 k   precise  False  True       1   1 2             70    113 1/0                     
+20990101-0000 0013-l-r1 l   precise  False  True       1   1 2             70    113 1/0                     
+20990101-0000 0014-m-r1 m   blocking  True False       0   0 4             78    113 1/0 no_log              
+20990101-0000 0015-n-r1 n   blocking  True False       0   0 4             78    113 1/0                     
+20990101-0000 0016-o-r1 o   blocking  True False       0   0 4             78    113 1/0                     
+20990101-0000 0017-p-r1 p   spin     False  True       0   0 4             78    113 1/0 precise_cvar_no_line
+20990101-0000 0018-q-r1 q   precise  False  True       1   1 2             70    113 1/0                     
+20990101-0000 0019-r-r1 r   spin     False False       0   0 -              0     91 1/0                     
+20990101-0000 0022-Y-r1 Y   spin     False False       0   0 4             78    113 1/0                     
+20990101-0000 0023-y-r2 y   spin     False False       0   0 4             78    113 1/0                     
+20990101-0000 0024-w-r1 w   unknown   True  True       0   0 2             70    113 1/0 no_log              
+
+
+
+precise runs: 7, with slow state: 7; blocking runs: 5, with slow state: 5; spin runs: 7, with slow state: 6; unknown runs: 2, with slow state: 2 (E below 800 MHz for 3+ samples)
+
+matrix        arm runs mode         slow_runs mean_slow_pct mean_onset_s note 
+------        --- ---- ----         --------- ------------- ------------ ---- 
+20990101-0000 a      1 spin                 1          70.2 2                 
+20990101-0000 b      1 blocking             1          70.2 2                 
+20990101-0000 c      1 precise              1          70.2 2                 
+20990101-0000 d      1 precise              1          70.2 2                 
+20990101-0000 e      1 precise              1          70.2 2                 
+20990101-0000 f      1 blocking             1          77.9 4                 
+20990101-0000 g      1 unknown              1          70.2 2                 
+20990101-0000 j      1 spin                 1          70.2 2                 
+20990101-0000 k      1 precise              1          70.2 2                 
+20990101-0000 l      1 precise              1          70.2 2                 
+20990101-0000 m      1 blocking             1          77.9 4                 
+20990101-0000 n      1 blocking             1          77.9 4                 
+20990101-0000 o      1 blocking             1          77.9 4                 
+20990101-0000 p      1 spin                 1          77.9 4                 
+20990101-0000 q      1 precise              1          70.2 2                 
+20990101-0000 r      1 spin                 0             0 -                 
+20990101-0000 w      1 unknown              1          70.2 2                 
+20990101-0000 x      2 spin/precise         2            74 3            MIXED
+20990101-0000 Y      2 spin                 2          77.9 4                 
+
+
+
+runs with flags: 10; mixed arms: 1
+
+matrix        run       mode     flags               
+------        ---       ----     -----               
+20990101-0000 0001-a-r1 spin     precise_cvar_no_line
+20990101-0000 0002-b-r1 blocking precise_cvar_no_line
+20990101-0000 0003-c-r1 precise  precise_line_no_cvar
+20990101-0000 0004-d-r1 precise  env+precise         
+20990101-0000 0005-e-r1 precise  precise_lines>1     
+20990101-0000 0006-f-r1 blocking no_log              
+20990101-0000 0007-g-r1 unknown  no_log              
+20990101-0000 0014-m-r1 blocking no_log              
+20990101-0000 0017-p-r1 spin     precise_cvar_no_line
+20990101-0000 0024-w-r1 unknown  no_log              
+
+
+
+wrote build\agent11\s4a\slowstate3-check\synth-3mode.csv

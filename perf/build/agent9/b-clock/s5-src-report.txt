@@ -1,0 +1,53 @@
+S5 source scan: 1225 files (lego 1, lego/src 259, sdk/include 339, sdk/src 606, sdk/tests 20), 28357450 chars, 1.0 s; missing trees: lego/include
+## group T: 43 hits in 6 files
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread.h:32: #include <rex/thread/timer_queue.h>
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread.h:150: // wrapper around QueueTimerRecurring which automatically cancels the timer on
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread.h:152: class HighResolutionTimer {
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread.h:153: HighResolutionTimer(std::chrono::milliseconds interval, std::function<void()> callback) {
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread.h:155: wait_item_ = QueueTimerRecurring([callback = std::move(callback)](void*) { callback(); },
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread.h:156: nullptr, TimerQueueWaitItem::clock::now(), interval);
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread.h:160: ~HighResolutionTimer() {
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread.h:169: static std::unique_ptr<HighResolutionTimer> CreateRepeating(std::chrono::milliseconds period,
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread.h:171: return std::unique_ptr<HighResolutionTimer>(
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread.h:172: new HighResolutionTimer(period, std::move(callback)));
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread.h:176: std::weak_ptr<TimerQueueWaitItem> wait_item_;
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/kernel/xboxkrnl/module.h:42: std::unique_ptr<rex::thread::HighResolutionTimer> timestamp_timer_;
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread/timer_queue.h:20: // Windows CreateTimerQueueTimer with WT_EXECUTEINTIMERTHREAD.
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread/timer_queue.h:24: class TimerQueue;
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread/timer_queue.h:26: struct TimerQueueWaitItem {
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread/timer_queue.h:29: TimerQueueWaitItem(std::function<void(void*)> callback, void* userdata, TimerQueue* parent_queue,
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread/timer_queue.h:47: friend TimerQueue;
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread/timer_queue.h:60: TimerQueue* parent_queue_;
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread/timer_queue.h:66: std::weak_ptr<TimerQueueWaitItem> QueueTimerOnce(std::function<void(void*)> callback,
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread/timer_queue.h:68: TimerQueueWaitItem::clock::time_point due);
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread/timer_queue.h:73: std::weak_ptr<TimerQueueWaitItem> QueueTimerRecurring(std::function<void(void*)> callback,
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread/timer_queue.h:75: TimerQueueWaitItem::clock::time_point due,
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/thread/timer_queue.h:76: TimerQueueWaitItem::clock::duration interval);
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/threading_posix.cpp:43: #include <rex/thread/timer_queue.h>
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/threading_posix.cpp:582: wait_item_ = QueueTimerOnce(&CompletionRoutine, this, due_time);
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/threading_posix.cpp:593: wait_item_ = QueueTimerRecurring(&CompletionRoutine, this, due_time, period);
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/threading_posix.cpp:630: std::weak_ptr<TimerQueueWaitItem> wait_item_;
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp:25: #include <rex/thread/timer_queue.h>
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp:31: using WaitItem = TimerQueueWaitItem;
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp:148: class TimerQueue {
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp:154: TimerQueue()
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp:164: ~TimerQueue() {
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp:180: set_current_thread_name("rex::thread::TimerQueue");
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp:250: std::weak_ptr<WaitItem> QueueTimer(std::shared_ptr<WaitItem> wait_item) {
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp:295: rex::thread::TimerQueue timer_queue_;
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp:297: void TimerQueueWaitItem::Disarm() {
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp:330: std::weak_ptr<WaitItem> QueueTimerOnce(std::function<void(void*)> callback, void* userdata,
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp:332: return timer_queue_.QueueTimer(std::make_shared<WaitItem>(
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp:333: std::move(callback), userdata, &timer_queue_, due, WaitItem::clock::duration::zero()));
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp:336: std::weak_ptr<WaitItem> QueueTimerRecurring(std::function<void(void*)> callback, void* userdata,
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp:339: return timer_queue_.QueueTimer(
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp:340: std::make_shared<WaitItem>(std::move(callback), userdata, &timer_queue_, due, interval));
+sdk/src DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_module.cpp:195: timestamp_timer_ = rex::thread::HighResolutionTimer::CreateRepeating(
+## group C: 7 hits in 4 files
+sdk/include DimensionsRecomp/rexglue-sdk/include/rex/threading_timing.h:20: uint32_t timer_resolution_ms = 0;
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/threading_win.cpp:235: const uint32_t period = config.timer_resolution_ms;
+sdk/src DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp:42: TimerWaitStrategy() : blocking_(std::getenv("REX_TIMER_WAIT_BLOCKING") != nullptr) {}
+sdk/src DimensionsRecomp/rexglue-sdk/src/system/runtime.cpp:39: REXCVAR_DEFINE_UINT32(host_timer_resolution_ms, 0, "Runtime",
+sdk/src DimensionsRecomp/rexglue-sdk/src/system/runtime.cpp:42: REXCVAR_DEFINE_BOOL(host_timer_throttling_optout, false, "Runtime",
+sdk/src DimensionsRecomp/rexglue-sdk/src/system/runtime.cpp:142: timing.timer_resolution_ms = REXCVAR_GET(host_timer_resolution_ms);
+sdk/src DimensionsRecomp/rexglue-sdk/src/system/runtime.cpp:143: timing.keep_timer_resolution_in_background = REXCVAR_GET(host_timer_throttling_optout);

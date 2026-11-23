@@ -1,0 +1,21 @@
+# w4b-standby compare 2026-11-22 15:05:57 (read-only; Agent 8 task #10)
+baseline   build\agent8\readout\w4b-standby-baseline-1311.tsv
+           # w4b-standby baseline 2026-11-22 13:14:34: 3654 rows (B 122, BD 19, C 2934, CD 571, H 8), 24.4 MB hashed in 175.8 s
+
+=== bench\agent8 (B/BD), build\agent8 minus readout\ (C/CD), harness closure (H) vs baseline ===
+B   same   122  changed 0  missing 0  added 0
+BD  same    19  changed 0  missing 0  added 0
+C   same  2934  changed 0  missing 0  added 0
+CD  same   571  changed 0  missing 0  added 0
+H   same     8  changed 0  missing 0  added 0
+
+=== Agent 11 W4b closure TSV build\agent11\pthrottle\w4b-hash-baseline-0516.tsv (sha256 for all files, bins included) ===
+           # pthrottle_w4b_hash 2026-11-22 05:17:40: 61 files, 657977630 bytes; not hashed: game\disc, game\tu23 (read-only game data)
+CHANGED  harness\runstats.py (scan:run-game.ps1): size 28180 -> 30662, mtime 2026-11-21 23:32:36 -> 2026-11-22 07:02:44, sha 5B889EFF101CCA1B -> AE6C8B0C2A00B70A
+closure    61 files: 60 same sha256, 0 bins same size + mtime (not hashed), 1 changed or missing; dirs checked for additions: build\agent8\cache, build\agent2\devoff2-bin, build\agent2\devoff3-bin, build\agent2\devoffB-bin
+
+=== Agent 11 W4b closure TSV build\agent11\pthrottle\pairs\20261122-0600-meta\w4b-after.tsv (sha256 for all files, bins included) ===
+           # pthrottle_w4b_hash 2026-11-22 06:19:09: 53 files, 657888905 bytes; not hashed: game\disc, game\tu23 (read-only game data)
+closure    53 files: 53 same sha256, 0 bins same size + mtime (not hashed), 0 changed or missing; dirs checked for additions: build\agent8\cache, build\agent2\devoff2-bin, build\agent2\devoff3-bin, build\agent2\devoffB-bin
+
+hashed 651.2 MB in 22.4 s

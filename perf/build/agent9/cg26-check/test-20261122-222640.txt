@@ -1,0 +1,48 @@
+# test_cg26_check.py (Agent 9, task #18)  2026-11-22 22:26:41  checker sha256 E246936B51EB7C6A7797B88D70ADB867EBB531EF486D54ED5C052F64CB8564BF
+# new tool build\agent2\cg26\tool\rexglue.exe sha256 9145166CDBEF5500: db16cyc_pause yes, \tsimde_mm_pause(); yes
+# old tool build\agent9\bin\rexglue.exe sha256 37B32713B7516402: db16cyc_pause no, \tsimde_mm_pause(); no
+mock built in 119.4 s: build\agent9\cg26-check\mock\rexlego\generated (pinned copy + 20 pause lines + mock stamps), build\agent9\cg26-check\mock\rexlego\legodimensions_config.toml, build\agent9\cg26-check\mock\bin
+
+OK   P0: mock CG26 regen + mock bin: expected PASS
+     exit 0 (want 0), failing gates "" (want ""), 154.0 s; RESULT: PASS  (144.6 s)
+
+OK   F1: Agent 2's real cg26 tree before the regen (pinned copy, ON toml, new tool) + the real nativeB-bin MANIFEST
+     exit 1 (want 1), failing gates "ab" (want "ab"), 10.4 s; RESULT: FAIL (16)  (9.2 s)
+     FAIL codegen.d names a config toml with this content: <workspace>/build/agent2/snap1/DimensionsRecomp/rexlego/legodimensions_config.toml 7F775847DB9CC2DA (another path)
+     FAIL the fingerprint differs from the reference (the inputs changed since the reference): gen 58c23c7e7cdb95afd17a35c5148cb3e9, ref 58c23c7e7cdb95afd17a35c5148cb3e9
+     FAIL the regen ran after the toml landed: codegen.stamp 2026-11-21 18:15:54, toml 2026-11-22 20:54:29
+     FAIL the regen emitted the pauses (both the toml line and the new tool were in effect): 0 of 20
+     FAIL exactly 20 pause lines (\tsimde_mm_pause();): 0
+     FAIL per-function pause counts == R2.17 (8, 2, 2, 2 and six 1s): sub_83E63F38 0 (want 1); sub_83E64900 0 (want 1); sub_83E66CD8 0 (want 1); sub_83E70320 0 (want 1); sub_83E96348 0 (want 1); sub_83EA90D0 0 (want 1); sub_83F99F80 0 
+     FAIL TU107 sub_83FAF180: 8 pause line(s), one after each db16cyc site; minus them == the reference: inserted 0, db16cyc sites without a pause 8, rest identical yes
+     FAIL TU116 sub_83F99F80: 2 pause line(s), one after each db16cyc site; minus them == the reference: inserted 0, db16cyc sites without a pause 2, rest identical yes
+
+OK   F2: one pause line missing (TU116, first site): 19 pauses
+     exit 1 (want 1), failing gates "ab" (want "ab"), 9.1 s; RESULT: FAIL (5)  (8.5 s)
+     FAIL the regen emitted the pauses (both the toml line and the new tool were in effect): 19 of 20
+     FAIL the staged exe is newer than the regen: exe 2026-11-22 22:28:34, newest of the 10 TUs 2026-11-22 22:31:25
+     FAIL exactly 20 pause lines (\tsimde_mm_pause();): 19
+     FAIL per-function pause counts == R2.17 (8, 2, 2, 2 and six 1s): sub_83F99F80 1 (want 2)
+     FAIL TU116 sub_83F99F80: 2 pause line(s), one after each db16cyc site; minus them == the reference: inserted 1, db16cyc sites without a pause 1, rest identical yes
+
+OK   F3: an extra pause line in TU108, not an arm TU
+     exit 1 (want 1), failing gates "abc" (want "abc"), 10.0 s; RESULT: FAIL (7)  (9.2 s)
+     FAIL the regen emitted the pauses (both the toml line and the new tool were in effect): 21 of 20
+     FAIL exactly 20 pause lines (\tsimde_mm_pause();): 21
+     FAIL no pause outside the arm-A 10 TUs: default/legodimensions_recomp.108.cpp
+     FAIL every pause is in its expected function and TU: legodimensions_recomp.108.cpp:201 in sub_8263D000
+     FAIL every pause line directly follows a '\t// db16cyc ' line: legodimensions_recomp.108.cpp:201
+     FAIL per-function pause counts == R2.17 (8, 2, 2, 2 and six 1s): sub_8263D000 1 (want 0)
+     FAIL no file differs except the 10 TUs and the 3 stamp files: unexpected 1: default/legodimensions_recomp.108.cpp
+
+BAD  F4: the TU125 pause moved one line down (no longer right after its db16cyc line)
+     exit 1 (want 1), failing gates "ab" (want "b"), 17.9 s; RESULT: FAIL (3)  (17.3 s)
+     FAIL the staged exe is newer than the regen: exe 2026-11-22 22:28:34, newest of the 10 TUs 2026-11-22 22:31:44
+     FAIL every pause line directly follows a '\t// db16cyc ' line: legodimensions_recomp.125.cpp:33896
+     FAIL TU125 sub_83E64900: 1 pause line(s), one after each db16cyc site; minus them == the reference: inserted 1, db16cyc sites without a pause 1, rest identical yes
+
+OK   F5: codegen.partition.json changed (one byte appended)
+     exit 1 (want 1), failing gates "c" (want "c"), 68.5 s; RESULT: FAIL (3)  (67.3 s)
+     FAIL no file differs except the 10 TUs and the 3 stamp files: unexpected 1: default/codegen.partition.json
+     FAIL codegen.partition.json unchanged: gen 6E8EEADCC3A1AADA, ref 22C9D89BEA8E8C6E
+     FAIL codegen.partition.json is the arm-A sidecar 22C9D89BEA8E8C6E: 6E8EEADCC3A1AADA

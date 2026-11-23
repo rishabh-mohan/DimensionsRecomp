@@ -1,0 +1,17 @@
+W6 promotion (Agent 8, run-2 task #7, build\agent8\w6-stage\promote-w6.ps1), 2026-11-22 20:50:03
+mode: PROMOTE (writes bench\agent8\run\matrix-window6.json and bench\agent8\RUN-WINDOW6.cmd)
+result: NOT OK: FINAL.txt is a PIPELINE CHECK with a stand-in bin: never promoted | -Promote needs -ExpectBin (the bin Agent 1 named) | -Promote needs -ManifestSha (from Agent 2's staging report) | matrix title or notes[0] says PIPELINE CHECK
+from: build\agent5\w6-draft\check  (FINAL.txt: W6 finalize (Agent 5, finalize-w6.ps1), 2026-11-22 20:35, -Bin build/agent2/devoff4-bin  [PIPELINE CHECK with a stand-in bin: do not promote])
+bin: build/agent2/devoff4-bin (expected: -)  legodimensions.exe sha256 6BE3C713229232B29C183D27B397A3560B46E2279C6AF47C64CF8A2EFA287376 (FINAL.txt 6BE3C713229232B29C183D27B397A3560B46E2279C6AF47C64CF8A2EFA287376)
+MANIFEST.txt sha256 16DCC9399239E5774BF571869B5248DF36DB0D374BF6A159BF1A9839784CAD6D; 7 files listed, 7 match by sha256 and size; check lines PASS 81, FAIL 0; unlisted files: none (Agent 2's staging report: -)
+matrix-window6.json  FINAL.txt DE34A02A7545376C46C6AC2713641E6838B2E849007CF6E2F32DF00E7A35B59E  copy -  -> bench\agent8\run\matrix-window6.json
+RUN-WINDOW6.cmd      FINAL.txt 24560C5883FD12B3E756BC7B386E4D25003798F4CE78BB439C546F94D3020968  copy -  -> bench\agent8\RUN-WINDOW6.cmd
+arms in the matrix: s0, p2, p2f, p2fc, f, fc; env keys: none; run: only=s0,p2,p2f,p2fc repeats=3 -ColdShared
+matrix folders before/after -PlanOnly:  / 
+GO line: GO W6 matrix-window6.json DE34A02A7545376C46C6AC2713641E6838B2E849007CF6E2F32DF00E7A35B59E only=s0,p2,p2f,p2fc repeats=3
+
+--- MANIFEST.txt (first 2 lines)
+# build/agent2/devoff4-bin - Agent 2 (Agent 1's batch schedule). dev OFF build 4 (S4a = S3d + SDK #7 #8 #5(i) #38 with every new switch OFF + #32 always on): NATIVE_GPU=OFF; Release, game x86-64-v3, SDK x86-64-v2.
+# staged 2026-11-22 13:31:29. Source: snapshot build/agent2/snap1/DimensionsRecomp at S4a (STATE-S4a-1325.tsv, sha256 87DB470A7D8BF3179EFD2B22CFAAF135FBB90627B6EA1074411066FF3DD43300); build tag snap4a; every patch applied to the snapshot since S1 is listed below.
+
+--- bench\agent8> powershell -File run\run-matrix.ps1 -Matrix run\matrix-window6.json -Only s0,p2,p2f,p2fc -Repeats 3 -ColdShared -NoPrompt -PlanOnly  (exit )

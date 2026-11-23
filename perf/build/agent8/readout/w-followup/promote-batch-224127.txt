@@ -1,0 +1,40 @@
+===== W9 -Promote -VerifyFiles: exit 0 in 4 s (started 22:41:27)
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:41:28
+mode: PROMOTE (copied to bench\agent8\run)
+result: OK
+run: only=off,q0,q125,q250,q500 repeats=4 -ColdShared; -PlanOnly: 21 runs, about 48 min (runner); expected 21 runs; Agent 7's formula 1.70 + 2.14 x 5 x 4 = 44.5 min
+latest start: the launcher accepts this GO until 06:32 (07:30 - runner estimate 48 min - slack 10 min); started then, it ends about 07:16 by Agent 7's formula
+GO line: GO W9 matrix-window9.json CE0AD75792B47D59876C864B39797CD877404F911D12F92E6CC9C4351D747610 only=off,q0,q125,q250,q500 repeats=4
+draft: build\agent8\w-followup\matrix-window9.json  sha256 CE0AD75792B47D59876C864B39797CD877404F911D12F92E6CC9C4351D747610  6146 bytes
+matrix for the GO: bench\agent8\run\matrix-window9.json  sha256 CE0AD75792B47D59876C864B39797CD877404F911D12F92E6CC9C4351D747610
+launcher: bench\agent5\launch\run-night.ps1 sha256 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 (2026-11-22 22:11:21); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/devoff4b-bin (arms off,q0,q125,q250,q500): MANIFEST.txt sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA (expected DE11A914079D7DF7); legodimensions.exe DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83; 7 files listed, 7 of 7 checked match; check lines PASS 102, FAIL 0
+arm: off (devoff4b; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+arm: q0 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=0 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+arm: q125 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=125 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+arm: q250 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=250 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+arm: q500 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=500 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: 21 / 21
+NOTE: queue gap: the queue is idle (last line 22:38:49: 22:38:49 idle; waiting for: [rpb0,rpm4,s4b19,s4b04,s4bV0,s4b08,s4bLV,s4b02,s4b05,s4b06,s4b03,s4b09,s4b11,s4b14,s4b10,s4b12,s4b13,s4b15,s4b16,s4b25,s4b21]); -PlanOnly at 22:41:29 after 0 s of waiting
+written: build\agent8\readout\w-followup\stage-W9-224128.txt and inputs-W9-224128.txt (28 files)
+===== W6 -Recheck -VerifyFiles: exit 0 in 4 s (started 22:41:31)
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:41:32
+mode: RECHECK (already in bench\agent8\run; no copy)
+result: OK
+run: only=s0,p2,p2f,p2fc repeats=5 -ColdShared; -PlanOnly: 21 runs, about 48 min (runner); expected 21 runs; Agent 7's formula 1.70 + 2.14 x 4 x 5 = 44.5 min
+latest start: the launcher accepts this GO until 06:32 (07:30 - runner estimate 48 min - slack 10 min); started then, it ends about 07:16 by Agent 7's formula
+GO line: GO W6 matrix-window6.json E50D791B6C38638F718A1AF65EB15EAF543A78AC8EA50B69DD1CC96AB7C9A0D2 only=s0,p2,p2f,p2fc repeats=5
+draft: bench\agent8\run\matrix-window6.json  sha256 E50D791B6C38638F718A1AF65EB15EAF543A78AC8EA50B69DD1CC96AB7C9A0D2  9211 bytes
+matrix for the GO: bench\agent8\run\matrix-window6.json  sha256 E50D791B6C38638F718A1AF65EB15EAF543A78AC8EA50B69DD1CC96AB7C9A0D2
+launcher: bench\agent5\launch\run-night.ps1 sha256 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 (2026-11-22 22:11:21); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/devoff4b-bin (arms s0,p2,p2f,p2fc,f,fc): MANIFEST.txt sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA (expected DE11A914079D7DF7); legodimensions.exe DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83; 7 files listed, 7 of 7 checked match; check lines PASS 102, FAIL 0
+arm: s0 (devoff4b; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+arm: p2 (devoff4b; frames perf; cvars framerate_limit=0;shared_memory_single_hold_rearm=true; env {}; drivers/thread-cpu.ps1)
+arm: p2f (devoff4b; frames perf; cvars framerate_limit=0;shared_memory_single_hold_rearm=true;physical_protect_hold_global_lock=true; env {}; drivers/thread-cpu.ps1)
+arm: p2fc (devoff4b; frames perf; cvars framerate_limit=0;shared_memory_single_hold_rearm=true;physical_protect_hold_global_lock=true;physical_protect_keep_watch=true;physical_protect_keep_watch_verify=false; env {}; drivers/thread-cpu.ps1)
+arm: f (devoff4b; frames perf; cvars framerate_limit=0;physical_protect_hold_global_lock=true; env {}; drivers/thread-cpu.ps1)
+arm: fc (devoff4b; frames perf; cvars framerate_limit=0;physical_protect_hold_global_lock=true;physical_protect_keep_watch=true;physical_protect_keep_watch_verify=false; env {}; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: 21 / 21
+NOTE: matrix-window6.json has 2 non-ASCII bytes
+NOTE: queue gap: the queue is idle (last line 22:38:49: 22:38:49 idle; waiting for: [rpb0,rpm4,s4b19,s4b04,s4bV0,s4b08,s4bLV,s4b02,s4b05,s4b06,s4b03,s4b09,s4b11,s4b14,s4b10,s4b12,s4b13,s4b15,s4b16,s4b25,s4b21]); -PlanOnly at 22:41:34 after 0 s of waiting
+written: build\agent8\readout\w-followup\stage-W6-224132.txt and inputs-W6-224132.txt (28 files)

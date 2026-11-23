@@ -1,0 +1,46 @@
+perf-csv-rows: native present writes the --perf_log_csv row (Agent 7, 20:10)
+=============================================================================
+
+Why: in NATIVE_GPU=ON builds the guest Swap is replaced by SwapHookQueued, so no
+XE_SWAP packet runs and Profiler::Flip() (ResetFrameCounters + WriteCsvFrame) is
+never called. device.cpp's present sets kFrameTimeUs/kFps and calls
+ResetFrameCounters() but not WriteCsvFrame(), so perf.csv stays header-only and
+Agent 8's runner reports "no frames" and stalls on the native ON build.
+
+Change: 2 lines after device.cpp:2264 (batch-1 copy), inside `if (presented)`:
+
+        rex::perf::ResetFrameCounters();
+    +   // Profiler::Flip() also writes the --perf_log_csv row (no-op without it).
+    +   rex::perf::WriteCsvFrame();
+      }
+
+WriteCsvFrame() is declared unconditionally in rex/perf/counter.h:79 (already
+included at device.cpp:15) and defined in rexglue-sdk/src/core/perf/counter.cpp
+next to ResetFrameCounters(), which device.cpp already links. It returns at once
+when --perf_log_csv is not set. Natively it is the only caller, so rows are not
+doubled. gpu_native/ is compiled only with NATIVE_GPU=ON: dev OFF build 1 is
+unaffected.
+
+Files:
+  build/agent7/batch1/device.cpp            batch-1 copy (= S1)  SHA256 4C15043E486A6225423CEDEF5DBC9F7BFA22FEC9FAD61F5A4DE4ED6C38D718A8
+  build/agent7/batch1-perfcsv/device.cpp    patched copy         SHA256 4DC63FA0B804C5FE00491FC53E7AA42208ED7AD8FD51425CC27C50F9E873FBD6
+  build/agent7/batch1/perf-csv-rows.patch   git-style diff, paths a/rexlego/src/gpu_native/device.cpp
+
+Option A (no git; recommended), from the workspace root:
+  $t = 'build\agent2\snap1\DimensionsRecomp\rexlego\src\gpu_native\device.cpp'
+  (Get-FileHash $t).Hash       # must be 4C15043E486A6225... (unchanged batch-1 file)
+  Copy-Item build\agent7\batch1-perfcsv\device.cpp $t
+  (Get-FileHash $t).Hash       # must be 4DC63FA0B804C5FE...
+
+Option B (the patch). TRAP: the workspace sits inside a parent git repo
+(toplevel C:/Users/<user>/.vscode/projects). Run from a directory without its
+own .git, `git apply` prints "Skipped patch ..." and exits 0 WITHOUT applying.
+Run it from build\agent2\snap1\DimensionsRecomp (that copy has its own .git),
+or set $env:GIT_CEILING_DIRECTORIES='C:/Users/<user>/.vscode/projects' first,
+and use --check --verbose: it must print "Checking patch
+rexlego/src/gpu_native/device.cpp...", not "Skipped patch".
+
+Checked (20:02-20:09): the patch applies to a copy of the batch-1 file outside
+any repo and gives exactly the patched copy's SHA256; --check passes with the
+ceiling set. A syntax-only compile of the same 2 lines in the live tree follows
+after S1 (batch 2 carries the same change).

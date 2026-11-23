@@ -1,0 +1,26 @@
+# mapcheck-s4c (Agent 2, run 2 task #1; by name and object, not address)  2026-11-22 20:34:11  mode same
+new: build\agent2\devoff4-bin\legodimensions.map  39162310 B  mtime 11-22 13:30:26  sha256 DCC51E2B7A0040E2
+ref: build\agent2\devoff4-bin\legodimensions.map  39162310 B  mtime 11-22 13:30:26  sha256 DCC51E2B7A0040E2
+new: publics 353031; sub_ 164786; __imp__sub_ 164786; hooked 27
+ref: publics 353031; sub_ 164786; __imp__sub_ 164786; hooked 27
+PASS sub_ name set equal to ref: 164786 names
+PASS __imp__sub_ name set equal to ref: 164786 names
+PASS hooked set = ref hooked (27) + 0 moved = 27: have 27
+PASS hooked set == the 27 names in build\agent9\s4\fence-wait\s4c\expected-map.txt minus the 4 targets
+PASS the 27 ref-hooked names keep their sub_ and __imp__ objects
+PASS per-object sub_ sets = ref (447 objects)
+PASS per-object __imp__sub_ sets = ref (438 objects)
+PASS unhooked names: sub_ and __imp__ in the same object: 164759 names
+PASS gpu_wait_backoff.cpp.obj defines exactly the sub_ publics (none): has none
+gpu_wait_backoff.cpp.obj publics (0): none (object not in the map)
+hooked by sub_ object (new map):
+  crash_guards.cpp.obj                  2  sub_82A35B90 sub_83C01C08
+  main_menu_extras.cpp.obj              3  sub_82F03C40 sub_82FBE7A8 sub_82FE4A80
+  name_trace.cpp.obj                    5  sub_82A3D980 sub_83470AF8 sub_834B8168 sub_836F5AD0 sub_83715F00
+  native_atomics.cpp.obj                3  sub_82A2A0E8 sub_82A2A138 sub_82A2A160
+  native_constants.cpp.obj              1  sub_82B7ABF0
+  native_lock_elide.cpp.obj             7  sub_82A2CAB0 sub_82A2CC20 sub_82A34E28 sub_82A34FE8 sub_82A35D28 sub_82A4CA18 sub_83F99CB8
+  native_markers.cpp.obj                2  sub_82A3E238 sub_82A3E2B8
+  native_memops.cpp.obj                 2  sub_83E45090 sub_83E46040
+  scene_distance.cpp.obj                2  sub_82C6F428 sub_83A11F50
+RESULT: PASS  (27 hooked; 11.3 s)

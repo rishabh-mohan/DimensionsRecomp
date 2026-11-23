@@ -1,0 +1,28 @@
+profile : <workspace>\build\agent3\selftest-runs\20261121-224935-profile\profile-710044781.bin
+map     : <workspace>\build\agent3\selftest-runs\20261121-224935-profile\fakedimensions.map
+samples : 6260  threads: 2  modules: 1  duration: 5.008 s (trailer)  rounds: 5008
+counting: busy samples (6260)
+
+busy 6260 (100.0%)  waiting 0 (0.0%)  io 0 (0.0%)
+busy samples by category (leaf): guest 5008 (80.0%)  rexlego 1252 (20.0%)
+
+== threads ==
+tid  name         samples   run%  busy  wait  io  top busy functions / role
+---  -----------  -------  -----  ----  ----  --  ------------------------------------
+  1  fake-main       5008  100.0  5008     0   0  sub_82000000 [guest 0x82000000] 100%
+  2  fake-render     1252  100.0  1252     0   0  FakeGame::Render 100%
+
+== top 2 by self (busy samples) ==
+samples      %     /s  category  function
+-------  -----  -----  --------  -------------------------------
+   5008  80.00  999.9  guest     sub_82000000 [guest 0x82000000]
+   1252  20.00  250.0  rexlego   FakeGame::Render
+
+== top 3 by inclusive (busy samples) ==
+samples      %     /s  category  function
+-------  -----  -----  --------  -------------------------------
+   5008  80.00  999.9  guest     sub_82000000 [guest 0x82000000]
+   5008  80.00  999.9  rexlego   FakeGame::Present
+   1252  20.00  250.0  rexlego   FakeGame::Render
+
+(read 0.027 s, map 0.121 s, symbolize 0.106 s; 2 unique stacks, 3 addresses, 5 functions)

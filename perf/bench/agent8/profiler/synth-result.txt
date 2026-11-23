@@ -1,0 +1,39 @@
+synth_test 2026-11-21 18:46:43: PASS (36/36)
+PASS  map: data/absolute symbols excluded, code range: 80046 entries vs 80046 functions
+PASS  a: no trailer parses, samples: samples 2170/2170
+PASS  a: observer effect true, duration estimated: True {'rounds': None, 'rounds_estimated': 1000, 'seconds': None, 'source': 'estimate'}
+PASS  a: busy categories: {'guest': 625, 'rexruntime': 0, 'native-gpu': 300, 'rexlego': 45, 'd3d12+driver': 100, 'system': 0, 'other': 0, 'unknown': 100} {'busy': 1170, 'waiting': 1000, 'io': 0}
+PASS  a: ntdll!NtWaitForSingleObject leaf = waiting (real System32 ntdll exports): wait 1000 role 'synth::Pump'
+PASS  a: guest name / address / category: sub_82000280 [guest 0x82000280] guest 400 rate 400.0
+PASS  a: hook (host category) and hooked original (guest): sub_8201C740 [hook of guest 0x8201C740] / __imp__sub_8201C740 [guest 0x8201C740, hooked original]
+PASS  a: return address at function end -> caller (addr-1): Dispatch 600, NeverCalled absent
+PASS  a: ICF aliases counted: synth::Same0 {+2 aliases}
+PASS  a: driver dll without file -> d3d12+driver: nvsynthumd64.dll!? d3d12+driver
+PASS  a: text header has the observer warning
+PASS  b: v1 trailer mode 0 -> observer true, duration 2.0 s from trailer: True {'rounds': 1000, 'rounds_estimated': 1000, 'seconds': 2.0, 'source': 'trailer', 'rounds_per_s': 500.0}
+PASS  c: v1 trailer mode 1 -> observer false, names per tid: False names_ok=True
+PASS  c: text has no observer warning
+PASS  c: --folded --folded-thread line: thread 100 synth-main;mainCRTStartup;synth::RunGuest;synth::Dispatch;sub_82000300 [guest 0x82000300];sub_82000280 [guest 0x82000280] 400
+PASS  d: payload_bytes > v1 (24 extra bytes) parses: extra 24 warnings []
+PASS  e1: garbage after samples -> warning, still reports: <workspace>\build\agent8\profiler\synth\e1_garbage.bin: 20 unknown trailing bytes after the samples (ignored)
+PASS  e2: truncated LSPX -> ignored with warning: <workspace>\build\agent8\profiler\synth\e2_truncated.bin: LSPX block truncated (18 of 126 payload bytes); trailer ignored
+PASS  e3: LSPX version 2 -> v1 fields read, warning: <workspace>\build\agent8\profiler\synth\e3_version2.bin: LSPX version 2; read the v1 fields only
+PASS  e4: bytes after the LSPX block -> warning, trailer kept: <workspace>\build\agent8\profiler\synth\e4_trailing_after_lspx.bin: 2 unknown bytes after the LSPX block (ignored)
+PASS  duration: --duration-s 4 -> 4.0 s: 4.0 [--duration]
+PASS  duration: --meta duration_s -> 3.0 s: 3.0 [meta m1.json: duration_s]
+PASS  duration: --meta nested duration_s -> 5.0 s: 5.0 [meta m2.json: duration_s]
+PASS  duration: --meta profile_trigger_start/end (epoch) -> 2.0 s: 1.9999999999999545 [meta m3.json: profile_trigger_end-profile_trigger_start (2.175 s) - 0.175 s start latency]
+PASS  duration: --meta trigger_start/end (ISO-8601) -> 2.0 s: 1.9999999523162841 [meta m4.json: trigger_end-trigger_start (2.175 s) - 0.175 s start latency]
+PASS  duration: trailer beats --duration-s: {'rounds': 1000, 'rounds_estimated': 1000, 'seconds': 2.0, 'source': 'trailer', 'rounds_per_s': 500.0}
+PASS  --thread 200: [200] counted 300
+PASS  --by module: {'synthgame.exe': 1020, 'nvsynthumd64.dll': 100, '?': 50}
+PASS  --focus synth::Dispatch callers/callees: incl 600 callers ['synth::RunGuest']
+PASS  --fold-guest: {'name': 'guest [folded]', 'category': 'guest', 'module': '', 'guest_addr': None, 'kind': 'folded', 'samples': 625, 'pct': 53.42, 'rate': 312.5}
+PASS  --include-waits counts waits: counted 2170 top ntdll.dll!NtWaitForSingleObject
+PASS  --diff b vs c (same samples, both 2 s): zero deltas, /s: unit /s max 0.0
+PASS  --diff --duration-a 2 --duration-b 4: rates halve: sub_82000280 [guest 0x82000280]: 200.0 -> 100.0
+PASS  --diff --meta-a/--meta-b: 3.0 / 1.9999999523162841
+PASS  --diff without durations -> /1k rounds + warning: /1k rounds
+PASS  1M: analysis exit 0, all samples read, < 60 s wall: rc 0 samples 1000000 wall 17.5 s
+1000000 samples (122 MB, generated in 2.6 s): analysis wall 17.5 s, cpu 15.7 s, peak working set 311 MB; read 2.447 s, map 1.609 s, symbolize 6.015 s, 178713 unique stacks, 227768 addresses, 69457 functions
+real map parse: 37 MB, 337634 code symbol lines -> 171785 entries in 3.56 s

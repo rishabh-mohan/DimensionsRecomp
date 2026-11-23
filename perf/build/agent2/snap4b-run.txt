@@ -1,0 +1,119 @@
+﻿19:49:51 [S4b off dry-run] guards: no HOLD file; -Jobs 8; -C1 v3; priority BelowNormal; free RAM 12.5 GB; free C: 234.7 GB
+19:49:51 [S4b off dry-run] PENDING: prep-s4b.py has not applied yet (no STATE-S4b-*.tsv); notes / verify / PATCHES guards run after it
+19:49:51 [S4b off dry-run] strings from build\agent2\s4b\work-194936\S4b-strings.tsv: rexruntime.dll [audio_shutdown_detach_worker, leave it running and leak what it can still reach, physical_protect_hold_global_lock, timer_queue_precise_wait, physical_protect_keep_watch]; rexgpu-xenos.dll [shared_memory_upload_hash_log, shared_memory_single_hold_rearm, physical_protect_keep_watch_verify, shared_memory_upload_nontemporal_copy, d3d12_submit_split_kb]; exe [which can hang when the guest pauses, LEGO_GPU_WAIT_BACKOFF_US, LEGO_GPU_WAIT_SPIN_US, LEGO_GPU_WAIT_STATS]; exe must NOT contain []
+19:49:51 [S4b off dry-run] PLAN 1: powershell -File <workspace>\build\agent2\build-snap.ps1 -Phase sdk -Tag snap4b -Jobs 8 -KeepGoing -SkipConfigure
+19:49:51 [S4b off dry-run] PLAN 2: powershell -File <workspace>\build\agent2\build-snap.ps1 -Phase game -Tag snap4b -Jobs 8 -KeepGoing
+19:49:51 [S4b off dry-run] PLAN 3 (only if snap1-off/rexruntime.dll != install/bin): rename exe + map to *.pre-S4b, powershell -File <workspace>\build\agent2\build-snap.ps1 -Phase game -Tag snap4br -Jobs 8 -KeepGoing -SkipConfigure
+19:49:51 [S4b off dry-run] PLAN 4: powershell -NoProfile -ExecutionPolicy Bypass -File <workspace>\build\agent2\stage-snap-bin.ps1 -Variant off -SnapTag S4b -BuildTag snap4b -OutDir <workspace>\build\agent2\devoff4b-bin -PatchTagList S1,S2,S3,S3d,S4a,S4b -RuntimeStrings "audio_shutdown_detach_worker,leave it running and leak what it can still reach,physical_protect_hold_global_lock,timer_queue_precise_wait,physical_protect_keep_watch" -XenosStrings shared_memory_upload_hash_log,shared_memory_single_hold_rearm,physical_protect_keep_watch_verify,shared_memory_upload_nontemporal_copy,d3d12_submit_split_kb -ExeStrings "which can hang when the guest pauses,LEGO_GPU_WAIT_BACKOFF_US,LEGO_GPU_WAIT_SPIN_US,LEGO_GPU_WAIT_STATS" -ManifestNotesFile <workspace>\build\agent2\S4b-notes.txt -WhatText "dev OFF build 4b (S4b = S4a + SDK C1 v3 + M1 + P2c + r1r2 + #26 tool with every new switch OFF + S4c #24 and #30 OFF): NATIVE_GPU=OFF"
+19:49:51 [S4b off dry-run] PLAN 5: compare each staged file with devoff4-bin (rexruntime.dll, rexgpu-xenos.dll, legodimensions.exe must differ); exe must not contain []
+19:49:51 [S4b off dry-run] DRY-RUN done: nothing built
+19:50:58 [S4b off] guards: no HOLD file; -Jobs 8; -C1 v3; priority BelowNormal; free RAM 12.2 GB; free C: 234.6 GB
+19:50:59 [S4b off] verify S4b : exit 0 : verify S4b against STATE-S4b-1950.tsv: 23844 files, 0 hashed (size/mtime changed), 15 backups checked, 0 extra file(s) in snap1, 0 problem(s), 1.0s
+19:51:00 [S4b off]   rexglue-sdk/include/rex/graphics/shared_memory.h: 4D861738A94B556B -> 82A66445ED98B091 == snap1
+19:51:00 [S4b off]   rexglue-sdk/include/rex/system/xmemory.h: 80100865A654AF04 -> 5A70782EF00F0FB6 == snap1
+19:51:00 [S4b off]   rexglue-sdk/src/graphics/primitive_processor.cpp: E07F690223B564AE -> 470BA4BED73B2ABF == snap1
+19:51:00 [S4b off]   rexglue-sdk/src/graphics/shared_memory.cpp: 0BE4BADCAC666BEE -> A4A31038ABDFF94A == snap1
+19:51:00 [S4b off]   rexglue-sdk/src/system/xmemory.cpp: 141FB1A947D59156 -> BCA5E1CF63686E73 == snap1
+19:51:00 [S4b off]   rexglue-sdk/src/graphics/d3d12/shared_memory.cpp: BB0838CE3909E18A -> 2A5ADF13B5E433F1 == snap1
+19:51:00 [S4b off]   rexglue-sdk/src/graphics/d3d12/command_processor.cpp: 3AB3AA5360D4E987 -> 027204B53A271D69 == snap1
+19:51:00 [S4b off]   rexglue-sdk/include/rex/graphics/d3d12/command_processor.h: 41F32B80BABA213C -> 67F4E8380C879377 == snap1
+19:51:00 [S4b off]   rexglue-sdk/include/rex/graphics/d3d12/deferred_command_list.h: DA2F58B6CE3D7F6A -> 9F6CC70A6922232D == snap1
+19:51:00 [S4b off]   rexglue-sdk/src/graphics/d3d12/deferred_command_list.cpp: FFDF7FB66EC81715 -> 30FF57446EFB5D76 == snap1
+19:51:00 [S4b off]   rexglue-sdk/include/rex/codegen/config.h: D07C575FF2904B87 -> CD39B0E110D3E0FD == snap1
+19:51:00 [S4b off]   rexglue-sdk/src/codegen/config.cpp: 0ED529B7E5F0F4E7 -> 4706A7F22C3859D6 == snap1
+19:51:00 [S4b off]   rexglue-sdk/src/codegen/builders/system.cpp: D1269273636B5A1A -> FAD4372074D32D69 == snap1
+19:51:00 [S4b off]   rexlego/src/gpu_native/memory_watch.cpp: 19AE1606C6DB7273 -> 70829846C4F321A9 == snap1
+19:51:00 [S4b off]   rexlego/CMakeLists.txt: 3690D5D76AA9FBED -> 1BF46D7878BA9A25 == snap1
+19:51:00 [S4b off]   rexlego/src/gpu_wait_backoff.cpp: ABSENT -> 01D9F8F3464C8614 == snap1
+19:51:01 [S4b off] strings from build\agent2\S4b-strings.tsv: rexruntime.dll [audio_shutdown_detach_worker, leave it running and leak what it can still reach, physical_protect_hold_global_lock, timer_queue_precise_wait, physical_protect_keep_watch]; rexgpu-xenos.dll [shared_memory_upload_hash_log, shared_memory_single_hold_rearm, physical_protect_keep_watch_verify, shared_memory_upload_nontemporal_copy, d3d12_submit_split_kb]; exe [which can hang when the guest pauses, LEGO_GPU_WAIT_BACKOFF_US, LEGO_GPU_WAIT_SPIN_US, LEGO_GPU_WAIT_STATS]; exe must NOT contain []
+19:51:02 [S4b off] START S4b off (tag snap4b, -j 8, Below Normal) -> devoff4b-bin
+19:51:02 [S4b off] BEGIN sdk build + install -j8 : -NoProfile -ExecutionPolicy Bypass -File <workspace>\build\agent2\build-snap.ps1 -Phase sdk -Tag snap4b -Jobs 8 -KeepGoing -SkipConfigure
+19:51:21 [S4b off]   priority: clang++ 9724 BelowNormal; clang++ 13760 BelowNormal; clang++ 15064 BelowNormal; clang++ 21188 BelowNormal
+20:13:43 [S4b off] END   sdk build + install -j8 exit=0 wall=1,360.5s freeC=233.82GB freeRAM=10.64GB
+20:13:44 [S4b off] BEGIN off game build -j8 : -NoProfile -ExecutionPolicy Bypass -File <workspace>\build\agent2\build-snap.ps1 -Phase game -Tag snap4b -Jobs 8 -KeepGoing
+20:48:37 [S4b off] END   off game build -j8 exit=0 wall=2,093.2s freeC=230.36GB freeRAM=11.60GB
+20:48:38 [S4b off] rexruntime.dll in snap1-off == install/bin (A33801D1538D6175)
+20:48:38 [S4b off] S4c TU in snap1: 01D9F8F3464C8614 (want 01D9F8F3 LF or 34D281E0 CRLF)
+20:48:38 [S4b off] BEGIN stage : -NoProfile -ExecutionPolicy Bypass -File <workspace>\build\agent2\stage-snap-bin.ps1 -Variant off -SnapTag S4b -BuildTag snap4b -OutDir <workspace>\build\agent2\devoff4b-bin -PatchTagList S1,S2,S3,S3d,S4a,S4b -RuntimeStrings "audio_shutdown_detach_worker,leave it running and leak what it can still reach,physical_protect_hold_global_lock,timer_queue_precise_wait,physical_protect_keep_watch" -XenosStrings shared_memory_upload_hash_log,shared_memory_single_hold_rearm,physical_protect_keep_watch_verify,shared_memory_upload_nontemporal_copy,d3d12_submit_split_kb -ExeStrings "which can hang when the guest pauses,LEGO_GPU_WAIT_BACKOFF_US,LEGO_GPU_WAIT_SPIN_US,LEGO_GPU_WAIT_STATS" -ManifestNotesFile <workspace>\build\agent2\S4b-notes.txt -WhatText "dev OFF build 4b (S4b = S4a + SDK C1 v3 + M1 + P2c + r1r2 + #26 tool with every new switch OFF + S4c #24 and #30 OFF): NATIVE_GPU=OFF"
+20:49:05 [S4b off] END   stage exit=0 wall=26.5s freeC=230.10GB freeRAM=11.50GB
+20:49:05 [S4b off]   PASS staged copy identical: FiraSans-Regular.ttf
+20:49:05 [S4b off]   staged 7 files into <workspace>\build\agent2\devoff4b-bin (214.4 MB)
+20:49:05 [S4b off]   staged achievement_unlocked.wav: 191018 B, sha256 A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5; == devoff4-bin
+20:49:05 [S4b off]   staged FiraSans-Regular.ttf: 456996 B, sha256 C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23; == devoff4-bin
+20:49:06 [S4b off]   staged legodimensions.exe: 170350080 B, sha256 DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83; differs from devoff4-bin
+20:49:06 [S4b off]   staged legodimensions.map: 39181442 B, sha256 52155274A978A946870446A1C8F573EC381A486D50636AF13DA8920E4DC18EA5; differs from devoff4-bin
+20:49:06 [S4b off]   staged rexgpu-xenos.dll: 3425792 B, sha256 E3CB99CFDEA95E66EF093BF1B2A500076757FB727E60B046D70EBA01E05C9939; differs from devoff4-bin
+20:49:06 [S4b off]   staged rexruntime.dll: 10909184 B, sha256 A33801D1538D61759D35FD137EBC9F5EAD636D7D26E9A79DC3B4994A22CB9F12; differs from devoff4-bin
+20:49:06 [S4b off]   staged TracyClient.dll: 233472 B, sha256 85044850B6C663B5CE8722285D13070381C33C9ABC49D06B3E59BA0277F8FF4E; == devoff4-bin
+20:49:07 [S4b off]   staged MANIFEST.txt: 30450 B, sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA
+20:49:07 [S4b off]   MANIFEST patch rows: S1 0 / S2 18 / S3 28 / S3d 1 / S4a 6 / S4b 16; checks: 102 PASS / 0 FAIL / 61 NOTE
+20:49:08 [S4b off]   #   PASS legodimensions.exe contains 'LEGO_GPU_WAIT_BACKOFF_US'
+20:49:08 [S4b off]   #   PASS legodimensions.exe contains 'LEGO_GPU_WAIT_SPIN_US'
+20:49:08 [S4b off]   #   PASS legodimensions.exe contains 'LEGO_GPU_WAIT_STATS'
+20:49:08 [S4b off]   #   PASS rexgpu-xenos.dll contains 'shared_memory_upload_hash_log'
+20:49:08 [S4b off]   #   PASS rexgpu-xenos.dll contains 'shared_memory_single_hold_rearm'
+20:49:08 [S4b off]   #   PASS rexgpu-xenos.dll contains 'physical_protect_keep_watch_verify'
+20:49:08 [S4b off]   #   PASS rexgpu-xenos.dll contains 'shared_memory_upload_nontemporal_copy'
+20:49:08 [S4b off]   #   PASS rexgpu-xenos.dll contains 'd3d12_submit_split_kb'
+20:49:08 [S4b off]   #   PASS rexruntime.dll contains 'audio_shutdown_detach_worker'
+20:49:08 [S4b off]   #   PASS rexruntime.dll contains 'physical_protect_hold_global_lock'
+20:49:08 [S4b off]   #   PASS rexruntime.dll contains 'timer_queue_precise_wait'
+20:49:08 [S4b off]   #   PASS rexruntime.dll contains 'physical_protect_keep_watch'
+20:49:08 [S4b off] DONE S4b off, total wall 3,486.1s
+20:53:09 [S4b native] guards: no HOLD file; -Jobs 8; -C1 v3; priority BelowNormal; free RAM 11.4 GB; free C: 229.4 GB
+20:53:11 [S4b native] verify S4b : exit 0 : verify S4b against STATE-S4b-1950.tsv: 23844 files, 0 hashed (size/mtime changed), 15 backups checked, 0 extra file(s) in snap1, 0 problem(s), 0.8s
+20:53:11 [S4b native]   rexglue-sdk/include/rex/graphics/shared_memory.h: 4D861738A94B556B -> 82A66445ED98B091 == snap1
+20:53:11 [S4b native]   rexglue-sdk/include/rex/system/xmemory.h: 80100865A654AF04 -> 5A70782EF00F0FB6 == snap1
+20:53:11 [S4b native]   rexglue-sdk/src/graphics/primitive_processor.cpp: E07F690223B564AE -> 470BA4BED73B2ABF == snap1
+20:53:11 [S4b native]   rexglue-sdk/src/graphics/shared_memory.cpp: 0BE4BADCAC666BEE -> A4A31038ABDFF94A == snap1
+20:53:11 [S4b native]   rexglue-sdk/src/system/xmemory.cpp: 141FB1A947D59156 -> BCA5E1CF63686E73 == snap1
+20:53:11 [S4b native]   rexglue-sdk/src/graphics/d3d12/shared_memory.cpp: BB0838CE3909E18A -> 2A5ADF13B5E433F1 == snap1
+20:53:11 [S4b native]   rexglue-sdk/src/graphics/d3d12/command_processor.cpp: 3AB3AA5360D4E987 -> 027204B53A271D69 == snap1
+20:53:11 [S4b native]   rexglue-sdk/include/rex/graphics/d3d12/command_processor.h: 41F32B80BABA213C -> 67F4E8380C879377 == snap1
+20:53:11 [S4b native]   rexglue-sdk/include/rex/graphics/d3d12/deferred_command_list.h: DA2F58B6CE3D7F6A -> 9F6CC70A6922232D == snap1
+20:53:12 [S4b native]   rexglue-sdk/src/graphics/d3d12/deferred_command_list.cpp: FFDF7FB66EC81715 -> 30FF57446EFB5D76 == snap1
+20:53:12 [S4b native]   rexglue-sdk/include/rex/codegen/config.h: D07C575FF2904B87 -> CD39B0E110D3E0FD == snap1
+20:53:12 [S4b native]   rexglue-sdk/src/codegen/config.cpp: 0ED529B7E5F0F4E7 -> 4706A7F22C3859D6 == snap1
+20:53:12 [S4b native]   rexglue-sdk/src/codegen/builders/system.cpp: D1269273636B5A1A -> FAD4372074D32D69 == snap1
+20:53:12 [S4b native]   rexlego/src/gpu_native/memory_watch.cpp: 19AE1606C6DB7273 -> 70829846C4F321A9 == snap1
+20:53:12 [S4b native]   rexlego/CMakeLists.txt: 3690D5D76AA9FBED -> 1BF46D7878BA9A25 == snap1
+20:53:12 [S4b native]   rexlego/src/gpu_wait_backoff.cpp: ABSENT -> 01D9F8F3464C8614 == snap1
+20:53:12 [S4b native] strings from build\agent2\S4b-strings.tsv: rexruntime.dll [audio_shutdown_detach_worker, leave it running and leak what it can still reach, physical_protect_hold_global_lock, timer_queue_precise_wait, physical_protect_keep_watch]; rexgpu-xenos.dll [shared_memory_upload_hash_log, shared_memory_single_hold_rearm, physical_protect_keep_watch_verify, shared_memory_upload_nontemporal_copy, d3d12_submit_split_kb]; exe [which can hang when the guest pauses, LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD, LEGO_NATIVE_FPS_CELL_RECTS, LEGO_NATIVE_TEXTURE_STAGING_POOL, LEGO_NATIVE_SHADER_MISS_CACHE]; exe must NOT contain [LEGO_GPU_WAIT_BACKOFF_US, LEGO_GPU_WAIT_SPIN_US, LEGO_GPU_WAIT_STATS]
+20:53:12 [S4b native] START S4b native (tag snap4b, -j 8, Below Normal) -> native4b-bin
+20:53:12 [S4b native] BEGIN native game build -j8 : -NoProfile -ExecutionPolicy Bypass -File <workspace>\build\agent2\build-snap.ps1 -Phase game -Native -Tag snap4b -Jobs 8 -PrelinkJobs 8 -KeepGoing
+20:53:43 [S4b native]   priority: clang++ 752 BelowNormal; clang++ 15332 BelowNormal; clang++ 15612 BelowNormal; clang++ 16832 BelowNormal
+22:39:53 [S4b native] END   native game build -j8 exit=0 wall=6,400.3s freeC=220.96GB freeRAM=13.75GB
+22:39:53 [S4b native] rexruntime.dll in snap1-on == install/bin (A33801D1538D6175)
+22:39:53 [S4b native] S4c TU in snap1: 01D9F8F3464C8614 (want 01D9F8F3 LF or 34D281E0 CRLF)
+22:39:53 [S4b native] BEGIN stage : -NoProfile -ExecutionPolicy Bypass -File <workspace>\build\agent2\stage-snap-bin.ps1 -Variant native -SnapTag S4b -BuildTag snap4b -OutDir <workspace>\build\agent2\native4b-bin -PatchTagList S1,S2,S3,S3d,S4a,S4b -RuntimeStrings "audio_shutdown_detach_worker,leave it running and leak what it can still reach,physical_protect_hold_global_lock,timer_queue_precise_wait,physical_protect_keep_watch" -XenosStrings shared_memory_upload_hash_log,shared_memory_single_hold_rearm,physical_protect_keep_watch_verify,shared_memory_upload_nontemporal_copy,d3d12_submit_split_kb -ExeStrings "which can hang when the guest pauses,LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD,LEGO_NATIVE_FPS_CELL_RECTS,LEGO_NATIVE_TEXTURE_STAGING_POOL,LEGO_NATIVE_SHADER_MISS_CACHE" -ManifestNotesFile <workspace>\build\agent2\S4b-notes.txt -WhatText "native build 4b (S4b = S4a + SDK C1 v3 + M1 + P2c + r1r2 + #26 tool with every new switch OFF + C1 memory_watch.cpp + S4c CMake): NATIVE_GPU=ON with Agent 6 AOT inputs"
+22:40:12 [S4b native] END   stage exit=0 wall=19.4s freeC=220.41GB freeRAM=13.50GB
+22:40:12 [S4b native]   PASS staged copy identical: amd_fidelityfx_dx12.dll
+22:40:12 [S4b native]   staged 8 files into <workspace>\build\agent2\native4b-bin (363.8 MB)
+22:40:12 [S4b native]   staged achievement_unlocked.wav: 191018 B, sha256 A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5; == native4-bin
+22:40:12 [S4b native]   staged amd_fidelityfx_dx12.dll: 6675664 B, sha256 12A5081257EC95B0B53AD51B4A87FB3C03F97FE0BBB59F9496968F8D50EF93A6; == native4-bin
+22:40:12 [S4b native]   staged FiraSans-Regular.ttf: 456996 B, sha256 C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23; == native4-bin
+22:40:14 [S4b native]   staged legodimensions.exe: 315811328 B, sha256 DC6484C224585E54190078A2225EA85848BFF36AAC5B3FC5B66F17235B59DD65; differs from native4-bin
+22:40:14 [S4b native]   staged legodimensions.map: 43741734 B, sha256 03CBC65FEA77674C1BAD92D631A60EBB6CF39BDD48BCFA2DBD847AB7B4701832; differs from native4-bin
+22:40:14 [S4b native]   staged rexgpu-xenos.dll: 3425792 B, sha256 E3CB99CFDEA95E66EF093BF1B2A500076757FB727E60B046D70EBA01E05C9939; differs from native4-bin
+22:40:14 [S4b native]   staged rexruntime.dll: 10909184 B, sha256 A33801D1538D61759D35FD137EBC9F5EAD636D7D26E9A79DC3B4994A22CB9F12; differs from native4-bin
+22:40:14 [S4b native]   staged TracyClient.dll: 233472 B, sha256 85044850B6C663B5CE8722285D13070381C33C9ABC49D06B3E59BA0277F8FF4E; == native4-bin
+22:40:16 [S4b native]   legodimensions.exe does not contain 'LEGO_GPU_WAIT_BACKOFF_US' (ok)
+22:40:17 [S4b native]   legodimensions.exe does not contain 'LEGO_GPU_WAIT_SPIN_US' (ok)
+22:40:17 [S4b native]   legodimensions.exe does not contain 'LEGO_GPU_WAIT_STATS' (ok)
+22:40:17 [S4b native]   staged MANIFEST.txt: 32559 B, sha256 B63769FE46CC04592F2BEDAF04A51C362000325D3291BC4D7489369C2160B817
+22:40:17 [S4b native]   MANIFEST patch rows: S1 0 / S2 18 / S3 28 / S3d 1 / S4a 6 / S4b 16; checks: 124 PASS / 0 FAIL / 46 NOTE
+22:40:17 [S4b native]   #   PASS legodimensions.exe contains 'LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD'
+22:40:17 [S4b native]   #   PASS legodimensions.exe contains 'LEGO_NATIVE_FPS_CELL_RECTS'
+22:40:17 [S4b native]   #   PASS legodimensions.exe contains 'LEGO_NATIVE_TEXTURE_STAGING_POOL'
+22:40:17 [S4b native]   #   PASS legodimensions.exe contains 'LEGO_NATIVE_SHADER_MISS_CACHE'
+22:40:17 [S4b native]   #   PASS rexgpu-xenos.dll contains 'shared_memory_upload_hash_log'
+22:40:17 [S4b native]   #   PASS rexgpu-xenos.dll contains 'shared_memory_single_hold_rearm'
+22:40:17 [S4b native]   #   PASS rexgpu-xenos.dll contains 'physical_protect_keep_watch_verify'
+22:40:17 [S4b native]   #   PASS rexgpu-xenos.dll contains 'shared_memory_upload_nontemporal_copy'
+22:40:17 [S4b native]   #   PASS rexgpu-xenos.dll contains 'd3d12_submit_split_kb'
+22:40:17 [S4b native]   #   PASS rexruntime.dll contains 'audio_shutdown_detach_worker'
+22:40:17 [S4b native]   #   PASS rexruntime.dll contains 'physical_protect_hold_global_lock'
+22:40:17 [S4b native]   #   PASS rexruntime.dll contains 'timer_queue_precise_wait'
+22:40:17 [S4b native]   #   PASS rexruntime.dll contains 'physical_protect_keep_watch'
+22:40:17 [S4b native]   native GPU fingerprint: LEGO Dimensions native GPU 9b40acbbef4c57b3
+22:40:17 [S4b native] DONE S4b native, total wall 6,425.1s

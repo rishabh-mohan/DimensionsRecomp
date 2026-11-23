@@ -1,0 +1,182 @@
+Checker B: Agent 6 task #13 (W5 game.log logdiff + perf read-out), matrix build/agent8/matrix/20261122-1756
+Read-only check, 2026-11-22 ~21:20. Verdicts: AGREE 7 (B1 B2 B3 B4 B5 B6 B8), NOTE 1 (B7), DISAGREE 0.
+
+Files (all in build/agent6/w4b/check-1756-b/; code is my own; only gate_logdiff.compare/scan reused, as asked):
+  logcheck.py  -> logcheck-out.txt   B1, B2 log greps, B3, B4, B5 (imports bench/agent8/run/gate_logdiff.py with
+                                      sys.dont_write_bytecode=True, run with python -B)
+  perfcheck.py -> perfcheck-out.txt  B6 (all 16 runs), B7 OLS, B8 separation, B4x frames between Toypad B1 challenges
+  bincheck.py  -> bincheck-out.txt   B2: strings in build/agent2/devoff3-bin vs devoff4-bin (rexruntime.dll,
+                                      rexgpu-xenos.dll, legodimensions.exe)
+  b2-grep.txt, b2-bins.txt           B2: source greps (snap1 and live rexglue-sdk/src) and bin listings
+  scan-agent6.txt                    index of Agent 6's output sections used for the comparison
+  bench/agent8/run/__pycache__ already existed before this check: created 2026-11-22 02:55. It holds only
+  frame_summary/matrix_recheck .pyc files (03:45, 04:24) and no gate_logdiff .pyc, so this check wrote nothing there.
+
+Normalisation (one key per game.log line; each run's keys compared as a multiset of key -> count):
+  R: '[level] [category] message'. Drops the '[YYYY-MM-DD HH:MM:SS.mmm]' timestamp and the '[tNNN]' thread id;
+     keeps header-less lines as '[raw] text'.
+  E: R, plus 'runs\NNNN-name' in paths -> 'runs/<run>'. The only line with a path is 'UI font loaded:
+     ...\runs\<run>\FiraSans-Regular.ttf at 18px'. Toypad frames are cut to their header: Write
+     '0B 16 55 <len> <cmd>', Read '0B <x> 55 <len>'. The rest of a frame is a counter plus random
+     challenge/response bytes.
+  N: E, plus every 0x-hex literal (handles, addresses) -> '0x#'.
+
+B1 AGREE  base (S3d) vs s0 (S4a): no S3d->S4a line difference.
+  - R: 169 keys, 61 in all 6 runs. The 109 others are Toypad payload variants (100), the per-run font path (6) and
+    IoDismount handles (3); nothing else.
+  - E: union 68, 65 in all 6 runs, 7 flagged (counts base-r1/r2/r3 | s0-r1/r2/r3):
+      Toypad[Read] 0B 04 55 01, [Read] 0B 11 55 0E, [Write] 0B 16 55 06 C0, [Write] 0B 16 55 0F B0: 1/1/2 | 1/1/1
+      IoDismountVolumeByFileHandle(0xf8000158) - stub 2/0/0 | 0/0/0;  (0xf8000160) 0/2/2 | 0/2/2;
+      (0xf8000164) 0/0/0 | 2/0/0
+  - N: union 66, all 66 in all 6 runs; only the 4 Toypad counts (base-r3) are flagged.
+  - Keys that separate the arms: 0 at R, E and N.
+  - Each of the 6 logs (in fact all 16) has 40 [warning] and 0 [error]/[critical] lines.
+  - gate_logdiff.compare(scan(A), scan(B), 25) over the 18 ordered base x s0 pairs: FAIL 0, NEW 0, MORE 0, GONE 0,
+    notes 0 in every pair. Warning kinds/lines are 5/40 in every log; unimpl 0.
+  - Matches Agent 6's report-base.txt / report-s0.txt (all 0) and extra-vs-s0.txt sec 2, which lists base-r1's
+    0xf8000158 ONLY line and the 4 base-r3 Toypad COUNT lines. 0xf8000160 is the handle in base-r2/r3 and s0-r2/r3.
+  - Outside B1's six runs, 1813-d11t-r2 also has 0xf8000158, as Agent 6's sec 6 says.
+
+B2 AGREE  S4a adds no default-on log line.
+  - perf-notes/agent10-batch2-review.md §29 (L1585-1632) lists 6 rows:
+      #7  d3d12/shared_memory.cpp (+145/-0)
+      #8  graphics/shared_memory.cpp (+30/-0)
+      #5 fix (i)  system/xmemory.cpp (+19/-0)
+      #38 core/timer_queue.cpp (+73/-6)
+      #32 d3d12/pipeline_cache.cpp (L564 only, +1/-1)
+      #2  game gpu_native/shaders.cpp (native only; devoff4 doesn't compile gpu_native)
+    It also says "#7, #8, #5 and #38 add four cvars, all default false".
+  - Log statements added:
+      #7: one REXGPU_INFO 'S4 upload hash: frame {} ...' inside if (REXCVAR_GET(shared_memory_upload_hash_log)),
+          default false.
+      #38: one REXLOG_INFO 'TimerQueue: precise wait (timer_queue_precise_wait)' at timer_queue.cpp:71, inside
+          std::call_once in SelectMode(), only when timer_queue_precise_wait (default false, kInitOnly; L31-35) is on.
+      #8, #5(i) and #32: none.
+      #2: native only. 'missing from AOT index', LEGO_NATIVE_SHADER_MISS_CACHE and shader_miss_cache_insert are in
+          neither devoff3 nor devoff4.
+  - Binaries (printable strings of 8+ chars found only in devoff4): rexruntime.dll 17, rexgpu-xenos.dll 8,
+    legodimensions.exe 0. The only new log-format strings are the #38 and #7 lines above. The rest are cvar
+    names/descriptions, C++ symbols, the timer_queue.cpp source path and code-byte noise.
+  - threading_win.cpp:226-254 ConfigureHostTiming():
+      period = uint32 timer_resolution_ms, and 'if (!period) return;' (L236) comes before both the warn
+      'Could not set the host timer resolution to {} ms' (L242, timeBeginPeriod failure) and the info
+      'Host timer resolution set to {} ms (background opt-out {})' (L252).
+      It is called once, from runtime.cpp:139-146, only when !tool_mode_, with host_timer_resolution_ms
+      (REXCVAR_DEFINE_UINT32, default 0, L39-41). So it logs once, and only when the cvar is > 0.
+      This code is not one of the 6 S4a rows: its strings, and both host_timer_* cvar names, are already in the
+      devoff3 rexruntime.dll. Only the d11 cvar host_timer_resolution_ms=1 turns it on.
+  - timer_queue.cpp:58-59: mode_(std::getenv("REX_TIMER_WAIT_BLOCKING") != nullptr ? kBlocking : kSpin) {}.
+    No log. The string is in devoff3 too, so this predates S4a.
+  - game.log counts:
+      'Host timer resolution set to 1 ms (background opt-out on)': 1 in each of the 9 d11/d11t/d11p logs,
+          0 in base, cold and s0
+      'Could not set the host timer resolution': 0 of 16
+      'TimerQueue: precise wait (timer_queue_precise_wait)': 1 in each d11p log, 0 in the other 13
+      'S4 upload hash': 0 of 16
+  - Caveat: today's snap1 xmemory.cpp also contains C1 keep-watch logging, gated by physical_protect_keep_watch
+    (default false). §29 lists C1 as not in S4a, and neither 'C1 keep-watch' nor 'physical_protect_keep_watch' is in
+    any devoff4 binary.
+
+B3 AGREE  cold-base vs warm base: same line sets; the cold boot is slower (quantified below).
+  - Line sets (E): lines 98 | 98/98/102; union 67, 65 in all 4 runs. The only flagged keys are base-r3's doubled
+    Toypad headers (1/1/1/2) and the IoDismount handle (cold 0xf8000160 x2, base-r1 0xf8000158).
+  - N: only the 4 Toypad counts differ.
+  - gate_logdiff over the 6 ordered cold<->warm pairs: FAIL/NEW/MORE/GONE/notes all 0. Agent 6's
+    report-cold-base.txt also has all 0.
+  - Boot timing, seconds; warm = median (min..max) of base-r1/r2/r3:
+      First game.log line after run.json process_start_mark: cold 5.367 vs warm 2.105 (2.084..2.287), +3.26.
+      After the first line: launch 1.455 vs 1.195 (+0.26); audio 4.860 vs 3.307 (+1.55); hdr_fail 5.241 vs 3.570
+          (+1.67); dat_fail 8.702 vs 6.748 (6.667..7.636) (+1.95).
+      From process start: launch 6.822 vs 3.279 (+3.54); dat_fail 14.069 vs 8.853 (+5.2).
+      run.json: boot_s = first_frame_signal_s 6.01 vs 5.01/4.02/4.02; warmup_start_s 11.0 vs 10.0/9.01/9.01;
+          first-frame epoch - process-start epoch 11.12 vs 7.00/5.83/5.82 (+4.1..+5.3).
+    In total the cold boot is ~3.3 s slower before the first log line, ~2 s more by the end of boot logging, and
+    ~5 s later to first frame.
+  - Agent 6's after-first-line values (cold 1.46/4.86/5.24/8.70 vs base medians 1.20/3.31/3.57/6.75) match. Their
+    toyB0 is the first B0 write (base median 4.24); my toyW1 is the first write of any command (3.31). The definitions
+    differ; the data agree.
+  - Note: s0-r1 also started slowly before its first log line (5.421 s; first frame 10.13 s after process start), so
+    the pre-log delay is not unique to cold. The in-log delays are cold-only. Cold closes ~20 s earlier only because
+    its window is 30 s (params.seconds 30 vs 50).
+
+B4 AGREE  slow runs show no log-visible difference beyond fps-driven Toypad timing.
+  - Line counts: s0 98/98/98 (s0-r2 98); base 98/98/102 (base-r2 98; base-r3 102 = doubled handshake);
+    d11t 103/103/95 (d11t-r3 95 = 3 challenges).
+  - Every log: 40 warning, 0 error/critical. A stall-word regex (stall|stuck|hang|timeout|deadlock|not responding|
+    watchdog|hitch|slow|freez) finds 0 hits in game.log, and summary.txt has 0 STUCK/stall lines.
+  - run.json health in all 16 runs: status OK, problems [], valid_timing true, perf_csv_stalled false,
+    not_responding 0, exit 0, clean, not killed, no WER, no dialogs, ticks_skipped_window 0. Every run carries the
+    flag light_share_high.
+  - E within each arm: s0 differs only by an IoDismount handle (s0-r1 0xf8000164). base differs by Toypad (r3) and
+    IoDismount (r1 0xf8000158). d11t differs by Toypad counts and IoDismount (r2 0xf8000158). Nothing is specific to a
+    slow run.
+  - Toypad write sequences, B1 times, intervals and close offsets equal extra-vs-s0.txt sec 3 for all 16 runs:
+      d11t-r3: 8/8 (B0 C0 B1 B3 B1 B3 B1 B3), B1 at 0.0/34.9/77.5 s, intervals 34.9 and 42.5 s, 3 challenges.
+      12/12 (C0 B0 B0 C0 + 4x B1/B3) occurs only in base-r3, d11t-r1 and d11t-r2.
+      base-r2 intervals [27.8, 34.0, 42.1]; s0-r2 [26.0, 32.6, 36.8].
+  - Largest log gap inside the measure window (log time against the run.json epoch window):
+      slow: base-r2 42.05 s (its 3rd B1 interval); d11t-r3 32.93 s (last line -> measure_end); s0-r2 35.10 s
+      non-slow: max 35.39 s (d11p-r1); base-r1 36.23 s includes the +8.3 s clock step
+  - Note: the B1 cadence is set by frame count. Every B1->B1 interval after boot (2nd and 3rd, all 16 runs) spans
+    11981-12032 perf.csv frames. So the long base-r2 and d11t-r3 intervals reflect only their lower fps. d11t-r3's
+    4th challenge would fall ~60 s after measure_start, after the window closed. d11t-r3 was already slow in its
+    first interval (341.8 fps vs 421-458 in the other 15 runs). s0-r2's intervals are not distinctive.
+
+B5 AGREE  clock step +8.30 s in base-r1 only.
+  - base-r1: step +8.2990 s (QPC window 50.0070 s, epoch window 58.306 s). Other 15 runs: |step| <= 0.0011 s
+    (d11p-r2 +0.0011, base-r2 +0.0011, base-r3 -0.0010).
+  - sys.csv locates the step at rows 103->104: epoch 17:59:39.661 -> 17:59:48.949 while t_s goes
+    103.676 -> 104.664 (+8.300 s). That is inside the measure window (QPC 66.99..117.00 s after process start). No
+    other run has a sys.csv step above 0.003 s.
+  - game.log shows the jump only indirectly; no line falls inside it:
+      The last line before it is a Toypad read at 17:59:22.752; the next is 'Window closing' at 18:00:01.487
+      (gap 38.73 s).
+      'Window closing' is 2.50 s after measure_end on the epoch clock (other runs 1.89-2.24 s), but 10.80 s after
+      measure_start + QPC window. So the game.log timestamps use the stepped wall clock.
+      First line -> closing: 125.51 s vs 115.69-116.94 s in the other 50-s runs.
+      First Toypad write -> closing: 121.2 s vs 111.7-113.5 s (121.2 - 8.3 = 112.9, inside that range).
+
+B6 AGREE  perf-threads.txt v2 spot-check (base-r2 / base-r3 / d11t-r3). perfcheck also covers all 16 runs.
+  - Window = data rows [23700, +14462) / [23760, +17778) / [19380, +13858). 0 bad rows in all 16 runs.
+  - mean 3.4574/2.8125/3.6086 ms and nearest-rank median 2.931/2.546/3.028 ms equal run.json, as in all 16 runs. The
+    frame times sum to window_s (50.0013/50.0001/50.0079). Shifting by +-1 row breaks the mean match in most runs;
+    the median alone does not tell offsets apart.
+  - fps = frames/window_s: 289.232/355.559/277.116, equal to run.json mean_fps.
+  - Per-frame means: bufQ 3.4046/2.7917/3.5224; funcs 13.1076/12.3412/13.2857; intr 12.4593/11.8138/12.6090.
+    Sec 4 has 3.40/2.79/3.52, 13.11/12.34/13.29, 12.46/11.81/12.61; sec 7's means are equal.
+  - Every window frame has draw_calls 226, vertices_processed 1022 and active_threads 30, with 0 violations in all 16
+    runs (sec 7).
+  - threads.csv busy (sec 3 equal):
+      GPU Commands (F8000018) 84.3/71.7/76.4
+      Main XThread (F800002C) 72.5/86.6/76.0
+      F80001A8 thread 61.9/41.8/53.3
+      rex::thread::TimerQueue 60.5/49.0/4.5
+      F8000144 thread 19.3/14.9/18.5
+  - run.json sys.window: p_util_mean 98.5/79.36/91.38, e_eff_mhz_mean 554/740/551. Recomputing from the sys.csv
+    window rows (50 each) gives the same values; sec 1 has 98.5/79.4/91.4 and 554/740/551.
+  - gpu.csv 0x20 rows: 0 / 20 (t_s 19.57..49.36) / 0, matching sec 2.
+  - Sec 0 (window self-check) and sec 1 frames/fps/mean/median also match for all 16 runs.
+
+B7 NOTE  fixed-rate fit correct; one rounding nit.
+  - OLS over 16 runs, rates = window totals / run.json frames.window_s:
+      interrupt_dispatches/s = 8.9997*fps + 1000.364; R2 0.9999997; max |res| 0.2446/s (1817-base-r2)
+      functions_dispatched/s = 9.0000*fps + 1187.805; max |res| 0.2463/s
+  - funcs/s - intr/s = 187.499..187.562 in every run, i.e. 187.5-187.6.
+  - k = 9.000, r = 1000.4, R2 = 1.000000 and the 187.5-187.6 range all agree.
+  - Nit: max |residual| is 0.2446/s, which is 0.24 at 2 dp (Agent 6's own sec 5b says 0.245). The claimed 0.25 comes
+    from rounding twice. It does not change any conclusion.
+
+B8 AGREE  separation claims. Non-slow = 13 runs for run.json/perf.csv metrics, 12 for threads/GPU (cold has no data).
+  - P util: slow 91.49/98.5/91.38 vs non-slow max 86.44 (s0-r1). Separating.
+  - E eff MHz: slow 597/554/551 vs non-slow min 609 (d11p-r3). Separating.
+  - buffer_queue_depth: slow 3.169/3.405/3.522 vs max 2.956 (d11p-r3). Separating.
+  - Main XThread busy: slow 77.1/72.5/76.0 vs min 82.5 (d11p-r1). Separating.
+  - X1A8: slow 56.2/61.9/53.3 vs max 46.7 (d11p-r3). Separating. Only 1800-s0-r1 needs the alias
+    (XThread2F84 (F80001AC) 41.9).
+  - X144: slow 19.0/19.3/18.5 vs max 16.3 (d11p-r3). Separating.
+  - GPU Commands: slow 80.4/84.3/76.4 vs max 77.0 (s0-r1). Not separating (d11t-r3 76.4 < 77.0), as claimed.
+  - TimerQueue busy: d11t 4.5/4.0/4.5 and d11p 5.2/4.2/5.9, vs base 39.5/60.5/49.0, s0 50.6/55.4/46.5 and
+    d11 49.0/51.1/47.5 (together 39.5..60.5).
+  - gpu.csv 0x20 rows: d11t-r2 18 (t_s 28.96..49.35), d11p-r2 18, d11-r3 8, d11p-r3 13, base-r3 20, s0-r3 22; 0 in
+    the other 9 runs that have gpu.csv (cold has none). The first run with any is 1813-d11t-r2, started 18:13:01.6,
+    so there are none before 18:13.

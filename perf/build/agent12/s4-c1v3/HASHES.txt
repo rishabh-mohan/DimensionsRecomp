@@ -1,0 +1,50 @@
+S4 C1 v3 (C1 v2 + the init latch for both cvars + the load-first blocked flag; Agent 12, run-2 task #13 follow-up). Staged 2026-11-22 14:22:38 on scratch. Not applied, not built. C1 v1 and v2 unchanged.
+SDK: DimensionsRecomp/rexglue-sdk HEAD c5fe668; game: DimensionsRecomp HEAD 08933a7.
+v2        build/agent12/s4-c1v2: 11 v1/orig/new copies and 3 diffs (+ v1's rexlego diff) = its HASHES.txt: yes
+live      B120D07C6709D0D2A7836B532ED06B2032A418CBD4A71808CD318C7E6EB6CFBC  src/graphics/d3d12/shared_memory.cpp
+live      15C89EDB4B197C17487A9D45208D5CE624DE98ABE416F86942C5D14ED43EB282  src/graphics/shared_memory.cpp
+live      6E8FA1BA80EF9271D4433DD1BB2CAD0403360E222B22CED78AA4C7951D811DB4  src/system/xmemory.cpp
+live      80100865A654AF047D25EDA70CF1C746B182C81BCBDFC5B027EE56E0AE7132F9  include/rex/system/xmemory.h
+live      4D861738A94B556B08A4604D2CAB07AD7AFE1B3AD56B295F7F1E31C57BAED847  include/rex/graphics/shared_memory.h
+live      E07F690223B564AE0D41D1192ACD9225BD35226A43A7ACA8F2798B1851291B35  src/graphics/primitive_processor.cpp
+live      19AE1606C6DB727369A5F119EF3371A8D307F4B42088D5C064F0D2DF8D62D47A  game rexlego/src/gpu_native/memory_watch.cpp (CRLF work tree)
+edit      L0 cvar comment: anchor once, +1 line(s)
+edit      L1 latch storage: anchor once, +7 line(s)
+edit      L2 latch at init: anchor once, +6 line(s)
+edit      N2 load before the exchange: anchor once, +2 line(s)
+edit      L3a fix (i) hold reads its latch: anchor once, +1 line(s)
+edit      L3b C1 gate reads its latch: anchor once, +1 line(s)
+edit      23 added/changed lines checked: none over 100 columns, no trailing space, no tab; longest 92
+check     REXCVAR_GET of the two cvars: 2, all inside Memory::Initialize: True; latch loads 2, stores 2
+check     the other 5 staged files read or declare neither cvar (REXCVAR_*(name) or cvars::name): True (0 hits)
+v2        DC23757AC206FCC51F03B89C0A77F8EFCDB372B138C5D72600C230C295EC8CFD  src/system/xmemory.cpp (C1 v2 new, the interdiff base, 119957 B)
+orig      4D861738A94B556B08A4604D2CAB07AD7AFE1B3AD56B295F7F1E31C57BAED847  include/rex/graphics/shared_memory.h (C1 base = S4a output)
+new       82A66445ED98B091B5CF8FAA75D0EF3E11DFA0344ABBC2184F3A23C46F0FF98C  include/rex/graphics/shared_memory.h (13051 B, = v1 and v2)
+orig      80100865A654AF047D25EDA70CF1C746B182C81BCBDFC5B027EE56E0AE7132F9  include/rex/system/xmemory.h (C1 base = S4a output)
+new       5A70782EF00F0FB6094A0F538690557E81B5EE21C7781E190A38ABD859541CB2  include/rex/system/xmemory.h (31430 B, = v1 and v2)
+orig      E07F690223B564AE0D41D1192ACD9225BD35226A43A7ACA8F2798B1851291B35  src/graphics/primitive_processor.cpp (C1 base = S4a output)
+new       470BA4BED73B2ABFD32048F901C426BA24048C26A07694F9768F7AD35EC137F2  src/graphics/primitive_processor.cpp (79790 B, = v1 and v2)
+orig      0BE4BADCAC666BEE80F656669D072EDA8B55C2D25D25C448BC4C29E12BD503F4  src/graphics/shared_memory.cpp (C1 base = S4a output)
+new       A4A31038ABDFF94A1B97D28A13EE2ACBB67F44DC596F7A964C8C7493050390C6  src/graphics/shared_memory.cpp (32711 B, = v1 and v2)
+orig      141FB1A947D59156EB40A835B27E64F94EE22A3F5BE0E0F70F17BC85C676C87A  src/system/xmemory.cpp (C1 base = S4a output)
+new       BCA5E1CF63686E73FC5A12642B9B169E155FBBEC65D0A56CE1BE9B0B71022794  src/system/xmemory.cpp (121109 B, C1 v3)
+diff      1FC8E2DCC452A6EFFA1066FFBED0592D5BA8A74DE5FA322D7E978CFD4D9D1190  v2-to-v3.diff, 80 lines, 6 hunks, +24/-6, LF
+diff      DECCFE3373C27C3C8442A26A3C4DDFDB01CE54E2C4912CDE6701484185D66F48  keep-watch-v3.diff, 597 lines, 20 hunks, +422/-5, LF
+diff      0E61E1D07C2BAB99B8ED0CBAE948B0035B8721D889501FC267D9D331DDF47817  chain-live-to-c1v3.diff, 829 lines, 25 hunks, +614/-3, LF
+diff      4D0C10794188CF450046D42B249C9C46D009EE9F4F1B82116954857FA70838BD  keep-watch-rexlego.diff (v1, reused unchanged)
+chain     D290530197427138029FF34EE8B1BBBEDE26340AA85D0AE4EABB00DC0CEE9CEF  build/agent12/s4-diag/upload-hash-log.diff
+chain     77BEB64E1325B85451941EA87E33D4371F6EAFB98F7C5E7A37DAE95D29A2F745  build/agent12/s4-p2/single-hold-rearm.diff
+chain     80CAD795EEEF7AD45DBD9DB52ECFFF38C7C7BAF73969FB5DE6FE275EE2F656D9  build/agent12/s4-fixi/protect-hold-g.diff
+git apply --check (live SDK, diag): exit 0
+git apply --check (live SDK, P2): exit 0
+git apply --check (live SDK, fix (i)): exit 0
+git apply --check (live SDK, chain-live-to-c1v3): exit 0
+git apply --check (live game repo, keep-watch-rexlego.diff): exit 0
+scratch   v2 xmemory.cpp + v2-to-v3.diff: exit 0; = C1 v3 new: True
+4-step chain on scratch copies of the live files (git -c core.autocrlf=false apply, outside any work tree):
+  1. diag exit 0; src/graphics/d3d12/shared_memory.cpp BB0838CE3909E18A (= staged: True)
+  2. p2   exit 0; src/graphics/shared_memory.cpp 0BE4BADCAC666BEE (= staged: True)
+  3. fixi exit 0; src/system/xmemory.cpp 141FB1A947D59156 (= staged: True)
+  4. c1v3 exit 0; include/rex/graphics/shared_memory.h 82A66445ED98B091 (= staged: True); include/rex/system/xmemory.h 5A70782EF00F0FB6 (= staged: True); src/graphics/primitive_processor.cpp 470BA4BED73B2ABF (= staged: True); src/graphics/shared_memory.cpp A4A31038ABDFF94A (= staged: True); src/system/xmemory.cpp BCA5E1CF63686E73 (= staged: True)
+script    3FD56FD020D938423B993AE95CBDCA553753500E5AC2C6270A8B479CAB572CB0  make_c1v3.py
+RESULT PASS

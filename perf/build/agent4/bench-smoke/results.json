@@ -1,0 +1,272 @@
+{
+ "tree": "<workspace>\\DimensionsRecomp",
+ "runs": 1,
+ "cpu_load_before": "93",
+ "benches": {
+  "log_throttle": {
+   "1T old fetch_add, 3 sites/draw": {
+    "median": 31.0547,
+    "min": 31.0547,
+    "max": 31.0547,
+    "runs": [
+     31.0547
+    ]
+   },
+   "1T new TakeLogBudget, 3 sites/draw": {
+    "median": 1.6896,
+    "min": 1.6896,
+    "max": 1.6896,
+    "runs": [
+     1.6896
+    ]
+   },
+   "2T old fetch_add, 3 sites/draw": {
+    "median": 147.8225,
+    "min": 147.8225,
+    "max": 147.8225,
+    "runs": [
+     147.8225
+    ]
+   },
+   "2T new TakeLogBudget, 3 sites/draw": {
+    "median": 1.5723,
+    "min": 1.5723,
+    "max": 1.5723,
+    "runs": [
+     1.5723
+    ]
+   }
+  },
+  "cached_flag": {
+   "per draw old: 5 flag calls + 20 guarded LongProbe": {
+    "median": 54.9843,
+    "min": 54.9843,
+    "max": 54.9843,
+    "runs": [
+     54.9843
+    ]
+   },
+   "per draw new: 25 cached-flag checks": {
+    "median": 18.0095,
+    "min": 18.0095,
+    "max": 18.0095,
+    "runs": [
+     18.0095
+    ]
+   },
+   "one check old NativeTextureTimingEnabled()": {
+    "median": 2.6507,
+    "min": 2.6507,
+    "max": 2.6507,
+    "runs": [
+     2.6507
+    ]
+   },
+   "one check new TimingEnabled()": {
+    "median": 0.9918,
+    "min": 0.9918,
+    "max": 0.9918,
+    "runs": [
+     0.9918
+    ]
+   },
+   "one check old LongProbeEnabled()": {
+    "median": 1.7022,
+    "min": 1.7022,
+    "max": 1.7022,
+    "runs": [
+     1.7022
+    ]
+   },
+   "one check new LongProbeEnabled()": {
+    "median": 0.9042,
+    "min": 0.9042,
+    "max": 0.9042,
+    "runs": [
+     0.9042
+    ]
+   }
+  },
+  "tls_accessor": {
+   "no preparation: old 12 accessor calls": {
+    "median": 36.5534,
+    "min": 36.5534,
+    "max": 36.5534,
+    "runs": [
+     36.5534
+    ]
+   },
+   "no preparation: new 3 accessor calls": {
+    "median": 11.1494,
+    "min": 11.1494,
+    "max": 11.1494,
+    "runs": [
+     11.1494
+    ]
+   },
+   "no preparation: old sequence, inline accessor": {
+    "median": 23.8248,
+    "min": 23.8248,
+    "max": 23.8248,
+    "runs": [
+     23.8248
+    ]
+   },
+   "preparation: old 14 accessor calls": {
+    "median": 40.5127,
+    "min": 40.5127,
+    "max": 40.5127,
+    "runs": [
+     40.5127
+    ]
+   },
+   "preparation: new 3 accessor calls": {
+    "median": 18.7502,
+    "min": 18.7502,
+    "max": 18.7502,
+    "runs": [
+     18.7502
+    ]
+   },
+   "preparation: old sequence, inline accessor": {
+    "median": 31.2453,
+    "min": 31.2453,
+    "max": 31.2453,
+    "runs": [
+     31.2453
+    ]
+   }
+  },
+  "query_scope": {
+   "N=0 1T old lock+none_of": {
+    "median": 47.5367,
+    "min": 47.5367,
+    "max": 47.5367,
+    "runs": [
+     47.5367
+    ]
+   },
+   "N=0 1T new atomic count": {
+    "median": 2.3098,
+    "min": 2.3098,
+    "max": 2.3098,
+    "runs": [
+     2.3098
+    ]
+   },
+   "N=0 2T old lock+none_of": {
+    "median": 92.5564,
+    "min": 92.5564,
+    "max": 92.5564,
+    "runs": [
+     92.5564
+    ]
+   },
+   "N=0 2T new atomic count": {
+    "median": 2.7196,
+    "min": 2.7196,
+    "max": 2.7196,
+    "runs": [
+     2.7196
+    ]
+   },
+   "N=16 1T old lock+none_of": {
+    "median": 74.5357,
+    "min": 74.5357,
+    "max": 74.5357,
+    "runs": [
+     74.5357
+    ]
+   },
+   "N=16 1T new atomic count": {
+    "median": 3.0591,
+    "min": 3.0591,
+    "max": 3.0591,
+    "runs": [
+     3.0591
+    ]
+   },
+   "N=16 2T old lock+none_of": {
+    "median": 144.8712,
+    "min": 144.8712,
+    "max": 144.8712,
+    "runs": [
+     144.8712
+    ]
+   },
+   "N=16 2T new atomic count": {
+    "median": 2.9218,
+    "min": 2.9218,
+    "max": 2.9218,
+    "runs": [
+     2.9218
+    ]
+   },
+   "N=64 1T old lock+none_of": {
+    "median": 239.5425,
+    "min": 239.5425,
+    "max": 239.5425,
+    "runs": [
+     239.5425
+    ]
+   },
+   "N=64 1T new atomic count": {
+    "median": 2.844,
+    "min": 2.844,
+    "max": 2.844,
+    "runs": [
+     2.844
+    ]
+   },
+   "N=64 2T old lock+none_of": {
+    "median": 462.54,
+    "min": 462.54,
+    "max": 462.54,
+    "runs": [
+     462.54
+    ]
+   },
+   "N=64 2T new atomic count": {
+    "median": 3.07,
+    "min": 3.07,
+    "max": 3.07,
+    "runs": [
+     3.07
+    ]
+   },
+   "N=256 1T old lock+none_of": {
+    "median": 961.0235,
+    "min": 961.0235,
+    "max": 961.0235,
+    "runs": [
+     961.0235
+    ]
+   },
+   "N=256 1T new atomic count": {
+    "median": 2.577,
+    "min": 2.577,
+    "max": 2.577,
+    "runs": [
+     2.577
+    ]
+   },
+   "N=256 2T old lock+none_of": {
+    "median": 1924.586,
+    "min": 1924.586,
+    "max": 1924.586,
+    "runs": [
+     1924.586
+    ]
+   },
+   "N=256 2T new atomic count": {
+    "median": 2.81,
+    "min": 2.81,
+    "max": 2.81,
+    "runs": [
+     2.81
+    ]
+   }
+  }
+ },
+ "cpu_load_after": "88"
+}

@@ -1,0 +1,50 @@
+---- O2_today
+
+variant  fn             instr call_callee jmp_callee ret stack_adj
+-------  --             ----- ----------- ---------- --- ---------
+O2_today proof_ctx_regs    49           1          1   0         2
+O2_today proof_locals      24           1          1   0         2
+O2_today proof_escaped     20           1          0   1         2
+O2_today proof_cond        10           0          2   0         0
+O2_today proof_switch       6           0          1   0         0
+O2_today proof_vector       4           0          1   0         0
+---- O2_musttail
+
+variant     fn             instr call_callee jmp_callee ret stack_adj
+-------     --             ----- ----------- ---------- --- ---------
+O2_musttail proof_ctx_regs    49           1          1   0         2
+O2_musttail proof_locals      24           1          1   0         2
+O2_musttail proof_escaped     18           0          1   0         2
+O2_musttail proof_cond        10           0          2   0         0
+O2_musttail proof_switch       6           0          1   0         0
+O2_musttail proof_vector       4           0          1   0         0
+---- O0_today
+
+variant  fn             instr call_callee jmp_callee ret stack_adj
+-------  --             ----- ----------- ---------- --- ---------
+O0_today proof_ctx_regs    75           2          0   1         2
+O0_today proof_locals      53           2          0   1         2
+O0_today proof_escaped     20           1          0   1         2
+O0_today proof_cond        26           2          0   1         2
+O0_today proof_switch      27           3          0   1         2
+O0_today proof_vector      63           1          0   1         2
+---- O0_musttail
+
+variant     fn             instr call_callee jmp_callee ret stack_adj
+-------     --             ----- ----------- ---------- --- ---------
+O0_musttail proof_ctx_regs    71           1          1   0         2
+O0_musttail proof_locals      51           1          1   0         2
+O0_musttail proof_escaped     17           0          1   0         2
+O0_musttail proof_cond        24           0          2   0         3
+O0_musttail proof_switch      25           0          3   0         4
+O0_musttail proof_vector      58           0          1   0         2
+---- O2_musttail_stackprotector
+
+variant                    fn             instr call_callee jmp_callee ret stack_adj
+-------                    --             ----- ----------- ---------- --- ---------
+O2_musttail_stackprotector proof_ctx_regs    49           1          1   0         2
+O2_musttail_stackprotector proof_locals      24           1          1   0         2
+O2_musttail_stackprotector proof_escaped     30           0          1   0         2
+O2_musttail_stackprotector proof_cond        10           0          2   0         0
+O2_musttail_stackprotector proof_switch       6           0          1   0         0
+O2_musttail_stackprotector proof_vector       4           0          1   0         0

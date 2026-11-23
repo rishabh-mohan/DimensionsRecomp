@@ -1,0 +1,215 @@
+﻿diff --git a/build/agent11/launcher-review/p-2119-3EFC5312/run-night.ps1 b/build/agent11/launcher-review/p-2147-B0902106/run-night.ps1
+index 30f958c..d29cd0b 100644
+--- a/build/agent11/launcher-review/p-2119-3EFC5312/run-night.ps1
++++ b/build/agent11/launcher-review/p-2147-B0902106/run-night.ps1
+@@ -3,7 +3,7 @@
+ #   GO <window-id> <matrix json in bench\agent8\run\> <sha256 of that json> only=<arm,arm,...> repeats=<n>
+ # checks it, waits for a quiet machine, then runs ONLY the pinned bench\agent8\run\run-matrix.ps1 with that json
+ # (-Only -Repeats -ColdShared -NoPrompt). It deletes every GO it reads. It exits at 07:30 or when
+-# perf-notes\WINDOW-STOP.txt appears.
++# perf-notes\WINDOW-STOP.txt appears; a window still running then is stopped (the runner and its processes are killed).
+ # -DryRun: everything happens in bench\agent5\launch\status-dryrun\[<tag>\] (GO, HOLD, STOP, status). It never touches
+ # the real GO/HOLD/STOP files, never closes apps, never changes the screensaver or the keep-awake state, and never
+ # starts a matrix: it prints the command it would run. It does run run-matrix.ps1 -PlanOnly (reads only, starts no
+@@ -21,8 +21,9 @@ param(
+     [int]$MaxGo = 0,                  # exit after this many GO files (0 = no limit)
+     [string]$GateFixture = '',        # json with simulated gate samples (see README, "Tests")
+     [string]$StartBy = '',            # latest window start, like -StopAt; default 06:45 (with -StopAt: the -StopAt time)
+-    [double]$GraceMinutes = 15,       # a window still running this long after the end time is stopped (runner tree killed)
++    [double]$GraceMinutes = 0,        # a window still running this long after the end time is stopped; 0: 07:30 is the hard stop
+     [string]$FakeRunner = '',         # runs this script instead of the runner (tests the run, STOP and end-time handling)
++    [double]$TestFailAfter = 0,       # a simulated launcher error this many seconds after the (fake) runner starts
+     [switch]$SkipStartChecks          # dry run only: start checks are logged but do not refuse
+ )
+ $ErrorActionPreference = 'Stop'
+@@ -40,6 +41,8 @@ $Inv = [Globalization.CultureInfo]::InvariantCulture
+ $AllowedEnv = @('REX_TIMER_WAIT_BLOCKING', 'LEGO_GPU_WAIT_STATS', 'LEGO_GPU_WAIT_BACKOFF_US', 'LEGO_GPU_WAIT_SPIN_US',
+                 'LEGO_NATIVE_FRAME_METRICS', 'LEGO_NATIVE_SHADER_MISS_CACHE', 'LEGO_NATIVE_THREADED', 'LEGO_NATIVE_PREPARE_THREADS',
+                 'LEGO_NATIVE_SNAPSHOT_STATE', 'LEGO_NATIVE_FULL_DRAW_PREPARATION', 'LEGO_NATIVE_CHAIN_PRIORITY')
++# The only drivers an arm may name (exact file names in bench\agent8\run\drivers; Agents 10 and 1, 21:29). Not sys-csv.ps1.
++$AllowedDrivers = @('thread-cpu.ps1', 'pso-stats-at-end.ps1', 'io-counters.ps1')
+ $MaxRunHours = 14     # refuse to start when the end (07:30) is further away than this, i.e. when started after 07:30
+ $LatestStartTime = 6.75   # 06:45: no window starts at or after this time on the morning of the end time
+ $GateProcs = @('MsMpEng', 'OfficeClickToRun', 'CrossDeviceService')
+@@ -59,7 +62,7 @@ $CloseByPath = @{ 'Copilot' = $CopilotRx; 'Microsoft.Copilot' = $CopilotRx; 'cop
+ $MinRamGB = 6.0; $MinDiskGB = 6.0; $QuietCores = 0.1; $RelaxMaxCores = 1.2; $RelaxSpread = 0.2; $DeadlineSlackMin = 10
+ 
+ # ---------- mode, paths, hooks ----------
+-$hookNames = @('DryRunTag', 'SampleSeconds', 'GiveUpMinutes', 'StrictMinutes', 'StopAt', 'MatrixDir', 'PollSeconds', 'MaxGo', 'GateFixture', 'StartBy', 'GraceMinutes', 'FakeRunner', 'SkipStartChecks')
++$hookNames = @('DryRunTag', 'SampleSeconds', 'GiveUpMinutes', 'StrictMinutes', 'StopAt', 'MatrixDir', 'PollSeconds', 'MaxGo', 'GateFixture', 'StartBy', 'GraceMinutes', 'FakeRunner', 'TestFailAfter', 'SkipStartChecks')
+ $usedHooks = @($PSBoundParameters.Keys | Where-Object { $hookNames -contains $_ })
+ if ($usedHooks.Count -and -not $DryRun) { Write-Host "refused: $((@($usedHooks | ForEach-Object { '-' + $_ })) -join ' ') only work together with -DryRun" -ForegroundColor Red; exit 2 }
+ if ($DryRun) {
+@@ -92,9 +95,9 @@ function Set-Text([string]$Path, [string]$Text) {
+ }
+ function Log([string]$Msg, [string]$Color = 'Gray') {
+     $line = "$(Ts (Now)) $(if ($DryRun) { '[dry] ' })$Msg"
+-    Write-Host $line -ForegroundColor $Color
+     Add-Text $LogFile $line
+     if ($script:WinLog) { Add-Text $script:WinLog $line }
++    try { Write-Host $line -ForegroundColor $Color } catch { }    # the files first: a console problem must not lose a line
+ }
+ $script:State = @{ state = 'starting'; since = (Ts (Now)) }
+ function Set-State([string]$S, [hashtable]$Extra = @{}) {
+@@ -279,15 +282,16 @@ function Test-Matrix($Go, [string]$Path) {
+         if ([string](Get-P $a 'seed_cache')) { $why.Add("arm '$id': seed_cache is not allowed here") }
+         $dr = Get-P $a 'driver'
+         if ($null -ne $dr) {
+-            # Only a plain string "drivers/<name>.ps1" (letters, digits, _ and -) that resolves to that file in
+-            # bench\agent8\run\drivers (pinned), with no args: any other runner file as a driver could start a game, bin,
+-            # env or matrix that was never checked. The {script, args} form is refused.
++            # Only a plain string "drivers/<name>.ps1" (no args) for one of the $AllowedDrivers, resolving to that file in
++            # bench\agent8\run\drivers (pinned): any other runner file as a driver could start a game, bin, env or matrix
++            # that was never checked. The {script, args} form is refused.
+             $okDrv = $false
+             if ($dr -is [string] -and $dr -cmatch '^drivers/([A-Za-z0-9_-]+\.ps1)$') {
+-                $want = Join-Path (Join-Path $RunDir 'drivers') $Matches[1]; $fp = ''; try { $fp = [IO.Path]::GetFullPath((Resolve-Driver $dr)) } catch { }
+-                $okDrv = [string]::Equals($fp, $want, [StringComparison]::OrdinalIgnoreCase) -and (Test-Path -LiteralPath $want -PathType Leaf) -and (Test-Pinned $want)
++                $dn = $Matches[1]
++                $want = Join-Path (Join-Path $RunDir 'drivers') $dn; $fp = ''; try { $fp = [IO.Path]::GetFullPath((Resolve-Driver $dr)) } catch { }
++                $okDrv = ($AllowedDrivers -ccontains $dn) -and [string]::Equals($fp, $want, [StringComparison]::OrdinalIgnoreCase) -and (Test-Path -LiteralPath $want -PathType Leaf) -and (Test-Pinned $want)
+             }
+-            if (-not $okDrv) { $why.Add("arm '$id': driver must be a plain string drivers/<name>.ps1 (no args, no {script, args}) naming a file in bench\agent8\run\drivers (it is '$(if ($dr -is [string]) { $dr } else { ConvertTo-Json -InputObject $dr -Compress -Depth 4 })')") }
++            if (-not $okDrv) { $why.Add("arm '$id': driver must be $((@($AllowedDrivers | ForEach-Object { 'drivers/' + $_ })) -join ' or ') as a plain string (no args, no {script, args}), a file in bench\agent8\run\drivers (it is '$(if ($dr -is [string]) { $dr } else { ConvertTo-Json -InputObject $dr -Compress -Depth 4 })')") }
+         }
+     }
+     foreach ($o in $Go.only) { if ($ids -cnotcontains $o) { $why.Add("only=: no arm '$o' in $($Go.json)") } }
+@@ -616,7 +620,7 @@ function Get-LatestStart {
+ }
+ 
+ # ---------- one GO ----------
+-$script:GoCount = 0; $script:StopNow = $false; $script:Stuck = ''
++$script:GoCount = 0; $script:StopNow = $false; $script:Stuck = ''; $script:Fixture = $null; $script:FixtureIx = 0
+ $script:GoReadAt = $null
+ function Write-LastGo([string]$Raw, [string]$Verdict) { Set-Text (Join-Path $StatusDir 'last-go.txt') ("read     $(if ($script:GoReadAt) { Ts $script:GoReadAt } else { '?' })`r`nline     $Raw`r`nverdict  $Verdict`r`ndecided  $(Ts (Now))") }
+ function Write-LastResult([string]$Text) { Set-Text (Join-Path $StatusDir 'last-result.txt') ("written  $(Ts (Now))`r`n" + $Text) }
+@@ -692,6 +696,12 @@ function Start-WindowLocked($Go, [string]$MPath, $Plan, [string]$WTag) {
+     $pw = Get-Power; if (-not $pw.ac) { $soft.Add("not on AC power: $($pw.text)") }
+     if ($soft.Count -and $DryRun -and $SkipStartChecks) { Log "last checks would refuse: $($soft -join '; ') (ignored: -DryRun -SkipStartChecks)" 'Yellow' }
+     else { foreach ($w in $soft) { $why.Add($w) } }
++    # The build check again (the last gate sample may be a minute old). A dry-run gate fixture answers it like the gate
++    # does, or with its "builds_at_start" list (tests). Real mode: the real process list.
++    $fx = $null; $bpf = $null
++    if ($script:Fixture) { $all = @($script:Fixture.samples); $fx = $all[[math]::Min([math]::Max($script:FixtureIx - 1, 0), $all.Count - 1)]; $bpf = $script:Fixture.PSObject.Properties['builds_at_start'] }
++    $bp = @(if ($bpf) { @($bpf.Value) | Where-Object { $_ } } elseif (Use-Real $fx 'builds') { Get-BuildProcs ([string](Get-P $fx 'builds_path')) } else { Get-P $fx 'builds' | Where-Object { $_ } })
++    if ($bp.Count) { $why.Add("build or game processes are running: $($bp -join ' ')") }
+     $hw = ''; try { $hw = Sync-Hold $Go.id } catch { $hw = "the HOLD file could not be written ($($_.Exception.Message))" }
+     if ($hw) { $why.Add($hw) }
+     if ($why.Count) { Refuse $Go.raw ($why -join '; ') 'START'; return }
+@@ -756,13 +766,57 @@ function Read-Tail($T, [string]$RLog, [bool]$Final) {
+     if ($Final -and $T.rest) { $lines += $T.rest; $T.rest = '' }
+     foreach ($l in $lines) { Add-Text $RLog $l; Write-Host $l }
+ }
+-# Kills the runner's whole process tree (run-timing, the game, the drivers) and logs it. Real mode also kills a
+-# legodimensions from build\agent2 that started during the window in this session but is no longer in the tree.
++# The runner's descendants from one Win32_Process snapshot, parents before children. A process counts as a child only if
++# it was created at or after its parent, so an older process whose parent PID was reused by the runner or by one of its
++# children is never followed (this replaces taskkill /T). The runner's own PID cannot be reused while the launcher holds
++# its handle. Throws if the snapshot fails.
++function Get-Descendants([int]$RootId, [datetime]$RootCreated) {
++    $kids = @{}
++    foreach ($x in @(Get-CimInstance -ClassName Win32_Process -Property ProcessId, ParentProcessId, CreationDate, Name -OperationTimeoutSec 20 -ErrorAction Stop)) {
++        if ($null -eq $x.CreationDate) { continue }
++        $k = [int]$x.ParentProcessId
++        if (-not $kids.ContainsKey($k)) { $kids[$k] = New-Object System.Collections.Generic.List[object] }
++        $kids[$k].Add($x)
++    }
++    $out = New-Object System.Collections.Generic.List[object]
++    $todo = New-Object System.Collections.Generic.Queue[object]; $todo.Enqueue(@{ id = $RootId; t = $RootCreated }); $seen = @{ $RootId = $true }
++    while ($todo.Count) {
++        $q = $todo.Dequeue()
++        if (-not $kids.ContainsKey($q.id)) { continue }
++        foreach ($c in $kids[$q.id]) {
++            $cid = [int]$c.ProcessId
++            if ($seen.ContainsKey($cid) -or $c.CreationDate -lt $q.t) { continue }
++            $seen[$cid] = $true; $out.Add($c); $todo.Enqueue(@{ id = $cid; t = $c.CreationDate })
++        }
++    }
++    return , $out
++}
++# Kills one process of the snapshot, only if its PID still belongs to it (same start time). Returns a short note.
++function Stop-One($X) {
++    $id = [int]$X.ProcessId; $n = "$($X.Name):$id"
++    $g = $null; try { $g = [Diagnostics.Process]::GetProcessById($id) } catch { return "$n (already gone)" }
++    try {
++        if ([math]::Abs(($g.StartTime - $X.CreationDate).TotalMilliseconds) -ge 2) { return "$n (left alone: the pid now belongs to another process)" }
++        $g.Kill(); [void]$g.WaitForExit(5000); return $n
++    } catch { return "$n (NOT killed: $($_.Exception.Message))" } finally { $g.Dispose() }
++}
++# Stops the runner and everything it started (run-timing, the game, the drivers) and logs each process: first the runner
++# (by its handle, so it starts nothing new), then its descendants, parents first; up to 3 walks catch late starts. If the
++# process list cannot be read, only the runner itself is killed. Real mode then also kills a legodimensions from
++# build\agent2 that started during the window in this session but is no longer in the tree.
+ function Stop-Tree($P, [string]$Why, [datetime]$Since) {
+     $ErrorActionPreference = 'Continue'
+-    Log "!!! $($Why): the runner (pid $($P.Id)) and every process it started are killed now (taskkill /T /F)" 'Yellow'
+-    try { $o = @(& (Join-Path $env:SystemRoot 'System32\taskkill.exe') /PID $P.Id /T /F 2>&1 | ForEach-Object { "$_".Trim() } | Where-Object { $_ }); Log "taskkill: $($o -join ' / ')" } catch { Log "!!! taskkill failed: $($_.Exception.Message)" 'Red' }
+-    try { if (-not $P.WaitForExit(15000)) { $P.Kill(); [void]$P.WaitForExit(5000) } } catch { }
++    Log "!!! $($Why): the runner (pid $($P.Id)) and every process it started are killed now" 'Yellow'
++    $floor = $null; try { $st = $P.StartTime; $floor = $st.AddTicks(-($st.Ticks % 10)) } catch { Log "!!! the runner's start time is unreadable ($($_.Exception.Message)): only the runner itself is killed" 'Red' }
++    try { if ($P.HasExited) { Log "runner pid $($P.Id) had already ended" } else { $P.Kill(); [void]$P.WaitForExit(10000); Log "runner pid $($P.Id) killed" } } catch { Log "!!! runner pid $($P.Id) could not be killed: $($_.Exception.Message)" 'Red' }
++    if ($floor) {
++        for ($walk = 1; $walk -le 3; $walk++) {
++            $d = $null
++            try { $d = Get-Descendants $P.Id $floor } catch { Log "!!! the process list could not be read ($($_.Exception.Message)): processes the runner started may still be running" 'Red'; break }
++            if (-not $d.Count) { if ($walk -eq 1) { Log 'the runner had no other processes running' }; break }
++            Log "killed (walk $walk): $((@($d | ForEach-Object { Stop-One $_ })) -join ', ')"
++        }
++    }
+     if (-not $DryRun) {
+         $mySess = [Diagnostics.Process]::GetCurrentProcess().SessionId; $binRoot = (Join-Path $Repo 'build\agent2') + '\'
+         foreach ($g in @(Get-Process -Name legodimensions -ErrorAction SilentlyContinue)) {
+@@ -778,34 +832,42 @@ function Stop-Tree($P, [string]$Why, [datetime]$Since) {
+     Log "runner stopped: $(if ($gone) { 'yes' } else { "NO, pid $($P.Id) is still running" })" $(if ($gone) { 'Gray' } else { 'Red' })
+ }
+ # Starts the runner with Start-Process (its output goes to runner-<tag>.out.txt / .err.txt and, as it comes, to this
+-# console and runner-<tag>.txt) and waits for it. Every second: a STOP file, or the end time + GraceMinutes passing,
+-# stops the window at once (Stop-Tree). If the launcher itself fails while the runner runs, the runner is stopped too:
+-# it never runs unwatched. Returns @{ code; killed }.
++# console and runner-<tag>.txt) and waits for it. Every second: a STOP file, or the end time (07:30; dry-run tests
++# may add GraceMinutes), stops the window at once (Stop-Tree). A launcher error or Ctrl+C while the runner runs stops
++# it too: it never runs unwatched. Returns @{ code; killed }.
+ function Invoke-Runner([string]$ArgLine, [string]$RLog, [string]$Tag, [datetime]$T0) {
+     $outF = Join-Path $StatusDir "runner-$Tag.out.txt"; $errF = Join-Path $StatusDir "runner-$Tag.err.txt"
+     $p = Start-Process -FilePath $PsExe -ArgumentList $ArgLine -WorkingDirectory ((Get-Location -PSProvider FileSystem).ProviderPath) -NoNewWindow -PassThru -RedirectStandardOutput $outF -RedirectStandardError $errF
+-    [void]$p.Handle     # keeps ExitCode readable (Windows PowerShell 5.1)
++    [void]$p.Handle     # keeps ExitCode readable (Windows PowerShell 5.1) and the runner's pid from being reused
+     $r = @{ code = $null; killed = '' }
+     $hardEnd = $script:Deadline.AddMinutes($GraceMinutes)
+-    Log "runner pid $($p.Id); a STOP file, or $(Ts $hardEnd) (end time + $GraceMinutes min), stops it and everything it started"
++    $hardWhy = if ($GraceMinutes -eq 0) { "end time $(Ts $hardEnd) reached" } else { "end time $(Ts $script:Deadline) + $GraceMinutes min ($(Ts $hardEnd)) reached" }
++    Log "runner pid $($p.Id); a STOP file, or the end time $(Ts $hardEnd), stops it and everything it started"
+     $tails = @(@{ path = $outF; pos = [long]0; rest = ''; enc = [Console]::OutputEncoding }, @{ path = $errF; pos = [long]0; rest = ''; enc = [Console]::OutputEncoding })
+-    $tailErr = $false
++    $tailErr = $false; $ended = $false
+     try {
+         while ($true) {
+             $done = $p.WaitForExit(1000)
+             foreach ($t in $tails) { try { Read-Tail $t $RLog $done } catch { if (-not $tailErr) { $tailErr = $true; Log "!!! runner output could not be read ($($_.Exception.Message)); it is still in $outF and $errF" 'Yellow' } } }
+-            if ($done) { break }
++            if ($done) { $ended = $true; break }
+             $why = ''
+-            if (Test-Stop) { $why = 'STOP file' } elseif ((Now) -ge $hardEnd) { $why = "end time $(Ts $script:Deadline) + $GraceMinutes min passed" }
++            if (Test-Stop) { $why = 'STOP file' } elseif ((Now) -ge $hardEnd) { $why = $hardWhy }
+             if ($why) {
+-                $r.killed = $why; Stop-Tree $p $why $T0
++                $r.killed = $why; $ended = $true; Stop-Tree $p $why $T0
+                 foreach ($t in $tails) { try { Read-Tail $t $RLog $true } catch { } }
+                 break
+             }
++            if ($TestFailAfter -gt 0 -and ((Now) - $T0).TotalSeconds -ge $TestFailAfter) { throw "simulated launcher error (dry-run hook -TestFailAfter $TestFailAfter)" }
+         }
++    } catch {
++        $r.killed = "launcher error while the runner was running ($($_.Exception.Message))"
++        try { Log "!!! $($r.killed)" 'Red' } catch { }
+     } finally {
+-        $alive = $false; try { $alive = -not $p.HasExited } catch { }
+-        if ($alive) { if (-not $r.killed) { $r.killed = 'launcher error while the runner was running' }; Stop-Tree $p $r.killed $T0 }
++        # Also on Ctrl+C (no catch block runs then, but this does): the runner never runs unwatched.
++        if (-not $ended) {
++            if (-not $r.killed) { $r.killed = 'the launcher was interrupted (Ctrl+C?) while the runner was running' }
++            Stop-Tree $p $r.killed $T0
++        }
+     }
+     try { if ($p.WaitForExit(5000)) { $r.code = $p.ExitCode } } catch { }
+     return $r

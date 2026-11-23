@@ -1,0 +1,17 @@
+sub_82A334D0: classes decl=1 flush=2; SO writers: none
+== prologue differs (decl)
+  A| REX_FUNC_PROLOGUE();
+  A| PPCRegister temp{};
+  B| REX_FUNC_PROLOGUE();
+  B| PPCCRRegister cr6{};
+  B| PPCRegister temp{};
+[5] lfd f0,26112(r11)   (flush)
+  A| ctx.fpscr.disableFlushMode();
+  A| ctx.f0.u64 = REX_LOAD_U64(ctx.r11.u32 + 26112);
+  B| ctx.f0.u64 = REX_LOAD_U64(ctx.r11.u32 + 26112);
+[7] lfs f13,6252(r10)   (flush)
+  A| temp.u32 = REX_LOAD_U32(ctx.r10.u32 + 6252);
+  A| ctx.f13.f64 = double(temp.f32);
+  B| ctx.fpscr.disableFlushMode();
+  B| temp.u32 = REX_LOAD_U32(ctx.r10.u32 + 6252);
+  B| ctx.f13.f64 = double(temp.f32);

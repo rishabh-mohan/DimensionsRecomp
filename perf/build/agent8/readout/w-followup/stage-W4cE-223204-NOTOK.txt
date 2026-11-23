@@ -1,0 +1,17 @@
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:32:04
+mode: TEST (copy in build\agent8\w-followup\test\W4cE; no bench writes)
+result: NOT OK: arm B: env key 'LEGO_BOGUS_KEY' is not allowed by the launcher
+run: only=d0,B repeats=6 -ColdShared; -PlanOnly: not run or failed; expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+latest start: -
+GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): none (result NOT OK)
+draft: build\agent8\w-followup\neg\matrix-window4c-negenv.json  sha256 6E74CFD42063217E1AFB8C60BFA4905079BB1137A10AE5522E80F60FD69A2760  4075 bytes
+matrix for the GO: build\agent8\w-followup\test\W4cE\matrix-window4c-negenv.json  sha256 -
+launcher: bench\agent5\launch\run-night.ps1 sha256 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 (2026-11-22 22:11:21); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/devoff2-bin (arms d0): MANIFEST.txt sha256 B87DC2D2CA22379F2A847770F48CD31ECA2889C692566E26791E84B744F77455 (expected B87DC2D2CA22379F); legodimensions.exe 7F0B1C1C84BC66FFFCB168D13B23AA1C40E56BE70913504EC47F1DB2E98BC790; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 49, FAIL 0
+bin: build/agent2/devoffB-bin (arms B): MANIFEST.txt sha256 8709476FF477876839539354A7718A3E8F856FC3CCB7526DA18A6FB10854B0C3 (expected 8709476FF4778768); legodimensions.exe C3F8686EBDD83340343CC93E1EE05E6F97E6C2CDFF0274BD0AF9AF85EDAD0F29; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 74, FAIL 0
+arm: d0 (devoff2; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+arm: B (devoffB; frames perf; cvars framerate_limit=0; env LEGO_BOGUS_KEY=1; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: - / -
+
+--- run-matrix.ps1 -Matrix build\agent8\w-followup\test\W4cE\matrix-window4c-negenv.json -Only d0,B -Repeats 6 -ColdShared -NoPrompt -PlanOnly (launcher Get-Plan)
+(not run)

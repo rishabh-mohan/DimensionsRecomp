@@ -1,0 +1,438 @@
+{
+ "tool": "analyze_profile.py",
+ "schema": 1,
+ "mode": "summary",
+ "profile": "<workspace>\\build\\agent8\\profiler\\profile-694345718.bin",
+ "map": "<workspace>\\build\\agent8\\profiler\\profiler_selftest.map",
+ "samples": 76,
+ "modules": 15,
+ "threads_seen": 7,
+ "trailer": {
+  "version": 1,
+  "payload_bytes": 154,
+  "qpc_frequency": 10000000,
+  "qpc_start": 6943650618301,
+  "qpc_end": 6943684970229,
+  "rounds": 11,
+  "timer_mode": 1,
+  "thread_count": 7,
+  "extra_payload_bytes": 0,
+  "thread_names": {
+   "12592": "selftest-main",
+   "48452": "",
+   "58604": "",
+   "73484": "selftest-sleeper",
+   "86780": "selftest-guest",
+   "94648": "",
+   "94704": "selftest-waiter"
+  }
+ },
+ "duration": {
+  "rounds": 11,
+  "rounds_estimated": 11,
+  "seconds": 3.4351928,
+  "source": "trailer"
+ },
+ "rate_unit": "/s",
+ "timer_observer_effect": false,
+ "counting": "busy samples",
+ "counted_samples": 19,
+ "thread_filter": null,
+ "fold_guest": false,
+ "totals": {
+  "busy": 19,
+  "waiting": 57,
+  "io": 0
+ },
+ "categories_busy": {
+  "guest": 10,
+  "rexruntime": 0,
+  "native-gpu": 0,
+  "rexlego": 9,
+  "d3d12+driver": 0,
+  "system": 0,
+  "other": 0,
+  "unknown": 0
+ },
+ "threads": [
+  {
+   "tid": 12592,
+   "name": "selftest-main",
+   "samples": 11,
+   "busy": 9,
+   "waiting": 2,
+   "io": 0,
+   "pct_running": 81.8,
+   "top_self": [
+    {
+     "name": "lsp_selftest_hot",
+     "category": "rexlego",
+     "module": "profiler_selftest.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 9,
+     "pct": 100.0
+    }
+   ],
+   "top_inclusive": [
+    {
+     "name": "main",
+     "category": "rexlego",
+     "module": "profiler_selftest.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 9,
+     "pct": 100.0
+    },
+    {
+     "name": "__scrt_common_main_seh",
+     "category": "rexlego",
+     "module": "profiler_selftest.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 9,
+     "pct": 100.0
+    },
+    {
+     "name": "KERNEL32.DLL!BaseThreadInitThunk",
+     "category": "system",
+     "module": "KERNEL32.DLL",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 9,
+     "pct": 100.0
+    },
+    {
+     "name": "ntdll.dll!RtlUserThreadStart",
+     "category": "system",
+     "module": "ntdll.dll",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 9,
+     "pct": 100.0
+    },
+    {
+     "name": "lsp_selftest_hot",
+     "category": "rexlego",
+     "module": "profiler_selftest.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 9,
+     "pct": 100.0
+    },
+    {
+     "name": "lsp_selftest_outer",
+     "category": "rexlego",
+     "module": "profiler_selftest.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 9,
+     "pct": 100.0
+    }
+   ],
+   "role": "lsp_selftest_hot"
+  },
+  {
+   "tid": 94648,
+   "name": "",
+   "samples": 11,
+   "busy": 0,
+   "waiting": 11,
+   "io": 0,
+   "pct_running": 0.0,
+   "top_self": [],
+   "top_inclusive": [],
+   "role": ""
+  },
+  {
+   "tid": 48452,
+   "name": "",
+   "samples": 11,
+   "busy": 0,
+   "waiting": 11,
+   "io": 0,
+   "pct_running": 0.0,
+   "top_self": [],
+   "top_inclusive": [],
+   "role": ""
+  },
+  {
+   "tid": 58604,
+   "name": "",
+   "samples": 11,
+   "busy": 0,
+   "waiting": 11,
+   "io": 0,
+   "pct_running": 0.0,
+   "top_self": [],
+   "top_inclusive": [],
+   "role": ""
+  },
+  {
+   "tid": 94704,
+   "name": "selftest-waiter",
+   "samples": 11,
+   "busy": 0,
+   "waiting": 11,
+   "io": 0,
+   "pct_running": 0.0,
+   "top_self": [],
+   "top_inclusive": [],
+   "role": "std::thread::_Invoke<class std::tuple<class `extern \"C\" main'::`1'::<lambda_1>>, 0>"
+  },
+  {
+   "tid": 73484,
+   "name": "selftest-sleeper",
+   "samples": 11,
+   "busy": 0,
+   "waiting": 11,
+   "io": 0,
+   "pct_running": 0.0,
+   "top_self": [],
+   "top_inclusive": [],
+   "role": "selftest::Sleeper"
+  },
+  {
+   "tid": 86780,
+   "name": "selftest-guest",
+   "samples": 10,
+   "busy": 10,
+   "waiting": 0,
+   "io": 0,
+   "pct_running": 100.0,
+   "top_self": [
+    {
+     "name": "sub_8200BEEF [guest 0x8200BEEF]",
+     "category": "guest",
+     "module": "profiler_selftest.exe",
+     "guest_addr": "0x8200BEEF",
+     "kind": null,
+     "samples": 10,
+     "pct": 100.0
+    }
+   ],
+   "top_inclusive": [
+    {
+     "name": "KERNEL32.DLL!BaseThreadInitThunk",
+     "category": "system",
+     "module": "KERNEL32.DLL",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 10,
+     "pct": 100.0
+    },
+    {
+     "name": "ntdll.dll!RtlUserThreadStart",
+     "category": "system",
+     "module": "ntdll.dll",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 10,
+     "pct": 100.0
+    },
+    {
+     "name": "sub_8200BEEF [guest 0x8200BEEF]",
+     "category": "guest",
+     "module": "profiler_selftest.exe",
+     "guest_addr": "0x8200BEEF",
+     "kind": null,
+     "samples": 10,
+     "pct": 100.0
+    },
+    {
+     "name": "selftest::GuestLoop",
+     "category": "rexlego",
+     "module": "profiler_selftest.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 10,
+     "pct": 100.0
+    },
+    {
+     "name": "std::thread::_Invoke<class std::tuple<class `extern \"C\" main'::`1'::<lambda_0>>, 0>",
+     "category": "rexlego",
+     "module": "profiler_selftest.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 10,
+     "pct": 100.0
+    },
+    {
+     "name": "thread_start<unsigned int (__cdecl *)(void *), 1>",
+     "category": "rexlego",
+     "module": "profiler_selftest.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 10,
+     "pct": 100.0
+    }
+   ],
+   "role": "sub_8200BEEF [guest 0x8200BEEF]"
+  }
+ ],
+ "top_self": [
+  {
+   "name": "sub_8200BEEF [guest 0x8200BEEF]",
+   "category": "guest",
+   "module": "profiler_selftest.exe",
+   "guest_addr": "0x8200BEEF",
+   "kind": null,
+   "samples": 10,
+   "pct": 52.63,
+   "rate": 2.911
+  },
+  {
+   "name": "lsp_selftest_hot",
+   "category": "rexlego",
+   "module": "profiler_selftest.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 9,
+   "pct": 47.37,
+   "rate": 2.62
+  }
+ ],
+ "top_inclusive": [
+  {
+   "name": "KERNEL32.DLL!BaseThreadInitThunk",
+   "category": "system",
+   "module": "KERNEL32.DLL",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 19,
+   "pct": 100.0,
+   "rate": 5.531
+  },
+  {
+   "name": "ntdll.dll!RtlUserThreadStart",
+   "category": "system",
+   "module": "ntdll.dll",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 19,
+   "pct": 100.0,
+   "rate": 5.531
+  },
+  {
+   "name": "sub_8200BEEF [guest 0x8200BEEF]",
+   "category": "guest",
+   "module": "profiler_selftest.exe",
+   "guest_addr": "0x8200BEEF",
+   "kind": null,
+   "samples": 10,
+   "pct": 52.63,
+   "rate": 2.911
+  },
+  {
+   "name": "selftest::GuestLoop",
+   "category": "rexlego",
+   "module": "profiler_selftest.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 10,
+   "pct": 52.63,
+   "rate": 2.911
+  },
+  {
+   "name": "std::thread::_Invoke<class std::tuple<class `extern \"C\" main'::`1'::<lambda_0>>, 0>",
+   "category": "rexlego",
+   "module": "profiler_selftest.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 10,
+   "pct": 52.63,
+   "rate": 2.911
+  },
+  {
+   "name": "thread_start<unsigned int (__cdecl *)(void *), 1>",
+   "category": "rexlego",
+   "module": "profiler_selftest.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 10,
+   "pct": 52.63,
+   "rate": 2.911
+  },
+  {
+   "name": "main",
+   "category": "rexlego",
+   "module": "profiler_selftest.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 9,
+   "pct": 47.37,
+   "rate": 2.62
+  },
+  {
+   "name": "__scrt_common_main_seh",
+   "category": "rexlego",
+   "module": "profiler_selftest.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 9,
+   "pct": 47.37,
+   "rate": 2.62
+  },
+  {
+   "name": "lsp_selftest_hot",
+   "category": "rexlego",
+   "module": "profiler_selftest.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 9,
+   "pct": 47.37,
+   "rate": 2.62
+  },
+  {
+   "name": "lsp_selftest_outer",
+   "category": "rexlego",
+   "module": "profiler_selftest.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 9,
+   "pct": 47.37,
+   "rate": 2.62
+  }
+ ],
+ "timing": {
+  "read_s": 0.001,
+  "map_s": 0.08,
+  "symbolize_s": 0.387,
+  "unique_stacks": 21,
+  "unique_addresses": 39,
+  "functions": 22
+ },
+ "map_info": {
+  "<workspace>\\build\\agent8\\profiler\\profiler_selftest.map": {
+   "symbols": 1062,
+   "lines": 1139,
+   "image": "profiler_selftest",
+   "parse_s": 0.069
+  }
+ },
+ "modules_self": [
+  {
+   "module": "profiler_selftest.exe",
+   "samples": 19,
+   "pct": 100.0
+  }
+ ],
+ "modules_inclusive": [
+  {
+   "module": "profiler_selftest.exe",
+   "samples": 19,
+   "pct": 100.0
+  },
+  {
+   "module": "ntdll.dll",
+   "samples": 19,
+   "pct": 100.0
+  },
+  {
+   "module": "KERNEL32.DLL",
+   "samples": 19,
+   "pct": 100.0
+  }
+ ],
+ "warnings": []
+}

@@ -1,0 +1,16 @@
+# s4c1v3_syntax (S4 C1 v3: C1 v2 + the init latch + load-first blocked flag)  2026-11-22 14:23:15  config Release
+# control = build\agent12\s4-c1v3\v2\sdk (C1 v2); candidate = build\agent12\s4-c1v3\new\sdk (C1 v3); both with new\sdk\include first
+header include/rex/system/xmemory.h           staged 5A70782EF00F0FB6 (= HASHES new (= C1 v1 and v2))
+header include/rex/graphics/shared_memory.h   staged 82A66445ED98B091 (= HASHES new (= C1 v1 and v2))
+src/system/xmemory.cpp   control   exit=0  15.6s diagnostics=1  sha DC23757AC206FCC5 (= HASHES v2)  <workspace>\build\agent12\s4-c1v3\v2\sdk\src\system\xmemory.cpp
+    | <workspace>\build\agent12\s4-c1v3\v2\sdk\src\system\xmemory.cpp:2511:76: warning: unused parameter 'global_lock_locked_once' [-Wunused-parameter]
+    |  2511 | bool PhysicalHeap::TriggerCallbacks(std::unique_lock<std::recursive_mutex> global_lock_locked_once,
+    |       |                                                                            ^
+    | 1 warning generated.
+src/system/xmemory.cpp   candidate exit=0  14.2s diagnostics=1  sha BCA5E1CF63686E73 (= HASHES new)  <workspace>\build\agent12\s4-c1v3\new\sdk\src\system\xmemory.cpp
+    | <workspace>\build\agent12\s4-c1v3\new\sdk\src\system\xmemory.cpp:2529:76: warning: unused parameter 'global_lock_locked_once' [-Wunused-parameter]
+    |  2529 | bool PhysicalHeap::TriggerCallbacks(std::unique_lock<std::recursive_mutex> global_lock_locked_once,
+    |       |                                                                            ^
+    | 1 warning generated.
+    no new diagnostics in the candidate
+RESULT: PASS

@@ -1,0 +1,163 @@
+pass 2026-11-22 21:47:55 -> build/agent11/launcher-review/p-2147-B0902106
+run-night.ps1  B0902106C4D935810C5747951095053E117165BE36CF8FE1F32B0C0337E8DB33  77221 B mtime 21:42:43 LF=1010 CR=0 nonASCII=0 BOM=False
+RUN-NIGHT.cmd  F7190AB228CF0EF90980103B04F079AFC5CE23BC92E3390A3A539D2C25CD5EAF   1012 B mtime 20:51:01 LF=18 CR=18 nonASCII=0 BOM=False
+README.md      581A03DB66D34A276684F1AEC242FD0B14290C58748302C706DC9CEBF4F81D13  21508 B mtime 21:28:05 LF=263 CR=0 nonASCII=15 BOM=False
+RUN-NIGHT.cmd bare LF=0
+ParseFile errors=0
+diff-cmd.txt 0 B, +0/-0
+diff-readme.txt 0 B, +0/-0
+diff-run-night.txt 18415 B, +89/-27
+--- A10-5 driver
+   L45: $AllowedDrivers = @('thread-cpu.ps1', 'pso-stats-at-end.ps1', 'io-counters.ps1')
+   L247: function Resolve-Driver([string]$P) {
+   L285: # Only a plain string "drivers/<name>.ps1" (no args) for one of the $AllowedDrivers, resolving to that file in
+   L289: if ($dr -is [string] -and $dr -cmatch '^drivers/([A-Za-z0-9_-]+\.ps1)$') {
+   L291: $want = Join-Path (Join-Path $RunDir 'drivers') $dn; $fp = ''; try { $fp = [IO.Path]::GetFullPath((Resolve-Driver $dr)) } catch { }
+   L292: $okDrv = ($AllowedDrivers -ccontains $dn) -and [string]::Equals($fp, $want, [StringComparison]::OrdinalIgnoreCase) -and (Test-Path -LiteralPath $want -PathType Leaf) -and
+   L294: if (-not $okDrv) { $why.Add("arm '$id': driver must be $((@($AllowedDrivers | ForEach-Object { 'drivers/' + $_ })) -join ' or ') as a plain string (no args, no {script, a
+--- A10-6 14h
+   L46: $MaxRunHours = 14     # refuse to start when the end (07:30) is further away than this, i.e. when started after 07:30
+   L958: if (($script:Deadline - (Now)).TotalHours -gt $MaxRunHours) { $why.Add("it would run until $(Ts $script:Deadline), more than $MaxRunHours h from now (it is past 07:30): s
+--- A10-7 recheck
+   L676: function Start-Window($Go, [string]$MPath, $Plan, [string]$WTag) {
+   L678: Close-Programs 'window start'
+   L685: function Start-WindowLocked($Go, [string]$MPath, $Plan, [string]$WTag) {
+   L695: if (Test-LogonUI) { $soft.Add('the PC is locked (LogonUI is running)') }
+--- A10-8 PassThru
+   L516: if ($p.WaitForExit(10000)) { Log "programs ($When): $tag closed" }
+   L517: else { $p.Kill(); [void]$p.WaitForExit(5000); Log "programs ($When): $tag closed (killed after 10 s)" }
+   L623: $script:GoCount = 0; $script:StopNow = $false; $script:Stuck = ''; $script:Fixture = $null; $script:FixtureIx = 0
+   L744: if ($run.killed -eq 'STOP file') { Use-Stop "while window $($Go.id) was running"; $script:StopNow = $true }
+   L771: # children is never followed (this replaces taskkill /T). The runner's own PID cannot be reused while the launcher holds
+   L800: $g.Kill(); [void]$g.WaitForExit(5000); return $n
+   L807: function Stop-Tree($P, [string]$Why, [datetime]$Since) {
+   L811: try { if ($P.HasExited) { Log "runner pid $($P.Id) had already ended" } else { $P.Kill(); [void]$P.WaitForExit(10000); Log "runner pid $($P.Id) killed" } } catch { Log "!
+   L826: $g.Kill(); [void]$g.WaitForExit(10000); Log "killed legodimensions pid $($g.Id) ($path), left over from the window" 'Yellow'
+   L834: # Starts the runner with Start-Process (its output goes to runner-<tag>.out.txt / .err.txt and, as it comes, to this
+   L840: $p = Start-Process -FilePath $PsExe -ArgumentList $ArgLine -WorkingDirectory ((Get-Location -PSProvider FileSystem).ProviderPath) -NoNewWindow -PassThru -RedirectStandard
+   L850: $done = $p.WaitForExit(1000)
+   L872: try { if ($p.WaitForExit(5000)) { $r.code = $p.ExitCode } } catch { }
+   L917: if ($r -eq 'stop') { Use-Stop 'waiting for the quiet gate'; $script:StopNow = $true; Write-LastResult "GO       $($go.raw)`r`nresult   NOT STARTED: STOP file while waitin
+   L987: if ($script:StopNow) { $endHow = 'STOP file'; break }
+--- F1 env
+   L39: # Env keys an arm may set (exact case), from build/agent8/w8w9/ENV-KEYS-F1.txt (sha256 D1AE6D57...), approved by Agent 1 at 21:14.
+   L41: $AllowedEnv = @('REX_TIMER_WAIT_BLOCKING', 'LEGO_GPU_WAIT_STATS', 'LEGO_GPU_WAIT_BACKOFF_US', 'LEGO_GPU_WAIT_SPIN_US',
+   L275: else { foreach ($pp in $ev.PSObject.Properties) { if ($AllowedEnv -cnotcontains $pp.Name) { $why.Add("arm '$id': env key '$($pp.Name)' is not allowed (only $($AllowedEnv 
+   L715: Log "DRY RUN, would start window $($Go.id) now, without $($AllowedEnv -join ' / ') in its environment:" 'Cyan'
+--- F3 06:45
+   L23: [string]$StartBy = '',            # latest window start, like -StopAt; default 06:45 (with -StopAt: the -StopAt time)
+   L47: $LatestStartTime = 6.75   # 06:45: no window starts at or after this time on the morning of the end time
+   L615: # The latest window start: 06:45 on the morning of the end time. Dry-run tests: -StartBy, else the -StopAt time.
+   L616: function Get-LatestStart {
+   L617: $l = if ($StartBy) { Read-When $StartBy '-StartBy' } elseif ($StopAt) { $script:Deadline } else { $script:Deadline.Date.AddHours($LatestStartTime) }
+   L652: if ($now -ge $script:LatestStart) { Write-GateLine "DEADLINE ($last; after $mins min; window not started)"; return "latest start: no window starts at or after $(Ts $scrip
+   L691: if ((Now) -ge $script:LatestStart) { $why.Add("latest start: no window starts at or after $(Ts $script:LatestStart)") }
+   L900: if ($script:GoReadAt -ge $script:LatestStart) { Refuse $go.raw "latest start: the GO was read at $(Ts $script:GoReadAt), at or after the latest window start $(Ts $script:
+   L932: $script:Deadline = $null; $script:LatestStart = $null; $script:Pins = $null; $script:GateLine = ''
+   L947: $script:LatestStart = Get-LatestStart
+   L950: Log "start checks: desktop '$desk'; LogonUI $(if ($locked) { 'RUNNING (locked)' } else { 'not running' }); power $($pw.text); ends at $(Ts $script:Deadline); latest windo
+   L975: if ((Now) -ge $script:LatestStart) { Log "!!! the latest window start $(Ts $script:LatestStart) has passed: every GO is refused; the launcher still ends at $(Ts $script:D
+--- F4 00:00
+--- F5 apps
+   L54: $CloseNames = @('ChatGPT', 'Copilot', 'Microsoft.Copilot', 'copilotapphost', 'copilotapp_proxy', 'Roblox', 'RobloxPlayerBeta',
+   L55: 'RobloxPlayerLauncher', 'Windows10Universal', 'Taskmgr', 'wallpaper32', 'wallpaper64', 'webwallpaper32', 'webwallpaper64')
+   L57: # run as Windows10Universal.exe): the Copilot apps, the Store Roblox app, Wallpaper Engine's ui32/ui64.
+   L58: $CopilotRx = '\\WindowsApps\\Microsoft\.(Copilot|Windows\.Ai\.Copilot)_'
+   L59: $OfficeHubRx = '\\WindowsApps\\Microsoft\.MicrosoftOfficeHub_'
+   L60: $CloseByPath = @{ 'Copilot' = $CopilotRx; 'Microsoft.Copilot' = $CopilotRx; 'copilotapphost' = $OfficeHubRx; 'copilotapp_proxy' = $OfficeHubRx
+   L61: 'Windows10Universal' = '\\WindowsApps\\ROBLOXCORPORATION\.ROBLOX_'; 'ui32' = 'wallpaper_engine'; 'ui64' = 'wallpaper_engine' }
+   L500: if ($CloseByPath.ContainsKey($n)) {
+   L503: if ($path -and $path -match $CloseByPath[$n]) { $p }
+   L504: elseif ($CloseNames -contains $n) { $left.Add("$n pid $($p.Id) ($(if ($path) { $path } else { 'path unknown' }); closed only from a path matching '$($CloseByPath[$n])')")
+--- hooks
+   L65: $hookNames = @('DryRunTag', 'SampleSeconds', 'GiveUpMinutes', 'StrictMinutes', 'StopAt', 'MatrixDir', 'PollSeconds', 'MaxGo', 'GateFixture', 'StartBy', 'GraceMinutes', 'F
+   L66: $usedHooks = @($PSBoundParameters.Keys | Where-Object { $hookNames -contains $_ })
+   L67: if ($usedHooks.Count -and -not $DryRun) { Write-Host "refused: $((@($usedHooks | ForEach-Object { '-' + $_ })) -join ' ') only work together with -DryRun" -ForegroundColo
+   L717: if (-not $FakeRunner) {
+   L945: if ($usedHooks.Count) { Log "dry-run hooks: $((@($usedHooks | ForEach-Object { "-$_ $($PSBoundParameters[$_])" })) -join ' ')" 'Yellow' }
+--- args refuse
+   L32: if ($args.Count) { Write-Host "refused: unknown argument(s) '$($args -join ' ')'. README.md lists the parameters." -ForegroundColor Red; exit 2 }
+--- README items
+   R12: 4. It starts no window after 06:45, and it ends by itself at **07:30**.
+   R21: - Before a window starts, it closes ChatGPT, the Copilot app, Roblox (the player and the Store app), Task Manager and Wallpaper Engine itself. It leaves Roblox Studio and
+   R23: - it is already morning (after 07:30 it would run for more than 14 hours): start it in the evening
+   R27: - a `perf-notes\WINDOW-STOP.txt` file exists: delete it
+   R35: 1. It checks the note against strict rules (see "For the agents"). If something is wrong, it writes the reason in its log, deletes the note and goes back to waiting. Noth
+   R44: 5. It closes the five programs again if they came back, checks everything once more, then runs the window. That is the agents' runner `bench\agent8\run\run-matrix.ps1`, w
+   R46: - It never starts a window that would end after 07:30, and it starts none after 06:45. At 07:30 it ends.
+   R47: - If a window is somehow still running at 07:45, it stops that window (it closes the runner and the game) and ends.
+   R55: | ChatGPT, the Copilot app, Roblox (player and Store app), Task Manager, Wallpaper Engine | closes them when a window is accepted and again right before it starts, only i
+   R63: - `perf-notes\WINDOW-STOP.txt`: if it appears, it is read and deleted, and the launcher ends.
+   R69: ## How to stop it
+   R71: - **Normal way:** create a file named `WINDOW-STOP.txt` in the `perf-notes` folder (any content, even empty).
+   R73: - During a window, it stops the window at once: it closes the runner and the game (that window's numbers are lost), puts everything back and ends. This takes a few second
+   R76: - A window that is running stops part-way (the launcher closes the runner and the game), and its numbers are lost. If the game stays open anyway, close it.
+   R84: - If you start the launcher again first, it moves that file to `status\screensaver-saved-unrestored-<date-time>.txt` and says so in yellow. The values to put back are the
+   R107: - **sha256:** checked against the file at GO time and again when the window starts.
+   R119: - its `env` has a key that is not one of these 11 (exact case; `build/agent8/w8w9/ENV-KEYS-F1.txt`, approved by Agent 1 at 21:14): `REX_TIMER_WAIT_BLOCKING`, `LEGO_GPU_WA
+   R121: - its `driver` is not a plain string `drivers/<name>.ps1` (letters, digits, `_`, `-`; forward slash) naming a file in `bench\agent8\run\drivers\` (pinned). No arguments: 
+   R125: - The GO was read at or after the latest window start, 06:45.
+   R144: - in `bench\agent8\run\`: `run-matrix.ps1`, `run-timing.ps1`, `common.ps1`, `timing-env.ps1`, `winhelper.cs`, every `*.py` / `*.cs`, and everything under `drivers\`;
+   R147: If any of them changes, appears or disappears, it refuses the next window. It checks at GO time and again just before the start. A change during a run marks the result SU
+   R151: **Last checks, right before the start.** First it closes the five programs again (they may have come back during the gate). In real mode it then opens the matrix json rea
+   R155: - the bin hashes, against the ones logged at the GO;
+   R156: - the deadline (estimate + 10 min by 07:30) and the latest start (06:45);
+   R174: - **Environment:** `RUN-NIGHT.cmd` clears `REX_TIMER_WAIT_BLOCKING` and `LEGO_GPU_WAIT_STATS`, and the launcher removes all 11 keys at its start (logged in yellow if one 
+   R176: - **While it runs**, the launcher checks every second for the STOP file and for the end time + 15 min (07:45). Either one kills the runner and every process it started (`
+   R177: - **After the run** it checks the pins, the matrix json and the bin hashes again. Any change adds `SUSPECT: ...` to the `END` line and to `last-result.txt`.
+   R189: - **Time limits:** the estimate + 10 min must still end by 07:30, no window starts at or after 06:45, and it gives up 120 min after the GO.
+   R200: - After `GAVE UP` or `DEADLINE`, the `GATE REFUSED` line in `status\log.txt` and `status\last-result.txt` adds the last reason it waited for: `(last wait: ...)`. Each gat
+   R208: - If its own HOLD has disappeared, it writes it again and logs that.
+   R211: - **At the end** of every accepted GO (window run, gate gave up, start refused, STOP) and when the launcher ends, it deletes the HOLD only if its token is still in it. Ot
+   R213: **STOP.** `perf-notes\WINDOW-STOP.txt`:
+   R217: - During a window, the launcher kills the runner and everything it started within about a second (see "While it runs"), and the `END` line says `stopped early: STOP file`
+   R238: **Exit codes:** 0 = normal end (07:30, STOP, `-MaxGo`), 2 = refused at start (also: an unknown argument, a test hook without `-DryRun`, a second launcher), 3 = launcher e
+   R242: - the start checks: desktop, LogonUI, the power line (`power AC (ACLineStatus n, BatteryFlag n, battery n %)`), the end time, the latest window start, and the time a wind
+   R243: - any leftover `REX_*` / `LEGO_*` variables;
+   R248: - Everything happens in `status-dryrun\[<tag>\]`: GO, HOLD, STOP and status files. It never touches the real `perf-notes` files.
+   R251: - The test hooks work only together with `-DryRun`: `-SampleSeconds`, `-GiveUpMinutes`, `-StrictMinutes`, `-StopAt 'HH:mm'|'yyyy-MM-dd HH:mm'`, `-StartBy` (latest window 
+   R253: - `-FakeRunner` runs the given script instead of the runner (`build\agent5\launch-test\fake-runner.ps1` prints ticks and can start a sleeping child), to test the run, STO
+   R259: - `go`: GO rules (hash, bins, env keys, drivers, malformed lines), start refusals (desktop, 14 h, unknown argument, hooks, a second launcher), the deadline and the latest
+   R260: - `gate`: the quiet gate, including a build running, STOP, the relaxed rule and the close list (dry run, with stand-in programs).
+   R261: - `run`: the fake runner: a normal end, STOP during a window, and the end time + grace kill (the whole process tree must be gone).
+--- RUN-NIGHT.cmd
+   @echo off
+   rem Overnight launcher (Agent 5). Double-click once on your own desktop, unlocked, on AC power, and leave the window open.
+   rem It waits for timing windows that the agents announce in perf-notes\WINDOW-GO.txt and ends at 07:30.
+   rem To stop it: create perf-notes\WINDOW-STOP.txt (any content). README.md next to this file explains everything.
+   setlocal
+   set "REX_TIMER_WAIT_BLOCKING="
+   set "LEGO_GPU_WAIT_STATS="
+   title Overnight launcher - leave open; to stop it create perf-notes\WINDOW-STOP.txt
+   "%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "%~dp0run-night.ps1"
+   set "RC=%ERRORLEVEL%"
+   echo.
+   if "%RC%"=="0" echo The launcher ended normally (07:30, STOP file).
+   if "%RC%"=="2" echo The launcher did not start: the reason is in red above. Nothing was changed.
+   if "%RC%"=="3" echo The launcher stopped on an error: see the red line above.
+   echo Status and logs: %~dp0status\
+   echo You can close this window.
+   pause
+   endlocal & exit /b %RC%
+static6: AllowedEnv=REX_TIMER_WAIT_BLOCKING,LEGO_GPU_WAIT_STATS,LEGO_GPU_WAIT_BACKOFF_US,LEGO_GPU_WAIT_SPIN_US,LEGO_NATIVE_FRAME_METRICS,LEGO_NATIVE_SHADER_MISS_CACHE,LEGO_NATIVE_THREADED,LEGO_NATIVE_PREPARE_THREADS,LEGO_NATIVE_SNAPSHOT_STATE,LEGO_NATIVE_FULL_DRAW_PREPARATION,LEGO_NATIVE_CHAIN_PRIORITY (11 keys)
+static6: DriverRule=v3-list AllowedDrivers=thread-cpu.ps1,pso-stats-at-end.ps1,io-counters.ps1
+static6: bench\agent8\run\matrix-base-vs-devoff1.json  sha=91AC59B0 arms=2 refused=1 sys_csv=
+static6: bench\agent8\run\matrix-codegen-check.json  sha=D64F2BE2 arms=4 refused=4 sys_csv=
+static6: bench\agent8\run\matrix-io-level.json  sha=AFAABD33 arms=2 refused=2 sys_csv=
+static6: bench\agent8\run\matrix-native-functional.json  sha=7E94C186 arms=7 refused=4 sys_csv=
+static6: bench\agent8\run\matrix-native-pso.json  sha=41F32CF8 arms=5 refused=5 sys_csv=
+static6: bench\agent8\run\matrix-native-tier1.json  sha=95200E0B arms=6 refused=5 sys_csv=
+static6: bench\agent8\run\matrix-native-tier2.json  sha=3B147D5C arms=7 refused=6 sys_csv=
+static6: bench\agent8\run\matrix-native-tier3.json  sha=50E82C8F arms=6 refused=6 sys_csv=
+static6: bench\agent8\run\matrix-native-uploads-45.json  sha=114A0242 arms=3 refused=2 sys_csv=True
+static6: bench\agent8\run\matrix-native-uploads.json  sha=15BB7822 arms=6 refused=5 sys_csv=
+static6: bench\agent8\run\matrix-window3.json  sha=DE293D96 arms=5 refused=1 sys_csv=
+static6: bench\agent8\run\matrix.example.json  sha=26809577 arms=2 refused=2 sys_csv=
+static6: bench\agent8\run\matrix.json  sha=F68A58EC arms=8 refused=1 sys_csv=
+static6: build\agent4\repin\matrix-repin-native4b-boot.json  sha=37DFC58F arms=1 refused=1 sys_csv=
+static6: build\agent4\repin\matrix-repin-native4b.json  sha=2580067D arms=4 refused=3 sys_csv=
+static6: build\agent4\repin\matrix-repin-packhit.json  sha=490964AC arms=2 refused=2 sys_csv=
+static6: build\agent4\repin\superseded\matrix-repin-native5.json  sha=91C951EE arms=4 refused=3 sys_csv=
+static6: build\agent5\w6-draft\matrix-w6.json  sha=8440B1E4 arms=6 refused=6 sys_csv=True
+static6: files=26 fully-accepted=8  end 21:48:20
+end 21:48:21

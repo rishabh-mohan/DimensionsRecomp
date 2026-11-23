@@ -1,0 +1,96 @@
+scan_baseline: baseline\DimensionsRecomp\rexlego\generated\default (440 .cpp files)
+elided builders: fabs fnabs fneg fmr fcfid fctidz fctiwz lfd lfdx lfdu lfdux stfd stfdx stfdux stfiwx stfdu vrfin vrfiz vctsxs vcfsx vcfux vctuxs vpkd3d128 (23)
+
+
+scan: 440 files, 450.9 MB, 17192654 lines, 165023 functions, 404446 labels, 6983219 instructions, 579193 gotos, 621314 call resets
+site instructions: 716428 at the 75 builders, 113605 of them at the 23 elided builders
+actual switch lines: 136802 (conditional 135053, unconditional 1749; enable 2050, disable 134752)
+  at elided builders: 38850; not after a site instruction: 0; second switch at one instruction: 0
+replay off:     136802 switch lines: conditional   135053 (after entry 6325, label 64591, call 64137), unconditional     1749
+validation: 0 instructions where the replay differs from the actual switch line
+replay on:      106248 switch lines: conditional   104573 (after entry 5067, label 50057, call 49449), unconditional     1675
+dataflow off:    99793 switch lines: conditional    97916 (after entry 6325, label 27454, call 64137), unconditional     1877
+dataflow on:     76587 switch lines: conditional    74797 (after entry 5067, label 20281, call 49449), unconditional     1790
+labels with a known state under dataflow: off 59710, on 55009, of 404446 (solver passes: total 461897, max 4)
+
+flush_mode_elision removes 30554 of 136802 switch lines (22.3%); a dataflow pass on top would leave 76587 (flag on) / 99793 (flag off)
+
+| builder | file | elided | instructions | mnemonics | actual switch lines | replay off | replay on | dataflow off | dataflow on | replay mismatches |
+|---|---|---|---|---|---|---|---|---|---|---|
+| fabs | floating_point.cpp | yes | 91 | fabs 91 | 41 | 41 | 0 | 3 | 0 | 0 |
+| fnabs | floating_point.cpp | yes | 0 | - | 0 | 0 | 0 | 0 | 0 | 0 |
+| fneg | floating_point.cpp | yes | 6876 | fneg 6876 | 998 | 998 | 0 | 645 | 0 | 0 |
+| fmr | floating_point.cpp | yes | 48688 | fmr 48688 | 17761 | 17761 | 0 | 12376 | 0 | 0 |
+| fcfid | floating_point.cpp | yes | 6892 | fcfid 6892 | 32 | 32 | 0 | 3 | 0 | 0 |
+| fctid | floating_point.cpp | no | 15 | fctid 15 | 1 | 1 | 1 | 0 | 1 | 0 |
+| fctidz | floating_point.cpp | yes | 1750 | fctidz 1750 | 437 | 437 | 0 | 66 | 0 | 0 |
+| fctiw | floating_point.cpp | no | 0 | - | 0 | 0 | 0 | 0 | 0 | 0 |
+| fctiwz | floating_point.cpp | yes | 4709 | fctiwz 4709 | 270 | 270 | 0 | 160 | 0 | 0 |
+| frsp | floating_point.cpp | no | 7408 | frsp 7408 | 331 | 331 | 2330 | 322 | 1591 | 0 |
+| fcmpu | floating_point.cpp | no | 37020 | fcmpu 37020 | 4361 | 4361 | 4748 | 1561 | 1847 | 0 |
+| fadd | floating_point.cpp | no | 314 | fadd 314 | 43 | 43 | 67 | 2 | 13 | 0 |
+| fadds | floating_point.cpp | no | 23297 | fadds 23297 | 1444 | 1444 | 1479 | 650 | 680 | 0 |
+| fsub | floating_point.cpp | no | 161 | fsub 161 | 25 | 25 | 56 | 23 | 47 | 0 |
+| fsubs | floating_point.cpp | no | 28431 | fsubs 28431 | 1825 | 1825 | 1892 | 713 | 768 | 0 |
+| fmul | floating_point.cpp | no | 773 | fmul 773 | 56 | 56 | 120 | 35 | 81 | 0 |
+| fmuls | floating_point.cpp | no | 61144 | fmuls 61144 | 5586 | 5586 | 5726 | 1965 | 2102 | 0 |
+| fdiv | floating_point.cpp | no | 136 | fdiv 136 | 27 | 27 | 55 | 13 | 37 | 0 |
+| fdivs | floating_point.cpp | no | 7038 | fdivs 7038 | 1109 | 1109 | 1120 | 236 | 242 | 0 |
+| fmadd | floating_point.cpp | no | 424 | fmadd 424 | 24 | 24 | 41 | 24 | 31 | 0 |
+| fmadds | floating_point.cpp | no | 20019 | fmadds 20019 | 228 | 228 | 232 | 107 | 112 | 0 |
+| fmsub | floating_point.cpp | no | 71 | fmsub 71 | 4 | 4 | 16 | 4 | 6 | 0 |
+| fmsubs | floating_point.cpp | no | 3102 | fmsubs 3102 | 53 | 53 | 53 | 48 | 48 | 0 |
+| fnmadd | floating_point.cpp | no | 0 | - | 0 | 0 | 0 | 0 | 0 | 0 |
+| fnmadds | floating_point.cpp | no | 93 | fnmadds 93 | 0 | 0 | 0 | 0 | 0 | 0 |
+| fnmsub | floating_point.cpp | no | 17 | fnmsub 17 | 1 | 1 | 3 | 1 | 2 | 0 |
+| fnmsubs | floating_point.cpp | no | 1769 | fnmsubs 1769 | 97 | 97 | 99 | 45 | 46 | 0 |
+| fres | floating_point.cpp | no | 0 | - | 0 | 0 | 0 | 0 | 0 | 0 |
+| frsqrte | floating_point.cpp | no | 0 | - | 0 | 0 | 0 | 0 | 0 | 0 |
+| fsqrt | floating_point.cpp | no | 7 | fsqrt 7 | 1 | 1 | 3 | 0 | 2 | 0 |
+| fsqrts | floating_point.cpp | no | 3856 | fsqrts 3856 | 1366 | 1366 | 1374 | 3 | 5 | 0 |
+| fsel | floating_point.cpp | no | 4935 | fsel 4935 | 143 | 143 | 376 | 126 | 320 | 0 |
+| lfd | memory.cpp | yes | 23656 | lfd 23656 | 11092 | 11092 | 0 | 9485 | 0 | 0 |
+| lfdx | memory.cpp | yes | 32 | lfdx 32 | 9 | 9 | 0 | 4 | 0 | 0 |
+| lfs | memory.cpp | no | 223980 | lfs 223980 | 65827 | 65827 | 70623 | 52458 | 57618 | 0 |
+| lfsx | memory.cpp | no | 2460 | lfsx 2460 | 727 | 727 | 753 | 345 | 387 | 0 |
+| lfdu | memory.cpp | yes | 2 | lfdu 2 | 2 | 2 | 0 | 2 | 0 | 0 |
+| lfdux | memory.cpp | yes | 0 | - | 0 | 0 | 0 | 0 | 0 | 0 |
+| lfsu | memory.cpp | no | 379 | lfsu 379 | 80 | 80 | 80 | 18 | 19 | 0 |
+| lfsux | memory.cpp | no | 126 | lfsux 126 | 16 | 16 | 16 | 4 | 4 | 0 |
+| stfd | memory.cpp | yes | 19964 | stfd 19964 | 8168 | 8168 | 0 | 8140 | 0 | 0 |
+| stfdx | memory.cpp | yes | 8 | stfdx 8 | 0 | 0 | 0 | 0 | 0 | 0 |
+| stfdux | memory.cpp | yes | 0 | - | 0 | 0 | 0 | 0 | 0 | 0 |
+| stfiwx | memory.cpp | yes | 256 | stfiwx 256 | 0 | 0 | 0 | 0 | 0 | 0 |
+| stfs | memory.cpp | no | 162235 | stfs 162235 | 12225 | 12225 | 12609 | 8221 | 8599 | 0 |
+| stfsx | memory.cpp | no | 1522 | stfsx 1522 | 273 | 273 | 281 | 109 | 125 | 0 |
+| stfdu | memory.cpp | yes | 7 | stfdu 7 | 0 | 0 | 0 | 0 | 0 | 0 |
+| stfsu | memory.cpp | no | 599 | stfsu 599 | 68 | 68 | 68 | 29 | 29 | 0 |
+| stfsux | memory.cpp | no | 29 | stfsux 29 | 1 | 1 | 1 | 1 | 1 | 0 |
+| vaddfp | vector.cpp | no | 948 | vaddfp 12, vaddfp128 936 | 294 | 294 | 292 | 267 | 266 | 0 |
+| vsubfp | vector.cpp | no | 959 | vsubfp 20, vsubfp128 939 | 298 | 298 | 307 | 263 | 272 | 0 |
+| vmulfp128 | vector.cpp | no | 2696 | vmulfp128 2696 | 481 | 481 | 491 | 441 | 451 | 0 |
+| vmaddfp | vector.cpp | no | 2663 | vmaddfp 2329, vmaddfp128 136, vmaddcfp128 198 | 247 | 247 | 248 | 230 | 230 | 0 |
+| vnmsubfp | vector.cpp | no | 799 | vnmsubfp 711, vnmsubfp128 88 | 13 | 13 | 12 | 12 | 11 | 0 |
+| vmaxfp | vector.cpp | no | 207 | vmaxfp 1, vmaxfp128 206 | 25 | 25 | 25 | 22 | 22 | 0 |
+| vminfp | vector.cpp | no | 271 | vminfp 22, vminfp128 249 | 62 | 62 | 62 | 59 | 59 | 0 |
+| vrefp | vector.cpp | no | 180 | vrefp 131, vrefp128 49 | 49 | 49 | 49 | 36 | 36 | 0 |
+| vrsqrtefp | vector.cpp | no | 409 | vrsqrtefp 5, vrsqrtefp128 404 | 40 | 40 | 40 | 37 | 37 | 0 |
+| vexptefp | vector.cpp | no | 2 | vexptefp128 2 | 0 | 0 | 0 | 0 | 0 | 0 |
+| vlogefp | vector.cpp | no | 1 | vlogefp128 1 | 1 | 1 | 1 | 1 | 1 | 0 |
+| vmsum3fp128 | vector.cpp | no | 544 | vmsum3fp128 544 | 179 | 179 | 179 | 158 | 158 | 0 |
+| vmsum4fp128 | vector.cpp | no | 275 | vmsum4fp128 275 | 128 | 128 | 128 | 125 | 125 | 0 |
+| vrfim | vector.cpp | no | 21 | vrfim 2, vrfim128 19 | 1 | 1 | 1 | 1 | 1 | 0 |
+| vrfin | vector.cpp | yes | 3 | vrfin128 3 | 0 | 0 | 0 | 0 | 0 | 0 |
+| vrfip | vector.cpp | no | 0 | - | 0 | 0 | 0 | 0 | 0 | 0 |
+| vrfiz | vector.cpp | yes | 4 | vrfiz128 4 | 0 | 0 | 0 | 0 | 0 | 0 |
+| vcmpbfp | vector.cpp | no | 0 | - | 0 | 0 | 0 | 0 | 0 | 0 |
+| vcmpeqfp | vector.cpp | no | 967 | vcmpeqfp 419, vcmpeqfp128 548 | 46 | 46 | 46 | 43 | 43 | 0 |
+| vcmpgefp | vector.cpp | no | 153 | vcmpgefp 1, vcmpgefp128 152 | 36 | 36 | 35 | 32 | 31 | 0 |
+| vcmpgtfp | vector.cpp | no | 368 | vcmpgtfp 1, vcmpgtfp128 367 | 110 | 110 | 110 | 81 | 81 | 0 |
+| vctsxs | vector.cpp | yes | 164 | vctsxs 38, vcfpsxws128 126 | 0 | 0 | 0 | 0 | 0 | 0 |
+| vcfsx | vector.cpp | yes | 355 | vcfsx 74, vcsxwfp128 281 | 30 | 30 | 0 | 28 | 0 | 0 |
+| vcfux | vector.cpp | yes | 26 | vcuxwfp128 26 | 8 | 8 | 0 | 8 | 0 | 0 |
+| vctuxs | vector.cpp | yes | 119 | vcfpuxws128 119 | 0 | 0 | 0 | 0 | 0 | 0 |
+| vpkd3d128 | vector.cpp | yes | 3 | vpkd3d128 3 | 2 | 2 | 0 | 2 | 0 | 0 |
+
+SCAN: validation PASS (replay mismatches 0, unattributed switch lines 0) | removed 30554 of 136802 switch lines | elided-builder instructions 113605

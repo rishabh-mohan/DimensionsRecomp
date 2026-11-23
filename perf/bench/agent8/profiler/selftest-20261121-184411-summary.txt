@@ -1,0 +1,42 @@
+profile : <workspace>\build\agent8\profiler\profile-695311421.bin
+map     : <workspace>\build\agent8\profiler\profiler_selftest.map
+samples : 53  threads: 6  modules: 14  duration: 3.475 s (trailer)  rounds: 9
+counting: busy samples (16)
+warning: profile-695311421.bin: low sampling rate (3 rounds/s, nominal ~1000): the machine was probably CPU-saturated (each SuspendThread/GetThreadContext waits until the target thread is scheduled); attribution is still usable but noisy
+
+busy 16 (30.2%)  waiting 37 (69.8%)  io 0 (0.0%)
+busy samples by category (leaf): guest 8 (50.0%)  rexlego 7 (43.8%)  system 1 (6.2%)
+
+== threads ==
+  tid  name              samples   run%  busy  wait  io  top busy functions / role
+-----  ----------------  -------  -----  ----  ----  --  --------------------------------------------------------------
+98172  selftest-main           9   88.9     8     1   0  lsp_selftest_hot 88%; ntdll.dll!RtlQueryPerformanceCounter 12%
+10412                          9    0.0     0     9   0  (waiting)
+33504                          9    0.0     0     9   0  (waiting)
+60324  selftest-waiter         9    0.0     0     9   0  (waiting) selftest::Waiter
+97288  selftest-sleeper        9    0.0     0     9   0  (waiting) selftest::Sleeper
+31892  selftest-guest          8  100.0     8     0   0  sub_8200BEEF [guest 0x8200BEEF] 100%
+
+== top 3 by self (busy samples) ==
+samples      %   /s  category  function
+-------  -----  ---  --------  ------------------------------------
+      8  50.00  2.3  guest     sub_8200BEEF [guest 0x8200BEEF]
+      7  43.75  2.0  rexlego   lsp_selftest_hot
+      1   6.25  0.3  system    ntdll.dll!RtlQueryPerformanceCounter
+
+== top 11 by inclusive (busy samples) ==
+samples       %   /s  category  function
+-------  ------  ---  --------  -----------------------------------------------------------------------------------
+     16  100.00  4.6  system    KERNEL32.DLL!BaseThreadInitThunk
+     16  100.00  4.6  system    ntdll.dll!RtlUserThreadStart
+      8   50.00  2.3  rexlego   lsp_selftest_outer
+      8   50.00  2.3  rexlego   main
+      8   50.00  2.3  rexlego   __scrt_common_main_seh
+      8   50.00  2.3  guest     sub_8200BEEF [guest 0x8200BEEF]
+      8   50.00  2.3  rexlego   selftest::GuestLoop
+      8   50.00  2.3  rexlego   std::thread::_Invoke<class std::tuple<class `extern "C" main'::`1'::<lambda_0>>, 0>
+      8   50.00  2.3  rexlego   thread_start<unsigned int (__cdecl *)(void *), 1>
+      7   43.75  2.0  rexlego   lsp_selftest_hot
+      1    6.25  0.3  system    ntdll.dll!RtlQueryPerformanceCounter
+
+(read 0.001 s, map 0.078 s, symbolize 0.219 s; 17 unique stacks, 37 addresses, 24 functions)

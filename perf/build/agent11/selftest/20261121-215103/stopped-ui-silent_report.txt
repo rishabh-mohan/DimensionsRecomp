@@ -1,0 +1,26 @@
+Test G driver report (bench/agent11/testg_driver.ps1), watch mode
+started 2026-11-21 21:51:17, ran 10.5 s; game pid 97848; log <workspace>\build\agent11\selftest\20261121-215103\stopped-ui-silent.log
+window at start: 0x47411C8 class=WindowsForms10.Window.8.app.0.1d4053a_r8_ad1 title='testg-standin-hung' 300x300, not foreground
+desktop at start: foreground window 0x0; input desktop 'Default'
+guest at start: running (4 pause line(s) already in the log)
+parameters: Cycles=5 PeriodMs=300 HoldMs=1000 GapMs=1000 SuspendTimeoutMs=5000 ResumeTimeoutMs=1000 UiHangMs=8000 FromStart=True
+
+cycle verdict       susp_ms res_ms paused_ms threads(s/r) tid(s/r)        note
+    1 ok                                 300        17/17 4242/4242       
+    2 ok                                 300        17/17 4242/4242       
+
+cycles: 2 (ok=2); stray 'Guest resumed' lines: 0
+paused time per cycle (log timestamps): median 300 ms, max 300 ms; post-mode resume latency: median - ms, max - ms
+UI thread: 8 WM_NULL pings, 8 unanswered, slowest answer 0 ms, longest silence 8010 ms
+error/critical log lines during the test: 0
+threads: <workspace>\build\agent11\selftest\20261121-215103\hang-215125-threads.txt : 26 threads, 0 suspended ()
+minidump: <workspace>\build\agent11\selftest\20261121-215103\hang-215125.dmp : written, 745253 bytes
+VERDICT: FAIL - UI thread did not answer WM_NULL for 8000 ms after 2 cycles (guest running: no 'Guest suspended' since the last 'Guest resumed' 8.0 s ago, so the next pause never got as far as its log line)
+
+last log lines:
+  [2026-11-21 21:50:47.666] [info] [rex] [t4242] Booting
+  [2026-11-21 21:50:47.666] [error] [rex] [t4242] some error
+  [2026-11-21 21:50:47.966] [info] [rex] [t4242] Guest suspended (17 threads)
+  [2026-11-21 21:50:48.266] [info] [rex] [t4242] Guest resumed (17 threads)
+  [2026-11-21 21:50:48.566] [info] [rex] [t4242] Guest suspended (17 threads)
+  [2026-11-21 21:50:48.866] [info] [rex] [t4242] Guest resumed (17 threads)

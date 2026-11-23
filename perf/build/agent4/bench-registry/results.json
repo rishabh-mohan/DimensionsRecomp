@@ -1,0 +1,58 @@
+{
+ "tree": "<workspace>\\DimensionsRecomp",
+ "runs": 5,
+ "cpu_load_before": "100",
+ "benches": {
+  "registry_lookup": {
+   "1T Lookup hit (weak_ptr::lock + release)": {
+    "median": 90.9906,
+    "min": 70.1131,
+    "max": 254.3238,
+    "runs": [
+     254.3238,
+     160.8698,
+     90.9906,
+     76.4929,
+     70.1131
+    ]
+   },
+   "1T LookupBorrowed hit (raw pointer)": {
+    "median": 17.2428,
+    "min": 14.8493,
+    "max": 62.2206,
+    "runs": [
+     62.2206,
+     39.1034,
+     17.2428,
+     15.8008,
+     14.8493
+    ]
+   },
+   "2T Lookup hit, same entries": {
+    "median": 206.8806,
+    "min": 137.711,
+    "max": 218.561,
+    "runs": [
+     218.561,
+     213.756,
+     206.8806,
+     158.1006,
+     137.711
+    ]
+   },
+   "2T LookupBorrowed hit, same entries": {
+    "median": 26.4822,
+    "min": 20.0502,
+    "max": 31.2824,
+    "runs": [
+     26.4822,
+     21.7718,
+     31.2824,
+     20.0502,
+     30.3182
+    ]
+   }
+  }
+ },
+ "cpu_load_after": "100"
+}

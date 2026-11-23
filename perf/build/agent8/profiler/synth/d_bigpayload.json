@@ -1,0 +1,620 @@
+{
+ "tool": "analyze_profile.py",
+ "schema": 1,
+ "mode": "summary",
+ "profile": "<workspace>\\build\\agent8\\profiler\\synth\\d_bigpayload.bin",
+ "map": "<workspace>\\build\\agent8\\profiler\\synth\\synthgame.map",
+ "samples": 2170,
+ "modules": 3,
+ "threads_seen": 5,
+ "trailer": {
+  "version": 1,
+  "payload_bytes": 150,
+  "qpc_frequency": 10000000,
+  "qpc_start": 5000000000,
+  "qpc_end": 5020000000,
+  "rounds": 1000,
+  "timer_mode": 1,
+  "thread_count": 5,
+  "extra_payload_bytes": 24,
+  "thread_names": {
+   "100": "synth-main",
+   "200": "synth-render",
+   "300": "synth-waiter",
+   "400": "synth-driver",
+   "500": ""
+  }
+ },
+ "duration": {
+  "rounds": 1000,
+  "rounds_estimated": 1000,
+  "seconds": 2.0,
+  "source": "trailer",
+  "rounds_per_s": 500.0
+ },
+ "rate_unit": "/s",
+ "timer_observer_effect": false,
+ "counting": "busy samples",
+ "counted_samples": 1170,
+ "thread_filter": null,
+ "fold_guest": false,
+ "totals": {
+  "busy": 1170,
+  "waiting": 1000,
+  "io": 0
+ },
+ "categories_busy": {
+  "guest": 625,
+  "rexruntime": 0,
+  "native-gpu": 300,
+  "rexlego": 45,
+  "d3d12+driver": 100,
+  "system": 0,
+  "other": 0,
+  "unknown": 100
+ },
+ "threads": [
+  {
+   "tid": 300,
+   "name": "synth-waiter",
+   "samples": 1000,
+   "busy": 0,
+   "waiting": 1000,
+   "io": 0,
+   "pct_running": 0.0,
+   "top_self": [],
+   "top_inclusive": [],
+   "role": "synth::Pump"
+  },
+  {
+   "tid": 100,
+   "name": "synth-main",
+   "samples": 650,
+   "busy": 650,
+   "waiting": 0,
+   "io": 0,
+   "pct_running": 100.0,
+   "top_self": [
+    {
+     "name": "sub_82000280 [guest 0x82000280]",
+     "category": "guest",
+     "module": "synthgame.exe",
+     "guest_addr": "0x82000280",
+     "kind": null,
+     "samples": 400,
+     "pct": 61.54
+    },
+    {
+     "name": "sub_820002C0 [guest 0x820002C0]",
+     "category": "guest",
+     "module": "synthgame.exe",
+     "guest_addr": "0x820002C0",
+     "kind": null,
+     "samples": 200,
+     "pct": 30.77
+    },
+    {
+     "name": "sub_8201C740 [hook of guest 0x8201C740]",
+     "category": "rexlego",
+     "module": "synthgame.exe",
+     "guest_addr": "0x8201C740",
+     "kind": "hook",
+     "samples": 25,
+     "pct": 3.85
+    },
+    {
+     "name": "__imp__sub_8201C740 [guest 0x8201C740, hooked original]",
+     "category": "guest",
+     "module": "synthgame.exe",
+     "guest_addr": "0x8201C740",
+     "kind": "hooked original",
+     "samples": 25,
+     "pct": 3.85
+    }
+   ],
+   "top_inclusive": [
+    {
+     "name": "synth::RunGuest",
+     "category": "rexlego",
+     "module": "synthgame.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 650,
+     "pct": 100.0
+    },
+    {
+     "name": "mainCRTStartup",
+     "category": "rexlego",
+     "module": "synthgame.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 650,
+     "pct": 100.0
+    },
+    {
+     "name": "sub_82000300 [guest 0x82000300]",
+     "category": "guest",
+     "module": "synthgame.exe",
+     "guest_addr": "0x82000300",
+     "kind": null,
+     "samples": 600,
+     "pct": 92.31
+    },
+    {
+     "name": "synth::Dispatch",
+     "category": "rexlego",
+     "module": "synthgame.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 600,
+     "pct": 92.31
+    },
+    {
+     "name": "sub_82000280 [guest 0x82000280]",
+     "category": "guest",
+     "module": "synthgame.exe",
+     "guest_addr": "0x82000280",
+     "kind": null,
+     "samples": 400,
+     "pct": 61.54
+    },
+    {
+     "name": "sub_820002C0 [guest 0x820002C0]",
+     "category": "guest",
+     "module": "synthgame.exe",
+     "guest_addr": "0x820002C0",
+     "kind": null,
+     "samples": 200,
+     "pct": 30.77
+    },
+    {
+     "name": "sub_8201C740 [hook of guest 0x8201C740]",
+     "category": "rexlego",
+     "module": "synthgame.exe",
+     "guest_addr": "0x8201C740",
+     "kind": "hook",
+     "samples": 50,
+     "pct": 7.69
+    },
+    {
+     "name": "__imp__sub_8201C740 [guest 0x8201C740, hooked original]",
+     "category": "guest",
+     "module": "synthgame.exe",
+     "guest_addr": "0x8201C740",
+     "kind": "hooked original",
+     "samples": 25,
+     "pct": 3.85
+    }
+   ],
+   "role": "sub_82000280 [guest 0x82000280]"
+  },
+  {
+   "tid": 200,
+   "name": "synth-render",
+   "samples": 300,
+   "busy": 300,
+   "waiting": 0,
+   "io": 0,
+   "pct_running": 100.0,
+   "top_self": [
+    {
+     "name": "legodimensions::gpu_native::Renderer::Draw",
+     "category": "native-gpu",
+     "module": "synthgame.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 300,
+     "pct": 100.0
+    }
+   ],
+   "top_inclusive": [
+    {
+     "name": "legodimensions::gpu_native::Renderer::Draw",
+     "category": "native-gpu",
+     "module": "synthgame.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 300,
+     "pct": 100.0
+    },
+    {
+     "name": "synth::Pump",
+     "category": "rexlego",
+     "module": "synthgame.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 300,
+     "pct": 100.0
+    },
+    {
+     "name": "mainCRTStartup",
+     "category": "rexlego",
+     "module": "synthgame.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 300,
+     "pct": 100.0
+    }
+   ],
+   "role": "legodimensions::gpu_native::Renderer::Draw"
+  },
+  {
+   "tid": 500,
+   "name": "",
+   "samples": 120,
+   "busy": 120,
+   "waiting": 0,
+   "io": 0,
+   "pct_running": 100.0,
+   "top_self": [
+    {
+     "name": "synthgame.exe!?",
+     "category": "unknown",
+     "module": "synthgame.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 50,
+     "pct": 41.67
+    },
+    {
+     "name": "[unknown]",
+     "category": "unknown",
+     "module": "?",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 50,
+     "pct": 41.67
+    },
+    {
+     "name": "synth::Same0 {+2 aliases}",
+     "category": "rexlego",
+     "module": "synthgame.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 20,
+     "pct": 16.67
+    }
+   ],
+   "top_inclusive": [
+    {
+     "name": "synth::Pump",
+     "category": "rexlego",
+     "module": "synthgame.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 120,
+     "pct": 100.0
+    },
+    {
+     "name": "synthgame.exe!?",
+     "category": "unknown",
+     "module": "synthgame.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 50,
+     "pct": 41.67
+    },
+    {
+     "name": "[unknown]",
+     "category": "unknown",
+     "module": "?",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 50,
+     "pct": 41.67
+    },
+    {
+     "name": "synth::Same0 {+2 aliases}",
+     "category": "rexlego",
+     "module": "synthgame.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 20,
+     "pct": 16.67
+    }
+   ],
+   "role": "synth::Pump"
+  },
+  {
+   "tid": 400,
+   "name": "synth-driver",
+   "samples": 100,
+   "busy": 100,
+   "waiting": 0,
+   "io": 0,
+   "pct_running": 100.0,
+   "top_self": [
+    {
+     "name": "nvsynthumd64.dll!?",
+     "category": "d3d12+driver",
+     "module": "nvsynthumd64.dll",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 100,
+     "pct": 100.0
+    }
+   ],
+   "top_inclusive": [
+    {
+     "name": "legodimensions::gpu_native::Renderer::Draw",
+     "category": "native-gpu",
+     "module": "synthgame.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 100,
+     "pct": 100.0
+    },
+    {
+     "name": "synth::Pump",
+     "category": "rexlego",
+     "module": "synthgame.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 100,
+     "pct": 100.0
+    },
+    {
+     "name": "nvsynthumd64.dll!?",
+     "category": "d3d12+driver",
+     "module": "nvsynthumd64.dll",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 100,
+     "pct": 100.0
+    }
+   ],
+   "role": "legodimensions::gpu_native::Renderer::Draw"
+  }
+ ],
+ "top_self": [
+  {
+   "name": "sub_82000280 [guest 0x82000280]",
+   "category": "guest",
+   "module": "synthgame.exe",
+   "guest_addr": "0x82000280",
+   "kind": null,
+   "samples": 400,
+   "pct": 34.19,
+   "rate": 200.0
+  },
+  {
+   "name": "legodimensions::gpu_native::Renderer::Draw",
+   "category": "native-gpu",
+   "module": "synthgame.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 300,
+   "pct": 25.64,
+   "rate": 150.0
+  },
+  {
+   "name": "sub_820002C0 [guest 0x820002C0]",
+   "category": "guest",
+   "module": "synthgame.exe",
+   "guest_addr": "0x820002C0",
+   "kind": null,
+   "samples": 200,
+   "pct": 17.09,
+   "rate": 100.0
+  },
+  {
+   "name": "nvsynthumd64.dll!?",
+   "category": "d3d12+driver",
+   "module": "nvsynthumd64.dll",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 100,
+   "pct": 8.55,
+   "rate": 50.0
+  },
+  {
+   "name": "synthgame.exe!?",
+   "category": "unknown",
+   "module": "synthgame.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 50,
+   "pct": 4.27,
+   "rate": 25.0
+  },
+  {
+   "name": "[unknown]",
+   "category": "unknown",
+   "module": "?",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 50,
+   "pct": 4.27,
+   "rate": 25.0
+  },
+  {
+   "name": "sub_8201C740 [hook of guest 0x8201C740]",
+   "category": "rexlego",
+   "module": "synthgame.exe",
+   "guest_addr": "0x8201C740",
+   "kind": "hook",
+   "samples": 25,
+   "pct": 2.14,
+   "rate": 12.5
+  },
+  {
+   "name": "__imp__sub_8201C740 [guest 0x8201C740, hooked original]",
+   "category": "guest",
+   "module": "synthgame.exe",
+   "guest_addr": "0x8201C740",
+   "kind": "hooked original",
+   "samples": 25,
+   "pct": 2.14,
+   "rate": 12.5
+  },
+  {
+   "name": "synth::Same0 {+2 aliases}",
+   "category": "rexlego",
+   "module": "synthgame.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 20,
+   "pct": 1.71,
+   "rate": 10.0
+  }
+ ],
+ "top_inclusive": [
+  {
+   "name": "mainCRTStartup",
+   "category": "rexlego",
+   "module": "synthgame.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 950,
+   "pct": 81.2,
+   "rate": 475.0
+  },
+  {
+   "name": "synth::RunGuest",
+   "category": "rexlego",
+   "module": "synthgame.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 650,
+   "pct": 55.56,
+   "rate": 325.0
+  },
+  {
+   "name": "sub_82000300 [guest 0x82000300]",
+   "category": "guest",
+   "module": "synthgame.exe",
+   "guest_addr": "0x82000300",
+   "kind": null,
+   "samples": 600,
+   "pct": 51.28,
+   "rate": 300.0
+  },
+  {
+   "name": "synth::Dispatch",
+   "category": "rexlego",
+   "module": "synthgame.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 600,
+   "pct": 51.28,
+   "rate": 300.0
+  },
+  {
+   "name": "synth::Pump",
+   "category": "rexlego",
+   "module": "synthgame.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 520,
+   "pct": 44.44,
+   "rate": 260.0
+  },
+  {
+   "name": "sub_82000280 [guest 0x82000280]",
+   "category": "guest",
+   "module": "synthgame.exe",
+   "guest_addr": "0x82000280",
+   "kind": null,
+   "samples": 400,
+   "pct": 34.19,
+   "rate": 200.0
+  },
+  {
+   "name": "legodimensions::gpu_native::Renderer::Draw",
+   "category": "native-gpu",
+   "module": "synthgame.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 400,
+   "pct": 34.19,
+   "rate": 200.0
+  },
+  {
+   "name": "sub_820002C0 [guest 0x820002C0]",
+   "category": "guest",
+   "module": "synthgame.exe",
+   "guest_addr": "0x820002C0",
+   "kind": null,
+   "samples": 200,
+   "pct": 17.09,
+   "rate": 100.0
+  },
+  {
+   "name": "nvsynthumd64.dll!?",
+   "category": "d3d12+driver",
+   "module": "nvsynthumd64.dll",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 100,
+   "pct": 8.55,
+   "rate": 50.0
+  },
+  {
+   "name": "sub_8201C740 [hook of guest 0x8201C740]",
+   "category": "rexlego",
+   "module": "synthgame.exe",
+   "guest_addr": "0x8201C740",
+   "kind": "hook",
+   "samples": 50,
+   "pct": 4.27,
+   "rate": 25.0
+  },
+  {
+   "name": "synthgame.exe!?",
+   "category": "unknown",
+   "module": "synthgame.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 50,
+   "pct": 4.27,
+   "rate": 25.0
+  },
+  {
+   "name": "[unknown]",
+   "category": "unknown",
+   "module": "?",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 50,
+   "pct": 4.27,
+   "rate": 25.0
+  },
+  {
+   "name": "__imp__sub_8201C740 [guest 0x8201C740, hooked original]",
+   "category": "guest",
+   "module": "synthgame.exe",
+   "guest_addr": "0x8201C740",
+   "kind": "hooked original",
+   "samples": 25,
+   "pct": 2.14,
+   "rate": 12.5
+  },
+  {
+   "name": "synth::Same0 {+2 aliases}",
+   "category": "rexlego",
+   "module": "synthgame.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 20,
+   "pct": 1.71,
+   "rate": 10.0
+  }
+ ],
+ "timing": {
+  "read_s": 0.018,
+  "map_s": 1.838,
+  "symbolize_s": 0.17,
+  "unique_stacks": 2135,
+  "unique_addresses": 2131,
+  "functions": 16
+ },
+ "map_info": {
+  "<workspace>\\build\\agent8\\profiler\\synth\\synthgame.map": {
+   "symbols": 80046,
+   "lines": 140247,
+   "image": "synthgame",
+   "parse_s": 1.776
+  }
+ },
+ "warnings": []
+}

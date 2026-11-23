@@ -1,0 +1,108 @@
+# syntax_check_s4c (#24 S4c package: staged gpu_wait_backoff.cpp vs S4a devoff4 flags, snap1-off)  2026-11-22 15:52:19
+compile_commands: build\agent2\snap1-off\compile_commands.json (477 entries, sha 6C0E6792144F55C1), entry dir build/agent2/snap1-off
+command (control; '-o <obj> -c <src>' replaced): toolchain\llvm-23.1.6\bin\clang++.exe -DNOMINMAX -DREXGLUE_BUILD_CONFIG=\"Release\" -DREXGLUE_ENABLE_PERF_COUNTERS -DREX_HAS_D3D12=1 -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DWIN32_LEAN_AND_MEAN -Ibuild/agent2/snap1/DimensionsRecomp/rexlego -Ibuild/agent2/snap1/DimensionsRecomp/rexlego/src -Ibuild/agent2/snap1/DimensionsRecomp/rexlego/generated/default -isystem build/agent2/snap1-sdk/install/include -isystem build/agent2/snap1-sdk/install/include/dxc -O3 -DNDEBUG -std=gnu++23 -D_DLL -D_MT -Xclang --dependent-lib=msvcrt -msse4.1 -march=x86-64-v3 [-D...] -fsyntax-only <src>
+clang: clang version 23.1.6 (https://github.com/llvm/llvm-project 5b10d2d74929eae78912771222c9855af97496f4)
+control  build\agent2\snap1\DimensionsRecomp\rexlego\src\native_lock_elide.cpp  sha 17AC1094DB1063D9  live 17AC1094DB1063D9 (same)
+pch      build\agent2\snap1\DimensionsRecomp\rexlego\generated\default\legodimensions_pch.h  sha 61BFA4CCB81A9D46
+staged   build\agent9\s4\fence-wait\s4c\new\rexlego\src\gpu_wait_backoff.cpp  sha 01D9F8F3464C861401C3BE98F797938619C5DD85B1AEA166B6D9CED053FA19DD  18177 B  395 lines  CR=0  (= rated draft)
+copy     build\agent9\s4\fence-wait\s4c\syntax\gpu_wait_backoff.cpp = staged file
+--- syntax (exact flags: S4a devoff4 flags, snap1-off) ---
+control       exit=0  34.0s diagnostics=1  build\agent2\snap1\DimensionsRecomp\rexlego\src\native_lock_elide.cpp
+    | build\agent2\snap1\DimensionsRecomp\rexlego\src\native_lock_elide.cpp:42:30: warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    |    42 |     const char* value = std::getenv("LEGO_NATIVE_LOCK_ELIDE");
+    |       |                              ^
+    | C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\stdlib.h:1183:20: note: 'getenv' has been explicitly marked deprecated here
+    |  1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+    |       |                    ^
+    | C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    |   356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+    |       |                                                       ^
+    | C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+    |   346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+    |       |                                               ^
+    | 1 warning generated.
+candidate(a)  exit=0  39.4s diagnostics=3  -DLEGO_GPU_WAIT_HOOK_GETDATA=1 build\agent9\s4\fence-wait\s4c\syntax\gpu_wait_backoff.cpp
+    | build\agent9\s4\fence-wait\s4c\syntax\gpu_wait_backoff.cpp:123:26: warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    |   123 |     const char* q = std::getenv("LEGO_GPU_WAIT_BACKOFF_US");
+    |       |                          ^
+    | C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\stdlib.h:1183:20: note: 'getenv' has been explicitly marked deprecated here
+    |  1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+    |       |                    ^
+    | C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    |   356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+    |       |                                                       ^
+    | C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+    |   346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+    |       |                                               ^
+    | build\agent9\s4\fence-wait\s4c\syntax\gpu_wait_backoff.cpp:125:27: warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    |   125 |     const char* sp = std::getenv("LEGO_GPU_WAIT_SPIN_US");
+    |       |                           ^
+    | C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\stdlib.h:1183:20: note: 'getenv' has been explicitly marked deprecated here
+    |  1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+    |       |                    ^
+    | C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    |   356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+    |       |                                                       ^
+    | C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+    |   346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+    |       |                                               ^
+    | build\agent9\s4\fence-wait\s4c\syntax\gpu_wait_backoff.cpp:129:27: warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    |   129 |     const char* st = std::getenv("LEGO_GPU_WAIT_STATS");
+    |       |                           ^
+    | C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\stdlib.h:1183:20: note: 'getenv' has been explicitly marked deprecated here
+    |  1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+    |       |                    ^
+    | C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    |   356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+    |       |                                                       ^
+    | C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+    |   346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+    |       |                                               ^
+    | 3 warnings generated.
+candidate(b)  exit=0  13.2s diagnostics=3  build\agent9\s4\fence-wait\s4c\syntax\gpu_wait_backoff.cpp
+    | build\agent9\s4\fence-wait\s4c\syntax\gpu_wait_backoff.cpp:123:26: warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    |   123 |     const char* q = std::getenv("LEGO_GPU_WAIT_BACKOFF_US");
+    |       |                          ^
+    | C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\stdlib.h:1183:20: note: 'getenv' has been explicitly marked deprecated here
+    |  1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+    |       |                    ^
+    | C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    |   356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+    |       |                                                       ^
+    | C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+    |   346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+    |       |                                               ^
+    | build\agent9\s4\fence-wait\s4c\syntax\gpu_wait_backoff.cpp:125:27: warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    |   125 |     const char* sp = std::getenv("LEGO_GPU_WAIT_SPIN_US");
+    |       |                           ^
+    | C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\stdlib.h:1183:20: note: 'getenv' has been explicitly marked deprecated here
+    |  1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+    |       |                    ^
+    | C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    |   356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+    |       |                                                       ^
+    | C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+    |   346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+    |       |                                               ^
+    | build\agent9\s4\fence-wait\s4c\syntax\gpu_wait_backoff.cpp:129:27: warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    |   129 |     const char* st = std::getenv("LEGO_GPU_WAIT_STATS");
+    |       |                           ^
+    | C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\stdlib.h:1183:20: note: 'getenv' has been explicitly marked deprecated here
+    |  1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+    |       |                    ^
+    | C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    |   356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+    |       |                                                       ^
+    | C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+    |   346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+    |       |                                               ^
+    | 3 warnings generated.
+    EXPECTED in candidate(a) : 3 x (control 1 x) warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    candidate(a) : no new diagnostic text vs the control
+    EXPECTED in candidate(b) : 3 x (control 1 x) warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    candidate(b) : no new diagnostic text vs the control
+--- positive control (-E: hooks defined in the candidate file) ---
+candidate(a)  exit=0   1.7s 8.5 MB  defined: sub_83FAF180,sub_83FB09E8,sub_83FBF7D0,sub_83FC0C10  (as expected)
+candidate(b)  exit=0   1.2s 8.5 MB  defined: sub_83FAF180,sub_83FBF7D0  (as expected)
+--- lint skipped (light-tasks-only window; run with -Lint; the 13:24 devoffB report has it) ---
+RESULT: PASS

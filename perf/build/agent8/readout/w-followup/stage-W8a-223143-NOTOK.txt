@@ -1,0 +1,16 @@
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:31:43
+mode: TEST (copy in build\agent8\w-followup\test\W8a; no bench writes)
+result: NOT OK: build/agent2/native4b-bin has no MANIFEST.txt or no legodimensions.exe (not staged)
+run: only=n0,mc repeats=6 -ColdShared; -PlanOnly: not run or failed; expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+latest start: -
+GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): none (result NOT OK)
+draft: build\agent8\w-followup\matrix-window8a.json  sha256 A06E5E3AAEE25B079532DE8BFC9134D7462B5F842ECB9FADA19B6FD8DD8A475E  4406 bytes
+matrix for the GO: build\agent8\w-followup\test\W8a\matrix-window8a.json  sha256 -
+launcher: bench\agent5\launch\run-night.ps1 sha256 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 (2026-11-22 22:11:21); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/native4b-bin (arms n0,mc): NOT STAGED
+arm: n0 (native4b; frames native; cvars native_settings_frontend=false;native_fps_limit=0;framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv; drivers/thread-cpu.ps1)
+arm: mc (native4b; frames native; cvars native_settings_frontend=false;native_fps_limit=0;framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv LEGO_NATIVE_SHADER_MISS_CACHE=1; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: - / -
+
+--- run-matrix.ps1 -Matrix build\agent8\w-followup\test\W8a\matrix-window8a.json -Only n0,mc -Repeats 6 -ColdShared -NoPrompt -PlanOnly (launcher Get-Plan)
+(not run)

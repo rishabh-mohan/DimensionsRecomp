@@ -1,0 +1,42 @@
+﻿R12: 4. It starts no window after 06:45, and it ends by itself at **07:30**.
+R21:    - Before a window starts, it closes ChatGPT, the Copilot app, Roblox (the player and the Store app), Task Manager and Wallpaper Engine itself. It leaves Roblox Studio and every other program alone.
+R23:    - it is already morning (after 07:30 it would run for more than 14 hours): start it in the evening
+R36:   2. It writes `perf-notes\WINDOW-HOLD.txt`, which tells every agent to keep the PC quiet. If an agent already left a HOLD note there, the launcher doesn't touch it and waits until it is gone.
+R45:   6. It removes its HOLD note, unless the agents' hold manager already has, and waits for the next window.
+R46: - It never starts a window that would end after 07:30, and it starts none after 06:45. At 07:30 it ends.
+R47: - If a window is somehow still running at 07:45, it stops that window (it closes the runner and the game) and ends.
+R55: | ChatGPT, the Copilot app, Roblox (player and Store app), Task Manager, Wallpaper Engine | closes them when a window is accepted and again right before it starts, only in your own session. The Copilot app, the Store Roblox app an
+R62: - `perf-notes\WINDOW-HOLD.txt`: written while a window waits or runs, deleted afterwards. It only ever deletes its own; the agents' hold manager may also take it over or delete it.
+R75:   - It still puts everything back (screensaver, HOLD note).
+R80:   2. Delete `perf-notes\WINDOW-HOLD.txt` if it is still there.
+R97: **GO file.** `perf-notes\WINDOW-GO.txt` holds exactly one line of 6 tokens:
+R111: **It refuses a GO (logs why, deletes it, keeps waiting) when any of these holds:**
+R119:   - its `env` has a key that is not one of these 11 (exact case; `build/agent8/w8w9/ENV-KEYS-F1.txt`, approved by Agent 1 at 21:14): `REX_TIMER_WAIT_BLOCKING`, `LEGO_GPU_WAIT_STATS`, `LEGO_GPU_WAIT_BACKOFF_US`, `LEGO_GPU_WAIT_SPIN
+R121:   - its `driver` is not a plain string `drivers/<name>.ps1` (letters, digits, `_`, `-`; forward slash) naming a file in `bench\agent8\run\drivers\` (pinned). No arguments: the `{script, args}` form is refused, and so is any other 
+R125: - The GO was read at or after the latest window start, 06:45.
+R126: - The HOLD file can't be written, or the bin files can't be hashed.
+R156: - the deadline (estimate + 10 min by 07:30) and the latest start (06:45);
+R158: - that the HOLD is still its own.
+R175: - **Output:** the runner runs as its own process. Its output goes to `status\runner-<id>-<HHmm>.out.txt` and `.err.txt` and, line by line as it comes, to the console and `status\runner-<id>-<HHmm>.txt`. The first line of that file
+R176: - **While it runs**, the launcher checks every second for the STOP file and for the end time + 15 min (07:45). Either one kills the runner and every process it started (`taskkill /T /F`); in real mode it also kills a `legodimensio
+R179: **Quiet gate.** One sample per minute. It starts after the GO is accepted (HOLD written, programs closed). All of these must hold:
+R188: - **HOLD:** the HOLD file must be its own (see HOLD).
+R189: - **Time limits:** the estimate + 10 min must still end by 07:30, no window starts at or after 06:45, and it gives up 120 min after the GO.
+R200: - After `GAVE UP` or `DEADLINE`, the `GATE REFUSED` line in `status\log.txt` and `status\last-result.txt` adds the last reason it waited for: `(last wait: ...)`. Each gate sample's reason is also in the log (`gate N ... -> wait: .
+R203: **HOLD.** `perf-notes\WINDOW-HOLD.txt`:
+R205: - **Writing:** at GO acceptance it is written only if there is no HOLD file. The content is a marker: `HOLD window <id> by Agent 5's overnight launcher (...), pid <pid>, since <time>, token <guid>`.
+R206: - **A foreign HOLD:** any HOLD without its token is never replaced or deleted. While one exists, the gate fails (`wait: foreign HOLD ('...')`), and the window waits within the 120-min and 07:30 limits.
+R208:   - If its own HOLD has disappeared, it writes it again and logs that.
+R210: - **During the run** the launcher doesn't touch it. Agent 1's hold manager takes it over once the runner has made its matrix folder, and removes it when summary.md appears.
+R211: - **At the end** of every accepted GO (window run, gate gave up, start refused, STOP) and when the launcher ends, it deletes the HOLD only if its token is still in it. Otherwise it logs `HOLD already gone (the hold manager removed
+R217: - During a window, the launcher kills the runner and everything it started within about a second (see "While it runs"), and the `END` line says `stopped early: STOP file`. Then it deletes the STOP file and ends.
+R234: | `runner-<id>-<HHmm>.out.txt`, `.err.txt` | the runner's raw stdout and stderr |
+R238: **Exit codes:** 0 = normal end (07:30, STOP, `-MaxGo`), 2 = refused at start (also: an unknown argument, a test hook without `-DryRun`, a second launcher), 3 = launcher error. Any other code (1) means PowerShell itself failed befo
+R242: - the start checks: desktop, LogonUI, the power line (`power AC (ACLineStatus n, BatteryFlag n, battery n %)`), the end time, the latest window start, and the time a window still running is stopped (end time + 15 min). It refuses 
+R248: - Everything happens in `status-dryrun\[<tag>\]`: GO, HOLD, STOP and status files. It never touches the real `perf-notes` files.
+R251: - The test hooks work only together with `-DryRun`: `-SampleSeconds`, `-GiveUpMinutes`, `-StrictMinutes`, `-StopAt 'HH:mm'|'yyyy-MM-dd HH:mm'`, `-StartBy` (latest window start, same format; default 06:45, or the `-StopAt` time), `
+R252: - An unknown argument is refused (exit 2), so a mistyped `-DryRun` can't start real mode.
+R253: - `-FakeRunner` runs the given script instead of the runner (`build\agent5\launch-test\fake-runner.ps1` prints ticks and can start a sleeping child), to test the run, STOP during a window and the end-time kill. In a dry run the ki
+R258: - **Tests:** `build\agent5\launch-test\run-tests.ps1 -Group go|gate|hold|run|pin`. Results go to `build\agent5\launch-test\results\`.
+R259:   - `go`: GO rules (hash, bins, env keys, drivers, malformed lines), start refusals (desktop, 14 h, unknown argument, hooks, a second launcher), the deadline and the latest start.
+R262:   - `hold`: HOLD handling.

@@ -1,0 +1,25 @@
+harness self-test 2026-11-22T04:13:54: 24 passed, 0 failed
+PASS  normal: exit 0, closed by WM_CLOSE, exit code 0: code 0, wm_close, exit 0x00000000, 19.4 s
+PASS  normal: verdict RUNNING from the DXGI adapter marker + perf.csv: RUNNING
+PASS  normal: perf.csv parsed (frames measured, p99 present): measured 515, median 16.741 ms, p99 31.436 ms
+PASS  normal: frames.csv written via LEGO_NATIVE_FRAME_METRICS: 621
+PASS  normal: command line reached the exe (log_flush_interval, perf_log_csv, CWD = run dir)
+PASS  normal: toml user_data_root + -Cvar override/append
+PASS  normal: toml not rewritten, files hard-linked, >= 8 samples: linked 5, samples 13, desktop exebox-JGWR2SVEU4PVVYD7BE2KMKVWMX, mode 'FUNCTIONAL ONLY (hidden desktop exebox-JGWR2SVEU4PVVYD7BE2KMKVWMX), NOT FOR TIMING'
+PASS  normal: -GpuLog gpu.csv from NVML, summarised after the first frame: device 'NVIDIA GeForce MX570', 13 samples, 9 from 4.0 s (first frame 2.0 s), util median 42.0 %, clock 652 MHz, P5, close sent at 12.14 s, note ''
+PASS  profile: exit 0, PROFILE ONLY mode: code 0, 28.9 s
+PASS  profile: env set, trigger removed, profile-*.bin written: <workspace>\build\agent3\selftest-runs\20261122-041230-profile\profile-729419515.bin
+PASS  profile: profile-meta.json trigger window ~4 s (epoch seconds): window 3.971 s
+PASS  profile: analyser ran (profile.json): top self = sub_82000000 guest: sub_82000000 [guest 0x82000000] (guest), rounds/s 999.8, duration 4.0106087 s from trailer
+PASS  profile: thread names from the LSPX trailer
+PASS  crash: exit 1, verdict CRASHED: code 1, verdict CRASHED, exited_early False, wer True, exit 0xFFFFFFFF, close killed, 26.8 s
+PASS  crash: crash evidence (events or WER): 1000 Application Error; 1026 .NET Runtime
+PASS  kill: WM_CLOSE ignored -> killed after the timeout: close killed after 4.14 s, windows at close: UAC_InputIndicatorOverlayWnd||0x0|bg| / UAC Input Indicator||0x0|bg| / WindowsForms10.Window.8.app.0.34f5582_r6_ad1|Fake Dimensions (harness self-test)|960x540|bg|
+PASS  input: build-vpad.ps1 -OutDir -Force built the self-test xinput1_4.dll (clang-cl, no CRT): code 0, <workspace>\build\agent3\selftest-bin\vpad\xinput1_4.dll
+PASS  input: a bad script is refused before the launch (exit 2, file:line): code 2, bad -InputScript: bad-route.txt:2: bad button(s) 'A+Q' (A B X Y START BACK UP DOWN LEFT RIGHT LB RB LS RS GUIDE, joined with +)
+PASS  input: exit 0, every step ran, the script ended the run, WM_CLOSE: code 0, steps 16/16, stopped True, error '', close wm_close, 12.1 s
+PASS  input: the game loaded the run-dir xinput1_4.dll; none in the bin dir; --input_backend=xinput, AGENT3_VPAD: pid 44160 (game 44160), maps 1, from '<workspace>\build\agent3\selftest-runs\20261122-041344-input\xinput1_4.dll'
+PASS  input: XInputGetState saw the presses, stick and releases in order: 0x0000/0 0x1000/0 0x0000/0 0x0010/0 0x0000/0 0x0002/0 0x0000/0 0x0002/0 0x0000/0 0x2000/0 0x0000/0 0x0000/-32767 0x0000/0; reads 336 (58 with input)
+PASS  input: XInputGetKeystroke handed out the key-down/key-up events in order: 0x5800/1 0x5800/2 0x5814/1 0x5814/2 0x5811/1 0x5811/2 0x5811/1 0x5811/2 0x5801/1 0x5801/2; key_events 10 (346 calls)
+PASS  input: input.csv: waits ok, wait_scene/wait_change saw the A press change the scene, 1 TIMEOUT (on purpose): 18 rows; wait_change 'ok after 0.2 s: 900/120000 -> 910/120001'; timeouts 1 (line 16); 'done' draws 910
+PASS  input: the gate DLL build\agent3\vpad\xinput1_4.dll is unchanged; the run used the self-test copy: gate 309DF316B576D2C3 -> 309DF316B576D2C3; run dll 616D7C5DA86A4310

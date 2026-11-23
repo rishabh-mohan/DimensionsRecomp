@@ -1,0 +1,517 @@
+{
+ "matrix": "<workspace>\\build\\agent6\\wnight\\test-s4b17-neg",
+ "expect": "<workspace>\\build\\agent6\\wnight\\expect-w9.json",
+ "matrix_json": "<workspace>\\build\\agent6\\wnight\\test-s4b17-neg\\matrix.json",
+ "reference": "off",
+ "generated": "2026-11-22T23:07:14",
+ "tools": {
+  "w4b_logdiff": {
+   "rc": 0,
+   "s": 0.2,
+   "out": "<workspace>\\build\\agent6\\wnight\\out-W9-test-s4b17-neg\\logdiff",
+   "log": "<workspace>\\build\\agent6\\wnight\\out-W9-test-s4b17-neg\\logdiff.log"
+  },
+  "w4b_extra": {
+   "rc": 0,
+   "s": 0.2,
+   "out": "<workspace>\\build\\agent6\\wnight\\out-W9-test-s4b17-neg\\extra.txt",
+   "log": "<workspace>\\build\\agent6\\wnight\\out-W9-test-s4b17-neg\\extra.log"
+  }
+ },
+ "arms": {
+  "off": {
+   "runs": [
+    "2053-off-r1"
+   ],
+   "verdict": "FAIL",
+   "fail": [
+    "2053-off-r1: status None, problems []"
+   ],
+   "note": [
+    "2053-off-r1: levels W/E/C 142/0/0, expected 40/0/0"
+   ],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0
+   ],
+   "unhandled": [
+    0
+   ],
+   "protect_failed": [
+    0
+   ],
+   "levels": [
+    "142/0/0"
+   ],
+   "slow": {
+    "runs": 0,
+    "slow_runs": 0,
+    "mean_slow_pct": null,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0
+    ],
+    "still not acquired after": [
+     0
+    ],
+    "Minidump written to": [
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0
+    ],
+    "GPU wait back-off:": [
+     0
+    ],
+    "GPU wait stats (5 s):": [
+     0
+    ],
+    "is not a plain number": [
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     137
+    ],
+    "Reserving the guest memory arena": [
+     1
+    ],
+    "Title terminated": [
+     1
+    ]
+   }
+  },
+  "q0": {
+   "runs": [
+    "2231-q0-r1"
+   ],
+   "verdict": "FAIL",
+   "fail": [
+    "2231-q0-r1: missing required \"GPU wait back-off: ON (quantum 0 us, spin 30 us); stats OFF; GetData hook built.\"",
+    "2231-q0-r1: forbidden \"GPU wait stats\" x81",
+    "2231-q0-r1: \"GPU wait back-off: ON (quantum 0 us, spin 30 us); stats OFF; GetData hook built.\" x0, expected exactly 1",
+    "2231-q0-r1: status None, problems []"
+   ],
+   "note": [
+    "logdiff NEW warning key: [warning] [krnl] __imp__XNetLogonGetTitleID STUB",
+    "logdiff ONLY key that no rule names: [warning] [krnl] __imp__XNetLogonGetTitleID STUB",
+    "2231-q0-r1: levels W/E/C 143/0/0, expected 40/0/0"
+   ],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0
+   ],
+   "unhandled": [
+    0
+   ],
+   "protect_failed": [
+    0
+   ],
+   "levels": [
+    "143/0/0"
+   ],
+   "slow": {
+    "runs": 0,
+    "slow_runs": 0,
+    "mean_slow_pct": null,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0
+    ],
+    "still not acquired after": [
+     0
+    ],
+    "Minidump written to": [
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0
+    ],
+    "GPU wait back-off:": [
+     1
+    ],
+    "GPU wait stats (5 s):": [
+     81
+    ],
+    "is not a plain number": [
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     137
+    ],
+    "Reserving the guest memory arena": [
+     1
+    ],
+    "Title terminated": [
+     1
+    ]
+   },
+   "logdiff": {
+    "fail": 0,
+    "fail_unexplained": [],
+    "new": 1,
+    "new_err": [],
+    "new_warn": [
+     "[warning] [krnl] __imp__XNetLogonGetTitleID STUB"
+    ],
+    "more": [],
+    "gone": [],
+    "only": 4,
+    "only_unnamed": [
+     "[warning] [krnl] __imp__XNetLogonGetTitleID STUB"
+    ],
+    "only_keys": [
+     "[info] [core] GPU wait back-off: OFF (quantum # us, spin # us); stats ON; GetData hook built.",
+     "[info] [core] GPU wait stats (# s): L# waits # polls #h moved # gpu_off # sleep>moved # sleep>done # | L# tries # waits # polls # delayed # sleep>ready # | kicks # | pause # yield # sleep # sleep_sum # ms sleep_fail # | L# sum # ms max # ms hist <#us # <#us # <#ms # <#ms # >=#ms # | L# sum # ms max # ms",
+     "[warning] [krnl] __imp__XNetLogonGetTitleID STUB",
+     "[info] [core] GPU wait stats (# s): L# waits # polls # moved # gpu_off # sleep>moved # sleep>done # | L# tries # waits # polls # delayed # sleep>ready # | kicks # | pause # yield # sleep # sleep_sum # ms sleep_fail # | L# sum # ms max # ms hist <#us # <#us # <#ms # <#ms # >=#ms # | L# sum # ms max # ms"
+    ]
+   }
+  },
+  "q250": {
+   "runs": [
+    "2209-q250-r1"
+   ],
+   "verdict": "FAIL",
+   "fail": [
+    "2209-q250-r1: missing required \"GPU wait back-off: ON (quantum 250 us, spin 30 us); stats OFF; GetData hook built.\"",
+    "2209-q250-r1: forbidden \"GPU wait stats\" x41",
+    "2209-q250-r1: \"GPU wait back-off: ON (quantum 250 us, spin 30 us); stats OFF; GetData hook built.\" x0, expected exactly 1",
+    "2209-q250-r1: status None, problems []"
+   ],
+   "note": [
+    "2209-q250-r1: levels W/E/C 142/0/0, expected 40/0/0"
+   ],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0
+   ],
+   "unhandled": [
+    0
+   ],
+   "protect_failed": [
+    0
+   ],
+   "levels": [
+    "142/0/0"
+   ],
+   "slow": {
+    "runs": 0,
+    "slow_runs": 0,
+    "mean_slow_pct": null,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0
+    ],
+    "still not acquired after": [
+     0
+    ],
+    "Minidump written to": [
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0
+    ],
+    "GPU wait back-off:": [
+     1
+    ],
+    "GPU wait stats (5 s):": [
+     41
+    ],
+    "is not a plain number": [
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     137
+    ],
+    "Reserving the guest memory arena": [
+     1
+    ],
+    "Title terminated": [
+     1
+    ]
+   },
+   "logdiff": {
+    "fail": 0,
+    "fail_unexplained": [],
+    "new": 0,
+    "new_err": [],
+    "new_warn": [],
+    "more": [],
+    "gone": [],
+    "only": 2,
+    "only_unnamed": [],
+    "only_keys": [
+     "[info] [core] GPU wait back-off: ON (quantum # us, spin # us); stats ON; GetData hook built.",
+     "[info] [core] GPU wait stats (# s): L# waits # polls # moved # gpu_off # sleep>moved # sleep>done # | L# tries # waits # polls # delayed # sleep>ready # | kicks # | pause # yield # sleep # sleep_sum # ms sleep_fail # | L# sum # ms max # ms hist <#us # <#us # <#ms # <#ms # >=#ms # | L# sum # ms max # ms"
+    ]
+   }
+  }
+ },
+ "runs": {
+  "2053-off-r1": {
+   "arm": "off",
+   "verdict": "FAIL",
+   "fail": [
+    "status None, problems []"
+   ],
+   "note": [
+    "levels W/E/C 142/0/0, expected 40/0/0"
+   ],
+   "slow": null,
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "s4b-01-off",
+    "status": null,
+    "valid_timing": null,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {},
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": null,
+    "clean": null,
+    "killed": null,
+    "exited": null,
+    "early": false,
+    "wer": null,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": null,
+    "flags_excluding": [],
+    "flags": [],
+    "free_gb": null,
+    "ff": null,
+    "start": null,
+    "nogrowth": null,
+    "nrw": null,
+    "m_start": null,
+    "m_end": null,
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      24438
+     ]
+    ],
+    "lines": 215,
+    "levels": {
+     "info": 65,
+     "raw": 8,
+     "warning": 142
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 137,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-22 20:54:03.056",
+    "last_ts": "2026-11-22 20:57:39.153"
+   }
+  },
+  "2209-q250-r1": {
+   "arm": "q250",
+   "verdict": "FAIL",
+   "fail": [
+    "missing required \"GPU wait back-off: ON (quantum 250 us, spin 30 us); stats OFF; GetData hook built.\"",
+    "forbidden \"GPU wait stats\" x41",
+    "\"GPU wait back-off: ON (quantum 250 us, spin 30 us); stats OFF; GetData hook built.\" x0, expected exactly 1",
+    "status None, problems []"
+   ],
+   "note": [
+    "levels W/E/C 142/0/0, expected 40/0/0"
+   ],
+   "slow": null,
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "s4b-18-gw-q250",
+    "status": null,
+    "valid_timing": null,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {},
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": null,
+    "clean": null,
+    "killed": null,
+    "exited": null,
+    "early": false,
+    "wer": null,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": null,
+    "flags_excluding": [],
+    "flags": [],
+    "free_gb": null,
+    "ff": null,
+    "start": null,
+    "nogrowth": null,
+    "nrw": null,
+    "m_start": null,
+    "m_end": null,
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      39830
+     ]
+    ],
+    "lines": 253,
+    "levels": {
+     "info": 103,
+     "raw": 8,
+     "warning": 142
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "GPU wait back-off:": 1,
+     "GPU wait back-off": 1,
+     "GPU wait back-off: ON (quantum 250 us, spin 30 us); stats ON; GetData hook built.": 1,
+     "[NtCreateFile] FAILED": 137,
+     "GPU wait stats (5 s):": 41,
+     "GPU wait stats": 41,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-22 22:09:50.634",
+    "last_ts": "2026-11-22 22:13:28.009"
+   }
+  },
+  "2231-q0-r1": {
+   "arm": "q0",
+   "verdict": "FAIL",
+   "fail": [
+    "missing required \"GPU wait back-off: ON (quantum 0 us, spin 30 us); stats OFF; GetData hook built.\"",
+    "forbidden \"GPU wait stats\" x81",
+    "\"GPU wait back-off: ON (quantum 0 us, spin 30 us); stats OFF; GetData hook built.\" x0, expected exactly 1",
+    "status None, problems []"
+   ],
+   "note": [
+    "levels W/E/C 143/0/0, expected 40/0/0"
+   ],
+   "slow": null,
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "s4b-17-gw-p1",
+    "status": null,
+    "valid_timing": null,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {},
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": null,
+    "clean": null,
+    "killed": null,
+    "exited": null,
+    "early": false,
+    "wer": null,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": null,
+    "flags_excluding": [],
+    "flags": [],
+    "free_gb": null,
+    "ff": null,
+    "start": null,
+    "nogrowth": null,
+    "nrw": null,
+    "m_start": null,
+    "m_end": null,
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      102426
+     ]
+    ],
+    "lines": 655,
+    "levels": {
+     "info": 504,
+     "raw": 8,
+     "warning": 143
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "GPU wait back-off:": 1,
+     "GPU wait back-off": 1,
+     "GPU wait back-off: OFF (quantum 0 us, spin 30 us); stats ON; GetData hook built.": 1,
+     "[NtCreateFile] FAILED": 137,
+     "GPU wait stats (5 s):": 81,
+     "GPU wait stats": 81,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-22 22:31:06.753",
+    "last_ts": "2026-11-22 22:38:04.885"
+   }
+  }
+ }
+}

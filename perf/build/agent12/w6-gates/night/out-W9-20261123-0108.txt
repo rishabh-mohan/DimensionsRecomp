@@ -1,0 +1,79 @@
+=== W6 gate kit (run_gates.py): <workspace>\build\agent8\matrix\20261123-0108 ===
+matrix   Window 9 (Agent 8, run-2 task #7 follow-up): #24 GPU-wait back-off sweep on devoff4b (S4b + S4c). off (back-off OFF, nothing set) vs Q = 0 / 125 / 250 / 500 us (LEGO_GPU_WAIT_BACKOFF_US) with spin 30 us
+ref      off; sys_csv true; plan.txt 21 runs (1 cold)
+arms run off x4 (+1 cold), q0 x4, q125 x4, q250 x4, q500 x4 (21 runs)
+bins     build/agent2/devoff4b-bin: off, q0, q125, q250, q500
+switches P2 (shared_memory_single_hold_rearm=true): none; keep-watch (physical_protect_keep_watch=true): none
+launcher window log: <workspace>\bench\agent5\launch\status\window-W9-0105.log (its END line names this out dir)
+quiet-gate source: <workspace>\bench\agent5\launch\status\window-W9-0105.log (the launcher's window log)
+
+--- G1 every switch rated: MANUAL ---
+  off (ref): bin build/agent2/devoff4b-bin; beyond the common set: -
+  q0: bin build/agent2/devoff4b-bin; beyond the common set: -; env LEGO_GPU_WAIT_BACKOFF_US=0, LEGO_GPU_WAIT_SPIN_US=30
+  q125: bin build/agent2/devoff4b-bin; beyond the common set: -; env LEGO_GPU_WAIT_BACKOFF_US=125, LEGO_GPU_WAIT_SPIN_US=30
+  q250: bin build/agent2/devoff4b-bin; beyond the common set: -; env LEGO_GPU_WAIT_BACKOFF_US=250, LEGO_GPU_WAIT_SPIN_US=30
+  q500: bin build/agent2/devoff4b-bin; beyond the common set: -; env LEGO_GPU_WAIT_BACKOFF_US=500, LEGO_GPU_WAIT_SPIN_US=30
+  rate every switch above against W6-GATES.md G1 (Agent 10's b2r ratings): the kit only lists them
+
+--- G2 one bin per arm, as built: PASS ---
+  bin build/agent2/devoff4b-bin: arms off, q0, q125, q250, q500; MANIFEST.txt sha256 DE11A914079D7DF7; TracyClient.dll 233472 B, legodimensions.exe 170350080 B, rexgpu-xenos.dll 3425792 B, rexruntime.dll 10909184 B; legodimensions.exe sha256 DFBE1D43B28861A6
+
+--- G3 every planned run completed: PASS ---
+  plan.txt: off x4+1 cold, q0 x4, q125 x4, q250 x4, q500 x4; results.csv: off x4+1 cold, q0 x4, q125 x4, q250 x4, q500 x4
+  launcher END: runner exit 0 (all runs OK) after 42.5 min (<workspace>\bench\agent5\launch\status\window-W9-0105.log)
+
+--- G4 P2's fallback never runs: n/a ---
+
+--- G5 C1 verify on gate A: n/a ---
+
+--- G6 keep only under G: n/a ---
+
+--- G7 inert on native: n/a ---
+
+--- G8 nothing stale, no new errors: PASS ---
+  logdiff reference: off x5 merged (500 log lines, 6 warning/error kinds); 21/21 runs have a game*.log to compare
+  by hand: the frame hash or screenshot matches the reference arm at the same point (W6-GATES G8)
+
+--- G9 launch-only switches as planned: PASS ---
+  hands off, no dev console during the window: procedural (C1 v3 latches keep_watch and hold_global_lock at init; other cvars are read live)
+
+--- G10 per-run validity: PASS ---
+  proof lines off: none (5 runs)
+  proof lines q0: none (4 runs)
+    q0: env LEGO_GPU_WAIT_BACKOFF_US=0, LEGO_GPU_WAIT_SPIN_US=30: run.json env_set (G9) is the proof
+  proof lines q125: none (4 runs)
+    q125: env LEGO_GPU_WAIT_BACKOFF_US=125, LEGO_GPU_WAIT_SPIN_US=30: run.json env_set (G9) is the proof
+  proof lines q250: none (4 runs)
+    q250: env LEGO_GPU_WAIT_BACKOFF_US=250, LEGO_GPU_WAIT_SPIN_US=30: run.json env_set (G9) is the proof
+  proof lines q500: none (4 runs)
+    q500: env LEGO_GPU_WAIT_BACKOFF_US=500, LEGO_GPU_WAIT_SPIN_US=30: run.json env_set (G9) is the proof
+  slow state (info; E-cores < 800 MHz for >= 3 samples overlapping the window): 0/20 scored runs; slow samples in the window: none
+
+--- G11 power overlay: PASS ---
+  power overlay: best_performance in 21/21 runs, no change inside any window (differs from W5's best_efficiency: don't compare absolute numbers with W5)
+  scheme: Balanced x21; AC: 1 x21; battery saver: 0 x21
+  launcher: plan| note     sys_csv: drivers/sys-csv.ps1 logs the system state every 1 s (sys.csv, sys.json). Input during the window, the game losing the foreground, battery, battery saver, a power-plan change, a non-default input desktop or a screensaver exclude a run from summary.md (it stays in results.csv, under 'Flagged runs'). Light phase: a game.log with < 30 'FAILED: path=d:\INSTALL*.DAT' lines (normal boot: 34) is excluded (light_phase).
+  launcher: 2026-11-23 01:08:53 power scheme at the start: Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+
+--- G12 quiet gate: PASS ---
+  non-game load: 3.36-3.70 cores (median 3.44) in 20 scored runs; unscored/cold 3.87
+  non-game load flag (scored runs above the median 3.44 + 1.0 cores): none
+  quiet gate: STRICT: <workspace>\bench\agent5\launch\status\window-W9-0105.log: '01:08:53 quiet gate: STRICT (MsMpEng 0.00/0.00/0.00, OfficeClickToRun 0.00/0.00/0.00, CrossDeviceService 0.04/0.06/0.04)' at 01:08:53; the window started at 01:08, 0 min later
+
+| gate | status | key number |
+|---|---|---|
+| G1 every switch rated | MANUAL | 5 arms; switches beyond the common set (framerate_limit=0): off 0, q0 0+2 env, q125 0+2 env, q250 0+2 env, q500 0+2 env |
+| G2 one bin per arm, as built | PASS | 21/21 runs on their arm's bin (MANIFEST + exe/dll SHA-256); 1 bin; one bin required (--one-bin) |
+| G3 every planned run completed | PASS | 21/21 runs OK, exit 0x00000000, wm_close, runner exit 0; plan.txt 21 runs (1 cold); arms 5/5 as planned; launcher END exit 0 |
+| G4 P2's fallback never runs | n/a | no run arm sets shared_memory_single_hold_rearm=true |
+| G5 C1 verify on gate A | n/a | no run arm sets physical_protect_keep_watch=true |
+| G6 keep only under G | n/a | no run arm sets physical_protect_keep_watch=true |
+| G7 inert on native | n/a | no run arm sets physical_protect_keep_watch=true |
+| G8 nothing stale, no new errors | PASS | stale/fault/Protect-failed lines in 0/21 runs; logdiff vs off (x5): FAIL findings in 0, NEW messages in 0/21 runs (0 kinds) |
+| G9 launch-only switches as planned | PASS | 21/21 runs: params.cvar, args, env_set and toml_set = the arm's |
+| G10 per-run validity | PASS | 20/20 scored runs valid; proof lines ok in 21/21 runs; free RAM >= 6 GB in 21/21; slow state 0/20 scored (info) |
+| G11 power overlay | PASS | overlay best_performance in 21/21 runs, no change inside any window; scheme Balanced; AC 1; saver 0 |
+| G12 quiet gate | PASS | STRICT at 01:08:53 [window-W9-0105.log]; MsMpEng 0.00/0.00/0.00, OfficeClickToRun 0.00/0.00/0.00, CrossDeviceService 0.04/0.06/0.04; non-game load 3.36-3.70 cores (median 3.44), 0 flagged |
+
+RECORD: overlay best_performance (21/21, no change); quiet gate STRICT; non-game load 3.36-3.70 cores
+GATES: G1 MANUAL; G2 PASS; G3 PASS; G4 n/a; G5 n/a; G6 n/a; G7 n/a; G8 PASS; G9 PASS; G10 PASS; G11 PASS; G12 PASS; exit 0

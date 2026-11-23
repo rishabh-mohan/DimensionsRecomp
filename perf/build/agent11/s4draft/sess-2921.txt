@@ -1,0 +1,174 @@
+﻿L2921: ## 21:55 Agent 1: W6 cleared for promotion; W6 repeats; gate A confirmed as finding 10
+L2922: 
+L2923: - W6 functional gates (Agent 3, 21:48-21:52): w6s1 PASS and w6s2 PASS (NEW 0 / MORE 0 vs RT, every proof line OK, cvars as W6-GATES v2). G4 p2c PASS (total 0) on gate A, side 1, side 2 and row 23. G3 PASS. G5 PASS, with partial coverage. G8: gate A's line items pass, with the finding-10 WARN. Row 23 (s4b23) PASS. w6s3 runs ~21:53-22:00.
+L2924: - Agent 6 #16 part 1: gate A's hang is CONFIRMED as finding 10, the Xenos L1 fence-wait (H1) variant.
+L2925:   - Lock: kGraphicsLock 0x84959edc. Owner lr is 83FAF188, the same as devoffB X3.
+L2926:   - #24 OFF was a pure pass-through: no LEGO_GPU_WAIT_* env var and no back-off line.
+L2927:   - Verify mode made the CP the bottleneck (median 61.5 ms per frame). The 9.7 s stalled frame had 1244 memexport syncs, against 5-62 normally. The -j8 build saturated the machine.
+L2928:   - Agent 1: go ahead and read the CP thread's stack from hang-36276.dmp (dumpstacks.py, BelowNormal, ~1 min).
+L2929: - Agent 8: promote W6 now (the conditions are met) and send the GO line.
+L2930:   - W6 runs at repeats=4 by default, ~53 min. Agent 7's REPEATS.md gives ±3.2 % median ms and ±2.7 % fps for that; repeats=3 would give ±3.8 % / ±3.3 % in ~40 min.
+L2931:   - repeats=4 stands unless the overnight plan due at 22:45 can't fit it.
+L2932: - Agent 7 #14 done: readout.py (T-std/B-block), repeats.py and REPEATS.md. Self-test 113/113, including the W4b/W5 regression; the independent check found 0 mismatches.
+L2933: - Launcher: Agent 10's 21:48 items forwarded to Agent 5:
+L2934:   - README L47/L176/L242/L251 still say 07:45 and taskkill /T.
+L2935:   - Fresh go/gate/run tests on the final hash, covering STOP mid-run, the 07:30 kill, -TestFailAfter and killing a fake-runner child.
+L2936:   - The final hashes go to Agents 10 and 11 by 23:00.
+L2937:   - Agent 5 also has to answer Agent 3's ready-m1 question (s4b20 waits on it).
+L2938: - Agent 3: w6gB counts as the C1 level-load coverage, and row 7 stays capped. The menu-phase watch stays with Agent 3: devoff4b takes 16.6-17.3 s against ≤8.7 s on devoff4, measured under load.
+L2939: - native4b was at [304/485] at 21:50 (~5 edges/min), so staging is ~22:35-22:40.
+L2940: - The user asked for the ETA to full completion. Agent 1's estimate, uncertain: S4 needs about 3 more nights plus about a day for keep/drop decisions, the final build and the write-up, so around Wed-Thu Nov 25-26.
+L2941:   - Tonight: W6 and the follow-ups.
+L2942:   - Mon: W10, W7, and W8a if it doesn't run tonight.
+L2943:   - Tue: a confirmation window of the final set vs S3d, plus W8b if #21 is built.
+L2944: 
+L2945: ## 22:05 Agent 1: what would speed S4 up; tasks #17 (Agent 7) and #18 (Agent 9)
+L2946: 
+L2947: - The user asked what resources would speed things up (the model-call limit is 90/min; the grid uses ~15-27).
+L2948:   - Agent 1's answer: model calls aren't the bottleneck. The limits are the one laptop's CPU (builds vs functional runs) and timed windows, which need the user's double-click and an idle, unlocked, visible desktop.
+L2949:   - Proposed to the user, awaiting answers:
+L2950:     - a daytime launcher session (needs an end-time option and a re-review);
+L2951:     - agents use the PC after tonight's last window (~03:30-06:00) for the CG26/CTR builds and their functional rows;
+L2952:     - a Defender exclusion for the project's build folder (the user, as admin);
+L2953:     - turning off the NVIDIA app overlay/PresentMon, plus Best performance;
+L2954:     - dropping #19 (still design-only) and with it W7;
+L2955:     - the #1 screenshot check and the #33 answer.
+L2956:   - All of it together could move completion from Wed-Thu to about Tue.
+L2957: - Task #17 (Agent 7): stage #21 (LEGO_NATIVE_CHAIN_PRIORITY) for Agent 10's rating on Monday morning, plus the §15.4 functional rows and the W8b arms. Staging only, done by 23:30.
+L2958: - Task #18 (Agent 9): a read-only CG26 check kit for Agent 10's #26 gates (W10 readiness), plus an independent pre-read of #21. Done by 23:40.
+L2959: - Agent 3: row 7 (s4b07) PASSES, capped at 600 s. Its 92 "C1 verify F" lines fit R1, because the row has no fix (i). Not a W6 blocker, since every W6 C1 arm has fix (i).
+L2960: 
+L2961: ## 22:10 Agent 1: G4 complete; Agent 10's G5 rating; C1 without P2 not cleared; W6 repeats=5
+L2962: 
+L2963: - Agent 3 (22:05): G4 is complete. P2c total is 0 on all four untimed W6 runs: w6s1, w6s2, w6gA, and w6s3 (`20261122-215230-w6-side3-p2fc-attract`).
+L2964:   - w6s3: exit 0, err/crit 0, STUCK-LOCK 0, kept 114688. Its WM_CLOSE took 25.4 s under the build load (limit 60 s). Agent 3 is checking WM_CLOSE times by C1 state, and Agent 8 is confirming the runner's close timeout. The w6s3 logdiff is still pending.
+L2965: - Agent 10, G5 for gate A: **PASS, partial coverage** (to story-load, 104/119 steps; K 0, F 0 over 32768 kept protects; gate D 0; P2c 0). Fine for W6.
+L2966:   - Still open: S21 A (b2r L1065). Before C1 can go default-ON, one p2fc + verify run has to reach the level, with a longer cap than 600 s. Candidate: Agent 3's queue tomorrow, or after tonight's windows if the user approves.
+L2967:   - Correction: row 7 does have fix (i) (`physical_protect_hold_global_lock`). What it lacks is P2 (`shared_memory_single_hold_rearm`, #8). So its F 92 is not R1.
+L2968:     - **Rule (Agent 10): C1 without P2 is not cleared, timing arms included,** until Agent 12 explains the 92 or a C1-OFF verify baseline (P2 off, L route) runs.
+L2969:     - Follow-up windows get no C1-without-P2 arm.
+L2970:     - W6 is unaffected: its GO is `only=s0,p2,p2f,p2fc` (FINAL.txt). The w6-noP2 arms f and fc are for the "G4 FAIL" decision row only and stay out.
+L2971:   - Nit: the check's PROOF labels should say "to story-load" for capped runs. This goes into b2r as row 42/§41.
+L2972: - **W6 repeats: 5 (Agent 1).** W6 has 4 arms, not 6, so the 21:55 figure (repeats=4, ~53 min) was wrong. Agent 7's formula gives 1.70 + 2.14·4·5 ≈ 44.5 min, plus up to ~2.5 min for the slower closes of the 5 p2fc runs. Precision is ~±2.9 % median ms, and repeats=5 meets Agent 12's ≥5 ask (S4-DRAFT L356). It stays W6 first in Agent 8's 22:45 plan.
+L2973: - Agent 4 (22:04): native4b at generated file 338 of ~438. Staging ~22:30, the pin record and handoff ~5 min later, and Agent 3's 5 re-pin runs done ~22:55.
+L2974: 
+L2975: ## 22:25 Agent 1: user decisions (daytime sessions, after-window agents, #19 kept); s4b24 finding 10 without verify
+L2976: - **User (22:10):**
+L2977:   - Daytime sessions: yes. The user now gets a notification when they're needed.
+L2978:   - Agents may use the PC after tonight's last window (CG26/CTR builds, test rows, reviews), with fan noise until ~07:00.
+L2979:   - Best performance on AC was already set.
+L2980:   - **#19 (R1 stage 2, `d3d12_async_submit`) stays in scope**, so W7 stays too.
+L2981:   - A stronger PC may arrive on the 19th. That is after S4, so it doesn't change the ETA; timing runs on it would need new baselines.
+L2982:   - Still unanswered and optional: the Defender exclusion for `build`, turning off the NVIDIA overlay, and the screenshot check (#1) + pop-in yes/no (#33).
+L2983: - **New S4 ETA: ~Wed Nov 25.** Tue evening if everything passes the first time; Thu if #19 needs a second try.
+L2984: - **Daytime launcher (Agent 5, after the night final):** RUN-DAY.cmd asks for the return time and sets `-StopAt` 15 min before it. If the night launcher is still running between windows, it stops it with the STOP file; if a window is running, it asks first. STOP-LAUNCHER.cmd writes perf-notes\WINDOW-STOP.txt. Plus a README section. run-night.ps1 stays unchanged.
+L2985: - **W6 GO line (Agent 8, 22:09, checked with the launcher's functions):** `GO W6 matrix-window6.json E50D791B6C38638F718A1AF65EB15EAF543A78AC8EA50B69DD1CC96AB7C9A0D2 only=s0,p2,p2f,p2fc repeats=5`. 21 runs, ~48 min; the launcher accepts it until 06:32. RUN-WINDOW6.cmd (double-click fallback) stays at -Repeats 3.
+L2986: - **s4b24 hang (Agent 3, 22:07):**
+L2987:   - Run: W9 row, p2fc, verify OFF, menus route.
+L2988:   - RECOVERED HANG at 22:07:54: STUCK-LOCK x5 + hang-31952.dmp. Route 54/54, WM_CLOSE 1.64 s, run-game exit 1.
+L2989:   - Owner tid 0x17, lr 83FAF200, in sub_83FAF180, so finding 10. It sits 3 frames deeper than gate A's 83FAF188; the waiter is the same (GPU thread on PM4 0x22).
+L2990:   - **This is the first finding-10 STUCK-LOCK without verify.** The host was at 100 % (8 clang++), and fps fell 56→19→14→1.3 at story-load.
+L2991:   - **Ruling: WARN, and the W6 GO is unchanged.** Reasons:
+L2992:     - run-matrix records a failed run and goes on (run-matrix.ps1 L26).
+L2993:     - W6 runs on an idle PC, and its 5 p2fc runs are the repeat test, so no s4b24 rerun tonight.
+L2994:     - Agent 6's verify-only explanation for gate A's kernel-mode CP time (VirtualQuery in KeepWatchVerifyRecord) is now incomplete.
+L2995:   - **C1 default-ON now also needs finding 10 explained.** Agent 6 part 3 asks: is the CP kernel time there without verify, what are the extra frames, and has finding 10 ever appeared with C1 off (devoffB X3's config)?
+L2996: - **Agent 12:**
+L2997:   - #15 done: build/agent12/w6-gates/run_gates.py + run_gates.ps1.
+L2998:   - G8: gate A's FAIL (finding 10) is read as WARN through a visible waiver, and s4b24 gets the same. No gate A re-run tonight; the post-window long-cap p2fc + verify level row is the clean re-run.
+L2999:   - s4bV0 (C1-OFF verify control, ~5 min) runs tonight only if it fits before 23:10, after the rows that gate tonight's windows: s4b18, s4b17 (W9 gate, which Agent 3's 22:10 order dropped; checking with Agent 8), then the re-pin (rpm4 by 23:07).
+L3000: - **Agent 3:**
+L3001:   - w6s3 PASS (logdiff NEW 0 / MORE 0), so the W6-critical set is complete. s4b22 PASS.
+L3002:   - WM_CLOSE times: the long ones (25.4 / 26.4 s) are the runs under build load, not C1.
+L3003: - **After the last window:**
+L3004:   - Agent 2: CG26 (+CTR), ≤ -j10.
+L3005:   - Agent 3: the remaining rows plus the long-cap p2fc + verify level-load row (cap > 600 s, S21 A).
+L3006:   - Agent 12: the W6 read-out.
+L3007:   - Agent 7: #19 (staged diff, RATE-REQUEST, functional rows, 10-min soak, W7 arms), aiming for Agent 10 by Monday ~09:00.
+L3008: 
+L3009: ## 22:28 Agent 1: finding 10 isn't C1's (s4b20); s4b18 PASS; CTR held
+L3010: - **Agent 3 (22:26):** s4b20 (M1 only, **C1 OFF**, run 20261122-221447-s4b-20-m1-level) hit the **same** STUCK-LOCK at 22:18:20.
+L3011:   - Owner tid 0x17, lr 83FAF200. The owner and waiter stacks match s4b24's exactly; the GPU thread is in PM4 0x22. It wrote hang-13236.dmp and recovered.
+L3012:   - **So the 83FAF200 variant of finding 10 isn't caused by C1.** This corrects the 22:25 line "C1 default-ON now also needs finding 10 explained", and answers Agent 6's question (c).
+L3013:   - Both hangs came with the host at 100 % from Agent 2's -j8 build. **W6's 21 runs on the idle PC are the load-only test.** No rerun tonight.
+L3014: - **s4b18 (W9) PASS:** exit 0, 54/54, back-off ON line, 41 stats lines, sleep_fail 0, no STUCK-LOCK, NEW 0 / MORE 0 vs s4b01. Its WM_CLOSE took 40.1 s (C1 off, under the build load), the highest so far against the 60 s limit.
+L3015:   - W9 rows so far: s4b18 PASS, s4b24 WARN (finding 10). s4b17 is still needed.
+L3016: - **Agent 4 (22:22):** native4b slowed. Link + staging ~22:40–22:45, pin record ~22:50, Agent 3's 5 re-pin runs (~19 min) end ~23:10. rpm4 must still launch by 23:07.
+L3017: - **Ruling:** after native4b's staging, Agent 2 starts no new build tonight. CTR moves to after the windows, with CG26 (≤ -j10).
+L3018:   - Reasons: a bin built after 22:45 can't be functionally gated by 23:10, so CTR can't serve tonight's windows anyway. The finding-10 hangs and the long closes both came under the -j8 load, so the re-pin and s4b17 should run on a lighter PC.
+L3019:   - s4bV0 (C1-OFF verify control) has no room before 23:10, so it is first in the post-window queue.
+L3020: 
+L3021: ## 22:33 Agent 1: overnight plan picked (Agent 8's PROPOSAL.md)
+L3022: - **Order:**
+L3023:   1. W6 r5.
+L3024:   2. W9 r4, if s4b17 PASSes. s4b18's logdiff is done.
+L3025:   3. **W8a4 r6**: native4's r6 PASS counts as its functional cover (MANIFEST 00D33D4FFB46776D).
+L3026:   4. W5b r6.
+L3027:   5. W4c r6.
+L3028: - **Cutoff:** the last new GO tonight is at 04:15. Anything left (W4c first) moves to Monday's day session, so the agents get the PC for CG26, CTR and the re-pin. Agent 8 promotes each window and sends the final ordered GO lines by 23:45.
+L3029: - **Timeline (Agent 8, ~10-min gates):** W6 00:15–01:02, W9 01:12–01:57, W8a4 02:07–02:34, W5b 02:44–03:24, W4c 03:34–04:02. With 30-min gates the night would run to ~05:42, so the cutoff applies.
+L3030: - **W8a (native4b) moves to Monday's day session**, if it's still needed after W8a4:
+L3031:   - Agent 2 now expects native4b's staging at ~22:55–23:10. Agent 3's back-to-back Normal-priority runs held the CPU at 100 %, so the build managed only 2–3 steps a minute.
+L3032:   - The 5 re-pin rows (~19 min) can't finish by the 23:10 last launch.
+L3033: - **Agent 3:** runs s4b17 (W9 gate) right after w6gB, then launches nothing more tonight, so native4b can stage. After the windows: the re-pin rows, s4b02/s4b05 (W8a), s4b04, s4b08, s4bV0 and the long-cap p2fc + verify level row.
+L3034: - **Agent 2:** lets native4b finish. The driver kills it at 23:40 if it isn't done, and ninja resumes later. CTR and CG26 build after the windows (≤ -j10).
+L3035: - **Agent 4:** writes the pin record tonight if staging lands before ~23:40.
+L3036: - **Agent 5:** until s4b17 has launched, -PlanOnly dry runs go only in queue gaps. Agent 5's dry runs caused 4 refused launches between 22:04 and 22:14.
+L3037: - **Rule (Agent 8's caveat):** nothing compiles during W6–W10. The quiet gate catches a build at window start, but not one that starts mid-window.
+L3038: 
+L3039: ## 22:33 Agent 1: overnight plan revised (Agent 8's PROPOSAL.md rev 22:35); W8a4 not tonight
+L3040: - **Launcher:** Agent 11 rates it SAFE to pin at 23:30 (22:31): run-night.ps1 16B90FA8, RUN-NIGHT.cmd D7A0362B, README 0058C8F6. My sha256 of bench\agent5\launch matches all 3, and the folder holds only those files.
+L3041:   - Still open: Agent 11 hasn't seen the RUN-NIGHT.cmd STOP smoke test, and Agent 10's formal rating is still due.
+L3042:   - The daytime files go to build\agent5\day-draft\ (with README-DAY.md, so README.md is untouched). They are copied in only after review.
+L3043: - **This replaces the order in my 22:33 entry:** W6 r5, then W9 r4 (if s4b17 PASSes), then W5b r6, then W4c r6.
+L3044: - **W8a4 is out of tonight.** W8a (native4b, after the post-window re-pin) and its fallback W8a4 move to Monday's day session, together with W8b and W10.
+L3045:   - Running W8a directly on native4b avoids a redundant W8a4 window.
+L3046:   - Ending earlier gives the agents more PC time after the windows: CG26/CTR builds, the re-pin, and the rows W10 needs.
+L3047: - **Timeline (10-min gates):** W6 00:15–01:02, W9 01:12–01:57, W5b 02:07–02:47, W4c 02:57–03:24. With full runner estimates it ends at 03:35.
+L3048: - **Latest GO (every window ends by 04:00):** W6 03:00, W9 03:02, W5b 03:06, W4c 03:20. No GO after those times; W4c is dropped first. This replaces my 04:15 cutoff.
+L3049: - **Failed or hung runs:** they are left out of the timing (readout.py, `--drop` for recovered hangs), and every verdict is given with and without the flagged runs.
+L3050:   - Counts per arm: planned / timed / failed runs, STUCK-LOCK by owner site, dumps, slow-state, and host CPU at each hang.
+L3051:   - An arm with fewer than 3 timed runs gets counts only, no timing verdict.
+L3052: - **Staging:** Agent 8 promotes W5b and W4c at ~22:50 and W9 once s4b17 passes, running -PlanOnly only in queue gaps. Final GO lines come by 23:45.
+L3053: 
+L3054: ## 22:36 Agent 1: launcher SAFE from both reviewers; approved for the 23:30 freeze
+L3055: - **Agent 10 (22:33, b2r row 41/§40, b2r sha 0167405D…): SAFE.** Same 3 files as Agent 11: run-night.ps1 16B90FA8, README 0058C8F6, RUN-NIGHT.cmd D7A0362B.
+L3056:   - RUN-NIGHT.cmd's mtime is 22:32:59 because the pin tests rewrite it; its content hash is unchanged.
+L3057:   - P1–P5 pass, the relaxed Defender gate passes, and Fix 2 matches hold-manager.ps1 D060F913.
+L3058:   - All must-fixes are in:
+L3059:     - no taskkill /T: it walks descendants by creation time, plus a PID + start-time check;
+L3060:     - the 3-name driver list;
+L3061:     - Start-WindowLocked checks for builds;
+L3062:     - 07:30 hard stop (GraceMinutes 0).
+L3063:   - The 16B9 change only affects the Stop-One catch's logging (L801–808).
+L3064:   - Agent 5's tests: go 16/16, hold 4/4, run 5/5, gate 12/13. The gate miss is t-relaxed, a timing problem in the test itself; it passed on B0902106 and in the solo re-run at 22:28:05.
+L3065: - **Optional (a)–(d) wait.** These are README retry wording, a handle, a try block, and a log line at L831. run-night.ps1 stays frozen through Monday's day session, which RUN-DAY.cmd runs with -StopAt.
+L3066: - **Approved for the 23:30 freeze**, with these conditions:
+L3067:   - I re-hash all 3 files at 23:30.
+L3068:   - No test may rewrite RUN-NIGHT.cmd after 23:25.
+L3069:   - Agent 11's last open item, the RUN-NIGHT.cmd STOP smoke test, goes to Agents 10/11 before 23:20.
+L3070:   - Any change after the freeze needs a new delta read from Agent 10.
+L3071: - **Agent 11:** checks the W9 / W5b / W4c GO lines against the arm rules before 23:40, as it did for W6.
+L3072: 
+L3073: ## 22:38 Agent 1: gate B passes, so the W6 functional set is complete; launcher tests all pass; day launcher becomes a generated copy
+L3074: - **Gate B (w6gB, run 20261122-222313): PASS + finding-10 WARN** (Agent 3).
+L3075:   - All 119/119 steps, through the level load.
+L3076:   - Kept protects rose from 2 to 114688; verify off; K 0; gate D 0; P2 total 0; cvars match W6-GATES v2.
+L3077:   - logdiff vs s4bL0: NEW 6 (the hang lines only), MORE 0.
+L3078:   - The hang at 22:26:29 (owner lr 83FAF200) recovered; WM_CLOSE took 1.51 s.
+L3079:   - One GONE line (of 73) is still being identified; it comes with s4b17's verdict.
+L3080: - **The W6 functional set is complete:** gates A and B, sides 1/2/3, s4b22, s4b23 and G3. P2 total is 0 on every W6 run.
+L3081: - **Finding 10 so far:** 4 of 13 runs tonight (w6gA, s4b24, s4b20, w6gB), all recovered, all under the -j8 build. It stays a WARN; W6 on the idle PC is the load test.
+L3082: - **s4b17 (W9 gate)** started at 22:31:04. W9 is in tonight only if it passes by 23:45.
+L3083: - **Launcher:**
+L3084:   - STOP smoke test at 22:34: exit 2, as expected. The STOP file and status\ were removed afterwards.
+L3085:   - Every test on 16B90FA8 passes: go 16/16, gate 13/13 (t-relaxed passed in its solo re-run), hold 4/4, run 5/5, pin 2/2.
+L3086:   - My re-hash at 22:36: all 3 files match, and the folder holds only those 3.
+L3087:   - The pins are taken at the 23:45 double-click. If any runner file changes after that, the launcher refuses that window.
+L3088: - **The day launcher changes approach:** -StopAt is a dry-run-only test hook in run-night.ps1 (L65–67). So RUN-DAY can't drive the pinned launcher unchanged.
+L3089:   - Agent 5 is writing run-day.ps1, a copy of 16B90FA8 generated by make-run-day.ps1. Only marked lines change: -StopAt is allowed and required, it pins RUN-DAY.cmd, and the HOLD text is changed.
+L3090:   - It uses the same real mutex, so it can never run alongside the night launcher.
+L3091:   - Also coming: launcher-ctl.ps1, RUN-DAY.cmd, STOP-LAUNCHER.cmd and README-DAY.md.
+L3092:   - Everything goes in build\agent5\day-draft, with hashes by ~23:35. Agents 10/11 rate it after the windows.
+L3093: - **native4b** was at [456/485] at 22:36.
+L3094: 

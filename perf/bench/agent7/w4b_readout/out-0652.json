@@ -1,0 +1,194 @@
+{
+ "dir": "<workspace>\\build\\agent8\\matrix\\20261122-0652",
+ "title": "NATIVE3D zero-code checks (agent slot, hidden desktop, functional, NOT timing): Agent 7's specs for Agent 1's slot item 3b (06:29). n2t/n3t/n2s on build/agent2/native3d-bin",
+ "command": "python bench\\agent7\\w4b_readout\\w4b_readout.py build\\agent8\\matrix\\20261122-0652 --all -o bench\\agent7\\w4b_readout\\out-0652.md --json bench\\agent7\\w4b_readout\\out-0652.json",
+ "ref": "n2t",
+ "order": [
+  "n2t"
+ ],
+ "n_rows": 1,
+ "n_scored": 1,
+ "n_kept": 1,
+ "keep_rule": "kept = scored, frame stats, no real problems, valid timing or not (--all), not excluded",
+ "functional": 1,
+ "runs": [
+  {
+   "seq": "1",
+   "round": "1",
+   "arm": "n2t",
+   "rep": "1",
+   "name": "0652-n2t-r1",
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-0652\\runs\\0652-n2t-r1",
+   "scored": true,
+   "valid": false,
+   "excluded": false,
+   "flags_excluding": [],
+   "keep": true,
+   "why": [
+    "not timing (kept: --all)"
+   ],
+   "benign": [],
+   "frames_source": "native",
+   "stats": {
+    "frames": 8204,
+    "window_s": 60.00463550000012,
+    "fps": 136.72277035996635,
+    "p50_ms": 6.4498,
+    "p99_ms": 21.5508,
+    "low1_fps": 32.887558520302115,
+    "low1_frames": 82,
+    "over33": 23,
+    "over33_min": 22.998223195606233
+   },
+   "check": [],
+   "draws_10s": null,
+   "scene_d": null,
+   "scene_loo": false,
+   "scene_flag": false,
+   "phase": "normal (DAT fails 34, <4.5 ms 0.06)",
+   "slow": {
+    "onset": null,
+    "in_window": false,
+    "win_share": 0.0
+   },
+   "slow_txt": "no",
+   "slow_win": false,
+   "timerq": {
+    "blocking": "False",
+    "onset_s": "-",
+    "slow_pct": "0",
+    "span_s": "128",
+    "fg": "0"
+   },
+   "results_fps_mean": 136.723,
+   "status": "OK",
+   "median_ms_csv": 6.4498,
+   "game_cores": 1.8654127943792185,
+   "game_src": "run.json window_cpu_cores_mean",
+   "bg": {
+    "samples": 60,
+    "skipped": 0,
+    "ncpu": 12.0,
+    "window_s": 60.00463604927063,
+    "busy_med": 0.9992764052732646,
+    "sys_cores": 11.991316863279174,
+    "game_cores": 1.8654127943792185,
+    "game_src": "run.json window_cpu_cores_mean",
+    "bg_cores": 10.071337916603936,
+    "bg_mean": 10.058191083766141,
+    "bg_p90": 10.297071954176582,
+    "bg_max": 10.703601662711904,
+    "sat_share": 0.9333333333333333,
+    "sat": true
+   },
+   "bg_note": "ok",
+   "bg_flags": [
+    "SAT"
+   ],
+   "bg_flag": false
+  }
+ ],
+ "arms": {
+  "n2t": {
+   "n": 1,
+   "n_lt3": true,
+   "runs": [
+    "0652-n2t-r1"
+   ],
+   "slow": 0,
+   "scene_flags": 0,
+   "bg": {
+    "med": 10.071337916603936,
+    "lo": 10.071337916603936,
+    "hi": 10.071337916603936,
+    "n": 1
+   },
+   "bg_plus": 0,
+   "sat": 1,
+   "fps": {
+    "med": 136.72277035996635,
+    "lo": 136.72277035996635,
+    "hi": 136.72277035996635,
+    "spread_pct": 0.0
+   },
+   "p50_ms": {
+    "med": 6.4498,
+    "lo": 6.4498,
+    "hi": 6.4498
+   },
+   "p99_ms": {
+    "med": 21.5508,
+    "lo": 21.5508,
+    "hi": 21.5508
+   },
+   "low1_fps": {
+    "med": 32.887558520302115,
+    "lo": 32.887558520302115,
+    "hi": 32.887558520302115
+   },
+   "over33_min": {
+    "med": 22.998223195606233,
+    "lo": 22.998223195606233,
+    "hi": 22.998223195606233
+   }
+  }
+ },
+ "deltas": {},
+ "arms_clean": null,
+ "deltas_clean": null,
+ "scene": {
+  "pool_from": "scored (no kept reference run with draws)",
+  "ref_runs": [],
+  "loo": [],
+  "threshold": 0.015,
+  "floor": 0.015,
+  "factor": 2.0,
+  "ref_p50": null,
+  "ref_mean": null
+ },
+ "timerq_note": "ran `powershell -NoProfile -ExecutionPolicy Bypass -File bench\\agent11\\timerq_slowstate.ps1 -Root <workspace>\\build\\agent8\\matrix -Since 20261122-0652 -EMhz 800 -MinRows 3`",
+ "timerq_rows": 1,
+ "slow_rule": {
+  "emhz": 800.0,
+  "rows": 3
+ },
+ "run_matrix_fps": {
+  "n2t": 136.723
+ },
+ "bg": {
+  "ref": null,
+  "ref_src": "none (no unsaturated scored run with sys.csv here or in 20261122-0013)",
+  "margin": 1.0,
+  "sat_busy": 0.97,
+  "ref_dir": {
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261122-0013",
+   "name": "20261122-0013",
+   "scored": 16,
+   "with_sys": 0,
+   "sat": 0,
+   "bg_values": [],
+   "bg_med": null,
+   "game_by_arm": {
+    "d0": {
+     "med": 3.430539344458139,
+     "n": 4
+    },
+    "base": {
+     "med": 3.4164919347634655,
+     "n": 4
+    },
+    "d11": {
+     "med": 3.4655676561260167,
+     "n": 4
+    },
+    "n0": {
+     "med": 2.329236885775754,
+     "n": 4
+    }
+   }
+  },
+  "all_sat": true,
+  "kept_with_bg": 1,
+  "sat_kept": 1
+ }
+}

@@ -1,0 +1,8 @@
+--- stop-snap.ps1.pre-S3e
++++ stop-snap.ps1
+@@ -11,3 +11,4 @@
+ $me = $PID
+-$drivers = 'build-snap\.ps1|run-s2\.ps1|run-s3\.ps1|run-s3d\.ps1|run-b\.ps1|prep-b\.py|b-chain\.ps1|rb-chain\.ps1|run-rb\d\.ps1|prep-rb\d\.py|run-nb\.ps1|prep-nb\.py'
++# 04:5x: run-s3e.ps1, the native3e driver (S3e = S3d + Agent 4's next draw.cpp write; Agent 1's GO only).
++$drivers = 'build-snap\.ps1|run-s2\.ps1|run-s3\.ps1|run-s3d\.ps1|run-s3e\.ps1|run-b\.ps1|prep-b\.py|b-chain\.ps1|rb-chain\.ps1|run-rb\d\.ps1|prep-rb\d\.py|run-nb\.ps1|prep-nb\.py'
+ $ps = Get-CimInstance Win32_Process | Where-Object {

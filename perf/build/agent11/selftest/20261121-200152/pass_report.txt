@@ -1,0 +1,19 @@
+Test G driver report (bench/agent11/testg_driver.ps1), watch mode
+started 2026-11-21 20:01:55, ran 1.0 s; game pid 74928; log <workspace>\build\agent11\selftest\20261121-200152\pass.log
+window at start: no window
+desktop at start: foreground window 0x0; input desktop 'Default'
+guest at start: running (10 pause line(s) already in the log)
+parameters: Cycles=5 PeriodMs=300 HoldMs=1000 GapMs=1000 SuspendTimeoutMs=5000 ResumeTimeoutMs=1000 UiHangMs=10000 FromStart=True
+
+cycle verdict       susp_ms res_ms paused_ms threads(s/r) tid(s/r)        note
+    1 ok                                 300        17/17 4242/4242       
+    2 ok                                 300        17/17 4242/4242       
+    3 ok                                 300        17/17 4242/4242       
+    4 ok                                 300        17/17 4242/4242       
+    5 ok                                 300        17/17 4242/4242       
+
+cycles: 5 (ok=5); stray 'Guest resumed' lines: 0
+paused time per cycle (log timestamps): median 300 ms, max 300 ms; post-mode resume latency: median - ms, max - ms
+UI thread: 0 WM_NULL pings, 0 unanswered, slowest answer 0 ms, longest silence 0 ms
+error/critical log lines during the test: 0
+VERDICT: PASS - 5 cycles, every one resumed in time

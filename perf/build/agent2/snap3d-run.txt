@@ -1,0 +1,26 @@
+﻿03:43:18 [S3d] verify S3d : exit 0 : verify S3d against STATE-S3d-0342.tsv: 23843 files, 0 hashed (size/mtime changed), 1 backups checked, 0 extra file(s) in snap1, 0 problem(s), 1.5s
+03:43:19 [S3d] PATCHES-S3d.tsv: 1 row, rexlego/src/gpu_native/draw.cpp 50AA3B1DEE615678 -> 5EA1F3576DCC2F90; snap1 copy == after
+03:43:19 [S3d] START S3d native (tag snap3d, -j 10) -> native3d-bin
+03:43:19 [S3d] BEGIN build : <workspace>\build\agent2\build-snap.ps1 -Phase game -Native -Tag snap3d -Jobs 10 -PrelinkJobs 10 -KeepGoing
+03:45:02 [S3d] END   build exit=0 wall=102.7s freeC=251.56GB
+03:45:02 [S3d] rexruntime.dll in snap1-on == install/bin (D1D66AC3716835AC)
+03:45:02 [S3d] BEGIN stage : <workspace>\build\agent2\stage-snap-bin.ps1 -Variant native -SnapTag S3d -BuildTag snap3d -OutDir <workspace>\build\agent2\native3d-bin -RuntimeStrings audio_shutdown_detach_worker,leave it running and leak what it can still reach -ExeStrings which can hang when the guest pauses,LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD,LEGO_NATIVE_FPS_CELL_RECTS,LEGO_NATIVE_TEXTURE_STAGING_POOL -ManifestNotesFile <workspace>\build\agent2\S3d-notes.txt -CompareBin <workspace>\build\agent2\native3-bin -CompareWhy S3d changed rexlego/src/gpu_native/draw.cpp -WhatText native build 3d (S3 + the Agent 4 draw.cpp write): NATIVE_GPU=ON with Agent 6 AOT inputs
+03:46:16 [S3d] END   stage exit=0 wall=74.5s freeC=251.21GB
+03:46:17 [S3d]   PASS legodimensions.exe differs from the one in native3-bin (S3d changed rexlego/src/gpu_native/draw.cpp)
+03:46:17 [S3d]   NOTE legodimensions.map differs from the one in native3-bin
+03:46:17 [S3d]   PASS rexruntime.dll == the one in native3-bin
+03:46:17 [S3d]   PASS rexgpu-xenos.dll == the one in native3-bin
+03:46:17 [S3d]   PASS TracyClient.dll == the one in native3-bin
+03:46:17 [S3d]   PASS achievement_unlocked.wav == the one in native3-bin
+03:46:17 [S3d]   PASS FiraSans-Regular.ttf == the one in native3-bin
+03:46:17 [S3d]   PASS amd_fidelityfx_dx12.dll == the one in native3-bin
+03:46:17 [S3d]   PASS staged copy identical: amd_fidelityfx_dx12.dll
+03:46:17 [S3d]   staged 8 files into <workspace>\build\agent2\native3d-bin (363.7 MB)
+03:46:18 [S3d]   staged legodimensions.exe: 315790336 B, sha256 B90DF683D0A57A21F4DC24F8EA69F75FC954ADD4712B830A08C28F82FF521944
+03:46:18 [S3d]   staged legodimensions.map: 43712449 B, sha256 1C9AB7E3E471A6BAC2260F78827ED6EDB1635FD567873BD74CCCCD437234BE83
+03:46:18 [S3d]   staged rexruntime.dll: 10889728 B, sha256 D1D66AC3716835AC40E1C61BC0600C147564563AE20E0D339AE7A00A77E3A1D8
+03:46:18 [S3d]   staged rexgpu-xenos.dll: 3385344 B, sha256 EE0A661FB0C30FCB1A9655D67B8968F346DC7EEBA1D32E748163D8D70620A5C5
+03:46:18 [S3d]   staged MANIFEST.txt: 24243 B, sha256 368F9CE650EC56CE458B459B9EE41E888ACCD67AA170C92381B51D783C6A7015
+03:46:18 [S3d]   MANIFEST patch rows: S1 0 / S2 18 / S3 28 / S3d 1; checks: 103 PASS / 0 FAIL / 34 NOTE
+03:46:18 [S3d]   native GPU fingerprint: LEGO Dimensions native GPU 335ff2d47268f3a1
+03:46:18 [S3d] DONE S3d native, total wall 179.7s

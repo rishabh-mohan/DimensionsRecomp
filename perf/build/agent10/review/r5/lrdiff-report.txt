@@ -1,0 +1,150 @@
+A build\agent10\review\r5\batch-2328 (build\agent10\review\r5\batch-2328\generated\default): 412 TUs, 165023 functions, duplicates 0, LR lines {'mflr': 1, 'lr_const': 3, 'lr_mtlr': 2, 'funcs_with_lr': 1}, other ctx.lr lines 1
+B build\agent9\install\batch-nolr (build\agent9\install\batch-nolr\generated\default): 430 TUs, 165023 functions, duplicates 0, LR lines {'mflr': 128920, 'lr_const': 621314, 'lr_mtlr': 97918, 'funcs_with_lr': 129043}, other ctx.lr lines 1
+ref build\agent9\generated\off4 (build\agent9\generated\off4\default): 438 TUs, 165023 functions, duplicates 0, LR lines {'mflr': 128920, 'lr_const': 621314, 'lr_mtlr': 97918, 'funcs_with_lr': 129043}, other ctx.lr lines 1
+functions only in A 0 [], only in B 0 []
+common 165023: body minus LR statements EQUAL 165017, DIFFERENT 6; fully identical (same LR statements too) 35980
+A functions with LR statements: 1 ['sub_83E5C830']
+DIFF sub_82BBF828 (A legodimensions_recomp.62.cpp, B legodimensions_recomp.106.cpp):
+    --- A
+    +++ B
+    @@ -25 +25,11 @@
+     
+    +extern void NativeCelShadingViewGate(PPCRegister& r10);
+    +
+    +extern void NativeCelShadingMaskGate(PPCRegister& r8);
+    +
+    +extern void NativeCelShadingTrace(PPCRegister& r9, PPCRegister& r22, PPCRegister& r30, PPCRegister& r19);
+    +
+    +extern void NativeCelShadingDefaultBinding(PPCRegister& r4, PPCRegister& r26, PPCRegister& r22, PPCRegister& r30);
+    +
+    +extern void NativeCelShadingIndexedBinding(PPCRegister& r4, PPCRegister& r26, PPCRegister& r22, PPCRegister& r30);
+    +
+DIFF sub_83527670 (A legodimensions_recomp.129.cpp, B legodimensions_recomp.314.cpp):
+    --- A
+    +++ B
+    @@ -63,3 +63 @@
+     
+    -extern bool MissingAdventureTimeLookupNode(PPCRegister& r11);
+    -
+DIFF sub_82E28228 (A legodimensions_recomp.212.cpp, B legodimensions_recomp.360.cpp):
+    --- A
+    +++ B
+    @@ -27 +27,3 @@
+     
+    +extern void RepairDialogueLockReleaseOperand(PPCRegister& r3);
+    +
+DIFF sub_82E22890 (A legodimensions_recomp.267.cpp, B legodimensions_recomp.262.cpp):
+    --- A
+    +++ B
+    @@ -74,3 +74 @@
+     
+    -extern void RepairDialogueLockReleaseOperand(PPCRegister& r3);
+    -
+DIFF sub_82BBF8C8 (A legodimensions_recomp.367.cpp, B legodimensions_recomp.376.cpp):
+    --- A
+    +++ B
+    @@ -25,11 +25 @@
+     
+    -extern void NativeCelShadingViewGate(PPCRegister& r10);
+    -
+    -extern void NativeCelShadingMaskGate(PPCRegister& r8);
+    -
+    -extern void NativeCelShadingTrace(PPCRegister& r9, PPCRegister& r22, PPCRegister& r30, PPCRegister& r19);
+    -
+    -extern void NativeCelShadingDefaultBinding(PPCRegister& r4, PPCRegister& r26, PPCRegister& r22, PPCRegister& r30);
+    -
+    -extern void NativeCelShadingIndexedBinding(PPCRegister& r4, PPCRegister& r26, PPCRegister& r22, PPCRegister& r30);
+    -
+DIFF sub_8352C9AC (A legodimensions_recomp.381.cpp, B legodimensions_recomp.279.cpp):
+    --- A
+    +++ B
+    @@ -25 +25,3 @@
+     
+    +extern bool MissingAdventureTimeLookupNode(PPCRegister& r11);
+    +
+B LR statements vs ref: EQUAL 165023, DIFFERENT 0, B functions missing in ref 0
+other ctx.lr lines (kept in the body): A 1, B 1, same multiset True
+  sub_83E5C830: { auto old_lr = ctx.lr; (A 1, B 1)
+TU preambles (TU numbers masked): 0 lines only in A, 0 only in B
+per-TU headers as a line set (TU numbers masked): 0 lines only in A, 0 only in B
+legodimensions_pch.h: DIFFERENT
+    --- A
+    +++ B
+    @@ -10,3 +10,2 @@
+     
+    -#define REX_CONFIG_SKIP_LR
+     #define REX_CONFIG_CTR_AS_LOCAL
+legodimensions_init.h: identical
+sources.cmake: DIFFERENT
+    --- A
+    +++ B
+    @@ -420,2 +420,20 @@
+         ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.411.cpp
+    +    ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.412.cpp
+    +    ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.413.cpp
+    +    ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.414.cpp
+    +    ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.415.cpp
+    +    ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.416.cpp
+    +    ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.417.cpp
+    +    ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.418.cpp
+    +    ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.419.cpp
+    +    ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.420.cpp
+    +    ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.421.cpp
+    +    ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.422.cpp
+    +    ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.423.cpp
+    +    ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.424.cpp
+    +    ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.425.cpp
+    +    ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.426.cpp
+    +    ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.427.cpp
+    +    ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.428.cpp
+    +    ${CMAKE_CURRENT_LIST_DIR}/legodimensions_recomp.429.cpp
+     )
+codegen.d: identical
+legodimensions_funcs.h: identical (76efb251276cb23d)
+legodimensions_init.cpp: DIFFERENT (4885154d87063e1a vs 72a600ba90a42848), 165292 vs 165292 lines; line set: 1 lines only in A, 1 only in B
+  -         .skip_lr = true,
+  +         .skip_lr = false,
+legodimensions_register.cpp: identical (747f2edadbf61a24)
+codegen.partition.json: DIFFERENT (608233868933c3a5 vs 9dadabcc6f543432), 165031 vs 165031 lines; line set: 164218 lines only in A, 164218 only in B
+  -     "82628230": 27,
+  -     "82628240": 45,
+  -     "82628250": 120,
+  -     "82628258": 122,
+  -     "82628260": 222,
+  -     "82628270": 373,
+  -     "826282C0": 396,
+  -     "82628300": 398,
+  +     "82628230": 412,
+  +     "82628240": 413,
+  +     "82628250": 414,
+  +     "82628258": 415,
+  +     "82628260": 416,
+  +     "82628270": 417,
+  +     "826282C0": 418,
+  +     "82628300": 419,
+codegen.stamp: DIFFERENT (2532021279f5c39a vs 211d2a0582e81d4a), 838 vs 874 lines; line set: 1 lines only in A, 37 only in B
+  -   "fingerprint": "1a219d51f75951116e1aecf46edc2009",
+  +     "legodimensions_funcs.412.h",
+  +     "legodimensions_funcs.413.h",
+  +     "legodimensions_funcs.414.h",
+  +     "legodimensions_funcs.415.h",
+  +     "legodimensions_funcs.416.h",
+  +     "legodimensions_funcs.417.h",
+  +     "legodimensions_funcs.418.h",
+  +     "legodimensions_funcs.419.h",
+codegen.build.stamp: DIFFERENT (953d89c1cc8eab41 vs 3cadf438b187fa22), 2 vs 2 lines; line set: 1 lines only in A, 1 only in B
+  - 1a219d51f75951116e1aecf46edc2009
+  + bc4c7504e6f8af09efdf2f7e51b79ae3
+config: A build\agent10\review\r5\batch-2328\legodimensions_config.toml, B build\agent9\install\batch-nolr\legodimensions_config.toml
+    --- A
+    +++ B
+    @@ -25,3 +25,2 @@
+     # Stage A register localization. The body= entries, their owners and their callers keep registers in ctx automatically.
+    -skip_lr = true
+     ctr_as_local = true
+    @@ -37,3 +36,4 @@
+     musttail_calls = true
+    -# Not now: skip_msr (STATUS decision 4); non_argument_as_local + non_volatile_as_local (Stage B/C: together, after the gate).
+    +# Not for LEGO: skip_lr (host hooks and XexGetProcedureAddress read ctx.lr as the caller), skip_msr (STATUS decision 4).
+    +# Later: non_argument_as_local + non_volatile_as_local (Stage B/C: together, after the gate).
+     

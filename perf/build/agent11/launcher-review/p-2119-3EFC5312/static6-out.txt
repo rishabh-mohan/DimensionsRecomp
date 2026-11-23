@@ -1,0 +1,185 @@
+static6 2026-11-22 21:19:19 launcher=build/agent11/launcher-review/p-2119-3EFC5312/run-night.ps1 sha=3EFC5312D0982E77D0F92D154D54EB063D9495A63812432113DEE65859630E5C
+AllowedEnv=REX_TIMER_WAIT_BLOCKING,LEGO_GPU_WAIT_STATS,LEGO_GPU_WAIT_BACKOFF_US,LEGO_GPU_WAIT_SPIN_US,LEGO_NATIVE_FRAME_METRICS,LEGO_NATIVE_SHADER_MISS_CACHE,LEGO_NATIVE_THREADED,LEGO_NATIVE_PREPARE_THREADS,LEGO_NATIVE_SNAPSHOT_STATE,LEGO_NATIVE_FULL_DRAW_PREPARATION,LEGO_NATIVE_CHAIN_PRIORITY (11 keys)
+DriverRule=cd64-plain (plain string, forward slash, case-sensitive, any file in drivers\)
+drivers dir: io-counters.ps1, LdSys.cs, pso-stats-at-end.ps1, sys-csv.ps1, thread-cpu.ps1
+bench\agent8\run\matrix-base-vs-devoff1.json  sha=91AC59B0 arms=2 refused=1 sys_csv=
+   base           bin=build/baseline-bin  REFUSE[bin-not-agent2]
+   r0             bin=build/agent2/devoff1-bin  ok
+bench\agent8\run\matrix-codegen-check.json  sha=D64F2BE2 arms=4 refused=4 sys_csv=
+   b-gate         bin=build/agent2/devoffB-bin  REFUSE[menu]
+   a-prof         bin=build/agent2/devoff2-bin  REFUSE[profile]
+   b-prof         bin=build/agent2/devoffB-bin  REFUSE[profile]
+   n-prof         bin=build/agent2/native2-bin  REFUSE[profile]
+bench\agent8\run\matrix-codegen.json  sha=40CF4072 arms=2 refused=0 sys_csv=
+   a              bin=build/agent2/devoff2-bin  ok
+   b              bin=build/agent2/devoffB-bin  ok
+bench\agent8\run\matrix-io-level.json  sha=AFAABD33 arms=2 refused=2 sys_csv=
+   A              bin=build/agent2/devoff1-bin  REFUSE[menu]
+   B              bin=build/agent2/devoff1-bin  REFUSE[menu]
+bench\agent8\run\matrix-native-functional.json  sha=7E94C186 arms=7 refused=4 sys_csv=
+   n1             bin=build/agent2/native2-bin  ok
+   n2             bin=build/agent2/native2-bin  ok
+   n3             bin=build/agent2/native2-bin  ok
+   f1             bin=build/agent2/native2-bin  REFUSE[env:LEGO_NATIVE_STATE_CALLS env:LEGO_NATIVE_STATE_CALLS_TRIGGER triggers]
+   f2             bin=build/agent2/native2-bin  REFUSE[env:LEGO_NATIVE_STATE_CALLS env:LEGO_NATIVE_STATE_CALLS_TRIGGER env:LEGO_NATIVE_ELIDE_STATE_CALLS triggers]
+   p1             bin=build/agent2/native2-bin  REFUSE[env:LEGO_NATIVE_PSO_STATS env:LEGO_NATIVE_PSO_STATS_INTERVAL]
+   p2             bin=build/agent2/native2-bin  REFUSE[env:LEGO_NATIVE_PSO_STATS env:LEGO_NATIVE_PSO_STATS_INTERVAL seed_cache]
+bench\agent8\run\matrix-native-pso.json  sha=41F32CF8 arms=5 refused=5 sys_csv=
+   p1             bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_PSO_STATS env:LEGO_NATIVE_PSO_STATS_INTERVAL]
+   p2             bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_PSO_STATS env:LEGO_NATIVE_PSO_STATS_INTERVAL seed_cache]
+   p3             bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_PSO_STATS env:LEGO_NATIVE_PSO_STATS_INTERVAL env:LEGO_NATIVE_PSO_CACHE]
+   p4a            bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_PSO_STATS env:LEGO_NATIVE_PSO_STATS_INTERVAL env:LEGO_NATIVE_PSO_PREPARE_THREADS seed_cache]
+   p4b            bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_PSO_STATS env:LEGO_NATIVE_PSO_STATS_INTERVAL env:LEGO_NATIVE_PSO_PREPARE_THREADS seed_cache]
+bench\agent8\run\matrix-native-threaded.json  sha=76FE0BAA arms=4 refused=0 sys_csv=True
+   n0             bin=build/agent2/native3d-bin  ok
+   th1            bin=build/agent2/native3d-bin  ok
+   th2            bin=build/agent2/native3d-bin  ok
+   th3            bin=build/agent2/native3d-bin  ok
+bench\agent8\run\matrix-native-tier1.json  sha=95200E0B arms=6 refused=5 sys_csv=
+   n0             bin=build/agent2/native-bin  ok
+   a1             bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_FORCE_GAMMA_PASS env:LEGO_NATIVE_FULL_PRESENT_CLEAR]
+   d0             bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_VSYNC env:LEGO_NATIVE_FPS_LIMIT]
+   d1             bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_VSYNC env:LEGO_NATIVE_FPS_LIMIT env:LEGO_NATIVE_UNLOCKED_PACING]
+   t1             bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_ELIDE_STATE_CALLS]
+   t2             bin=build/agent2/native-bin  REFUSE[env:PLUME_D3D12_STATE_CACHE]
+bench\agent8\run\matrix-native-tier2.json  sha=3B147D5C arms=7 refused=6 sys_csv=
+   n0             bin=build/agent2/native-bin  ok
+   e0             bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_COMMAND_SLOTS]
+   e1             bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_COMMAND_SLOTS env:LEGO_NATIVE_FRAMES_IN_FLIGHT]
+   v0             bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_VSYNC]
+   g1             bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_VSYNC env:LEGO_NATIVE_LATENCY_WAIT]
+   e0-diag        bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_COMMAND_SLOTS env:LEGO_NATIVE_TIMING]
+   e1-diag        bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_COMMAND_SLOTS env:LEGO_NATIVE_FRAMES_IN_FLIGHT env:LEGO_NATIVE_TIMING]
+bench\agent8\run\matrix-native-tier3.json  sha=50E82C8F arms=6 refused=6 sys_csv=
+   d1             bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_VSYNC env:LEGO_NATIVE_FPS_LIMIT env:LEGO_NATIVE_UNLOCKED_PACING]
+   d2             bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_VSYNC env:LEGO_NATIVE_FPS_LIMIT env:LEGO_NATIVE_UNLOCKED_PACING]
+   e1             bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_COMMAND_SLOTS env:LEGO_NATIVE_FRAMES_IN_FLIGHT]
+   e2             bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_COMMAND_SLOTS env:LEGO_NATIVE_FRAMES_IN_FLIGHT]
+   g1             bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_VSYNC env:LEGO_NATIVE_LATENCY_WAIT]
+   g2             bin=build/agent2/native-bin  REFUSE[env:LEGO_NATIVE_VSYNC env:LEGO_NATIVE_LATENCY_WAIT]
+bench\agent8\run\matrix-native-uploads-45.json  sha=114A0242 arms=3 refused=2 sys_csv=True
+   u0             bin=build/agent2/native3-bin  ok
+   u1             bin=build/agent2/native3-bin  REFUSE[env:LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD]
+   u2             bin=build/agent2/native3-bin  REFUSE[env:LEGO_NATIVE_TEXTURE_STAGING_POOL]
+bench\agent8\run\matrix-native-uploads.json  sha=15BB7822 arms=6 refused=5 sys_csv=
+   u0             bin=build/agent2/native3-bin  ok
+   u1             bin=build/agent2/native3-bin  REFUSE[env:LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD]
+   u2             bin=build/agent2/native3-bin  REFUSE[env:LEGO_NATIVE_TEXTURE_STAGING_POOL]
+   s0             bin=build/agent2/native3-bin  REFUSE[env:LEGO_NATIVE_SLOW_OPERATIONS]
+   s1             bin=build/agent2/native3-bin  REFUSE[env:LEGO_NATIVE_SLOW_OPERATIONS env:LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD]
+   s2             bin=build/agent2/native3-bin  REFUSE[env:LEGO_NATIVE_SLOW_OPERATIONS env:LEGO_NATIVE_TEXTURE_STAGING_POOL]
+bench\agent8\run\matrix-s3-functional.json  sha=3A5C277F arms=3 refused=0 sys_csv=True
+   d0t            bin=build/agent2/devoff2-bin  ok
+   d11t           bin=build/agent2/devoff2-bin  ok
+   d0f            bin=build/agent2/devoff2-bin  ok
+bench\agent8\run\matrix-window3.json  sha=DE293D96 arms=5 refused=1 sys_csv=
+   d0             bin=build/agent2/devoff2-bin  ok
+   base           bin=build/baseline-bin  REFUSE[bin-not-agent2]
+   d11            bin=build/agent2/devoff2-bin  ok
+   n0             bin=build/agent2/native2-bin  ok
+   d12            bin=build/agent2/devoff2-bin  ok
+bench\agent8\run\matrix-window4.json  sha=6CA4AC6E arms=5 refused=0 sys_csv=True
+   d0             bin=build/agent2/devoff2-bin  ok
+   B              bin=build/agent2/devoffB-bin  ok
+   d3             bin=build/agent2/devoff3-bin  ok
+   d0t            bin=build/agent2/devoff2-bin  ok
+   d11t           bin=build/agent2/devoff2-bin  ok
+bench\agent8\run\matrix-window5-s3d.json  sha=4D7D689B arms=5 refused=0 sys_csv=True
+   base           bin=build/agent2/devoff3-bin  ok
+   s0             bin=build/agent2/devoff4-bin  ok
+   d11            bin=build/agent2/devoff4-bin  ok
+   d11t           bin=build/agent2/devoff4-bin  ok
+   d11p           bin=build/agent2/devoff4-bin  ok
+bench\agent8\run\matrix.example.json  sha=26809577 arms=2 refused=2 sys_csv=
+   base           bin=build/baseline-bin  REFUSE[bin-not-agent2]
+   base-vsync0    bin=build/baseline-bin  REFUSE[bin-not-agent2]
+bench\agent8\run\matrix.json  sha=F68A58EC arms=8 refused=1 sys_csv=
+   base           bin=build/baseline-bin  REFUSE[bin-not-agent2]
+   r0             bin=build/agent2/devoff1-bin  ok
+   r1             bin=build/agent2/devoff1-bin  ok
+   r2             bin=build/agent2/devoff1-bin  ok
+   r3             bin=build/agent2/devoff1-bin  ok
+   r4             bin=build/agent2/devoff1-bin  ok
+   io-b           bin=build/agent2/devoff1-bin  ok
+   r0g            bin=build/agent2/devoff1-bin  ok
+build\agent4\matrix-native-threaded.419FAE1F.json  sha=419FAE1F arms=4 refused=0 sys_csv=
+   n0             bin=build/agent2/native3d-bin  ok
+   th1            bin=build/agent2/native3d-bin  ok
+   th2            bin=build/agent2/native3d-bin  ok
+   th3            bin=build/agent2/native3d-bin  ok
+build\agent4\repin\matrix-repin-native4b-boot.json  sha=37DFC58F arms=1 refused=1 sys_csv=
+   b0             bin=build/agent2/native4b-bin  REFUSE[bin-missing:MANIFEST.txt bin-missing:legodimensions.exe]
+build\agent4\repin\matrix-repin-native4b.json  sha=2580067D arms=4 refused=3 sys_csv=
+   n0old          bin=build/agent2/native4-bin  ok
+   n0             bin=build/agent2/native4b-bin  REFUSE[bin-missing:MANIFEST.txt bin-missing:legodimensions.exe]
+   n2             bin=build/agent2/native4b-bin  REFUSE[bin-missing:MANIFEST.txt bin-missing:legodimensions.exe]
+   n3             bin=build/agent2/native4b-bin  REFUSE[bin-missing:MANIFEST.txt bin-missing:legodimensions.exe]
+build\agent4\repin\matrix-repin-packhit.json  sha=490964AC arms=2 refused=2 sys_csv=
+   t0             bin=build/agent2/native4b-bin  REFUSE[bin-missing:MANIFEST.txt bin-missing:legodimensions.exe env:LEGO_NATIVE_TRACE_DIR]
+   t0p            bin=build/agent2/native4bp-bin  REFUSE[bin-missing:MANIFEST.txt bin-missing:legodimensions.exe env:LEGO_NATIVE_TRACE_DIR]
+build\agent4\repin\superseded\matrix-repin-native5.json  sha=91C951EE arms=4 refused=3 sys_csv=
+   n0old          bin=build/agent2/native4-bin  ok
+   n0             bin=build/agent2/native5-bin  REFUSE[bin-missing:MANIFEST.txt bin-missing:legodimensions.exe]
+   n2             bin=build/agent2/native5-bin  REFUSE[bin-missing:MANIFEST.txt bin-missing:legodimensions.exe]
+   n3             bin=build/agent2/native5-bin  REFUSE[bin-missing:MANIFEST.txt bin-missing:legodimensions.exe]
+build\agent5\w6-draft\matrix-w6.json  sha=8440B1E4 arms=6 refused=6 sys_csv=True
+   s0             bin=build/agent2/S4b-bin-TBD  REFUSE[bin-not-agent2]
+   p2             bin=build/agent2/S4b-bin-TBD  REFUSE[bin-not-agent2]
+   p2f            bin=build/agent2/S4b-bin-TBD  REFUSE[bin-not-agent2]
+   p2fc           bin=build/agent2/S4b-bin-TBD  REFUSE[bin-not-agent2]
+   f              bin=build/agent2/S4b-bin-TBD  REFUSE[bin-not-agent2]
+   fc             bin=build/agent2/S4b-bin-TBD  REFUSE[bin-not-agent2]
+build\agent5\w6-draft\matrix-window6.json  sha=E50D791B arms=6 refused=0 sys_csv=True
+   s0             bin=build/agent2/devoff4b-bin  ok
+   p2             bin=build/agent2/devoff4b-bin  ok
+   p2f            bin=build/agent2/devoff4b-bin  ok
+   p2fc           bin=build/agent2/devoff4b-bin  ok
+   f              bin=build/agent2/devoff4b-bin  ok
+   fc             bin=build/agent2/devoff4b-bin  ok
+build\agent5\w6-draft\check\matrix-window6.json  sha=DE34A02A arms=6 refused=0 sys_csv=True
+   s0             bin=build/agent2/devoff4-bin  ok
+   p2             bin=build/agent2/devoff4-bin  ok
+   p2f            bin=build/agent2/devoff4-bin  ok
+   p2fc           bin=build/agent2/devoff4-bin  ok
+   f              bin=build/agent2/devoff4-bin  ok
+   fc             bin=build/agent2/devoff4-bin  ok
+build\agent8\w6-stage\test\matrix-window6.json  sha=BD0696DA arms=6 refused=0 sys_csv=True
+   s0             bin=build/agent2/devoff4b-bin  ok
+   p2             bin=build/agent2/devoff4b-bin  ok
+   p2f            bin=build/agent2/devoff4b-bin  ok
+   p2fc           bin=build/agent2/devoff4b-bin  ok
+   f              bin=build/agent2/devoff4b-bin  ok
+   fc             bin=build/agent2/devoff4b-bin  ok
+--- driver values used (count)
+   drivers/io-counters.ps1  x2
+   drivers/pso-stats-at-end.ps1  x7
+   drivers/thread-cpu.ps1  x63
+--- env keys used (count)
+   LEGO_NATIVE_COMMAND_SLOTS  x6
+   LEGO_NATIVE_ELIDE_STATE_CALLS  x2
+   LEGO_NATIVE_FORCE_GAMMA_PASS  x1
+   LEGO_NATIVE_FPS_LIMIT  x4
+   LEGO_NATIVE_FRAME_METRICS  x47  (allowed)
+   LEGO_NATIVE_FRAMES_IN_FLIGHT  x4
+   LEGO_NATIVE_FULL_DRAW_PREPARATION  x5  (allowed)
+   LEGO_NATIVE_FULL_PRESENT_CLEAR  x1
+   LEGO_NATIVE_LATENCY_WAIT  x3
+   LEGO_NATIVE_PREPARE_THREADS  x10  (allowed)
+   LEGO_NATIVE_PSO_CACHE  x1
+   LEGO_NATIVE_PSO_PREPARE_THREADS  x2
+   LEGO_NATIVE_PSO_STATS  x7
+   LEGO_NATIVE_PSO_STATS_INTERVAL  x7
+   LEGO_NATIVE_SLOW_OPERATIONS  x3
+   LEGO_NATIVE_SNAPSHOT_STATE  x5  (allowed)
+   LEGO_NATIVE_STATE_CALLS  x2
+   LEGO_NATIVE_STATE_CALLS_TRIGGER  x2
+   LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD  x3
+   LEGO_NATIVE_TEXTURE_STAGING_POOL  x3
+   LEGO_NATIVE_THREADED  x13  (allowed)
+   LEGO_NATIVE_TIMING  x2
+   LEGO_NATIVE_TRACE_DIR  x2
+   LEGO_NATIVE_UNLOCKED_PACING  x3
+   LEGO_NATIVE_VSYNC  x8
+   PLUME_D3D12_STATE_CACHE  x1
+   REX_TIMER_WAIT_BLOCKING  x5  (allowed)
+files=27 fully-accepted=9  end 21:19:30

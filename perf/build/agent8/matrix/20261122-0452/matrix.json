@@ -1,0 +1,39 @@
+{
+  "title": "NATIVE3D functional check (agent slot, hidden desktop OK, NOT timing): Agent 4 task #12 step 3, the S3.2 hash=0 guard. n0/n2/n3 on build/agent2/native3d-bin",
+  "reference": "n0",
+  "warmup_s": 30,
+  "warmup_from": "firstframe",
+  "measure_s": 60,
+  "repeats": 1,
+  "order": "fixed",
+  "settle_s": 0,
+  "cooldown_s": 5,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "menu_s": 60,
+  "cold_run": false,
+  "quick": { "warmup_s": 10, "measure_s": 20, "settle_s": 0, "menu_s": 20, "cooldown_s": 5 },
+  "notes": [
+    "Run once Agent 2 has staged build/agent2/native3d-bin (S3 plus draw.cpp 5EA1F3576DCC2F90..., native only): run-matrix.ps1 -Matrix bench\\agent4\\s3\\matrix-native3d-functional.json -NoPrompt. Functional only (hidden desktop OK): log lines and counts, not frame times. 3 runs, about 10 min. All game runs end by 08:30.",
+    "Same settings as S3's N1-N3 (bench/agent8/run/matrix-native-functional.json; runs build/agent8/matrix/s3-n123-0205 and s3-n2-0210): native_settings_frontend=false, uncapped (native_fps_limit=0, framerate_limit=0), drivers/thread-cpu.ps1, frames=native, 30 s warm-up from the first frame, then a 60 s window. Only the bin changes. n0 has the same settings without the threaded env, so it is the same-bin baseline for 'no new warning type'.",
+    "Pass, checked by Agent 4 with bench/agent4/check_n_rows.py together with Agent 10: no 'Native GPU shader cache miss: hash=0x0000000000000000' lines in n2/n3 (S3 on native2: n2 67,220, n3 44,968, n0 0); no warning type that n0 lacks; both rows show 'threaded recording ON'; n2 shows 'Native draw batches: parallel workers=2'; n3 shows no 'Native draw batches' line (agent4-draw-path.md S3.1); draws/frame and the marks as in N2/N3. N3's heavy-scene rate starts about 37 s after the first frame, so keep the full window.",
+    "If n2/n3 still log hash=0, send the run dirs to Agent 4 anyway: the likely source is address-0 vertex shaders (agent4-draw-path.md S3.2). That follow-up needs its own proof, Agent 10's rating, Agent 1's GO and a second native3d build."
+  ],
+  "arms": [
+    { "id": "n0", "group": "native3d", "ref": true, "frames": "native", "bin": "build/agent2/native3d-bin",
+      "cvars": ["native_settings_frontend=false", "native_fps_limit=0", "framerate_limit=0"],
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv" },
+      "driver": "drivers/thread-cpu.ps1",
+      "note": "Agent 4 n0: default serial path, the same-bin baseline. It never calls PrepareDrawGeometry, so the guard can't change it: expect 0 hash=0 lines" },
+    { "id": "n2", "group": "native3d", "frames": "native", "bin": "build/agent2/native3d-bin",
+      "cvars": ["native_settings_frontend=false", "native_fps_limit=0", "framerate_limit=0"],
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv", "LEGO_NATIVE_THREADED": "1", "LEGO_NATIVE_PREPARE_THREADS": "2", "LEGO_NATIVE_SNAPSHOT_STATE": "1" },
+      "driver": "drivers/thread-cpu.ps1",
+      "note": "Agent 4 N2 on native3d: parallel draws, env as S3's n2. 'Native draw batches: parallel workers=2'; expect no hash=0 lines" },
+    { "id": "n3", "group": "native3d", "frames": "native", "bin": "build/agent2/native3d-bin",
+      "cvars": ["native_settings_frontend=false", "native_fps_limit=0", "framerate_limit=0"],
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv", "LEGO_NATIVE_THREADED": "1", "LEGO_NATIVE_PREPARE_THREADS": "2", "LEGO_NATIVE_FULL_DRAW_PREPARATION": "1" },
+      "driver": "drivers/thread-cpu.ps1",
+      "note": "Agent 4 N3 on native3d: full draw preparation, env as S3's n3. No 'Native draw batches' line; expect no hash=0 lines" }
+  ]
+}

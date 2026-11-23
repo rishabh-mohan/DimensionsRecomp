@@ -1,0 +1,13 @@
+run      <workspace>\build\agent3\selftest-runs\20261121-224956-crash
+mode     FUNCTIONAL ONLY (hidden desktop exebox-7T6FHH5QSWIXSTZXLNMFVGRIYF), NOT FOR TIMING
+result   CRASHED; closed by WM_CLOSE in 9.45 s; exit code 0xE0434352
+         event 1001 Windows Error Reporting: Fault bucket 2133063596693472624, type 5 Event Name: CLR20r3 Response: Not available Cab Id: 0 Problem signature: P1: fakedimensions.exe P2: 0.0.0.0 P3: 6b02744a P4: fakedimensions P5: 0.0.0.0 P6: 6b02744a P7: 3 P8: 67 P9: System.InvalidOperationException P10: Attached files: \\?\C:\ProgramData\Micr
+         event 1000 Application Error: Faulting application name: fakedimensions.exe, version: 0.0.0.0, time stamp: 0x6b02744a Faulting module name: KERNELBASE.dll, version: 10.0.26100.9974, time stamp: 0xa3ff6954 Exception code: 0xe0434352 Fault offset: 0x00000000000c569a Faulting process id: 0xBD48 Faulting application start time: 0x1D
+         event 1026 .NET Runtime: Application: fakedimensions.exe Framework Version: v4.0.30319 Description: The process was terminated due to an unhandled exception. Exception Info: System.InvalidOperationException at FakeGame.Present() at System.Windows.Forms.Timer.OnTick(System.EventArgs) at System.Windows.Forms.Timer+TimerNative
+         dumps: C:\Users\<user>\AppData\Local\CrashDumps\fakedimensions.exe.48456.dmp
+process  cpu 0.7 s over 18.53 s (avg 0.04 cores); peak working set 72 MB, peak private 25 MB
+boot     TU patch 0.0.0.3 -> 0.0.23.3 at 0.01 s; DXGI adapter 'Harness Fake Adapter' (0 MB) at 0.0 s; shader storage init at 0.01 s
+log      7 lines over 3.92 s: 1 warnings, 0 errors, 1 critical; 0 MISSING-FUNCTION addresses; unknown cvars: fake_selftest_cvar
+         3.92s [critical] self-test crash
+frames   119 presented over 2.47 s; none left after the 10.0 s warm-up
+perf     120 guest frames over 2.48 s in perf.csv; none left after the 10.0 s warm-up (counted from the first frame)

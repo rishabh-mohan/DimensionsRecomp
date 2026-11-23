@@ -1,0 +1,35 @@
+{
+  "title": "PACK HIT check (NOT TONIGHT; DRAFT; agent slot, hidden desktop OK, NOT timing): Agent 4, REPIN.md section 4. Traced n0 on native4b (t0) and on the pack bin native4bp (t0p)",
+  "reference": "t0",
+  "warmup_s": 30,
+  "warmup_from": "firstframe",
+  "measure_s": 240,
+  "repeats": 1,
+  "order": "fixed",
+  "settle_s": 0,
+  "cooldown_s": 5,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "menu_s": 60,
+  "cold_run": false,
+  "quick": { "warmup_s": 10, "measure_s": 20, "settle_s": 0, "menu_s": 20, "cooldown_s": 5 },
+  "notes": [
+    "NOT TONIGHT (Agent 1, task #12, 19:41): the pack bin needs the user's visual-check yes first (build/agent4/r2t6/VISUAL-CHECK.md). Adapted 2026-11-22 19:55 from the 14:40 draft (native5 / native5p) so it is ready if the yes comes: t0 on build/agent2/native4b-bin (tonight's pin candidate, S4b + S4c) and t0p on build/agent2/native4bp-bin, a PLACEHOLDER for the folder Agent 2 would stage. Until native4bp-bin has a MANIFEST.txt, run-matrix skips its arm.",
+    "Run it only after Agent 1's GO, once native4bp-bin is staged and repin_check.ps1 -Line snap1 -Pack -BinDir build\\agent2\\native4bp-bin shows the 4 pack hashes in the prelinked cache: bench\\agent8\\run\\run-matrix.ps1 -Matrix build\\agent4\\repin\\matrix-repin-packhit.json -NoPrompt -OutDir build\\agent3\\runs\\repin-packhit-<stamp> (always pass -OutDir: without it the output goes to build\\agent8\\matrix and trips Agent 1's HOLD). 2 runs, about 12 min.",
+    "Both arms are traced: LEGO_NATIVE_TRACE_DIR=<run>\\trace (the game creates the dir: long_probe.h:49). A trace turns off buffer/texture reuse and some draw fast paths, so traced runs pair only with traced runs. Only the bin differs between the arms. With the trace on, the game also saves a present frame every 5 s (device.cpp:2533-2548), and VISUAL-CHECK 3.3 can reuse those frames.",
+    "Pass: t0 is the positive control. Its events.tsv has draw_missing_vertex_shader / draw_missing_pixel_shader rows, and its game.log has the placement 'missing from AOT index' lines (native4 n0: VS 0xAC449538 x4, PS 0xAC448F28 x4); without them the check is void, not passed. t0p must have 0 draw_missing_* rows, no placement 'missing from AOT index' line and no 'unrecognized ... resource' line for the packed addresses. Its draws per frame p10/p50/p90 must be >= t0's, check_n_rows.py --baseline t0 --rows t0p=<dir> must exit 0, and it must close cleanly on WM_CLOSE.",
+    "On a fail, send both run dirs to Agent 4 and Agent 2 (VISUAL-CHECK.md section 5). The pack bin is parked, and the pin stays on native4b."
+  ],
+  "arms": [
+    { "id": "t0", "group": "nopack", "ref": true, "frames": "native", "bin": "build/agent2/native4b-bin",
+      "cvars": ["native_settings_frontend=false", "native_fps_limit=0", "framerate_limit=0"],
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv", "LEGO_NATIVE_TRACE_DIR": "<run>\\trace" },
+      "driver": "drivers/thread-cpu.ps1",
+      "note": "native4b (S4b + S4c), no pack, traced: the positive control (the 4 placement shaders miss)" },
+    { "id": "t0p", "group": "pack", "frames": "native", "bin": "build/agent2/native4bp-bin",
+      "cvars": ["native_settings_frontend=false", "native_fps_limit=0", "framerate_limit=0"],
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv", "LEGO_NATIVE_TRACE_DIR": "<run>\\trace" },
+      "driver": "drivers/thread-cpu.ps1",
+      "note": "native4b plus the s35 pack, traced: expect 0 draw_missing_* rows and no placement-missing lines. PLACEHOLDER bin, NOT TONIGHT" }
+  ]
+}

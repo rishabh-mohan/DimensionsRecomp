@@ -1,0 +1,79 @@
+D1: # S4 draft plan, for the user and Agent 1 to decide
+D2: 
+D3: Agent 11, tasks #30 and #35, then board-run-2 tasks #2 and #14. Drafted 2026-11-22 06:55-07:28; updated 07:40-07:45 (Agent 10's P2 rating, Agent 9's merged back-off item), 07:50-07:58 under task #35 (see "Changed 07:44-07:58"), and at 13:02, 13:11 and 13:15 under task #2, after the 08:29-08:34 Windows Update restart (see "Changed since 07:58"), then 14:27-14:42 under task #14 (see "Changed since 13:15"), then at 15:54 under task #24 (see "Changed since 14:42"), then at 19:37, 20:07, 21:47 and 22:55-23:02 under task #10 (run 2 after the 17:27 agy-grid relaunch; the old board-run-2 #35; see "Changed since 15:54"), and at 23:29 with the user's 23:16-23:24 answers (Agent 1, 23:25).
+D4: 
+D5: **This is a draft only.** Nothing here is decided, applied or built. Every row is a proposal. Agent 10's ratings are quoted from the review notes, not re-done here.
+D6: 
+D7: **Changed since 15:54** (task #10, run 2 after the 17:27 agy-grid relaunch, = the old board-run-2 task #35; 19:37, 20:07, 21:47, 22:55-23:02 and 23:29; the 15:54 version is kept in `build/agent11/s4draft/S4-DRAFT.1937-14C2A482.md`, the 19:37 one in `build/agent11/s4draft/S4-DRAFT.2007-0CB74A52.md`, the 20:07 one in `build/agent11/s4draft/S4-DRAFT.2147-0C93A609.md`, the 21:47 one in `build/agent11/s4draft/S4-DRAFT.2255-E496D3F6.md`, the 22:55 one in `build/agent11/s4draft/S4-DRAFT.2302-F25F4E1E.md` and the 23:02 one in `build/agent11/s4draft/S4-DRAFT.2329-A95013AC.md`):
+D8: - **W4b is done** (SESSION2 16:35, L2605-2618): the user's double-click ran it at 15:41-16:17 (`build/agent8/matrix/20261122-1541`, on WinSta0\Default), 17 of 17 runs OK (1 shared cold run + 4 Latin-square rounds). Title screen, uncapped; medians of run medians, against d0 = devoff2; the noise band is ±19.6% (d0's run spread):
+D9:   - d0 devoff2: 3.40 ms (3.07..3.73), p99 10.73 ms, 239.7 fps, 3.44 cores;
+D10:   - B devoffB: 3.23 ms (2.88..3.53), −4.9% (3.03 ms and −10.8% without run 6), p99 10.50 ms, 255.1 fps, 3.35 cores;
+D11:   - d3 devoff3: 3.21 ms (2.89..4.26), −5.4%, p99 10.49 ms, 248.9 fps, 3.38 cores;
+D12:   - d11t (devoff2 + the timer bundle + the blocking wait): 3.36 ms (3.02..3.86), −1.1%, p99 10.94 ms, 237.7 fps, 2.91 cores (−15%);
+D167: ## Decisions this draft asks for
+D168: 
+D169: 1. **What goes into the first S4 build?** **Decided by Agent 1 at 13:04:** Agent 2 builds S4a now as devoff4 and native4: #7, #8, #5 and #38 OFF, #32 always on (output-identical, b2r §27) and #2 OFF on native4; P2's counter goes into the next build, not S4a (SESSION2 13:04). The proposal was a fast build, S4a: ~6-10 min at -j10 per Agent 2, holding the staged items that are SAFE or rated, all OFF:
+D170:    - #7 u diagnostic, #8 P2, #5 fix (i) and #38 precise timer wait (all SAFE at the default; fix (i) was rated at ~07:56, b2r §23), plus P2's fallback counter, which P2 ON needs: A12 stages it after window 4 (not staged or rated yet; a12 S4.12), and at 13:04 it went to the next build;
+D171:    - on native, #2 miss cache, or #1 shader pack (13:04: #2, OFF).
+D172: 
+D173:    C1 (#4) is staged and rated (SAFE OFF; SAFE to test ON, b2r §24), but it would wait for three reasons. That is a planning call; the rating doesn't change it (A10, §25):
+D174:    - It edits `xmemory.h`, which turns any build into a full rebuild of both game trees (~37-46 min).
+D175:    - Its value is unknown until #7's functional run measures u_block.
+D176:    - Its v2, with the kept-protect counter and the first-kept log line that ON needs, comes after window 4, after P2's counter (Agent 1, 08:12 and 08:25).
+D177: 
+D178:    If C1 turns out to be worth it, S4b would be one full rebuild with C1 v2 and the codegen regen (#26, +3-4 min when bundled). See §2a and §3.
+D179: 2. **Which timing windows, and in which order?** The proposal is W5 first (S4 baseline + timer modes; it needs only S4a), then W6 (upload path). W7-W10 would follow once their items are rated and built. Window 4 is the first window after a Windows Update (Intel DTT/IPF extensions and the OS), so a W5+ plan that leans on window 3 or earlier results has to say so. See §2c.
+D180: 3. **The user questions in §4a:** Toy Pad tags (**answered yes**, the user, 17:27), simde (open), Defender/PresentMon (**answered**, 23:16: the exclusion is in; the overlay is believed off), the native screenshot check (**yes, Monday**, 23:24) and no-wait pop-in (**yes, opt-in and off by default**, 23:24).
+D181: 4. **The drops in §1f:** confirm them.
+D182: 
+D183: ## 1. Items
+D357: ### 2c. Timing windows (45 min or less each)
+D358: 
+D359: Rules for every window:
+D360: - **Start (since 15:34; SESSION2 L2568-2579):** only the user's double-click starts a timed window. W4b ran that way at 15:41-16:17 (SESSION2 L2605), and W5 at 17:56-18:29 (L2672). W6, and W7-W10 overnight as their gates pass, go through Agent 5's launcher, `bench/agent5/launch/RUN-NIGHT.cmd`, which the user double-clicks at ~23:45 before leaving the PC: no timed window starts before 00:00 (its gate also refuses while clang/ninja run), W6's GO comes only after Agent 3's S4b queue passes and Agent 8 promotes W6, and every timed run starts by 06:45 and ends before 07:30 (L2701-2703, L2714). Every agent command runs in agy's terminal sandbox on its own hidden desktop, where a game is never presented, so its frame times are invalid (finding 7): agent runs are functional only, and no agent starts the game on the user's desktop, since that would bypass the sandbox. The user's 14:44 rules: run unattended, each window as soon as quiet and readiness pass; the screensaver may be set to None, and only ChatGPT, Copilot, Roblox, Task Manager and Wallpaper Engine may be closed (never agy-grid, T3 Code or anything else), both only once a window starts; every timed run ends before 07:30 tomorrow, or holds.
+D361: - **Metric rule (a7 §3 L306-310; F):** score p99, 1% low and frames >33 ms per minute next to mean fps. p99.9 is secondary. Report per phase (10 s bins).
+D362: - **Runs:**
+D363:   - ≥3 runs per arm, plus one unscored cold run;
+D364:   - Latin-square rounds or ABBAAB;
+D365:   - sys.csv on;
+D366:   - every measured window starts ≥60 s after the first frame (W4b rule).
+D367:   - A12 asks for the median of ≥5 runs, which favours two-arm windows (ABBAAB × 2 = 6 per arm).
+D368: - **Before reading fps:**
+D369:   - the slow-state check per run (from W5 on, `bench/agent11/timerq_slowstate_3mode.ps1`; its mode column must match each arm: in W5, spin for base, s0 and d11, blocking for d11t and precise for d11p, which it does);
+D370:   - each ON arm's log line is present;
+D371:   - ≥6 GB free memory (runner) or ≥8 GB (your check);
+D372:   - Defender below ~5% (F, window-4 step 3).
+D373: - **Run length:** ~2.5 min per uncapped title-screen run (W4b: 17 runs in ~43 min; my derivation). So 45 min holds at most ~17 runs.
+D374: - **Environment (from window 4 on; Agent 1, SESSION2 12:24; Agent 8, 12:50):** at the 08:29-08:34 restart, Windows Update installed the Intel DTT extension dtt_ext 9.1.10501.3322, the Intel IPF provider extensions 3.4.1009.0 and KB5132057 (OS build 26300.10075). The base DTT and IPF drivers are unchanged, but extension packages carry the OEM's settings, so the caveat stands.
+D375:   - W4b stays internally comparable: all its runs come after the update, in a Latin square with the d0 reference.
+D376:   - Any comparison across windows has to say so: W4b's d11t against window 3's d11 (−3.1%), and any W5+ arm against window 3 or overnight numbers.
+D377:   - Finding 7's power-limit (PL1) idea: DTT manages the power limits behind the slow state, so the slow state may change with the update itself, not with an arm.
+D378:   - #40's package-power columns come in only after window 4, so they describe the post-update setup only and can't show whether PL1 explained the pre-update slow state (my reading).
+D379:   - Windows Update's active hours are 14:00-08:00, so a restart can come between 08:00 and 14:00 (as at 08:29). Pause updates before a window in that span, and before overnight sessions whose mornings reach into it (Agent 8, 12:50). At 13:04 pausing was blocked from the agent shell (not elevated), no restart was pending, and the risk ends at 14:00, before W4b (Agent 1).
+D380: 
+D381: Arm names:
+D382: - **base** = the bin S4 is built on: devoff3, or devoffB on the B line.
+D383: - **s0** = S4a with every switch OFF.
+D384: - **d11** = s0 + the 8 timer cvars (spin wait).
+D385: - **d11t** = d11 + `REX_TIMER_WAIT_BLOCKING=1`.
+D386: - **d11p** = d11 + `timer_queue_precise_wait=true`.
+D387: 
+D388: | window | needs first | arms | runs | ~min | question |
+D389: |---|---|---|---|---|---|
+D390: | **W5: S4 baseline + timer modes** | S4a + §2b passed (done; S4a live 14:56); window 4's result (done 16:17: no frame-time change clears the noise band, so W5 ran on the S3d line and B4 is deferred; promoted 16:46 as `bench/agent8/RUN-WINDOW5-S3D.cmd` with `bench/agent8/run/matrix-window5-s3d.json`, inputs frozen in `build/agent1/w5/W5-INPUTS-1642.txt`; SESSION2 L2625-2635). **Done 17:56-18:29** (`build/agent8/matrix/20261122-1756`, 16 of 16 OK, 15 scored; L2672): every arm within the noise band (±20.4%), and d11t and d11p use ~0.4 core less game CPU (L2674-2682); the read-out is Agent 8's | base / s0 / d11 / d11t / d11p | 1 cold + 5 × 3 = 16 | ~37 (ran 33) | Is s0 the same as base? What does the blocking wait do alone (d11 vs d11t)? Precise vs blocking? Each run's slow state and timer mode from the 3-mode script (§2b step 5) |
+D391: | **W6: upload path** | #7's u_block; #8's memexport count from §2b step 3 (from P2's fallback counter; a cap only if that path runs); for C1, S4b with C1 v3 (b2r §35) and §21 A-D passed (A's verify-mode level load can run since decision 1, §4a); GO only after Agent 3's S4b queue passes and Agent 8 promotes W6; started by Agent 5's launcher, not before 00:00 (SESSION2 L2702, L2714). As run tonight: devoff4b, no timer bundle, `bench/agent8/run/matrix-window6.json` (E50D791B…) with the GO `only=s0,p2,p2f,p2fc repeats=5` (f and fc, C1 without P2, stay out); first of the night, latest GO 03:00; the functional set is complete (L2968-2972, L2985, L3048, L3080) | s0 / #8 / #8 + #5 / #8 + #5 + #4 (C1 ON, verify off). The #8 + #5 arm times C1 with fix (i) ON in both arms (a12 S4.12 step 7; A10, §25) | 1 + 4 × 5 = 21 | ~48 | GPU Cmds ms/f and the slowest frames; fix (i)'s own cost (#8 vs #8 + #5); C1's kept protects per frame. If C1 is a no-go: s0 vs #8, ABBAAB × 2 (13 runs, ~33 min) |
+D392: | **W7: submission** | S4b with #18/#20; #19 rated and soaked | s0 / #18 / #18 + #19 / #18 + #19 + #20 | 1 + 4 × 4 = 17 | ~43 | GPU Cmds and fps. #18 alone should tie (§17 cond 6) |
+D393: | **W8a: native shaders** | native S4a | native3d / n-S4a with #2 ON (or the #1 pack) | ABBAAB × 2 + 1 = 13 | ~33 | render-thread ms/f and fps on native |
+D394: | **W8b: native threading** | #21 rated and built. #22's functional runs were inconclusive (the slow state), so W8b needs a reference arm and busy < 0.97 (a7 "Task #33") | n0 / the best threaded mode / threaded + #21 | 1 + 3 × 4 = 13 | ~33 | the threaded modes' slowest frames with and without #21 (replaces #3) |
+D395: | **W9: render busy-wait** (devoff only: #24 is Xenos-only) | #24 rated (b2r §26), N1 fixed, compiled and built with skip_lr off; its P1 run (positive controls > 0) and the Q = 250 functional pair done (a9 S5.2.4 steps 1-2) | hook off / Q = 0 / 125 / 250 / 500 µs | 1 + 5 × 3 = 16 | ~40 | process and render-thread CPU, GPU Cmds busy/blocked, fps and the slowest frames. Pick the largest CPU drop with no loss in p99 or the 1% low beyond the run-to-run spread; if every Q loses, go to #25. Every Q > 0 arm needs sleep_fail == 0 (b2r §26). A6's loaded-machine arm is separate and functional |
+D396: | **W10: codegen** | the #26 build; A10's diff review | s0 / #26 | ABBAAB × 2 + 1 = 13 | ~33 | CPU and fps |
+D397: 
+D398: **Order from W5 on** (Agent 1, 16:48, re-issued in task #10; SESSION2 L2625, L2694-2717): (1) W5: done at 17:56-18:29, the user's double-click after the 17:27 resume (L2653, L2672); (2) the S4b + S4c build: S4b on the S3d line with C1 v3, with S4c (#24 + #30) folded in (B4 deferred), its compose check rated PASS, SAFE to build (Agent 10, 19:47; b2r §38; L2732-2745); Agent 2, at -j8 Below Normal since 19:35: devoff4b ~20:25-20:30, native4b ~21:00, then CTR, then CG26; (3) the functional queue: Agent 3's S4b queue, with Toy Pad rows 7, 20 and 23 in (decision 1, §4a), to ~22:50-23:00; (4) W6 by Agent 5's launcher, `bench/agent5/launch/RUN-NIGHT.cmd` (the user's double-click at ~23:45; nothing timed before 00:00; W6's GO only after Agent 3's queue passes and Agent 8 promotes W6); (5) W7-W10 overnight, each once its "needs first" column is met; every timed run starts by 06:45 and ends before 07:30; (6) the native re-pin once, on native4b, by Agent 4 (run-2 task #12; its boot check and identity/n-row matrix run in Agent 3's queue; L2730, L2744). Every window from W5 on is after the Windows Update: compare arms within a window, and give the environment caveat above for any comparison with window 3 or earlier.
+D399: 
+D400: Options already defined in F (L26-33):
+D401: - #17, the upload matrix x5 (~23-28 min);
+D402: - #3, the native threaded matrix (~30 min);
+D403: - the attract benchmark (~42-45 min at 3 runs each). It needs a quiet machine, so it depends on §4a Q3 (answered at 23:16: the Defender exclusion is in);
+D404: - native3d vs nativeB (to be planned).
+D405: 
+D406: ## 3. Build time and disk (Agent 2, 07:08; estimates only, ±30%, nothing built)

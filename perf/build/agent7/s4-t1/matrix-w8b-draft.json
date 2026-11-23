@@ -1,0 +1,93 @@
+{
+  "title": "W8b DRAFT (Agent 7, task #17; Agent 8 owns the final matrix): #21 LEGO_NATIVE_CHAIN_PRIORITY timing on native4b+#21, th3 mode, n0 / th3 / th3cp. Title/attract loop, no input needed",
+  "reference": "n0",
+  "warmup_s": 55,
+  "warmup_from": "firstframe",
+  "measure_s": 60,
+  "repeats": 4,
+  "settle_s": 5,
+  "cooldown_s": 5,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "menu_s": 60,
+  "cold_run": true,
+  "order": "roundrobin",
+  "sys_csv": true,
+  "quick": {
+    "warmup_s": 10,
+    "measure_s": 20,
+    "settle_s": 5,
+    "menu_s": 20,
+    "cooldown_s": 5
+  },
+  "notes": [
+    "BIN: every arm on <NATIVE4B-S4T1> = native4b + build/agent7/s4-t1/s4-t1.diff, staged only after Agent 10's rating and row F1 PASS (build/agent7/s4-t1/FUNCTIONAL-ROWS.md). Replace the placeholder in Agent 8's final copy.",
+    "KEYS: env keys only from build/agent8/w8w9/ENV-KEYS-F1.txt (checked by build/agent7/s4-t1/check_rows.py). th3 = Agent 8's 'th' with LEGO_NATIVE_FULL_DRAW_PREPARATION=1; th3cp = 'thcp' = th3 + LEGO_NATIVE_CHAIN_PRIORITY=3. Values 1 or 2 get a window only if 3 helps.",
+    "WHY th3: in th3 the present runs on RecorderMain (NORMAL today, n3's busiest thread at 55 %), which #21 raises to ABOVE_NORMAL; in th2 the present already runs on the ABOVE_NORMAL worker (native_worker.cpp:390) and #21 only touches the recording queue (11 %) and the prepare pool (about 1 %). n3t also had the worse pre-onset tail (56.8 vs 23.0 frames > 33 ms per min). One mode fits 13 runs; if th3 shows nothing, drop T1.",
+    "TIME: 1 cold + 3 arms x 4 repeats = 13 runs, about 33 min (planner about 142 s/run, observed about 158 s/run). Round-robin; the cold run is unscored.",
+    "READ-OUT: primary = paired within-round deltas th3cp - th3 on p99, 1 % low and frames > 33 ms per min (t interval, df = 3; bench/agent7/w4b_readout/w4b_readout.py <dir> --all). Secondary = fps T-std / B-block with its guards (light share, raw GM delta with the pooled CI, host flags) from build/agent7/w4b-noise/readout.py <dir>. A timed verdict needs busy < 0.97 in the scored runs; runs in the slow state (sys.csv E-core MHz < 800 for >= 3 rows; matrix_recheck.py --drop-slow, bench/agent11/timerq_slowstate.ps1) are dropped or scored only up to the onset.",
+    "PRE-FLIGHT: run-matrix.ps1 -PlanOnly on the final copy (about 1 min), then queue row s4t1-w1 (-Quick -NoCold -Repeats 1, 3 runs).",
+    "No LEGO_NATIVE_TIMING, LEGO_NATIVE_STATE_CALLS, trace toggles or debug layer in any arm."
+  ],
+  "arms": [
+    {
+      "id": "n0",
+      "group": "w8b",
+      "ref": true,
+      "frames": "perf",
+      "repeats": 4,
+      "bin": "<NATIVE4B-S4T1>",
+      "cvars": [
+        "native_settings_frontend=false",
+        "native_fps_limit=0",
+        "framerate_limit=0"
+      ],
+      "env": {
+        "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv"
+      },
+      "note": "Reference: native defaults, threaded recording off, #21 unset",
+      "driver": "drivers/thread-cpu.ps1"
+    },
+    {
+      "id": "th3",
+      "group": "w8b",
+      "frames": "perf",
+      "repeats": 4,
+      "bin": "<NATIVE4B-S4T1>",
+      "cvars": [
+        "native_settings_frontend=false",
+        "native_fps_limit=0",
+        "framerate_limit=0"
+      ],
+      "env": {
+        "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv",
+        "LEGO_NATIVE_THREADED": "1",
+        "LEGO_NATIVE_PREPARE_THREADS": "2",
+        "LEGO_NATIVE_FULL_DRAW_PREPARATION": "1"
+      },
+      "note": "Agent 8's 'th' (th3 mode), #21 unset",
+      "driver": "drivers/thread-cpu.ps1"
+    },
+    {
+      "id": "th3cp",
+      "group": "w8b",
+      "frames": "perf",
+      "repeats": 4,
+      "bin": "<NATIVE4B-S4T1>",
+      "cvars": [
+        "native_settings_frontend=false",
+        "native_fps_limit=0",
+        "framerate_limit=0"
+      ],
+      "env": {
+        "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv",
+        "LEGO_NATIVE_THREADED": "1",
+        "LEGO_NATIVE_PREPARE_THREADS": "2",
+        "LEGO_NATIVE_FULL_DRAW_PREPARATION": "1",
+        "LEGO_NATIVE_CHAIN_PRIORITY": "3"
+      },
+      "note": "Agent 8's 'thcp': th3 + #21 mode 3 (ABOVE_NORMAL + EcoQoS opt-out on the chain threads)",
+      "driver": "drivers/thread-cpu.ps1"
+    }
+  ]
+}

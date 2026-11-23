@@ -1,0 +1,28 @@
+# s4p2_syntax (S4 P2: shared_memory_single_hold_rearm, default OFF)  2026-11-22 07:02:17  config Release  candidate: staged copy
+extra include path (last): <workspace>\DimensionsRecomp\rexglue-sdk\src\graphics
+shared_memory.cpp  pristine  exit=0   3.3s diagnostics=3  sha 15C89EDB4B197C17 (= HASHES pristine)  <workspace>\build\agent12\s4-p2\orig\shared_memory.cpp
+    | <workspace>\build\agent12\s4-p2\orig\shared_memory.cpp:295:62: warning: unused parameter 'offset_allocations' [-Wunused-parameter]
+    |   295 | bool SharedMemory::AllocateSparseHostGpuMemoryRange(uint32_t offset_allocations,
+    |       |                                                              ^
+    | <workspace>\build\agent12\s4-p2\orig\shared_memory.cpp:296:62: warning: unused parameter 'length_allocations' [-Wunused-parameter]
+    |   296 |                                                     uint32_t length_allocations) {
+    |       |                                                              ^
+    | In file included from <workspace>\build\agent12\s4-p2\orig\shared_memory.cpp:20:
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/shared_memory.h:170:9: warning: private field 'memory_data_provider_handle_' is not used [-Wunused-private-field]
+    |   170 |   void* memory_data_provider_handle_ = nullptr;
+    |       |         ^
+    | 3 warnings generated.
+shared_memory.cpp  candidate exit=0   5.5s diagnostics=3  sha 0BE4BADCAC666BEE (= HASHES staged)  <workspace>\build\agent12\s4-p2\new\shared_memory.cpp
+    | <workspace>\build\agent12\s4-p2\new\shared_memory.cpp:315:62: warning: unused parameter 'offset_allocations' [-Wunused-parameter]
+    |   315 | bool SharedMemory::AllocateSparseHostGpuMemoryRange(uint32_t offset_allocations,
+    |       |                                                              ^
+    | <workspace>\build\agent12\s4-p2\new\shared_memory.cpp:316:62: warning: unused parameter 'length_allocations' [-Wunused-parameter]
+    |   316 |                                                     uint32_t length_allocations) {
+    |       |                                                              ^
+    | In file included from <workspace>\build\agent12\s4-p2\new\shared_memory.cpp:21:
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/shared_memory.h:170:9: warning: private field 'memory_data_provider_handle_' is not used [-Wunused-private-field]
+    |   170 |   void* memory_data_provider_handle_ = nullptr;
+    |       |         ^
+    | 3 warnings generated.
+    no new diagnostics in the candidate
+RESULT: PASS

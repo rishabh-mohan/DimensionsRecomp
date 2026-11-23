@@ -1,0 +1,97 @@
+GATE OK perf-notes/FINDINGS-AND-CHANGES.md 9AF761BEDB57191A 102491 B 410 LF
+EDIT F1 title                   +0 chars
+EDIT F2 alert                   +131 chars
+EDIT F3 W9 row                  +154 chars
+EDIT F4 W5b row                 +229 chars
+EDIT F5 f10 summary             +165 chars
+EDIT F6 after the break         +-57 chars
+EDIT F7a quiet-PC waits         +19 chars
+EDIT F7b quiet-PC bursts        +2 chars
+EDIT F7c quiet-PC n=2           +311 chars
+EDIT F8a sources A7             +529 chars
+EDIT F8b sources A10            +128 chars
+EDIT F7d quiet-PC C1-off bursts +74 chars
+EDIT F9 finding 6 for S4        +260 chars
+EDIT F10 SCRNSAVE installed     +39 chars
+EDIT F11 popin rated            +152 chars
+EDIT F12 confirmation window    +59 chars
+NEW 29E56B476477C875 104688 B 410 LF (was 410)
+---- PEEK
+DESIGN.md L27: 2. **The draw is dropped.**
+DESIGN.md L62: - **Help text:** "Don't wait at the end of a submission for pipelines still being created: their draws stay skipped until ready (pop-in for a few frames instead of a stall; memexport and occlusion-query draws still wait). Needs async_shader_compilation, pipeline creation threads and bindless resources"
+DESIGN.md L65:   - When the latch is set, one INFO line: `d3d12_pipeline_creation_no_wait: not waiting for pipeline creation at the end of submissions; draws stay skipped until their pipeline is ready`
+DESIGN.md L89: - Side effect, ON only: a draw whose pipeline failed to create is also dropped when async is off. With OFF it is recorded without `SetPipelineState`, which is upstream behaviour.
+DESIGN.md L98: - **#4 (IssueDraw):** `(async || false) && null` is the old condition, evaluated in the same order. When async is on, `IsCreationNoWait()` isn't even called. Inside the branch, `skip_draw` stays `true`, the guard is skipped, and the function returns `true` as before. The only addition is `frame_stats::Add`: two relaxed `fetch_add`s on atomics.
+DESIGN.md L101: - **#8:** the new block is skipped.
+DESIGN.md L104: - **#10:** two ids before `kCount`. The only code that walks the counters loops to `kCount` (command_processor.cpp:269-275). Nothing stores counters by index.
+DESIGN.md L145: | Frame end (`IssueSwap` → `EndSubmission(true)`) | same as above | carry over across frames. Their draws stay dropped until each `state` is published. |
+DESIGN.md L146: | A draw that memexports or is inside a query | dropped for the rest of the submission | forced drain-and-wait, then recorded. Dropped only if creation failed. |
+DESIGN.md L148: | Storage-load tail (L683-716, when non-blocking or no extra threads) | awaited at the next EndSubmission | finishes in the background. At most a few draws are dropped for a few ms. |
+DESIGN.md L151: | Device removal | `BeginSubmission` fails before `ConfigurePipeline` (L2686). Creating on a removed device gives null, so the draw is dropped. | same. A pending pipeline that ends up null is just a dropped draw. |
+DESIGN.md L163:   - Incremented in IssueDraw once per skipped draw, in both modes, after any forced wait, through `frame_stats::Add(kDroppedDraw, 0)`.
+DESIGN.md L169: - **Reset:** on every swap, `ReportSlowFrame` (called from `IssueSwap`, command_processor.cpp:2224) exchanges all `kCount` counters to 0 (L269-275), whether or not the line prints.
+DESIGN.md L171:   `... | memexport full-buffer {}x (total {}) | dropped draws {} | forced pipeline waits {:.1f} ({}x)`
+DESIGN.md L180: ### Draws that must not be skipped
+DESIGN.md L182: | Draw class | What skipping it does | Today (OFF) | ON |
+DESIGN.md L184: | **memexport** (`memexport_used`, L2684: the VS or PS writes `eM`) | **Corruption, not pop-in.** The guest reads stale exported data (GPU-written vertex or particle data, readbacks), and effects that feed later frames glitch. | dropped for the rest of the miss's submission | **waits** (forced drain-and-wait), then draws. Dropped only if creation failed. |
+DESIGN.md L185: | **inside a host occlusion query** (`active_occlusion_query_.valid`: set at L5840, cleared at L4279 and L5852) | The query counts too few samples, so the game may hide or cull things (flares, visibility-based LOD). | dropped for the submission | **waits**, as above |
+DESIGN.md L187: | **alpha-tested depth prepass, shadow casters** (they have a PS) | pop-in: missing depth or shadows, transient | dropped for the submission | dropped until ready, so a multi-frame flicker. Not guarded. |
+DESIGN.md L188: | **EDRAM resolve sources** (render-to-texture that `IssueCopy` later resolves) | If the pass runs only once, the texture stays **wrong until the game renders it again**, possibly for the whole scene. Examples: environment or reflection captures, UI and portrait render-to-textures, menu backgrounds captured once, luminance or exposure chains. | lost only if the pass falls in the miss's own submiss
+DESIGN.md L196: - **(d) Guard resolve sources.** This needs replay, or per-render-target tracking of "draws dropped since the last resolve". A cheap first step is a diagnostic: count resolves issued in a frame after a dropped draw. That measures the exposure before anyone trusts ON.
+DESIGN.md L239: | 2 | Cvar on, cold attract | The INFO line exactly once. Frames over 250 ms at the §8 scene points drop to the non-compile residue (PRE, heavy, fence-wait and depth-only frames). pm unchanged. `dropped draws` > 0 in frames after misses. `forced pipeline waits` ≈ 0. | `forced pipeline waits` > 0, meaning memexport or query pipelines in the burst. `dropped draws` long after a burst (a failed pipeli
+DESIGN.md L242: | 5 | Cvar on, warm storage | Same as warm with the cvar off, apart from at most a few dropped draws right after the storage load. | — |
+DESIGN.md L247: - On the ON arms, use `slow_frame_log_ms=1` (or 17) to see the pop-in tail as per-frame `dropped draws`.
+DESIGN.md L299: - **N4 NIT: `build/agent2/PENDING-DIFFS.md` L39-40, L65 and L130 are out of date for #33 and #34.** That file is Agent 2's, so it isn't changed here.
+RESULTS.md L7: | f10a | s4b20's (M1, C1 off) | 05:58-06:05 | PASS | NEW 0 / MORE 0 | - |
+RESULTS.md L9: | f10a2 | s4b20's (M1, C1 off) | 06:32-06:40 | PASS | NEW 0 / MORE 0 | - |
+RESULTS.md L18:   - Quiet worst frames: 1.79 s (f10a), 1.54 s (f10a2), 2.89 s (f10b), 1.79 s (f10b2).
+RESULTS.md L23: - **Same GPU work.** The 2736-sync cinematic frame has 6262-6313 draws in every run. The ~690-sync frame has 2172 draws in f10b and 2237 in gate B.
+RESULTS.md L29:   | 2736-sync | 0.29 and 0.37 (f10b), 0.18 (f10b2) | 1.79 (gate B, hung), 0.86 (gate A, verify on, hung), 0.64 (w6s3), 0.50 (s4b23) |
+RESULTS.md L31: - **The submit half stretched too.** The rest of the 2736-sync frame (CP CPU time outside the waits) took 1.30 s (f10b2) and 1.88-1.90 s (f10b) on the quiet host. Under the build it took 2.08-2.27 s (s4b23, gate A, w6s3) and 3.14 s (gate B).
+RESULTS.md L44: - The quiet host gives very different totals for the same set: f10a 18810 vs f10a2 28030, and f10b 45458 vs f10b2 77236. f10b2's total is more than gate B's 60921.
+RESULTS.md L45: - Which bursts happen depends on timing. The 1644-sync in-level burst came in f10a2, f10b2 and gate B, but not in f10a or f10b.
+RESULTS.md L51: - **Margin.** The quiet worst frame, 2.89 s (f10b), is not far below 5 s. A busier host or a slower PC could push a 2736-sync frame past it. w6s3 (under the build, no hang) took 3.99 s.
+RESULTS.md L52: - **The M1 set (f10a, f10a2; C1 off) makes no cinematic bursts.**
+RESULTS.md L53:   - It had at most 24 (f10a) and 93 (f10a2) syncs per frame at story-load +10..+40 s.
+RESULTS.md L64:   - One exception: gate B's 1644-sync frame had 16012 draws, against 5554-5558 in f10a2 and f10b2.
+RESULTS.md L68: - **Rows.** `f10a`, `f10b` and the second pair `f10a2`, `f10b2` in `build/agent3/s4b/queue.jsonl`. The second pair has the same args and was added by `build/agent3/s4b/add_f10r2_0628.py`. All four use:
+RESULTS.md L74:   - **f10a, f10a2** = s4b20's set (C1 OFF): `shared_memory_upload_nontemporal_copy=true`.
+RESULTS.md L89: | **f10a2** (s4b20's set) | quiet | **no** | 0 | 16489 | 228 / 3 / 0 | 1540.7 | 0.0 / 28.9 / 466.7 | 0.29 / 0.64 | 28030 / 1644 | 3 | end | 0 of 14 |
+RESULTS.md L90: | **f10b** (gate B's set) | quiet | **no** | 0 | 38492 | 272 / 7 / 0 | 2886.5 | 0.0 / 26.5 / 990.4 | 0.33 / 2.32 | 45458 / 2736 | 3 | end | 0 of 13 |
+RESULTS.md L91: | **f10b2** (gate B's set) | quiet | **no** | 0 | 39936 | 318 / 3 / 0 | 1793.8 | 0.0 / 29.2 / 493.8 | 0.25 / 0.81 | 77236 / 2736 | 3 | end | 0 of 13 |
+RESULTS.md L92: | gate B (w6gB, p2fc) | -j8 build | YES 22:26:29.586, 83FAF200 | hang-38764 | 36553 | 506 / 10 / 2 | 7978.6 | 0.0 / 41.9 / 4836.2 | 0.32 / 7.5 | 60921 / 2736 | 0 | end | 6 of 6 |
+RESULTS.md L93: | gate A (w6gA, p2fcv) | -j8 build | YES 21:18:17.497, 83FAF188 | hang-36276 | 7271 | 1005 / 11 / 3 | 9657.9 | 0.0 / 22.7 / 2280.7 | 0.45 / 2.46 | 9101 / 2736 | 3 | story-load | no sampler yet |
+RESULTS.md L94: | s4b20 (C1 off) | -j8 build | YES 22:18:20.260, 83FAF200 | hang-13236 | none logged | - | 12037.2 (perf.csv) | - | - | - | 3 | end | 5 of 5 |
+RESULTS.md L97: | w6s3 (p2fc, attract) | -j8 build | no | 0 | 36388 | 379 / 6 / 0 | 3987.3 | 0.0 / 22.8 / 1715.8 | 0.33 / 2.21 | 30450 / 2736 | 0 | idle-320 | 1 of 1 |
+RESULTS.md L108: | first 2736-sync | #32493 at +23.0 s: 2657.6 ms; wait 773.8 ms over 2688 = **0.29**; rest of frame 1884 ms | #33718 at +17.3 s: 1793.8 ms; wait 493.8 ms over 2724 = **0.18**; rest of frame 1300 ms | #33131 at +39.0 s: 7978.6 ms; wait 4836.2 ms over 2708 = **1.79**; rest of frame 3142 ms. The STUCK-LOCK (+35.7 s) falls inside this frame |
+RESULTS.md L109: | second 2736-sync | #32528 at +29.8 s: 2886.5 ms; wait 990.4 ms over 2666 = **0.37**; rest of frame 1896 ms | - | - |
+RESULTS.md L112: f10a2 (M1 set) also has the 1644-sync frame: #10487 at +60.2 s, 1540.7 ms, wait 466.7 ms over 1616 = 0.29.
+RESULTS.md L114: Other 2736/2750-sync frames:
+RESULTS.md L122: The loaded runs reached the cinematic later: gate B's 2736-sync frame came at +39.0 s, against +17.3 to +29.8 s on the quiet host.
+RESULTS.md L129: | f10a2 | 5 | 3698 (1644) | 18583 | 5744 | 28030 | 16.4 |
+RESULTS.md L130: | f10b | 5 | 21481 (2736) | 16092 | 7880 | 45458 | 16.8 |
+RESULTS.md L131: | f10b2 | 5 | 14984 (2736) | 19818 | 42429 | 77236 | 16.7 |
+RESULTS.md L132: | gate B | 5 | 13313 (2736) | 19372 | 28231 | 60921 | 13.3 |
+RESULTS.md L135: frames/s = slow-frame lines in the segment divided by its length; with `slow_frame_log_ms=1` nearly every frame is logged. Through the cinematic the M1 set had at most 24 (f10a) and 93 (f10a2) syncs per frame (story-load +10..+40 s).
+RESULTS.md L145: | f10a2 (quiet) | 1252 | 27.6 ms | 2 (2.8 s) | 1540.7 ms (the 1644-sync frame, +60.2 s) |
+RESULTS.md L157:   - f10a2 launched at 06:32:44 at 28.2 % (sampled over 12 s).
+RESULTS.md L159: - **During the runs** (`hostload.csv`): 0 rows with clang/cl/ninja/link (f10a 0 of 12, f10b 0 of 13, f10a2 0 of 14, f10b2 0 of 13). The top processes, as % of 12 threads:
+RESULTS.md L172:   - `20261123-063244-f10a2-m1-sfl-level`
+RESULTS.md L174: - Checks, all under `build/agent3/s4b/logs/`: `f10a.check.txt`, `f10b.check.txt`, `f10a2.check.txt`, `f10b2.check.txt`, `f10b.p2c.txt`, `f10b2.p2c.txt`, and `<id>.quiet.txt`.
+f10-rating.md L40: - **A hang on a busy host** (during a build, for example) still counts as "WARN, finding 10" if it meets all three conditions of the rule. Otherwise it's FAIL.
+f10-rating.md L41: - **Agent 3's possible next steps** are in RESULTS L184-189. None has run, and each needs Agent 1's OK:
+f10-rating.md L42:   - a third quiet pair, which gives p = 0.03 if it's clean;
+f10-rating.md L43:   - a controlled-load repeat with about 8 busy threads and no build;
+f10-rating.md L44:   - an s4b20-style row under load with slow_frame_log_ms=1;
+f10-rating.md L45:   - -GpuLog on any of these.
+f10-rating.md L47: **Read.** The four check files (hashes above); `build/agent3/f10/f10-table.md` C7DB0B024BF03D78 L3-8, L40-65; `build/agent3/f10/RESULTS.md` 7143C2E9AD2DD276 in full; `f10b.p2c.txt` and `f10b2.p2c.txt`; the four holdwatch and attach out files; `perf-notes/SESSION2.md` 6CAAE865D51DC936 L3106-3132 and L3295-3328.
+f10-rating.md L49: **Sent.** Nothing separately. Agent 3's 07:02 summary needed no reply. HANDOFF §4 item 7 points here, and the task #27 done line mentions this file.
+tail-check.md L48: ## Per arm
+tail-check.md L50: | arm | runs | runs with a frame > 8 ms | frames > 8 ms (total; median per run) | frames > 10 ms | frames > 16.7 ms | p99.9 ms median / max |
+tail-check.md L51: |---|---|---|---|---|---|---|
+tail-check.md L52: | d11 | 12 | 2 | 2; 0.0 | 1 | 0 | 5.390 / 5.952 |
+tail-check.md L53: | d11p | 12 | 4 | 6; 0.0 | 2 | 0 | 5.429 / 5.904 |
+tail-check.md L54: | d11t | 12 | 3 | 46; 0.0 | 28 | 6 | 5.479 / 11.672 |
+tail-check.md L56: ## Frames over 10 ms (with the sys.csv sample)
+tail-check.md L58: | run | arm | T s | ms | sys sample wall | cpu util % (run median) | eff MHz (run median) | E util % (run median) |
+DRY OK (no FAIL)

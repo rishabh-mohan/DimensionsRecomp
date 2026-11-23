@@ -1,0 +1,884 @@
+{
+ "matrix": "<workspace>\\build\\agent6\\w6\\test-synth\\W6SYNTH",
+ "expect": "<workspace>\\build\\agent6\\w6\\expect-w6.json",
+ "matrix_json": "<workspace>\\build\\agent6\\w6\\test-synth\\W6SYNTH\\matrix.json",
+ "reference": "s0",
+ "generated": "2026-11-22T22:44:13",
+ "tools": {
+  "w4b_logdiff": {
+   "rc": 0,
+   "s": 0.2,
+   "out": "<workspace>\\build\\agent6\\w6\\out-test-synth\\logdiff",
+   "log": "<workspace>\\build\\agent6\\w6\\out-test-synth\\logdiff.log"
+  },
+  "w4b_extra": {
+   "rc": 0,
+   "s": 0.2,
+   "out": "<workspace>\\build\\agent6\\w6\\out-test-synth\\extra.txt",
+   "log": "<workspace>\\build\\agent6\\w6\\out-test-synth\\extra.log"
+  }
+ },
+ "arms": {
+  "s0": {
+   "runs": [
+    "1800-s0-r1",
+    "1808-s0-r2",
+    "1827-s0-r3"
+   ],
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0,
+    0,
+    0
+   ],
+   "unhandled": [
+    0,
+    0,
+    0
+   ],
+   "protect_failed": [
+    0,
+    0,
+    0
+   ],
+   "levels": [
+    "40/0/0",
+    "40/0/0",
+    "40/0/0"
+   ],
+   "slow": {
+    "runs": 3,
+    "slow_runs": 3,
+    "mean_slow_pct": 60.5,
+    "mean_onset_s": 20.9
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0,
+     0,
+     0
+    ],
+    "still not acquired after": [
+     0,
+     0,
+     0
+    ],
+    "Minidump written to": [
+     0,
+     0,
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0,
+     0,
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0,
+     0,
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0,
+     0,
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0,
+     0,
+     0
+    ],
+    "C1 keep-watch:": [
+     0,
+     0,
+     0
+    ],
+    "C1 keep-watch: on (with physical_protect_hold_global_lock)": [
+     0,
+     0,
+     0
+    ],
+    "C1 keep-watch: on, but": [
+     0,
+     0,
+     0
+    ],
+    "C1 keep-watch: blocked": [
+     0,
+     0,
+     0
+    ],
+    "C1 keep-watch: first kept protect at": [
+     0,
+     0,
+     0
+    ],
+    "protects kept so far": [
+     0,
+     0,
+     0
+    ],
+    "C1 verify": [
+     0,
+     0,
+     0
+    ],
+    "S4 upload hash:": [
+     0,
+     0,
+     0
+    ],
+    "slow frame #": [
+     0,
+     0,
+     0
+    ],
+    "memexport full-buffer": [
+     0,
+     0,
+     0
+    ],
+    "memexport flush reasons": [
+     0,
+     0,
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     35,
+     35,
+     35
+    ],
+    "Reserving the guest memory arena": [
+     1,
+     1,
+     1
+    ],
+    "Title terminated": [
+     1,
+     1,
+     1
+    ]
+   }
+  },
+  "p2fc": {
+   "runs": [
+    "1830-p2fc-r1",
+    "1832-p2fc-r2",
+    "1834-p2fc-r3"
+   ],
+   "verdict": "FAIL",
+   "fail": [
+    "1830-p2fc-r1: STUCK-LOCK 18:01:40.914 0x84959edc after 5.0s, owner tid 0x0017 lr=83FAF188 (H1, sub_83FAF180+0x8), waiter lr=82A2A270, stall from 18:01:35.914, window IN -> timing invalid"
+   ],
+   "note": [
+    "1830-p2fc-r1: \"STUCK-LOCK\" x5",
+    "1830-p2fc-r1: \"Minidump written to\" x1",
+    "1830-p2fc-r1: levels W/E/C 40/5/1, expected 40/0/0",
+    "1830-p2fc-r1: hang dump hang-36276.dmp",
+    "1832-p2fc-r2: \"STUCK-LOCK\" x5",
+    "1832-p2fc-r2: \"Minidump written to\" x1",
+    "1832-p2fc-r2: levels W/E/C 40/5/1, expected 40/0/0",
+    "1832-p2fc-r2: STUCK-LOCK 18:02:18.926 0x84959edc after 5.0s, owner tid 0x0017 lr=83FAF188 (H1, sub_83FAF180+0x8), waiter lr=82A2A270, stall from 18:02:13.926, window after",
+    "1832-p2fc-r2: hang dump hang-36276.dmp"
+   ],
+   "stuck": 2,
+   "stuck_sites": {
+    "H1": 2
+   },
+   "stuck_in_window": 1,
+   "minidump": 2,
+   "recovered": [
+    0,
+    0,
+    0
+   ],
+   "unhandled": [
+    0,
+    0,
+    0
+   ],
+   "protect_failed": [
+    0,
+    0,
+    0
+   ],
+   "levels": [
+    "40/5/1",
+    "40/5/1",
+    "40/0/0"
+   ],
+   "slow": {
+    "runs": 3,
+    "slow_runs": 3,
+    "mean_slow_pct": 50.4,
+    "mean_onset_s": 39.9
+   },
+   "dumps": 2,
+   "counts": {
+    "STUCK-LOCK": [
+     5,
+     5,
+     0
+    ],
+    "still not acquired after": [
+     1,
+     1,
+     0
+    ],
+    "Minidump written to": [
+     1,
+     1,
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0,
+     0,
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0,
+     0,
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0,
+     0,
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0,
+     0,
+     0
+    ],
+    "C1 keep-watch:": [
+     2,
+     2,
+     2
+    ],
+    "C1 keep-watch: on (with physical_protect_hold_global_lock)": [
+     1,
+     1,
+     1
+    ],
+    "C1 keep-watch: on, but": [
+     0,
+     0,
+     0
+    ],
+    "C1 keep-watch: blocked": [
+     0,
+     0,
+     0
+    ],
+    "C1 keep-watch: first kept protect at": [
+     1,
+     1,
+     1
+    ],
+    "protects kept so far": [
+     0,
+     0,
+     0
+    ],
+    "C1 verify": [
+     0,
+     0,
+     0
+    ],
+    "S4 upload hash:": [
+     0,
+     0,
+     0
+    ],
+    "slow frame #": [
+     0,
+     0,
+     0
+    ],
+    "memexport full-buffer": [
+     0,
+     0,
+     0
+    ],
+    "memexport flush reasons": [
+     0,
+     0,
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     35,
+     35,
+     35
+    ],
+    "Reserving the guest memory arena": [
+     1,
+     1,
+     1
+    ],
+    "Title terminated": [
+     1,
+     1,
+     1
+    ]
+   },
+   "logdiff": {
+    "fail": 2,
+    "fail_unexplained": [],
+    "new": 6,
+    "new_err": [],
+    "new_warn": [],
+    "more": [],
+    "gone": [],
+    "only": 8,
+    "only_unnamed": [],
+    "only_keys": [
+     "[info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)",
+     "[info] [sys] C# keep-watch: first kept protect at #h, #h bytes",
+     "[error] [krnl] STUCK-LOCK: critical section #x# still not acquired after #s. owner=guest thread object #x#, lock_count=#, recursion=#; waiting thread is #x#. An owner of #, or one naming a thread that has exited, means the lock was leaked.",
+     "[error] [krnl] STUCK-LOCK: the owner is tid #x# (unnamed), parked at lr=#h with r#=#h. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.",
+     "[error] [krnl] STUCK-LOCK: owner's callers: #h <- #h <- #h <- #h <- #h <- #h",
+     "[error] [krnl] STUCK-LOCK: waiter's callers: lr=#h <- #h <- #h <- #h <- #h <- #h <- #h",
+     "[error] [krnl] STUCK-LOCK: GPU thread: executing PM# opcode #x# | read ptr #x#, write ptr #x#",
+     "[critical] [core] [FATAL] Minidump written to hang-#.dmp"
+    ]
+   }
+  }
+ },
+ "runs": {
+  "1800-s0-r1": {
+   "arm": "s0",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": 39.93499994277954,
+    "slow_pct": 50.442477876106196,
+    "span_s": 112.57099986076355,
+    "rows": 113
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "s0-r1",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14.29,
+    "ff": 1795392020.914,
+    "start": "2026-11-22 18:00:10.780",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-22 18:01:20.914",
+    "m_end": "2026-11-22 18:02:10.926",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11064
+     ]
+    ],
+    "lines": 98,
+    "levels": {
+     "info": 50,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-22 18:00:16.202",
+    "last_ts": "2026-11-22 18:02:12.961"
+   }
+  },
+  "1808-s0-r2": {
+   "arm": "s0",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": 20.95900011062622,
+    "slow_pct": 69.02654867256638,
+    "span_s": 112.82100009918213,
+    "rows": 113
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "s0-r2",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14.52,
+    "ff": 1795392533.461,
+    "start": "2026-11-22 18:08:46.712",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-22 18:09:53.473",
+    "m_end": "2026-11-22 18:10:43.474",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11029
+     ]
+    ],
+    "lines": 98,
+    "levels": {
+     "info": 50,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-22 18:08:48.752",
+    "last_ts": "2026-11-22 18:10:45.582"
+   }
+  },
+  "1827-s0-r3": {
+   "arm": "s0",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": 1.934999942779541,
+    "slow_pct": 61.94690265486726,
+    "span_s": 112.83399987220764,
+    "rows": 113
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "s0-r3",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14.69,
+    "ff": 1795393681.822,
+    "start": "2026-11-22 18:27:55.005",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-22 18:29:01.811",
+    "m_end": "2026-11-22 18:29:51.833",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11064
+     ]
+    ],
+    "lines": 98,
+    "levels": {
+     "info": 50,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-22 18:27:57.077",
+    "last_ts": "2026-11-22 18:29:54.124"
+   }
+  },
+  "1830-p2fc-r1": {
+   "arm": "p2fc",
+   "verdict": "FAIL",
+   "fail": [
+    "STUCK-LOCK 18:01:40.914 0x84959edc after 5.0s, owner tid 0x0017 lr=83FAF188 (H1, sub_83FAF180+0x8), waiter lr=82A2A270, stall from 18:01:35.914, window IN -> timing invalid"
+   ],
+   "note": [
+    "\"STUCK-LOCK\" x5",
+    "\"Minidump written to\" x1",
+    "levels W/E/C 40/5/1, expected 40/0/0",
+    "hang dump hang-36276.dmp"
+   ],
+   "slow": {
+    "onset_s": 39.93499994277954,
+    "slow_pct": 50.442477876106196,
+    "span_s": 112.57099986076355,
+    "rows": 113
+   },
+   "dumps": [
+    "hang-36276.dmp"
+   ],
+   "facts": {
+    "_error": null,
+    "tag": "s0-r1",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14.29,
+    "ff": 1795392020.914,
+    "start": "2026-11-22 18:00:10.780",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-22 18:01:20.914",
+    "m_end": "2026-11-22 18:02:10.926",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      12243
+     ]
+    ],
+    "lines": 106,
+    "levels": {
+     "info": 52,
+     "raw": 8,
+     "warning": 40,
+     "error": 5,
+     "critical": 1
+    },
+    "counts": {
+     "C1 keep-watch:": 2,
+     "C1 keep-watch: on (with physical_protect_hold_global_lock)": 1,
+     "C1 keep-watch: first kept protect at": 1,
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "STUCK-LOCK": 5,
+     "still not acquired after": 1,
+     "Minidump written to": 1,
+     "Title terminated": 1
+    },
+    "episodes": [
+     {
+      "ts": "2026-11-22 18:01:40.914",
+      "cs": "0x84959edc",
+      "after_s": 5.0,
+      "owner_tid": "0x0017",
+      "owner_lr": "83FAF188",
+      "owner_callers": [
+       "83FBFBDC",
+       "83FC0CA8",
+       "83FB3AC8",
+       "83FBF698",
+       "83FBFA98",
+       "82BD6BA4"
+      ],
+      "waiter_lr": "82A2A270",
+      "pm4": "0x22",
+      "dump": "hang-36276.dmp",
+      "lines": 6,
+      "first": "[2026-11-22 18:01:40.914] [error] [krnl] [t8520] STUCK-LOCK: critical section 0x84959edc still not acquired after 5s. owner=guest thread object 0x30111018, lock_count=1, recursion=1; waiting thread is 0x6. An owner of 0, or one naming a thread that has exited, means the lock was leaked.",
+      "site": "H1",
+      "owner_func": "sub_83FAF180+0x8",
+      "waiter_func": "sub_82A2A260+0x10",
+      "map": "build\\agent2\\devoff4-bin\\legodimensions.map",
+      "window": "IN",
+      "stall_start": "18:01:35.914"
+     }
+    ],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-22 18:00:16.202",
+    "last_ts": "2026-11-22 18:02:12.961"
+   }
+  },
+  "1832-p2fc-r2": {
+   "arm": "p2fc",
+   "verdict": "NOTE",
+   "fail": [],
+   "note": [
+    "\"STUCK-LOCK\" x5",
+    "\"Minidump written to\" x1",
+    "levels W/E/C 40/5/1, expected 40/0/0",
+    "STUCK-LOCK 18:02:18.926 0x84959edc after 5.0s, owner tid 0x0017 lr=83FAF188 (H1, sub_83FAF180+0x8), waiter lr=82A2A270, stall from 18:02:13.926, window after",
+    "hang dump hang-36276.dmp"
+   ],
+   "slow": {
+    "onset_s": 39.93499994277954,
+    "slow_pct": 50.442477876106196,
+    "span_s": 112.57099986076355,
+    "rows": 113
+   },
+   "dumps": [
+    "hang-36276.dmp"
+   ],
+   "facts": {
+    "_error": null,
+    "tag": "s0-r1",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14.29,
+    "ff": 1795392020.914,
+    "start": "2026-11-22 18:00:10.780",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-22 18:01:20.914",
+    "m_end": "2026-11-22 18:02:10.926",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      12243
+     ]
+    ],
+    "lines": 106,
+    "levels": {
+     "info": 52,
+     "raw": 8,
+     "warning": 40,
+     "error": 5,
+     "critical": 1
+    },
+    "counts": {
+     "C1 keep-watch:": 2,
+     "C1 keep-watch: on (with physical_protect_hold_global_lock)": 1,
+     "C1 keep-watch: first kept protect at": 1,
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "STUCK-LOCK": 5,
+     "still not acquired after": 1,
+     "Minidump written to": 1,
+     "Title terminated": 1
+    },
+    "episodes": [
+     {
+      "ts": "2026-11-22 18:02:18.926",
+      "cs": "0x84959edc",
+      "after_s": 5.0,
+      "owner_tid": "0x0017",
+      "owner_lr": "83FAF188",
+      "owner_callers": [
+       "83FBFBDC",
+       "83FC0CA8",
+       "83FB3AC8",
+       "83FBF698",
+       "83FBFA98",
+       "82BD6BA4"
+      ],
+      "waiter_lr": "82A2A270",
+      "pm4": "0x22",
+      "dump": "hang-36276.dmp",
+      "lines": 6,
+      "first": "[2026-11-22 18:02:18.926] [error] [krnl] [t8520] STUCK-LOCK: critical section 0x84959edc still not acquired after 5s. owner=guest thread object 0x30111018, lock_count=1, recursion=1; waiting thread is 0x6. An owner of 0, or one naming a thread that has exited, means the lock was leaked.",
+      "site": "H1",
+      "owner_func": "sub_83FAF180+0x8",
+      "waiter_func": "sub_82A2A260+0x10",
+      "map": "build\\agent2\\devoff4-bin\\legodimensions.map",
+      "window": "after",
+      "stall_start": "18:02:13.926"
+     }
+    ],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-22 18:00:16.202",
+    "last_ts": "2026-11-22 18:02:12.961"
+   }
+  },
+  "1834-p2fc-r3": {
+   "arm": "p2fc",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": 39.93499994277954,
+    "slow_pct": 50.442477876106196,
+    "span_s": 112.57099986076355,
+    "rows": 113
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "s0-r1",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14.29,
+    "ff": 1795392020.914,
+    "start": "2026-11-22 18:00:10.780",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-22 18:01:20.914",
+    "m_end": "2026-11-22 18:02:10.926",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11192
+     ]
+    ],
+    "lines": 100,
+    "levels": {
+     "info": 52,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "C1 keep-watch:": 2,
+     "C1 keep-watch: on (with physical_protect_hold_global_lock)": 1,
+     "C1 keep-watch: first kept protect at": 1,
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-22 18:00:16.202",
+    "last_ts": "2026-11-22 18:02:12.961"
+   }
+  }
+ }
+}

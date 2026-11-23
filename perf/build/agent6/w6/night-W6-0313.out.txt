@@ -1,0 +1,79 @@
+W6 logdiff kit (Agent 6, task #16): <workspace>\build\agent8\matrix\20261123-0313
+expect build\agent6\w6\expect-w6.json (reference s0); matrix.json build\agent8\matrix\20261123-0313\matrix.json
+runs 21 in 5 arms: s0=5; cold-s0=1; p2=5; p2f=5; p2fc=5
+arms in the expect file with no run here: f, fc
+
+Per arm. stuck = STUCK-LOCK episodes (sites; IN = in the measured window); recov/unh/pfail = Recovered stale protection / Unhandled write fault / Protect failed lines per run; W/E/C = warning/error/critical lines per run; slow = slow runs/runs, mean slow_pct, mean onset s; logdiff vs s0 = gate FAIL findings/NEW/MORE/GONE/ONLY keys
+  arm        runs verdict stuck                  dumps recov      unh        pfail      W/E/C                      slow                   logdiff F/N/M/G/O
+  s0         5    PASS    0                      0     [0, 0, 0, 0, 0] [0, 0, 0, 0, 0] [0, 0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 0/5 0.0% -s            (reference)
+  cold-s0    1    PASS    0                      0     [0]        [0]        [0]        40/0/0                     0/1 0.0% -s            0/0/0/0/0
+  p2         5    PASS    0                      0     [0, 0, 0, 0, 0] [0, 0, 0, 0, 0] [0, 0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 0/5 0.0% -s            0/0/0/0/0
+  p2f        5    NOTE    0                      0     [0, 0, 0, 0, 0] [0, 0, 0, 0, 0] [0, 0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 0/5 0.0% -s            0/0/0/1/0
+  p2fc       5    PASS    0                      0     [0, 0, 0, 0, 0] [0, 0, 0, 0, 0] [0, 0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 0/5 0.0% -s            0/0/0/0/3
+
+Per run. exit = run.json exit code; close = WM_CLOSE posted/clean; seq = log ends with the clean-exit lines; stuck = episodes; slow = onset s / slow_pct / span s (sys.csv rows); nogrowth = perf.csv max no-growth s in the window; free = GB at start
+  run                arm      verdict status exit  close     seq  W/E/C     stuck dmp  slow                 nogrowth free  lines
+  0313-cold-s0       cold-s0  PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/91 (91)          0        13.99 98
+  0315-s0-r1         s0       PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.95 102
+  0317-p2-r1         p2       PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (111)        0        13.93 98
+  0319-p2f-r1        p2f      PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.94 98
+  0321-p2fc-r1       p2fc     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/111 (112)        0        13.93 140
+  0323-p2-r2         p2       PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.92 98
+  0325-p2f-r2        p2f      PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.91 98
+  0327-p2fc-r2       p2fc     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.91 140
+  0329-s0-r2         s0       PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.95 98
+  0331-p2f-r3        p2f      PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (111)        0        13.89 98
+  0333-p2fc-r3       p2fc     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.96 140
+  0335-s0-r3         s0       PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.94 98
+  0337-p2-r3         p2       PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.92 98
+  0339-p2fc-r4       p2fc     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.96 139
+  0341-s0-r4         s0       PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.94 98
+  0343-p2-r4         p2       PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.94 98
+  0345-p2f-r4        p2f      NOTE    OK     0     1/True    NO   40/0/0    0     0    -/0/112 (113)        0        13.95 97
+  0348-s0-r5         s0       PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.95 98
+  0350-p2-r5         p2       PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.96 98
+  0352-p2f-r5        p2f      PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (113)        0        13.96 98
+  0354-p2fc-r5       p2fc     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/111 (112)        0        13.96 140
+
+STUCK-LOCK episodes: 0 (H1 = owner parked in sub_83FAF180, the L1 fence-wait poll; finding 10)
+
+Reasons, FAIL first (per arm: its runs, then its logdiff findings)
+  NOTE p2f      logdiff GONE: [info] [core] Execution complete
+  NOTE p2f      0345-p2f-r4: log does not end with the clean-exit lines: ['Toypad[Read ] 0B 0C 55 09 0A E9 FE 3E 60 12 90 9B 32 5C 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ', 'Window closing, shutting down...', 'Title terminated; hard-exiting process.']
+
+Counts per arm (lines containing each expect count text; one number per run, run-dir order)
+  STUCK-LOCK                                                   s0=[0, 0, 0, 0, 0]; cold-s0=[0]; p2=[0, 0, 0, 0, 0]; p2f=[0, 0, 0, 0, 0]; p2fc=[0, 0, 0, 0, 0]
+  still not acquired after                                     s0=[0, 0, 0, 0, 0]; cold-s0=[0]; p2=[0, 0, 0, 0, 0]; p2f=[0, 0, 0, 0, 0]; p2fc=[0, 0, 0, 0, 0]
+  Minidump written to                                          s0=[0, 0, 0, 0, 0]; cold-s0=[0]; p2=[0, 0, 0, 0, 0]; p2f=[0, 0, 0, 0, 0]; p2fc=[0, 0, 0, 0, 0]
+  Recovered stale physical page protection                     s0=[0, 0, 0, 0, 0]; cold-s0=[0]; p2=[0, 0, 0, 0, 0]; p2f=[0, 0, 0, 0, 0]; p2fc=[0, 0, 0, 0, 0]
+  Unhandled guest physical write fault                         s0=[0, 0, 0, 0, 0]; cold-s0=[0]; p2=[0, 0, 0, 0, 0]; p2f=[0, 0, 0, 0, 0]; p2fc=[0, 0, 0, 0, 0]
+  PhysicalHeap::Protect failed                                 s0=[0, 0, 0, 0, 0]; cold-s0=[0]; p2=[0, 0, 0, 0, 0]; p2f=[0, 0, 0, 0, 0]; p2fc=[0, 0, 0, 0, 0]
+  BaseHeap::Protect failed                                     s0=[0, 0, 0, 0, 0]; cold-s0=[0]; p2=[0, 0, 0, 0, 0]; p2f=[0, 0, 0, 0, 0]; p2fc=[0, 0, 0, 0, 0]
+  C1 keep-watch:                                               s0=[0, 0, 0, 0, 0]; cold-s0=[0]; p2=[0, 0, 0, 0, 0]; p2f=[0, 0, 0, 0, 0]; p2fc=[38, 38, 38, 37, 38]
+  C1 keep-watch: on (with physical_protect_hold_global_lock)   s0=[0, 0, 0, 0, 0]; cold-s0=[0]; p2=[0, 0, 0, 0, 0]; p2f=[0, 0, 0, 0, 0]; p2fc=[1, 1, 1, 1, 1]
+  C1 keep-watch: on, but                                       s0=[0, 0, 0, 0, 0]; cold-s0=[0]; p2=[0, 0, 0, 0, 0]; p2f=[0, 0, 0, 0, 0]; p2fc=[0, 0, 0, 0, 0]
+  C1 keep-watch: blocked                                       s0=[0, 0, 0, 0, 0]; cold-s0=[0]; p2=[0, 0, 0, 0, 0]; p2f=[0, 0, 0, 0, 0]; p2fc=[0, 0, 0, 0, 0]
+  C1 keep-watch: first kept protect at                         s0=[0, 0, 0, 0, 0]; cold-s0=[0]; p2=[0, 0, 0, 0, 0]; p2f=[0, 0, 0, 0, 0]; p2fc=[1, 1, 1, 1, 1]
+  protects kept so far                                         s0=[0, 0, 0, 0, 0]; cold-s0=[0]; p2=[0, 0, 0, 0, 0]; p2f=[0, 0, 0, 0, 0]; p2fc=[36, 36, 36, 35, 36]
+  C1 verify                                                    s0=[0, 0, 0, 0, 0]; cold-s0=[0]; p2=[0, 0, 0, 0, 0]; p2f=[0, 0, 0, 0, 0]; p2fc=[0, 0, 0, 0, 0]
+  S4 upload hash:                                              s0=[0, 0, 0, 0, 0]; cold-s0=[0]; p2=[0, 0, 0, 0, 0]; p2f=[0, 0, 0, 0, 0]; p2fc=[0, 0, 0, 0, 0]
+  slow frame #                                                 s0=[0, 0, 0, 0, 0]; cold-s0=[0]; p2=[0, 0, 0, 0, 0]; p2f=[0, 0, 0, 0, 0]; p2fc=[0, 0, 0, 0, 0]
+  memexport full-buffer                                        s0=[0, 0, 0, 0, 0]; cold-s0=[0]; p2=[0, 0, 0, 0, 0]; p2f=[0, 0, 0, 0, 0]; p2fc=[0, 0, 0, 0, 0]
+  memexport flush reasons                                      s0=[0, 0, 0, 0, 0]; cold-s0=[0]; p2=[0, 0, 0, 0, 0]; p2f=[0, 0, 0, 0, 0]; p2fc=[0, 0, 0, 0, 0]
+  [NtCreateFile] FAILED                                        s0=[35, 35, 35, 35, 35]; cold-s0=[35]; p2=[35, 35, 35, 35, 35]; p2f=[35, 35, 35, 35, 35]; p2fc=[35, 35, 35, 35, 35]
+  Reserving the guest memory arena                             s0=[1, 1, 1, 1, 1]; cold-s0=[1]; p2=[1, 1, 1, 1, 1]; p2f=[1, 1, 1, 1, 1]; p2fc=[1, 1, 1, 1, 1]
+  Title terminated                                             s0=[1, 1, 1, 1, 1]; cold-s0=[1]; p2=[1, 1, 1, 1, 1]; p2f=[1, 1, 1, 1, 1]; p2fc=[1, 1, 1, 1, 1]
+
+ONLY keys per arm vs s0 (any level, not Toypad; in no s0 run), from w4b_logdiff
+  cold-s0: 0
+  p2: 0
+  p2f: 0
+  p2fc: 3
+    [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)
+    [info] [sys] C# keep-watch: first kept protect at #h, #h bytes
+    [info] [sys] C# keep-watch: # protects kept so far
+
+w4b_logdiff: exit 0 in 0.6 s -> build\agent6\w6\out-20261123-0313\logdiff (log build\agent6\w6\out-20261123-0313\logdiff.log)
+w4b_extra: exit 0 in 0.6 s -> build\agent6\w6\out-20261123-0313\extra.txt (log build\agent6\w6\out-20261123-0313\extra.log)
+verdict: no FAIL; runtime 1.4 s; output build\agent6\w6\out-20261123-0313
+w6_kit exit 0 (0 = no FAIL, 1 = at least one FAIL, 2 = usage error)

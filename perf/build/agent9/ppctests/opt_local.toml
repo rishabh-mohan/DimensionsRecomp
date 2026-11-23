@@ -1,0 +1,6 @@
+# Local workaround for the opt variant (not an SDK file).
+# RecompilerConfig::Load -> FinalizeConfig fails with "Missing required field: file_path" when the
+# TOML has no file_path; recompile-tests builds its context from the test binary, so the value is unused.
+# The option keys themselves come unchanged from the SDK file via includes.
+includes = ["../../../DimensionsRecomp/rexglue-sdk/tests/ppc/opt_config.toml"]
+file_path = "unused-by-recompile-tests"

@@ -1,0 +1,40 @@
+profile : <workspace>\build\agent8\profiler\profile-695028062.bin
+map     : <workspace>\build\agent8\profiler\profiler_selftest.map
+samples : 95  threads: 6  modules: 14  duration: 3.279 s (trailer)  rounds: 16
+counting: busy samples (29)
+warning: profile-695028062.bin: low sampling rate (5 rounds/s, nominal ~1000): the machine was probably CPU-saturated (each SuspendThread/GetThreadContext waits until the target thread is scheduled); attribution is still usable but noisy
+
+busy 29 (30.5%)  waiting 66 (69.5%)  io 0 (0.0%)
+busy samples by category (leaf): guest 15 (51.7%)  rexlego 14 (48.3%)
+
+== threads ==
+  tid  name              samples   run%  busy  wait  io  top busy functions / role
+-----  ----------------  -------  -----  ----  ----  --  ------------------------------------
+51404  selftest-main          16   87.5    14     2   0  lsp_selftest_hot 100%
+50136                         16    0.0     0    16   0  (waiting)
+77552  selftest-waiter        16    0.0     0    16   0  (waiting) selftest::Waiter
+83640  selftest-sleeper       16    0.0     0    16   0  (waiting) selftest::Sleeper
+13124                         16    0.0     0    16   0  (waiting)
+28872  selftest-guest         15  100.0    15     0   0  sub_8200BEEF [guest 0x8200BEEF] 100%
+
+== top 2 by self (busy samples) ==
+samples      %   /s  category  function
+-------  -----  ---  --------  -------------------------------
+     15  51.72  4.6  guest     sub_8200BEEF [guest 0x8200BEEF]
+     14  48.28  4.3  rexlego   lsp_selftest_hot
+
+== top 10 by inclusive (busy samples) ==
+samples       %   /s  category  function
+-------  ------  ---  --------  -----------------------------------------------------------------------------------
+     29  100.00  8.8  system    KERNEL32.DLL!BaseThreadInitThunk
+     29  100.00  8.8  system    ntdll.dll!RtlUserThreadStart
+     15   51.72  4.6  guest     sub_8200BEEF [guest 0x8200BEEF]
+     15   51.72  4.6  rexlego   selftest::GuestLoop
+     15   51.72  4.6  rexlego   std::thread::_Invoke<class std::tuple<class `extern "C" main'::`1'::<lambda_0>>, 0>
+     15   51.72  4.6  rexlego   thread_start<unsigned int (__cdecl *)(void *), 1>
+     14   48.28  4.3  rexlego   main
+     14   48.28  4.3  rexlego   __scrt_common_main_seh
+     14   48.28  4.3  rexlego   lsp_selftest_hot
+     14   48.28  4.3  rexlego   lsp_selftest_outer
+
+(read 0.001 s, map 0.025 s, symbolize 0.196 s; 30 unique stacks, 46 addresses, 23 functions)

@@ -1,0 +1,37 @@
+﻿=== timing matrix: Window 4 (Agent 8, session 3): B = devoffB (codegen B) vs d0 = devoff2 (primary), then d3 = devoff3; optional d0t = devoff2 + REX_TIMER_WAIT_BLOCKING=1 ===
+matrix   <workspace>\bench\agent8\run\matrix-window4.json   [-Quick: short settle/menu/warm-up/window, FUNCTIONAL ONLY]
+note     W4a (the default), RUN-WINDOW4.cmd: -Only d0,B,d3 (Agent 1 priority: B vs devoff2 first, then devoff3). One unscored cold run per bin (devoff2, devoffB, devoff3), then round-robin rounds rotated each round: d0 x5, B x5, d3 x4 (17 runs, about 39 min, -PlanOnly 03:15).
+note     W4b, RUN-WINDOW4B.cmd, only if Agent 1 picks it after Agent 11's d0t functional check: -Only d0,B,d3,d0t -Repeats 4 -ColdShared. One unscored cold run (devoff2) shared by all bins, then 4 rounds in a Latin square (each arm once per round, each position once per arm): d0, B, d3, d0t x4 each (17 runs, about 39 min, -PlanOnly 03:15). With one cold run per bin it is 19 runs, about 44 min: too long. One shared cold run is enough because every run copies its bin into a fresh run dir (no per-bin cache state is carried over), the game data are shared by all bins, and every window starts >= 60 s after the first frame. Check after the run: each arm's round-1 run against its later rounds (matrix_recheck.py).
+note     Window: 5 s settle + 55 s warm-up from the first frame, then 50 s measured, so every window starts >= 60 s after the first frame (min_window_after_ff_s 60, Agent 1's hard floor). The runner raises the warm-up when settle + warm-up is shorter, and after each run flags window_before_floor (excluded) when the first-frame signal to the start mark was < 59.5 s. Cold runs too: warm-up max(cold_warmup_s, 60 - settle) = 55 s, window 30 s.
+note     One frame source for every arm: perf.csv (frames perf), uncapped (framerate_limit=0), the same driver (drivers/thread-cpu.ps1 -> threads.csv). Runner flags on every run: --audio_mute=true --pause_when_unfocused=false --native_settings_load=false --discord_rpc=false.
+note     sys_csv: drivers/sys-csv.ps1 logs idle time, foreground window, input desktop, screensaver, CPU util/MHz, thermal and power every 1 s (sys.csv); sys_summary.py gives sys.json for the window. On the interactive desktop, input during the window, the game losing the foreground part-way, battery, battery saver, a power-plan change, a non-default input desktop or a screensaver exclude the run from summary.md (still in results.csv, listed under 'Flagged runs').
+note     Light phase (window 3's d11-r1): a run whose game.log has < 30 'FAILED: path=d:\INSTALL*.DAT' lines (normal boot: 34) ran a lighter title phase and is excluded (light_phase); a window with >= 60 % of frames under 4.5 ms is flagged light_share_high (info). python bench/agent8/run/matrix_recheck.py <out dir> [--keep-flagged] recomputes the summary.
+note     Timing comes only from this double-click run on the unlocked desktop (screensaver None, AC power, hands off). Agent runs of this matrix (-Quick, hidden desktop) are functional only.
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order roundrobin; close timeout 60 s; cooldown 5 s
+floor    every window >= 20 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+       d0: bin build/agent2/devoff2-bin; frames perf; x1; warm-up 15 s (raised from 10 s for the floor); window 20 s; group w4 (ref); cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         devoff2 = S2 sources + S1 codegen (window 3's d0, MANIFEST B87DC2D2)
+       B: bin build/agent2/devoffB-bin; frames perf; x1; warm-up 15 s (raised from 10 s for the floor); window 20 s; group w4; cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         devoffB = S2 sources + codegen B (Agent 9 recipe; MANIFEST 8709476FF4778768)
+       d3: bin build/agent2/devoff3-bin; frames perf; x1; warm-up 15 s (raised from 10 s for the floor); window 20 s; group w4; cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         devoff3 = S3 sources (MANIFEST B9C5175DA1904235)
+cold     d0 (build/agent2/devoff2-bin), B (build/agent2/devoffB-bin), d3 (build/agent2/devoff3-bin): unscored, before round 1 (warm-up 15 s, window 10 s)
+round 1  d0 B d3
+order    d0 B d3
+estimate 6 runs (3 cold), about 7 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-DMTARMUBZWO2RQC7CO33E3NBBO -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   8.88 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/devoff2-bin : ok (MANIFEST.txt)
+bin        build/agent2/devoff3-bin : ok (MANIFEST.txt)
+bin        build/agent2/devoffB-bin : ok (MANIFEST.txt)
+screensaver WPXSCR~1.SCR after 120 s: the keep-awake request should hold it off; if it starts during timing runs, set it to (None)
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   6 runs, about 7 min: done around 03:43
+keep-awake ON (SetThreadExecutionState continuous+system+display until the matrix ends)

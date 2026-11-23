@@ -1,0 +1,92 @@
+# s4b_check w6gA 20261122-210906-w6-gateA-p2fcv-level (off, scenario level-l.txt)
+run.json: exit 0 (0x00000000) dumps 1 crash_events 0 wer False; close wm_close 0.89 s; elapsed 601.03 of 600 s; cvars {"framerate_limit": "0", "shared_memory_single_hold_rearm": "true", "physical_protect_hold_global_lock": "true", "physical_protect_keep_watch": "true", "physical_protect_keep_watch_verify": "true", "slow_frame_log_ms": "1"}; env -; steps 104/119
+  dumps: hang-36276.dmp
+summary: verdict RECOVERED HANG (STUCK-LOCK + dump); first frame 17.0 s; levels {"info": 7378, "warning": 142, "error": 5, "critical": 1}; unknown cvars []; errors 6
+log files game.log; levels {"info": 7378, "warning": 142, "error": 5, "critical": 1}
+families: c1_any=21 k=0 c1_verify_on=1 c1_verify_f=0 c1_other=0 recovered_stale=0 unhandled_phys=0 protect_failed=0 split_init=0 split=0 deferred_counters=0 gpu_wait=0 memexport=7271 slow_frame=7271 s4_upload_hash=0 precise_wait=0 miss_cache=0 stuck_lock=5 minidump=1 fatal=1 debug_layer=0 dred=0 d3d12_msg=0 clean_exit=1
+  c1_any: [2026-11-22 21:09:13.865] [info] [sys] [t1016] C1 keep-watch: on (with physical_protect_hold_global_lock)
+  c1_any: [2026-11-22 21:09:16.473] [info] [sys] [t8520] C1 keep-watch: first kept protect at ED19F000, 299892736 bytes
+  c1_any: [2026-11-22 21:09:16.475] [info] [sys] [t8520] C1 keep-watch: 2 protects kept so far
+  c1_any: ... (15 more)
+  c1_any: [2026-11-22 21:17:00.548] [info] [sys] [t19856] C1 keep-watch: 24576 protects kept so far
+  c1_any: [2026-11-22 21:17:12.972] [info] [sys] [t19856] C1 keep-watch: 28672 protects kept so far
+  c1_any: [2026-11-22 21:17:23.308] [info] [sys] [t19856] C1 keep-watch: 32768 protects kept so far
+  c1_verify_on: [2026-11-22 21:09:20.026] [info] [gpu] [t17104] C1 verify: on. Hashing CPU uploads; K checks keep-watch protects, F checks write faults
+  memexport: [2026-11-22 21:09:20.185] [info] [gpu] [t17104] slow frame #2: 87.6 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.2 (2x), new 3 | texture load 2.5 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | m
+  memexport: [2026-11-22 21:09:20.265] [info] [gpu] [t17104] slow frame #3: 80.9 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 1x 4 KB (on memexport pages 0x 0 KB) | m
+  memexport: [2026-11-22 21:09:20.411] [info] [gpu] [t17104] slow frame #4: 145.6 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 2x 8 KB (on memexport pages 0x 0 KB) | 
+  memexport: ... (7265 more)
+  memexport: [2026-11-22 21:19:08.772] [info] [gpu] [t17104] slow frame #7270: 189.0 ms | gpu-thread idle 19.6 | host-gpu wait 9.4 (2x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.3 (41x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 3x 392 KB (on memexport pages 
+  memexport: [2026-11-22 21:19:09.085] [info] [gpu] [t17104] slow frame #7271: 312.7 ms | gpu-thread idle 0.0 | host-gpu wait 27.9 (16x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.2 (41x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 6x 7392 KB (on memexport page
+  memexport: [2026-11-22 21:19:09.311] [info] [gpu] [t17104] slow frame #7272: 225.8 ms | gpu-thread idle 21.1 | host-gpu wait 6.4 (2x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 1 | texture load 0.4 (55x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 3x 36 KB (on memexport pages 1
+  slow_frame: [2026-11-22 21:09:20.185] [info] [gpu] [t17104] slow frame #2: 87.6 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.2 (2x), new 3 | texture load 2.5 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | m
+  slow_frame: [2026-11-22 21:09:20.265] [info] [gpu] [t17104] slow frame #3: 80.9 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 1x 4 KB (on memexport pages 0x 0 KB) | m
+  slow_frame: [2026-11-22 21:09:20.411] [info] [gpu] [t17104] slow frame #4: 145.6 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 2x 8 KB (on memexport pages 0x 0 KB) | 
+  slow_frame: ... (7265 more)
+  slow_frame: [2026-11-22 21:19:08.772] [info] [gpu] [t17104] slow frame #7270: 189.0 ms | gpu-thread idle 19.6 | host-gpu wait 9.4 (2x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.3 (41x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 3x 392 KB (on memexport pages 
+  slow_frame: [2026-11-22 21:19:09.085] [info] [gpu] [t17104] slow frame #7271: 312.7 ms | gpu-thread idle 0.0 | host-gpu wait 27.9 (16x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.2 (41x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 6x 7392 KB (on memexport page
+  slow_frame: [2026-11-22 21:19:09.311] [info] [gpu] [t17104] slow frame #7272: 225.8 ms | gpu-thread idle 21.1 | host-gpu wait 6.4 (2x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 1 | texture load 0.4 (55x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 3x 36 KB (on memexport pages 1
+  stuck_lock: [2026-11-22 21:18:17.497] [error] [krnl] [t8520] STUCK-LOCK: critical section 0x84959edc still not acquired after 5s. owner=guest thread object 0x30111018, lock_count=1, recursion=1; waiting thread is 0x6. An owner of 0, or one naming a thread that has exited, means the lock was leaked.
+  stuck_lock: [2026-11-22 21:18:17.497] [error] [krnl] [t8520] STUCK-LOCK: the owner is tid 0x0017 (unnamed), parked at lr=83FAF188 with r3=7048F7E0. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.
+  stuck_lock: [2026-11-22 21:18:17.497] [error] [krnl] [t8520] STUCK-LOCK: owner's callers: 83FBFBDC <- 83FC0CA8 <- 83FB3AC8 <- 83FBF698 <- 83FBFA98 <- 82BD6BA4
+  stuck_lock: ...
+  stuck_lock: [2026-11-22 21:18:17.497] [error] [krnl] [t8520] STUCK-LOCK: waiter's callers: lr=82A2A270 <- 82AED6BC <- 82B7132C <- 82FB01A0 <- 82B7995C <- 82AB2108 <- 82FEBDE0
+  stuck_lock: [2026-11-22 21:18:17.497] [error] [krnl] [t8520] STUCK-LOCK: GPU thread: executing PM4 opcode 0x22 | read ptr 0x2665, write ptr 0x26fb
+  minidump: [2026-11-22 21:18:20.628] [critical] [core] [t8520] [FATAL] Minidump written to hang-36276.dmp
+  fatal: [2026-11-22 21:18:20.628] [critical] [core] [t8520] [FATAL] Minidump written to hang-36276.dmp
+C1 kept so far: last 32768 (19 lines)
+memexport full-buffer: {"lines": 7271, "last_total": 0, "max_total": 0, "sum_x": 0, "lines_x_gt0": 0}
+last slow-frame line (tail): ...e load 0.4 (55x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 3x 36 KB (on memexport pages 1x 28 KB) | memexport syncs 2 (40 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)
+frames (perf.csv rows) 7272; slow_frame per frame 1.000
+logdiff vs 20261122-210059-s4b-L0-off-level (base scenario level-l.txt): NEW 6 (+0 allowed) MORE 0 (+0 allowed) GONE 103 (6 unexpected) FLAG 1; NEW at info 10 other, 1 allowed; rc 0
+  NEW build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log x1 [critical] [core] [FATAL] Minidump written to hang-#.dmp
+  NEW build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log x1 [error] [krnl] STUCK-LOCK: GPU thread: executing PM# opcode #x# | read ptr #x#, write ptr #x#
+  NEW build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log x1 [error] [krnl] STUCK-LOCK: critical section #x# still not acquired after #s. owner=guest thread object #x#, lock_count=#, recursion=#; waiting thread is #x#. An owner of #, or one naming a thread that has exited, me
+  NEW build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log x1 [error] [krnl] STUCK-LOCK: owner's callers: #h <- #h <- #h <- #h <- #h <- #h
+  NEW build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log x1 [error] [krnl] STUCK-LOCK: the owner is tid #x# (unnamed), parked at lr=#h with r#=#h. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.
+  NEW build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log x1 [error] [krnl] STUCK-LOCK: waiter's callers: lr=#h <- #h <- #h <- #h <- #h <- #h <- #h
+  FLAG build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log fatal=1 (baseline max 0)
+  GONE build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log [info] [core] Toypad: pad # mode # lit # #E # (on # off # count # speed #)
+  GONE build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log [info] [core] Toypad: pad # mode # lit FE # # (on # off # count # speed #)
+  GONE build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log [info] [core] Toypad: pad # mode # lit FF # # (on # off # count # speed #)
+  GONE build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log [info] [core] Toypad: pad # mode # lit FF #E # (on # off # count # speed #)
+  GONE build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log [warning] [krnl] [NtCreateFile] FAILED: path='ttappdat<path>' -> #x#
+  GONE build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log [warning] [krnl] __imp__XNetLogonGetTitleID STUB
+  info NEW build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log x1 [critical] [core] [FATAL] Minidump written to hang-#.dmp
+  info NEW build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log x1 [error] [krnl] STUCK-LOCK: GPU thread: executing PM# opcode #x# | read ptr #x#, write ptr #x#
+  info NEW build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log x1 [error] [krnl] STUCK-LOCK: critical section #x# still not acquired after #s. owner=guest thread object #x#, lock_count=#, recursion=#; waiting thread is #x#. An owner of #, or one naming a 
+  info NEW build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log x1 [error] [krnl] STUCK-LOCK: owner's callers: #h <- #h <- #h <- #h <- #h <- #h
+  info NEW build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log x1 [error] [krnl] STUCK-LOCK: the owner is tid #x# (unnamed), parked at lr=#h with r#=#h. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.
+  info NEW build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log x1 [error] [krnl] STUCK-LOCK: waiter's callers: lr=#h <- #h <- #h <- #h <- #h <- #h <- #h
+  info NEW build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log x1 [info] [gpu] C# verify: on. Hashing CPU uploads; K checks keep-watch protects, F checks write faults
+  info NEW build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log x19 [info] [sys] C# keep-watch: # protects kept so far
+  info NEW build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log x1 [info] [sys] C# keep-watch: first kept protect at #h, #h bytes
+  info NEW build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log x1 [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)
+  info allowed NEW build\agent3\runs\20261122-210906-w6-gateA-p2fcv-level\game.log x7271 [info] [gpu] slow frame ##: # ms | gpu-thread idle # | host-gpu wait # (#x) | shader translate # (#x) | pipeline create # (#x), new # | texture load # (#x) | readback
+levels cand {"info": 7378, "warning": 142, "error": 5, "critical": 1} vs 20261122-210059-s4b-L0-off-level {"info": 442, "warning": 144}
+scenes (>= 2 s) base: 220/534:82s 218/222:26s 226/1022:24s 220/528:17s 219/226:15s 594/2813:4s 788/31613:3s 841/31696:3s 790/31625:2s
+scenes (>= 2 s) cand: 220/534:195s 218/222:176s 220/528:44s 219/226:15s 594/2813:10s 226/1022:5s
+  missing in cand: ['788/31613', '790/31625', '841/31696']; extra in cand: -
+  note: attract/idle scenes missing in cand (timing after the route; not a BASE item): ['788/31613', '790/31625', '841/31696']
+route marks first-frame..tags-placed: 4, 3 differ: title 226/1022->219/244 pads-white 220/528->226/1022 tags-placed 220/528->226/1022; all marks: 9 differ
+  cand marks: first-frame=218/222 title=219/244 pads-white=226/1022 tags-placed=226/1022 m01=220/528 m02=220/528 m03=220/528 m04=220/528 m05=220/528 m06=220/528 m07=220/534 m08=220/534 m09=220/534 m10=220/534 story-load=220/534
+threads (% of one core, window [20.0, 572.4] s from the first frame, 552.4 s): GPU Commands (F8000018) x1 52.8 | XThread8484 (F80001A8) x1 46.5 | rex::thread::TimerQueue x1 22.6 | Main XThread (F800002C) x1 15.3 | XThread4D90 (F80000F4) x1 10.9 | (unnamed) x33 10.8 | XThread393C (F8000144) x1 3.9 | 0xc0550001 x1 3.3 | XThread5A84 (F8000114) x1 1.0 | D3D12 Pipelines x9 0.9
+  TimerQueue ticks (tid 38752): 299 samples over [-13.6, 582.4] s, cycles non-rising in 0 of 298 steps 
+sys.csv slow state: {"rows": 581, "onset_s": null, "slow_pct": 0.0, "e_eff_mhz_median": 2424, "cpu_util_pct_median": 136.1, "slow": false}
+PROOF ok   init "C1 keep-watch: on (with physical_protect_hold_global_lock)" x1
+PROOF ok   "first kept protect" x1 (gate D / positive control)
+PROOF ok   kept count: last "kept so far" = 32768 (19 such lines)
+PROOF ok   C1 verify armed: "C1 verify: on. Hashing CPU uploads ..." x1 (without it K = 0 proves nothing)
+PROOF ok   verify-mismatch (K) lines 0 (gate A / G5, through the level load)
+PROOF ok   G5: C1 verify F lines 0 (G5 needs 0 K and 0 F) -
+PROOF ok   kept count rises through the level load: first 2 -> last 32768 (19 "kept so far" lines)
+PROOF ok   gate D zero lines: "Recovered stale physical page protection" 0, "Unhandled guest physical write fault" 0
+PROOF ok   no blocked/no-hold C1 line (0/0/0)
+PROOF ok   slow-frame lines 7271
+PROOF ok   the last slow-frame line ends with the memexport suffix: ...memexport pages 1x 28 KB) | memexport syncs 2 (40 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)
+PROOF ok   P2 COUNTER: memexport full-buffer total (last line) = 0; max 0; sum Nx 0; lines with Nx > 0: 0 -> closes P2 memexport gate
+PROOF ok   W6 cvars in run.json: single_hold_rearm=true hold_global_lock=true
+PROOF ok   W6 w6gA cvars in run.json (6 expected): all as W6-GATES.md v2
+PROOF ok   G8 bad lines: "PhysicalHeap::Protect failed" 0, "Recovered stale physical page protection" 0, "Unhandled guest physical write fault" 0
+BASE items missed: marks differ before up-2: title 226/1022->219/244 pads-white 220/528->226/1022 tags-placed 220/528->226/1022; logdiff NEW 6; logdiff FLAG 1; logdiff GONE 6 beyond Toypad/u-diag lines; dumps 1; steps 104/119; [error] 5 [critical] 1; stuck_lock 5; minidump 1; fatal 1
+VERDICT HINT LOOK: 10 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row w6gA)

@@ -1,0 +1,16 @@
+# pthrottle_readout 2026-11-22 06:24:32: build\agent11\pthrottle\pairs\20261122-0600\runs (slow state: E below 800 MHz for 3+ samples, from the first frame)
+
+run         arm status applied readback                                     reapplied held_pct pt_ok  ver lost_s onset_s slow_pct span_s e_mhz e_mhz_slow e_util_slow p_mhz tz_min fg
+---         --- ------ ------- --------                                     --------- -------- -----  --- ------ ------- -------- ------ ----- ---------- ----------- ----- ------ --
+0600-d0-r1  d0  OK       False C=0x0 S=0x0 -> C=0x0 S=0x0, last C=0x0 S=0x0         0        0  True True -          103       24    163  1455        555          33  1946 -      0 
+0604-d0e-r1 d0e OK        True C=0x0 S=0x0 -> C=0x1 S=0x0, last C=0x0 S=0x0         1     99.6 False True -0.57       40       40    155   938        596          36  1947 -      0 
+0607-d0e-r2 d0e OK        True C=0x0 S=0x0 -> C=0x1 S=0x0, last C=0x0 S=0x0         1     99.7 False True -0.55       49       12    157  1448        697          42  1693 -      0 
+0610-d0-r2  d0  OK       False C=0x0 S=0x0 -> C=0x0 S=0x0, last C=0x0 S=0x0         0        0  True True -           71       37    158  1156        756          45  1692 -      0 
+0613-d0-r3  d0  OK       False C=0x0 S=0x0 -> C=0x0 S=0x0, last C=0x0 S=0x0         0        0  True True -           37       41    159   988        558          33  1949 -      0 
+0616-d0e-r3 d0e OK        True C=0x0 S=0x0 -> C=0x1 S=0x0, last C=0x0 S=0x0         1     99.6 False True -0.57       47       34    154  1003        619          37  1897 -      0 
+
+
+
+arm d0  : 3 runs, 3 counted, 3 with the slow state (onsets 103,71,37 s; slow share % per counted run 24,37,41); arm state verified in 3/3 (sidecar record ok in 3/3)
+arm d0e : 3 runs, 3 counted, 3 with the slow state (onsets 40,49,47 s; slow share % per counted run 40,12,34); arm state verified in 3/3 (sidecar record ok in 0/3)
+VERDICT: NO EFFECT: opt-out runs reached the slow state about as often as off runs. Process EXECUTION_SPEED throttling is not what holds the E cores; left: PL1 / package power, thread-level or visibility QoS the process flag does not override, the power-mode overlay / EPP.

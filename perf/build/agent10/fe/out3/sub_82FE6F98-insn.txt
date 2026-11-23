@@ -1,0 +1,23 @@
+sub_82FE6F98: classes cr=5 decl=1; SO writers: none
+== prologue differs (decl)
+  A| REX_FUNC_PROLOGUE();
+  A| uint32_t ea{};
+  B| REX_FUNC_PROLOGUE();
+  B| PPCRegister ctr{};
+  B| PPCCRRegister cr6{};
+  B| uint32_t ea{};
+[6] cmpwi cr6,r10,47   (cr)
+  A| ctx.cr6.compare<int32_t>(ctx.r10.s32, 47, ctx.xer);
+  B| cr6.compare<int32_t>(ctx.r10.s32, 47, {});
+[15] cmplwi cr6,r9,0   (cr)
+  A| ctx.cr6.compare<uint32_t>(ctx.r9.u32, 0, ctx.xer);
+  B| cr6.compare<uint32_t>(ctx.r9.u32, 0, {});
+[23] cmplwi cr6,r10,0   (cr)
+  A| ctx.cr6.compare<uint32_t>(ctx.r10.u32, 0, ctx.xer);
+  B| cr6.compare<uint32_t>(ctx.r10.u32, 0, {});
+[33] cmpwi cr6,r11,-1   (cr)
+  A| ctx.cr6.compare<int32_t>(ctx.r11.s32, -1, ctx.xer);
+  B| cr6.compare<int32_t>(ctx.r11.s32, -1, {});
+[61] cmpwi cr6,r10,57   (cr)
+  A| ctx.cr6.compare<int32_t>(ctx.r10.s32, 57, ctx.xer);
+  B| cr6.compare<int32_t>(ctx.r10.s32, 57, {});

@@ -1,0 +1,199 @@
+{
+ "tool": "analyze_profile.py",
+ "schema": 1,
+ "mode": "summary",
+ "profile": "<workspace>\\build\\agent3\\selftest-runs\\20261121-214923-profile\\profile-706434015.bin",
+ "map": "<workspace>\\build\\agent3\\selftest-runs\\20261121-214923-profile\\fakedimensions.map",
+ "samples": 5067,
+ "modules": 1,
+ "threads_seen": 2,
+ "trailer": {
+  "version": 1,
+  "payload_bytes": 76,
+  "qpc_frequency": 10000000,
+  "qpc_start": 7064527259486,
+  "qpc_end": 7064567800549,
+  "rounds": 4054,
+  "timer_mode": 1,
+  "thread_count": 2,
+  "extra_payload_bytes": 0,
+  "thread_names": {
+   "1": "fake-main",
+   "2": "fake-render"
+  }
+ },
+ "duration": {
+  "rounds": 4054,
+  "rounds_estimated": 4054,
+  "seconds": 4.0541063,
+  "source": "trailer",
+  "rounds_per_s": 1000.0
+ },
+ "rate_unit": "/s",
+ "timer_observer_effect": false,
+ "counting": "busy samples",
+ "counted_samples": 5067,
+ "thread_filter": null,
+ "fold_guest": false,
+ "totals": {
+  "busy": 5067,
+  "waiting": 0,
+  "io": 0
+ },
+ "categories_busy": {
+  "guest": 4054,
+  "rexruntime": 0,
+  "native-gpu": 0,
+  "rexlego": 1013,
+  "d3d12+driver": 0,
+  "system": 0,
+  "other": 0,
+  "unknown": 0
+ },
+ "threads": [
+  {
+   "tid": 1,
+   "name": "fake-main",
+   "samples": 4054,
+   "busy": 4054,
+   "waiting": 0,
+   "io": 0,
+   "pct_running": 100.0,
+   "top_self": [
+    {
+     "name": "sub_82000000 [guest 0x82000000]",
+     "category": "guest",
+     "module": "fakedimensions.exe",
+     "guest_addr": "0x82000000",
+     "kind": null,
+     "samples": 4054,
+     "pct": 100.0
+    }
+   ],
+   "top_inclusive": [
+    {
+     "name": "sub_82000000 [guest 0x82000000]",
+     "category": "guest",
+     "module": "fakedimensions.exe",
+     "guest_addr": "0x82000000",
+     "kind": null,
+     "samples": 4054,
+     "pct": 100.0
+    },
+    {
+     "name": "FakeGame::Present",
+     "category": "rexlego",
+     "module": "fakedimensions.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 4054,
+     "pct": 100.0
+    }
+   ],
+   "role": "sub_82000000 [guest 0x82000000]"
+  },
+  {
+   "tid": 2,
+   "name": "fake-render",
+   "samples": 1013,
+   "busy": 1013,
+   "waiting": 0,
+   "io": 0,
+   "pct_running": 100.0,
+   "top_self": [
+    {
+     "name": "FakeGame::Render",
+     "category": "rexlego",
+     "module": "fakedimensions.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 1013,
+     "pct": 100.0
+    }
+   ],
+   "top_inclusive": [
+    {
+     "name": "FakeGame::Render",
+     "category": "rexlego",
+     "module": "fakedimensions.exe",
+     "guest_addr": null,
+     "kind": null,
+     "samples": 1013,
+     "pct": 100.0
+    }
+   ],
+   "role": "FakeGame::Render"
+  }
+ ],
+ "top_self": [
+  {
+   "name": "sub_82000000 [guest 0x82000000]",
+   "category": "guest",
+   "module": "fakedimensions.exe",
+   "guest_addr": "0x82000000",
+   "kind": null,
+   "samples": 4054,
+   "pct": 80.01,
+   "rate": 999.974
+  },
+  {
+   "name": "FakeGame::Render",
+   "category": "rexlego",
+   "module": "fakedimensions.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 1013,
+   "pct": 19.99,
+   "rate": 249.87
+  }
+ ],
+ "top_inclusive": [
+  {
+   "name": "sub_82000000 [guest 0x82000000]",
+   "category": "guest",
+   "module": "fakedimensions.exe",
+   "guest_addr": "0x82000000",
+   "kind": null,
+   "samples": 4054,
+   "pct": 80.01,
+   "rate": 999.974
+  },
+  {
+   "name": "FakeGame::Present",
+   "category": "rexlego",
+   "module": "fakedimensions.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 4054,
+   "pct": 80.01,
+   "rate": 999.974
+  },
+  {
+   "name": "FakeGame::Render",
+   "category": "rexlego",
+   "module": "fakedimensions.exe",
+   "guest_addr": null,
+   "kind": null,
+   "samples": 1013,
+   "pct": 19.99,
+   "rate": 249.87
+  }
+ ],
+ "timing": {
+  "read_s": 0.009,
+  "map_s": 0.169,
+  "symbolize_s": 0.626,
+  "unique_stacks": 2,
+  "unique_addresses": 3,
+  "functions": 5
+ },
+ "map_info": {
+  "<workspace>\\build\\agent3\\selftest-runs\\20261121-214923-profile\\fakedimensions.map": {
+   "symbols": 3,
+   "lines": 4,
+   "image": "fakedimensions",
+   "parse_s": 0.002
+  }
+ },
+ "warnings": []
+}

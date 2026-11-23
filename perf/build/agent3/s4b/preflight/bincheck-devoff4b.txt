@@ -1,0 +1,82 @@
+bin build\agent2\devoff4b-bin (set off): 8 files
+  FiraSans-Regular.ttf                  456,996
+  MANIFEST.txt                           30,450
+  TracyClient.dll                       233,472
+  achievement_unlocked.wav              191,018
+  legodimensions.exe                170,350,080
+  legodimensions.map                 39,181,442
+  rexgpu-xenos.dll                    3,425,792
+  rexruntime.dll                     10,909,184
+MANIFEST.txt: 265 lines; first line: ﻿# build/agent2/devoff4b-bin - Agent 2 (Agent 1's batch schedule). dev OFF build 4b (S4b = S4a + SDK C1 v3 + M1 + P2c + r1r2 + #26 tool with every new switch OFF + S4c #24 and #30 OFF): NATIVE_GPU=OFF
+  | ﻿# build/agent2/devoff4b-bin - Agent 2 (Agent 1's batch schedule). dev OFF build 4b (S4b = S4a + SDK C1 v3 + M1 + P2c + r1r2 + #26 tool with every new switch OFF + S4c #24 and #30 OFF): NATIVE_GPU=OFF; Release, game x86-
+  | # staged 2026-11-22 20:49:02. Source: snapshot build/agent2/snap1/DimensionsRecomp at S4b (STATE-S4b-1950.tsv, sha256 A739468D5FF55C400A5053748B757DDECA76D388DF788B2A303C06EE62E61378); build tag snap4b; every patch appli
+  | # S4b build inputs (board run 2, task #1 = old #28): snap1 at S4a (STATE-S4a-1325.tsv; the trees behind devoff4-bin and native4-bin) + 16 files. rexglue-sdk: 13 files, made by git apply of the staged diffs in the order C
+  | # New switches, all OFF by default: physical_protect_keep_watch_verify (rexgpu-xenos.dll, BOOL, default false); physical_protect_keep_watch (rexruntime.dll, BOOL, default false); shared_memory_upload_nontemporal_copy (re
+  | # B4 deferred. Per-file hashes: build/agent2/s4b/HASHES.txt; new strings: build/agent2/S4b-strings.tsv.
+  | # patches in PATCHES-S1.tsv (sha256 74655029008CAFE72595CDA70BE7A85479742022E9E295E12AD157BE7C779499); before -> after sha256 prefixes:
+  | # patches in PATCHES-S2.tsv (sha256 B25547164383CC7514498BBFC1B6EDDC3B505DDA1223B26D3368DEBFF6729C6F); before -> after sha256 prefixes:
+  | #   S2 A6 tools/gpu-aot/patches/plume-winsdk-compat.patch: ABSENT -> E03D29D0758E6150
+  | # patches in PATCHES-S3.tsv (sha256 2DA2AB6CA49E3723AFD4E26FA07927511E9C5C9FC71C54701EE599C88430F3B0); before -> after sha256 prefixes:
+  | #   S3 A9 rexglue-sdk/include/rex/codegen/config.h: 929EEDA15600105B -> D07C575FF2904B87
+  | #   S3 A9 rexglue-sdk/src/codegen/config.cpp: 75CEAAB72FC4495C -> 0ED529B7E5F0F4E7
+  | #   S3 A9 rexglue-sdk/tests/ppc/opt_config.toml: ABSENT -> C74CD990C3299AFF
+  | # patches in PATCHES-S3d.tsv (sha256 0250A3D000CB11C55E21AF6E338C70BDDD311455B9C7DC69BF730C2AFC996C87); before -> after sha256 prefixes:
+  | # patches in PATCHES-S4a.tsv (sha256 B9612DA2A08262F2FA612B6A2E861B431A82C191796BCB2BF2AC60934F6B5AC6); before -> after sha256 prefixes:
+  | # patches in PATCHES-S4b.tsv (sha256 49D4E947BA7037DBE7E0937AF954E90C46A2FDFD0431803BE25B500C572B8028); before -> after sha256 prefixes:
+  | #   S4b A12 rexglue-sdk/include/rex/graphics/shared_memory.h: 4D861738A94B556B -> 82A66445ED98B091
+  | #   S4b A12 rexglue-sdk/include/rex/system/xmemory.h: 80100865A654AF04 -> 5A70782EF00F0FB6
+  | #   S4b A12 rexglue-sdk/src/graphics/primitive_processor.cpp: E07F690223B564AE -> 470BA4BED73B2ABF
+  | #   S4b A12 rexglue-sdk/src/graphics/shared_memory.cpp: 0BE4BADCAC666BEE -> A4A31038ABDFF94A
+  | #   S4b A12 rexglue-sdk/src/system/xmemory.cpp: 141FB1A947D59156 -> BCA5E1CF63686E73
+  | #   S4b A5 rexglue-sdk/src/graphics/d3d12/shared_memory.cpp: BB0838CE3909E18A -> 2A5ADF13B5E433F1
+  | #   S4b A12+A7 rexglue-sdk/src/graphics/d3d12/command_processor.cpp: 3AB3AA5360D4E987 -> 027204B53A271D69
+  | #   S4b A7 rexglue-sdk/include/rex/graphics/d3d12/command_processor.h: 41F32B80BABA213C -> 67F4E8380C879377
+  | #   S4b A7 rexglue-sdk/include/rex/graphics/d3d12/deferred_command_list.h: DA2F58B6CE3D7F6A -> 9F6CC70A6922232D
+  | #   S4b A7 rexglue-sdk/src/graphics/d3d12/deferred_command_list.cpp: FFDF7FB66EC81715 -> 30FF57446EFB5D76
+  | #   S4b A9 rexglue-sdk/include/rex/codegen/config.h: D07C575FF2904B87 -> CD39B0E110D3E0FD
+  | #   S4b A9 rexglue-sdk/src/codegen/config.cpp: 0ED529B7E5F0F4E7 -> 4706A7F22C3859D6
+  | #   S4b A9 rexglue-sdk/src/codegen/builders/system.cpp: D1269273636B5A1A -> FAD4372074D32D69
+  | #   S4b A12 rexlego/src/gpu_native/memory_watch.cpp: 19AE1606C6DB7273 -> 70829846C4F321A9
+  | #   S4b A9 rexlego/CMakeLists.txt: 3690D5D76AA9FBED -> 1BF46D7878BA9A25
+  | #   S4b A9 rexlego/src/gpu_wait_backoff.cpp: ABSENT -> 01D9F8F3464C8614
+  | #   PASS snapshot record MANIFEST-S4b-*.tsv or STATE-S4b-*.tsv exists
+  | #   PASS snap1-sdk/install/include copy of rexglue-sdk/include/rex/audio/audio_system.h == the patched file (4836B139802D3438)
+  | #   PASS snap1-sdk/install/include copy of rexglue-sdk/include/rex/codegen/config.h == the patched file (CD39B0E110D3E0FD)
+  | #   PASS snap1-sdk/install/include copy of rexglue-sdk/include/rex/codegen/function_types.h == the patched file (3CBD9F6DC3850CD1)
+  | #   PASS snap1-sdk/install/include copy of rexglue-sdk/include/rex/graphics/shared_memory.h == the patched file (82A66445ED98B091)
+  | #   PASS snap1-sdk/install/include copy of rexglue-sdk/include/rex/system/xmemory.h == the patched file (5A70782EF00F0FB6)
+  | #   PASS snap1-sdk/install/include copy of rexglue-sdk/include/rex/graphics/d3d12/command_processor.h == the patched file (67F4E8380C879377)
+  | #   PASS snap1-sdk/install/include copy of rexglue-sdk/include/rex/graphics/d3d12/deferred_command_list.h == the patched file (9F6CC70A6922232D)
+  | #   PASS rexglue-sdk/include/rex/audio/audio_system.h: 1 object(s) in snap1-off compile or include it, all newer than the patched copy
+  | #   NOTE tools/gpu-aot/patches/plume-winsdk-compat.patch is not compiled or included in snap1-off
+  | #   NOTE rexglue-sdk/include/rex/codegen/config.h is not compiled or included in snap1-off
+  | #   NOTE rexglue-sdk/src/codegen/config.cpp is not compiled or included in snap1-off
+  | #   NOTE rexglue-sdk/tests/ppc/opt_config.toml is not compiled or included in snap1-off
+  | #   PASS rexlego/src/settings_preferences.cpp: 1 object(s) in snap1-off compile or include it, all newer than the patched copy
+  | ... 38 more matching lines
+needles (* = in the exit-code set):
+ * ok   'shared_memory_single_hold_rearm'            rexgpu-xenos.dll
+ * ok   'physical_protect_hold_global_lock'          rexruntime.dll
+ * ok   'physical_protect_keep_watch'                rexgpu-xenos.dll, rexruntime.dll
+ * ok   'physical_protect_keep_watch_verify'         rexgpu-xenos.dll
+ * ok   'slow_frame_log_ms'                          rexgpu-xenos.dll
+ * ok   'shared_memory_upload_hash_log'              rexgpu-xenos.dll
+ * ok   'shared_memory_upload_nontemporal_copy'      rexgpu-xenos.dll
+ * MISS 'framerate_limit'                            
+ * ok   'C1 keep-watch: on (with'                    rexruntime.dll
+ * ok   'first kept protect at'                      rexruntime.dll
+ * ok   'protects kept so far'                       rexruntime.dll
+ * ok   'C1 verify: on'                              rexgpu-xenos.dll
+ * ok   'changed since its upload'                   rexgpu-xenos.dll
+ * ok   'memexport full-buffer'                      rexgpu-xenos.dll
+ * ok   'd3d12_submit_split_kb'                      rexgpu-xenos.dll
+ * ok   'd3d12_readback_memexport'                   rexgpu-xenos.dll
+ * ok   'd3d12_debug'                                rexruntime.dll
+ * ok   'LEGO_GPU_WAIT_STATS'                        legodimensions.exe
+ * ok   'LEGO_GPU_WAIT_BACKOFF_US'                   legodimensions.exe
+   MISS 'native_settings_frontend'                   
+   MISS 'Native GPU ['                               
+   MISS 'Native draw batches'                        
+   MISS 'Native write tracking'                      
+   MISS 'deferred_counters'                          
+RESULT: MISS 1: framerate_limit (off set, 19 needles)

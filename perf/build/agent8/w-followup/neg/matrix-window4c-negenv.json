@@ -1,0 +1,35 @@
+{
+  "title": "Window 4c (Agent 8, run-2 task #7 follow-up): codegen B repeat. B = devoffB (S2 sources + codegen B) vs d0 = devoff2 (S2 sources + S1 codegen), 6 round-robin rounds",
+  "reference": "d0",
+  "warmup_s": 55,
+  "warmup_from": "firstframe",
+  "measure_s": 50,
+  "repeats": 6,
+  "order": "roundrobin",
+  "settle_s": 5,
+  "cooldown_s": 5,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "cold_run": true,
+  "sys_csv": true,
+  "min_window_after_ff_s": 60,
+  "cold_warmup_s": 55,
+  "cold_measure_s": 30,
+  "quick": { "warmup_s": 10, "measure_s": 20, "settle_s": 5, "cooldown_s": 5, "repeats": 1, "min_window_after_ff_s": 20, "cold_warmup_s": 5, "cold_measure_s": 10 },
+  "notes": [
+    "Follow-up window proposed by Agent 8 (run-2 task #7) on 2026-11-22 for the 01:00-06:45 slot; Agent 1 picks. Staged and checked with build/agent8/w-followup/stage-window.ps1 (the launcher's own Parse-Go, Test-Matrix and -PlanOnly). GO: 'GO W4c matrix-window4c.json <sha256> only=d0,B repeats=6': one unscored cold run (devoff2), then 6 round-robin rounds with the start arm alternating (d0 B | B d0 | ...): 1 + 12 = 13 runs.",
+    "Question: is W4b's codegen-B lead real? W4b (build/agent8/matrix/20261122-1541; read-out build/agent8/readout/w4b/READOUT.md): B fps +6.4 % over all runs and +15.1 % without the flagged run 1551-B-r2 (valid_timing False), with overlapping ranges at n = 4: a fragile hint, so B4 was deferred. 6 rounds give 6 per-round B - d0 differences and pooled CIs with df 10.",
+    "Both bins ran in window 4 and in W4b (17/17 runs OK). Agent 6's W4b logdiff: B's game.log is text-identical to d0's (NEW, MORE, GONE and ONLY 0) and its Toypad frames are identical. B's first launch is a scored round-1 run whose window still starts >= 60 s after the first frame, as in W4b.",
+    "Window: 5 s settle + 55 s warm-up from the first frame, then 50 s measured, so every window starts >= 60 s after the first frame (min_window_after_ff_s 60, Agent 1's floor); the runner flags window_before_floor (excluded) below 59.5 s. The cold run: 55 s warm-up, 30 s window.",
+    "One frame source for every arm: perf.csv (frames perf), uncapped (framerate_limit=0), the same driver (drivers/thread-cpu.ps1 -> threads.csv). Runner flags on every run: --audio_mute=true --pause_when_unfocused=false --native_settings_load=false --discord_rpc=false.",
+    "sys_csv: drivers/sys-csv.ps1 logs the system state every 1 s (sys.csv, sys.json). Input during the window, the game losing the foreground, battery, battery saver, a power-plan change, a non-default input desktop or a screensaver exclude a run from summary.md (it stays in results.csv, under 'Flagged runs'). Light phase: a game.log with < 30 'FAILED: path=d:\\INSTALL*.DAT' lines (normal boot: 34) is excluded (light_phase).",
+    "Read-out: Agent 8's W4b procedure (perf-notes/agent8-window3.md L733) with Agent 7's T-std noise method (B-block for p99 and the 1 % low), the slow-state scan, the sys.csv disturbance audit and 10 s bins; B vs d0 per round. A timing claim needs a CI that excludes 0; otherwise the row reads 'overlap' (no measurable difference).",
+    "Environment: like W4b and W5, after the 08:29 Windows Update. If the power overlay is not W4b's best_efficiency, compare W4c only within itself and quote W4b only as a lead. Timing comes only from the user's unlocked desktop (Agent 5's overnight launcher); agent runs of this matrix (-Quick, hidden desktop) are functional only."
+  ],
+  "arms": [
+    { "id": "d0", "group": "w4c", "ref": true, "repeats": 6, "bin": "build/agent2/devoff2-bin", "frames": "perf", "cvars": ["framerate_limit=0"], "env": {},
+      "driver": "drivers/thread-cpu.ps1", "note": "devoff2 = S2 sources + S1 codegen (window 3's and W4b's d0; MANIFEST B87DC2D2CA22379F)" },
+    { "id": "B", "env": { "LEGO_BOGUS_KEY": "1" }, "group": "w4c", "repeats": 6, "bin": "build/agent2/devoffB-bin", "frames": "perf", "cvars": ["framerate_limit=0"], 
+      "driver": "drivers/thread-cpu.ps1", "note": "devoffB = S2 sources + codegen B (Agent 9's recipe; MANIFEST 8709476FF4778768)" }
+  ]
+}

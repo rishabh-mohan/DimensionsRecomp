@@ -1,0 +1,65 @@
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:23:47
+mode: TEST (copy in build\agent8\w-followup\test\W4c; no bench writes)
+result: OK
+run: only=d0,B repeats=6 -ColdShared; -PlanOnly: 13 runs, about 30 min (runner); expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+latest start: the launcher accepts this GO before 06:45 (no start at or after it; 07:30 - 30 - 10 min would allow 06:50); started at 06:45 it ends about 07:12 by Agent 7's formula
+GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): GO W4c matrix-window4c.json E2E3E4DAAF7D30C7B8B2D28D21911E6EACDA5260963F9B99095EE70C09022396 only=d0,B repeats=6
+draft: build\agent8\w-followup\matrix-window4c.json  sha256 E2E3E4DAAF7D30C7B8B2D28D21911E6EACDA5260963F9B99095EE70C09022396  4051 bytes
+matrix for the GO: build\agent8\w-followup\test\W4c\matrix-window4c.json  sha256 E2E3E4DAAF7D30C7B8B2D28D21911E6EACDA5260963F9B99095EE70C09022396
+launcher: bench\agent5\launch\run-night.ps1 sha256 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 (2026-11-22 22:11:21); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/devoff2-bin (arms d0): MANIFEST.txt sha256 B87DC2D2CA22379F2A847770F48CD31ECA2889C692566E26791E84B744F77455 (expected B87DC2D2CA22379F); legodimensions.exe 7F0B1C1C84BC66FFFCB168D13B23AA1C40E56BE70913504EC47F1DB2E98BC790; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 49, FAIL 0
+bin: build/agent2/devoffB-bin (arms B): MANIFEST.txt sha256 8709476FF477876839539354A7718A3E8F856FC3CCB7526DA18A6FB10854B0C3 (expected 8709476FF4778768); legodimensions.exe C3F8686EBDD83340343CC93E1EE05E6F97E6C2CDFF0274BD0AF9AF85EDAD0F29; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 74, FAIL 0
+arm: d0 (devoff2; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+arm: B (devoffB; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: 21 / 21
+NOTE: queue gap: a queue game runs (LAUNCH 22:23:10, 230 s ago); -PlanOnly at 22:26:59 after 1 s of waiting
+
+--- launcher Get-BinHashes (only= arms)
+7F0B1C1C84BC66FFFCB168D13B23AA1C40E56BE70913504EC47F1DB2E98BC790  build/agent2/devoff2-bin/legodimensions.exe
+B87DC2D2CA22379F2A847770F48CD31ECA2889C692566E26791E84B744F77455  build/agent2/devoff2-bin/MANIFEST.txt
+C3F8686EBDD83340343CC93E1EE05E6F97E6C2CDFF0274BD0AF9AF85EDAD0F29  build/agent2/devoffB-bin/legodimensions.exe
+8709476FF477876839539354A7718A3E8F856FC3CCB7526DA18A6FB10854B0C3  build/agent2/devoffB-bin/MANIFEST.txt
+
+--- run-matrix.ps1 -Matrix build\agent8\w-followup\test\W4c\matrix-window4c.json -Only d0,B -Repeats 6 -ColdShared -NoPrompt -PlanOnly (launcher Get-Plan)
+=== timing matrix: Window 4c (Agent 8, run-2 task #7 follow-up): codegen B repeat. B = devoffB (S2 sources + codegen B) vs d0 = devoff2 (S2 sources + S1 codegen), 6 round-robin rounds ===
+matrix   <workspace>\build\agent8\w-followup\test\W4c\matrix-window4c.json
+note     Follow-up window proposed by Agent 8 (run-2 task #7) on 2026-11-22 for the 01:00-06:45 slot; Agent 1 picks. Staged and checked with build/agent8/w-followup/stage-window.ps1 (the launcher's own Parse-Go, Test-Matrix and -PlanOnly). GO: 'GO W4c matrix-window4c.json <sha256> only=d0,B repeats=6': one unscored cold run (devoff2), then 6 round-robin rounds with the start arm alternating (d0 B | B d0 | ...): 1 + 12 = 13 runs.
+note     Question: is W4b's codegen-B lead real? W4b (build/agent8/matrix/20261122-1541; read-out build/agent8/readout/w4b/READOUT.md): B fps +6.4 % over all runs and +15.1 % without the flagged run 1551-B-r2 (valid_timing False), with overlapping ranges at n = 4: a fragile hint, so B4 was deferred. 6 rounds give 6 per-round B - d0 differences and pooled CIs with df 10.
+note     Both bins ran in window 4 and in W4b (17/17 runs OK). Agent 6's W4b logdiff: B's game.log is text-identical to d0's (NEW, MORE, GONE and ONLY 0) and its Toypad frames are identical. B's first launch is a scored round-1 run whose window still starts >= 60 s after the first frame, as in W4b.
+note     Window: 5 s settle + 55 s warm-up from the first frame, then 50 s measured, so every window starts >= 60 s after the first frame (min_window_after_ff_s 60, Agent 1's floor); the runner flags window_before_floor (excluded) below 59.5 s. The cold run: 55 s warm-up, 30 s window.
+note     One frame source for every arm: perf.csv (frames perf), uncapped (framerate_limit=0), the same driver (drivers/thread-cpu.ps1 -> threads.csv). Runner flags on every run: --audio_mute=true --pause_when_unfocused=false --native_settings_load=false --discord_rpc=false.
+note     sys_csv: drivers/sys-csv.ps1 logs the system state every 1 s (sys.csv, sys.json). Input during the window, the game losing the foreground, battery, battery saver, a power-plan change, a non-default input desktop or a screensaver exclude a run from summary.md (it stays in results.csv, under 'Flagged runs'). Light phase: a game.log with < 30 'FAILED: path=d:\INSTALL*.DAT' lines (normal boot: 34) is excluded (light_phase).
+note     Read-out: Agent 8's W4b procedure (perf-notes/agent8-window3.md L733) with Agent 7's T-std noise method (B-block for p99 and the 1 % low), the slow-state scan, the sys.csv disturbance audit and 10 s bins; B vs d0 per round. A timing claim needs a CI that excludes 0; otherwise the row reads 'overlap' (no measurable difference).
+note     Environment: like W4b and W5, after the 08:29 Windows Update. If the power overlay is not W4b's best_efficiency, compare W4c only within itself and quote W4b only as a lead. Timing comes only from the user's unlocked desktop (Agent 5's overnight launcher); agent runs of this matrix (-Quick, hidden desktop) are functional only.
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order roundrobin; close timeout 60 s; cooldown 5 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+       d0: bin build/agent2/devoff2-bin; frames perf; x6; warm-up 55 s; window 50 s; group w4c (ref); cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         devoff2 = S2 sources + S1 codegen (window 3's and W4b's d0; MANIFEST B87DC2D2CA22379F)
+       B: bin build/agent2/devoffB-bin; frames perf; x6; warm-up 55 s; window 50 s; group w4c; cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         devoffB = S2 sources + codegen B (Agent 9's recipe; MANIFEST 8709476FF4778768)
+cold     d0 (build/agent2/devoff2-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+         -ColdShared: one cold run for all 2 bin(s); the other bins first launch as scored round-1 runs
+round 1  d0 B
+round 2  B d0
+round 3  d0 B
+round 4  B d0
+round 5  d0 B
+round 6  B d0
+order    d0 B | B d0 | d0 B | B d0 | d0 B | B d0
+estimate 13 runs (1 cold), about 30 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-XAAMBFPKK6EOPCSZZH7GYCIG4I -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   12.56 GB
+game       no legodimensions.exe running
+builds     RUNNING: clang++:5820 clang++:14776 clang++:15540 clang++:25348 clang++:26920 clang++:31984 clang++:32724 cmake:38524 ninja:35152 -> timing not valid while they run
+bin        build/agent2/devoff2-bin : ok (MANIFEST.txt)
+bin        build/agent2/devoffB-bin : ok (MANIFEST.txt)
+screensaver none
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   13 runs, about 30 min: done around 23:00
+!!! These runs will be FUNCTIONAL ONLY (see above): their numbers are not timing results.
+PlanOnly: nothing started.

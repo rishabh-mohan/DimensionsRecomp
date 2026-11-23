@@ -1,0 +1,9 @@
+﻿02:22:27 NOTE  snapshot <workspace>\build\agent2\snapB\DimensionsRecomp, game tree <workspace>\build\agent2\snapB-off, codegen stand-in <workspace>/build/agent2/codegen-frozen/codegen-frozen2.exe, gen-check reference <workspace>\build\agent9\install\batch-nolr\generated
+02:22:27 BEGIN game-configure : cmake -S "<workspace>\build\agent2\snapB\DimensionsRecomp\rexlego" -B "<workspace>\build\agent2\snapB-off" -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLEGODIMENSIONS_NATIVE_GPU=OFF -DLEGODIMENSIONS_X86_BASELINE=x86-64-v3 -DCMAKE_PREFIX_PATH=<workspace>/build/agent2/snap1-sdk/install -DREXGLUE_HOST_CODEGEN_EXECUTABLE=<workspace>/build/agent2/codegen-frozen/codegen-frozen2.exe -DCMAKE_EXPORT_COMPILE_COMMANDS=ON > "<workspace>\build\agent2\snapB-game-configure.log" 2>&1
+02:22:41 END   game-configure exit=0 wall=13.6s freeC=255.84GB
+02:22:41 BEGIN gen-check : python "<workspace>\build\agent2\gen-check.py" --snap "<workspace>\build\agent2\snapB\DimensionsRecomp\rexlego\generated" --snap-rex "<workspace>\build\agent2\snapB\DimensionsRecomp\rexlego" --base "<workspace>\build\agent9\install\batch-nolr\generated" > "<workspace>\build\agent2\snapB-game-gen-check.log" 2>&1
+02:22:45 END   gen-check exit=0 wall=3.7s freeC=255.83GB
+02:22:45 BEGIN gate : python "<workspace>\build\agent2\snap-gate.py" "<workspace>\build\agent2\snapB-off" --snap-dir "<workspace>\build\agent2\snapB\DimensionsRecomp" > "<workspace>\build\agent2\snapB-gate.log" 2>&1
+02:22:46 END   gate exit=0 wall=1.2s freeC=255.82GB
+02:22:46 BEGIN game-build : cmake --build "<workspace>\build\agent2\snapB-off" --target legodimensions -j 10 -- -k 0 > "<workspace>\build\agent2\snapB-game-build.log" 2>&1
+02:40:06 END   game-build exit=0 wall=1039.5s freeC=255.19GB

@@ -1,0 +1,35 @@
+metric                    off3    batch-nolr  d(batch-nolr-off3)
+files                      886           870               -16
+bytes              490,008,269   481,048,529        -8,959,740
+tus                        438           430                -8
+last_tu                    437           429                -8
+functions              165,023       165,023                +0
+ctx_refs            13,192,705    11,464,410        -1,728,295
+flush_switches         136,802       106,248           -30,554
+rotl64                 101,824        10,218           -91,606
+rlw_pin_form            97,942         6,336           -91,606
+rotl32                  11,405        11,908              +503
+musttail                     0        63,167           +63,167
+lr_writes              719,232       719,232                +0
+cmp_xer_local                0             0                +0
+cmp_xer_ctx            430,626             0          -430,626
+cmp_so_zero                  0       430,626          +430,626
+lines               16,862,073    16,879,873           +17,800
+
+batch-nolr vs off3: 165,023 common functions, 0 only in off3, 0 only in batch-nolr
+  function text 459,057,937 -> 450,116,310 B (-1.95%); smaller 46,385, equal 76,225, larger 42,413
+  size ratio quantiles: p1=0.908, p5=0.953, p25=0.996, p50=1.000, p75=1.001, p95=1.085, p99=1.114
+
+top shrink (batch-nolr - off3, B): sub_840668C8 868,593->779,351, sub_82B09280 516,664->480,218, sub_82BF9478 280,321->245,380, sub_82C11EA8 276,976->242,169, sub_84042A18 492,612->462,836, sub_84073A50 397,301->372,065, sub_84035820 324,441->302,871, sub_839B56D0 374,144->357,545
+top growth (batch-nolr - off3, B): sub_82F6F720 89,866->91,393, sub_82D8E358 31,797->32,408, sub_82BBF828 616->1,068, sub_83F66E38 24,673->25,039, sub_83F66768 41,465->41,773, sub_82F251D8 12,517->12,728, sub_82F1A240 11,775->11,986, sub_834A1EC8 2,535->2,719
+
+samples (OUTDIR/samples/<fn>.<variant>.cpp):
+  median_ratio  sub_82827AD0: off3=3,532B ctx=104 flush=0 tail=0 rotl32=0 so0=0 lr=7; batch-nolr=3,482B ctx=78 flush=0 tail=1 rotl32=0 so0=6 lr=7
+  max_shrink    sub_840668C8: off3=868,593B ctx=28450 flush=0 tail=0 rotl32=15 so0=0 lr=133; batch-nolr=779,351B ctx=24622 flush=0 tail=2 rotl32=15 so0=508 lr=133
+  musttail      sub_82C10CD8: off3=756B ctx=16 flush=0 tail=0 rotl32=0 so0=0 lr=0; batch-nolr=802B ctx=9 flush=0 tail=3 rotl32=0 so0=2 lr=0
+  rlwinm        sub_82C9C568: off3=1,207B ctx=34 flush=0 tail=0 rotl32=5 so0=0 lr=0; batch-nolr=1,203B ctx=28 flush=0 tail=0 rotl32=5 so0=2 lr=0
+  flush_elided  sub_8395B690: off3=956B ctx=26 flush=3 tail=0 rotl32=0 so0=0 lr=3; batch-nolr=894B ctx=24 flush=1 tail=0 rotl32=0 so0=0 lr=3
+  so_zero       sub_83048108: off3=818B ctx=23 flush=0 tail=0 rotl32=0 so0=0 lr=0; batch-nolr=801B ctx=14 flush=0 tail=0 rotl32=0 so0=3 lr=0
+  lr_kept       sub_8284A768: off3=177B ctx=4 flush=0 tail=0 rotl32=0 so0=0 lr=1; batch-nolr=177B ctx=4 flush=0 tail=0 rotl32=0 so0=0 lr=1
+  named         sub_83E5C88C: off3=4,534B ctx=161 flush=1 tail=0 rotl32=0 so0=0 lr=1; batch-nolr=4,578B ctx=124 flush=0 tail=0 rotl32=0 so0=0 lr=1
+  named         sub_8307C528: off3=32,732B ctx=818 flush=25 tail=0 rotl32=0 so0=0 lr=4; batch-nolr=32,750B ctx=818 flush=25 tail=1 rotl32=0 so0=0 lr=4

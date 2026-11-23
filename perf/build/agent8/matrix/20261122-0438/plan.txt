@@ -1,0 +1,38 @@
+﻿=== timing matrix: NATIVE ON build, Agent 5 uploads (task #4): u0 batch-2 defaults, u1 legacy upload CPU paths, u2 texture staging pool. Title/attract loop from boot, no input needed ===
+matrix   <workspace>\bench\agent8\run\matrix-native-uploads.json
+note     BIN DIR: build/agent2/native3-bin (Agent 2, staged 02:45:57; exe sha256 7F7F8586D219465C, MANIFEST.txt B50FE8D4A16565DA, native GPU fingerprint 8f849b69907d4006). It is the S3 snapshot with NATIVE_GPU=ON. Batch 2 is in (all three batch-2 strings are in the exe, and MANIFEST.txt lists the 8 Agent 5 files) and so is fix-a, so it boots with the settings frontend on (Agent 8 boot PASS, build/agent8/runs/0256-native3). Do not swap in an older native bin: native-bin (S1) has neither env switch, so u1/u2 would equal u0, and native-bin and native2-bin throw at startup with the frontend on.
+note     WINDOW (Agent 1, 02:09; the S3 floor): every window starts 60 s after the first-frame signal: settle_s 50, then warmup_s 10, so the timing windows cover 60-180 s after the first frame and the cold run 60-90 s. Window 3 switched from the light to the heavy title phase 30-40 s after the first frame (agent8-window3.md), so that switch falls in the settle. This meets the runner's floor (min_window_after_ff_s, default 60) exactly, so no warm-up is raised. Settle carries most of the 60 s because the older runner capped only the cold run's warm-up (to 10 s), not its settle. menu_s is unused (no arm has a menu). -Quick (settle 5 s) is functional only and never scored.
+note     UNCAPPED (SG rule): every arm passes native_fps_limit=0 and framerate_limit=0. The runner adds the standard flags itself (common.ps1:99-100: --native_settings_load=false --discord_rpc=false --audio_mute=true --pause_when_unfocused=false), so they are not repeated here. No arm sets native_settings_frontend=false: the build must boot with the settings frontend on. With the frontend on, the cap is LEGO_NATIVE_FPS_LIMIT if that env is set, else the native_fps_limit cvar (settings_snapshot.cpp:64-65; the frontend only reads the env). No arm sets that env, so the cvar uncaps it. Check: the native_fps_limit_cvar column of native-frames.csv (the cap in force) must be 0 in every row. Agent 8's native3 boot run without these cvars (build/agent8/runs/0256-native3) shows 240 in all 13642 rows.
+note     SCORING: score the 120 s window as usual (mean fps, p50, p99, over_33ms, over_100ms, max_ms, CPU). It measures the steady-state upload cost: textures streamed in after boot (u1: scalar untile and byte swap) and per-upload staging buffer creation (u2). Most first-use uploads (boot, title load, the light-to-heavy switch) now happen before the window, so expect small u0/u1/u2 differences; a tie is a valid result. Report runs with Agent 8's light-phase flag separately.
+note     UNSCORED DIAGNOSTIC for Agent 5 (no extra runs): the first-load hitches are in the rows before the window. From row 0 of each run's native-frames.csv, run bench/agent8/run/frame_summary.py with --seconds 30, and again with --skip-seconds 30 --seconds 30; report over_33ms, over_100ms, max_ms and p99 per arm, leaving out light-phase-flagged runs. These are first-use costs, not timing results.
+note     Expect u0 <= u1 in frame time: u1 restores the pre-batch-1 CPU paths (zero-filled staging, scalar untile, scalar byte swap) with identical output bytes. Expect u2 <= u0 if per-upload createBuffer cost shows up; a tie is a valid result.
+note     u2 must log 'Native texture staging pool: enabled, 64 MB idle budget' once and 'Native texture staging pool: hits=... misses=...' every 256 staged uploads. u0 and u1 must log neither.
+note     Memory: compare commit / peak commit between u2 and u0 (the pool keeps <= 64 MB idle, and pooled capacities round up to a power of two).
+note     Watch u2 for texture corruption (wrong or flickering textures). That would mean a staging buffer was released before its copy retired; stop the arm and tell Agent 5.
+note     No LEGO_NATIVE_TIMING, LEGO_NATIVE_SLOW_OPERATIONS or debug layer in timing arms. The s0/s1/s2 arms are diagnostics with LEGO_NATIVE_SLOW_OPERATIONS=1: do not score their frame times; compare the 'Native slow CPU operation: texture-upload total_ms=...' lines and their stage marks (source-validation-hash, decode-content-hash, allocate-map-stage, record-copy-retire) between s0, s1 and s2, over the whole game.log (boot included), not just the window.
+note     Run only the timing arms with -Only u0,u1,u2 and the diagnostics with -Only s0,s1,s2. -Repeats 3 is acceptable if the window is short. Sizes from -PlanOnly (03:03, runner of 02:53): -Only u0,u1,u2 -Repeats 3 is 10 runs, about 35 min; -Only s0,s1,s2 is 4 runs, about 13 min; all 19 runs take about 66 min. Each count includes the one unscored cold run (u0). Agent 1 (03:02): run it in a later window, not window 4.
+settings warm-up from firstframe (boot timeout 240 s, settle 50 s); order roundrobin; close timeout 60 s; cooldown 10 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv off
+arms:
+       s0: bin build/agent2/native3-bin; frames native; x1; warm-up 10 s; window 120 s; group upload-diag (ref); cvars native_fps_limit=0 framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv LEGO_NATIVE_SLOW_OPERATIONS=1
+         Agent 5 diagnostic, not a timing arm: slow texture-upload stage breakdown with batch-2 defaults
+       s1: bin build/agent2/native3-bin; frames native; x1; warm-up 10 s; window 120 s; group upload-diag; cvars native_fps_limit=0 framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv LEGO_NATIVE_SLOW_OPERATIONS=1 LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD=1
+         Agent 5 diagnostic, not a timing arm: the same with the legacy upload paths (decode-content-hash should be longer)
+       s2: bin build/agent2/native3-bin; frames native; x1; warm-up 10 s; window 120 s; group upload-diag; cvars native_fps_limit=0 framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv LEGO_NATIVE_SLOW_OPERATIONS=1 LEGO_NATIVE_TEXTURE_STAGING_POOL=1
+         Agent 5 diagnostic, not a timing arm: the same with the staging pool (allocate-map-stage should be shorter)
+cold     s0 (build/agent2/native3-bin): unscored, before round 1 (warm-up 10 s, window 30 s)
+round 1  s0 s1 s2
+order    s0 s1 s2
+estimate 4 runs (1 cold), about 13 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-4FL55QZSZVCFAAG22A54PM7YM7 -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   8.15 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/native3-bin : ok (MANIFEST.txt)
+screensaver WPXSCR~1.SCR after 120 s: the keep-awake request should hold it off; if it starts during timing runs, set it to (None)
+estimate   4 runs, about 13 min: done around 04:51
+keep-awake ON (SetThreadExecutionState continuous+system+display until the matrix ends)

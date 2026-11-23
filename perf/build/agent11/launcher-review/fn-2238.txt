@@ -1,0 +1,96 @@
+﻿L225: function Parse-Go([string]$Text) {
+L226:     $g = @{ ok = $false; why = New-Object System.Collections.Generic.List[string]; raw = ''; id = ''; json = ''; sha = ''; only = @(); repeats = 0 }
+L227:     if ($null -eq $Text) { $g.why.Add('GO file is larger than 4 KB'); return $g }
+L228:     $lines = @($Text -split "`r?`n" | Where-Object { $_.Trim() })
+L229:     if ($lines.Count -ne 1) { $g.why.Add("GO file must hold exactly one line, it has $($lines.Count)"); if ($lines.Count) { $g.raw = $lines[0].Trim() }; return $g }
+L230:     $g.raw = $lines[0].Trim()
+L231:     $t = @($g.raw -split '\s+')
+L232:     if ($t.Count -ne 6) { $g.why.Add("GO line must have 6 tokens, it has $($t.Count)"); return $g }
+L233:     $idRx = '[A-Za-z0-9][A-Za-z0-9_.-]{0,31}'
+L234:     if ($t[0] -cne 'GO') { $g.why.Add("first token must be GO, not '$($t[0])'") }
+L235:     if ($t[1] -notmatch "^$idRx$") { $g.why.Add("window id '$($t[1])' must be 1-32 of A-Z a-z 0-9 _ . -") } else { $g.id = $t[1] }
+L236:     if ($t[2] -notmatch '^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}\.json$' -or $t[2] -match '\.\.') { $g.why.Add("matrix '$($t[2])' must be a plain .json file name (no folder)") } else { $g.json = $t[2] }
+L237:     if ($t[3] -notmatch '^[0-9A-Fa-f]{64}$') { $g.why.Add('sha256 must be 64 hex digits') } else { $g.sha = $t[3].ToUpperInvariant() }
+L238:     if ($t[4] -cnotmatch "^only=$idRx(,$idRx)*$") { $g.why.Add("'$($t[4])' must be only=<arm>[,<arm>...]") }
+L239:     else { $g.only = @($t[4].Substring(5) -split ','); if (@($g.only | Select-Object -Unique).Count -ne $g.only.Count) { $g.why.Add('only= lists an arm twice') } }
+L240:     if ($t[5] -cnotmatch '^repeats=([1-9]|1[0-9]|20)$') { $g.why.Add("'$($t[5])' must be repeats=<1-20>") } else { $g.repeats = [int]$t[5].Substring(8) }
+L241:     $g.ok = ($g.why.Count -eq 0)
+L242:     return $g
+L243: }
+L244: 
+L245: # ---------- the matrix named by the GO ----------
+L253: function Test-Matrix($Go, [string]$Path) {
+L254:     $why = New-Object System.Collections.Generic.List[string]
+L255:     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { $why.Add("matrix $($Go.json) not found in $MatrixDirEff"); return , $why }
+L256:     if (-not [string]::Equals((Split-Path -Parent ([IO.Path]::GetFullPath($Path))).TrimEnd('\'), $MatrixDirEff, [StringComparison]::OrdinalIgnoreCase)) { $why.Add("matrix is not directly in $MatrixDirEff"); return , $why }
+L257:     $sha = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash
+L258:     if ($sha -ne $Go.sha) { $why.Add("sha256 mismatch: the GO says $($Go.sha), the file is $sha"); return , $why }
+L259:     try { $mx = [IO.File]::ReadAllText($Path) | ConvertFrom-Json } catch { $why.Add("matrix is not valid JSON: $($_.Exception.Message)"); return , $why }
+L260:     $arms = @(Get-P $mx 'arms')
+L261:     if ($arms.Count -eq 0 -or $null -eq $arms[0]) { $why.Add('matrix has no arms'); return , $why }
+L262:     $ids = @()
+L263:     foreach ($a in $arms) {
+L264:         $id = [string](Get-P $a 'id'); $ids += $id
+L265:         $bin = [string](Get-P $a 'bin')
+L266:         $bn = $bin -replace '\\', '/'
+L267:         if ($bn -notmatch '^build/agent2/([A-Za-z0-9][A-Za-z0-9_.-]*)-bin/?$' -or $bn -match '\.\.') { $why.Add("arm '$id': bin '$bin' is not build/agent2/<name>-bin") }
+L268:         else {
+L269:             $bd = Join-Path $Repo ('build\agent2\' + $Matches[1] + '-bin')
+L270:             foreach ($need in @('MANIFEST.txt', 'legodimensions.exe')) { if (-not (Test-Path -LiteralPath (Join-Path $bd $need) -PathType Leaf)) { $why.Add("arm '$id': $bin has no $need") } }
+L271:         }
+L272:         $ev = Get-P $a 'env'
+L273:         if ($null -ne $ev) {
+L274:             if ($ev -isnot [System.Management.Automation.PSCustomObject]) { $why.Add("arm '$id': env is not an object") }
+L275:             else { foreach ($pp in $ev.PSObject.Properties) { if ($AllowedEnv -cnotcontains $pp.Name) { $why.Add("arm '$id': env key '$($pp.Name)' is not allowed (only $($AllowedEnv -join ', '))") } } }
+L276:         }
+L277:         # Launcher rule (unattended, pinned inputs only): no menu prompt, no profiler, no triggers, no toml edits, no seed cache.
+L278:         if ([string](Get-P $a 'menu')) { $why.Add("arm '$id': menu needs a person at the PC") }
+L279:         if ((Get-P $a 'profile') -eq $true) { $why.Add("arm '$id': profile runs are not timing runs") }
+L280:         if (@(Get-P $a 'triggers' | Where-Object { $_ }).Count) { $why.Add("arm '$id': triggers are not allowed here") }
+L281:         $tm = Get-P $a 'toml'; if ($null -ne $tm -and @($tm.PSObject.Properties).Count) { $why.Add("arm '$id': toml edits are not allowed here") }
+L282:         if ([string](Get-P $a 'seed_cache')) { $why.Add("arm '$id': seed_cache is not allowed here") }
+L283:         $dr = Get-P $a 'driver'
+L284:         if ($null -ne $dr) {
+L285:             # Only a plain string "drivers/<name>.ps1" (no args) for one of the $AllowedDrivers, resolving to that file in
+L286:             # bench\agent8\run\drivers (pinned): any other runner file as a driver could start a game, bin, env or matrix
+L287:             # that was never checked. The {script, args} form is refused.
+L288:             $okDrv = $false
+L289:             if ($dr -is [string] -and $dr -cmatch '^drivers/([A-Za-z0-9_-]+\.ps1)$') {
+L290:                 $dn = $Matches[1]
+L291:                 $want = Join-Path (Join-Path $RunDir 'drivers') $dn; $fp = ''; try { $fp = [IO.Path]::GetFullPath((Resolve-Driver $dr)) } catch { }
+L292:                 $okDrv = ($AllowedDrivers -ccontains $dn) -and [string]::Equals($fp, $want, [StringComparison]::OrdinalIgnoreCase) -and (Test-Path -LiteralPath $want -PathType Leaf) -and (Test-Pinned $want)
+L293:             }
+L294:             if (-not $okDrv) { $why.Add("arm '$id': driver must be $((@($AllowedDrivers | ForEach-Object { 'drivers/' + $_ })) -join ' or ') as a plain string (no args, no {script, args}), a file in bench\agent8\run\drivers (it is '$(if ($dr -is [string]) { $dr } else { ConvertTo-Json -InputObject $dr -Compress -Depth 4 })')") }
+L295:         }
+L296:     }
+L297:     foreach ($o in $Go.only) { if ($ids -cnotcontains $o) { $why.Add("only=: no arm '$o' in $($Go.json)") } }
+L298:     return , $why
+L299: }
+L300: # -NonInteractive: if the runner ever asked for input it would fail at once instead of waiting all night (run-matrix.ps1
+L301: # asks only without -Matrix or without -NoPrompt).
+L322: function Get-MatrixWarnings([string]$Path) {
+L323:     $w = New-Object System.Collections.Generic.List[string]
+L324:     try { $mx = [IO.File]::ReadAllText($Path) | ConvertFrom-Json } catch { return , $w }
+L325:     if ((Get-P $mx 'sys_csv') -ne $true) { $w.Add('the matrix has no "sys_csv": true, so the runs write no sys.json (no system data for this window)') }
+L326:     return , $w
+L327: }
+L328: # run-matrix.ps1 -PlanOnly: reads the matrix, writes nothing, starts nothing. Gives the runner's own estimate.
+L329: function Get-Plan([string]$Path, $Go) {
+L330:     $r = @{ ok = $false; why = ''; min = 0; runs = 0; lines = @() }
+L331:     $old = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+L332:     try { $r.lines = @(& $PsExe @(Get-RunnerArgs $Path $Go) -PlanOnly 2>&1 | ForEach-Object { "$_" }); $code = $LASTEXITCODE } finally { $ErrorActionPreference = $old }
+L333:     $est = @($r.lines | Where-Object { $_ -match '^estimate (\d+) runs \(\d+ cold\), about (\d+) min' })
+L334:     $bad = @($r.lines | Where-Object { $_ -match '^!!! (ERROR|SKIPPED ARM|MATRIX ERROR)' -or $_ -match '^\s+SKIP ' })
+L335:     if ($code -ne 0) { $r.why = "run-matrix.ps1 -PlanOnly exit $code" }
+L336:     elseif ($bad.Count) { $r.why = "run-matrix.ps1 -PlanOnly: $($bad -join ' / ')" }
+L337:     elseif (-not $est.Count) { $r.why = 'run-matrix.ps1 -PlanOnly printed no estimate line' }
+L338:     else { [void]($est[0] -match '^estimate (\d+) runs \(\d+ cold\), about (\d+) min'); $r.runs = [int]$Matches[1]; $r.min = [int]$Matches[2]; $r.ok = $true }
+L339:     return $r
+L340: }
+L341: 
+L342: # ---------- the quiet gate ----------
+L343: # One sample per interval. CPU of MsMpEng / OfficeClickToRun / CrossDeviceService = kernel+user time from CIM
+L344: # Win32_Process (readable for protected processes too), summed over the processes of that name, as cores over the
+L345: # interval since the previous sample. A process that cannot be read fails the gate; a process that is not running
+L346: # counts as 0. The first sample after a GO is the baseline (no CPU figure).
+L347: $script:Fixture = $null; $script:FixtureIx = 0

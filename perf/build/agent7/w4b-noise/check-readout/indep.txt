@@ -1,0 +1,144 @@
+INFO T975 parsed from noise_methods.py: {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262, 10: 2.228, 11: 2.201, 12: 2.179, 13: 2.16, 14: 2.145, 15: 2.131, 16: 2.12, 17: 2.11, 18: 2.101, 19: 2.093, 20: 2.086, 25: 2.06, 30: 2.042}
+PASS 2 W4b md re-run vs readout-w4b.md: only the "- command:" line differs | 1 lines each side 101/101; differing lines: 5
+INFO 2 W4b md line 5: kit  = - command: `python -B build\agent7\w4b-noise\readout.py build\agent8\matrix\20261122-1541 -o build\agent7\w4b-noise\readout-w4b.md --json build\agent7\w4b-noise\readout-w4b.json`
+INFO 2 W4b md line 5: mine = - command: `python -B build\agent7\w4b-noise\readout.py build\agent8\matrix\20261122-1541 -o build\agent7\w4b-noise\check-readout\check-w4b.md --json build\agent7\w4b-noise\check-readout\check-w4b.json`
+PASS 2 W4b json re-run vs readout-w4b.json: only command / params differ | 1 differing paths, 0 outside command/params
+INFO 2 W4b json diff /command: 'python -B build\\agent7\\w4b-noise\\readout.py build\\agent8\\matrix\\20261122-1541 -o build\\agent7\\w4b-noise\\readout-w4b.md --json build\\agent7\\w4b-noise\\readout-w4b.json' vs 'python -B build\\agent7\\w4b-noise\\readout.py build\\agent8\\matrix\\20261122-1541 -o build\\agent7\\w4b-noise\\check-readout\\check-w4b.md --json build\\agent7\\w4b-noise\\check-readout\\check-w4b.json'
+PASS 2 W5 md re-run vs readout-w5.md: only the "- command:" line differs | 1 lines each side 95/95; differing lines: 5
+INFO 2 W5 md line 5: kit  = - command: `python -B build\agent7\w4b-noise\readout.py build\agent8\matrix\20261122-1756 -o build\agent7\w4b-noise\readout-w5.md --json build\agent7\w4b-noise\readout-w5.json`
+INFO 2 W5 md line 5: mine = - command: `python -B build\agent7\w4b-noise\readout.py build\agent8\matrix\20261122-1756 -o build\agent7\w4b-noise\check-readout\check-w5.md --json build\agent7\w4b-noise\check-readout\check-w5.json`
+PASS 2 W5 json re-run vs readout-w5.json: only command / params differ | 1 differing paths, 0 outside command/params
+INFO 2 W5 json diff /command: 'python -B build\\agent7\\w4b-noise\\readout.py build\\agent8\\matrix\\20261122-1756 -o build\\agent7\\w4b-noise\\readout-w5.md --json build\\agent7\\w4b-noise\\readout-w5.json' vs 'python -B build\\agent7\\w4b-noise\\readout.py build\\agent8\\matrix\\20261122-1756 -o build\\agent7\\w4b-noise\\check-readout\\check-w5.md --json build\\agent7\\w4b-noise\\check-readout\\check-w5.json'
+PASS 3a W4b RESULTS.md rows found | 6 table rows (want 6), 3 median-delta rows (want 3)
+PASS 3a W4b row verbatim in readout-w4b.md | | raw | median ms | 19.6 | 12.2 | 20.9 | 11 | -8.3 [-25.3, +12.6] | -0.9 [-18.1, +19.8] | -0.1 [-17.4, +20.8] |
+PASS 3a W4b row verbatim in readout-w4b.md | | T-std | median ms | 7.8 | 2.3 | 3.6 | 11 | -2.1 [-5.8, +1.8] | -1.5 [-4.9, +2.1] | -0.5 [-4.0, +3.1] |
+PASS 3a W4b row verbatim in readout-w4b.md | | B-block T-std | median ms | 3.6 | 1.4 | 2.3 | 8 | -2.5 [-5.0, +0.0] | -1.5 [-3.7, +0.8] | -0.5 [-2.8, +1.8] |
+PASS 3a W4b row verbatim in readout-w4b.md | | raw | fps | 23.6 | 14.7 | 25.6 | 11 | +13.5 [-11.3, +45.2] | +2.5 [-18.4, +28.8] | -0.7 [-21.0, +24.7] |
+PASS 3a W4b row verbatim in readout-w4b.md | | T-std | fps | 12.7 | 4.1 | 6.6 | 11 | +5.2 [-1.8, +12.8] | +2.3 [-4.0, +9.1] | +2.5 [-3.9, +9.3] |
+PASS 3a W4b row verbatim in readout-w4b.md | | B-block T-std | fps | 6.4 | 3.0 | 4.9 | 8 | +6.0 [+0.5, +11.8] * | +2.3 [-2.5, +7.4] | +2.5 [-2.3, +7.6] |
+PASS 3a W4b row verbatim in readout-w4b.md | | raw | -10.8 | -5.4 | -1.1 |
+PASS 3a W4b row verbatim in readout-w4b.md | | T-std | -0.8 | -0.6 | +0.2 |
+PASS 3a W4b row verbatim in readout-w4b.md | | B-block T-std | -1.9 | -1.1 | -0.4 |
+PASS 3a W5 RESULTS.md rows found | 8 table rows (want 8), 2 median-delta rows (want 2)
+PASS 3a W5 row verbatim in readout-w5.md | | raw | median ms | 20.4 | 6.5 | 10.7 | 10 | +1.3 [-9.9, +14.0] | -0.9 [-11.9, +11.5] | +4.3 [-7.3, +17.3] | -0.2 [-11.3, +12.3] |
+PASS 3a W5 row verbatim in readout-w5.md | | T-std | median ms | 6.5 | 2.1 | 3.3 | 10 | +1.1 [-2.7, +5.0] | +1.2 [-2.5, +5.2] | +2.4 [-1.4, +6.4] | +1.5 [-2.3, +5.4] |
+PASS 3a W5 row verbatim in readout-w5.md | | B-block T-std | median ms | 5.7 | 2.3 | 3.8 | 8 | +1.1 [-3.1, +5.5] | +1.2 [-3.0, +5.7] | +2.4 [-1.9, +6.9] | +1.5 [-2.8, +5.9] |
+PASS 3a W5 row verbatim in readout-w5.md | | raw | fps | 26.8 | 9.7 | 16.4 | 10 | -2.0 [-17.8, +16.8] | +3.1 [-13.5, +22.9] | -5.2 [-20.5, +13.0] | +1.3 [-15.0, +20.7] |
+PASS 3a W5 row verbatim in readout-w5.md | | T-std | fps | 5.8 | 1.8 | 2.9 | 10 | -1.4 [-4.6, +2.0] | -0.8 [-4.0, +2.6] | -2.6 [-5.7, +0.7] | -1.6 [-4.8, +1.7] |
+PASS 3a W5 row verbatim in readout-w5.md | | B-block T-std | fps | 5.1 | 2.0 | 3.3 | 8 | -1.4 [-5.0, +2.4] | -0.8 [-4.4, +3.0] | -2.6 [-6.2, +1.2] | -1.6 [-5.2, +2.1] |
+PASS 3a W5 row verbatim in readout-w5.md | | T-std | p99 ms | 6.9 | 4.1 | 6.7 | 10 | +2.8 [-4.6, +10.8] | +0.5 [-6.7, +8.3] | +8.8 [+1.0, +17.2] * | +5.3 [-2.2, +13.5] |
+PASS 3a W5 row verbatim in readout-w5.md | | T-std | 1 % low fps | 6.9 | 5.0 | 8.2 | 10 | -2.5 [-11.0, +6.8] | -0.4 [-9.1, +9.1] | -8.1 [-16.1, +0.7] | -6.3 [-14.4, +2.7] |
+PASS 3a W5 row verbatim in readout-w5.md | | raw | +5.5 | +2.6 | +4.0 | +3.1 |
+PASS 3a W5 row verbatim in readout-w5.md | | T-std | +2.3 | +2.5 | +2.7 | +2.1 |
+PASS 3b W4b round test on median ms: F and p recomputed | mine F = 7.029408 on (3, 8), p = 0.01242963 (density 0..F) / 0.01242963 (density F..inf); json F = 7.029408, p = 0.01242963, df [3, 8]
+PASS 3b W4b decision | p = 0.0124 -> B-block T-std; json decision B-block T-std; expected B-block T-std
+PASS 3b W4b md prints "F = 7.03 on (3, 8), p = 0.012"
+PASS 3b W4b round test on fps: F and p recomputed | mine F = 4.482298 on (3, 8), p = 0.03987037 (density 0..F) / 0.03987037 (density F..inf); json F = 4.482298, p = 0.03987037, df [3, 8]
+PASS 3c W4b CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | T-std median ms B: df 11 t 2.201 sd 0.022963 n 3/4 -> [-5.7898, 1.7716]; json [-5.7898, 1.7716]
+PASS 3c W4b CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | T-std median ms d3: df 11 t 2.201 sd 0.022963 n 4/4 -> [-4.9359, 2.1075]; json [-4.9359, 2.1075]
+PASS 3c W4b CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | T-std median ms d11t: df 11 t 2.201 sd 0.022963 n 4/4 -> [-4.0180, 3.0934]; json [-4.0180, 3.0934]
+PASS 3c W4b CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | T-std fps B: df 11 t 2.201 sd 0.041200 n 3/4 -> [-1.7972, 12.7927]; json [-1.7972, 12.7927]
+PASS 3c W4b CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | T-std fps d3: df 11 t 2.201 sd 0.041200 n 4/4 -> [-4.0339, 9.0969]; json [-4.0339, 9.0969]
+PASS 3c W4b CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | T-std fps d11t: df 11 t 2.201 sd 0.041200 n 4/4 -> [-3.8629, 9.2914]; json [-3.8629, 9.2914]
+INFO 3c W4b simple CI formula does not hold for B-block T-std median ms B: df 8 t 2.306 sd 0.014121 n 3/4 -> [-4.9039, -0.0542]; json [-4.9596, 0.0043] (checked below with the OLS variance)
+PASS 3c W4b CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | B-block T-std median ms d3: df 8 t 2.306 sd 0.014121 n 4/4 -> [-3.7197, 0.8177]; json [-3.7197, 0.8177]
+PASS 3c W4b CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | B-block T-std median ms d11t: df 8 t 2.306 sd 0.014121 n 4/4 -> [-2.7901, 1.7911]; json [-2.7901, 1.7911]
+INFO 3c W4b simple CI formula does not hold for B-block T-std fps B: df 8 t 2.306 sd 0.029506 n 3/4 -> [0.6153, 11.6354]; json [0.4923, 11.7720] (checked below with the OLS variance)
+PASS 3c W4b CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | B-block T-std fps d3: df 8 t 2.306 sd 0.029506 n 4/4 -> [-2.4852, 7.3643]; json [-2.4852, 7.3643]
+PASS 3c W4b CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | B-block T-std fps d11t: df 8 t 2.306 sd 0.029506 n 4/4 -> [-2.3115, 7.5556]; json [-2.3115, 7.5556]
+PASS 3d W4b own one-way raw median ms vs json and md row | sd 0.122102 df 11; | raw | median ms | 19.6 | 12.2 | 20.9 | 11 | -8.3 [-25.3, +12.6] | -0.9 [-18.1, +19.8] | -0.1 [-17.4, +20.8] |
+PASS 3d W4b own median-delta row raw | | raw | -10.8 | -5.4 | -1.1 |
+PASS 3d W4b own one-way T-std median ms vs json and md row | sd 0.022963 df 11; | T-std | median ms | 7.8 | 2.3 | 3.6 | 11 | -2.1 [-5.8, +1.8] | -1.5 [-4.9, +2.1] | -0.5 [-4.0, +3.1] |
+PASS 3d W4b own median-delta row T-std | | T-std | -0.8 | -0.6 | +0.2 |
+PASS 3d W4b own two-way OLS (B-block T-std) median ms vs json and md row | sd 0.014121 df 8 b -0.04120, -0.03135, -0.03979; var factors: B 0.6111 (1/n_a + 1/n_ref = 0.5833), d3 0.5000 (1/n_a + 1/n_ref = 0.5000), d11t 0.5000 (1/n_a + 1/n_ref = 0.5000); | B-block T-std | median ms | 3.6 | 1.4 | 2.3 | 8 | -2.5 [-5.0, +0.0] | -1.5 [-3.7, +0.8] | -0.5 [-2.8, +1.8] |
+PASS 3d W4b own median-delta row B-block T-std | | B-block T-std | -1.9 | -1.1 | -0.4 |
+PASS 3d W4b round terms 100 (e^b - 1) from own OLS | round 2 -4.0 %, round 3 -3.1 %, round 4 -3.9 %; 100 |b| = 4.12 / 3.14 / 3.98
+PASS 3d W4b round-test F from own one-way and own OLS | F = 7.029408
+PASS 3d W4b own one-way raw fps vs json and md row | sd 0.146566 df 11; | raw | fps | 23.6 | 14.7 | 25.6 | 11 | +13.5 [-11.3, +45.2] | +2.5 [-18.4, +28.8] | -0.7 [-21.0, +24.7] |
+PASS 3d W4b own one-way T-std fps vs json and md row | sd 0.041200 df 11; | T-std | fps | 12.7 | 4.1 | 6.6 | 11 | +5.2 [-1.8, +12.8] | +2.3 [-4.0, +9.1] | +2.5 [-3.9, +9.3] |
+PASS 3d W4b own two-way OLS (B-block T-std) fps vs json and md row | sd 0.029506 df 8 b 0.06828, 0.05583, 0.06527; var factors: B 0.6111 (1/n_a + 1/n_ref = 0.5833), d3 0.5000 (1/n_a + 1/n_ref = 0.5000), d11t 0.5000 (1/n_a + 1/n_ref = 0.5000); | B-block T-std | fps | 6.4 | 3.0 | 4.9 | 8 | +6.0 [+0.5, +11.8] * | +2.3 [-2.5, +7.4] | +2.5 [-2.3, +7.6] |
+PASS 3d W4b own one-way raw p99 ms vs json | sd 0.093965 df 11; raw tails are not printed
+PASS 3d W4b own one-way T-std p99 ms vs json and md row | sd 0.048777 df 11; | T-std | p99 ms | 10.6 | 4.9 | 7.9 | 11 | -1.0 [-8.8, +7.4] | +2.7 [-4.8, +10.8] | +1.3 [-6.1, +9.3] |
+PASS 3d W4b own two-way OLS (B-block T-std) p99 ms vs json and md row | sd 0.044500 df 8 b -0.02267, -0.02481, -0.07023; var factors: B 0.6111 (1/n_a + 1/n_ref = 0.5833), d3 0.5000 (1/n_a + 1/n_ref = 0.5000), d11t 0.5000 (1/n_a + 1/n_ref = 0.5000); | B-block T-std | p99 ms | 7.8 | 4.4 | 7.5 | 8 | -0.8 [-8.5, +7.5] | +2.7 [-4.5, +10.5] | +1.3 [-5.8, +8.9] |
+PASS 3d W4b own one-way raw 1 % low fps vs json | sd 0.074846 df 11; raw tails are not printed
+PASS 3d W4b own one-way T-std 1 % low fps vs json and md row | sd 0.056707 df 11; | T-std | 1 % low fps | 10.0 | 5.7 | 9.2 | 11 | +3.0 [-6.3, +13.3] | -1.9 [-10.2, +7.1] | -2.4 [-10.6, +6.7] |
+PASS 3d W4b own two-way OLS (B-block T-std) 1 % low fps vs json and md row | sd 0.047086 df 8 b -0.04504, -0.01236, 0.05366; var factors: B 0.6111 (1/n_a + 1/n_ref = 0.5833), d3 0.5000 (1/n_a + 1/n_ref = 0.5000), d11t 0.5000 (1/n_a + 1/n_ref = 0.5000); | B-block T-std | 1 % low fps | 10.7 | 4.7 | 8.0 | 8 | +1.5 [-6.7, +10.5] | -1.9 [-9.2, +5.9] | -2.4 [-9.6, +5.4] |
+PASS 3d W4b guard (a) light share | One-way F = 0.40 on (3, 11), p = 0.756. json F 0.400020 p 0.755775
+PASS 3d W4b guard (c) flagged runs (P util >= 90, E MHz < 600, kept) | 1549-d11t-r1, 1556-d11t-r2, 1600-d3-r3, 1604-d0-r3, 1606-B-r3, 1608-d11t-r4, 1611-d0-r4
+PASS 3d W4b guard (c) flag rows with own LOO residuals | | 1549-d11t-r1 | 99.5 | 573 | 0.560 | +19.0 | +3.4 | -0.4 | ; | 1556-d11t-r2 | 100.8 | 587 | 0.599 | +7.2 | -0.5 | +1.3 | ; | 1600-d3-r3 | 103.3 | 551 | 0.513 | +37.5 | +0.6 | +1.0 | ; | 1604-d0-r3 | 101.0 | 555 | 0.600 | +6.9 | -1.3 | -0.9 | ; | 1606-B-r3 | 101.1 | 545 | 0.626 | +16.1 | -0.8 | +0.3 | ; | 1608-d11t-r4 | 96.1 | 573 | 0.701 | -8.9 | -2.0 | -0.5 | ; | 1611-d0-r4 | 101.7 | 553 | 0.565 | +13.7 | -3.4 | -1.9 |
+PASS 3d W4b guard (c) flagged mean / RMS line | Mean of the flagged runs: raw +13.1, T-std -0.6 (-4 % of raw), B-block T-std -0.1 (-1 % of raw). RMS of the other kept runs: raw 10.9, T-std 3.1, B-block T-std 1.7.
+PASS 3b W5 round test on median ms: F and p recomputed | mine F = 0.239340 on (2, 8), p = 0.79258682 (density 0..F) / 0.79258682 (density F..inf); d1 = 2 closed form p = 0.7925868201; json F = 0.239340, p = 0.79258682, df [2, 8]
+PASS 3b W5 decision | p = 0.7926 -> T-std; json decision T-std; expected T-std
+PASS 3b W5 md prints "F = 0.24 on (2, 8), p = 0.793"
+PASS 3b W5 round test on fps: F and p recomputed | mine F = 0.171212 on (2, 8), p = 0.84565031 (density 0..F) / 0.84565031 (density F..inf); d1 = 2 closed form p = 0.8456503099; json F = 0.171212, p = 0.84565031, df [2, 8]
+PASS 3c W5 CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | T-std median ms s0: df 10 t 2.228 sd 0.020914 n 3/3 -> [-2.6874, 5.0062]; json [-2.6874, 5.0062]
+PASS 3c W5 CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | T-std median ms d11: df 10 t 2.228 sd 0.020914 n 3/3 -> [-2.5307, 5.1753]; json [-2.5307, 5.1753]
+PASS 3c W5 CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | T-std median ms d11t: df 10 t 2.228 sd 0.020914 n 3/3 -> [-1.4202, 6.3736]; json [-1.4202, 6.3736]
+PASS 3c W5 CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | T-std median ms d11p: df 10 t 2.228 sd 0.020914 n 3/3 -> [-2.3005, 5.4237]; json [-2.3005, 5.4237]
+PASS 3c W5 CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | T-std fps s0: df 10 t 2.228 sd 0.018218 n 3/3 -> [-4.5770, 1.9621]; json [-4.5770, 1.9621]
+PASS 3c W5 CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | T-std fps d11: df 10 t 2.228 sd 0.018218 n 3/3 -> [-4.0168, 2.5607]; json [-4.0168, 2.5607]
+PASS 3c W5 CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | T-std fps d11t: df 10 t 2.228 sd 0.018218 n 3/3 -> [-5.7361, 0.7235]; json [-5.7361, 0.7235]
+PASS 3c W5 CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | T-std fps d11p: df 10 t 2.228 sd 0.018218 n 3/3 -> [-4.8303, 1.6914]; json [-4.8303, 1.6914]
+PASS 3c W5 CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | B-block T-std median ms s0: df 8 t 2.306 sd 0.022713 n 3/3 -> [-3.1455, 5.5029]; json [-3.1455, 5.5029]
+PASS 3c W5 CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | B-block T-std median ms d11: df 8 t 2.306 sd 0.022713 n 3/3 -> [-2.9896, 5.6728]; json [-2.9896, 5.6728]
+PASS 3c W5 CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | B-block T-std median ms d11t: df 8 t 2.306 sd 0.022713 n 3/3 -> [-1.8843, 6.8768]; json [-1.8843, 6.8768]
+PASS 3c W5 CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | B-block T-std median ms d11p: df 8 t 2.306 sd 0.022713 n 3/3 -> [-2.7605, 5.9224]; json [-2.7605, 5.9224]
+PASS 3c W5 CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | B-block T-std fps s0: df 8 t 2.306 sd 0.019946 n 3/3 -> [-4.9972, 2.4131]; json [-4.9972, 2.4131]
+PASS 3c W5 CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | B-block T-std fps d11: df 8 t 2.306 sd 0.019946 n 3/3 -> [-4.4395, 3.0144]; json [-4.4395, 3.0144]
+PASS 3c W5 CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | B-block T-std fps d11t: df 8 t 2.306 sd 0.019946 n 3/3 -> [-6.1513, 1.1690]; json [-6.1513, 1.1690]
+PASS 3c W5 CI = exp(dl +- t sd sqrt(1/n_a + 1/n_ref)) - 1 | B-block T-std fps d11p: df 8 t 2.306 sd 0.019946 n 3/3 -> [-5.2494, 2.1412]; json [-5.2494, 2.1412]
+PASS 3d W5 own one-way raw median ms vs json and md row | sd 0.064758 df 10; | raw | median ms | 20.4 | 6.5 | 10.7 | 10 | +1.3 [-9.9, +14.0] | -0.9 [-11.9, +11.5] | +4.3 [-7.3, +17.3] | -0.2 [-11.3, +12.3] |
+PASS 3d W5 own median-delta row raw | | raw | +5.5 | +2.6 | +4.0 | +3.1 |
+PASS 3d W5 own one-way T-std median ms vs json and md row | sd 0.020914 df 10; | T-std | median ms | 6.5 | 2.1 | 3.3 | 10 | +1.1 [-2.7, +5.0] | +1.2 [-2.5, +5.2] | +2.4 [-1.4, +6.4] | +1.5 [-2.3, +5.4] |
+PASS 3d W5 own median-delta row T-std | | T-std | +2.3 | +2.5 | +2.7 | +2.1 |
+PASS 3d W5 own two-way OLS (B-block T-std) median ms vs json and md row | sd 0.022713 df 8 b 0.00766, -0.00165; var factors: s0 0.6667 (1/n_a + 1/n_ref = 0.6667), d11 0.6667 (1/n_a + 1/n_ref = 0.6667), d11t 0.6667 (1/n_a + 1/n_ref = 0.6667), d11p 0.6667 (1/n_a + 1/n_ref = 0.6667); | B-block T-std | median ms | 5.7 | 2.3 | 3.8 | 8 | +1.1 [-3.1, +5.5] | +1.2 [-3.0, +5.7] | +2.4 [-1.9, +6.9] | +1.5 [-2.8, +5.9] |
+PASS 3d W5 own median-delta row B-block T-std | | B-block T-std | +1.4 | +1.7 | +2.5 | +1.9 |
+PASS 3d W5 round terms 100 (e^b - 1) from own OLS | round 2 +0.8 %, round 3 -0.2 %; 100 |b| = 0.77 / 0.17
+PASS 3d W5 round-test F from own one-way and own OLS | F = 0.239340
+PASS 3d W5 own one-way raw fps vs json and md row | sd 0.096565 df 10; | raw | fps | 26.8 | 9.7 | 16.4 | 10 | -2.0 [-17.8, +16.8] | +3.1 [-13.5, +22.9] | -5.2 [-20.5, +13.0] | +1.3 [-15.0, +20.7] |
+PASS 3d W5 own one-way T-std fps vs json and md row | sd 0.018218 df 10; | T-std | fps | 5.8 | 1.8 | 2.9 | 10 | -1.4 [-4.6, +2.0] | -0.8 [-4.0, +2.6] | -2.6 [-5.7, +0.7] | -1.6 [-4.8, +1.7] |
+PASS 3d W5 own two-way OLS (B-block T-std) fps vs json and md row | sd 0.019946 df 8 b -0.00726, -0.00480; var factors: s0 0.6667 (1/n_a + 1/n_ref = 0.6667), d11 0.6667 (1/n_a + 1/n_ref = 0.6667), d11t 0.6667 (1/n_a + 1/n_ref = 0.6667), d11p 0.6667 (1/n_a + 1/n_ref = 0.6667); | B-block T-std | fps | 5.1 | 2.0 | 3.3 | 8 | -1.4 [-5.0, +2.4] | -0.8 [-4.4, +3.0] | -2.6 [-6.2, +1.2] | -1.6 [-5.2, +2.1] |
+PASS 3d W5 own one-way raw p99 ms vs json | sd 0.092502 df 10; raw tails are not printed
+PASS 3d W5 own one-way T-std p99 ms vs json and md row | sd 0.040965 df 10; | T-std | p99 ms | 6.9 | 4.1 | 6.7 | 10 | +2.8 [-4.6, +10.8] | +0.5 [-6.7, +8.3] | +8.8 [+1.0, +17.2] * | +5.3 [-2.2, +13.5] |
+PASS 3d W5 own two-way OLS (B-block T-std) p99 ms vs json and md row | sd 0.033584 df 8 b 0.03067, 0.05561; var factors: s0 0.6667 (1/n_a + 1/n_ref = 0.6667), d11 0.6667 (1/n_a + 1/n_ref = 0.6667), d11t 0.6667 (1/n_a + 1/n_ref = 0.6667), d11p 0.6667 (1/n_a + 1/n_ref = 0.6667); | B-block T-std | p99 ms | 4.1 | 3.4 | 5.6 | 8 | +2.8 [-3.5, +9.5] | +0.5 [-5.7, +7.0] | +8.8 [+2.1, +15.9] * | +5.3 [-1.1, +12.2] |
+PASS 3d W5 own one-way raw 1 % low fps vs json | sd 0.095631 df 10; raw tails are not printed
+PASS 3d W5 own one-way T-std 1 % low fps vs json and md row | sd 0.050131 df 10; | T-std | 1 % low fps | 6.9 | 5.0 | 8.2 | 10 | -2.5 [-11.0, +6.8] | -0.4 [-9.1, +9.1] | -8.1 [-16.1, +0.7] | -6.3 [-14.4, +2.7] |
+PASS 3d W5 own two-way OLS (B-block T-std) 1 % low fps vs json and md row | sd 0.036318 df 8 b -0.03194, -0.07604; var factors: s0 0.6667 (1/n_a + 1/n_ref = 0.6667), d11 0.6667 (1/n_a + 1/n_ref = 0.6667), d11t 0.6667 (1/n_a + 1/n_ref = 0.6667), d11p 0.6667 (1/n_a + 1/n_ref = 0.6667); | B-block T-std | 1 % low fps | 3.5 | 3.6 | 6.1 | 8 | -2.5 [-9.0, +4.4] | -0.4 [-7.0, +6.7] | -8.1 [-14.2, -1.6] * | -6.3 [-12.5, +0.4] |
+PASS 3d W5 guard (a) light share | One-way F = 0.33 on (4, 10), p = 0.850. json F 0.332932 p 0.849695
+PASS 3d W5 guard (c) flagged runs (P util >= 90, E MHz < 600, kept) | 1808-s0-r2, 1817-base-r2, 1821-d11t-r3
+PASS 3d W5 guard (c) flag rows with own LOO residuals | | 1808-s0-r2 | 91.5 | 597 | 0.822 | +6.2 | +1.0 | +0.1 | ; | 1817-base-r2 | 98.5 | 554 | 0.765 | +18.3 | +5.4 | +4.5 | ; | 1821-d11t-r3 | 91.4 | 551 | 0.763 | +16.6 | +3.8 | +4.4 |
+PASS 3d W5 guard (c) flagged mean / RMS line | Mean of the flagged runs: raw +13.7, T-std +3.4 (25 % of raw), B-block T-std +3.0 (22 % of raw). RMS of the other kept runs: raw 5.4, T-std 2.1, B-block T-std 2.1.
+PASS 4 s(p50_ms) = readout-w5.json methods[T-std][p50_ms].sd_ln | 0.020913898719, df 10
+PASS 4 s(fps) = readout-w5.json methods[T-std][fps].sd_ln | 0.018217615955, df 10
+PASS 4 s(p99_ms) = readout-w5.json methods[T-std][p99_ms].sd_ln | 0.040964884516, df 10
+PASS 4 s(low1_fps) = readout-w5.json methods[T-std][low1_fps].sd_ln | 0.050130783898, df 10
+PASS 4 unflagged s (p50_ms) over the 12 kept runs not flagged | 12 runs, df 7, s = 0.014685 (1.5 %); repeats.json s_calm 0.014685
+PASS 4 unflagged s (fps) over the 12 kept runs not flagged | 12 runs, df 7, s = 0.011832 (1.2 %); repeats.json s_calm 0.011832
+PASS 4 T975 table entries vs own t quantile (to 3 decimals) | 22 entries; df 24 uses 2.086
+INFO 4 timing: 15 scored + 1 cold; cold 2026-11-22 17:56:02.409 .. first scored 2026-11-22 17:57:53.683; last scored 2026-11-22 18:27:55.005 .. 2026-11-22 18:29:54.655
+PASS 4 timing from run.json = repeats.json timing | cold slot 111.274 s, slot 128.6659 s, last 119.650 s, run mean 120.125 s, total 2032.246 s
+PASS 4 measured total 33.9 min = model for 15 runs | measured 33.8708 min, model 33.8708 min
+PASS 4 section 2 sentence rebuilt from run.json | From W5's run.json start/end: the cold run's slot 1.85 min, then one slot of 2.14 min per scored run (start to start; a run lasts 120 s on average, the gap is 9 s), and the last run 1.99 min. Window = cold slot + (A n - 1) slots + the last run = 1.70 + 2.14 x A n min. Check: 15 runs give 33.9 min; measured 33.9 min (17:56:02-18:29:54).
+PASS 4 REPEATS.md table median ms: all 15 cells recomputed | e.g. (6 arms, 3) ±3.8 (12), (2 arms, 5) ±3.1 (8)
+PASS 4 REPEATS.md table fps: all 15 cells recomputed | e.g. (6 arms, 3) ±3.3 (12), (2 arms, 5) ±2.7 (8)
+PASS 4 REPEATS.md table tails: all 15 cells recomputed | e.g. (6 arms, 3) ±7.6 / ±9.3, (2 arms, 5) ±6.2 / ±7.6
+PASS 4 REPEATS.md table minutes: all 15 cells recomputed | e.g. (6 arms, 3) 40.3 (18), (2 arms, 5) 23.1 (10)
+PASS 4 REPEATS.md table B-block: all 15 cells recomputed | e.g. (6 arms, 3) ±3.9 (10), (2 arms, 5) ±3.7 (4)
+PASS 4 REPEATS.md table MDE: all 15 cells recomputed | e.g. (6 arms, 3) 5.3, (2 arms, 5) 4.3
+PASS 4 REPEATS.md table CV 1/2/3: all 15 cells recomputed | e.g. (6 arms, 3) 1.8 / 3.6 / 5.5, (2 arms, 5) 1.5 / 3.0 / 4.5
+PASS 4 repeats.json grid (hw, hw_block, mde80, minutes, df) vs own numbers | 15 grid cells x 4 metrics
+PASS 4 chi-square df 10 quantiles and CV range | q0.025 3.2470, q0.975 20.4832 -> 0.6987-1.7549 x; repeats.json [0.6987170441634245, 1.7549335474133563]
+PASS 4 own t0.80 quantiles | df 4 0.9410, df 10 0.8791, df 24 0.8569
+PASS 4 REPEATS.md text rebuilt with own numbers | - **repeats=3:** median ms ±3.8 % (6 arms) to ±4.9 % (2 arms); fps ±3.3 to ±4.2 %; 15 min (2 arms) to 40 min (6 arms).
+PASS 4 REPEATS.md text rebuilt with own numbers | - **repeats=4:** median ms ±3.2 % (6 arms) to ±3.7 % (2 arms); fps ±2.7 to ±3.2 %; 19 min (2 arms) to 53 min (6 arms).
+PASS 4 REPEATS.md text rebuilt with own numbers | - **repeats=5:** median ms ±2.8 % (6 arms) to ±3.1 % (2 arms); fps ±2.4 to ±2.7 %; 23 min (2 arms) to 66 min (6 arms).
+PASS 4 REPEATS.md text rebuilt with own numbers | - Each repeat adds A runs of 2.14 min. From 3 to 4 repeats the ± narrows by 17 % (6 arms) to 24 % (2 arms); from 4 to 5 by 11-16 %.
+PASS 4 REPEATS.md text rebuilt with own numbers | - An arm's true delta must be about 1.35-1.42 x its ± to give a `*` 80 % of the time: with 6 arms that is 5.3 / 4.5 / 4.0 % on median ms for 3 / 4 / 5 repeats.
+PASS 4 REPEATS.md text rebuilt with own numbers | - W5's CV is itself an estimate on df 10: another window on the same Power mode can give 0.70-1.75 x these ± (95 %). W4b (same overlay) had T-std CV 2.3 % on median ms, against W5's 2.1 %.
+PASS 4 REPEATS.md text rebuilt with own numbers | s = W5's T-std pooled SD of ln(value) over its 15 kept runs (df 10): median ms 2.1 %, fps 1.8 %, p99 4.1 %, 1 % low 5.0 %.
+PASS 4 REPEATS.md text rebuilt with own numbers | In W5 (no round effect) B-block's own s was 2.3 % on median ms (df 8), so there T-std applies.
+PASS 4 REPEATS.md text rebuilt with own numbers | - W5's s comes from df 10. Its 95 % range is 0.70-1.75 x s (chi-square), and every ± above scales with s (nearly in proportion): for median ms, s could be 1.5-3.7 %.
+PASS 4 REPEATS.md text rebuilt with own numbers | - W4b, on the same overlay, had T-std CV 2.3 % (median ms, df 11) and 4.1 % (fps); W5 has 2.1 % and 1.8 %.
+PASS 4 REPEATS.md text rebuilt with own numbers | (W5's unflagged runs: 1.5 %; W4b B-block T-std: 1.4 %). High end: W5's 2.1 %
+PASS 4 REPEATS.md text rebuilt with own numbers | (W4b: CV 2.3 -> 1.4 % on median ms)
+RESULT PASS (133 passed, 0 failed)

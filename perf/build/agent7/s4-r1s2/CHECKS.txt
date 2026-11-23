@@ -1,0 +1,24 @@
+# s4-r1s2.diff: git apply --check (read-only), 2026-11-22 23:12, Agent 7
+
+Run from the workspace root. The git toplevel is C:/Users/<user>/.vscode/projects, so --directory is repo-relative
+(a cwd-relative value makes git print "Skipped patch" and exit 0 without checking anything).
+
+1. Forward on orig (must apply):
+   cmd /c "git apply --check --verbose --directory=games/lego-dimensions-recomp/build/agent7/s4-r1s2/orig/sdk build/agent7/s4-r1s2/s4-r1s2.diff 2>&1"
+   -> exit 0. "Checking patch ..." for all 5 files (cp.h, dcl.h, cp.cpp, shared_memory.cpp, texture_cache.cpp), no errors.
+2. Reverse on new (must apply):
+   cmd /c "git apply --check --verbose -R --directory=games/lego-dimensions-recomp/build/agent7/s4-r1s2/new/sdk build/agent7/s4-r1s2/s4-r1s2.diff 2>&1"
+   -> exit 0. All 5 files checked, no errors.
+3. Negative, forward on new (must fail):
+   cmd /c "git apply --check --verbose --directory=games/lego-dimensions-recomp/build/agent7/s4-r1s2/new/sdk build/agent7/s4-r1s2/s4-r1s2.diff 2>&1"
+   -> exit 1. "patch does not apply" for all 5 files (cp.h:15, dcl.h:37, cp.cpp:109, shared_memory.cpp:487,
+      texture_cache.cpp:1250).
+
+No check printed "Skipped patch". orig/sdk is byte-identical to the S4b SDK files (PROOFS.txt P1), so check 1 is the
+same as a check against the S4b tree.
+
+Apply (Agent 2 only, after the user OKs it), at the S4b SDK root (snap1: build/agent2/snap1/DimensionsRecomp/rexglue-sdk,
+or the tree devoff4b is rebuilt from):
+   git -C <sdk root> apply --check --verbose <abs path>\build\agent7\s4-r1s2\s4-r1s2.diff
+   git -C <sdk root> apply <abs path>\build\agent7\s4-r1s2\s4-r1s2.diff
+   Corrected 11-23 09:04 (task #33). Corrected 11-23 09:39 (task #33): scope added. Corrected 11-23 09:59 (task #33): one tag per time. WARNING: where <sdk root> has no .git of its own (as in snap1), the two git -C lines above skip all 5 files ("Skipped patch") and exit 0 without applying anything (git uses the parent repo); use the --directory form in RATE-REQUEST.md section 2, or copy new/sdk/.

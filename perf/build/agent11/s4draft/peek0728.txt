@@ -1,0 +1,81 @@
+SESSION2 lines 3337
+S2 L3325: - Agent 3 f10 (quiet host, untimed, devoff4b-bin): f10a and f10b PASS, no hang. Worst frame 2.9 s against the 5 s detector; the same sync-heavy frames took 5-20x less per wait than gate B under -j8 (0.98 vs 6.05 ms; 0.29-0.37 vs 1.79 ms), so a starved host, with a small margin. rpm4 PASS. Second pair approved: f10a2 started 06:32, all runs end by 07:20; the n=2 summary goes to Agents 6 and 11. Agent 12 adds a 2-line pointer to its HANDOFF.
+S2 L3326: - Agent 10: SCRNSAVE delta SAFE (build/agent10/t27/scrnsave-delta.md); day condition 1 met in staged form (run-day B67EBD6C from run-night 565D30D4). Item #21 (s4-t1) rating in build/agent10/t27/r21-s4t1.md: (a) SAFE, (b) SAFE-IF with 5 conditions incl. the new F-CA (a th2-only deadlock path that exists without #21, not seen at runtime), (c) ACCEPTED. F-CA goes to the RESUME open items; Agent 7 records it under MP4 gap 2.
+S2 L3327: - Export: export_perf.py now scrubs each copy (workspace path -> <workspace>; other profile paths and the account name -> <user>; plain, JSON-escaped and file:/// forms) and counts leftovers; checked on a sample. The full re-run waits until Agent 3's quiet runs end. Personal-schedule mentions sit in about 47 exported files (session log, FINDINGS, S4-DRAFT, agent notes): too spread out to cut, so it goes into the notes question for the user.
+S2 L3328: - Machine 06:31: launcher 19960 and hold manager 25948 up until 07:30; no HOLD.
+S2 L3329: 
+S2 L3330: ### 07:06 - Agent 1: f10 n=2 done; fresh clone verified; export scrubbed; my HANDOFF
+S2 L3331: 
+S2 L3332: - Done since 06:35: #28 Agent 2 (COMMIT-CHECK PASS; PENDING-DIFFS.md; old task #1 closed as DEFERRED, CTR/CG26 bins unbuilt, steps in its HANDOFF S4.1); #22 Agent 6 (gate B dumpstacks S7.3, quiet-host answer S7.4, night logdiffs, #33 pop-in staged in build/agent6/s33-popin/, cvar d3d12_pipeline_creation_no_wait default OFF, apply --check OK on 5350b1d, not built); #29 Agent 4 (screenshot kit build/agent4/screenshot-kit/README.md, about 25 min, user at the visible desktop); #23 Agent 3 (f10 n=2: f10a, f10a2, f10b, f10b2 all PASS; 0/4 hung on the quiet host vs 4/6 under -j8, p=0.07; rpb0 and rpm4 PASS; queue stopped, STOP file in place, last game 06:47:26).
+S2 L3333: - Agent 10: RESUME interim review R1-R32 (build/agent10/t27/resume-review.md; 3 wrong facts R20-R22, restart gaps R30-R32); SCRNSAVE install tooling SAFE (install-scrnsave.ps1, day-update.ps1). Pointed Agent 11 at the review; R19 (scrub) done on my side.
+S2 L3334: - Export re-run 07:02 with the scrub: 4529 files, 38.6 MB, 8319 edits in 1411 files, 0 files still holding the account name. Still staged, not pushed.
+S2 L3335: - Fresh clone test (https, scratch folder outside the workspace): DimensionsRecomp perf/opt b0bd3b4 and the SDK submodule 5350b1d come from the forks fine. thirdparty/plume fails ('not our ref ceaeeee0', the upstream gitlink is not on zolaware/plume); fetching the pin e0c8871 by sha, then prepare_plume.py and prepare_simde.py, gives the same git status as the live tree, and the 4 patched files are byte-identical to the live ones. Steps in build/agent1/HANDOFF.md section 3 (R32).
+S2 L3336: - Wrote build/agent1/HANDOFF.md (first version; the final pass adds the readout verdicts).
+S2 L3337: 
+A8C lines 879
+A8C L1: # Check of Agent 7's W9 / W5b numbers against results.csv
+A8C L2: 
+A8C L3: Agent 8, task #20. Script: `build/agent8/readout/w-followup/a7check/check_a7_w9w5b.py` (run from the workspace root; it reads only results.csv and, for ng_t, `audit/runs.csv`; it shares no code with either pool_readout.py).
+A8C L4: 
+A8C L5: ## Inputs
+A8C L6: 
+A8C L7: - W9 pass 1: `build/agent8/matrix/20261123-0108/results.csv` sha256 823BA531C6EC402D...
+A8C L8: - W9 pass 2: `build/agent8/matrix/20261123-0401/results.csv` sha256 45C2D73C071E23EC...
+A8C L9: - W5b pass 1: `build/agent8/matrix/20261123-0155/results.csv` sha256 5A08241AA965ADE4...
+A8C L10: - W5b pass 2: `build/agent8/matrix/20261123-0451/results.csv` sha256 8C6CC5147A7470E2...
+A8C L11: - Checked files (Agent 7, read-only): `build/agent7/readout/W9.md` (07:01), `build/agent7/readout/pool-W9.md` (06:26), `build/agent7/readout/pool-W5b.md` (07:02), `build/agent7/readout/load-check.md` (06:40).
+A8C L12: - Kept runs: scored, status OK, valid_timing, not excluded; cold runs out. W9 40 (8 per arm), W5b 36 (12 per arm).
+A8C L13: - ng_t = `win_ngB_mean` (non-game busy cores, window mean) from `build/agent8/readout/w-followup/audit/runs.csv`.
+A8C L14: - Agree = every recomputed number rounds to the posted number at the posted decimals (ties count as agree). "agree (rounded inputs)" = it matches only when the inputs are first rounded the way the pool run tables print them (fps 1 dp, cores 2 dp, p99 2 dp, MHz 0 dp, ng_t 2 dp); load-check.md and parts of W9.md work from those tables (the W9.md pass-2 cores % also uses the printed q500 mean).
+A8C L15: - Gap = the largest |recomputed - posted| in a claim, in last-digit units of the posted number (0.5 = a rounding tie), taking the closer of the plain recompute and, where given, the rounded-input one. Sign flip = recomputed and posted on opposite sides of 0, with the posted number at least one unit from 0.
+A8C L16: - Not checkable from results.csv, so not checked: T-std, B-block T-std, T-light / T-heavy, 1 % low, thread busy %, sys.json util and P/E MHz, round-effect F tests, guard (b), the thread-cycle table. Raw, CPU, count and run-level numbers are all checked.
+A8C L17: - Categories: main = deltas, CIs and per-arm values; count = run counts; run = the per-run tables (section 8); aux = method details (band %, CV %, 4 vs 4 band, df, within-arm Spearman, t critical values) plus the per-run light share and its one-way F (light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp, so a run can differ by 0.001 and F moves; the per-arm light means are main claims).
+A8C L18: 
+A8C L19: ## Result
+A8C L20: 
+A8C L21: **733 claims, 3086 numbers: 708 agree (67 only with rounded inputs, 1 with the stated alternative), 25 disagree, 0 parse problems.**
+A8C L22: 
+A8C L23: Disagreements by gap (last-digit units): 0.5-0.6: 13; 0.6-1: 4; 1-2: 5; > 2: 3. Sign flips: 0. Hand-coded W9.md claims whose numbers are not on the cited line of the current file: 0.
+A8C L24: 
+A8C L25: | file | category | claims | numbers | agree | agree (rounded inputs) | agree (alternative) | disagree | parse |
+A8C L26: |---|---|---|---|---|---|---|---|---|
+A8C L27: | W9.md | main | 165 | 580 | 147 | 17 | 0 | 1 | 0 |
+A8C L28: | W9.md | count | 15 | 31 | 15 | 0 | 0 | 0 | 0 |
+A8C L29: | W9.md | aux | 1 | 3 | 0 | 0 | 0 | 1 | 0 |
+A8C L30: | pool-W9.md | main | 166 | 550 | 156 | 0 | 0 | 10 | 0 |
+A8C L31: | pool-W9.md | count | 18 | 76 | 18 | 0 | 0 | 0 | 0 |
+A8C L32: | pool-W9.md | run | 42 | 294 | 42 | 0 | 0 | 0 | 0 |
+A8C L33: | pool-W9.md | aux | 46 | 57 | 42 | 0 | 0 | 4 | 0 |
+A8C L34: | pool-W5b.md | main | 100 | 324 | 93 | 0 | 1 | 6 | 0 |
+A8C L35: | pool-W5b.md | count | 18 | 46 | 18 | 0 | 0 | 0 | 0 |
+A8C L36: | pool-W5b.md | run | 38 | 266 | 38 | 0 | 0 | 0 | 0 |
+A8C L37: | pool-W5b.md | aux | 42 | 53 | 39 | 0 | 0 | 3 | 0 |
+A8C L38: | load-check.md | main | 77 | 799 | 28 | 49 | 0 | 0 | 0 |
+A8C L39: | load-check.md | aux | 5 | 7 | 4 | 1 | 0 | 0 | 0 |
+A8C L40: 
+A8C L63: Aux (method-detail) claims that do not agree:
+A8C L78: - pool-W5b.md L226: W5b light share per arm (mean of results.csv light_share): posted 0.974 0.972 0.975; recomputed 0.9745 0.9719 0.9744 / posted run-table light shares: 0.9744 0.9719 0.9745 (agree (posted run-table light shares))
+A8C L142: ## All claims
+A8C rows citing W5b.md: 0  DISAGREE rows: 50
+  W5bDIS | pool-W5b.md L54 | W5b cores d11t: mean; change [CI]; GM % one-way [CI]; GM % B-block [CI] | 2.33; -0.22 [-0.25, -0.19]; -8.6 [-9.8, -7.4] *; -8.6 [-9.6, -7.6] * | 2.329 -0.220 -0.251 -0.189 -8.63 -9.80 -7.45 -8.63 -9.60 -7.65 | DISAGREE | 0.50 | 0 |  |
+  W5bDIS | pool-W5b.md L120 | W5b no-audit-flag: raw median ms d11p | +0.5 [-1.7, +2.7] | 0.52 -1.65 2.73 | DISAGREE | 0.51 | 0 |  |
+  W5bDIS | pool-W5b.md L134 | W5b no-flagged: raw median ms d11t | +0.0 [-2.3, +2.3] | 0.01 -2.25 2.32 | DISAGREE | 0.52 | 0 |  |
+  W5bDIS | pool-W5b.md L136 | W5b no-flagged: raw p99 ms d11t | +0.0 [-1.7, +1.7] | 0.03 -1.65 1.74 | DISAGREE | 0.51 | 0 |  |
+  W5bDIS | pool-W5b.md L148 | W5b no-loaded: raw median ms d11t | +0.0 [-2.3, +2.4] | 0.01 -2.25 2.33 | DISAGREE | 0.75 | 0 |  |
+  W5bDIS | pool-W5b.md L148 | W5b no-loaded: raw median ms d11p | +0.0 [-2.3, +2.4] | 0.02 -2.24 2.33 | DISAGREE | 0.67 | 0 |  |
+  W5bDIS | pool-W5b.md L248 | 0219-d11p-r4: light share | 0.973 | 0.9720 | DISAGREE | 1.00 | 0 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+  W5bDIS | pool-W5b.md L263 | 0508-d11-r3: light share | 0.975 | 0.9760 | DISAGREE | 1.00 | 0 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+  W5bDIS | pool-W5b.md L226 | W5b light share one-way F (df1, df2) | 1.18 (2, 33) | 1.214 2 33 / posted run-table light shares: 1.225 2 33 | DISAGREE | 3.43 | 0 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+  W5bDIS | 289 | pool-W5b.md L54 | W5b cores d11t: mean; change [CI]; GM % one-way [CI]; GM % B-block [CI] | 2.33; -0.22 [-0.25, -0.19]; -8.6 [-9.8, -7.4] *; -8.6 [-9.6, -7.6] * | 2.329 -0.220 -0.251 -0.189 -8.63 -9.80 -7.45 -8.63 -9.60 -7.65 | DISAGREE | 0.50 |  |
+  W5bDIS | 323 | pool-W5b.md L120 | W5b no-audit-flag: raw median ms d11p | +0.5 [-1.7, +2.7] | 0.52 -1.65 2.73 | DISAGREE | 0.51 |  |
+  W5bDIS | 331 | pool-W5b.md L134 | W5b no-flagged: raw median ms d11t | +0.0 [-2.3, +2.3] | 0.01 -2.25 2.32 | DISAGREE | 0.52 |  |
+  W5bDIS | 335 | pool-W5b.md L136 | W5b no-flagged: raw p99 ms d11t | +0.0 [-1.7, +1.7] | 0.03 -1.65 1.74 | DISAGREE | 0.51 |  |
+  W5bDIS | 340 | pool-W5b.md L148 | W5b no-loaded: raw median ms d11t | +0.0 [-2.3, +2.4] | 0.01 -2.25 2.33 | DISAGREE | 0.75 |  |
+  W5bDIS | 341 | pool-W5b.md L148 | W5b no-loaded: raw median ms d11p | +0.0 [-2.3, +2.4] | 0.02 -2.24 2.33 | DISAGREE | 0.67 |  |
+  W5bDIS | 418 | pool-W5b.md L248 | 0219-d11p-r4: light share | 0.973 | 0.9720 | DISAGREE | 1.00 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+  W5bDIS | 448 | pool-W5b.md L263 | 0508-d11-r3: light share | 0.975 | 0.9760 | DISAGREE | 1.00 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+  W5bDIS | 470 | pool-W5b.md L226 | W5b light share one-way F (df1, df2) | 1.18 (2, 33) | 1.214 2 33 / posted run-table light shares: 1.225 2 33 | DISAGREE | 3.43 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+build/agent7/HANDOFF.md False
+build/agent8/HANDOFF.md False
+build/agent7/readout/W5b.md 30541
+build/agent5/scrnsave-fix/install-log.txt 1326

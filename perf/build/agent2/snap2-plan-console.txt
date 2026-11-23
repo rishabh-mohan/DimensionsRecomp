@@ -1,0 +1,95 @@
+﻿# snap-patch S2 plan 2026-11-21 23:14:44; rules <workspace>\build\agent2\S2-rules.txt (sha256 0d3edcb0a34abed22536aaa54562709bdc8dc6ec98729a3a5480656ac720225b)
+# base: MANIFEST-S1-2041.tsv + 2 PATCHES row(s) + 48 native-input file(s)
+files: live 23843, snap1 23838; hashed live 87, snap1 50; walk 4.0s, hash 0.6s
+same 23805; differing 38: COPY 18 (781066 bytes), DELETE 0, HELD BACK 20; errors 0, warnings 0
+## COPY live -> snap1 (18): category, owner, live sha/mtime, snap1 sha, path
+  modified A12          live 4836b139802d3438 2026-11-21 21:44:35  snap1 8f8a2e71a05258b0  rexglue-sdk/include/rex/audio/audio_system.h
+  modified A12          live c281fa8625435efe 2026-11-21 21:56:43  snap1 7e129af6ea359947  rexglue-sdk/src/audio/audio_system.cpp
+  modified A5           live 75025044c39ff910 2026-11-21 21:13:38  snap1 db8fe4864dbaf207  rexlego/src/gpu_native/buffers.cpp
+  modified A7           live 3d01e63142dbfb50 2026-11-21 20:48:29  snap1 4dc63fa0b804c5fe  rexlego/src/gpu_native/device.cpp
+  modified A7           live 703939aa91efea81 2026-11-21 20:48:28  snap1 12391f5ce364e280  rexlego/src/gpu_native/device.h
+  modified A6 (applied by A4) live 50aa3b1dee615678 2026-11-21 21:24:30  snap1 751c219ea5cccd2f  rexlego/src/gpu_native/draw.cpp
+  modified A7           live e05d6a554042b302 2026-11-21 20:48:29  snap1 79fc841e3180ca0d  rexlego/src/gpu_native/fps_counter.h
+  modified A6           live 42318b849fae030b 2026-11-21 20:48:11  snap1 a0b71db586139545  rexlego/src/gpu_native/pipeline_snapshot.h
+  modified A5           live 8f6a12ae70994065 2026-11-21 21:13:38  snap1 d1f0a5c3bb8427d6  rexlego/src/gpu_native/texture_scratch.h
+  modified A5           live ff9e11417227a8ba 2026-11-21 21:13:38  snap1 e8bd27d3713ffe28  rexlego/src/gpu_native/texture_upload_source.h
+  modified A5           live d0601ecf0150df8f 2026-11-21 21:13:38  snap1 328dfcec476599c2  rexlego/src/gpu_native/texture_volume_upload.h
+  modified A5 (+A4 (a)) live 3011add45516123f 2026-11-21 21:13:38  snap1 a6b45772d017f8d4  rexlego/src/gpu_native/textures.cpp
+  modified A5           live 853e6c16be4082b9 2026-11-21 21:13:38  snap1 3ede3afc0f6a368e  rexlego/src/gpu_native/upload_buffer_pool.h
+  added    A5           live 5c823f13b067c93a 2026-11-21 20:55:39  snap1 ABSENT  rexlego/src/gpu_native/upload_legacy_paths.h
+  modified A5           live ffd2b023ac4cc6d5 2026-11-21 21:13:38  snap1 7fc6952362ff4b8e  rexlego/src/gpu_native/vertex_upload.h
+  added    A6           live e03d29d0758e6150 2026-11-21 22:08:09  snap1 ABSENT  tools/gpu-aot/patches/plume-winsdk-compat.patch
+  modified A6           live b3c877379038091e 2026-11-21 22:08:37  snap1 ced19f81cf923329  tools/gpu-aot/prepare_plume.py
+  modified A6           live da360aba28d609a3 2026-11-21 22:08:39  snap1 82039eba12f58180  tools/gpu-aot/test_prepare_plume.py
+## HELD BACK (20): differs from live but stays at its snap1 content; grouped by board claim
+  [A9] 20 file(s)
+    modified excluded     live d07c575ff2904b87 2026-11-21 21:45:15  snap1 929eeda15600105b  rexglue-sdk/include/rex/codegen/config.h
+    modified excluded     live 3cbd9f6dc3850cd1 2026-11-21 22:12:35  snap1 7331cde11b9bface  rexglue-sdk/include/rex/codegen/function_types.h
+    modified excluded     live 873a69bbc0134bba 2026-11-21 22:12:36  snap1 2168678c8a40ca4b  rexglue-sdk/src/codegen/builders/builder_context.h
+    modified excluded     live 7710107ce9c577ca 2026-11-21 22:12:37  snap1 aa887012da1f7f1d  rexglue-sdk/src/codegen/builders/context.cpp
+    modified excluded     live 61538970604512db 2026-11-21 22:12:39  snap1 046462fcb7b46677  rexglue-sdk/src/codegen/builders/control_flow.cpp
+    modified excluded     live 348840d2ac86988f 2026-11-21 21:29:51  snap1 b34b8684a0695f2b  rexglue-sdk/src/codegen/builders/floating_point.cpp
+    added    excluded     live b1a8f81bbc062850 2026-11-21 21:25:19  snap1 ABSENT  rexglue-sdk/src/codegen/builders/flush_mode.h
+    modified excluded     live 1abf25fe5a164910 2026-11-21 20:55:26  snap1 6b4bb2b7f778b6ba  rexglue-sdk/src/codegen/builders/helpers.h
+    modified excluded     live 6e95aaf361f94536 2026-11-21 20:54:44  snap1 530cf95932f271ca  rexglue-sdk/src/codegen/builders/logical.cpp
+    modified excluded     live b1b9869852359947 2026-11-21 21:30:17  snap1 ada82f71017f43de  rexglue-sdk/src/codegen/builders/memory.cpp
+    modified excluded     live d1269273636b5a1a 2026-11-21 22:12:40  snap1 4f8fae95ce008a58  rexglue-sdk/src/codegen/builders/system.cpp
+    modified excluded     live d32bb5a253bd1bc1 2026-11-21 21:30:07  snap1 527a195f53400ea6  rexglue-sdk/src/codegen/builders/vector.cpp
+    modified excluded     live 8235c8c77cf06b66 2026-11-21 22:12:35  snap1 19094a7bbb07960c  rexglue-sdk/src/codegen/codegen_writer.cpp
+    modified excluded     live 0ed529b7e5f0f4e7 2026-11-21 21:45:17  snap1 75ceaab72fc4495c  rexglue-sdk/src/codegen/config.cpp
+    modified excluded     live 3e4b0e982cc14eb3 2026-11-21 22:12:38  snap1 13bf36159c6115a1  rexglue-sdk/src/codegen/function_graph.cpp
+    modified excluded     live 688f450cc185ea21 2026-11-21 22:12:41  snap1 6db0ab3ef551132f  rexglue-sdk/src/codegen/test_support.cpp
+    modified excluded     live 30bb9be432c2fc8c 2026-11-21 22:12:42  snap1 36578dbe6f5df222  rexglue-sdk/src/rexglue/commands/test_recompiler.cpp
+    added    excluded     live f2413015ba36cfb2 2026-11-21 22:04:58  snap1 ABSENT  rexglue-sdk/tests/ppc/asm/instr_cr_so_fold.s
+    added    excluded     live c74cd990c3299aff 2026-11-21 21:59:09  snap1 ABSENT  rexglue-sdk/tests/ppc/opt_config.toml
+    modified excluded     live 893eeacb7c555bf0 2026-11-21 22:13:03  snap1 9be38388d871b31c  rexglue-sdk/tests/regression/emit_interior_entries.cpp
+## RULES (39)
+  line 6                     rexlego/src/gpu_native/device.cpp  [A7] expect=3d01e63142dbfb5083147ca8636243ecb98b6c9552af03533bbae592dffb8e0a hits=1 differing=1
+  line 8                     rexlego/src/gpu_native/device.h  [A7] expect=703939aa91efea81b40f3415ad511d38fbab8558b8ffae90746a1b2f1ebef745 hits=1 differing=1
+  line 10                    rexlego/src/gpu_native/fps_counter.h  [A7] expect=e05d6a554042b302e65ad5a48407c4bee3ce173b78ea0583705c53be38c75864 hits=1 differing=1
+  line 12                    rexlego/src/gpu_native/draw.cpp  [A6 (applied by A4)] expect=50aa3b1dee61567838076edf19cb7a5466727c3cc31be3a80e6dcc3722d7bdd6 hits=1 differing=1
+  line 14                    rexlego/src/gpu_native/pipeline_snapshot.h  [A6] expect=42318b849fae030bfc1168e5e07b03d2f854983fc9f3001c310e53aee8d43727 hits=1 differing=1
+  line 16                    rexlego/src/gpu_native/buffers.cpp  [A5] expect=75025044c39ff91023628a1a8ca7179bb48da484bec3cf732c1893c739e4cf79 hits=1 differing=1
+  line 18                    rexlego/src/gpu_native/textures.cpp  [A5 (+A4 (a))] expect=3011add45516123f6db56f93aba824261142569a388c4cc56198eec0094f9e43 hits=1 differing=1
+  line 20                    rexlego/src/gpu_native/texture_scratch.h  [A5] expect=8f6a12ae70994065f94e6a133c730c1176524107519cc99e083ec38a46bbdfb2 hits=1 differing=1
+  line 22                    rexlego/src/gpu_native/texture_upload_source.h  [A5] expect=ff9e11417227a8bae81002989b99bab66a5ae4b22228374967c2ff51442ade43 hits=1 differing=1
+  line 24                    rexlego/src/gpu_native/texture_volume_upload.h  [A5] expect=d0601ecf0150df8fbd410a310df783161bb8cded06ad0558480cfd84005d2f73 hits=1 differing=1
+  line 26                    rexlego/src/gpu_native/upload_buffer_pool.h  [A5] expect=853e6c16be4082b9ecd638cbecae0f6fe2f366028ed11530b040fb6425fdf867 hits=1 differing=1
+  line 28                    rexlego/src/gpu_native/vertex_upload.h  [A5] expect=ffd2b023ac4cc6d55a696c8dd99db22d9927b2cb726ccfbc7b9efd14bc06d5a5 hits=1 differing=1
+  line 30                    rexlego/src/gpu_native/upload_legacy_paths.h  [A5] expect=5c823f13b067c93a921864ed49ddd1718a74ecf30ea5b5d7d72f5273e478e968 hits=1 differing=1
+  line 32                    rexglue-sdk/src/audio/audio_system.cpp  [A12] expect=c281fa8625435efe352dd4e62043837063ba84d523831ed629a994759a861260 hits=1 differing=1
+  line 34                    rexglue-sdk/include/rex/audio/audio_system.h  [A12] expect=4836b139802d34384ab8f00021078893260a22041e7bcb16d1263652c824cf89 hits=1 differing=1
+  line 36                    tools/gpu-aot/prepare_plume.py  [A6] expect=b3c877379038091e8ba2963c06daa054e8246050d3bb89094766f132320a6957 hits=1 differing=1
+  line 38                    tools/gpu-aot/test_prepare_plume.py  [A6] expect=da360aba28d609a3059d85a69f8dc6e4691761ff9e2213eec06185005efa8f76 hits=1 differing=1
+  line 40                    tools/gpu-aot/patches/plume-winsdk-compat.patch  [A6] expect=e03d29d0758e615004ba86ceca95f9ce446785508c43e22f6e26805e558747ef hits=1 differing=1
+  line 42                    thirdparty/plume/plume_d3d12.cpp  [A2 (p2)] expect=564568d4d5853f22b6823884a79556c773c7679692b3c9022f4dd45b55f6e09e hits=1 differing=0
+  line 44                    !rexglue-sdk/include/rex/codegen/config.h  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 45                    !rexglue-sdk/include/rex/codegen/function_types.h  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 46                    !rexglue-sdk/src/codegen/builders/builder_context.h  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 47                    !rexglue-sdk/src/codegen/builders/context.cpp  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 48                    !rexglue-sdk/src/codegen/builders/control_flow.cpp  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 49                    !rexglue-sdk/src/codegen/builders/floating_point.cpp  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 50                    !rexglue-sdk/src/codegen/builders/helpers.h  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 51                    !rexglue-sdk/src/codegen/builders/logical.cpp  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 52                    !rexglue-sdk/src/codegen/builders/memory.cpp  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 53                    !rexglue-sdk/src/codegen/builders/system.cpp  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 54                    !rexglue-sdk/src/codegen/builders/vector.cpp  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 55                    !rexglue-sdk/src/codegen/codegen_writer.cpp  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 56                    !rexglue-sdk/src/codegen/config.cpp  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 57                    !rexglue-sdk/src/codegen/function_graph.cpp  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 58                    !rexglue-sdk/src/codegen/test_support.cpp  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 59                    !rexglue-sdk/src/rexglue/commands/test_recompiler.cpp  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 60                    !rexglue-sdk/tests/regression/emit_interior_entries.cpp  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 61                    !rexglue-sdk/src/codegen/builders/flush_mode.h  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 62                    !rexglue-sdk/tests/ppc/asm/instr_cr_so_fold.s  [codegen (A9 #15 B and related)] hits=1 differing=1
+  line 63                    !rexglue-sdk/tests/ppc/opt_config.toml  [codegen (A9 #15 B and related)] hits=1 differing=1
+## REBUILD PLAN (18 changed files)
+  rexglue-sdk files: 2 (CMake inputs 0) -> SDK build + install into snap1-sdk/install
+  closure headers (sdk-headers-dev.txt, 101 loaded): 0 -> the generated TUs stay
+  game-side CMake inputs: 0 -> -SkipConfigure is fine
+  native-only paths (gpu_native, plume, gpu-aot, native inputs): 16 of 18
+  1. powershell -NoProfile -ExecutionPolicy Bypass -File build\agent2\build-snap.ps1 -Phase sdk -Tag snap2 -Jobs 10 -KeepGoing -SkipConfigure
+  2. powershell -NoProfile -ExecutionPolicy Bypass -File build\agent2\build-snap.ps1 -Phase game -Tag snap2 -Jobs 10 -KeepGoing -SkipConfigure   (devoff)
+  3. powershell -NoProfile -ExecutionPolicy Bypass -File build\agent2\build-snap.ps1 -Phase game -Native -Tag snap2 -Jobs 10 -PrelinkJobs 10 -KeepGoing -SkipConfigure   (native)
+  then: stage-snap-bin.ps1 -Variant off / -Variant native -SnapTag S2
+plan: <workspace>\build\agent2\snap1\PLAN-S2-2314.txt

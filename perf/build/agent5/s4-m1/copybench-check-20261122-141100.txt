@@ -1,0 +1,57 @@
+# m1_copybench_check (S4 M1 correctness gate, task #18)  2026-11-22 14:11:11
+priority  BelowNormal (inherited by clang++, link.exe and the exe)
+bench     sha F98B935A8F1A72C9158C9C9859C18FCC4826125709FC5847166B206EEDAB7444  bench\agent5\m1_copybench.cpp
+build     exit=0  56.1s diagnostics=0
+          <workspace>\toolchain\llvm-23.1.6\bin\clang++.exe -std=c++23 -O3 -march=x86-64-v2 -fno-strict-aliasing -fms-runtime-lib=dll bench\agent5\m1_copybench.cpp -o build\agent5\m1_copybench.exe
+exe       sha 92C5FF6E201DBEE1F21AD701A8850E14F2D3F934A8CF0009526263DB038C3916  40960 B  build\agent5\m1_copybench.exe  (written 14:12:11)
+check     exit=0   7.9s  build\agent5\m1_copybench.exe --check-only
+    | # m1_copybench (S4 M1) 2026-11-22 14:12:20; check only, no rate part; cpu -1
+    | # cpu: 12th Gen Intel(R) Core(TM) i7-1255U; ERMS 1, FSRM 1; 12 logical processors
+    | # adapter 0 (used): NVIDIA GeForce MX570 (vendor 0x10DE, 1934 MB dedicated)
+    | # adapter 1: Intel(R) Iris(R) Xe Graphics (vendor 0x8086, 128 MB dedicated)
+    | # d3d12: UMA 0, CacheCoherentUMA 0; upload heap: CPU page property WRITE_COMBINE, pool L0 (system memory)
+    | # check wb guard 0xCD src_mis 0: dst_mis 0-63 x size 0-300: 19264 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0xCD src_mis 1: dst_mis 0-63 x size 0-300: 19264 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0xCD src_mis 15: dst_mis 0-63 x size 0-300: 19264 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0xCD src_mis 33: dst_mis 0-63 x size 0-300: 19264 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0xCD size 4095: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0xCD size 4096: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0xCD size 4097: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0xCD size 65553: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0xCD size 2097152: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0xCD size 2097185: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0xCD size 3936256: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0x32 src_mis 0: dst_mis 0-63 x size 0-300: 19264 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0x32 src_mis 1: dst_mis 0-63 x size 0-300: 19264 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0x32 src_mis 15: dst_mis 0-63 x size 0-300: 19264 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0x32 src_mis 33: dst_mis 0-63 x size 0-300: 19264 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0x32 size 4095: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0x32 size 4096: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0x32 size 4097: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0x32 size 65553: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0x32 size 2097152: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0x32 size 2097185: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check wb guard 0x32 size 3936256: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check wb: 154224 cases, 0 failures, 0 skipped (0.5 s)
+    | # check upload guard 0xCD src_mis 0: dst_mis 0-63 x size 0-300: 19264 cases, 0 failures, 0 skipped: PASS
+    | # check upload guard 0xCD src_mis 1: dst_mis 0-63 x size 0-300: 19264 cases, 0 failures, 0 skipped: PASS
+    | # check upload guard 0xCD size 4095: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check upload guard 0xCD size 4096: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check upload guard 0xCD size 4097: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check upload guard 0xCD size 65553: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check upload guard 0xCD size 2097152: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check upload guard 0xCD size 2097185: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check upload guard 0xCD size 3936256: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check upload guard 0x32 src_mis 0: dst_mis 0-63 x size 0-300: 19264 cases, 0 failures, 0 skipped: PASS
+    | # check upload guard 0x32 src_mis 1: dst_mis 0-63 x size 0-300: 19264 cases, 0 failures, 0 skipped: PASS
+    | # check upload guard 0x32 size 4095: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check upload guard 0x32 size 4096: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check upload guard 0x32 size 4097: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check upload guard 0x32 size 65553: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check upload guard 0x32 size 2097152: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check upload guard 0x32 size 2097185: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check upload guard 0x32 size 3936256: dst_mis 0/1/16/63 x src_mis 0/1: 8 cases, 0 failures, 0 skipped: PASS
+    | # check upload: 77168 cases, 0 failures, 0 skipped (1.1 s)
+    | # RESULT: PASS (normal memory and the upload buffer)
+groups    40 group lines (40 expected), 0 not PASS
+RESULT: PASS

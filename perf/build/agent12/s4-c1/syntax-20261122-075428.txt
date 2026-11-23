@@ -1,0 +1,154 @@
+# s4c1_syntax (S4.12 C1: physical_protect_keep_watch, default OFF)  2026-11-22 07:54:29  config Release
+# control = build\agent12\s4-c1\orig\sdk + live headers; candidate = build\agent12\s4-c1\new\sdk + new\sdk\include first
+header include/rex/system/xmemory.h           live 80100865A654AF04 (= HASHES orig)  staged 5A70782EF00F0FB6 (= HASHES new)
+header include/rex/graphics/shared_memory.h   live 4D861738A94B556B (= HASHES orig)  staged 82A66445ED98B091 (= HASHES new)
+src/system/xmemory.cpp                 control   exit=0   3.0s diagnostics=1  sha 141FB1A947D59156 (= HASHES)  <workspace>\build\agent12\s4-c1\orig\sdk\src\system\xmemory.cpp
+    | <workspace>\build\agent12\s4-c1\orig\sdk\src\system\xmemory.cpp:2292:76: warning: unused parameter 'global_lock_locked_once' [-Wunused-parameter]
+    |  2292 | bool PhysicalHeap::TriggerCallbacks(std::unique_lock<std::recursive_mutex> global_lock_locked_once,
+    |       |                                                                            ^
+    | 1 warning generated.
+src/system/xmemory.cpp                 candidate exit=0   4.5s diagnostics=1  sha 6C801EB2BA7D0D07 (= HASHES)  <workspace>\build\agent12\s4-c1\new\sdk\src\system\xmemory.cpp
+    | <workspace>\build\agent12\s4-c1\new\sdk\src\system\xmemory.cpp:2471:76: warning: unused parameter 'global_lock_locked_once' [-Wunused-parameter]
+    |  2471 | bool PhysicalHeap::TriggerCallbacks(std::unique_lock<std::recursive_mutex> global_lock_locked_once,
+    |       |                                                                            ^
+    | 1 warning generated.
+    no new diagnostics in the candidate
+src/graphics/shared_memory.cpp         control   exit=0   4.0s diagnostics=3  sha 0BE4BADCAC666BEE (= HASHES)  <workspace>\build\agent12\s4-c1\orig\sdk\src\graphics\shared_memory.cpp
+    | <workspace>\build\agent12\s4-c1\orig\sdk\src\graphics\shared_memory.cpp:315:62: warning: unused parameter 'offset_allocations' [-Wunused-parameter]
+    |   315 | bool SharedMemory::AllocateSparseHostGpuMemoryRange(uint32_t offset_allocations,
+    |       |                                                              ^
+    | <workspace>\build\agent12\s4-c1\orig\sdk\src\graphics\shared_memory.cpp:316:62: warning: unused parameter 'length_allocations' [-Wunused-parameter]
+    |   316 |                                                     uint32_t length_allocations) {
+    |       |                                                              ^
+    | In file included from <workspace>\build\agent12\s4-c1\orig\sdk\src\graphics\shared_memory.cpp:21:
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/shared_memory.h:170:9: warning: private field 'memory_data_provider_handle_' is not used [-Wunused-private-field]
+    |   170 |   void* memory_data_provider_handle_ = nullptr;
+    |       |         ^
+    | 3 warnings generated.
+src/graphics/shared_memory.cpp         candidate exit=0   2.5s diagnostics=3  sha A4A31038ABDFF94A (= HASHES)  <workspace>\build\agent12\s4-c1\new\sdk\src\graphics\shared_memory.cpp
+    | <workspace>\build\agent12\s4-c1\new\sdk\src\graphics\shared_memory.cpp:327:62: warning: unused parameter 'offset_allocations' [-Wunused-parameter]
+    |   327 | bool SharedMemory::AllocateSparseHostGpuMemoryRange(uint32_t offset_allocations,
+    |       |                                                              ^
+    | <workspace>\build\agent12\s4-c1\new\sdk\src\graphics\shared_memory.cpp:328:62: warning: unused parameter 'length_allocations' [-Wunused-parameter]
+    |   328 |                                                     uint32_t length_allocations) {
+    |       |                                                              ^
+    | In file included from <workspace>\build\agent12\s4-c1\new\sdk\src\graphics\shared_memory.cpp:21:
+    | <workspace>\build\agent12\s4-c1\new\sdk\include\rex/graphics/shared_memory.h:170:9: warning: private field 'memory_data_provider_handle_' is not used [-Wunused-private-field]
+    |   170 |   void* memory_data_provider_handle_ = nullptr;
+    |       |         ^
+    | 3 warnings generated.
+    no new diagnostics in the candidate
+src/graphics/primitive_processor.cpp   control   exit=0   4.2s diagnostics=3  sha E07F690223B564AE (= HASHES)  <workspace>\build\agent12\s4-c1\orig\sdk\src\graphics\primitive_processor.cpp
+    | <workspace>\build\agent12\s4-c1\orig\sdk\src\graphics\primitive_processor.cpp:270:43: warning: loop variable 'cache_map_entry' of type 'const std::pair<CacheKey, size_t> &' (aka 'const std::pair<CacheKey, unsigned long long> &') binds to a temporary constructed from type 'reference' (aka 'std::pair<const rex::graphics::PrimitiveProcessor::CacheKey, unsigned long long> &') [-Wrange-loop-construct]
+    |   270 |   for (const std::pair<CacheKey, size_t>& cache_map_entry : cache_map_) {
+    |       |                                           ^
+    | <workspace>\build\agent12\s4-c1\orig\sdk\src\graphics\primitive_processor.cpp:270:8: note: use non-reference type 'std::pair<CacheKey, size_t>' (aka 'std::pair<CacheKey, unsigned long long>') to make construction explicit or type 'const value_type &' (aka 'const std::pair<const rex::graphics::PrimitiveProcessor::CacheKey, unsigned long long> &') to prevent copying
+    |   270 |   for (const std::pair<CacheKey, size_t>& cache_map_entry : cache_map_) {
+    |       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    | <workspace>\build\agent12\s4-c1\orig\sdk\src\graphics\primitive_processor.cpp:1245:75: warning: unused parameter 'index_transform' [-Wunused-parameter]
+    |  1245 |                                          const PassthroughIndexTransform& index_transform) {
+    |       |                                                                           ^
+    | <workspace>\build\agent12\s4-c1\orig\sdk\src\graphics\primitive_processor.cpp:1255:75: warning: unused parameter 'index_transform' [-Wunused-parameter]
+    |  1255 |                                          const PassthroughIndexTransform& index_transform) {
+    |       |                                                                           ^
+    | 3 warnings generated.
+src/graphics/primitive_processor.cpp   candidate exit=0   3.6s diagnostics=3  sha 470BA4BED73B2ABF (= HASHES)  <workspace>\build\agent12\s4-c1\new\sdk\src\graphics\primitive_processor.cpp
+    | <workspace>\build\agent12\s4-c1\new\sdk\src\graphics\primitive_processor.cpp:274:43: warning: loop variable 'cache_map_entry' of type 'const std::pair<CacheKey, size_t> &' (aka 'const std::pair<CacheKey, unsigned long long> &') binds to a temporary constructed from type 'reference' (aka 'std::pair<const rex::graphics::PrimitiveProcessor::CacheKey, unsigned long long> &') [-Wrange-loop-construct]
+    |   274 |   for (const std::pair<CacheKey, size_t>& cache_map_entry : cache_map_) {
+    |       |                                           ^
+    | <workspace>\build\agent12\s4-c1\new\sdk\src\graphics\primitive_processor.cpp:274:8: note: use non-reference type 'std::pair<CacheKey, size_t>' (aka 'std::pair<CacheKey, unsigned long long>') to make construction explicit or type 'const value_type &' (aka 'const std::pair<const rex::graphics::PrimitiveProcessor::CacheKey, unsigned long long> &') to prevent copying
+    |   274 |   for (const std::pair<CacheKey, size_t>& cache_map_entry : cache_map_) {
+    |       |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    | <workspace>\build\agent12\s4-c1\new\sdk\src\graphics\primitive_processor.cpp:1249:75: warning: unused parameter 'index_transform' [-Wunused-parameter]
+    |  1249 |                                          const PassthroughIndexTransform& index_transform) {
+    |       |                                                                           ^
+    | <workspace>\build\agent12\s4-c1\new\sdk\src\graphics\primitive_processor.cpp:1259:75: warning: unused parameter 'index_transform' [-Wunused-parameter]
+    |  1259 |                                          const PassthroughIndexTransform& index_transform) {
+    |       |                                                                           ^
+    | 3 warnings generated.
+    no new diagnostics in the candidate
+src/graphics/d3d12/shared_memory.cpp   control   exit=0   4.6s diagnostics=12  sha BB0838CE3909E18A (= HASHES)  <workspace>\build\agent12\s4-diag\new\shared_memory.cpp
+    | In file included from <workspace>\build\agent12\s4-diag\new\shared_memory.cpp:19:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/command_processor.h:27:
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/command_processor.h:187:48: warning: unused parameter 'why' [-Wunused-parameter]
+    |   187 |   virtual void OnGuestVisibleWrite(const char* why) {}
+    |       |                                                ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/command_processor.h:189:43: warning: unused parameter 'physical_address' [-Wunused-parameter]
+    |   189 |   virtual void OnGuestMemoryPoll(uint32_t physical_address) {}
+    |       |                                           ^
+    | In file included from <workspace>\build\agent12\s4-diag\new\shared_memory.cpp:19:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/command_processor.h:30:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/pipeline_cache.h:29:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/render_target_cache.h:27:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/texture_cache.h:24:
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:171:53: warning: first argument in call to 'memcpy' is a pointer to non-trivially copyable type 'rex::graphics::TextureCache::TextureKey' [-Wnontrivial-memcall]
+    |   171 |     TextureKey(const TextureKey& key) { std::memcpy(this, &key, sizeof(*this)); }
+    |       |                                                     ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:171:53: note: explicitly cast the pointer to silence this warning
+    |   171 |     TextureKey(const TextureKey& key) { std::memcpy(this, &key, sizeof(*this)); }
+    |       |                                                     ^
+    |       |                                                     (void*)
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:173:19: warning: first argument in call to 'memcpy' is a pointer to non-trivially copyable type 'rex::graphics::TextureCache::TextureKey' [-Wnontrivial-memcall]
+    |   173 |       std::memcpy(this, &key, sizeof(*this));
+    |       |                   ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:173:19: note: explicitly cast the pointer to silence this warning
+    |   173 |       std::memcpy(this, &key, sizeof(*this));
+    |       |                   ^
+    |       |                   (void*)
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:178:19: warning: first argument in call to 'memset' is a pointer to non-trivially copyable type 'rex::graphics::TextureCache::TextureKey' [-Wnontrivial-memcall]
+    |   178 |       std::memset(this, 0, sizeof(*this));
+    |       |                   ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:178:19: note: explicitly cast the pointer to silence this warning
+    |   178 |       std::memset(this, 0, sizeof(*this));
+    |       |                   ^
+    |       |                   (void*)
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:227:70: warning: unused parameter 'global_lock' [-Wunused-parameter]
+    |   227 |     bool base_outdated(const std::unique_lock<std::recursive_mutex>& global_lock) const {
+    |       |                                                                      ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:230:70: warning: unused parameter 'global_lock' [-Wunused-parameter]
+    |   230 |     bool mips_outdated(const std::unique_lock<std::recursive_mutex>& global_lock) const {
+    |       |                                                                      ^
+src/graphics/d3d12/shared_memory.cpp   candidate exit=0   6.3s diagnostics=12  sha BB0838CE3909E18A (= HASHES)  <workspace>\build\agent12\s4-diag\new\shared_memory.cpp
+    | In file included from <workspace>\build\agent12\s4-diag\new\shared_memory.cpp:19:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/command_processor.h:27:
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/command_processor.h:187:48: warning: unused parameter 'why' [-Wunused-parameter]
+    |   187 |   virtual void OnGuestVisibleWrite(const char* why) {}
+    |       |                                                ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/command_processor.h:189:43: warning: unused parameter 'physical_address' [-Wunused-parameter]
+    |   189 |   virtual void OnGuestMemoryPoll(uint32_t physical_address) {}
+    |       |                                           ^
+    | In file included from <workspace>\build\agent12\s4-diag\new\shared_memory.cpp:19:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/command_processor.h:30:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/pipeline_cache.h:29:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/render_target_cache.h:27:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/texture_cache.h:24:
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:171:53: warning: first argument in call to 'memcpy' is a pointer to non-trivially copyable type 'rex::graphics::TextureCache::TextureKey' [-Wnontrivial-memcall]
+    |   171 |     TextureKey(const TextureKey& key) { std::memcpy(this, &key, sizeof(*this)); }
+    |       |                                                     ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:171:53: note: explicitly cast the pointer to silence this warning
+    |   171 |     TextureKey(const TextureKey& key) { std::memcpy(this, &key, sizeof(*this)); }
+    |       |                                                     ^
+    |       |                                                     (void*)
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:173:19: warning: first argument in call to 'memcpy' is a pointer to non-trivially copyable type 'rex::graphics::TextureCache::TextureKey' [-Wnontrivial-memcall]
+    |   173 |       std::memcpy(this, &key, sizeof(*this));
+    |       |                   ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:173:19: note: explicitly cast the pointer to silence this warning
+    |   173 |       std::memcpy(this, &key, sizeof(*this));
+    |       |                   ^
+    |       |                   (void*)
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:178:19: warning: first argument in call to 'memset' is a pointer to non-trivially copyable type 'rex::graphics::TextureCache::TextureKey' [-Wnontrivial-memcall]
+    |   178 |       std::memset(this, 0, sizeof(*this));
+    |       |                   ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:178:19: note: explicitly cast the pointer to silence this warning
+    |   178 |       std::memset(this, 0, sizeof(*this));
+    |       |                   ^
+    |       |                   (void*)
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:227:70: warning: unused parameter 'global_lock' [-Wunused-parameter]
+    |   227 |     bool base_outdated(const std::unique_lock<std::recursive_mutex>& global_lock) const {
+    |       |                                                                      ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:230:70: warning: unused parameter 'global_lock' [-Wunused-parameter]
+    |   230 |     bool mips_outdated(const std::unique_lock<std::recursive_mutex>& global_lock) const {
+    |       |                                                                      ^
+    no new diagnostics in the candidate
+rexlego src/gpu_native/memory_watch.cpp: native-only TU (LEGODIMENSIONS_NATIVE_GPU), inspected, not compiled here
+RESULT: PASS

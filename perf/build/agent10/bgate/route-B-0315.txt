@@ -1,0 +1,13 @@
+# logdiff: 1 baseline logs, 1 candidate logs, min level warning
+## per log (lines by level; fail markers; clean-exit)
+BASE build\agent3\runs\20261122-030511-bgate-a\game.log | 03:05:15..03:07:42 | info=44 warning=108 | no fail markers | clean-exit=1
+CAND build\agent3\runs\20261122-030752-bgate-b\game.log | 03:07:56..03:10:25 | info=44 warning=142 | no fail markers | clean-exit=1
+## NEW keys (level >= warning; in a candidate log, in no baseline log)
+## MORE keys (level >= warning; candidate count > baseline max + max(5, baseline max))
+## GONE keys (any level; in every baseline log, missing from a candidate log)
+GONE build\agent3\runs\20261122-030752-bgate-b\game.log [info] [core] Toypad[Read ] #B #C # # # # # EB # #B # # #E #B # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-030752-bgate-b\game.log [info] [core] Toypad[Read ] #B #C # # # #A B# #C E# F# #E FF # #F # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-030752-bgate-b\game.log [info] [core] Toypad[Write] #B # # #A B# # A# # #D # # BE #D A# #C # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-030752-bgate-b\game.log [info] [core] Toypad[Write] #B # # #A B# # FA # DA FB # EA E# # C# # # # # # # # # # # # # # # # # # 
+## MARKER CHECK (fail marker above the baseline max per log; clean-exit missing)
+# NEW total 0, marker flags 0

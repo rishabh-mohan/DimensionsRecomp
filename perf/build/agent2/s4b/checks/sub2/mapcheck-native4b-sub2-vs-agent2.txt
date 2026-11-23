@@ -1,0 +1,46 @@
+# mapcheck-native4b-sub2-vs-agent2: sub2's independent result vs Agent 2's report (native4b vs native4-bin, same mode)  2026-11-22 22:53
+# I read Agent 2's report only after both sub2 outputs were written (mapcheck 22:42:43, mapdiff 22:45:25). No addresses are compared across maps.
+sub2 outputs:  build\agent2\s4b\checks\sub2\mapcheck-native4b-sub2.txt      (mapcheck_sub2.py, own parser, mode same, --expect-count 164786, 7.9 s)
+               build\agent2\s4b\checks\sub2\mapdiff-native4b-vs-native4.txt  (mapdiff_sub2.py, full diff of publics and statics, 9.7 s)
+Agent 2:       build\agent2\s4b\checks\mapcheck-native4b.txt                (mapcheck-s4c, mode same, 22:41:45, RESULT: PASS, 109 hooked, 4.3 s)
+inputs (the same in both reports): NEW build\agent2\native4b-bin\legodimensions.map 43741734 B sha256 03CBC65FEA77674C
+                                   REF build\agent2\native4-bin\legodimensions.map  43741350 B sha256 136CF59158249EED
+
+item                                        sub2                                        Agent 2                           verdict
+publics NEW / REF                           358797 / 358795                             358797 / 358795                   agree
+sub_ / __imp__sub_ (each map)               164786 / 164786                             164786 / 164786                   agree
+sub_ name set NEW == REF                    yes (0 only in NEW, 0 only in REF)          PASS (164786)                     agree
+__imp__sub_ name set NEW == REF             yes (0 only in NEW, 0 only in REF)          PASS (164786)                     agree
+hooked NEW / REF                            109 / 109, NEW set == REF set               PASS 109 (= 109 ref + 0 moved)    agree
+hooked: sub_ and __imp__ objects kept       109 kept, 0 changed                         PASS (109)                        agree
+per-object sub_ sets                        458 objects, 0 differ                       PASS (458 objects)                agree
+per-object __imp__sub_ sets                 438 objects, 0 differ                       PASS (438 objects)                agree
+unhooked: sub_ and __imp__ in one object    164677, 0 split (both maps)                 PASS (164677)                     agree
+gpu_wait_backoff.cpp.obj                    absent from both maps (object list; 0 grep  absent ("object not in the map"), agree
+                                            lines in either map)                        defines none
+hooked-by-object table (NEW map)            20 objects, 109 names                       20 objects, 109 names             identical (object, count and names compared by script)
+=> no disagreement. Both reports: the same-mode hook criteria PASS.
+
+Beyond Agent 2's check (sub2 only):
+ e) all publics as (name, object) pairs: 3 only in NEW, 1 only in REF, 0 with a changed object. Net publics +2:
+   +1 ?BlockPhysicalProtectKeepWatch@Memory@memory@rex@@SAXXZ        rexruntime:rexruntime.dll  (import thunk, 0001)
+   +1 __imp_?BlockPhysicalProtectKeepWatch@Memory@memory@rex@@SAXXZ  rexruntime:rexruntime.dll  (IAT entry, 0002)
+      These two are the +2. They import the new SDK API "public: static void rex::memory::Memory::BlockPhysicalProtectKeepWatch(void)" from rexruntime.dll, which comes from C1 v3.
+   +1 __xmm@33623735633466656262636130346239  pipeline_library.cpp.obj  } same slot, net 0
+   -1 __xmm@34366634663031656435356666336535  pipeline_library.cpp.obj  }
+      This constant holds the 16 ASCII bytes of kNativeGpuBuildFingerprint (generated/native_gpu_build_info.h, included through gpu_native/pipeline_recipes.h:18):
+        NEW "9b40acbbef4c57b3": confirmed by build\agent2\snap1-on\generated\native_gpu_build_info.h and native-gpu-build.txt (11-22 20:53:53)
+        REF "5e3ff55de10f4f64": decoded from the symbol name (memory order is the name's bytes reversed; the same decoding gives the confirmed NEW value)
+      The fingerprint is the first 16 hex characters of a SHA256 over the SHA256 of every file in LEGO_NATIVE_GPU_FINGERPRINT_INPUTS (DimensionsRecomp\rexlego\CMakeLists.txt:582-776).
+      The inputs include src/gpu_native/memory_watch.cpp and memory_watch.h, rexlego/CMakeLists.txt, all src/gpu_native/*.h, 11 recompiled TUs and the shader banks.
+      The C1 v3 edit to memory_watch.cpp is enough to change it. This is an expected generated-constant change, not a code change in pipeline_library.cpp.
+      mapcheck_sub2's e) rule puts it in category 4b (project object), which is why that report's RESULT line says FAIL.
+      Runtime note: pipeline_recipes.h:250-256 rejects recipe and seed files whose fingerprint differs. So native4b ignores native-pso-recipes.bin and native-pso-seed.bin
+      written by or for native4-bin (5e3ff55de10f4f64). Its startup PSO preparation starts cold until they are re-recorded or re-seeded.
+      native-pso.bin (the driver library; names are an XXH3 of the pipeline desc) is not keyed by the fingerprint. Account for this warm-up in perf A/B runs.
+ - Not present: msvcrt:tlsdyn.obj is unchanged (13 lines in both maps), and so are VCRUNTIME140_1 (2 lines in both) and pipeline_library.cpp.obj (1154 lines in both).
+   gpu_wait_backoff is absent. There are no S4c names; S4c is not in native builds.
+ - statics: +1 ?g_keep_watch_blocked@?A0xF002FE51@gpu_native@legodimensions@@3_NB in memory_watch.cpp.obj (a const bool in an anonymous namespace), from C1 v3.
+   memory_watch.cpp.obj has the same publics in both maps.
+ - Unchanged: section-table names, the 621 objects and the import-DLL descriptors. The only per-object public count that changed is rexruntime:rexruntime.dll, 904 -> 906.
+RESULT: AGREE (both reports pass the hook-level same-mode check; sub2's e) flags only the C1 v3 import pair and the expected build-fingerprint constant)

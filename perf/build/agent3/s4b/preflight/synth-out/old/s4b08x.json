@@ -1,0 +1,110 @@
+{
+ "run": "s4b08x",
+ "row": "s4b08",
+ "kind": "off",
+ "scenario": "I420",
+ "runjson": {
+  "exit_code": 0,
+  "exit_code_hex": "0x00000000",
+  "dumps": [],
+  "crash_events": [],
+  "wer_seen": false,
+  "close_method": "wm_close",
+  "close_seconds": 1.0,
+  "elapsed_s": 40.0,
+  "seconds_requested": 420,
+  "cvars": {
+   "shared_memory_single_hold_rearm": "true",
+   "slow_frame_log_ms": "1"
+  },
+  "exited_early": null,
+  "env_extra": {},
+  "steps": null
+ },
+ "summary": {
+  "verdict": null,
+  "first_frame_s": null,
+  "levels": null,
+  "unknown_cvars": null,
+  "errors": []
+ },
+ "log_files": [
+  "game.log"
+ ],
+ "families": {
+  "c1_any": 0,
+  "c1_init_on": 0,
+  "c1_init_blocked": 0,
+  "c1_init_nohold": 0,
+  "c1_first": 0,
+  "c1_kept": 0,
+  "c1_blocked": 0,
+  "recovered_stale": 0,
+  "unhandled_phys": 0,
+  "protect_failed": 0,
+  "split_init": 0,
+  "split": 0,
+  "deferred_counters": 0,
+  "gpu_wait": 0,
+  "gpu_wait_stats": 0,
+  "gpu_wait_backoff": 0,
+  "memexport": 2,
+  "slow_frame": 2,
+  "s4_upload_hash": 0,
+  "precise_wait": 0,
+  "miss_cache": 0,
+  "stuck_lock": 0,
+  "minidump": 0,
+  "fatal": 0,
+  "clean_exit": 1,
+  "debug_layer": 0,
+  "d3d12_msg": 0,
+  "k": 0,
+  "c1_other": 0
+ },
+ "levels": {
+  "info": 3
+ },
+ "lines": {
+  "memexport": {
+   "first": [
+    "[2026-11-22 20:10:05.000] [info] [gpu] [t4242] slow frame #100: 34.5 ms | gpu-thread idle 1.0 | host-gpu wait 2.0 (3x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.5 (2x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 5x 20 KB (on memexport pages 0x 0 KB) | memexport syncs 1 (4 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 3)",
+    "[2026-11-22 20:10:10.001] [info] [gpu] [t4242] slow frame #240: 34.5 ms | gpu-thread idle 1.0 | host-gpu wait 2.0 (3x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.5 (2x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 5x 20 KB (on memexport pages 0x 0 KB) | memexport syncs 1 (4 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 7)"
+   ],
+   "last": []
+  },
+  "slow_frame": {
+   "first": [
+    "[2026-11-22 20:10:05.000] [info] [gpu] [t4242] slow frame #100: 34.5 ms | gpu-thread idle 1.0 | host-gpu wait 2.0 (3x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.5 (2x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 5x 20 KB (on memexport pages 0x 0 KB) | memexport syncs 1 (4 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 3)",
+    "[2026-11-22 20:10:10.001] [info] [gpu] [t4242] slow frame #240: 34.5 ms | gpu-thread idle 1.0 | host-gpu wait 2.0 (3x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.5 (2x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 5x 20 KB (on memexport pages 0x 0 KB) | memexport syncs 1 (4 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 7)"
+   ],
+   "last": []
+  }
+ },
+ "memexport": {
+  "lines": 2,
+  "last_total": 7,
+  "max_total": 7,
+  "sum_x": 0,
+  "lines_x_gt0": 0
+ },
+ "slow_last": "[2026-11-22 20:10:10.001] [info] [gpu] [t4242] slow frame #240: 34.5 ms | gpu-thread idle 1.0 | host-gpu wait 2.0 (3x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.5 (2x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 5x 20 KB (on memexport pages 0x 0 KB) | memexport syncs 1 (4 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 7)",
+ "frame_rows": null,
+ "slow_state": null,
+ "proofs": [
+  {
+   "ok": true,
+   "text": "slow-frame lines 2"
+  },
+  {
+   "ok": true,
+   "text": "the last slow-frame line ends with the memexport suffix: ...n memexport pages 0x 0 KB) | memexport syncs 1 (4 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 7)"
+  },
+  {
+   "ok": false,
+   "text": "P2 COUNTER: memexport full-buffer total (last line) = 7; max 7; sum Nx 0; lines with Nx > 0: 0 -> > 0: goes to Agent 1 (hold cap)"
+  }
+ ],
+ "base_misses": [],
+ "hint": "LOOK"
+}

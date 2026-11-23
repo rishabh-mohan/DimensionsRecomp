@@ -1,0 +1,40 @@
+# FE gate flags from Agent 10's (b) result (Agent 9, 07:37); A tree; read-only
+# 0x848E2EA2 (byte): fq.py constant-EA: writers of 848E2EA0-848E2EA3 = sub_829D4390 (EA1), sub_82A7EC08 (EA3); readers of EA2 = sub_82A75FD8 TU328:5820, sub_82A7EAA0 TU341:6152
+# arm_scan.py (lis/addi/addis/ori/mr tracking, stb/sth/stw):
+stores resolved to 0x848E2EA2: 0
+
+# [app]+2288 (offset scan, any base register):
+stores at offset 2288 (any base): 12 (loads at +2288: 5)
+  sub_82B7B398 TU131:7517  stw r8,2288(r3)
+  sub_82FE08C8 TU246:13296  stb r11,2288(r3)
+  sub_82FF68E8 TU246:13662  stb r29,2288(r30)
+  sub_83E26CC0 TU249:35184  stb r27,2288(r1)
+  sub_82C11EA8 TU270:11991  stw r11,2288(r8)
+  sub_8407C158 TU309:39808  stb r6,2288(r11)
+  sub_83A68238 TU357:27677  stw r29,2288(r30)
+  sub_82B7BC90 TU358:7508  stw r8,2288(r3)
+  sub_82FE7E40 TU39:14188  stb r30,2288(r31)
+  sub_82BF9478 TU418:11706  stw r11,2288(r8)
+  sub_82BF9478 TU418:11722  stw r4,2288(r11)
+  sub_82648FD0 TU55:1170  stw r28,2288(r3)
+
+# +2288 = 1: sub_82FE08C8 (only caller sub_82FE7E40), run when +2289 != 0; +2288 = 0: sub_82FE7E40 when +2290 != 0, and sub_82FF68E8
+# sub_82FE7E40 callers: sub_82FEB7B8 (main-loop body), sub_82FEB798, sub_83A53560; event 5 (sub_82FE70C0) reads [[0x849F5E8C]+2288] (lbz)
+# +2289/+2290 request bytes (offset scan, any base; 07:38):
+byte stores/loads at +2289/+2290 (any base): 8
+  stb  +2289  sub_82FE7E40 TU39:14162  r30,2289(r31)
+  stb  +2289  sub_82FF63A8 TU383:14008  r11,2289(r27)
+  stb  +2289  sub_8407C158 TU309:39838  r5,2289(r11)
+  stb  +2290  sub_82FE7E40 TU39:14197  r30,2290(r31)
+  stb  +2290  sub_82FF63A8 TU383:14017  r11,2290(r27)
+  stb  +2290  sub_8407C158 TU309:39856  r10,2290(r11)
+  lbz  +2289  sub_82FE7E40 TU39:14149  r11,2289(r3)
+  lbz  +2290  sub_82FE7E40 TU39:14165  r11,2290(r31)
+
+# Request setters (fq.py show, 07:39):
+#   sub_82FF63A8 (only caller sub_83AA1170 TU279:28966): if r25->vtbl[0](r25, 0x847AD990) matches: [r29+8]==0 -> stb 1,2289(r27) (82FF66FC, freeze); [r29+8]==1 -> stb 1,2290(r27) (82FF670C, resume)
+#   sub_82FE7E40: +2289 set -> bl sub_82FE08C8 (+2288 = 1 if 0; tail-call sub_82FD7FC0([0x849F5F14], app+2228)), clear +2289;
+#                 +2290 set and +2288 != 0 -> sub_82FC1C78([0x849F5F14], app+2228, 0), +2288 = 0, +2269 |= 64; clear +2290
+#   sub_82FF68E8 (callers sub_82FF72A0, sub_83ABC7F8): stb 0,2288(r30=r3) at 82FF6AA8, then bl sub_82FD7DA8 at 82FF6B7C
+#   sub_8407C158: stb +2288/+2289/+2290 at 8407D930/8407D968/8407D98C (probably init)
+#   Not resolved: the 0x848E2EA2 writer (computed or indexed address); the message name at 0x847AD990 (image data).

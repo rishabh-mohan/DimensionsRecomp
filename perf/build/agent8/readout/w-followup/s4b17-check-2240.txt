@@ -1,0 +1,15 @@
+s4b17 check for W9's gate (Agent 8, run-2 task #7), 22:40, read-only
+run: build\agent3\runs\20261122-223103-s4b-17-gw-p1 (queue: LAUNCH 22:31:01, DONE 22:38:48 exit 0 in 468 s)
+spec: P1 = LEGO_GPU_WAIT_STATS=1, back-off OFF, harness\routes\attract-long.txt, -Seconds 420 -StatsWarmup 20, devoff4b-bin (exe DFBE1D43B28861A6...)
+criterion (perf-notes/agent10-batch2-review.md L1445-1446; W9 draft notes): positive controls l1_waits, l1_polls, l2_tries and kicks all > 0 on a route with occlusion queries
+
+game.log: 1 file; 81 'GPU wait stats (5 s)' lines, summed by field name:
+  L1 waits   21,926          > 0  PASS
+  L1 polls   2,823,878,292   > 0  PASS
+  L2 tries   21,524          > 0  PASS (non-zero in 48 of 81 lines)
+  kicks      87,247          > 0  PASS
+  sleep 0, sleep_fail 0 (back-off OFF: no sleeps, as expected)
+startup line (exactly 1): "GPU wait back-off: OFF (quantum 0 us, spin 30 us); stats ON; GetData hook built."
+STUCK-LOCK 0; 'is not a plain number' 0; [error] 0; [critical] 0; no .dmp; run.json exit 0x00000000, exited_early False
+
+Verdict (my read): s4b17 PASS on all four positive controls. With s4b18 PASS (Agent 1, 22:28), W9's gates are met.

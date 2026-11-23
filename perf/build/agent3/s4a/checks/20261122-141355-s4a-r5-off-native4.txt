@@ -1,0 +1,17 @@
+# s4a_check 20261122-141355-s4a-r5-off-native4 (native)
+run.json: exit 0 (0x00000000) dumps 0 crash_events 0 wer False; close wm_close 1.22 s; elapsed 223.36 of 420 s; cvars {"native_settings_frontend": "false"}; args -; env -; script b-gate-menus-long.txt steps 54/54
+summary: verdict RUNNING; first frame 15.0 s; levels {"info": 1674, "warning": 184}; unknown cvars []; errors 0
+log files game.log; greps s4_upload_hash=0 slow_frame=0 precise_wait=0 miss_cache=0 protect_failed=0 stuck_lock=0 minidump=0 fatal=0 storage=0 storage_init=0 clean_exit=1; gap after "Initializing shader storage" None s
+frames (frames.csv rows) 18075; per frame: s4_upload_hash 0.000 slow_frame 0.000
+logdiff vs 20261122-055439-bgate-rev-native3d: NEW 0 (+0 allowed) MORE 0 (+0 allowed) GONE 9 (1 non-Toypad) FLAG 0; NEW at info 8 (0 non-Toypad)
+  GONE build\agent3\runs\20261122-141355-s4a-r5-off-native4\game.log [warning] [core] Native GPU: completion callback GPU wait took # ms
+levels (game*.log) cand {"info": 1674, "warning": 184} vs 20261122-055439-bgate-rev-native3d {"info": 1667, "warning": 186}; [error] 0 vs 0
+scenes (>= 2 s) base 20261122-055439-bgate-rev-native3d: 2:63s 8:29s 0:23s 1:15s 59:12s 57:4s 41:4s 58:3s 40:3s 3649:2s
+scenes (>= 2 s) cand: 2:56s 8:28s 0:23s 1:15s 59:12s 58:5s 57:4s 40:3s 41:3s 3649:2s
+  missing in cand: -; extra in cand: -
+route marks: 12 same scene, 10 differ: back-3 n2->n0 idle-10 n0->n41 idle-20 n41->n58 idle-40 n57->n355 idle-50 n57->n2299 idle-60 n2298->n2205 idle-70 n2506->n727 idle-80 n2173->n185 idle-90 n5030->n482 end n5030->n482
+  cand marks: first-frame=n0 title=n8 after-start=n8 after-a1=n2 after-a2=n2 after-a3=n2 down-1=n2 down-2=n2 up-2=n2 back-1=n2 back-2=n2 back-3=n0 idle-10=n41 idle-20=n58 idle-30=n59 idle-40=n355 idle-50=n2299 idle-60=n2205 idle-70=n727 idle-80=n185 idle-90=n482 end=n482
+threads (% of one core, window [20.0, 197.1] s from the first frame, 177.1 s): XThread2864 (F8000190) x1 77.5 | Main XThread (F8000024) x1 33.4 | XThread13D0 (F80000F4) x1 32.5 | rex::thread::TimerQueue x1 30.8 | XThread82E0 (F8000128) x1 9.8 | XThread12B0 (F800010C) x1 5.2 | 0xc0550001 x1 4.9 | (unnamed) x29 2.5 | Audio Worker (F8000014) x1 2.2 | XThread5778 (F8000104) x1 1.8 | XThread4CCC (F8000068) x1 1.2 | XThread52A8 (F8000178) x1 1.1
+  TimerQueue: {"rex::thread::TimerQueue": {"pct": 30.81, "threads": 1}}
+  TimerQueue ticks (tid 30808): 109 samples over [-8.9, 207.1] s (step median 2.0 s), cycles non-rising in 0 of 108 steps 
+sys.csv slow state: {"rows": 209, "onset_s": null, "slow_pct": 0.0, "e_eff_mhz_median": 1505, "cpu_util_pct_median": 97.9, "slow": false}

@@ -1,0 +1,32 @@
+# pthrottle_pairs (S4 task #24) 2026-11-22 05:32:04: PLAN ONLY; 3 pairs, measure 90 s, bin build/agent2/devoff2-bin
+out <workspace>\build\agent11\pthrottle\pairs-dry\20261122-0532 ; meta <workspace>\build\agent11\pthrottle\pairs-dry\20261122-0532-meta
+=== timing matrix: Agent 11 task #24: execution-speed opt-out pairs, devoff2 d0 (off) vs d0e (on) ===
+matrix   <workspace>\build\agent11\pthrottle\pairs-dry\20261122-0532-meta\pthrottle-pairs.json
+note     Agent 11 task #24, FUNCTIONAL ONLY (hidden desktop). d0e = d0 plus the runner-side EXECUTION_SPEED opt-out by bench/agent11/pthrottle_sidecar.ps1 (SetProcessInformation on its own handle); game, bin, cvars and env are identical. The sidecar reads the state of d0 runs too, never sets it.
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order roundrobin; close timeout 60 s; cooldown 5 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+       d0: bin build/agent2/devoff2-bin; frames perf; x3; warm-up 55 s; window 90 s; group pt (ref); cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         opt-out off (sidecar reads only)
+       d0e: bin build/agent2/devoff2-bin; frames perf; x3; warm-up 55 s; window 90 s; group pt; cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         opt-out on (sidecar sets EXECUTION_SPEED controlled + off)
+round 1  d0 d0e
+round 2  d0e d0
+round 3  d0 d0e
+order    d0 d0e | d0e d0 | d0 d0e
+estimate 6 runs (0 cold), about 18 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-RKAQXBR3I6LZ23Z4U4WEF2WT52 -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   6.35 GB
+game       legodimensions.exe RUNNING (pid 69196) -> close it first
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/devoff2-bin : ok (MANIFEST.txt)
+screensaver WPXSCR~1.SCR after 120 s: the keep-awake request should hold it off; if it starts during timing runs, set it to (None)
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   6 runs, about 18 min: done around 05:49
+!!! FATAL: legodimensions.exe is running (pid 69196)
+PlanOnly: nothing started.
+run-matrix -PlanOnly exit 0

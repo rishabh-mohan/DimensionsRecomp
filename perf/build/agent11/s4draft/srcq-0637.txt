@@ -1,0 +1,113 @@
+﻿##### build\agent8\readout\w-followup\W4c.md 06:17:40
+L7: - **B gives no gain.** Over 6 rounds, the paired median frame time is **+2.6 % [−1.2, +6.5]** (B was lower in 1 of 6 rounds). fps is **−1.7 % [−4.9, +1.7]** and CPU is **+0.063 cores [−0.007, +0.133]**. Every CI includes 0. Agent 7's T-std read-out agrees: +2.7 % [−0.8, +6.3] median and −2.0 % [−4.8, +1.0] fps.
+L9: - **Lead, not a finding: B may be about 1 % slower.** Without round 1 (the warm-up-biased round, see below), Agent 7's T-std gives B **+1.4 % [+0.5, +2.3]\*** median and **−0.8 % [−1.0, −0.6]\*** fps. Three things keep this a lead:
+L13: - **Tails:** B's extra >6 ms frames all come from two back-to-back runs, 0251-B-r3 and 0253-B-r4, between 02:51 and 02:56. The sys.csv audit flags 0253 for non-game CPU. Without those two runs, B's tails match d0's.
+L14: - **Health:** all 13 runs were clean. There were 0 failures, 0 KILLED, 0 STUCK-LOCK, 0 dumps and 0 slow-state runs.
+L16: **Verdict:** B has no timing gain over d0 on this host. Don't adopt B for performance. It is neutral or slightly slower and uses slightly more CPU (both leads). Telling 1 % apart from 0 would need a second pass with a discarded warm-up run.
+L34: | B | 6 | 6 | 0 | 0 | 0 (all sites 0) | 0 | 0/6 | 0 / 1 (0253-B-r4) | n/a (no hangs) |
+L39: - **Slow state:** Agent 11's 3-mode timerq copy found 0 slow runs ([timerq3-20261123-0239.txt](audit/timerq3-20261123-0239.txt), audit §1).
+L49: | B | 6 | 2.500 | +1.3 % | +2.6 [−1.2, +6.5] | 1/6 (p 0.219) | 383.9 | 384.6 | −1.7 [−4.9, +1.7] | 2.596 | +0.063 [−0.007, +0.133] | 19232 (19103-19427) | 1.6 % | 0.6 % |
+L71: | 1 | d0 first | 0241 | 2.246 | 0243 | 2.472 | +0.226 | −33.3 | +0.022 | 0241 is the window's first scored run: 421.8 fps, +9.5 % vs d0's other runs |
+L74: | 4 | B first | 0255 | 2.493 | 0253 | 2.491 | −0.002 | −2.9 | +0.157 | 0253: sys.csv flag; eff_mhz 1831 (the others 1930-1996) |
+L84: | all | 6 + 6 | +2.6 [−1.2, +6.5] | 1/6 | −1.7 [−4.9, +1.7] | +0.063 [−0.007, +0.133] | T-std +2.7 [−0.8, +6.3] | −2.0 [−4.8, +1.0] |
+L85: | without flagged (0253-B-r4) | 6 + 5 | +3.1 [−1.5, +8.0] | 0/5 (p 0.062) | −1.9 [−6.1, +2.5] | +0.045 [−0.023, +0.112] | T-std +2.8 [−1.1, +6.9] (guards OK) | −1.9 [−5.1, +1.4] |
+L86: | without round 1 | 5 + 5 | +1.1 [−0.1, +2.4] | 1/5 | −0.4 [−0.9, +0.0] | +0.072 [−0.017, +0.160] | T-std **+1.4 [+0.5, +2.3]\*** (light-share WARNING) | **−0.8 [−1.0, −0.6]\*** |
+L87: | without 0251 + 0253 | 6 + 4 | +3.4 [−3.3, +10.6] | 0/4 | −2.2 [−8.2, +4.3] | +0.033 [−0.054, +0.120] | T-std +2.8 [−1.7, +7.6] | −1.9 [−5.6, +2.0] |
+L88: | without round 1, 0251, 0253 | 5 + 3 | +1.3 [−0.8, +3.4] | 0/3 | −0.2 [−0.7, +0.4] | +0.037 [−0.129, +0.202] | – | – |
+L98: | B without 0251 + 0253 | 1.5 | 0 | 0 | 0 | 7.39 | 5.558 | −0.042 [−0.163, +0.080] (higher in 1/4) |
+L102: - **0253-B-r4** (02:54:48-02:55:38): 35 frames over 6 ms, spread over all 10 s bins, maximum 14.07 ms. It is W4c's only flagged run. Non-game CPU averaged 3.09 cores against 2.48 for the rest (z 10.6), with 21 of 50 s above the folder's p90. Its mean E clock, 1837 MHz, was the folder's lowest.
+L106: ## Round 1 and warm-up bias
+L112:   | W4c | +9.5 % |
+L113:   | W6 (pass 1 / pass 2) | +15.9 % / +8.6 % |
+L118: - **Suggestion for future windows:** one discarded warm-up run after the cold run, or a randomized first arm.
+L122: - **Cross-window:** W4b (`build/agent8/matrix/20261122-1541`) ran on the **best_efficiency** overlay, with P clocks flat at ~1.93 GHz and some slow-state runs. It also ran **before** the Defender exclusion for `build/` (added ~23:16 Nov 22). W4c ran on best_performance, after the exclusion, with 0 slow-state runs. Absolute numbers don't compare across the two. W4c shows that B gives no gain on tonight's host. It does not show why W4b's hint appeared.
+L139: - Audit: [audit/audit.md](audit/audit.md), covering slow state, sys.csv disturbance, game.log, dumps and timerq3.
+##### build\agent12\w6-gates\NIGHT-RESULTS.md 06:08:03
+L5:   pass: selftest 51/51, and the W5 and W4b fixtures are OK.
+L15: ## Verdicts: all 7 windows PASS
+L17: The two W6 windows PASS with the finding-10 WARN on G8.
+L19: | Window | Matrix dir | Window log | Kit exit | Gates not PASS | Verdict |
+L21: | W6 | `20261123-0009` | `window-W6-0006.log` | 1 | G8 FAIL (raw) | **PASS**: G8 = raw FAIL + "WARN, finding 10, Agent 1 22:25" |
+L22: | W9 | `20261123-0108` | `window-W9-0105.log` | 0 | none | **PASS** |
+L23: | W5b | `20261123-0155` | `window-W5b-0152.log` | 0 | none | **PASS** |
+L24: | W4c | `20261123-0239` | `window-W4c-0236.log` | 0 | none | **PASS** |
+L25: | W6 | `20261123-0313` | `window-W6-0310.log` | 1 | G8 FAIL (raw) | **PASS**: G8 = raw FAIL + "WARN, finding 10, Agent 1 22:25" |
+L26: | W9 | `20261123-0401` | `window-W9-0358.log` | 0 | none | **PASS** |
+L27: | W5b | `20261123-0451` | `window-W5b-0445.log` | 0 | none | **PASS** |
+L36: Every window passes G2, G3, G9, G10, G11 and G12.
+L44: | W6 0009 | 21 (20) | 4/4 | 3.32-4.64 (3.41) | #8 p2fc r2, 4.64 | STRICT at 00:09:01 | 00:51:52, all runs OK, 42.8 min |
+L49: | W9 0401 | 21 (20) | 5/5 | 3.35-4.62 (3.51) | #4 q125 r1, 4.62; #12 q125 r3, 4.58 | STRICT at 04:01:16 | 04:44:08, all runs OK, 42.8 min |
+L59: - **G4 PASS 4/4**, all T=0: side 1 (p2f), side 2 (p2fc), side 3 (p2fc, attract) and gate A (p2fc + verify).
+L60: - **G5 PASS:** gate A has verify on, first kept 1, K 0 and F 0.
+L67:   That line is gate A's finding-10 minidump (`hang-36276.dmp`), waived by Agent 1 at 22:25.
+L68:   **The timed runs are clean.**
+L73: - **G11 PASS in all 7:**
+L76:   - **W5 ran under `best_efficiency`.** Compare the night windows with each other, but don't compare absolute
+L78: - **G12 PASS in all 7:**
+L84:   the window`, plus `!!!` and `killed`). There are 0 hits in all 7, so no process was left over.
+L103: - **Re-run of the 7 windows (05:54-05:55):** only G12 changed, from CHECK to PASS. Exits went from 3 to 0, and
+L105: - **The read-only checker** also confirmed the fix's edge cases: exactly 30 min passes, 1 min after the start is a
+##### build\agent6\wnight\RESULTS.md 06:03:33
+L3: Agent 6, written 06:05 on 2026-11-23. Inputs, read-only: the 7 night dirs in `build/agent8/matrix/`. All outputs are under `build/agent6/`. Timing read-outs are Agent 8's (`summary.md` in each dir); this file covers only game.log, run.json and summary.txt.
+L7: - **No FAIL in any of the 7 dirs (135 runs).** All 7 wrappers exited 0 (0 = no FAIL).
+L9:   - 6 runs miss the `Execution complete` line. This is a benign race in the hard-exit path (see "The Execution complete race" below) and hits a different arm each time.
+L10:   - 1 run is W9 `0128-off-r2`, where the shutdown watchdog fired 3 s after WM_CLOSE (see "The shutdown watchdog in 0128-off-r2" below). It's a first sighting: 1 of 135 runs.
+L13:   - 0 STUCK-LOCK, 0 dumps;
+L17: - **ONLY keys** (lines in an arm and in no reference run) are exactly the switch proof lines, and nothing else is NEW or GONE:
+L21: - **W9 q-arm env and quantum proof** (the check that couldn't be run before W9): 42 of 42 runs OK, with 0 mismatches. See "W9 env and quantum proof" below.
+L27: | W6 | `20261123-0009` | 21 | s0 5, cold-s0 1, p2 5, p2f 5, p2fc 5 | s0, p2, p2f, p2fc PASS; cold-s0 NOTE | `0009-cold-s0` (no `Execution complete`; GONE vs s0) | `build/agent6/w6/night-W6-0009.out.txt`, `build/agent6/w6/out-20261123-0009/` |
+L28: | W6 | `20261123-0313` | 21 | same | s0, cold-s0, p2, p2fc PASS; p2f NOTE | `0345-p2f-r4` (no `Execution complete`) | `build/agent6/w6/night-W6-0313.out.txt`, `build/agent6/w6/out-20261123-0313/` |
+L30: | W9 | `20261123-0401` | 21 | same | q0-q500 and cold-off PASS; off NOTE | `0429-off-r3` (no `Execution complete`) | `build/agent6/wnight/night-W9-0401.out.txt`, `build/agent6/wnight/out-W9-20261123-0401/` |
+L31: | W5b | `20261123-0155` | 19 | d11 6, cold-d11 1, d11p 6, d11t 6 | d11p, d11t, cold-d11 PASS; d11 NOTE | `0215-d11-r4` (no `Execution complete`) | `build/agent6/wnight/night-W5B-0155.out.txt`, `build/agent6/wnight/out-W5B-20261123-0155/` |
+L32: | W5b | `20261123-0451` | 19 | same | d11, d11p, cold-d11 PASS; d11t NOTE | `0528-d11t-r6` (no `Execution complete`; GONE) | `build/agent6/wnight/night-W5B-0451.out.txt`, `build/agent6/wnight/out-W5B-20261123-0451/` |
+L43: - W9: p1 and q250s are only in `expect-w9.json`.
+L44: - W5b: base and s0 are in `expect-w5b.json` only for the W5 test.
+L45: - W4c: d11t and d3 are only in `expect-w4c.json`.
+L47: ## ONLY keys and proof lines
+L49: | Window | Arm | ONLY keys vs the reference | Counts per run |
+L58: | W4c | b, cold-d0 | 0 | 0 NEW, GONE or ONLY keys. |
+L69: - Script: `build/agent6/wnight/w9_envcheck.py`, read-only.
+L83:   - 0 STUCK-LOCK. Per owner site (L1 83FAF188 / 83FAF200 / 83FBF868, L2 83FB09F0), that's 0/0/0/0 in every arm.
+L84: - The kit's own env check gives the same answer: it compares run.json env_set with matrix.json for every arm and found no FAIL.
+L94: ## The "Execution complete" race (6 runs, NOTE only)
+L96: **Runs:** `0009-cold-s0` (W6), `0345-p2f-r4` (W6), `0429-off-r3` (W9), `0215-d11-r4` (W5b), `0528-d11t-r6` (W5b), plus none in W4c. Each one ends with `Window closing, shutting down...` and then `Title terminated; hard-exiting process.`, with no `[info] [core] Execution complete` line. All of them have exit 0 and a clean close.
+L100: - `Execution complete` comes from `module_thread_` (L634-641), after the guest main thread's `Wait` returns.
+L103:   - `Execution complete` at .719, on the module thread;
+L108: **Suggestion for the kit:** treat a missing `Execution complete` as INFO when `Title terminated; hard-exiting process.` is present and exit is 0.
+L110: ## The shutdown watchdog in 0128-off-r2 (first sighting)
+L136: - `Select-String` over every `build/agent8/matrix/*/runs/*/game.log` finds `Shutdown wedged` only in this run (line 100).
+L158: - the run table (verdict, status, exit, close, levels, STUCK, dumps);
+L161: - "ONLY keys per arm";
+##### build\agent3\f10\RESULTS.md 06:22:45
+L7: **No hang on a quiet host.** Neither set hung: 0 STUCK-LOCK events and 0 dumps. Both runs got into the level and to the end of the L route with 3/3 tags. This is n = 1 per set.
+L9: - **Worst frames vs the 5 s threshold.** The worst frame was 2.89 s in f10b and 1.79 s in f10a. Both are under the detector's 5 s threshold ("STUCK-LOCK: critical section ... still not acquired after 5s"). Under last night's -j8 build the same part of the route reached 4.9-8.0 s (gate B, same set as f10b) and 12.0 s (s4b20, same set as f10a), and all four of those runs hung.
+L10: - **The starved host, not the GPU, stretched the stall.** Take the same cinematic frames with the same GPU work and the same sync counts (691/698 and 2736):
+L11:   - each host<->GPU round trip took 0.29-0.98 ms on the quiet host and 1.79-6.05 ms under the build;
+L13:   - under load more draws also took the full-path sync: 60921 syncs in gate B vs 45458 in f10b, and 28231 vs 7880 after the vortex;
+L18: - **Sample size.** n = 1 per set. A second quiet pair is offered (below).
+L19: - **Margin.** The margin is not large. f10b's 2736-sync frames still cost 2.66-2.89 s on the quiet host, so a busier host or a slower PC could push one past 5 s. w6s3 (p2fc, attract route, during the build) shows the in-between case: its 2736-sync frame took 3.99 s at 0.64 ms per wait, and it did not hang.
+L20: - **f10a's set (M1, C1 off) never makes the 2736-sync bursts.**
+L26:   - No build process, and Processor(_Total) at most 40 % over 10 s before launch.
+L44:   - Processor(_Total) at most 40 % over 10 s.
+L54: | **f10b** (gate B's set) | quiet | **no** | 0 | 38492 | 272 / 7 / 0 | 2886.5 | 0.0 / 26.5 / 990.4 | 0.33 / 2.32 | 45458 / 2736 | 3 | end | 0 of 13 |
+L55: | gate B (w6gB, p2fc) | -j8 build | YES 22:26:29.586, 83FAF200 | hang-38764 | 36553 | 506 / 10 / 2 | 7978.6 | 0.0 / 41.9 / 4836.2 | 0.32 / 7.5 | 60921 / 2736 | 0 | end | 6 of 6 |
+L56: | gate A (w6gA, p2fcv) | -j8 build | YES 21:18:17.497, 83FAF188 | hang-36276 | 7271 | 1005 / 11 / 3 | 9657.9 | 0.0 / 22.7 / 2280.7 | 0.45 / 2.46 | 9101 / 2736 | 3 | story-load | no sampler yet |
+L60: | w6s3 (p2fc, attract) | -j8 build | no | 0 | 36388 | 379 / 6 / 0 | 3987.3 | 0.0 / 22.8 / 1715.8 | 0.33 / 2.21 | 30450 / 2736 | 0 | idle-320 | 1 of 1 |
+L69: | first 2736-sync frame | #32493 at +23.0 s: 2657.6 ms; wait 773.8 ms over 2688 = **0.29**; rest of frame 1884 ms | #33131 at +39.0 s: 7978.6 ms; wait 4836.2 ms over 2708 = **1.79**; rest of frame 3142 ms. STUCK-LOCK at +35.7 s, inside this frame |
+L70: | second 2736-sync frame | #32528 at +29.8 s: 2886.5 ms; wait 990.4 ms over 2666 = **0.37**; rest of frame 1896 ms | - |
+L72: Other 2736/2750-sync frames:
+L87: | f10b | 5 | 21481 (2736) | 16092 | 7880 | 45458 |
+L88: | gate B | 5 | 13313 (2736) | 19372 | 28231 | 60921 |
+L140: - **A second quiet pair** for n = 2, f10a + f10b, about 16 min. Offered to Agent 1 at 06:2x; it runs only if approved.
+##### build\agent5\scrnsave-fix\README.md 06:16:37
+L3: Status: **staged here, not installed yet.** Install only after the night launcher (pid 19960) has exited at 07:30 and
+L4: put the screensaver back, and after Agent 8 (owner of run-matrix.ps1) and Agent 10 have read this delta.
+L18: | `bench/agent8/run/run-matrix.ps1` (Agent 8's) | L417-419 only. SCRNSAVE.EXE, ScreenSaveActive, ScreenSaveTimeOut and ScreenSaverIsSecure are read with the existing `Get-P` (L65, reads through `PSObject.Properties`). A missing value reads as '' (the timeout as '?'). The task named L417; L418-419 had the same plain reads of the other three values, so they get the same treatment. When the values are there, the printed line is the same as before (tests `m-*-same`). |
+L21: | day draft, `build/agent5/day-draft/` (staged in `new/`; **not** installed to `bench/agent5/day/` before the break) | `make-run-day.ps1`: pins the fixed night launcher `565D30D4...` instead of `16B90FA8...` (Agent 10's condition 1) and writes `run-day.diff` with repo-relative paths (N1). `run-day.ps1` regenerated from the fixed night launcher, so it gets the same screensaver change. `README-DAY.md`: new sha, N2 (L57: use the installed STOP-LAUNCHER), a note on this fix. `RUN-DAY.cmd` L25: the exit-2 line no longer says "Nothing was changed" (N3). |
+L43: | bench/agent5/launch/run-night.ps1 | 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 | 565D30D40DC5025AD63FD9B9F606724BABC167BC81FCB6FBEB6362B603977112 |
+L53: hard-coded pin is make-run-day.ps1's `$Want`, which this change moves to `565D30D4...`.
+L59: Result, 23 Nov 06:14:40: **45/45 PASS** (`results/summary-new-061440.txt`). The real Desktop key read
+L68: | `s-*` static | parse, ASCII and LF; no plain `$scr.<name>` read left in run-matrix.ps1; `Remove-ItemProperty` only in `Restore-Screensaver` (night and day); the day launcher's screensaver functions are identical to the night launcher's, 7 `# DAY:` lines, header names `565D30D4`; run-day.diff names no absolute path |
+L73: ## Install (after 07:30; after Agents 8 and 10 have read this)
+L91: before the break. Agent 10 delta-reads it (condition 1); Agent 11 still has to rate the day draft.
+L95: - Agent 8: in run-matrix.ps1 only L417-419 change. `Get-P` returns the default for a `$null` object (no key) and

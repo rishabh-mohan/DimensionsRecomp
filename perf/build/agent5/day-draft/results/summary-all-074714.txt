@@ -1,0 +1,29 @@
+test-day all, ended 2026-11-23 07:47:15; run-day.ps1 B67EBD6C2C9A378C8897558DD71AD383DCC85015952601F3EDF2FAED415ADC65; launcher-ctl.ps1 6DDE3150B72D6B0D849B17788098F9C10C1E96CBF5CF3BBC395C95C935C34895
+PASS  d-return-1  25:00, now+30 min and now+15 h refused, nothing started (exit 1)
+PASS  d-return-2  now+3 h, answer N: nothing started (exit 1)
+PASS  d-return-3  now+80 min refused, then now+100 min (09:26) accepted: end 2026-11-23 09:11 (exit 0)
+PASS  d-return-4  now+3 h (10:46), answer Y: -StopAt = return - 15 min = 2026-11-23 10:31; power check shown (exit 0)
+PASS  d-return-5  test hooks without -DryRunTag are refused (exit 1)
+PASS  d-stale-1  old STOP file, answer N: kept, nothing started (exit 1)
+PASS  d-stale-2  old STOP file, answer Y: deleted, then the day session (exit 0)
+PASS  d-none  no launcher: 'nothing to stop', no STOP file written (exit 0)
+PASS  d-unknown-1  RUN-DAY with a launcher in an unknown state asks first; N: no STOP, nothing started (exit 1)
+PASS  d-unknown-2  STOP-LAUNCHER with an unknown state does not say 'nothing is lost' and asks; N: nothing written (exit 1)
+PASS  d-real-1  run-day.ps1 without -StopAt: refused, exit 2
+PASS  d-real-2  run-day.ps1 -StopAt 7pm: refused, exit 2
+PASS  d-real-3  REAL run-day.ps1 -StopAt 10:46 accepted as the end time (ends at 2026-11-23 10:46:00, latest start 2026-11-23 10:46:00) and refused on this desktop, exit 2
+PASS  d-real-4  REAL run-night.ps1 -StopAt is still refused as a test hook and bench\agent5\launch\status is unchanged, exit 2
+PASS  d-cmd  RUN-DAY.cmd passes return - 15 min (2026-11-23 10:31) to run-day.ps1 -StopAt; it refuses on this desktop; exit 2
+PASS  d-cmd-nul  the real RUN-DAY.cmd in day-draft refuses (it runs only from bench\agent5\day\): nothing started, nothing written (exit 1)
+PASS  d-stopcmd-none  STOP-LAUNCHER.cmd with no launcher: nothing to stop, no STOP file (exit 0)
+PASS  d-between  waiting launcher stopped by RUN-DAY's STOP (no question), ended exit 0, STOP consumed, -StopAt 2026-11-23 10:31 (ctl exit 0)
+PASS  d-stop-n  answer N: no STOP file, launcher still running (exit 1)
+PASS  d-stop-y  answer Y: STOP with the reason line, launcher ended exit 0 (ctl exit 0)
+PASS  d-dl  -StopAt 07:58 (12 min): the 7-min GO is refused for the end time; launcher exit 0
+PASS  d-window-0  run-day.ps1 -StopAt 10:46 accepted the GO and runs the (fake) window; pins.txt has run-day.ps1 + RUN-DAY.cmd (child pid 34484)
+PASS  d-window-1  RUN-DAY during a window says so and asks; N: no STOP, window keeps running (exit 1)
+PASS  d-window-2  STOP-LAUNCHER during a window warns the numbers are lost; N: nothing written (exit 1)
+PASS  d-window-3  Y: window killed (runner + child 34484), launcher ended, STOP consumed, -StopAt 2026-11-23 10:31 (ctl exit 0)
+PASS  real-files  perf-notes GO/HOLD/STOP and bench\agent5\launch unchanged (WINDOW-GO.txt=False | WINDOW-HOLD.txt=False | WINDOW-STOP.txt=False | launch=431898222)
+PASS  leftovers  processes left from the tests: 0 
+27/27 PASS

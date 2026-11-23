@@ -1,0 +1,83 @@
+﻿=== test_binding_caches.py
+34: bool CurrentDrawPreparation(){return false;}
+50: bool LongProbeEnabled() { return false; }
+=== test_buffer_variants.py
+77: bool NativeTextureTimingEnabled(){return true;}
+78: bool LongProbeEnabled(){return false;}
+=== test_buffer_view_generation.py
+78: bool NativeTextureTimingEnabled(){return true;}
+=== test_constant_timing.py
+13: start = source.index('struct DrawTimer {')
+27: bool NativeTextureTimingEnabled(){return enabled;}
+28: DrawTiming g_draw_timing;
+38: {DrawTimer t;t.Next();t.Next();}
+39: assert(g_draw_timing.calls==1&&FakeClock::calls==0);
+40: for(double v:g_draw_timing.stages_ms)assert(v==0);
+43: DrawTimer t;
+47: assert(g_draw_timing.calls==2);
+48: for(double v:g_draw_timing.stages_ms)assert(v==1);
+49: auto draw_frame=std::exchange(g_draw_timing,{});
+=== test_cull_state.py
+31: nonindex_begin = draw.rfind('    QueryDrawScope query_scope(commands);', 0, nonindex_draw)
+136: struct QueryDrawScope {Recorder* c;explicit QueryDrawScope(Recorder* c):c(c){++c->begun;}
+137: ~QueryDrawScope(){++c->ended;}};
+=== test_draw_index_bounds.py
+67: struct QueryDrawScope{explicit QueryDrawScope(CommandRecorder*){++query_scopes;}};
+=== test_draw_upload.py
+89: bool NativeTextureTimingEnabled(){return timing_enabled;}
+=== test_frame_cadence.py
+33: bool LongProbeEnabled(){return false;}
+=== test_frame_ring_transaction.py
+117: bool NativeTextureTimingEnabled(){return true;}
+=== test_nonindexed_buffer_windows.py
+81: struct {PreparedValue<std::array<u64,5>,VertexLayoutPlan> vertex_layout;} g_prepared_draw;
+87: VertexInputUsageCache g_vertex_input_usage;
+=== test_portrait_probe.py
+67: assert(PortraitProbeEnabled()==enabled);
+=== test_preparation_metadata.py
+33: bool CurrentDrawPreparation(){return preparing;}
+=== test_quad_buffer_windows.py
+85: QuadIndexCache<Buffer> g_quad_indices;
+110: struct {PreparedValue<std::array<u64,5>,VertexLayoutPlan> vertex_layout;} g_prepared_draw;
+115: VertexInputUsageCache g_vertex_input_usage;
+163: struct QueryDrawScope {explicit QueryDrawScope(Commands*){operations.emplace_back("query_begin");}
+164: ~QueryDrawScope(){operations.emplace_back("query_end");}};
+187: void Reset(){g_quad_indices.Clear();uploads.clear();retired.clear();operations.clear();uploaded_vertex_bytes=0;window_calls=full_calls=0;
+278: const auto cached=g_quad_indices.Find(0,8);assert(cached&&cached->maps==1);
+=== test_query_retirement.py
+=== test_query_sample_pool.py
+8: start=source.index('struct QueryDrawScope::Impl {');end=source.index('void FailActiveQueries()',start)
+41: class QueryDrawScope{public:explicit QueryDrawScope(plume::RenderCommandList*);~QueryDrawScope();struct Impl;std::unique_ptr<Impl> impl_;};
+45: {QueryDrawScope scope(&list);assert(!scope.impl_&&device.heaps==0);}
+47: {QueryDrawScope scope(&list);}assert(device.heaps==1&&q->draws.size()==1);
+49: {QueryDrawScope scope(&list);}assert(device.heaps==2&&q->draws[0]!=first);
+54: {QueryDrawScope scope(&list);}assert(q->draws[0]!=retired->draws[0]);q->draws.clear();
+58: device.fail=true;{QueryDrawScope scope(&list);assert(!scope.impl_);}assert(q->failed);
+60: for(int i=0;i<300;++i){QueryDrawScope scope(&list);}
+=== test_shader_binding_failures.py
+69: nonindex_begin = draw.rfind('    QueryDrawScope query_scope(commands);', 0, nonindex_draw)
+196: struct QueryDrawScope{
+197: explicit QueryDrawScope(Recorder*){++query_begins;}
+198: ~QueryDrawScope(){++query_ends;}
+=== test_snapshot_selection.py
+18: bool LongProbeEnabled(){return probe;}
+=== test_submission_waits.py
+108: bool NativeTextureTimingEnabled(){return true;}
+=== test_temporal_draw_route.py
+37: DrawSnapshot SnapshotDrawDevice(D3DDevice* d){return {std::make_shared<D3DDevice>(*d)};}
+=== test_texture_authority_probe.py
+81: bool LongProbeEnabled() {return enabled;}
+=== test_texture_binding_failures.py
+55: bool LongProbeEnabled(){return false;}
+=== test_texture_depth_upload.py
+207: bool NativeTextureTimingEnabled(){return true;}
+209: bool CurrentDrawPreparation(){return false;}
+216: bool LongProbeEnabled(){return false;} bool LongProbeOnce(u64){return false;}
+=== test_texture_header_refresh.py
+47: bool LongProbeEnabled() { return false; }
+=== test_texture_prepare.py
+48: bool CurrentDrawPreparation(){return false;}
+=== test_texture_source_residency.py
+38: bool LongProbeEnabled() { return false; }
+=== test_texture_use_refresh.py
+46: bool LongProbeEnabled(){return false;}

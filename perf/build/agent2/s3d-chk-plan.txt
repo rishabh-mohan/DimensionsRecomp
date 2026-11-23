@@ -1,0 +1,20 @@
+# snap-patch CHK plan 2026-11-22 03:01:11; rules <workspace>\build\agent2\s3d-chk-rules.txt (sha256 f33f73c4bc83026abf4cd11429243e34e5462222c9f80b2e4b104866c4ebb50d)
+# base: MANIFEST-S1-2041.tsv + 48 PATCHES row(s) + 48 native-input file(s) + STATE-S3-0241.tsv
+# note: S3 build inputs: game commit 001336f + SDK commit c5fe668 on top of the 01:50 checkpoint (game a0bdaa7, SDK 90e7ccd), plus the uncommitted pre-sprint plume and simde edits, as in S1/S2 (Agent 1, 02:22); from exactly Agent 10's 4 confirmed hashes 11DE333F (rex_app.cpp), 4331A312 (audio_system.cpp), 4EC71328 (settings_registry.cpp), 9CBE6DBF (settings_preferences.cpp); working-tree contents and mtimes unchanged by the commits.
+# note: S3 rules: build/agent10/s3/S3-include.tsv (sha256 A1E7C83F7CFA13728559DEFFEB0B4F43ADEC23A52A3D9679F0712F75F2E3463D, 28 INCLUDE / 0 EXCLUDE vs STATE-S2-2315.tsv) -> build/agent2/S3-rules.txt (make-rules-from-tsv.py) -> snap-patch.py apply S3.
+# note: Generated code: the pinned S1 output (gen-check against baseline/), as in S1/S2; only build B uses install/batch-nolr.
+files: live 23843, snap1 23843; hashed live 0, snap1 0; walk 3.2s, hash 0.1s
+same 23843; differing 0: COPY 0 (0 bytes), DELETE 0, HELD BACK 0; errors 0, warnings 0
+## COPY live -> snap1 (0): category, owner, live sha/mtime, snap1 sha, path
+## HELD BACK (0): differs from live but stays at its snap1 content; grouped by board claim
+## RULES (1)
+  line 2                     rexlego/src/gpu_native/draw.cpp  [A4] expect=50aa3b1dee61567838076edf19cb7a5466727c3cc31be3a80e6dcc3722d7bdd6 hits=1 differing=0
+## REBUILD PLAN (0 changed files)
+  rexglue-sdk files: 0 (CMake inputs 0) -> no SDK build; snap1-sdk/install stays
+  closure headers (sdk-headers-dev.txt, 101 loaded): 0 -> the generated TUs stay
+  game-side CMake inputs: 0 -> -SkipConfigure is fine
+  native-only paths (gpu_native, plume, gpu-aot, native inputs): 0 of 0
+  2. powershell -NoProfile -ExecutionPolicy Bypass -File build\agent2\build-snap.ps1 -Phase game -Tag snap-chk -Jobs 10 -KeepGoing -SkipConfigure   (devoff)
+  3. powershell -NoProfile -ExecutionPolicy Bypass -File build\agent2\build-snap.ps1 -Phase game -Native -Tag snap-chk -Jobs 10 -PrelinkJobs 10 -KeepGoing -SkipConfigure   (native)
+  then: stage-snap-bin.ps1 -Variant off / -Variant native -SnapTag CHK
+plan: <workspace>\build\agent2\snap1\PLAN-CHK-0301.txt

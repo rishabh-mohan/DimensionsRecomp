@@ -1,0 +1,17 @@
+diff --git a/rexlego/src/gpu_native/memory_watch.cpp b/rexlego/src/gpu_native/memory_watch.cpp
+index 954de08..240a354 100644
+--- a/rexlego/src/gpu_native/memory_watch.cpp
++++ b/rexlego/src/gpu_native/memory_watch.cpp
+@@ -28,6 +28,12 @@ std::atomic<uint64_t> g_write_epoch{1};
+ rex::thread::global_critical_region g_watch_region;
+ rex::memory::Memory* g_memory = nullptr;
+ void* g_callback = nullptr;
++// S4 C1: MemoryWritten has no keep-watch guard on purpose: it unwatches its exact
++// range, so a kept watch would fault once per written page. The native renderer
++// also turns physical_protect_keep_watch off for the process from static init,
++// before any guest code runs, not only from the lazy registration below.
++[[maybe_unused]] const bool g_keep_watch_blocked =
++    (rex::memory::Memory::BlockPhysicalProtectKeepWatch(), true);
+ 
+ void AdvanceWriteEpoch() {
+   // Zero permanently disables the shortcut if this counter ever wraps.

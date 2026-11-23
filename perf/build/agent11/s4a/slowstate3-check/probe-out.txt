@@ -1,0 +1,13 @@
+﻿short csv row: missing field is null: True; passes the -ne '' filter: True; [double] of it: 0
+[math]::Round(2.5,0)=2 [math]::Round(3.5,0)=4 [math]::Round(0.25,1)=0.2
+pcvar regex on '--timer_queue_precise_wait=true' -> True
+pcvar regex on '--timer_queue_precise_wait=TRUE' -> True
+pcvar regex on '--timer_queue_precise_wait=false' -> False
+pcvar regex on '--timer_queue_precise_wait false' -> True
+pcvar regex on '--timer_queue_precise_wait=yes' -> False
+pcvar regex on '--timer_queue_precise_wait=on' -> False
+pcvar regex on '--no_timer_queue_precise_wait' -> True
+pcvar regex on '--timer_queue_precise_wait=true,x' -> False
+Group-Object m, a on arms 'Y','y' -> groups: 1
+ConvertTo-Json of params.cvar-like hashtable: @{timer_queue_precise_wait=True}
+de-DE culture: ConvertTo-Csv of 13.5 -> "13,5"; string interpolation -> 13.5

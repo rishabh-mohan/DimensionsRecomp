@@ -1,0 +1,312 @@
+diff --git a/include/rex/codegen/config.h b/include/rex/codegen/config.h
+index 9e74744..8bfde84 100644
+--- a/include/rex/codegen/config.h
++++ b/include/rex/codegen/config.h
+@@ -101,6 +101,12 @@ struct RecompilerConfig {
+   bool nonVolatileRegistersAsLocalVariables = false;
+   bool generateExceptionHandlers = false;  ///< Generate SEH exception handler wrappers
+ 
++  // Emission-only optimizations. Each one off keeps the emitted text unchanged.
++  bool rlwinmLowering = false;    ///< 32-bit shift/rotate forms for rlwinm/rlwnm/rlwimi
++  bool flushModeElision = false;  ///< No flush-mode switch for mode-independent FP/VMX ops
++  bool crCompareSoZero = false;   ///< Compares store SO=0 when no mtxer exists in the image
++  bool musttailCalls = false;     ///< Tail calls as [[clang::musttail]] return f(ctx, base)
++
+   // === Analysis tuning (optional) ===
+   uint32_t maxJumpExtension = 65536;  ///< Max bytes to extend function for jump table targets
+   uint32_t dataRegionThreshold = 16;  ///< Consecutive invalid instructions to mark as data region
+diff --git a/include/rex/codegen/function_types.h b/include/rex/codegen/function_types.h
+index 8c6772d..60a768a 100644
+--- a/include/rex/codegen/function_types.h
++++ b/include/rex/codegen/function_types.h
+@@ -56,6 +56,14 @@ struct EmitContext {
+   /// per-file declaration header, so a missed name is a compile error.
+   std::unordered_set<std::string>* referenced = nullptr;
+ 
++  /// Register localization fallback; both null unless a localization option is
++  /// on. interiorEntries: entries reached with live registers (body= entries and
++  /// entries inside another function's blocks). registersInCtx: functions emitted
++  /// with every register in ctx - those entries, body owners, functions with a
++  /// direct edge or jump table into one, and the save/restore helpers.
++  const std::unordered_set<uint32_t>* interiorEntries = nullptr;
++  const std::unordered_set<uint32_t>* registersInCtx = nullptr;
++
+   void reference(std::string_view name) const {
+     if (referenced)
+       referenced->emplace(name);
+diff --git a/src/codegen/builders/builder_context.h b/src/codegen/builders/builder_context.h
+index 33ac6d0..d8227b4 100644
+--- a/src/codegen/builders/builder_context.h
++++ b/src/codegen/builders/builder_context.h
+@@ -98,6 +98,10 @@ struct BuilderContext {
+   /// Pointer to active jump table for bctr dispatch, or nullptr
+   const JumpTable* activeJumpTable = nullptr;
+ 
++  /// Ignore the register localization options for this function (see
++  /// EmitContext::registersInCtx). Its registers all live in ctx.
++  bool registersInCtx = false;
++
+   /// Get the recompiler configuration
+   const RecompilerConfig& config() const;
+ 
+diff --git a/src/codegen/builders/context.cpp b/src/codegen/builders/context.cpp
+index 8fad303..85f84ec 100644
+--- a/src/codegen/builders/context.cpp
++++ b/src/codegen/builders/context.cpp
+@@ -45,12 +45,13 @@ const FunctionGraph& BuilderContext::graph() const {
+ // Localizing a non-volatile assumes the function owns it across its whole body.
+ // An SEH funclet does not: it inherits its owner's live registers through ctx.
+ bool BuilderContext::localizeNonVolatiles() const {
+-  return config().nonVolatileRegistersAsLocalVariables && !fn.sharesRegisters();
++  return config().nonVolatileRegistersAsLocalVariables && !fn.sharesRegisters() &&
++         !registersInCtx;
+ }
+ 
+ std::string BuilderContext::r(size_t index) {
+   const auto& cfg = config();
+-  if ((cfg.nonArgumentRegistersAsLocalVariables &&
++  if ((cfg.nonArgumentRegistersAsLocalVariables && !registersInCtx &&
+        (index == 0 || index == 2 || index == 11 || index == 12)) ||
+       (localizeNonVolatiles() && index >= 14)) {
+     locals.r[index] = true;
+@@ -61,7 +62,7 @@ std::string BuilderContext::r(size_t index) {
+ 
+ std::string BuilderContext::f(size_t index) {
+   const auto& cfg = config();
+-  if ((cfg.nonArgumentRegistersAsLocalVariables && index == 0) ||
++  if ((cfg.nonArgumentRegistersAsLocalVariables && !registersInCtx && index == 0) ||
+       (localizeNonVolatiles() && index >= 14)) {
+     locals.f[index] = true;
+     return fmt::format("f{}", index);
+@@ -71,7 +72,8 @@ std::string BuilderContext::f(size_t index) {
+ 
+ std::string BuilderContext::v(size_t index) {
+   const auto& cfg = config();
+-  if ((cfg.nonArgumentRegistersAsLocalVariables && (index >= 32 && index <= 63)) ||
++  if ((cfg.nonArgumentRegistersAsLocalVariables && !registersInCtx &&
++       (index >= 32 && index <= 63)) ||
+       (localizeNonVolatiles() && ((index >= 14 && index <= 31) || (index >= 64 && index <= 127)))) {
+     locals.v[index] = true;
+     return fmt::format("v{}", index);
+@@ -80,7 +82,7 @@ std::string BuilderContext::v(size_t index) {
+ }
+ 
+ std::string BuilderContext::cr(size_t index) {
+-  if (config().crRegistersAsLocalVariables) {
++  if (config().crRegistersAsLocalVariables && !registersInCtx) {
+     locals.cr[index] = true;
+     return fmt::format("cr{}", index);
+   }
+@@ -88,7 +90,7 @@ std::string BuilderContext::cr(size_t index) {
+ }
+ 
+ const char* BuilderContext::ctr() {
+-  if (config().ctrAsLocalVariable) {
++  if (config().ctrAsLocalVariable && !registersInCtx) {
+     locals.ctr = true;
+     return "ctr";
+   }
+@@ -96,7 +98,7 @@ const char* BuilderContext::ctr() {
+ }
+ 
+ const char* BuilderContext::xer() {
+-  if (config().xerAsLocalVariable) {
++  if (config().xerAsLocalVariable && !registersInCtx) {
+     locals.xer = true;
+     return "xer";
+   }
+@@ -104,7 +106,7 @@ const char* BuilderContext::xer() {
+ }
+ 
+ const char* BuilderContext::reserved() {
+-  if (config().reservedRegisterAsLocalVariable) {
++  if (config().reservedRegisterAsLocalVariable && !registersInCtx) {
+     locals.reserved = true;
+     return "reserved";
+   }
+@@ -201,8 +203,10 @@ void BuilderContext::emit_function_call(uint32_t address) {
+       // Handle save/restore helpers. Gated on the global setting, not this
+       // function's: the helper bodies are emitted under it too, so once they
+       // spill to locals they are no-ops that scribble zeros on the caller's
+-      // frame. A share_registers function still has to elide them.
+-      if (cfg.nonVolatileRegistersAsLocalVariables &&
++      // frame. A share_registers function still has to elide them. A
++      // registersInCtx function keeps its non-volatiles in ctx and needs the
++      // real save/restore; the writer emits the helpers in ctx for it.
++      if (cfg.nonVolatileRegistersAsLocalVariables && !registersInCtx &&
+           (name.find("__rest") == 0 || name.find("__save") == 0)) {
+         // print nothing - these are handled by local variable tracking
+         return;
+diff --git a/src/codegen/codegen_writer.cpp b/src/codegen/codegen_writer.cpp
+index 80b1e3e..ac941ab 100644
+--- a/src/codegen/codegen_writer.cpp
++++ b/src/codegen/codegen_writer.cpp
+@@ -15,6 +15,7 @@
+ #include <algorithm>
+ #include <array>
+ #include <filesystem>
++#include <set>
+ #include <string>
+ #include <unordered_map>
+ #include <unordered_set>
+@@ -49,10 +50,6 @@ bool ValidateFunctionBodies(const rex::codegen::RecompilerConfig& config,
+     if ((address & 3) || (function.bodyOwner & 3) || function.parent ||
+         address == function.bodyOwner)
+       return reject("body requires a distinct aligned owner and cannot be a chunk");
+-    if (config.ctrAsLocalVariable || config.xerAsLocalVariable ||
+-        config.reservedRegisterAsLocalVariable || config.crRegistersAsLocalVariables ||
+-        config.nonArgumentRegistersAsLocalVariables || config.nonVolatileRegistersAsLocalVariables)
+-      return reject("interior body entries require all register localization options disabled");
+     auto ownerConfig = config.functions.find(function.bodyOwner);
+     if (ownerConfig != config.functions.end() && ownerConfig->second.bodyOwner)
+       return reject("nested or cyclic body owners are unsupported");
+@@ -149,6 +146,93 @@ bool ValidateFunctionBodies(const rex::codegen::RecompilerConfig& config,
+   return true;
+ }
+ 
++// Register localization assumes every transfer into a function is a real call
++// whose callee reads only argument registers from ctx. An interior entry breaks
++// that: the code before it can leave any register live. So while a localization
++// option is on, interior entries (body= entries and entries inside another
++// function's blocks), body owners and every function with a direct edge or jump
++// table into an interior entry keep all registers in ctx. Those make real calls
++// to the save/restore helpers, so the helpers keep their registers in ctx too.
++struct RegisterFallback {
++  std::unordered_set<uint32_t> interior;
++  std::unordered_set<uint32_t> inCtx;
++};
++
++RegisterFallback BuildRegisterFallback(const rex::codegen::RecompilerConfig& config,
++                                       const rex::codegen::FunctionGraph& graph) {
++  RegisterFallback result;
++  if (!config.ctrAsLocalVariable && !config.xerAsLocalVariable &&
++      !config.reservedRegisterAsLocalVariable && !config.crRegistersAsLocalVariables &&
++      !config.nonArgumentRegistersAsLocalVariables && !config.nonVolatileRegistersAsLocalVariables)
++    return result;
++
++  auto isHelper = [](const rex::codegen::FunctionNode& node) {
++    return node.authority() == rex::codegen::FunctionAuthority::HELPER ||
++           node.name().starts_with("__save") || node.name().starts_with("__rest");
++  };
++  size_t owners = 0;
++  for (const auto& [address, function] : config.functions) {
++    if (function.bodyOwner && result.interior.insert(address).second)
++      owners += result.inCtx.insert(function.bodyOwner).second;
++  }
++  const size_t bodyEntries = result.interior.size();
++
++  // Helpers overlap each other by design and are not interior entries.
++  std::set<uint32_t> entries;
++  for (const auto& [address, node] : graph.functions()) {
++    if (!node->isImport() && !isHelper(*node))
++      entries.insert(address);
++  }
++  for (const auto& [address, node] : graph.functions()) {
++    if (node->isImport() || isHelper(*node))
++      continue;
++    for (const auto& block : node->blocks()) {
++      for (auto it = entries.lower_bound(block.base); it != entries.end() && *it < block.end();
++           ++it) {
++        if (*it != address)
++          result.interior.insert(*it);
++      }
++    }
++  }
++  if (result.interior.empty())
++    return result;
++
++  auto hitsInterior = [&](const std::vector<uint32_t>& targets) {
++    return std::any_of(targets.begin(), targets.end(),
++                       [&](uint32_t target) { return result.interior.contains(target); });
++  };
++  auto intoInterior = [&](const rex::codegen::CallEdge& edge) {
++    const auto* target = edge.target.asFunction();
++    return target && result.interior.contains(static_cast<uint32_t>(target->base()));
++  };
++  size_t callers = 0, helpers = 0;
++  for (const auto& [address, node] : graph.functions()) {
++    bool reaches = std::any_of(node->calls().begin(), node->calls().end(), intoInterior) ||
++                   std::any_of(node->tailCalls().begin(), node->tailCalls().end(), intoInterior) ||
++                   std::any_of(node->jumpTables().begin(), node->jumpTables().end(),
++                               [&](const auto& table) { return hitsInterior(table.targets); });
++    if (reaches && !result.interior.contains(address))
++      callers += result.inCtx.insert(address).second;
++    else if (isHelper(*node))
++      helpers += result.inCtx.insert(address).second;
++  }
++  for (const auto& [bctr, table] : config.switchTables) {
++    if (!hitsInterior(table.targets))
++      continue;
++    for (const auto& [address, node] : graph.functions()) {
++      if (std::any_of(node->blocks().begin(), node->blocks().end(),
++                      [&](const auto& block) { return block.contains(bctr); }))
++        callers += result.inCtx.insert(address).second;
++    }
++  }
++  result.inCtx.insert(result.interior.begin(), result.interior.end());
++  REXCODEGEN_INFO(
++      "Register localization fallback: {} functions keep registers in ctx ({} interior entries, "
++      "{} of them body=; {} more body owners, {} callers, {} save/restore helpers)",
++      result.inCtx.size(), result.interior.size(), bodyEntries, owners, callers, helpers);
++  return result;
++}
++
+ nlohmann::json buildTemplateData(const rex::codegen::CodegenContext& ctx,
+                                  const std::vector<const rex::codegen::FunctionNode*>& functions,
+                                  const std::unordered_map<uint32_t, std::string>& rexcrtByAddr) {
+@@ -373,6 +457,13 @@ bool CodegenWriter::write(bool force) {
+   if (runtime_)
+     emitCtx.resolver = runtime_->export_resolver();
+ 
++  // Interior entries and everything that can reach them keep registers in ctx.
++  const auto registerFallback = BuildRegisterFallback(config(), graph());
++  if (!registerFallback.inCtx.empty()) {
++    emitCtx.interiorEntries = &registerFallback.interior;
++    emitCtx.registersInCtx = &registerFallback.inCtx;
++  }
++
+   REXCODEGEN_TRACE("Recompiling {} functions...", functions.size());
+ 
+   std::vector<std::string> bodies;
+diff --git a/src/codegen/config.cpp b/src/codegen/config.cpp
+index 723fe8e..50b49bc 100644
+--- a/src/codegen/config.cpp
++++ b/src/codegen/config.cpp
+@@ -116,6 +116,14 @@ bool ApplyToml(const toml::table& toml, RecompilerConfig& cfg, const std::string
+             hasBool("non_volatile_as_local"), "non_volatile_as_local");
+   MergeBool(cfg.generateExceptionHandlers, toml["generate_exception_handlers"].value_or(false),
+             hasBool("generate_exception_handlers"), "generate_exception_handlers");
++  MergeBool(cfg.rlwinmLowering, toml["rlwinm_lowering"].value_or(false),
++            hasBool("rlwinm_lowering"), "rlwinm_lowering");
++  MergeBool(cfg.flushModeElision, toml["flush_mode_elision"].value_or(false),
++            hasBool("flush_mode_elision"), "flush_mode_elision");
++  MergeBool(cfg.crCompareSoZero, toml["cr_compare_so_zero"].value_or(false),
++            hasBool("cr_compare_so_zero"), "cr_compare_so_zero");
++  MergeBool(cfg.musttailCalls, toml["musttail_calls"].value_or(false),
++            hasBool("musttail_calls"), "musttail_calls");
+   if (hasBool("is_dll")) {
+     cfg.isDll = toml["is_dll"].value_or(false);
+   }
+diff --git a/src/codegen/function_graph.cpp b/src/codegen/function_graph.cpp
+index dc3ff76..9ac97a0 100644
+--- a/src/codegen/function_graph.cpp
++++ b/src/codegen/function_graph.cpp
+@@ -563,6 +563,9 @@ std::string FunctionNode::emitCppForEntry(const EmitContext& ctx,
+   bool allRecompiled = true;
+   CSRState csrState = CSRState::Unknown;
+   RecompilerLocalVariables localVariables;
++  // An interior body entry and its partners keep every register in ctx.
++  const bool registersInCtx = ctx.registersInCtx &&
++                              ctx.registersInCtx->contains(static_cast<uint32_t>(entry.base()));
+ 
+   // Local map for late-detected jump tables (can't mutate const config)
+   std::unordered_map<uint32_t, JumpTable> lateJumpTables;
+@@ -661,7 +664,7 @@ std::string FunctionNode::emitCppForEntry(const EmitContext& ctx,
+         // Dispatch instruction to builder
+         int id = insn.opcode->id;
+         BuilderContext builderCtx{body,           ctx,      *this,   insn, blockBase, data,
+-                                  localVariables, csrState, activeJt};
++                                  localVariables, csrState, activeJt, registersInCtx};
+ 
+         if (hasHookBefore) {
+           builderCtx.emit_mid_asm_hook();

@@ -1,0 +1,56 @@
+02:49:14 PASS parse - 0 errors
+    | 02:49:17 bin <workspace>\build\agent2\devoff2-bin: exe 2026-11-21 23:18, rexruntime.dll 2026-11-21 23:18
+    | 02:49:18 the build defines pause_safe_order, guest_suspend_guard, debug_pause_cycle_ms and debug_pause_cycle_count
+    | 02:49:18 NOT STARTED: the 'default' run needs a pause_safe_order default-ON build, and this one lacks its help text ('which can hang when the guest pauses')
+02:49:18 PASS devoff2 -Only default -CheckOnly refuses - exit 2
+02:49:19 PASS devoff2 carries the old description - rexruntime.dll False, exe True
+02:49:19 PASS devoff2 lacks the marker - rexruntime.dll False, exe False
+    | 02:49:22 bin <workspace>\build\agent2\devoff2-bin: exe 2026-11-21 23:18, rexruntime.dll 2026-11-21 23:18
+    | 02:49:23 the build defines pause_safe_order, guest_suspend_guard, debug_pause_cycle_ms and debug_pause_cycle_count
+    | 02:49:23 NOT STARTED: another game is running (pid 86748)
+02:49:23 SKIP devoff2 -CheckOnly: another game is running (expected exit 0 otherwise)
+    | 02:49:25 bin <workspace>\build\agent11\selftest\default-20261122-024914\fake-marker: exe 2026-11-22 02:49, rexruntime.dll -
+    | 02:49:25 the build defines pause_safe_order, guest_suspend_guard, debug_pause_cycle_ms and debug_pause_cycle_count
+    | 02:49:25 the build carries the pause_safe_order default-ON help text ('which can hang when the guest pauses')
+    | 02:49:25 NOT STARTED: another game is running (pid 86748)
+02:49:25 PASS fake with marker, -Only default (a game is running, so exit 2 after the marker check) - exit 2
+    | 02:49:27 bin <workspace>\build\agent11\selftest\default-20261122-024914\fake-nomarker: exe 2026-11-22 02:49, rexruntime.dll -
+    | 02:49:28 the build defines pause_safe_order, guest_suspend_guard, debug_pause_cycle_ms and debug_pause_cycle_count
+    | 02:49:28 NOT STARTED: the 'default' run needs a pause_safe_order default-ON build, and this one lacks its help text ('which can hang when the guest pauses')
+02:49:28 PASS fake without marker, -Only default - exit 2
+    | 02:49:31 bin <workspace>\build\agent11\selftest\default-20261122-024914\fake-nomarker: exe 2026-11-22 02:49, rexruntime.dll -
+    | 02:49:31 the build defines pause_safe_order, guest_suspend_guard, debug_pause_cycle_ms and debug_pause_cycle_count
+    | 02:49:31 NOT STARTED: the 'default' run needs a pause_safe_order default-ON build, and this one lacks its help text ('which can hang when the guest pauses')
+02:49:31 PASS fake without marker, -Only testg-default - exit 2
+    | 02:49:33 bin <workspace>\build\agent11\selftest\default-20261122-024914\fake-nomarker: exe 2026-11-22 02:49, rexruntime.dll -
+    | 02:49:33 the build defines pause_safe_order, guest_suspend_guard, debug_pause_cycle_ms and debug_pause_cycle_count
+    | 02:49:33 NOT STARTED: the 'default' run needs a pause_safe_order default-ON build, and this one lacks its help text ('which can hang when the guest pauses')
+02:49:33 PASS fake without marker, -Only b-off,default - exit 2
+    | 02:49:35 bin <workspace>\build\agent11\selftest\default-20261122-024914\fake-nomarker: exe 2026-11-22 02:49, rexruntime.dll -
+    | 02:49:36 the build defines pause_safe_order, guest_suspend_guard, debug_pause_cycle_ms and debug_pause_cycle_count
+    | 02:49:36 NOT STARTED: another game is running (pid 86748)
+02:49:36 PASS fake without marker, -Only default -NoMarkerCheck (a game is running, so exit 2 after the marker check) - exit 2
+    | 02:49:39 bin <workspace>\build\agent11\selftest\default-20261122-024914\fake-nomarker: exe 2026-11-22 02:49, rexruntime.dll -
+    | 02:49:39 the build defines pause_safe_order, guest_suspend_guard, debug_pause_cycle_ms and debug_pause_cycle_count
+    | 02:49:39 NOT STARTED: another game is running (pid 86748)
+02:49:39 PASS fake without marker, no -Only (a game is running, so exit 2 after the marker check) - exit 2
+02:49:39 PASS the loop starts with $short, the -Only filter, the OptIn filter
+02:49:39 PASS filter -Only '' -> b-off,b-on,control - got 'b-off,b-on,control'
+02:49:39 PASS filter -Only 'default' -> default - got 'default'
+02:49:39 PASS filter -Only 'testg-default' -> default - got 'default'
+02:49:39 PASS filter -Only 'b-off,default' -> b-off,default - got 'b-off,default'
+02:49:39 PASS filter -Only 'control' -> control - got 'control'
+02:49:39 PASS filter -Only 'b-on' -> b-on - got 'b-on'
+02:49:39 PASS the post-run OptIn check exists
+02:49:39 PASS post-run: clean run dir - default: cmdline.txt and legodimensions.toml do not set pause_safe_order, so the build default picked the order
+02:49:39 PASS post-run: cmdline sets it - default: WARNING, the build default may not have picked the order: cmdline.txt sets pause_safe_order
+02:49:39 PASS post-run: toml sets it - default: WARNING, the build default may not have picked the order: legodimensions.toml sets pause_safe_order
+02:49:39 PASS post-run: toml missing - default: WARNING, the build default may not have picked the order: legodimensions.toml missing
+02:49:39 PASS harness\legodimensions.toml does not set pause_safe_order
+    | 02:49:42 bin <workspace>\build\agent2\devoff3-bin: exe 2026-11-22 02:43, rexruntime.dll 2026-11-22 02:44
+    | 02:49:43 the build defines pause_safe_order, guest_suspend_guard, debug_pause_cycle_ms and debug_pause_cycle_count
+    | 02:49:44 the build carries the pause_safe_order default-ON help text ('which can hang when the guest pauses')
+    | 02:49:44 NOT STARTED: another game is running (pid 86748)
+02:49:44 PASS devoff3 -Only default -CheckOnly carries the marker - exit 2 (another game is running)
+02:49:44 RESULT: PASS (0 failed)
+02:49:45 report: <workspace>\build\agent11\selftest\default-20261122-024914.txt

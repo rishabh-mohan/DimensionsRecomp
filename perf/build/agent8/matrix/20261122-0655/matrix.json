@@ -1,0 +1,40 @@
+{
+  "title": "NATIVE3D zero-code checks (agent slot, hidden desktop, functional, NOT timing): Agent 7's specs for Agent 1's slot item 3b (06:29). n2t/n3t/n2s on build/agent2/native3d-bin",
+  "reference": "n2t",
+  "warmup_s": 30,
+  "warmup_from": "firstframe",
+  "measure_s": 60,
+  "repeats": 1,
+  "order": "fixed",
+  "settle_s": 0,
+  "cooldown_s": 5,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "menu_s": 60,
+  "cold_run": false,
+  "sys_csv": true,
+  "quick": { "warmup_s": 10, "measure_s": 20, "settle_s": 0, "menu_s": 20, "cooldown_s": 5 },
+  "notes": [
+    "Written by Agent 8 at 06:31 from Agent 7's spec. Settings and the n2/n3 rows are copied exactly from bench/agent4/s3/matrix-native3d-functional.json (the 0452 rows); each arm adds exactly one env var. sys_csv is on (drivers/sys-csv.ps1, 1 s) so the slow-state check can be applied; the 0452 rows had none.",
+    "n2t = n2 + LEGO_NATIVE_TIMING=1 and n3t = n3 + LEGO_NATIVE_TIMING=1: no log line, but the *_ms columns in native-frames.csv and perf.csv must be non-zero (textures.cpp:1531-1541).",
+    "n2s = n2 + LEGO_NATIVE_PARALLEL_DRAWS=0: game.log must show 'Native draw batches: serial workers=' (draw.cpp:5586).",
+    "Run by Agent 8's slot one arm at a time (run-matrix.ps1 -Only <id> -NoPrompt), each only if it can end by 07:30. Functional only: log lines and counts, never timing. Analysis (if Agent 1 assigns it): Agent 7, bench/agent7/threaded_tail.py."
+  ],
+  "arms": [
+    { "id": "n2t", "group": "native3d", "ref": true, "frames": "native", "bin": "build/agent2/native3d-bin",
+      "cvars": ["native_settings_frontend=false", "native_fps_limit=0", "framerate_limit=0"],
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv", "LEGO_NATIVE_THREADED": "1", "LEGO_NATIVE_PREPARE_THREADS": "2", "LEGO_NATIVE_SNAPSHOT_STATE": "1", "LEGO_NATIVE_TIMING": "1" },
+      "driver": "drivers/thread-cpu.ps1",
+      "note": "Agent 7 n2t: Agent 4's native3d n2 row plus LEGO_NATIVE_TIMING=1. Expect non-zero *_ms columns in native-frames.csv and perf.csv" },
+    { "id": "n3t", "group": "native3d", "frames": "native", "bin": "build/agent2/native3d-bin",
+      "cvars": ["native_settings_frontend=false", "native_fps_limit=0", "framerate_limit=0"],
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv", "LEGO_NATIVE_THREADED": "1", "LEGO_NATIVE_PREPARE_THREADS": "2", "LEGO_NATIVE_FULL_DRAW_PREPARATION": "1", "LEGO_NATIVE_TIMING": "1" },
+      "driver": "drivers/thread-cpu.ps1",
+      "note": "Agent 7 n3t: Agent 4's native3d n3 row plus LEGO_NATIVE_TIMING=1. Expect non-zero *_ms columns in native-frames.csv and perf.csv" },
+    { "id": "n2s", "group": "native3d", "frames": "native", "bin": "build/agent2/native3d-bin",
+      "cvars": ["native_settings_frontend=false", "native_fps_limit=0", "framerate_limit=0"],
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv", "LEGO_NATIVE_THREADED": "1", "LEGO_NATIVE_PREPARE_THREADS": "2", "LEGO_NATIVE_SNAPSHOT_STATE": "1", "LEGO_NATIVE_PARALLEL_DRAWS": "0" },
+      "driver": "drivers/thread-cpu.ps1",
+      "note": "Agent 7 n2s: Agent 4's native3d n2 row plus LEGO_NATIVE_PARALLEL_DRAWS=0. game.log must show 'Native draw batches: serial workers='" }
+  ]
+}

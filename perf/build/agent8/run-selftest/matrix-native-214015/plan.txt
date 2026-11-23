@@ -1,0 +1,20 @@
+﻿=== timing matrix: selftest native + seed chain (fake exe) ===
+matrix   <workspace>\build\agent8\run-selftest\matrix-test\matrix-st-native.json   [-Quick: short settle/menu/warm-up/window, FUNCTIONAL ONLY]
+settings warm-up from firstframe (boot timeout 30 s, settle 1 s); order fixed; close timeout 15 s; cooldown 1 s
+arms:
+       N1: bin <workspace>\build\agent8\run-selftest\fake-bin; frames native; x1; warm-up 2 s; window 3 s; group n (ref)
+       N2: bin <workspace>\build\agent8\run-selftest\fake-bin; frames native; x1; warm-up 2 s; window 3 s; group n; seed from arm N1
+       N3: bin <workspace>\build\agent8\run-selftest\fake-bin; frames native; x1; warm-up 2 s; window 3 s; group n; env LEGO_NATIVE_PSO_CACHE=0; seed from arm N2 (recipes only)
+round 1  N1 N2 N3
+order    N1 N2 N3
+estimate 3 runs (0 cold), about 4 min (warm boot 20 s, cold boot 61 s, close 35 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-3LMYHDBXIEQA4QZFS6Z436D4MI -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   6.15 GB
+game       no legodimensions.exe running
+builds     RUNNING: ninja:56668 -> timing not valid while they run
+bin        <workspace>\build\agent8\run-selftest\fake-bin : ok (MANIFEST.txt)
+estimate   3 runs, about 4 min: done around 21:43

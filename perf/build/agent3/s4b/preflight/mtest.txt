@@ -1,0 +1,28 @@
+=== timing matrix: RE-PIN boot check on native4b, frontend on (agent slot, hidden desktop OK, NOT timing): Agent 4 task #12, REPIN.md section 3(a). One run: b0 on build/agent2/native4b-bin ===
+matrix   <workspace>\build\agent4\repin\matrix-repin-native4b-boot.json
+note     Written 2026-11-22 ~20:15 (Agent 4, task #12). native3_boot_check.py group A needs the effective native_settings_frontend=true, and every arm of matrix-repin-native4b.json runs with it false, so the boot check gets this 1-run matrix. Run it after REPIN.md step 3 (the pin record), in Agent 3's S4b queue: bench\agent8\run\run-matrix.ps1 -Matrix build\agent4\repin\matrix-repin-native4b-boot.json -NoPrompt -OutDir build\agent3\runs\repin-boot-<stamp> (always pass -OutDir: without it the output goes to build\agent8\matrix and trips Agent 1's HOLD). 1 run, about 4 min. Functional only (hidden desktop OK).
+note     Then: python bench\agent7\native3_boot_check.py build\agent3\runs\repin-boot-<stamp>\runs\<HHMM>-b0-r1 --bin-dir build\agent2\native4b-bin. Pass: exit 0 (no FAIL in A, B or C) plus D's identity lines (D is info-only and never FAILs on its own; REPIN.md 3a). A: frontend true (from the run's command line). B: no throw/fatal line, a present line after 'Native write tracking', run.json OK, no dumps, >= 600 native-frames.csv rows. C: bilinear present. D: a PASS line 'native GPU fingerprint: MANIFEST 9b40acbbef4c57b3, game.log 9b40acbbef4c57b3' (a missing line is a fail: the check skips it when either side is missing), PASS on the fix (a) MANIFEST rows (settings_registry.cpp -> 4EC71328 or 8BA19C5F, settings_preferences.cpp -> 9CBE6DBF), and VERDICT D=PASS with no WARN; send any other D WARN to Agent 4.
+note     The check reads <run>\native-frames.csv, which this arm's env sets. harness/run-game.ps1 writes frames.csv instead, so a run-game.ps1 boot would fail groups B and C (no native rows): use this matrix.
+note     Until native4b-bin has a MANIFEST.txt, run-matrix skips the arm. On a fail, send the run dir and the check output to Agent 4 and Agent 2; the pin stays on native4 (5e3ff55de10f4f64) and native4b-bin is parked.
+settings warm-up from firstframe (boot timeout 240 s, settle 0 s); order fixed; close timeout 60 s; cooldown 5 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv off
+arms:
+  SKIP b0: bin build/agent2/native4b-bin; frames native; x1; warm-up 60 s (raised from 30 s for the floor); window 60 s; cvars native_settings_frontend=true native_fps_limit=0 framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv
+         native4b (S4b + S4c, every switch OFF), frontend on (NativeSettingsRuntime built), default serial path. Expected fingerprint 9b40acbbef4c57b3
+!!! SKIPPED ARM b0: bin build/agent2/native4b-bin is missing or has no MANIFEST.txt (not staged yet?)
+order    (no runnable arms)
+estimate 0 runs (0 cold), about 0 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+staged   once the missing bins are staged: order b0; 1 runs, about 3 min
+
+--- preflight ---
+desktop    WinSta0\exebox-T2J5RW5NZB6SVOIKEAIMGDYE3W -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   10.7 GB
+game       no legodimensions.exe running
+builds     RUNNING: clang++:2860 clang++:11592 clang++:12776 clang++:13536 clang++:18812 clang++:29236 clang++:35556 clang++:35844 cmake:37268 ninja:38020 -> timing not valid while they run
+bin        build/agent2/native4b-bin : MISSING -> arms skipped: b0
+screensaver none
+estimate   0 runs, about 0 min: done around 20:43
+!!! FATAL: no runnable arms
+PlanOnly: nothing started.

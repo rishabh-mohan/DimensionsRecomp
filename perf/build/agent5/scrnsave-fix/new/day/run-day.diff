@@ -1,0 +1,58 @@
+diff --git a/scrnsave-fix/new/run-night.ps1 b/scrnsave-fix/new/day/run-day.ps1
+index 183e9fc..cd29347 100644
+--- a/scrnsave-fix/new/run-night.ps1
++++ b/scrnsave-fix/new/day/run-day.ps1
+@@ -1,4 +1,4 @@
+-# run-night.ps1: Agent 5's overnight launcher (task #4, old #27). Plain description: README.md next to this file.
++# run-day.ps1: Agent 5's day launcher, made from run-night.ps1 (sha 565D30D4) by make-run-day.ps1; changed lines end in '# DAY:'. -StopAt is required; in the comments below, 07:30 means the -StopAt time. Plain description: README-DAY.md.   # DAY: header
+ # The user starts it once (RUN-NIGHT.cmd) on the unlocked desktop. It waits for perf-notes\WINDOW-GO.txt:
+ #   GO <window-id> <matrix json in bench\agent8\run\> <sha256 of that json> only=<arm,arm,...> repeats=<n>
+ # checks it, waits for a quiet machine, then runs ONLY the pinned bench\agent8\run\run-matrix.ps1 with that json
+@@ -62,9 +62,10 @@ $CloseByPath = @{ 'Copilot' = $CopilotRx; 'Microsoft.Copilot' = $CopilotRx; 'cop
+ $MinRamGB = 6.0; $MinDiskGB = 6.0; $QuietCores = 0.1; $RelaxMaxCores = 1.2; $RelaxSpread = 0.2; $DeadlineSlackMin = 10
+ 
+ # ---------- mode, paths, hooks ----------
+-$hookNames = @('DryRunTag', 'SampleSeconds', 'GiveUpMinutes', 'StrictMinutes', 'StopAt', 'MatrixDir', 'PollSeconds', 'MaxGo', 'GateFixture', 'StartBy', 'GraceMinutes', 'FakeRunner', 'TestFailAfter', 'SkipStartChecks')
++$hookNames = @('DryRunTag', 'SampleSeconds', 'GiveUpMinutes', 'StrictMinutes', 'MatrixDir', 'PollSeconds', 'MaxGo', 'GateFixture', 'StartBy', 'GraceMinutes', 'FakeRunner', 'TestFailAfter', 'SkipStartChecks')   # DAY: -StopAt is the day session end here, not a test hook
+ $usedHooks = @($PSBoundParameters.Keys | Where-Object { $hookNames -contains $_ })
+ if ($usedHooks.Count -and -not $DryRun) { Write-Host "refused: $((@($usedHooks | ForEach-Object { '-' + $_ })) -join ' ') only work together with -DryRun" -ForegroundColor Red; exit 2 }
++if ($StopAt -notmatch '^(\d{4}-\d\d-\d\d )?\d\d:\d\d$') { Write-Host "refused: run-day.ps1 needs -StopAt 'HH:mm' or 'yyyy-MM-dd HH:mm' (RUN-DAY.cmd sets it from your return time)" -ForegroundColor Red; exit 2 }   # DAY: -StopAt is required
+ if ($DryRun) {
+     if ($DryRunTag -and $DryRunTag -notmatch '^[A-Za-z0-9][A-Za-z0-9_.-]{0,31}$') { Write-Host "refused: -DryRunTag '$DryRunTag' must be 1-32 of A-Z a-z 0-9 _ . -" -ForegroundColor Red; exit 2 }
+     $Base = Join-Path $PSScriptRoot 'status-dryrun'; if ($DryRunTag) { $Base = Join-Path $Base $DryRunTag }
+@@ -183,7 +184,7 @@ function Get-BuildProcs([string]$PathRx = '') {
+ # ---------- pins: the runner and everything it loads, plus this launcher ----------
+ function Get-PinFiles {
+     $f = New-Object System.Collections.Generic.List[string]
+-    $f.Add($PSCommandPath); $f.Add((Join-Path $PSScriptRoot 'RUN-NIGHT.cmd'))
++    $f.Add($PSCommandPath); $f.Add((Join-Path $PSScriptRoot 'RUN-DAY.cmd'))   # DAY: pins RUN-DAY.cmd
+     foreach ($n in @('run-matrix.ps1', 'run-timing.ps1', 'common.ps1', 'timing-env.ps1', 'winhelper.cs')) { $f.Add((Join-Path $RunDir $n)) }
+     foreach ($x in @(Get-ChildItem -LiteralPath $RunDir -File | Where-Object { $_.Extension -eq '.py' -or $_.Extension -eq '.cs' })) { $f.Add($x.FullName) }
+     $drv = Join-Path $RunDir 'drivers'
+@@ -541,7 +542,7 @@ function Get-HoldState {
+ # there first. Throws if no HOLD could be written.
+ function Set-Hold([string]$WindowId) {
+     $tok = [guid]::NewGuid().ToString('N')
+-    $text = "HOLD window $WindowId by Agent 5's overnight launcher (bench\agent5\launch\run-night.ps1), pid $PID, since $(Ts (Now)), token $tok"
++    $text = "HOLD window $WindowId by Agent 5's day launcher ($PSCommandPath), pid $PID, since $(Ts (Now)), token $tok"   # DAY: HOLD names the day launcher
+     $bytes = (New-Object Text.UTF8Encoding $false).GetBytes($text + "`r`n")
+     $err = 'unknown'
+     for ($k = 0; $k -lt 10; $k++) {
+@@ -935,7 +936,7 @@ function Invoke-Go {
+ function Refuse-Start([string]$Why) {
+     Log "START REFUSED: $Why" 'Red'
+     Set-State 'refused-at-start' @{ reason = $Why }
+-    Write-Host "`r`nThe launcher did not start: $Why`r`nNothing was changed. README.md explains the start checks." -ForegroundColor Red
++    Write-Host "`r`nThe launcher did not start: $Why`r`nNothing was changed. README-DAY.md explains the start checks." -ForegroundColor Red   # DAY: message
+ }
+ $script:Deadline = $null; $script:LatestStart = $null; $script:Pins = $null; $script:GateLine = ''
+ $exitCode = 0; $begun = $false; $endHow = 'interrupted (Ctrl+C?) before a normal end'
+@@ -963,7 +964,7 @@ try {
+     if ($soft.Count -and $DryRun -and $SkipStartChecks) { Log "start checks would refuse: $($soft -join '; ') (ignored: -DryRun -SkipStartChecks)" 'Yellow' }
+     else { foreach ($w in $soft) { $why.Add($w) } }
+     if (Test-Stop) { $why.Add("$StopFile exists: delete it first") }
+-    if (($script:Deadline - (Now)).TotalHours -gt $MaxRunHours) { $why.Add("it would run until $(Ts $script:Deadline), more than $MaxRunHours h from now (it is past 07:30): start it in the evening") }
++    if (($script:Deadline - (Now)).TotalHours -gt $MaxRunHours) { $why.Add("it would run until $(Ts $script:Deadline), more than $MaxRunHours h from now: -StopAt must be less than $MaxRunHours h away") }   # DAY: message
+     $script:Pins = Get-Pins
+     $miss = @($script:Pins.Keys | Where-Object { $script:Pins[$_] -eq 'MISSING' })
+     if ($miss.Count) { $why.Add("pinned file(s) missing: $($miss -join ', ')") }

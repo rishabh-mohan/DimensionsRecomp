@@ -1,0 +1,14 @@
+# "opt9" variant (session 3): the 9 keys of S2.10 in perf-notes/agent9-codegen.md, i.e. tests/ppc/opt_config.toml
+# without skip_lr. This is the key set of LEGO build B (build/agent9/install/batch-nolr).
+#   rexglue recompile-tests --config bench/agent9/ppctests/opt9_config.toml ...
+# Deliberately off: skip_lr (LEGO host code reads ctx.lr), skip_msr, non_argument_as_local, non_volatile_as_local.
+
+ctr_as_local = true
+xer_as_local = true
+reserved_as_local = true
+cr_as_local = true
+rlwinm_lowering = true
+cr_compare_so_zero = true
+musttail_calls = true
+vmx_vector_fallbacks = true
+flush_mode_elision = true

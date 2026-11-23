@@ -1,0 +1,18 @@
+# s4b_check s4b08 s4b08 (off, scenario I420)
+run.json: exit 0 (0x00000000) dumps 0 crash_events 0 wer False; close wm_close 1.00 s; elapsed 40.0 of 420 s; cvars {"shared_memory_single_hold_rearm": "true", "slow_frame_log_ms": "1"}; env -; steps None
+summary: verdict None; first frame None s; levels null; unknown cvars None; errors 0
+log files game.log; levels {"info": 3}
+families: c1_any=0 k=0 c1_other=0 recovered_stale=0 unhandled_phys=0 protect_failed=0 split_init=0 split=0 deferred_counters=0 gpu_wait=0 memexport=2 slow_frame=2 s4_upload_hash=0 precise_wait=0 miss_cache=0 stuck_lock=0 minidump=0 fatal=0 debug_layer=0 d3d12_msg=0 clean_exit=1
+  memexport: [2026-11-22 20:10:05.000] [info] [gpu] [t4242] slow frame #100: 34.5 ms | gpu-thread idle 1.0 | host-gpu wait 2.0 (3x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.5 (2x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 5x 20 KB (on memexport pages 0x 0 KB) |
+  memexport: [2026-11-22 20:10:10.001] [info] [gpu] [t4242] slow frame #240: 34.5 ms | gpu-thread idle 1.0 | host-gpu wait 2.0 (3x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.5 (2x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 5x 20 KB (on memexport pages 0x 0 KB) |
+  slow_frame: [2026-11-22 20:10:05.000] [info] [gpu] [t4242] slow frame #100: 34.5 ms | gpu-thread idle 1.0 | host-gpu wait 2.0 (3x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.5 (2x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 5x 20 KB (on memexport pages 0x 0 KB) |
+  slow_frame: [2026-11-22 20:10:10.001] [info] [gpu] [t4242] slow frame #240: 34.5 ms | gpu-thread idle 1.0 | host-gpu wait 2.0 (3x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.5 (2x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 5x 20 KB (on memexport pages 0x 0 KB) |
+memexport full-buffer: {"lines": 2, "last_total": 0, "max_total": 0, "sum_x": 0, "lines_x_gt0": 0}
+last slow-frame line (tail): ... texture load 0.5 (2x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 5x 20 KB (on memexport pages 0x 0 KB) | memexport syncs 1 (4 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)
+threads: no threads-s4a.csv
+sys.csv slow state: no sys.csv
+PROOF ok   slow-frame lines 2
+PROOF ok   the last slow-frame line ends with the memexport suffix: ...n memexport pages 0x 0 KB) | memexport syncs 1 (4 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)
+PROOF ok   P2 COUNTER: memexport full-buffer total (last line) = 0; max 0; sum Nx 0; lines with Nx > 0: 0 -> closes P2 memexport gate
+BASE items missed: none
+VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b08)

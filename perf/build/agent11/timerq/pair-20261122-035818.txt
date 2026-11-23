@@ -1,0 +1,49 @@
+# timerq_pair 2026-11-22 03:58:27  reference 0354-d0f-r1  test arms 0352-d11t-r1, 0349-d0t-r1
+
+| run | cvars; env | TimerQueue busy % (max 1 s) | all threads, cores | window cores | fps mean | >33 ms | >100 ms | eff MHz P / E | utility % P / E | status, close, exit | dumps |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 0354-d0f-r1 | framerate_limit=0; - | 44.1 (61.3) | 2.27 | 2.23 | 52.2 | 588 | 8 | 1,930 / 594 | 112.1 / 35.6 | OK WM_CLOSE 0x00000000 | 0 |
+| 0352-d11t-r1 | framerate_limit=0 host_timer_resolution_ms=1 host_timer_throttling_optout=true precise_guest_sleep=true wait_timeout_round_up=true cs_spin=true spinlock_pause_spin=true clock_lockfree=true tls_bounds_fix=true; REX_TIMER_WAIT_BLOCKING=1 | 0.3 (1.7) | 1.76 | 1.77 | 62.0 | 573 | 2 | 1,938 / 785 | 112.7 / 47.4 | OK WM_CLOSE 0x00000000 | 0 |
+| 0349-d0t-r1 | framerate_limit=0; REX_TIMER_WAIT_BLOCKING=1 | 0.5 (2.6) | 1.99 | 2.00 | 78.0 | 403 | 12 | 1,897 / 699 | 109.8 / 42.0 | OK WM_CLOSE 0x00000000 | 0 |
+| context: window 3 d0 (interactive desktop, mean of 4) | framerate_limit=0; - | 62.0 | 3.48 | | 163.6 | | | | | | |
+| context: verify3b d0 (hidden desktop, 23:46) | framerate_limit=0; - | 32.9 | 2.73 | 2.73 | 226.9 | 5 | 0 | | | | |
+Power overlay: best_efficiency
+
+Per 10 s from the first frame (* = inside the measured window, 60-110 s); MHz and E utility from sys.csv:
+| run | metric | 0 | 10 | 20 | 30 | 40 | 50 | 60* | 70* | 80* | 90* | 100* | 110 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 0354-d0f-r1 | fps | 230 | 214 | 200 | 162 | 201 | 167 | 46 | 42 | 68 | 50 | 54 | 49 |
+| 0354-d0f-r1 | P MHz | 2,009 | 2,092 | 1,915 | 1,916 | 1,907 | 1,930 | 1,901 | 1,940 | 1,930 | 1,940 | 1,939 | 1,944 |
+| 0354-d0f-r1 | E MHz | 1,632 | 1,722 | 1,488 | 1,488 | 1,475 | 1,438 | 555 | 554 | 601 | 639 | 622 | 692 |
+| 0354-d0f-r1 | E util % | 97 | 104 | 89 | 89 | 89 | 87 | 33 | 33 | 36 | 38 | 37 | 42 |
+| 0352-d11t-r1 | fps | 238 | 256 | 258 | 163 | 67 | 57 | 60 | 36 | 78 | 74 | 64 | 41 |
+| 0352-d11t-r1 | P MHz | 1,944 | 1,917 | 1,920 | 1,940 | 1,847 | 1,887 | 1,935 | 1,930 | 1,940 | 1,941 | 1,945 | 2,035 |
+| 0352-d11t-r1 | E MHz | 1,492 | 1,502 | 1,490 | 1,511 | 665 | 551 | 553 | 550 | 871 | 965 | 986 | 1,449 |
+| 0352-d11t-r1 | E util % | 90 | 89 | 90 | 90 | 40 | 33 | 33 | 33 | 53 | 58 | 60 | 87 |
+| 0349-d0t-r1 | fps | 262 | 253 | 231 | 154 | 117 | 186 | 161 | 79 | 62 | 54 | 38 | 45 |
+| 0349-d0t-r1 | P MHz | 2,088 | 1,915 | 1,922 | 1,936 | 1,941 | 1,923 | 1,924 | 1,826 | 1,880 | 1,915 | 1,939 | 1,949 |
+| 0349-d0t-r1 | E MHz | 1,749 | 1,502 | 1,489 | 1,505 | 1,499 | 1,499 | 1,274 | 552 | 555 | 557 | 557 | 555 |
+| 0349-d0t-r1 | E util % | 102 | 89 | 90 | 90 | 91 | 90 | 76 | 33 | 33 | 33 | 33 | 33 |
+
+## 0352-d11t-r1 against 0354-d0f-r1
+PASS  TimerQueue busy <= 3 % (got 0.3; reference 44.1)
+PASS  >100 ms frames <= reference (got 2 vs 8)
+PASS  fps mean at most 10 % below the reference (got 62.0 vs 52.2, +18.8 %)
+PASS  closed cleanly (status OK, killed False, exit 0x00000000)
+PASS  no dump (dumps 0, WerFault False)
+PASS  REX_TIMER_WAIT_BLOCKING set in the test arm only (test True, reference False)
+INFO  TimerQueue 44.1 -> 0.3 % of a core (0.44 cores freed on the hidden desktop; window 3 d0 had 0.62 cores)
+INFO  window eff MHz P 1,930 -> 1,938, E 594 -> 785; utility P 112.1 -> 112.7, E 35.6 -> 47.4
+
+## 0349-d0t-r1 against 0354-d0f-r1
+PASS  TimerQueue busy <= 3 % (got 0.5; reference 44.1)
+FAIL  >100 ms frames <= reference (got 12 vs 8)
+PASS  fps mean at most 10 % below the reference (got 78.0 vs 52.2, +49.6 %)
+PASS  closed cleanly (status OK, killed False, exit 0x00000000)
+PASS  no dump (dumps 0, WerFault False)
+PASS  REX_TIMER_WAIT_BLOCKING set in the test arm only (test True, reference False)
+INFO  TimerQueue 44.1 -> 0.5 % of a core (0.44 cores freed on the hidden desktop; window 3 d0 had 0.62 cores)
+INFO  window eff MHz P 1,930 -> 1,897, E 594 -> 699; utility P 112.1 -> 109.8, E 35.6 -> 42.0
+
+RESULT: FAIL (1)
+# log <workspace>\build\agent11\timerq\pair-20261122-035818.txt

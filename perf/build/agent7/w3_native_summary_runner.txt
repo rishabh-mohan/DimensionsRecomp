@@ -1,0 +1,85 @@
+﻿== build/agent8/matrix/20261122-0013/runs/0030-n0-r1 (arm n0)
+  runner window: frames.json source=native first_row=12262 rows=7169 -> native rows [12262, 19431) 0-based (first_row-0); mean 6.9745 vs frames.json 6.9745, n 7169 vs 7169: MATCH; perf window shifted +1 row
+  perf.csv: 27309 rows, runner window rows 12264-19432 (50.0 s): n=7169 fps=143.38 mean=6.974 sd=1.397 p50=6.691 p99=11.372 p99.9=14.113 max=16.343 ms; >33ms=0 >100ms=0
+  native-frames.csv: 27308 rows, runner window rows 12263-19431 (50.0 s): n=7169 fps=143.38 mean=6.974 sd=1.399 p50=6.691 p99=11.374 p99.9=14.113 max=16.345 ms; >33ms=0 >100ms=0
+    window means: frame_slot_wait_ms=0.0000 acquire_cpu_ms=0.0000 present_submit_cpu_ms=0.0000 swap_present_cpu_ms=1.0122 sync_calls=0.0000 sync_ms=0.0000 draw_calls=8.0000
+    first row: scene_render_width=1920 scene_render_height=1080 present_source_width=1920 present_source_height=1080 spatial_fsr_presented=0
+    last row: native_vsync=0 native_fps_limit_cvar=0 output_width=2240 output_height=1294 fsr_enabled=0 presentation_refresh_hz=60 scene_render_width=1920 scene_render_height=1080 present_source_width=1920 present_source_height=1080 spatial_fsr_presented=0
+  rows: perf.csv 27309, native-frames.csv 27308 (perf - native = +1; expect +1, perf.csv's leading 0 row)
+  native rows: frame 2..27309, 0 gap(s); max over all rows: spatial_fsr_presented=0 fsr_enabled=0
+  proc.csv: cpu_cores mean=2.44 max=3.66 (measure rows)
+  game.log toggles: 
+    [2026-11-22 00:30:48.738] [info] [core] [t31972] Native GPU init: swap chain ready (vsync off)
+    [2026-11-22 00:30:48.762] [info] [core] [t31972] Native GPU [b7cc74f980e016c3]: D3D12 ready on 'NVIDIA GeForce MX570' (2240x1294, 3 images)
+    [2026-11-22 00:30:48.763] [info] [core] [t31972] Native GPU: threaded recording off
+    [2026-11-22 00:30:53.298] [info] [core] [t8744] Native GPU: display gamma updated from title ramp black=00000000 mid=21485214 white=3FFFFFFF identity=false
+    [2026-11-22 00:30:53.306] [info] [core] [t8744] Native GPU: presented internal texture 1920x1080 (before swap-chain copy)
+    [2026-11-22 00:30:53.306] [info] [core] [t8744] Native GPU: presentation cap override=-1 (-1 uses live native_fps_limit)
+    [2026-11-22 00:30:53.320] [info] [core] [t8744] Native GPU: swap-chain max frame latency=1 query=00000000 waitable=true latency_wait=0 set=00000001
+    [2026-11-22 00:30:53.320] [info] [core] [t8744] Native GPU: present override sync=-1 flags=0
+== build/agent8/matrix/20261122-0013/runs/0042-n0-r2 (arm n0)
+  runner window: frames.json source=native first_row=13846 rows=6835 -> native rows [13846, 20681) 0-based (first_row-0); mean 7.3163 vs frames.json 7.3163, n 6835 vs 6835: MATCH; perf window shifted +1 row
+  perf.csv: 28278 rows, runner window rows 13848-20682 (50.0 s): n=6835 fps=136.68 mean=7.316 sd=1.656 p50=6.873 p99=12.591 p99.9=14.966 max=16.610 ms; >33ms=0 >100ms=0
+  native-frames.csv: 28277 rows, runner window rows 13847-20681 (50.0 s): n=6835 fps=136.68 mean=7.316 sd=1.657 p50=6.875 p99=12.591 p99.9=14.966 max=16.609 ms; >33ms=0 >100ms=0
+    window means: frame_slot_wait_ms=0.0000 acquire_cpu_ms=0.0000 present_submit_cpu_ms=0.0000 swap_present_cpu_ms=1.0162 sync_calls=0.0000 sync_ms=0.0000 draw_calls=8.0000
+    first row: scene_render_width=1920 scene_render_height=1080 present_source_width=1920 present_source_height=1080 spatial_fsr_presented=0
+    last row: native_vsync=0 native_fps_limit_cvar=0 output_width=2240 output_height=1294 fsr_enabled=0 presentation_refresh_hz=60 scene_render_width=1920 scene_render_height=1080 present_source_width=1920 present_source_height=1080 spatial_fsr_presented=0
+  rows: perf.csv 28278, native-frames.csv 28277 (perf - native = +1; expect +1, perf.csv's leading 0 row)
+  native rows: frame 2..28278, 0 gap(s); max over all rows: spatial_fsr_presented=0 fsr_enabled=0
+  proc.csv: cpu_cores mean=2.55 max=8.63 (measure rows)
+  game.log toggles: 
+    [2026-11-22 00:42:52.783] [info] [core] [t52652] Native GPU init: swap chain ready (vsync off)
+    [2026-11-22 00:42:52.813] [info] [core] [t52652] Native GPU [b7cc74f980e016c3]: D3D12 ready on 'NVIDIA GeForce MX570' (2240x1294, 3 images)
+    [2026-11-22 00:42:52.814] [info] [core] [t52652] Native GPU: threaded recording off
+    [2026-11-22 00:42:57.195] [info] [core] [t52900] Native GPU: display gamma updated from title ramp black=00000000 mid=21485214 white=3FFFFFFF identity=false
+    [2026-11-22 00:42:57.204] [info] [core] [t52900] Native GPU: presented internal texture 1920x1080 (before swap-chain copy)
+    [2026-11-22 00:42:57.204] [info] [core] [t52900] Native GPU: presentation cap override=-1 (-1 uses live native_fps_limit)
+    [2026-11-22 00:42:57.217] [info] [core] [t52900] Native GPU: swap-chain max frame latency=1 query=00000000 waitable=true latency_wait=0 set=00000001
+    [2026-11-22 00:42:57.218] [info] [core] [t52900] Native GPU: present override sync=-1 flags=0
+== build/agent8/matrix/20261122-0013/runs/0054-n0-r3 (arm n0)
+  runner window: frames.json source=native first_row=12454 rows=7329 -> native rows [12454, 19783) 0-based (first_row-0); mean 6.8224 vs frames.json 6.8224, n 7329 vs 7329: MATCH; perf window shifted +1 row
+  perf.csv: 21044 rows, runner window rows 12456-19784 (50.0 s): n=7329 fps=146.58 mean=6.822 sd=1.310 p50=6.554 p99=10.968 p99.9=13.808 max=14.594 ms; >33ms=0 >100ms=0
+  native-frames.csv: 21043 rows, runner window rows 12455-19783 (50.0 s): n=7329 fps=146.58 mean=6.822 sd=1.311 p50=6.555 p99=10.967 p99.9=13.808 max=14.593 ms; >33ms=0 >100ms=0
+    window means: frame_slot_wait_ms=0.0000 acquire_cpu_ms=0.0000 present_submit_cpu_ms=0.0000 swap_present_cpu_ms=1.0178 sync_calls=0.0000 sync_ms=0.0000 draw_calls=8.0000
+    first row: scene_render_width=1920 scene_render_height=1080 present_source_width=1920 present_source_height=1080 spatial_fsr_presented=0
+    last row: native_vsync=0 native_fps_limit_cvar=0 output_width=2240 output_height=1294 fsr_enabled=0 presentation_refresh_hz=60 scene_render_width=1920 scene_render_height=1080 present_source_width=1920 present_source_height=1080 spatial_fsr_presented=0
+  rows: perf.csv 21044, native-frames.csv 21043 (perf - native = +1; expect +1, perf.csv's leading 0 row)
+  native rows: frame 2..21044, 0 gap(s); max over all rows: spatial_fsr_presented=0 fsr_enabled=0
+  proc.csv: cpu_cores mean=2.38 max=3.40 (measure rows)
+  game.log toggles: 
+    [2026-11-22 00:54:26.100] [info] [core] [t37808] Native GPU init: swap chain ready (vsync off)
+    [2026-11-22 00:54:26.131] [info] [core] [t37808] Native GPU [b7cc74f980e016c3]: D3D12 ready on 'NVIDIA GeForce MX570' (2240x1294, 3 images)
+    [2026-11-22 00:54:26.132] [info] [core] [t37808] Native GPU: threaded recording off
+    [2026-11-22 00:54:30.112] [info] [core] [t40812] Native GPU: display gamma updated from title ramp black=00000000 mid=21485214 white=3FFFFFFF identity=false
+    [2026-11-22 00:54:30.121] [info] [core] [t40812] Native GPU: presented internal texture 1920x1080 (before swap-chain copy)
+    [2026-11-22 00:54:30.121] [info] [core] [t40812] Native GPU: presentation cap override=-1 (-1 uses live native_fps_limit)
+    [2026-11-22 00:54:30.134] [info] [core] [t40812] Native GPU: swap-chain max frame latency=1 query=00000000 waitable=true latency_wait=0 set=00000001
+    [2026-11-22 00:54:30.135] [info] [core] [t40812] Native GPU: present override sync=-1 flags=0
+== build/agent8/matrix/20261122-0013/runs/0104-n0-r4 (arm n0)
+  runner window: frames.json source=native first_row=10126 rows=7153 -> native rows [10126, 17279) 0-based (first_row-0); mean 6.9904 vs frames.json 6.9904, n 7153 vs 7153: MATCH; perf window shifted +1 row
+  perf.csv: 17399 rows, runner window rows 10128-17280 (50.0 s): n=7153 fps=143.05 mean=6.990 sd=1.350 p50=6.722 p99=11.289 p99.9=14.149 max=16.330 ms; >33ms=0 >100ms=0
+  native-frames.csv: 17398 rows, runner window rows 10127-17279 (50.0 s): n=7153 fps=143.05 mean=6.990 sd=1.351 p50=6.723 p99=11.303 p99.9=14.149 max=16.332 ms; >33ms=0 >100ms=0
+    window means: frame_slot_wait_ms=0.0000 acquire_cpu_ms=0.0000 present_submit_cpu_ms=0.0000 swap_present_cpu_ms=1.0418 sync_calls=0.0000 sync_ms=0.0000 draw_calls=8.0000
+    first row: scene_render_width=1920 scene_render_height=1080 present_source_width=1920 present_source_height=1080 spatial_fsr_presented=0
+    last row: native_vsync=0 native_fps_limit_cvar=0 output_width=2240 output_height=1294 fsr_enabled=0 presentation_refresh_hz=60 scene_render_width=1920 scene_render_height=1080 present_source_width=1920 present_source_height=1080 spatial_fsr_presented=0
+  rows: perf.csv 17399, native-frames.csv 17398 (perf - native = +1; expect +1, perf.csv's leading 0 row)
+  native rows: frame 2..17399, 0 gap(s); max over all rows: spatial_fsr_presented=0 fsr_enabled=0
+  proc.csv: cpu_cores mean=2.42 max=3.52 (measure rows)
+  game.log toggles: 
+    [2026-11-22 01:05:00.527] [info] [core] [t40648] Native GPU init: swap chain ready (vsync off)
+    [2026-11-22 01:05:00.552] [info] [core] [t40648] Native GPU [b7cc74f980e016c3]: D3D12 ready on 'NVIDIA GeForce MX570' (2240x1294, 3 images)
+    [2026-11-22 01:05:00.554] [info] [core] [t40648] Native GPU: threaded recording off
+    [2026-11-22 01:05:04.991] [info] [core] [t93100] Native GPU: display gamma updated from title ramp black=00000000 mid=21485214 white=3FFFFFFF identity=false
+    [2026-11-22 01:05:05.000] [info] [core] [t93100] Native GPU: presented internal texture 1920x1080 (before swap-chain copy)
+    [2026-11-22 01:05:05.000] [info] [core] [t93100] Native GPU: presentation cap override=-1 (-1 uses live native_fps_limit)
+    [2026-11-22 01:05:05.013] [info] [core] [t93100] Native GPU: swap-chain max frame latency=1 query=00000000 waitable=true latency_wait=0 set=00000001
+    [2026-11-22 01:05:05.013] [info] [core] [t93100] Native GPU: present override sync=-1 flags=0
+
+run                          source      fps     mean      sd      p50      p99    p99.9   >33  cores
+0030-n0-r1                   perf     143.38    6.974   1.397    6.691   11.372   14.113     0   2.44
+0042-n0-r2                   perf     136.68    7.316   1.656    6.873   12.591   14.966     0   2.55
+0054-n0-r3                   perf     146.58    6.822   1.310    6.554   10.968   13.808     0   2.38
+0104-n0-r4                   perf     143.05    6.990   1.350    6.722   11.289   14.149     0   2.42
+
+per-arm medians over runs:
+  n0               runs=4 fps=143.22 sd=1.374 p99=11.331 p99.9=14.131 cores=2.43

@@ -1,0 +1,30 @@
+base build\agent3\runs\20261122-045945-bgate-long-native3d: game.log 342,066 B; 1,831 lines
+cand build\agent3\runs\20261122-050343-bgate-long-nativeB: game.log 345,508 B; 1,851 lines
+
+item                                       verdict      base | cand
+slot heap registered                       MATCH        9 bytes=[2044723, 2044723, 4194304, 4194304, 4194304, 4194304, 4194304, 4194304, 4194304] | 9 bytes=[2044723, 2044723, 4194304, 4194304, 4194304, 4194304, 4194304, 4194304, 4194304]   [addresses: base 847E1660/AAC43A40,847E18C8/AACE5D28,847E1B30/AB62F0D8,847E1D98/AAC221B8 cand 847E1660/ABB70A78,847E18C8/AB8BF560,847E1B30/AACCEB90,847E1D98/AB62F258]
+slot heap extended (Grow, lr 82A33FC4)     NOT COVERED  0 | 0   [owned_regions max base - cand -]
+placement relocation (lr 83F9B660)         DIFF         1 {('1', '83F9B660'): 1} | 0 {}
+pool copy (lr, caller, VS)                 MATCH        128 lr=82BD2B44 caller=82B5819C VS=A58EBA12..x128 | 128 lr=82BD2B44 caller=82B5819C VS=A58EBA12..x128
+pool copy bytes (in order)                 DIFF         [716800, 131072, 4096, 4096, 380928, 4096, 8192, 8192, 8192, 8192, 8192, 8192] | [716800, 131072, 4096, 4096, 380928, 4096, 4096, 4096, 4096, 8192, 8192, 8192]
+cel/bloom diagnostics                      NOT COVERED  {} | {}   [logged only with native effects diagnostics on (off by default)]
+memexport begin warnings                   NOT COVERED  0 | 0
+
+hash=0x0 cache-miss lines: base 0, cand 0 (same)
+info lines: base Native GPU: threaded recording off x1 | cand Native GPU: threaded recording off x1
+
+Fail lines (cand must be 0):
+  not in any registered module                            base 0, cand 0  ok
+  Native GPU: pool copy unsupported                       base 0, cand 0  ok
+  pool copy POINTLIST contract mismatch                   base 0, cand 0  ok
+  Native slot heap: external detach verification failed   base 0, cand 0  ok
+  pool copy byte verification failed                      base 0, cand 0  ok
+  ordered pool copy skipped                               base 0, cand 0  ok
+  ordered pool copy unsupported GPU dependency            base 0, cand 0  ok
+  Native slot heap: retained                              base 0, cand 0  ok
+  unimplemented-instruction lines                         base 0, cand 0  ok
+
+covered: slot heap registered, pool copy (lr, caller, VS)
+not covered: slot heap extended (Grow, lr 82A33FC4), cel/bloom diagnostics, memexport begin warnings
+RESULT DIFF/FAIL
+

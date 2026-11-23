@@ -1,0 +1,17 @@
+live DimensionsRecomp\rexglue-sdk\src\graphics\d3d12\pipeline_cache.cpp: 161305 B  sha256 5DBED81F611E25B17EBBE7FE2779ED5540FD94651F2D29A631D1C8AB74AE5213  CRLF 0  bare LF 3335
+snap build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\d3d12\pipeline_cache.cpp: 161303 B  sha256 DA77744302CFC1496F46CF9177D16FEBE4716A34C8086AC71B63970072841708  CRLF 0  bare LF 3335
+size delta snap-live = -2 B (expected -2)
+lines: live 3335  snap 3335
+differing hunks: 1
+  replace: live L564-564  snap L564-564
+    - L564: b'    while (creation_threads_.size() < creation_thread_original_count) {\n'
+    + L564: b'    while (creation_threads_.size() < creation_thread_needed_count) {\n'
+context (snap):
+  561: b'    size_t creation_thread_needed_count ='
+  562: b'        std::max(std::min(pipeline_stored_descriptions.size(), logical_processor_count) - size_t(1),'
+  563: b'                 creation_thread_original_count);'
+  564: b'    while (creation_threads_.size() < creation_thread_needed_count) {'
+  565: b'      size_t creation_thread_index = creation_threads_.size();'
+  566: b'      std::unique_ptr<rex::thread::Thread> creation_thread = rex::thread::Thread::Create('
+  567: b'          {}, [this, creation_thread_index]() { CreationThread(creation_thread_index); });'
+VERDICT: PASS - exactly one changed line at L564, creation_thread_original_count -> creation_thread_needed_count, nothing else

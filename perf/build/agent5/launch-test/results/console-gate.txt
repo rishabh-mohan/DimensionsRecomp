@@ -1,0 +1,38 @@
+group gate; t-good.json sha256 4D7D689B799F6102E6325B4CED12688E60F1D2FCE82397C06956574B2B025DFD; real perf-notes files: WINDOW-GO.txt=absent WINDOW-HOLD.txt=absent WINDOW-STOP.txt=absent
+PASS  build running      exit 0        
+PASS  build all along    exit 0        
+PASS  build at window start exit 0        
+PASS  close list (dry run) exit 0        
+PASS  STOP at start      exit 2        
+PASS  STOP waiting for GO exit 0        
+PASS  STOP in the gate   exit 0        
+FAIL  relaxed gate       exit 0        missing /strict gate for the first 0.25 min/ | missing /quiet gate: RELAXED \(MsMpEng 1\.02/1\.02/1\.02/
+PASS  MsMpEng unstable   exit 0        
+PASS  MsMpEng 1.25 stable exit 0        
+PASS  low RAM and disk   exit 0        
+PASS  matrix changed in gate exit 0        
+PASS  real sensors       exit 0        
+2026-11-22 22:23:34 [dry] gate 1 (+0 min): cpu n/a; builds clang++:13376 clang++:20256 clang++:21216 clang++:28864 clang++:32552 clang++:32688 clang++:37348 clang++:38652 cmake:38524 legodimensions:38764 ninja:35152; RAM 10.6 GB; C: 222.76 GB; LogonUI False; AC True -> wait: build/game processes: clang++:13376 clang++:20256 clang++:21216 clang++:28864 clang++:32552 clang++:32688 clang++:37348 clang++:38652 cmake:38524 legodimensions:38764 ninja:35152; 0 of 3 consecutive one-minute CPU averages so far
+2026-11-22 22:23:39 [dry] gate 2 (+0.1 min): cpu MsMpEng 1.20, OfficeClickToRun 0.00, CrossDeviceService 0.05; builds clang++:13376 clang++:20256 clang++:21216 clang++:28864 clang++:32552 clang++:32688 clang++:37348 clang++:38652 cmake:38524 legodimensions:38764 ninja:35152; RAM 10.49 GB; C: 222.75 GB; LogonUI False; AC True -> wait: build/game processes: clang++:13376 clang++:20256 clang++:21216 clang++:28864 clang++:32552 clang++:32688 clang++:37348 clang++:38652 cmake:38524 legodimensions:38764 ninja:35152; 1 of 3 consecutive one-minute CPU averages so far
+2026-11-22 22:23:44 [dry] gate 3 (+0.2 min): cpu MsMpEng 1.50, OfficeClickToRun 0.00, CrossDeviceService 0.05; builds clang++:13376 clang++:18100 clang++:21216 clang++:25400 clang++:28864 clang++:33244 clang++:37348 clang++:38528 cmake:38524 legodimensions:38764 ninja:35152; RAM 11.27 GB; C: 222.75 GB; LogonUI False; AC True -> wait: build/game processes: clang++:13376 clang++:18100 clang++:21216 clang++:25400 clang++:28864 clang++:33244 clang++:37348 clang++:38528 cmake:38524 legodimensions:38764 ninja:35152; 2 of 3 consecutive one-minute CPU averages so far
+2026-11-22 22:23:49 [dry] gate 4 (+0.3 min): cpu MsMpEng 1.74, OfficeClickToRun 0.00, CrossDeviceService 0.03; builds clang++:13376 clang++:18100 clang++:25400 clang++:28864 clang++:29052 clang++:33244 clang++:37348 clang++:38528 cmake:38524 legodimensions:38764 ninja:35152; RAM 11.27 GB; C: 222.74 GB; LogonUI False; AC True -> wait: build/game processes: clang++:13376 clang++:18100 clang++:25400 clang++:28864 clang++:29052 clang++:33244 clang++:37348 clang++:38528 cmake:38524 legodimensions:38764 ninja:35152; sample 1: build/game processes clang++:13376 clang++:20256 clang++:21216 clang++:28864 clang++:32552 clang++:32688 clang++:37348 clang++:38652 cmake:38524 legodimensions:38764 ninja:35152; sample 2: build/game processes clang++:13376 clang++:18100 clang++:21216 clang++:25400 clang++:28864 clang++:33244 clang++:37348 clang++:38528 cmake:38524 legodimensions:38764 ninja:35152; MsMpEng not < 0.1 core in all 3 (1.20/1.50/1.74; strict gate for the first 30 min)
+2026-11-22 22:23:54 [dry] gate 5 (+0.4 min): cpu MsMpEng 1.03, OfficeClickToRun 0.00, CrossDeviceService 0.10; builds clang++:13376 clang++:18100 clang++:25400 clang++:28864 clang++:29052 clang++:33244 clang++:37348 clang++:38528 cmake:38524 legodimensions:38764 ninja:35152; RAM 11.06 GB; C: 222.74 GB; LogonUI False; AC True -> wait: build/game processes: clang++:13376 clang++:18100 clang++:25400 clang++:28864 clang++:29052 clang++:33244 clang++:37348 clang++:38528 cmake:38524 legodimensions:38764 ninja:35152; sample 1: build/game processes clang++:13376 clang++:18100 clang++:21216 clang++:25400 clang++:28864 clang++:33244 clang++:37348 clang++:38528 cmake:38524 legodimensions:38764 ninja:35152; MsMpEng not < 0.1 core in all 3 (1.50/1.74/1.03; strict gate for the first 30 min)
+22:23:56 quiet gate: GAVE UP (MsMpEng 1.50/1.74/1.03, OfficeClickToRun 0.00/0.00/0.00, CrossDeviceService 0.05/0.03/0.10; after 0 min; window not started)
+group gate, 2026-11-22 22:23:57, run-night.ps1 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31
+
+test                   tag            result exit detail                                                                                                  
+----                   ---            ------ ---- ------                                                                                                  
+build running          t-build        PASS   0    ok                                                                                                      
+build all along        t-build-giveup PASS   0    ok                                                                                                      
+build at window start  t-build-start  PASS   0    ok                                                                                                      
+close list (dry run)   t-close        PASS   0    ok                                                                                                      
+STOP at start          t-stop-start   PASS   2    ok                                                                                                      
+STOP waiting for GO    t-stop-wait    PASS   0    ok                                                                                                      
+STOP in the gate       t-stop-gate    PASS   0    ok                                                                                                      
+relaxed gate           t-relaxed      FAIL   0    missing /strict gate for the first 0.25 min/ | missing /quiet gate: RELAXED \(MsMpEng 1\.02/1\.02/1\.02/
+MsMpEng unstable       t-unstable     PASS   0    ok                                                                                                      
+MsMpEng 1.25 stable    t-toohigh      PASS   0    ok                                                                                                      
+low RAM and disk       t-lowres       PASS   0    ok                                                                                                      
+matrix changed in gate t-json         PASS   0    ok                                                                                                      
+real sensors           t-real         PASS   0    ok
+real perf-notes files at the end: WINDOW-GO.txt=absent WINDOW-HOLD.txt=absent WINDOW-STOP.txt=absent

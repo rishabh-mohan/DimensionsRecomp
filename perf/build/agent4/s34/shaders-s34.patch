@@ -1,0 +1,307 @@
+diff --git a/rexlego/src/gpu_native/shaders.cpp b/rexlego/src/gpu_native/shaders.cpp
+--- a/rexlego/src/gpu_native/shaders.cpp
++++ b/rexlego/src/gpu_native/shaders.cpp
+@@ -206,6 +206,208 @@
+       capture.size(), stage, hash, "placement-containers");
+ }
+ 
++// LEGO_NATIVE_SHADER_MISS_CACHE=1 (default OFF): remember a placement shader that missed the AOT index, so its
++// later binds skip ReadableGuestSpan and FindShaderByMicrocode. An entry replays the miss (warning counter and
++// line included) only while the pack generation is unchanged and a CPU write stamp, armed before the lookup,
++// proves unchanged every byte the lookup could read. Capture runs (LEGO_DUMP_MISSING_SHADERS) keep the full path.
++bool ShaderMissEnvironmentSet(const char* name, bool zero_disables) {
++  char* value = nullptr;
++  size_t length = 0;
++  _dupenv_s(&value, &length, name);
++  const bool result = value && length > 1 && !(zero_disables && std::strcmp(value, "0") == 0);
++  std::free(value);
++  return result;
++}
++
++bool ShaderMissCacheEnabled() {
++  static const bool enabled = ShaderMissEnvironmentSet("LEGO_NATIVE_SHADER_MISS_CACHE", true) &&
++                              !ShaderMissEnvironmentSet("LEGO_DUMP_MISSING_SHADERS", false);
++  return enabled;
++}
++
++// FindShaderByMicrocode hashes the 8 prefix bytes, then each index entry of the same stage and prefix whose
++// microcode size fits readable_size. With readable_size >= this span no candidate is skipped, so while these
++// bytes and the static index (pack generation 0) are unchanged the lookup misses again. 16 covers the logged words.
++u32 ShaderMissSpan(u64 prefix, ShaderStage stage) {
++  static const auto spans = [] {
++    std::array<std::unordered_map<u64, u32>, 2> result;
++    for (size_t i = 0; i < ::g_shaderMicrocodeEntryCount; ++i) {
++      const ::ShaderMicrocodeEntry& entry = ::g_shaderMicrocodeEntries[i];
++      if (!entry.microcodeSize || entry.stage > 1) continue;
++      u32& span = result[entry.stage][entry.prefixHash];
++      span = std::max<u32>(span, entry.microcodeSize);
++    }
++    return result;
++  }();
++  const auto& table = spans[StageIndex(stage)];
++  const auto it = table.find(prefix);
++  return std::max<u32>(16, it == table.end() ? 0 : it->second);
++}
++
++struct ShaderMissEntry {
++  ShaderStage stage = ShaderStage::kVertex;
++  u32 guest_address = 0;
++  u32 container_address = 0;
++  u32 span = 0;
++  u64 pack_generation = 0;
++  u64 prefix = 0;
++  std::array<u32, 4> words{};
++  CpuMemoryStamp stamp;
++};
++
++// Taken before the lookup; the stamp covers [container_address, container_address + span).
++struct ShaderMissArm {
++  ShaderStage stage = ShaderStage::kVertex;
++  u32 container_address = 0;
++  u32 span = 0;
++  u64 pack_generation = 0;
++  u64 prefix = 0;
++  CpuMemoryStamp stamp;
++  bool armed() const { return !stamp.pages.empty(); }
++};
++
++constexpr size_t kShaderMissCacheCapacity = 256;
++// Leaf lock: held only for map operations and lock-free validity checks, never across a guest query or lock.
++std::mutex g_miss_cache_mutex;
++std::array<std::unordered_map<u64, std::shared_ptr<const ShaderMissEntry>>, 2> g_miss_cache;
++// Moves on every insert, so PoolCopyMayTouchShaders marks the new span. OFF: stays 0.
++std::atomic<u64> g_miss_cache_generation{0};
++
++u64 ShaderMissKey(u32 guest_address, u32 container_address) {
++  return (u64(guest_address) << 32) | container_address;
++}
++
++bool ShaderMissValid(const ShaderMissEntry& entry) {
++  return entry.pack_generation == PrecompiledShaderPackGeneration() && CpuMemoryUnchanged(entry.stamp);
++}
++
++void LogMissingPlacementShader(ShaderStage stage, u32 guest_address, u32 container_address, u64 prefix,
++                               const std::array<u32, 4>& words) {
++  REXLOG_WARN("Native GPU: placement {} shader 0x{:08X} backing "
++              "0x{:08X} prefix=0x{:016X} words={:08X} {:08X} "
++              "{:08X} {:08X} missing from AOT index",
++              stage == ShaderStage::kVertex ? "vertex" : "pixel",
++              guest_address, container_address, prefix,
++              words[0], words[1], words[2], words[3]);
++}
++
++ShaderMissArm ArmShaderMiss(u32 container_address, const uint8_t* microcode, size_t readable_size,
++                            ShaderStage stage) {
++  ShaderMissArm arm;
++  // Pack microcode entries are outside the span table.
++  arm.pack_generation = PrecompiledShaderPackGeneration();
++  if (arm.pack_generation) return arm;
++  arm.prefix = XXH3_64bits(microcode, 8);
++  arm.span = ShaderMissSpan(arm.prefix, stage);
++  if (readable_size < arm.span) return arm;
++  arm.stage = stage;
++  arm.container_address = container_address;
++  const CpuMemorySpan span{container_address, arm.span};
++  // Empty when the memory watch is off or the span has no physical backing: then nothing is remembered.
++  arm.stamp = WatchCpuMemory({&span, 1});
++  return arm;
++}
++
++// g_miss_cache_mutex held.
++void SweepShaderMisses() {
++  for (auto& map : g_miss_cache)
++    std::erase_if(map, [](const auto& item) { return !ShaderMissValid(*item.second); });
++}
++
++void RememberShaderMiss(ShaderMissArm arm, u32 guest_address, const uint8_t* microcode) {
++  // A different prefix means the bytes changed before the stamp was armed: the span was measured for another bucket.
++  if (XXH3_64bits(microcode, 8) != arm.prefix) return;
++  auto entry = std::make_shared<ShaderMissEntry>();
++  entry->stage = arm.stage;
++  entry->guest_address = guest_address;
++  entry->container_address = arm.container_address;
++  entry->span = arm.span;
++  entry->pack_generation = arm.pack_generation;
++  entry->prefix = arm.prefix;
++  const auto* words = reinterpret_cast<const be_u32*>(microcode);
++  for (size_t i = 0; i < entry->words.size(); ++i) entry->words[i] = static_cast<u32>(words[i]);
++  entry->stamp = std::move(arm.stamp);
++  // Still clean after the lookup and these reads: the entry describes exactly the bytes the lookup hashed.
++  if (!ShaderMissValid(*entry)) return;
++  const u64 key = ShaderMissKey(guest_address, entry->container_address);
++  bool inserted = false;
++  {
++    std::lock_guard lock(g_miss_cache_mutex);
++    auto& map = g_miss_cache[StageIndex(entry->stage)];
++    const auto full = [] { return g_miss_cache[0].size() + g_miss_cache[1].size() >= kShaderMissCacheCapacity; };
++    if (!map.contains(key) && full()) SweepShaderMisses();
++    if (map.contains(key) || !full()) {
++      map.insert_or_assign(key, entry);
++      g_miss_cache_generation.fetch_add(1, std::memory_order_release);
++      inserted = true;
++    }
++  }
++  static std::atomic<u32> events{0};
++  if (inserted && events.fetch_add(1, std::memory_order_relaxed) < 64)
++    LongProbeEvent("shader_miss_cache_insert", false, "stage=", static_cast<u32>(entry->stage),
++        "guest=", guest_address, "physical=", entry->container_address, "span=", entry->span,
++        "prefix=", entry->prefix);
++}
++
++// True when a remembered miss still holds; it is counted and logged exactly as the full path would.
++bool ReplayShaderMiss(u32 guest_address, u32 container_address, ShaderStage stage) {
++  const u64 key = ShaderMissKey(guest_address, container_address);
++  auto& map = g_miss_cache[StageIndex(stage)];
++  std::shared_ptr<const ShaderMissEntry> entry;
++  {
++    std::lock_guard lock(g_miss_cache_mutex);
++    const auto it = map.find(key);
++    if (it == map.end()) return false;
++    entry = it->second;
++  }
++  if (!ShaderMissValid(*entry)) {
++    std::lock_guard lock(g_miss_cache_mutex);
++    const auto it = map.find(key);
++    if (it != map.end() && it->second == entry) map.erase(it);
++    return false;
++  }
++  if (g_shader_warning_count.fetch_add(1, std::memory_order_relaxed) < 16)
++    LogMissingPlacementShader(stage, guest_address, container_address, entry->prefix, entry->words);
++  return true;
++}
++
++std::vector<std::shared_ptr<const ShaderMissEntry>> ShaderMissEntries() {
++  std::vector<std::shared_ptr<const ShaderMissEntry>> entries;
++  if (!ShaderMissCacheEnabled()) return entries;
++  std::lock_guard lock(g_miss_cache_mutex);
++  for (const auto& map : g_miss_cache)
++    for (const auto& item : map) entries.push_back(item.second);
++  return entries;
++}
++
++void ForgetShaderMisses(u32 guest_address) {
++  if (!ShaderMissCacheEnabled()) return;
++  std::lock_guard lock(g_miss_cache_mutex);
++  for (auto& map : g_miss_cache)
++    std::erase_if(map, [&](const auto& item) { return item.second->guest_address == guest_address; });
++}
++
++// Pool copies write through host pointers; drop the overlapping misses as the registry drops resources.
++void ForgetShaderMissesOverlapping(PhysicalCopyRange destination) {
++  std::vector<std::shared_ptr<const ShaderMissEntry>> overlapping;
++  for (auto& entry : ShaderMissEntries())
++    if (GuestRangeOverlapsPoolCopy(entry->container_address, entry->span, destination))
++      overlapping.push_back(std::move(entry));
++  if (overlapping.empty()) return;
++  std::lock_guard lock(g_miss_cache_mutex);
++  for (const auto& entry : overlapping) {
++    auto& map = g_miss_cache[StageIndex(entry->stage)];
++    const auto it = map.find(ShaderMissKey(entry->guest_address, entry->container_address));
++    if (it != map.end() && it->second == entry) map.erase(it);
++  }
++}
++
++void ClearShaderMisses() {
++  if (!ShaderMissCacheEnabled()) return;
++  std::lock_guard lock(g_miss_cache_mutex);
++  for (auto& map : g_miss_cache) map.clear();
++}
++
+ bool PlacementShaderUnchanged(ShaderResource& resource) {
+   if (resource.owns_guest_memory) return true;
+   const u64 frame = g_probe_frame.load(std::memory_order_relaxed);
+@@ -282,6 +484,9 @@
+   if (!container_address) {
+     return nullptr;
+   }
++  // A remembered miss whose bytes and pack generation are unchanged skips the span query and the lookup.
++  if (ShaderMissCacheEnabled() && ReplayShaderMiss(guest_address, container_address, expected_stage))
++    return nullptr;
+   // XDK placement objects retain the copied physical microcode, not the
+   // original ShaderContainer. Associate it with the independently indexed
+   // AOT entry before creating any host object.
+@@ -289,6 +494,10 @@
+   if (readable_size < 8) return nullptr;
+   const auto* microcode =
+       memory->TranslateVirtual<const uint8_t*>(container_address);
++  // Armed before the lookup, so a write during it dirties the stamp instead of remembering a stale miss.
++  ShaderMissArm miss_arm;
++  if (ShaderMissCacheEnabled())
++    miss_arm = ArmShaderMiss(container_address, microcode, readable_size, expected_stage);
+   const ShaderCacheEntry* cache_entry = FindShaderByMicrocode(
+       microcode, expected_stage == ShaderStage::kPixel ? 1u : 0u, readable_size);
+   if (!cache_entry) {
+@@ -296,15 +505,13 @@
+                                   readable_size, expected_stage);
+     if (g_shader_warning_count.fetch_add(1, std::memory_order_relaxed) < 16) {
+       const auto* words = reinterpret_cast<const be_u32*>(microcode);
+-      REXLOG_WARN("Native GPU: placement {} shader 0x{:08X} backing "
+-                  "0x{:08X} prefix=0x{:016X} words={:08X} {:08X} "
+-                  "{:08X} {:08X} missing from AOT index",
+-                  expected_stage == ShaderStage::kVertex ? "vertex" : "pixel",
+-                  guest_address, container_address, XXH3_64bits(microcode, 8),
+-                  static_cast<u32>(words[0]), static_cast<u32>(words[1]),
+-                  readable_size >= 12 ? static_cast<u32>(words[2]) : 0u,
+-                  readable_size >= 16 ? static_cast<u32>(words[3]) : 0u);
+-    }
++      LogMissingPlacementShader(expected_stage, guest_address, container_address,
++                                XXH3_64bits(microcode, 8),
++                                {static_cast<u32>(words[0]), static_cast<u32>(words[1]),
++                                 readable_size >= 12 ? static_cast<u32>(words[2]) : 0u,
++                                 readable_size >= 16 ? static_cast<u32>(words[3]) : 0u});
++    }
++    if (miss_arm.armed()) RememberShaderMiss(std::move(miss_arm), guest_address, microcode);
+     return nullptr;
+   }
+   auto resource = std::make_shared<ShaderResource>();
+@@ -718,6 +925,8 @@
+ void InvalidatePlacementShader(u32 guest_address) {
+   RegistryOnlyScope registry_only;
+   auto recording = HostDevice::LockRecording();
++  // Before the registry lookup: a failed bind never registered, but it may be remembered as a miss.
++  ForgetShaderMisses(guest_address);
+   std::shared_ptr<ShaderResource> previous;
+   {
+     std::lock_guard lock(g_registry_mutex);
+@@ -750,7 +959,9 @@
+ bool PoolCopyMayTouchShaders(PhysicalCopyRange range) {
+   static FootprintIndex index;
+   const u64 generation = g_shader_registry_generation.load(std::memory_order_acquire);
+-  if (!index.Current(generation, 0)) {
++  // OFF: stays 0, so the key is the registry generation alone, as before.
++  const u64 miss_generation = g_miss_cache_generation.load(std::memory_order_acquire);
++  if (!index.Current(generation, miss_generation)) {
+     index.pages.Clear();
+     // Only reads registries: the registry half suffices and never waits on the recorder.
+     struct RegistryOnly {
+@@ -767,8 +978,13 @@
+         index.pages.Mark(physical);
+       if (PoolCopyPhysicalRange(resource->guest_address, header_size, physical)) index.pages.Mark(physical);
+     }
++    // Remembered misses: a pool copy over their code must reach InvalidatePoolCopyShaders as well.
++    for (const auto& entry : ShaderMissEntries()) {
++      PhysicalCopyRange physical;
++      if (PoolCopyPhysicalRange(entry->container_address, entry->span, physical)) index.pages.Mark(physical);
++    }
+     index.key[0] = generation;
+-    index.key[1] = 0;
++    index.key[1] = miss_generation;
+   }
+   return index.pages.Any(range);
+ }
+@@ -793,6 +1009,7 @@
+       } else ++it;
+     }
+   }
++  ForgetShaderMissesOverlapping(destination);
+   const u32 count = u32(retired.size());
+   for (auto& resource : retired) HostDevice::RetireResource(std::move(resource));
+   if (rebind[0]) BindShader(ShaderStage::kVertex, rebind[0]);
+@@ -903,6 +1120,7 @@
+     }
+     g_registry.clear();
+   }
++  ClearShaderMisses();
+   for (const u32 guest_address : guest_addresses) {
+     REX_KERNEL_MEMORY()->SystemHeapFree(guest_address);
+   }

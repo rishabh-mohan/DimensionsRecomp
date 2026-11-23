@@ -1,0 +1,98 @@
+# s4p2_syntax.ps1 (Agent 12) - S4 P2 (shared_memory_single_hold_rearm, default OFF). clang -fsyntax-only of
+# src/graphics/shared_memory.cpp with the exact dev-SDK flags (env\compile-one.ps1 -SyntaxOnly -PrintOnly gives the
+# command), once for the pristine copy (build\agent12\s4-p2\orig) and once for the candidate (the staged copy
+# build\agent12\s4-p2\new, or the live tree with -Live), so the two diagnostic outputs can be compared: the patch
+# must add no diagnostic. Adapted from bench\agent12\s4diag_syntax.ps1; same rules.
+#   powershell -NoProfile -ExecutionPolicy Bypass -File bench\agent12\s4p2_syntax.ps1         # staged copy
+#   powershell -NoProfile -ExecutionPolicy Bypass -File bench\agent12\s4p2_syntax.ps1 -Live   # live tree (after an apply)
+# The precompiled header is always dropped (its header stays force-included as plain source). shared_memory.cpp
+# includes "frame_stats.h" from its own directory, so the SDK's src\graphics is appended as the LAST include path:
+# copies elsewhere then find it, and every <...> include still resolves through the original paths first.
+# Each compiled file must match build\agent12\s4-p2\HASHES.txt (pristine copy = pristine, candidate = staged), so
+# -Live fails if the patch is not applied. Single-threaded, one compile at a time, writes no objects.
+# Output: build\agent12\s4-p2\syntax-<stamp>.txt. Exit 0 = both compiles exit 0, both hashes match and the
+# candidate has no diagnostic line the pristine copy doesn't have.
+param([switch]$Live, [string]$Config = 'Release')
+$ErrorActionPreference = 'Stop'
+$root = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+Set-Location $root
+$stage = Join-Path $root 'build\agent12\s4-p2'
+$report = Join-Path $stage ("syntax-{0:yyyyMMdd-HHmmss}.txt" -f (Get-Date))
+$name = 'shared_memory.cpp'
+$liveRel = 'DimensionsRecomp\rexglue-sdk\src\graphics\shared_memory.cpp'
+$srcDir = [IO.Path]::GetFullPath((Join-Path $root 'DimensionsRecomp\rexglue-sdk\src\graphics'))
+if (-not $env:LEGO_LLVM -or -not $env:INCLUDE) { . (Join-Path $root 'env\devshell.ps1') 6>$null | Out-Null }
+
+function Sha([string]$p) { (Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash }
+$h = @{}
+foreach ($l in [IO.File]::ReadAllLines((Join-Path $stage 'HASHES.txt'))) {
+    if ($l -match '^(pristine|staged|diff)\s+([0-9A-F]{64})\b') { $h[$Matches[1]] = $Matches[2] }
+}
+if (-not $h['pristine'] -or -not $h['staged']) { throw 'build\agent12\s4-p2\HASHES.txt lacks the pristine/staged lines' }
+
+function Compile([string]$exe, [string]$argStr, [string]$dir) {
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName = $exe; $psi.Arguments = $argStr; $psi.WorkingDirectory = $dir
+    $psi.UseShellExecute = $false; $psi.RedirectStandardError = $true; $psi.RedirectStandardOutput = $true
+    $sw = [Diagnostics.Stopwatch]::StartNew()
+    $p = [Diagnostics.Process]::Start($psi)
+    $e = $p.StandardError.ReadToEndAsync(); $o = $p.StandardOutput.ReadToEndAsync()
+    $p.WaitForExit()
+    $r = @{ Code = $p.ExitCode; Secs = $sw.Elapsed.TotalSeconds; Diag = ($o.Result + $e.Result) }
+    $p.Dispose()
+    return $r
+}
+# diagnostic lines without the file path and line/column numbers, so pristine and candidate compare
+function Diag-Set([string]$d) {
+    @($d -split "`r?`n" | Where-Object { $_ -match '(warning|error):' } |
+        ForEach-Object { ($_ -replace '^.*?\.(cpp|h|hpp|hxx|inl):\d+:\d+:\s*', '') })
+}
+
+$lines = New-Object System.Collections.Generic.List[string]
+$lines.Add("# s4p2_syntax (S4 P2: shared_memory_single_hold_rearm, default OFF)  $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')  config $Config  candidate: $(if ($Live) { 'live tree' } else { 'staged copy' })")
+$bad = 0
+$old = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+$po = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'env\compile-one.ps1') $liveRel -OutDir 'build\agent12\obj' -SyntaxOnly -PrintOnly -Config $Config 2>&1
+$poCode = $LASTEXITCODE
+$ErrorActionPreference = $old
+$po = @($po | ForEach-Object { "$_" })
+if ($poCode -ne 0) { $po | ForEach-Object { Write-Host $_ }; throw "compile-one -PrintOnly failed for $liveRel" }
+$dir = ($po | Where-Object { $_ -like 'cd *' } | Select-Object -First 1).Substring(3)
+$cmd = $po | Where-Object { $_ -notlike 'cd *' -and $_ -notlike 'note:*' -and $_ -notlike 'compile-one:*' -and $_ -match '-fsyntax-only' } | Select-Object -First 1
+if (-not $cmd) { $po | ForEach-Object { Write-Host $_ }; throw 'no compiler command in the compile-one -PrintOnly output' }
+if ($cmd.StartsWith('"')) { $q = $cmd.IndexOf('"', 1); $exe = $cmd.Substring(1, $q - 1); $args0 = $cmd.Substring($q + 1).Trim() }
+else { $sp = $cmd.IndexOf(' '); $exe = $cmd.Substring(0, $sp); $args0 = $cmd.Substring($sp + 1) }
+# drop the PCH (keep the force-included PCH header as plain source)
+$args0 = [regex]::Replace($args0, '-Xclang -include-pch -Xclang \S+\s*', '')
+# "frame_stats.h" lives next to the live file; append its directory as the last include path
+$args0 = $args0.TrimEnd() + ' -I"' + $srcDir + '"'
+$lines.Add("extra include path (last): $srcDir")
+$livePath = [IO.Path]::GetFullPath((Join-Path $root $liveRel))
+$pristine = Join-Path $stage "orig\$name"
+$cand = Join-Path $stage "new\$name"; if ($Live) { $cand = $livePath }
+$esc = [regex]::Escape($livePath)
+if (([regex]::Matches($args0, $esc, 'IgnoreCase')).Count -ne 1) { throw "source path not found exactly once in the command for $name" }
+$res = @{}
+foreach ($which in 'pristine', 'candidate') {
+    $src = $pristine; $key = 'pristine'
+    if ($which -eq 'candidate') { $src = $cand; $key = 'staged' }
+    $sha = Sha $src
+    $hashNote = "= HASHES $key"
+    if ($sha -ne $h[$key]) { $bad++; $hashNote = "MISMATCH: HASHES $key is $($h[$key].Substring(0, 16))" }
+    $a = [regex]::Replace($args0, $esc, $src.Replace('$', '$$'), 'IgnoreCase')
+    $r = Compile $exe $a $dir
+    $res[$which] = $r
+    $nd = (Diag-Set $r.Diag).Count
+    $lines.Add(('{0,-18} {1,-9} exit={2} {3,5:N1}s diagnostics={4}  sha {5} ({6})  {7}' -f $name, $which, $r.Code, $r.Secs, $nd, $sha.Substring(0, 16), $hashNote, $src))
+    if ($r.Code -ne 0) { $bad++ }
+    if ($r.Diag.Trim()) { $r.Diag -split "`r?`n" | Where-Object { $_.Trim() } | Select-Object -First 40 | ForEach-Object { $lines.Add("    | $_") } }
+}
+$new = @(Diag-Set $res['candidate'].Diag | Where-Object { (Diag-Set $res['pristine'].Diag) -notcontains $_ })
+if ($new.Count) { $bad++; $new | ForEach-Object { $lines.Add("    NEW in candidate: $_") } }
+else { $lines.Add('    no new diagnostics in the candidate') }
+$lines.Add($(if ($bad) { "RESULT: FAIL ($bad problem(s))" } else { 'RESULT: PASS' }))
+Set-Content -LiteralPath $report -Value $lines -Encoding ascii
+$lines | ForEach-Object { Write-Host $_ }
+Write-Host "report: $report"
+if ($bad) { exit 1 }
+exit 0

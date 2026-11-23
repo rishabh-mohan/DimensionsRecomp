@@ -1,0 +1,184 @@
+==== O2_today  __imp__proof_escaped
+__imp__proof_escaped:                   # @__imp__proof_escaped
+.seh_proc __imp__proof_escaped
+# %bb.0:
+	push	rsi
+	push	rdi
+	sub	rsp, 40
+	mov	rsi, rdx
+	mov	rdi, rcx
+	mov	rax, qword ptr [rcx]
+	mov	qword ptr [rsp + 32], rax
+	lea	rcx, [rsp + 32]
+	mov	rdx, rdi
+	call	"?proof_mid_asm_hook@@YAXAEATRegister@ppc@rex@@0@Z"
+	mov	rax, qword ptr [rsp + 32]
+	mov	qword ptr [rdi + 32], rax
+	mov	rcx, rdi
+	mov	rdx, rsi
+	call	callee_c
+	nop
+	add	rsp, 40
+	pop	rdi
+	pop	rsi
+	ret
+==== O2_today  __imp__proof_cond
+__imp__proof_cond:                      # @__imp__proof_cond
+# %bb.0:
+	mov	byte ptr [rcx + 316], 0
+	cmp	dword ptr [rcx], 0
+	setne	byte ptr [rcx + 317]
+	sete	byte ptr [rcx + 318]
+	movzx	eax, byte ptr [rcx + 272]
+	mov	byte ptr [rcx + 319], al
+	je	.LBB5_2
+# %bb.1:
+	jmp	callee_a                        # TAILCALL
+.LBB5_2:
+	mov	qword ptr [rcx], 1
+	jmp	callee_b                        # TAILCALL
+==== O2_musttail  __imp__proof_escaped
+__imp__proof_escaped:                   # @__imp__proof_escaped
+.seh_proc __imp__proof_escaped
+# %bb.0:
+	push	rsi
+	push	rdi
+	sub	rsp, 40
+	mov	rsi, rdx
+	mov	rdi, rcx
+	mov	rax, qword ptr [rcx]
+	mov	qword ptr [rsp + 32], rax
+	lea	rcx, [rsp + 32]
+	mov	rdx, rdi
+	call	"?proof_mid_asm_hook@@YAXAEATRegister@ppc@rex@@0@Z"
+	mov	rax, qword ptr [rsp + 32]
+	mov	qword ptr [rdi + 32], rax
+	mov	rcx, rdi
+	mov	rdx, rsi
+	add	rsp, 40
+	pop	rdi
+	pop	rsi
+	jmp	callee_c                        # TAILCALL
+==== O2_musttail  __imp__proof_cond
+__imp__proof_cond:                      # @__imp__proof_cond
+# %bb.0:
+	mov	byte ptr [rcx + 316], 0
+	cmp	dword ptr [rcx], 0
+	setne	byte ptr [rcx + 317]
+	sete	byte ptr [rcx + 318]
+	movzx	eax, byte ptr [rcx + 272]
+	mov	byte ptr [rcx + 319], al
+	je	.LBB5_2
+# %bb.1:
+	jmp	callee_a                        # TAILCALL
+.LBB5_2:
+	mov	qword ptr [rcx], 1
+	jmp	callee_b                        # TAILCALL
+==== O0_today  __imp__proof_escaped
+__imp__proof_escaped:                   # @__imp__proof_escaped
+.seh_proc __imp__proof_escaped
+# %bb.0:
+	sub	rsp, 56
+	mov	qword ptr [rsp + 48], rdx
+	mov	qword ptr [rsp + 40], rcx
+	mov	rax, qword ptr [rip + .L__const.__imp__proof_escaped.r31]
+	mov	qword ptr [rsp + 32], rax
+	mov	rax, qword ptr [rsp + 40]
+	mov	rax, qword ptr [rax]
+	mov	qword ptr [rsp + 32], rax
+	mov	rdx, qword ptr [rsp + 40]
+	lea	rcx, [rsp + 32]
+	call	"?proof_mid_asm_hook@@YAXAEATRegister@ppc@rex@@0@Z"
+	mov	rcx, qword ptr [rsp + 32]
+	mov	rax, qword ptr [rsp + 40]
+	mov	qword ptr [rax + 32], rcx
+	mov	rdx, qword ptr [rsp + 48]
+	mov	rcx, qword ptr [rsp + 40]
+	call	callee_c
+	nop
+	add	rsp, 56
+	ret
+==== O0_today  __imp__proof_cond
+__imp__proof_cond:                      # @__imp__proof_cond
+.seh_proc __imp__proof_cond
+# %bb.0:
+	sub	rsp, 56
+	mov	qword ptr [rsp + 48], rdx
+	mov	qword ptr [rsp + 40], rcx
+	mov	rcx, qword ptr [rsp + 40]
+	add	rcx, 316
+	mov	r9, qword ptr [rsp + 40]
+	add	r9, 272
+	mov	rax, qword ptr [rsp + 40]
+	mov	edx, dword ptr [rax]
+	xor	r8d, r8d
+	call	"??$compare@I@CRRegister@ppc@rex@@QEAAXIIAEBUXERRegister@12@@Z"
+	mov	rax, qword ptr [rsp + 40]
+	cmp	byte ptr [rax + 318], 0
+	jne	.LBB7_2
+# %bb.1:
+	mov	rdx, qword ptr [rsp + 48]
+	mov	rcx, qword ptr [rsp + 40]
+	call	callee_a
+	jmp	.LBB7_3
+.LBB7_2:
+	mov	rax, qword ptr [rsp + 40]
+	mov	qword ptr [rax], 1
+	mov	rdx, qword ptr [rsp + 48]
+	mov	rcx, qword ptr [rsp + 40]
+	call	callee_b
+	nop
+.LBB7_3:
+	add	rsp, 56
+	ret
+==== O0_musttail  __imp__proof_escaped
+__imp__proof_escaped:                   # @__imp__proof_escaped
+.seh_proc __imp__proof_escaped
+# %bb.0:
+	sub	rsp, 56
+	mov	qword ptr [rsp + 48], rdx
+	mov	qword ptr [rsp + 40], rcx
+	mov	qword ptr [rsp + 32], 0
+	mov	rax, qword ptr [rsp + 40]
+	mov	rax, qword ptr [rax]
+	mov	qword ptr [rsp + 32], rax
+	mov	rdx, qword ptr [rsp + 40]
+	lea	rcx, [rsp + 32]
+	call	"?proof_mid_asm_hook@@YAXAEATRegister@ppc@rex@@0@Z"
+	mov	rcx, qword ptr [rsp + 32]
+	mov	rax, qword ptr [rsp + 40]
+	mov	qword ptr [rax + 32], rcx
+	mov	rdx, qword ptr [rsp + 48]
+	mov	rcx, qword ptr [rsp + 40]
+	add	rsp, 56
+	jmp	callee_c                        # TAILCALL
+==== O0_musttail  __imp__proof_cond
+__imp__proof_cond:                      # @__imp__proof_cond
+.seh_proc __imp__proof_cond
+# %bb.0:
+	sub	rsp, 56
+	mov	qword ptr [rsp + 48], rdx
+	mov	qword ptr [rsp + 40], rcx
+	mov	rcx, qword ptr [rsp + 40]
+	add	rcx, 316
+	mov	r9, qword ptr [rsp + 40]
+	add	r9, 272
+	mov	rax, qword ptr [rsp + 40]
+	mov	edx, dword ptr [rax]
+	xor	r8d, r8d
+	call	"??$compare@I@CRRegister@ppc@rex@@QEAAXIIAEBUXERRegister@12@@Z"
+	mov	rax, qword ptr [rsp + 40]
+	cmp	byte ptr [rax + 318], 0
+	jne	.LBB7_2
+# %bb.1:
+	mov	rdx, qword ptr [rsp + 48]
+	mov	rcx, qword ptr [rsp + 40]
+	add	rsp, 56
+	jmp	callee_a                        # TAILCALL
+.LBB7_2:
+	mov	rax, qword ptr [rsp + 40]
+	mov	qword ptr [rax], 1
+	mov	rdx, qword ptr [rsp + 48]
+	mov	rcx, qword ptr [rsp + 40]
+	add	rsp, 56
+	jmp	callee_b                        # TAILCALL

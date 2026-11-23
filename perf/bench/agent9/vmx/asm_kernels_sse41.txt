@@ -1,0 +1,321 @@
+---- k_vsubsws_distinct_old (sse41)
+ movdqa xmm1, xmmword ptr [rcx + 608]
+ movdqa xmm0, xmmword ptr [rcx + 624]
+ movdqa xmm2, xmm1
+ psubd xmm2, xmm0
+ pcmpgtd xmm0, xmm1
+ pxor xmm0, xmm2
+ movdqa xmm1, xmm2
+ psrad xmm1, 31
+ pxor xmm1, xmmword ptr [rip + __xmm@80000000800000008000000080000000]
+ blendvps xmm2, xmm1, xmm0
+ movaps xmmword ptr [rcx + 640], xmm2
+ ret
+---- k_vsubsws_distinct_new (sse41)
+ movdqa xmm0, xmmword ptr [rcx + 608]
+ movdqa xmm1, xmmword ptr [rcx + 624]
+ movdqa xmm2, xmm0
+ psubd xmm2, xmm1
+ pxor xmm1, xmm0
+ movdqa xmm3, xmm0
+ pxor xmm3, xmm2
+ pand xmm1, xmm3
+ movaps xmm3, xmmword ptr [rip + __xmm@7fffffff7fffffff7fffffff7fffffff]
+ blendvps xmm3, xmmword ptr [rip + __xmm@80000000800000008000000080000000], xmm0
+ movdqa xmm0, xmm1
+ blendvps xmm2, xmm3, xmm0
+ movaps xmmword ptr [rcx + 640], xmm2
+ ret
+---- k_vsrb_distinct_old (sse41)
+ movdqa xmm1, xmmword ptr [rcx + 608]
+ movdqa xmm0, xmmword ptr [rcx + 624]
+ movdqa xmm2, xmm1
+ psrlw xmm2, 4
+ pand xmm2, xmmword ptr [rip + __xmm@0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f]
+ psllw xmm0, 5
+ pblendvb xmm1, xmm2, xmm0
+ movdqa xmm2, xmm1
+ psrlw xmm2, 2
+ pand xmm2, xmmword ptr [rip + __xmm@3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f]
+ pand xmm0, xmmword ptr [rip + __xmm@e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0]
+ paddb xmm0, xmm0
+ pblendvb xmm1, xmm2, xmm0
+ movdqa xmm2, xmm1
+ psrlw xmm2, 1
+ pand xmm2, xmmword ptr [rip + __xmm@7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f]
+ paddb xmm0, xmm0
+ pblendvb xmm1, xmm2, xmm0
+ movdqa xmmword ptr [rcx + 640], xmm1
+ ret
+---- k_vsrb_distinct_new (sse41)
+ movdqa xmm2, xmmword ptr [rcx + 608]
+ movdqa xmm1, xmmword ptr [rcx + 624]
+ movdqa xmm0, xmm1
+ psllw xmm0, 5
+ movdqa xmm3, xmm2
+ psrlw xmm3, 4
+ pand xmm3, xmmword ptr [rip + __xmm@0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f]
+ pblendvb xmm2, xmm3, xmm0
+ movdqa xmm0, xmm1
+ psllw xmm0, 6
+ movdqa xmm3, xmm2
+ psrlw xmm3, 2
+ pand xmm3, xmmword ptr [rip + __xmm@3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f]
+ pblendvb xmm2, xmm3, xmm0
+ psllw xmm1, 7
+ movdqa xmm3, xmm2
+ psrlw xmm3, 1
+ pand xmm3, xmmword ptr [rip + __xmm@7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f]
+ movdqa xmm0, xmm1
+ pblendvb xmm2, xmm3, xmm0
+ movdqa xmmword ptr [rcx + 640], xmm2
+ ret
+---- k_vsrab_distinct_old (sse41)
+ movdqa xmm2, xmmword ptr [rcx + 624]
+ psllw xmm2, 5
+ pand xmm2, xmmword ptr [rip + __xmm@e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0]
+ movdqa xmm3, xmmword ptr [rcx + 608]
+ punpckhbw xmm0, xmm2
+ punpckhbw xmm1, xmm3
+ movdqa xmm4, xmm1
+ psraw xmm4, 4
+ pblendvb xmm1, xmm4, xmm0
+ movdqa xmm4, xmm1
+ psraw xmm4, 2
+ paddw xmm0, xmm0
+ pblendvb xmm1, xmm4, xmm0
+ movdqa xmm4, xmm1
+ psraw xmm4, 1
+ paddw xmm0, xmm0
+ pblendvb xmm1, xmm4, xmm0
+ punpcklbw xmm0, xmm2
+ punpcklbw xmm2, xmm3
+ movdqa xmm3, xmm2
+ psraw xmm3, 4
+ pblendvb xmm2, xmm3, xmm0
+ movdqa xmm3, xmm2
+ psraw xmm3, 2
+ paddw xmm0, xmm0
+ pblendvb xmm2, xmm3, xmm0
+ movdqa xmm3, xmm2
+ psraw xmm3, 1
+ paddw xmm0, xmm0
+ pblendvb xmm2, xmm3, xmm0
+ psrlw xmm1, 8
+ psrlw xmm2, 8
+ packuswb xmm2, xmm1
+ movdqa xmmword ptr [rcx + 640], xmm2
+ ret
+---- k_vsrab_distinct_new (sse41)
+ movdqa xmm1, xmmword ptr [rcx + 608]
+ movdqa xmm2, xmmword ptr [rcx + 624]
+ pxor xmm1, xmmword ptr [rip + __xmm@80808080808080808080808080808080]
+ movdqa xmm0, xmm2
+ psllw xmm0, 5
+ movdqa xmm3, xmm1
+ psrlw xmm3, 4
+ pand xmm3, xmmword ptr [rip + __xmm@0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f]
+ pblendvb xmm1, xmm3, xmm0
+ movdqa xmm0, xmm2
+ movdqa xmm3, xmm1
+ psrlw xmm3, 2
+ pand xmm3, xmmword ptr [rip + __xmm@3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f]
+ psllw xmm0, 6
+ pblendvb xmm1, xmm3, xmm0
+ movdqa xmm0, xmm2
+ psllw xmm0, 7
+ movdqa xmm3, xmm1
+ psrlw xmm3, 1
+ pand xmm3, xmmword ptr [rip + __xmm@7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f]
+ pblendvb xmm1, xmm3, xmm0
+ pand xmm2, xmmword ptr [rip + __xmm@07070707070707070707070707070707]
+ movq xmm0, qword ptr [rip + __xmm@00000000000000000102040810204080]
+ pshufb xmm0, xmm2
+ psubb xmm1, xmm0
+ movdqa xmmword ptr [rcx + 640], xmm1
+ ret
+---- k_vrlw_distinct_old (sse41)
+ push rsi
+ push rdi
+ mov rax, rcx
+ mov esi, dword ptr [rcx + 608]
+ mov edi, dword ptr [rcx + 612]
+ mov r9d, dword ptr [rcx + 616]
+ mov r8d, dword ptr [rcx + 620]
+ movzx ecx, byte ptr [rcx + 624]
+ movzx edx, byte ptr [rax + 632]
+ mov r10d, esi
+ rol r10d, cl
+ movzx ecx, byte ptr [rax + 628]
+ movdqa xmm0, xmmword ptr [rax + 624]
+ pand xmm0, xmmword ptr [rip + __xmm@0000001f0000001f0000001f0000001f]
+ pxor xmm1, xmm1
+ pcmpeqd xmm1, xmm0
+ movmskps r11d, xmm1
+ test r11b, 1
+ cmovne r10d, esi
+ mov esi, edi
+ rol esi, cl
+ test r11b, 2
+ cmovne esi, edi
+ mov edi, r9d
+ mov ecx, edx
+ rol edi, cl
+ test r11b, 4
+ cmovne edi, r9d
+ pextrb edx, xmm0, 12
+ mov dword ptr [rax + 640], r10d
+ mov ecx, edx
+ neg cl
+ mov r9d, r8d
+ shr r9d, cl
+ xor r10d, r10d
+ test r11b, 8
+ cmove r10d, r9d
+ mov ecx, edx
+ shl r8d, cl
+ mov dword ptr [rax + 644], esi
+ mov dword ptr [rax + 648], edi
+ or r8d, r10d
+ mov dword ptr [rax + 652], r8d
+ pop rdi
+ pop rsi
+ ret
+---- k_vrlw_distinct_new (sse41)
+ movdqa xmm0, xmmword ptr [rcx + 608]
+ movdqa xmm1, xmmword ptr [rcx + 624]
+ pshufd xmm2, xmm0, 245
+ pslld xmm1, 23
+ pand xmm1, xmmword ptr [rip + __xmm@0f8000000f8000000f8000000f800000]
+ paddd xmm1, xmmword ptr [rip + __xmm@3f8000003f8000003f8000003f800000]
+ cvttps2dq xmm1, xmm1
+ pshufd xmm3, xmm1, 245
+ pmuludq xmm3, xmm2
+ pmuludq xmm0, xmm1
+ pshufd xmm1, xmm0, 245
+ pblendw xmm1, xmm3, 204
+ pshufd xmm2, xmm3, 160
+ pblendw xmm2, xmm0, 51
+ por xmm2, xmm1
+ movdqa xmmword ptr [rcx + 640], xmm2
+ ret
+---- k_vsraw_distinct_old (sse41)
+ movdqa xmm0, xmmword ptr [rcx + 608]
+ movdqa xmm1, xmmword ptr [rcx + 624]
+ pshufb xmm1, xmmword ptr [rip + __xmm@0000000000000000000000000c080400]
+ pand xmm1, xmmword ptr [rip + __xmm@0000000000000000000000001f1f1f1f]
+ pmovzxbd xmm2, xmm1
+ pshuflw xmm3, xmm2, 254
+ movdqa xmm4, xmm0
+ psrad xmm4, xmm3
+ pshufd xmm2, xmm2, 238
+ pshuflw xmm3, xmm2, 254
+ movdqa xmm5, xmm0
+ psrad xmm5, xmm3
+ pmovzxbq xmm1, xmm1
+ movdqa xmm3, xmm0
+ psrad xmm3, xmm1
+ pshuflw xmm1, xmm2, 84
+ psrad xmm0, xmm1
+ pblendw xmm5, xmm4, 15
+ pblendw xmm0, xmm3, 15
+ pblendw xmm0, xmm5, 204
+ movdqa xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vsraw_distinct_new (sse41)
+ movdqa xmm0, xmmword ptr [rcx + 608]
+ movdqa xmm1, xmmword ptr [rcx + 624]
+ pand xmm1, xmmword ptr [rip + __xmm@0000001f0000001f0000001f0000001f]
+ pshuflw xmm2, xmm1, 254
+ movdqa xmm3, xmm0
+ psrad xmm3, xmm2
+ pshufd xmm2, xmm1, 238
+ pshuflw xmm4, xmm2, 254
+ movdqa xmm5, xmm0
+ psrad xmm5, xmm4
+ pshuflw xmm1, xmm1, 84
+ movdqa xmm4, xmm0
+ psrad xmm4, xmm1
+ pshuflw xmm1, xmm2, 84
+ psrad xmm0, xmm1
+ pblendw xmm5, xmm3, 15
+ pblendw xmm0, xmm4, 15
+ pblendw xmm0, xmm5, 204
+ movdqa xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vsrw_distinct_old (sse41)
+ movdqa xmm0, xmmword ptr [rcx + 608]
+ movdqa xmm1, xmmword ptr [rcx + 624]
+ pshufb xmm1, xmmword ptr [rip + __xmm@0000000000000000000000000c080400]
+ pand xmm1, xmmword ptr [rip + __xmm@0000000000000000000000001f1f1f1f]
+ pmovzxbd xmm2, xmm1
+ pshuflw xmm3, xmm2, 254
+ movdqa xmm4, xmm0
+ psrld xmm4, xmm3
+ pshufd xmm2, xmm2, 238
+ pshuflw xmm3, xmm2, 254
+ movdqa xmm5, xmm0
+ psrld xmm5, xmm3
+ pmovzxbq xmm1, xmm1
+ movdqa xmm3, xmm0
+ psrld xmm3, xmm1
+ pshuflw xmm1, xmm2, 84
+ psrld xmm0, xmm1
+ pblendw xmm5, xmm4, 15
+ pblendw xmm0, xmm3, 15
+ pblendw xmm0, xmm5, 204
+ movdqa xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vsrw_distinct_new (sse41)
+ movdqa xmm0, xmmword ptr [rcx + 608]
+ movdqa xmm1, xmmword ptr [rcx + 624]
+ pand xmm1, xmmword ptr [rip + __xmm@0000001f0000001f0000001f0000001f]
+ pshuflw xmm2, xmm1, 254
+ movdqa xmm3, xmm0
+ psrld xmm3, xmm2
+ pshufd xmm2, xmm1, 238
+ pshuflw xmm4, xmm2, 254
+ movdqa xmm5, xmm0
+ psrld xmm5, xmm4
+ pshuflw xmm1, xmm1, 84
+ movdqa xmm4, xmm0
+ psrld xmm4, xmm1
+ pshuflw xmm1, xmm2, 84
+ psrld xmm0, xmm1
+ pblendw xmm5, xmm3, 15
+ pblendw xmm0, xmm4, 15
+ pblendw xmm0, xmm5, 204
+ movdqa xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vpkuhus_distinct_old (sse41)
+ movdqa xmm0, xmmword ptr [rip + __xmm@00ff00ff00ff00ff00ff00ff00ff00ff]
+ movdqa xmm1, xmmword ptr [rcx + 608]
+ pminuw xmm1, xmm0
+ pminuw xmm0, xmmword ptr [rcx + 624]
+ packuswb xmm0, xmm1
+ movdqa xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vpkuhus_distinct_new (sse41)
+ movdqa xmm0, xmmword ptr [rip + __xmm@00ff00ff00ff00ff00ff00ff00ff00ff]
+ movdqa xmm1, xmmword ptr [rcx + 608]
+ pminuw xmm1, xmm0
+ pminuw xmm0, xmmword ptr [rcx + 624]
+ packuswb xmm0, xmm1
+ movdqa xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vpkuwus_distinct_old (sse41)
+ movdqa xmm0, xmmword ptr [rip + __xmm@0000ffff0000ffff0000ffff0000ffff]
+ movdqa xmm1, xmmword ptr [rcx + 608]
+ pminud xmm1, xmm0
+ pminud xmm0, xmmword ptr [rcx + 624]
+ packusdw xmm0, xmm1
+ movdqa xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vpkuwus_distinct_new (sse41)
+ movdqa xmm0, xmmword ptr [rip + __xmm@0000ffff0000ffff0000ffff0000ffff]
+ movdqa xmm1, xmmword ptr [rcx + 608]
+ pminud xmm1, xmm0
+ pminud xmm0, xmmword ptr [rcx + 624]
+ packusdw xmm0, xmm1
+ movdqa xmmword ptr [rcx + 640], xmm0
+ ret

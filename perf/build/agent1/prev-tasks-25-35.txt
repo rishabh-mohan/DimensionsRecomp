@@ -1,0 +1,143 @@
+===== line 632 step 631 2026-11-22T22:46:44Z =====
+ 10 tasks (55 of the 79 left).
+
+@@cancel 21: W4b is done; the overnight launcher moves to Agent 5 (new task).
+@@cancel 24: replaced by Agent 11's new task (review Agent 5's launcher, not Agent 8's).
+
+```agy-task to=8 subagents=3 files=bench/agent8/**, build/agent8/**, perf-notes/agent8-window3.md
+W4b is done (build/agent8/matrix/20261122-1541, 17/17 OK). I promoted your W5 S3d draft at 16:42, changing only the JSON's title and first note and the .cmd's header and missing-file message: bench/agent8/RUN-WINDOW5-S3D.cmd 5467F1BE…, bench/agent8/run/matrix-window5-s3d.json 4D7D689B…; -PlanOnly exit 0 (16 runs, ~37 min); inputs in build/agent1/w5/W5-INPUTS-1642.txt. Don't touch W5's inputs until its read-out is done.
+
+Window rule: W5 (~37 min) may start on the user's desktop any minute. Until I send 'go': file tools only (read, search, edit your own files); no run_command and no subagents. While perf-notes/WINDOW-HOLD.txt exists: no tool calls at all; end your turn and wait for my resume. After 'go': check the HOLD file before every command; subagents only read, stage and check, never build or run games.
+
+1. After 'go': the W4b read-out by your procedure (agent8-window3.md L733), written to build/agent8/readout/w4b/: recompute without run 6 (1551-B-r2, valid_timing=False); the 1 ms line in every d11t game.log; the slow-state scan; a disturbance audit from sys.csv (non-game CPU per window, runs 3, 4-7 and 10 against the rest); 10 s bins. Verdict per arm vs d0, with and without the flagged runs. Use subagents for the log scans, the sys.csv audit and a cross-check of the recomputed medians.
+2. Now, with file tools only: the W5 read-out procedure, built on your README's proof-and-gates table (d11/d11t/d11p vs base and vs s0), using Agent 11's 3-mode timerq_slowstate copy.
+3. When I say W5 is done: run that read-out.
+4. On my word, once the S4b bins exist: promote W6 from build/agent5/w6-draft/ as bench/agent8/run/matrix-window6.json + bench/agent8/RUN-WINDOW6.cmd, run -PlanOnly, and hash its inputs.
+Report with @@done: the W4b verdicts (with and without run 6), the disturbance audit, and the W5 procedure's path.
+```
+
+```agy-task to=5 subagents=3 files=bench/agent5/**, build/agent5/**, perf-notes/agent5-uploads.md
+The overnight launcher. Agents run on hidden desktops, so the user starts it once on their own desktop and it runs timing windows when I write a go-file. Target: ready and reviewed by ~18:30.
+
+Window rule: W5 (~37 min) may start on the user's desktop any minute. Until I send 'go': file tools only (read, search, edit your own files); no run_command and no subagents. While perf-notes/WINDOW-HOLD.txt exists: no tool calls at all; end your turn and wait for my resume. After 'go': check the HOLD file before every command; subagents only read, stage and check, never build or run games.
+
+Write bench/agent5/launch/RUN-NIGHT.cmd, run-night.ps1 and README.md (plain words, for the user: what it does, what it touches, how to stop it).
+- Start checks: it refuses unless it runs on WinSta0\Default (the user's input desktop), unlocked (no LogonUI), on AC. At start it hashes and pins itself, bench/agent8/run/run-matrix.ps1 and every file the runner loads (run-timing.ps1, common.ps1, drivers/*, the .py/.cs helpers); any later change means it refuses that window.
+- GO file: it waits for perf-notes/WINDOW-GO.txt, one line: `GO <window-id> <matrix json name in bench/agent8/run/> <sha256 of that json> only=<arm list> repeats=<n>`. It runs nothing but the pinned run-matrix.ps1 with that JSON (-Only, -Repeats, -ColdShared, -NoPrompt), with REX_TIMER_WAIT_BLOCKING removed from its environment first. It checks the hash, that every arm's bin is build/agent2/<name>-bin with MANIFEST.txt and legodimensions.exe, and that env keys are only REX_TIMER_WAIT_BLOCKING or LEGO_GPU_WAIT_STATS. Anything else: refuse, log, delete the GO. It deletes every GO it consumes.
+- Quiet gate: no clang/clang++/ninja/cmake/lld/legodimensions process; MsMpEng, OfficeClickToRun and CrossDeviceService each < 0.1 core for 3 consecutive 1-min averages; >= 6 GB available RAM and >= 6 GB free on C:. A window starts only if its runner estimate + 10 min ends by 07:30. It gives up 120 min after a GO whose gate never passes.
+- While waiting and running: it writes perf-notes/WINDOW-HOLD.txt from the moment it accepts a GO until the window ends (my hold manager may delete it when summary.md lands; that's fine), and status files in bench/agent5/launch/status/ (state, last GO, last result, log). It closes only ChatGPT, Copilot, Roblox, Task Manager and Wallpaper Engine (Task Manager runs elevated: log it and go on), sets the screensaver to None and restores it in finally, and keeps the PC awake (SetThreadExecutionState) until 07:30 or until perf-notes/WINDOW-STOP.txt appears, then exits.
+- -DryRun: uses status-dryrun/ and a GO file there; it never touches the real GO/HOLD files or starts the runner (it prints the command it would run).
+- After 'go', test with -DryRun: a good GO, a bad hash, a bin outside build/agent2, a disallowed env key, a build process running (it must refuse to start the window), the deadline, and the STOP file.
+- Then ask Agent 11 for a review and Agent 10 for a safety read, and fix what they find.
+- Also finalize W6 (build/agent5/w6-draft/) for Agent 8 to promote as matrix-window6.json + RUN-WINDOW6.cmd once the S4b bins exist.
+Subagents: one per test group, plus an independent read of run-night.ps1 against this spec.
+Report with @@done: the files and their sha256, the dry-run results (including the refusal during builds), the reviews, and the W6 status.
+```
+
+```agy-task to=2 subagents=2 files=build/agent2/**, perf-notes/agent2-baseline.md
+S4b + S4c on the S3d line. Start at my 'go' (after W5, or at 17:10 if W5 doesn't start).
+
+Window rule: W5 (~37 min) may start on the user's desktop any minute. Until I send 'go': file tools only (read, search, edit your own files); no run_command and no subagents. While perf-notes/WINDOW-HOLD.txt exists: no tool calls at all; end your turn and wait for my resume. After 'go': check the HOLD file before every command; subagents only read, stage and check, never build or run games.
+
+1. Add S4c as the last step of build/agent2/s4b-compose-check.py: Agent 9's build/agent9/s4/fence-wait/s4c/s4c-24-30.diff (DC02104E…; fallback s4c-24-only.diff A279DC71…). Run it with --c1 v3 (dry), dry-run the prep/build driver with -C1 v3, and send the report to Agent 10 for a rating.
+2. Then build at -j10 max, Below Normal: C1 v3 (keep-watch-v3.diff DECCFE33…, then rexlego 4D0C1079… with CRLF) → M1 → P2c → r1r2 → #26 tool with the option OFF → S4c (#24 + #30, both OFF). Bins: devoff4b, native4b, devoff4b-ctr, and devoff4b-cg26 only if Agent 10's #26 gates hold (the toml line and the new tool in one build; exactly 20 pauses in the arm's 10 TUs; codegen.partition.json kept).
+3. Checks: the map check by name and object, not address; the S4c TU as 01D9F8F3 (LF) or 34D281E0 (CRLF); re-hash W5's inputs (build/agent1/w5/W5-INPUTS-1642.txt): devoff3-bin and devoff4-bin must be unchanged.
+4. If perf-notes/WINDOW-HOLD.txt appears during the build, stop ninja within 2 min and wait for my resume.
+5. When the bins land, message Agents 3, 4 and me. B4 stays deferred.
+Subagents: a read of the composed tree against the staged after-files, and the map check.
+Report with @@done: the bins with MANIFEST hashes, build times, the checks, and W5's re-hash.
+```
+
+```agy-task to=3 subagents=3 files=build/agent3/**, perf-notes/agent3-run-harness.md
+The S4b functional queue (Agent 7's build/agent7/s4b-queue/QUEUE.md).
+
+Window rule: W5 (~37 min) may start on the user's desktop any minute. Until I send 'go': file tools only (read, search, edit your own files); no run_command and no subagents. While perf-notes/WINDOW-HOLD.txt exists: no tool calls at all; end your turn and wait for my resume. After 'go': check the HOLD file before every command; subagents only read, stage and check, never build or run games.
+
+1. After 'go': preflight the queue against the current bins (no game runs until the S4b bins land).
+2. When Agent 2 reports the bins: run the queue on the hidden desktop, one game at a time, checking the HOLD file before every launch. Rows 7, 20 and 23 wait for decision 1 (Toy Pad tags); skip them for now.
+3. Read P2's fallback counter from the devoff4b-ctr run with slow_frame_log_ms; it must be 0 for W6. Use Agent 12's check script when it's ready.
+Subagents: log checks per row (crash, NEW/MORE warnings, proof lines), in parallel.
+Report with @@done: the per-row results, the P2 counter, and anything that blocks W6-W10.
+```
+
+```agy-task to=7 subagents=2 files=build/agent7/**, perf-notes/agent7-present.md
+A noise method to shrink W4b's ±19.6% band (d0's run spread).
+
+Window rule: W5 (~37 min) may start on the user's desktop any minute. Until I send 'go': file tools only (read, search, edit your own files); no run_command and no subagents. While perf-notes/WINDOW-HOLD.txt exists: no tool calls at all; end your turn and wait for my resume. After 'go': check the HOLD file before every command; subagents only read, stage and check, never build or run games.
+
+Candidates: a light-share/phase-matched comparison (heavy-phase frames only), paired within-round deltas, trimmed means. Design now with file tools; after 'go', apply each to W4b's 17 runs (build/agent8/matrix/20261122-1541) and give each arm's delta vs d0 with its new band. Say which method W5's read-out should use.
+Subagents: one per method.
+Report with @@done: the deltas and bands per method, sent to Agent 8 and me.
+```
+
+```agy-task to=6 subagents=2 files=build/agent6/**, perf-notes/agent6-attract-stalls.md
+W4b game.log logdiff, per arm against d0.
+
+Window rule: W5 (~37 min) may start on the user's desktop any minute. Until I send 'go': file tools only (read, search, edit your own files); no run_command and no subagents. While perf-notes/WINDOW-HOLD.txt exists: no tool calls at all; end your turn and wait for my resume. After 'go': check the HOLD file before every command; subagents only read, stage and check, never build or run games.
+
+After 'go': for build/agent8/matrix/20261122-1541, diff each arm's game.logs against d0's: NEW/MORE warnings, crashes, Toypad lines, and anything only d11t logs. You may use bench/agent8/run/gate_logdiff.py read-only.
+Subagents: one per arm.
+Report with @@done: the findings per arm, sent to Agent 8 and me.
+```
+
+```agy-task to=12 subagents=2 files=build/agent12/**, perf-notes/agent12-io-memory.md
+P2 counter and W6 gates.
+
+Window rule: W5 (~37 min) may start on the user's desktop any minute. Until I send 'go': file tools only (read, search, edit your own files); no run_command and no subagents. While perf-notes/WINDOW-HOLD.txt exists: no tool calls at all; end your turn and wait for my resume. After 'go': check the HOLD file before every command; subagents only read, stage and check, never build or run games.
+
+1. A P2 counter check script: it reads a run's game.log and prints P2's fallback counter, PASS if 0. Write it now; after 'go', test it on an existing log. Give its path to Agent 3.
+2. With Agent 5: W6's proof-and-gates table and read-out steps (arms s0/p2/p2f/p2fc, build/agent5/w6-draft/).
+Subagents: an independent check of the script against the counter's source.
+Report with @@done: the script path and test result, and the W6 table.
+```
+
+```agy-task to=9 subagents=3 files=perf-notes/ANDROID-FEASIBILITY.md, build/agent9/android/**
+Low priority, read-only: an Android feasibility report for the user's two phones, a Galaxy S25 FE (Exynos 2400, Xclipse 940, 8 GB) and a rooted OnePlus Nord N30 (Snapdragon 695, Adreno 619, 8 GB).
+
+Window rule: W5 (~37 min) may start on the user's desktop any minute. Until I send 'go': file tools only (read, search, edit your own files); no run_command and no subagents. While perf-notes/WINDOW-HOLD.txt exists: no tool calls at all; end your turn and wait for my resume. After 'go': subagents only read. This task needs no builds and no commands.
+
+Evidence with file:line:
+(a) SDK: ARM64 CI, POSIX code, the Vulkan backend, SPIR-V translator and Android surface, SIMDe, memory ordering (sync/lwsync/eieio emit nothing: src/codegen/builders/system.cpp:33-49), guest memory mapping and page size (4 KB vs 16 KB), exception handler and MMIO on arm64.
+(b) Game: the native GPU path is D3D12-only (rexlego/CMakeLists.txt:62-63); raw D3D12 vs Plume use; shader packs; Toy Pad, audio, input, file I/O.
+(c) Android: NDK/Clang build of the generated code, an APK shell, storage for the user's own game files, controllers, a USB-OTG Toy Pad, thermals, big.LITTLE.
+A phased plan with effort ranges and risks, and what each phone is good for.
+Subagents: one per part (a), (b), (c).
+Report with @@done: the report path and a 5-line summary.
+```
+
+```agy-task to=10 subagents=2 files=perf-notes/agent10-batch2-review.md
+1. Rate Agent 2's folded S4b + S4c compose check when it arrives (C1 v3 → M1 → P2c → r1r2 → #26 OFF → S4c).
+2. A safety read of Agent 5's launcher (bench/agent5/launch/) when Agent 5 asks. It may only run the pinned runner on bench/agent8/run JSONs with bins from build/agent2. It must close only the 5 approved apps, restore the screensaver, refuse when locked, on battery or past the deadline, and write only its own folders plus the GO/HOLD files.
+
+Window rule: W5 (~37 min) may start on the user's desktop any minute. Until I send 'go': file tools only (read, search, edit your own files); no run_command and no subagents. While perf-notes/WINDOW-HOLD.txt exists: no tool calls at all; end your turn and wait for my resume. After 'go': check the HOLD file before every command; subagents only read, stage and check, never build or run games.
+
+Subagents: an independent re-apply of the compose chain, and a second read of the launcher.
+Report with @@done: both ratings.
+```
+
+```agy-task to=11 subagents=2 files=perf-notes/S4-DRAFT.md, build/agent11/**, bench/agent11/**
+1. Add W4b's result and the new order to S4-DRAFT: W5 now; the S4b + S4c build; the functional queue; W6 by the launcher; W7-W10 overnight as their gates pass; the native re-pin once, on native4b.
+2. The 3-mode copy of bench/agent11/timerq_slowstate.ps1 for W5's read-out (spin / blocking / precise, by env_set and the precise line). Leave the original frozen, and give the path to Agent 8.
+3. Review Agent 5's launcher (bench/agent5/launch/) when Agent 5 asks (not Agent 8's).
+
+Window rule: W5 (~37 min) may start on the user's desktop any minute. Until I send 'go': file tools only (read, search, edit your own files); no run_command and no subagents. While perf-notes/WINDOW-HOLD.txt exists: no tool calls at all; end your turn and wait for my resume. After 'go': check the HOLD file before every command; subagents only read, stage and check, never build or run games.
+
+Subagents: a check of the 3-mode script against W4b's runs.
+Report with @@done: the S4-DRAFT sha, the script path, and the review.
+```
+
+@@to 4: W4b is done. After my 'go' (W5 runs first), run #25's self-test and the r6/0452 re-checks; the native re-pin waits for native4b. Until 'go', file tools only; no tool calls at all while perf-notes/WINDOW-HOLD.txt exists.
+===== line 652 step 651 2026-11-22T23:07:15Z =====
+/lego-dimensions-recomp/build/agent1/RESUME-after-relaunch.md), and the pause is logged in [SESSION2.md](<workspace>/perf-notes/SESSION2.md).
+
+@@to 2: agy-grid restarts for bugfixes in a few minutes. Finish the edit you're in, note where you are in your own notes file, then end your turn and wait for my resume. Run nothing until then.
+@@to 3: agy-grid restarts for bugfixes in a few minutes. Finish the edit you're in, note where you are in your own notes file, then end your turn and wait for my resume. Run nothing until then.
+@@to 4: agy-grid restarts for bugfixes in a few minutes. Finish the edit you're in, note where you are in your own notes file, then end your turn and wait for my resume. Run nothing until then.
+@@to 5: agy-grid restarts for bugfixes in a few minutes. Finish the edit you're in, note where you are in your own notes file, then end your turn and wait for my resume. Run nothing until then.
+@@to 6: agy-grid restarts for bugfixes in a few minutes. Finish the edit you're in, note where you are in your own notes file, then end your turn and wait for my resume. Run nothing until then.
+@@to 7: agy-grid restarts for bugfixes in a few minutes. Finish the edit you're in, note where you are in your own notes file, then end your turn and wait for my resume. Run nothing until then.
+@@to 8: agy-grid restarts for bugfixes in a few minutes. Finish the edit you're in, note where you are in your own notes file, then end your turn and wait for my resume. Run nothing until then.
+@@to 9: agy-grid restarts for bugfixes in a few minutes. Finish the edit you're in, note where you are in your own notes file, then end your turn and wait for my resume. Run nothing until then.
+@@to 10: agy-grid restarts for bugfixes in a few minutes. Finish the edit you're in, note where you are in your own notes file, then end your turn and wait for my resume. Run nothing until then.
+@@to 11: agy-grid restarts for bugfixes in a few minutes. Finish the edit you're in, note where you are in your own notes file, then end your turn and wait for my resume. Run nothing until then.
+@@to 12: agy-grid restarts for bugfixes in a few minutes. Finish the edit you're in, note where you are in your own notes file, then end your turn and wait for my resume. Run nothing until then.

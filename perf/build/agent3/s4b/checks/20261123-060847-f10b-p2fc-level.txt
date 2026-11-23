@@ -1,0 +1,66 @@
+# s4b_check f10b 20261123-060847-f10b-p2fc-level (off, scenario level-l.txt)
+run.json: exit 0 (0x00000000) dumps 0 crash_events 0 wer False; close wm_close 1.50 s; elapsed 441.79 of 600 s; cvars {"framerate_limit": "0", "shared_memory_single_hold_rearm": "true", "physical_protect_hold_global_lock": "true", "physical_protect_keep_watch": "true", "physical_protect_keep_watch_verify": "false", "slow_frame_log_ms": "1"}; env -; steps 119/119
+summary: verdict RUNNING; first frame 9.0 s; levels {"info": 39004, "warning": 144}; unknown cvars []; errors 0
+log files game.2.log,game.1.log,game.log; levels {"info": 39004, "warning": 144}
+families: c1_any=44 k=0 c1_verify_on=0 c1_verify_f=0 c1_other=0 recovered_stale=0 unhandled_phys=0 protect_failed=0 split_init=0 split=0 deferred_counters=0 gpu_wait=0 memexport=38492 slow_frame=38492 s4_upload_hash=0 precise_wait=0 miss_cache=0 stuck_lock=0 minidump=0 fatal=0 debug_layer=0 dred=0 d3d12_msg=0 clean_exit=1
+  c1_any: [2026-11-23 06:08:51.299] [info] [sys] [t34980] C1 keep-watch: on (with physical_protect_hold_global_lock)
+  c1_any: [2026-11-23 06:08:53.940] [info] [sys] [t2272] C1 keep-watch: first kept protect at ED19F000, 299892736 bytes
+  c1_any: [2026-11-23 06:08:53.942] [info] [sys] [t2272] C1 keep-watch: 2 protects kept so far
+  c1_any: ... (38 more)
+  c1_any: [2026-11-23 06:15:01.970] [info] [sys] [t17368] C1 keep-watch: 118784 protects kept so far
+  c1_any: [2026-11-23 06:15:03.776] [info] [sys] [t13360] C1 keep-watch: 122880 protects kept so far
+  c1_any: [2026-11-23 06:15:45.402] [info] [sys] [t2272] C1 keep-watch: 126976 protects kept so far
+  memexport: [2026-11-23 06:08:57.995] [info] [gpu] [t32752] slow frame #2: 55.7 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.1 (2x), new 3 | texture load 2.1 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | m
+  memexport: [2026-11-23 06:08:58.004] [info] [gpu] [t32752] slow frame #3: 8.7 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 1x 4 KB (on memexport pages 0x 0 KB) | me
+  memexport: [2026-11-23 06:08:58.008] [info] [gpu] [t32752] slow frame #4: 4.0 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 1x 4 KB (on memexport pages 0x 0 KB) | me
+  memexport: ... (38486 more)
+  memexport: [2026-11-23 06:16:09.273] [info] [gpu] [t32752] slow frame #38491: 23.4 ms | gpu-thread idle 10.9 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.3 (34x) | readback 23x 2300 KB, 0 stalled | cpu-write invalidations 2x 8 KB (on memexport pages 0x
+  memexport: [2026-11-23 06:16:09.298] [info] [gpu] [t32752] slow frame #38492: 25.1 ms | gpu-thread idle 9.6 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.3 (34x) | readback 23x 2300 KB, 0 stalled | cpu-write invalidations 4x 16 KB (on memexport pages 0x
+  memexport: [2026-11-23 06:16:09.322] [info] [gpu] [t32752] slow frame #38493: 24.1 ms | gpu-thread idle 10.1 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.5 (34x) | readback 23x 2300 KB, 0 stalled | cpu-write invalidations 2x 8 KB (on memexport pages 0x
+  slow_frame: [2026-11-23 06:08:57.995] [info] [gpu] [t32752] slow frame #2: 55.7 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.1 (2x), new 3 | texture load 2.1 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | m
+  slow_frame: [2026-11-23 06:08:58.004] [info] [gpu] [t32752] slow frame #3: 8.7 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 1x 4 KB (on memexport pages 0x 0 KB) | me
+  slow_frame: [2026-11-23 06:08:58.008] [info] [gpu] [t32752] slow frame #4: 4.0 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 1x 4 KB (on memexport pages 0x 0 KB) | me
+  slow_frame: ... (38486 more)
+  slow_frame: [2026-11-23 06:16:09.273] [info] [gpu] [t32752] slow frame #38491: 23.4 ms | gpu-thread idle 10.9 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.3 (34x) | readback 23x 2300 KB, 0 stalled | cpu-write invalidations 2x 8 KB (on memexport pages 0x
+  slow_frame: [2026-11-23 06:16:09.298] [info] [gpu] [t32752] slow frame #38492: 25.1 ms | gpu-thread idle 9.6 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.3 (34x) | readback 23x 2300 KB, 0 stalled | cpu-write invalidations 4x 16 KB (on memexport pages 0x
+  slow_frame: [2026-11-23 06:16:09.322] [info] [gpu] [t32752] slow frame #38493: 24.1 ms | gpu-thread idle 10.1 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.5 (34x) | readback 23x 2300 KB, 0 stalled | cpu-write invalidations 2x 8 KB (on memexport pages 0x
+C1 kept so far: last 126976 (42 lines)
+memexport full-buffer: {"lines": 38492, "last_total": 0, "max_total": 0, "sum_x": 0, "lines_x_gt0": 0}
+last slow-frame line (tail): ...ture load 0.5 (34x) | readback 23x 2300 KB, 0 stalled | cpu-write invalidations 2x 8 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)
+frames (perf.csv rows) 38493; slow_frame per frame 1.000
+logdiff cand: 3 logs joined -> build\agent3\s4b\checks\joined\20261123-060847-f10b-p2fc-level
+logdiff vs 20261122-210059-s4b-L0-off-level (base scenario level-l.txt): NEW 0 (+0 allowed) MORE 0 (+0 allowed) GONE 52 (0 unexpected) FLAG 0; NEW at info 4 other, 1 allowed; rc 0
+  info NEW build\agent3\s4b\checks\joined\20261123-060847-f10b-p2fc-level\game.log x3 [info] [core] Toypad: pad # mode # lit FE #C # (on # off # count # speed #)
+  info NEW build\agent3\s4b\checks\joined\20261123-060847-f10b-p2fc-level\game.log x42 [info] [sys] C# keep-watch: # protects kept so far
+  info NEW build\agent3\s4b\checks\joined\20261123-060847-f10b-p2fc-level\game.log x1 [info] [sys] C# keep-watch: first kept protect at #h, #h bytes
+  info NEW build\agent3\s4b\checks\joined\20261123-060847-f10b-p2fc-level\game.log x1 [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)
+  info allowed NEW build\agent3\s4b\checks\joined\20261123-060847-f10b-p2fc-level\game.log x38492 [info] [gpu] slow frame ##: # ms | gpu-thread idle # | host-gpu wait # (#x) | shader translate # (#x) | pipeline create # (#x), new # | texture load # (#x) |
+levels cand {"info": 39004, "warning": 144} vs 20261122-210059-s4b-L0-off-level {"info": 442, "warning": 144}
+scenes (>= 2 s) base: 220/534:82s 218/222:26s 226/1022:24s 220/528:17s 219/226:15s 594/2813:4s 788/31613:3s 841/31696:3s 790/31625:2s
+scenes (>= 2 s) cand: 220/534:68s 785/123950:64s 218/222:28s 226/1022:21s 219/226:15s 220/528:14s 594/2813:4s 839/31674:2s
+  missing in cand: ['788/31613', '790/31625', '841/31696']; extra in cand: ['785/123950']
+  note: attract/idle scenes missing in cand (timing after the route; not a BASE item): ['788/31613', '790/31625', '841/31696']
+route marks first-frame..tags-placed: 4, 0 differ; all marks: 6 differ
+  cand marks: first-frame=218/222 title=226/1022 pads-white=220/528 tags-placed=220/528 m01=220/528 m02=220/534 m03=220/534 m04=220/534 m05=220/534 m06=220/534 m07=220/534 m08=220/534 m09=220/534 m10=220/534 story-load=218/222 vortex=4134/682007 v-idle=774/114220 v-start=798/117532 v-start-a=785/123950 settled=785/123950 end=785/123950
+threads (% of one core, window [20.0, 421.7] s from the first frame, 401.7 s): XThread3150 (F80001AC) x1 55.6 | GPU Commands (F8000018) x1 54.9 | Main XThread (F800002C) x1 54.8 | rex::thread::TimerQueue x1 36.7 | XThread3430 (F80000F4) x1 24.7 | (unnamed) x35 18.7 | XThread8AF4 (F8000144) x1 12.7 | XThread89E0 (F8000114) x1 8.6 | 0xc0550001 x1 6.7 | XThread8478 (F800010C) x1 4.2
+  TimerQueue ticks (tid 32812): 220 samples over [-8.3, 429.7] s, cycles non-rising in 0 of 219 steps 
+sys.csv slow state: {"rows": 433, "onset_s": null, "slow_pct": 0.0, "e_eff_mhz_median": 1433, "cpu_util_pct_median": 79.5, "slow": false}
+hangs: 0 STUCK-LOCK event(s); hostload rows during the run: {"rows": 13, "busy_rows": 0}; toypad: {"confirms": 3, "result": "listener=True trigger=True placed=True load-confirms=3/3 then=off remove-confirms=0"}
+PROOF ok   init "C1 keep-watch: on (with physical_protect_hold_global_lock)" x1
+PROOF ok   "first kept protect" x1 (gate D / positive control)
+PROOF ok   kept count: last "kept so far" = 126976 (42 such lines)
+PROOF ok   verify off (keep_watch_verify=false): "C1 verify: on" x0, K lines 0
+PROOF ok   kept count rises through the level load (last mark end): first 2 -> last 126976 (42 "kept so far" lines)
+PROOF ok   gate D zero lines: "Recovered stale physical page protection" 0, "Unhandled guest physical write fault" 0
+PROOF ok   no blocked/no-hold C1 line (0/0/0)
+PROOF ok   slow-frame lines 38492
+PROOF ok   the last slow-frame line ends with the memexport suffix: ...n memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)
+PROOF ok   P2 COUNTER: memexport full-buffer total (last line) = 0; max 0; sum Nx 0; lines with Nx > 0: 0 -> closes P2 memexport gate
+PROOF ok   f10 f10b cvars in run.json (6 expected, w6gB's set): all as planned
+PROOF ok   tags placed: 3 game.log LOAD lines (3 needed); sidecar: listener=True trigger=True placed=True load-confirms=3/3 then=off remove-confirms=0
+PROOF ok   L route reached the level: through the level load (last mark end)
+PROOF note FINDING 10 (Agent 6 direct test): STUCK-LOCK events 0
+PROOF ok   quiet host: hostload.csv rows with clang/cl/ninja/link during the run: 0 of 13
+PROOF ok   G8 bad lines: Protect failed 0, Recovered stale 0, Unhandled guest physical write fault 0
+BASE items missed: none
+VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row f10b)

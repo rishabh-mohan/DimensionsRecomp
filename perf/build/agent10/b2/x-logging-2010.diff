@@ -1,0 +1,108 @@
+﻿diff --git a/baseline/DimensionsRecomp/rexglue-sdk/include/rex/logging/api.h b/DimensionsRecomp/rexglue-sdk/include/rex/logging/api.h
+index be0497b..45464bf 100644
+--- a/baseline/DimensionsRecomp/rexglue-sdk/include/rex/logging/api.h
++++ b/DimensionsRecomp/rexglue-sdk/include/rex/logging/api.h
+@@ -13,6 +13,7 @@
+ 
+ #include <rex/logging/types.h>
+ 
++#include <atomic>
+ #include <filesystem>
+ #include <span>
+ 
+@@ -124,6 +125,47 @@ std::span<const LogCategoryEntry> GetAllCategories();
+  */
+ spdlog::logger* GetLoggerRaw(LogCategoryId category);
+ 
++/**
++ * Recompute the level floor used by the logging macros (cvar log_level_gate).
++ *
++ * InitLogging and the Set*Level functions keep the floor current. Call this
++ * after changing a logger's level directly through spdlog.
++ */
++void RefreshLogLevelFloor();
++
++namespace detail {
++
++// Level floor for the logging macros: a call below it cannot pass any logger's
++// should_log(), so the macro skips it without evaluating the category. Only the
++// copy in the module that contains logging.cpp is written. Inline variables are
++// per module (WINDOWS_EXPORT_ALL_SYMBOLS exports functions, not importable data),
++// so each module reads the floor through g_log_level_floor_ptr. It starts at the
++// module's own copy (0 = trace, every call takes the full path) and is bound to
++// the shared floor by the module's first enabled log line (BindLogLevelFloor).
++inline constinit std::atomic<int> g_log_level_floor{0};
++inline constinit std::atomic<const std::atomic<int>*> g_log_level_floor_ptr{&g_log_level_floor};
++inline constinit std::atomic<bool> g_log_level_floor_bound{false};
++
++const std::atomic<int>* SharedLogLevelFloor();
++
++inline bool LogLevelMayBeEnabled(int level) {
++  return level >=
++         g_log_level_floor_ptr.load(std::memory_order_relaxed)->load(std::memory_order_relaxed);
++}
++
++// Points this module's floor at the shared one. The logging macros call it only for
++// a line that passes should_log(), so a call that is filtered out pays nothing for it.
++// A module that has never logged an enabled line keeps reading its own floor (0): its
++// calls all take the full path, which costs speed but changes no output.
++inline void BindLogLevelFloor() {
++  if (!g_log_level_floor_bound.load(std::memory_order_relaxed)) [[unlikely]] {
++    g_log_level_floor_ptr.store(SharedLogLevelFloor(), std::memory_order_relaxed);
++    g_log_level_floor_bound.store(true, std::memory_order_relaxed);
++  }
++}
++
++}  // namespace detail
++
+ /**
+  * Get the shared logger pointer for a category.
+  *
+diff --git a/baseline/DimensionsRecomp/rexglue-sdk/include/rex/logging/macros.h b/DimensionsRecomp/rexglue-sdk/include/rex/logging/macros.h
+index 504fdcb..8f5208f 100644
+--- a/baseline/DimensionsRecomp/rexglue-sdk/include/rex/logging/macros.h
++++ b/DimensionsRecomp/rexglue-sdk/include/rex/logging/macros.h
+@@ -13,20 +13,31 @@
+ 
+ #include <rex/logging/api.h>
+ 
+-/* Implementation macro - do not call directly. Uses raw pointer for zero
+-   ref-count overhead and gates on should_log() to skip format evaluation. */
+-#define REX_LOG_IMPL(cat, lvl, ...)                                                              \
+-  do {                                                                                           \
+-    auto* rex_log_ptr_ = ::rex::GetLoggerRaw(cat);                                               \
+-    if (rex_log_ptr_ && rex_log_ptr_->should_log(lvl))                                           \
+-      rex_log_ptr_->log(spdlog::source_loc{__FILE__, __LINE__, __FUNCTION__}, lvl, __VA_ARGS__); \
++/* Implementation macro - do not call directly. A call below the level floor
++   (rex::detail::LogLevelMayBeEnabled) costs one inline compare and does not
++   evaluate `cat`. Above the floor it is the old sequence: raw pointer for zero
++   ref-count overhead, and should_log() to skip format evaluation. Nothing else
++   runs before should_log(), so a call that passes the floor but fails it (every
++   disabled call while log_level_gate is off) costs what it did before: no
++   [[unlikely]] on the floor test (clang then treats the block as cold and calls
++   the category function out of line), and the floor is bound only by a line that
++   is logged. */
++#define REX_LOG_IMPL(cat, lvl, ...)                                                                \
++  do {                                                                                             \
++    if (::rex::detail::LogLevelMayBeEnabled(lvl)) {                                                \
++      auto* rex_log_ptr_ = ::rex::GetLoggerRaw(cat);                                               \
++      if (rex_log_ptr_ && rex_log_ptr_->should_log(lvl)) {                                         \
++        ::rex::detail::BindLogLevelFloor();                                                        \
++        rex_log_ptr_->log(spdlog::source_loc{__FILE__, __LINE__, __FUNCTION__}, lvl, __VA_ARGS__); \
++      }                                                                                            \
++    }                                                                                              \
+   } while (0)
+ 
+-#define REX_LOG_NOISY_IMPL(cat, lvl, ...) \
+-  do {                                    \
+-    if (!REXCVAR_GET(log_noisy))          \
+-      break;                              \
+-    REX_LOG_IMPL(cat, lvl, __VA_ARGS__);  \
++#define REX_LOG_NOISY_IMPL(cat, lvl, ...)                                     \
++  do {                                                                        \
++    if (!::rex::detail::LogLevelMayBeEnabled(lvl) || !REXCVAR_GET(log_noisy)) \
++      break;                                                                  \
++    REX_LOG_IMPL(cat, lvl, __VA_ARGS__);                                      \
+   } while (0)
+ 
+ /* --- Parameterized Macros (Primary API) --------------------------------- */

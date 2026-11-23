@@ -1,0 +1,21 @@
+﻿diff --git a/baseline/DimensionsRecomp/rexlego/src/gpu_native/pipeline_creation_gate.h b/DimensionsRecomp/rexlego/src/gpu_native/pipeline_creation_gate.h
+index 1aba89d..2a011e7 100644
+--- a/baseline/DimensionsRecomp/rexlego/src/gpu_native/pipeline_creation_gate.h
++++ b/DimensionsRecomp/rexlego/src/gpu_native/pipeline_creation_gate.h
+@@ -20,8 +20,16 @@ class PipelineCreationGate {
+         : mutex_(std::move(mutex)), lock_(*mutex_) {}
+     Lease(Lease&&) = default;
+     Lease& operator=(Lease&&) = delete;
+ 
++    // Unlocks early, once the key's work is visible to other workers (the
++    // async PSO path). Safe to call once; the destructor then does nothing.
++    void Release() {
++      if (lock_.owns_lock()) lock_.unlock();
++      lock_ = std::unique_lock<std::mutex>();
++      mutex_.reset();
++    }
++
+    private:
+     // The lock must be destroyed before its mutex owner.
+     std::shared_ptr<std::mutex> mutex_;
+     std::unique_lock<std::mutex> lock_;

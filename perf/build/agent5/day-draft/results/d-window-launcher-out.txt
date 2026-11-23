@@ -1,0 +1,54 @@
+2026-11-23 07:46:53 [dry] launcher start: DRY RUN, files in <workspace>\build\agent5\day-draft\status-dryrun\d-window; pid 22308; PowerShell 5.1.26100.10068; repo <workspace>
+2026-11-23 07:46:53 [dry] dry-run hooks: -DryRunTag d-window -SkipStartChecks True -PollSeconds 1 -SampleSeconds 1 -MatrixDir <workspace>\build\agent5\launch-test -GateFixture <workspace>\build\agent5\launch-test\gate-quiet.json -FakeRunner <workspace>\build\agent5\launch-test\fake-runner.ps1 -MaxGo 1
+2026-11-23 07:46:53 [dry] start checks: desktop 'WinSta0\exebox-D7INIM6QPP4HMNZNRV3CGC4VHZ'; LogonUI not running; power AC (ACLineStatus 1, BatteryFlag 1, battery 100 %); ends at 2026-11-23 10:46:00; latest window start 2026-11-23 10:46:00; a window still running at 2026-11-23 10:46:00 is stopped
+2026-11-23 07:46:53 [dry] start checks would refuse: this is desktop 'WinSta0\exebox-D7INIM6QPP4HMNZNRV3CGC4VHZ', not the user's own desktop WinSta0\Default (ignored: -DryRun -SkipStartChecks)
+2026-11-23 07:46:53 [dry] pinned 19 files (status: pins.txt)
+2026-11-23 07:46:53 [dry] environment: no other REX_*/LEGO_* variables
+2026-11-23 07:46:53 [dry] console Quick Edit: not changed in a dry run
+2026-11-23 07:46:54 [dry] screensaver: would set (None) (now ScreenSaveActive=0, SCRNSAVE.EXE '') and restore it at the end
+2026-11-23 07:46:54 [dry] keep-awake: would request SetThreadExecutionState(continuous+system+display) until the end
+2026-11-23 07:46:54 [dry] waiting for <workspace>\build\agent5\day-draft\status-dryrun\d-window\WINDOW-GO.txt (checked every 1 s) until 2026-11-23 10:46:00, or until <workspace>\build\agent5\day-draft\status-dryrun\d-window\WINDOW-STOP.txt appears
+2026-11-23 07:46:56 [dry] GO read and deleted: 'GO T1 t-good.json 4D7D689B799F6102E6325B4CED12688E60F1D2FCE82397C06956574B2B025DFD only=base,s0 repeats=1'
+2026-11-23 07:46:58 [dry] HOLD written: <workspace>\build\agent5\day-draft\status-dryrun\d-window\WINDOW-HOLD.txt
+2026-11-23 07:47:00 [dry] GO ACCEPTED: window T1: t-good.json (sha256 ok), only=base,s0, repeats=1; runner estimate 3 runs, about 7 min
+2026-11-23 07:47:00 [dry] bin build/agent2/devoff3-bin/legodimensions.exe sha256 2522D43605D8A9BF2A5EEE31490E6C349274D3258C8E0E1474DBB561CDE86F57
+2026-11-23 07:47:00 [dry] bin build/agent2/devoff3-bin/MANIFEST.txt sha256 B9C5175DA19042353A084E355CBA22D09C50A6B8CE95A1E0A8B17BF64E40FEFE
+2026-11-23 07:47:00 [dry] bin build/agent2/devoff4-bin/legodimensions.exe sha256 6BE3C713229232B29C183D27B397A3560B46E2279C6AF47C64CF8A2EFA287376
+2026-11-23 07:47:00 [dry] bin build/agent2/devoff4-bin/MANIFEST.txt sha256 16DCC9399239E5774BF571869B5248DF36DB0D374BF6A159BF1A9839784CAD6D
+2026-11-23 07:47:00 [dry] WARN: run-matrix.ps1 -PlanOnly says: note     Timing comes only from this double-click run on the unlocked desktop (screensaver None, AC power, hands off). Agent runs of this matrix (-Quick, hidden desktop) are functional only.
+2026-11-23 07:47:00 [dry] WARN: run-matrix.ps1 -PlanOnly says: desktop    WinSta0\exebox-D7INIM6QPP4HMNZNRV3CGC4VHZ -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+2026-11-23 07:47:00 [dry] WARN: run-matrix.ps1 -PlanOnly says: !!! These runs will be FUNCTIONAL ONLY (see above): their numbers are not timing results.
+2026-11-23 07:47:00 [dry] programs (GO accepted): none running (ChatGPT, Copilot app, Roblox player or Store app, Task Manager, Wallpaper Engine)
+2026-11-23 07:47:00 [dry] gate: simulated samples from <workspace>\build\agent5\launch-test\gate-quiet.json (fields set to 'real' use this PC)
+2026-11-23 07:47:01 [dry] gate 1 (+0 min): cpu n/a; builds none; RAM 12 GB; C: 50 GB; LogonUI False; AC True -> wait: 0 of 3 consecutive one-minute CPU averages so far
+2026-11-23 07:47:02 [dry] gate 2 (+0.1 min): cpu MsMpEng 0.02, OfficeClickToRun 0.00, CrossDeviceService 0.01; builds none; RAM 12 GB; C: 50 GB; LogonUI False; AC True -> wait: 1 of 3 consecutive one-minute CPU averages so far
+2026-11-23 07:47:03 [dry] gate 3 (+0.1 min): cpu MsMpEng 0.02, OfficeClickToRun 0.00, CrossDeviceService 0.01; builds none; RAM 12 GB; C: 50 GB; LogonUI False; AC True -> wait: 2 of 3 consecutive one-minute CPU averages so far
+2026-11-23 07:47:04 [dry] gate 4 (+0.1 min): cpu MsMpEng 0.02, OfficeClickToRun 0.00, CrossDeviceService 0.01; builds none; RAM 12 GB; C: 50 GB; LogonUI False; AC True -> PASS
+07:47:04 quiet gate: STRICT (MsMpEng 0.02/0.02/0.02, OfficeClickToRun 0.00/0.00/0.00, CrossDeviceService 0.01/0.01/0.01)
+2026-11-23 07:47:04 [dry] programs (window start): none running (ChatGPT, Copilot app, Roblox player or Store app, Task Manager, Wallpaper Engine)
+2026-11-23 07:47:05 [dry] last checks would refuse: this is desktop 'WinSta0\exebox-D7INIM6QPP4HMNZNRV3CGC4VHZ', not the user's own desktop WinSta0\Default (ignored: -DryRun -SkipStartChecks)
+2026-11-23 07:47:05 [dry] bins unchanged since the GO (4 files)
+2026-11-23 07:47:05 [dry] power scheme at the start: Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+2026-11-23 07:47:05 [dry] DRY RUN, would start window T1 now, without REX_TIMER_WAIT_BLOCKING / LEGO_GPU_WAIT_STATS / LEGO_GPU_WAIT_BACKOFF_US / LEGO_GPU_WAIT_SPIN_US / LEGO_NATIVE_FRAME_METRICS / LEGO_NATIVE_SHADER_MISS_CACHE / LEGO_NATIVE_THREADED / LEGO_NATIVE_PREPARE_THREADS / LEGO_NATIVE_SNAPSHOT_STATE / LEGO_NATIVE_FULL_DRAW_PREPARATION / LEGO_NATIVE_CHAIN_PRIORITY in its environment:
+2026-11-23 07:47:05 [dry]   "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File <workspace>\bench\agent8\run\run-matrix.ps1 -Matrix <workspace>\build\agent5\launch-test\t-good.json -Only base,s0 -Repeats 1 -ColdShared -NoPrompt
+2026-11-23 07:47:05 [dry] DRY RUN with -FakeRunner: the fake runner below runs instead (tests the run, STOP and end-time handling)
+2026-11-23 07:47:05 [dry] window T1 START (estimate 7 min, about 07:54): "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File <workspace>\build\agent5\launch-test\fake-runner.ps1 -Dir <workspace>\build\agent5\day-draft\status-dryrun\d-window
+2026-11-23 07:47:05 [dry] runner pid 34980; a STOP file, or the end time 2026-11-23 10:46:00, stops it and everything it started
+fake runner pid 34980 starting (seconds 900, exit 0, child 900 s)
+fake child pid 34484
+out dir: <workspace>\build\agent5\day-draft\status-dryrun\d-window\fake-out
+fake run tick 1
+fake runner stderr line
+fake run tick 2
+fake run tick 3
+fake run tick 4
+fake run tick 5
+fake run tick 6
+2026-11-23 07:47:12 [dry] !!! STOP file: the runner (pid 34980) and every process it started are killed now
+2026-11-23 07:47:12 [dry] runner pid 34980 killed
+2026-11-23 07:47:12 [dry] killed (walk 1): powershell.exe:34484, conhost.exe:9040 (already gone)
+2026-11-23 07:47:13 [dry] runner stopped: yes
+2026-11-23 07:47:14 [dry] window T1 END: runner exit -1 (stopped early: STOP file; the runner and everything it started were killed) after 0.1 min; out dir <workspace>\build\agent5\day-draft\status-dryrun\d-window\fake-out
+2026-11-23 07:47:14 [dry] STOP file seen (while window T1 was running): 'STOP 2026-11-23 07:47:11 by RUN-DAY.cmd: day session until 2026-11-23 10:31 (back at 10:46)'; it is deleted (consumed) and the launcher ends
+2026-11-23 07:47:14 [dry] HOLD removed
+2026-11-23 07:47:14 [dry] launcher end: STOP file, exit 0

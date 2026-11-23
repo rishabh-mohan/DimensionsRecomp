@@ -1,0 +1,67 @@
+# pthrottle_pairs (S4 task #24) 2026-11-22 05:24:03: DRY RUN (no game); 3 pairs, measure 90 s, bin build/agent2/devoff2-bin
+out <workspace>\build\agent11\pthrottle\pairs\20261122-0524 ; meta <workspace>\build\agent11\pthrottle\pairs\20261122-0524-meta
+hash before: # pthrottle_w4b_hash 2026-11-22 05:24:10: 53 files, 657888905 bytes; not hashed: game\disc, game\tu23 (read-only game data) (exit 0)
+sidecar pid 49356 ready (process pthrottle_standin, max 45 min)
+dry runner order: d0-r1, d0e-r1, d0e-r2, d0-r2, d0-r3, d0e-r3
+dry run 0524-d0-r1: game-like Set C=0x4 (error 0), 2 s later C=0x4 S=0x0 (want C=0x4 S=0x0): PASS
+dry run 0524-d0e-r1: game-like Set C=0x4 (error 0), 2 s later C=0x5 S=0x0 (want C=0x5 S=0x0): PASS
+dry run 0524-d0e-r2: game-like Set C=0x4 (error 0), 2 s later C=0x5 S=0x0 (want C=0x5 S=0x0): PASS
+dry run 0524-d0-r2: game-like Set C=0x4 (error 0), 2 s later C=0x4 S=0x0 (want C=0x4 S=0x0): PASS
+dry run 0525-d0-r3: game-like Set C=0x4 (error 0), 2 s later C=0x4 S=0x0 (want C=0x4 S=0x0): PASS
+dry run 0525-d0e-r3: game-like Set C=0x4 (error 0), 2 s later C=0x4 S=0x0 (want C=0x5 S=0x0): FAIL
+runner exit 1
+  sidecar: 05:24:22.928 ready: runs dir <workspace>\build\agent11\pthrottle\pairs\20261122-0524\runs\, process pthrottle_standin, opt-out arm d0e (^\d{4}-d0e-r\d+(-r\d+)?$), poll 500 ms, max 45 min, pid 49356
+  sidecar: 05:24:28.167 ignore pid 26840: not under the runs dir (<workspace>\build\agent11\pthrottle\pairs\20261122-0524-meta\outside\pthrottle_standin.exe)
+  sidecar: 05:24:30.665 start 0524-d0-r1 pid 56452 (seen 0.58 s after its start): C=0x0 S=0x0 -> C=0x0 S=0x0 (apply result 0)
+  sidecar: 05:24:39.403 end   0524-d0-r1 pid 56452 (exited): before C=0x0 S=0x0, after C=0x0 S=0x0, last C=0x4 S=0x0, reads 15 (0% opted out), reapplied 0, exit 0, ok True
+  sidecar: 05:24:40.078 start 0524-d0e-r1 pid 24004 (seen 0.97 s after its start): C=0x0 S=0x0 -> C=0x1 S=0x0 (apply result 0)
+  sidecar: 05:24:42.340 reapply 0524-d0e-r1: C=0x4 S=0x0 -> C=0x5 S=0x0 (result 0)
+  sidecar: 05:24:48.484 start 0524-d0e-r2 pid 88988 (seen 0.09 s after its start): C=0x0 S=0x0 -> C=0x1 S=0x0 (apply result 0)
+  sidecar: 05:24:48.506 end   0524-d0e-r1 pid 24004 (exited): before C=0x0 S=0x0, after C=0x1 S=0x0, last C=0x5 S=0x0, reads 15 (93.3% opted out), reapplied 1, exit 0, ok True
+  sidecar: 05:24:51.920 reapply 0524-d0e-r2: C=0x4 S=0x0 -> C=0x5 S=0x0 (result 0)
+  sidecar: 05:24:57.558 end   0524-d0e-r2 pid 88988 (exited): before C=0x0 S=0x0, after C=0x1 S=0x0, last C=0x5 S=0x0, reads 16 (93.8% opted out), reapplied 1, exit 0, ok True
+  sidecar: 05:24:58.682 start 0524-d0-r2 pid 72212 (seen 0.56 s after its start): C=0x0 S=0x0 -> C=0x0 S=0x0 (apply result 0)
+  sidecar: 05:25:07.304 start 0525-d0-r3 pid 81156 (seen 0.14 s after its start): C=0x0 S=0x0 -> C=0x0 S=0x0 (apply result 0)
+  sidecar: 05:25:07.331 end   0524-d0-r2 pid 72212 (exited): before C=0x0 S=0x0, after C=0x0 S=0x0, last C=0x4 S=0x0, reads 15 (0% opted out), reapplied 0, exit 0, ok True
+  sidecar: 05:25:16.217 ignore pid 100012: not under the runs dir ()
+  sidecar: 05:25:16.359 end   0525-d0-r3 pid 81156 (exited): before C=0x0 S=0x0, after C=0x0 S=0x0, last C=0x4 S=0x0, reads 16 (0% opted out), reapplied 0, exit 0, ok True
+  sidecar: 05:25:31.383 stop file seen, nothing tracked: done
+dry check: stand-in outside the runs dir (pid 26840): state C=0x0 S=0x0, ignored by the sidecar True: PASS
+merge 0524-d0e-r1: applied True, C=0x0 S=0x0 -> C=0x1 S=0x0, last C=0x5 S=0x0, reapplied 1, held 93.3%; bom True; record ok
+merge 0524-d0e-r2: applied True, C=0x0 S=0x0 -> C=0x1 S=0x0, last C=0x5 S=0x0, reapplied 1, held 93.8%; bom True; record ok
+merge 0524-d0-r1: applied False, C=0x0 S=0x0 -> C=0x0 S=0x0, last C=0x4 S=0x0, reapplied 0, held 0%; bom True; record ok
+merge 0524-d0-r2: applied False, C=0x0 S=0x0 -> C=0x0 S=0x0, last C=0x4 S=0x0, reapplied 0, held 0%; bom True; record ok
+merge 0525-d0e-r3: NO sidecar record; bom True; record FAIL
+merge 0525-d0-r3: applied False, C=0x0 S=0x0 -> C=0x0 S=0x0, last C=0x4 S=0x0, reapplied 0, held 0%; bom True; record ok
+R : The identifier 0 is not a valid value for a 
+History identifier. Specify a positive number, and 
+then try again.
+Parameter name: Id
+At C:\Users\<user>\.vscode\projects\games\lego-dimen
+sions-recomp\bench\agent11\pthrottle_readout.ps1:55
+ char:82
++ ... l -ne $onset) { R $onset } else { '-' }); 
+slow_pct = R $share; span_s ...
++                                                  
+        ~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (0: 
+   Int64) [Invoke-History], ArgumentOutOfRangeExc  
+  eption
+    + FullyQualifiedErrorId : InvokeHistoryInvalid 
+   IdGetHistory,Microsoft.PowerShell.Commands.Inv  
+  okeHistoryCommand
+ 
+--- timerq_slowstate.ps1 cross-check
+matrix        run         blocking onset_s slow_pct span_s fg
+------        ---         -------- ------- -------- ------ --
+20261122-0524 0524-d0e-r1    False -              0    150 0 
+20261122-0524 0524-d0e-r2    False -              1    150 0 
+20261122-0524 0524-d0-r1     False 40            74    150 0 
+20261122-0524 0524-d0-r2     False 80            47    150 0 
+20261122-0524 0525-d0e-r3    False -              0    150 0 
+20261122-0524 0525-d0-r3     False -              0    150 0 
+blocking runs: 0, with slow state: 0; spin runs: 6, with slow state: 2 (E below 800 MHz for 3+ samples)
+hash after: # pthrottle_w4b_hash 2026-11-22 05:26:13: 53 files, 657888905 bytes; not hashed: game\disc, game\tu23 (read-only game data)
+hash after: tsv: <workspace>\build\agent11\pthrottle\pairs\20261122-0524-meta\w4b-after.tsv
+hash after: compare with <workspace>\build\agent11\pthrottle\pairs\20261122-0524-meta\w4b-before.tsv: 53 files before, 0 changed or missing
+RESULT: FAIL (a run, record, merge or check); bad 3; 05:26:14

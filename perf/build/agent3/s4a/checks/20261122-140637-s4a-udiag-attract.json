@@ -1,0 +1,284 @@
+{
+ "run": "20261122-140637-s4a-udiag-attract",
+ "kind": "off",
+ "runjson": {
+  "exit_code": 0,
+  "exit_code_hex": "0x00000000",
+  "dumps": [],
+  "crash_events": [],
+  "wer_seen": false,
+  "close_method": "wm_close",
+  "close_seconds": 2.53,
+  "elapsed_s": 422.84,
+  "seconds_requested": 420,
+  "cvars": {
+   "shared_memory_upload_hash_log": "true",
+   "slow_frame_log_ms": "1",
+   "framerate_limit": "0"
+  },
+  "exited_early": false,
+  "env_extra": {},
+  "script": "attract-long.txt",
+  "steps": "79/91",
+  "peak_threads": 82,
+  "extra_args": []
+ },
+ "summary": {
+  "verdict": "RUNNING",
+  "first_frame_s": 10.0,
+  "levels": {
+   "info": 57905,
+   "warning": 143
+  },
+  "errors": [],
+  "unknown_cvars": []
+ },
+ "greps": {
+  "s4_upload_hash": 28809,
+  "slow_frame": 28704,
+  "precise_wait": 0,
+  "miss_cache": 0,
+  "protect_failed": 0,
+  "stuck_lock": 0,
+  "minidump": 0,
+  "fatal": 0,
+  "storage": 0,
+  "storage_init": 1,
+  "clean_exit": 1
+ },
+ "grep_first": {
+  "s4_upload_hash": [
+   "[2026-11-22 14:06:48.285] [info] [gpu] [t24916] S4 upload hash: frame 1 calls 2 ranges 2 pages 921 (3684 KB) first 921 unchanged 0 changed 0 blocks 16 changed_blocks 0 pages_in_changed_blocks 0 u_page -1.0000 u_block -1.0000",
+   "[2026-11-22 14:06:48.299] [info] [gpu] [t24916] S4 upload hash: frame 2 calls 2 ranges 2 pages 921 (3684 KB) first 921 unchanged 0 changed 0 blocks 17 changed_blocks 0 pages_in_changed_blocks 0 u_page -1.0000 u_block -1.0000"
+  ],
+  "slow_frame": [
+   "[2026-11-22 14:06:48.295] [info] [gpu] [t24916] slow frame #2: 40.8 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.1 (2x), new 3 | texture load 3.5 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | m",
+   "[2026-11-22 14:06:48.299] [info] [gpu] [t24916] slow frame #3: 3.7 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 1x 4 KB (on memexport pages 0x 0 KB) | me"
+  ],
+  "precise_wait": [],
+  "miss_cache": [],
+  "protect_failed": [],
+  "stuck_lock": [],
+  "minidump": [],
+  "fatal": [],
+  "storage": [],
+  "storage_init": [
+   "[2026-11-22 14:06:44.201] [info] [core] [t14064] Initializing shader storage for title 5752084B..."
+  ],
+  "clean_exit": [
+   "[2026-11-22 14:13:39.268] [info] [core] [t14064] Title terminated; hard-exiting process."
+  ]
+ },
+ "storage_init_gap_s": 0.109,
+ "log_files": [
+  "game.3.log",
+  "game.2.log",
+  "game.1.log",
+  "game.log"
+ ],
+ "s4_lines_off": 57513,
+ "frame_rows": 28810,
+ "threads": {
+  "window_s": 381.9,
+  "window": [
+   20.0,
+   401.9
+  ],
+  "by_name": {
+   "(unnamed)": {
+    "pct": 10.7,
+    "threads": 34
+   },
+   "rex::thread::TimerQueue": {
+    "pct": 35.28,
+    "threads": 1
+   },
+   "DeviceHotplugThread": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "D3D Background Thread 0": {
+    "pct": 0.11,
+    "threads": 1
+   },
+   "D3D Background Thread 1": {
+    "pct": 0.08,
+    "threads": 1
+   },
+   "D3D Background Thread 2": {
+    "pct": 0.1,
+    "threads": 1
+   },
+   "D3D Background Thread 3": {
+    "pct": 0.04,
+    "threads": 1
+   },
+   "0x16c00001": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "0xc0550001": {
+    "pct": 5.16,
+    "threads": 1
+   },
+   "XMA Decoder (F8000010)": {
+    "pct": 1.02,
+    "threads": 1
+   },
+   "Audio Worker (F8000014)": {
+    "pct": 3.32,
+    "threads": 1
+   },
+   "GPU Commands (F8000018)": {
+    "pct": 47.48,
+    "threads": 1
+   },
+   "GPU VSync (F800001C)": {
+    "pct": 2.58,
+    "threads": 1
+   },
+   "D3D12 Pipelines": {
+    "pct": 2.41,
+    "threads": 9
+   },
+   "Kernel Dispatch (F8000028)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "Main XThread (F800002C)": {
+    "pct": 36.86,
+    "threads": 1
+   },
+   "D3D12 Storage writer": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread54E8 (F8000070)": {
+    "pct": 0.36,
+    "threads": 1
+   },
+   "XThread1CA0 (F80000F4)": {
+    "pct": 18.65,
+    "threads": 1
+   },
+   "XThread27A8 (F80000FC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread45F4 (F8000104)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread1C98 (F800010C)": {
+    "pct": 3.51,
+    "threads": 1
+   },
+   "XThread25E4 (F8000114)": {
+    "pct": 4.39,
+    "threads": 1
+   },
+   "XThread1DF8 (F8000120)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread1AC0 (F8000128)": {
+    "pct": 0.3,
+    "threads": 1
+   },
+   "XThread3640 (F800012C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread62C4 (F8000140)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread82A4 (F8000144)": {
+    "pct": 7.84,
+    "threads": 1
+   },
+   "SDLWASAPIMgmt": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "SDLAudioP19": {
+    "pct": 1.13,
+    "threads": 1
+   },
+   "XThread858C (F8000164)": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "XThread8FA0 (F800016C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread8F44 (F8000188)": {
+    "pct": 0.1,
+    "threads": 1
+   },
+   "XThread8460 (F8000190)": {
+    "pct": 0.61,
+    "threads": 1
+   },
+   "XThread5E18 (F8000198)": {
+    "pct": 0.59,
+    "threads": 1
+   },
+   "XThread7364 (F80001A8)": {
+    "pct": 71.07,
+    "threads": 1
+   },
+   "XThread1D98 (F80001BC)": {
+    "pct": 0.26,
+    "threads": 1
+   },
+   "XThread2F00 (F800026C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread7404 (F80002A8)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread3B44 (F80002B0)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread82F0 (F80002B8)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread3B6C (F80002C8)": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "XThread412C (F8000328)": {
+    "pct": 0.03,
+    "threads": 1
+   }
+  },
+  "ticks": {
+   "19000": {
+    "name": "rex::thread::TimerQueue",
+    "samples": 210,
+    "steps": 209,
+    "non_rising": 0,
+    "non_rising_at_s": [],
+    "step_s_median": 2.0,
+    "span_s": [
+     -8.1,
+     409.9
+    ]
+   }
+  }
+ },
+ "slow_state": {
+  "rows": 413,
+  "onset_s": 216.9,
+  "slow_pct": 25.9,
+  "e_eff_mhz_median": 1483,
+  "cpu_util_pct_median": 98.3,
+  "slow": true
+ }
+}

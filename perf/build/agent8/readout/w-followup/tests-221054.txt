@@ -1,0 +1,186 @@
+===== PASS  T1 W9 r4 (expect OK): exit 0 (want 0) in 231 s
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:11:41
+mode: TEST (copy in build\agent8\w-followup\test\W9; no bench writes)
+result: OK
+run: only=off,q0,q125,q250,q500 repeats=4 -ColdShared; -PlanOnly: 21 runs, about 48 min (runner); expected 21 runs; Agent 7's formula 1.70 + 2.14 x 5 x 4 = 44.5 min
+latest start: the launcher accepts this GO until 06:32 (07:30 - runner estimate 48 min - slack 10 min); started then, it ends about 07:16 by Agent 7's formula
+GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): GO W9 matrix-window9.json CE0AD75792B47D59876C864B39797CD877404F911D12F92E6CC9C4351D747610 only=off,q0,q125,q250,q500 repeats=4
+draft: build\agent8\w-followup\matrix-window9.json  sha256 CE0AD75792B47D59876C864B39797CD877404F911D12F92E6CC9C4351D747610  6146 bytes
+matrix for the GO: build\agent8\w-followup\test\W9\matrix-window9.json  sha256 CE0AD75792B47D59876C864B39797CD877404F911D12F92E6CC9C4351D747610
+launcher: bench\agent5\launch\run-night.ps1 sha256 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 (2026-11-22 22:11:21); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/devoff4b-bin (arms off,q0,q125,q250,q500): MANIFEST.txt sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA (expected DE11A914079D7DF7); legodimensions.exe DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 102, FAIL 0
+arm: off (devoff4b; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+arm: q0 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=0 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+arm: q125 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=125 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+arm: q250 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=250 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+arm: q500 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=500 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: 21 / 21
+NOTE: queue gap: a queue game runs (LAUNCH 22:14:11, 23 s ago); -PlanOnly at 22:14:34 after 15 s of waiting
+written: build\agent8\readout\w-followup\stage-W9-221141.txt and inputs-W9-221141.txt (22 files)
+===== PASS  T2 W5b r6 three arms (expect OK): exit 0 (want 0) in 504 s
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:14:47
+mode: TEST (copy in build\agent8\w-followup\test\W5b; no bench writes)
+result: OK
+run: only=d11,d11t,d11p repeats=6 -ColdShared; -PlanOnly: 19 runs, about 44 min (runner); expected 19 runs; Agent 7's formula 1.70 + 2.14 x 3 x 6 = 40.2 min
+latest start: the launcher accepts this GO until 06:36 (07:30 - runner estimate 44 min - slack 10 min); started then, it ends about 07:16 by Agent 7's formula
+GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): GO W5b matrix-window5b.json 23575AAAE9DCBB85C9965AC8A3A8794916FFA881C09C656A6512C7EE462D5F76 only=d11,d11t,d11p repeats=6
+draft: build\agent8\w-followup\matrix-window5b.json  sha256 23575AAAE9DCBB85C9965AC8A3A8794916FFA881C09C656A6512C7EE462D5F76  6770 bytes
+matrix for the GO: build\agent8\w-followup\test\W5b\matrix-window5b.json  sha256 23575AAAE9DCBB85C9965AC8A3A8794916FFA881C09C656A6512C7EE462D5F76
+launcher: bench\agent5\launch\run-night.ps1 sha256 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 (2026-11-22 22:11:21); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/devoff4-bin (arms d11,d11t,d11p): MANIFEST.txt sha256 16DCC9399239E5774BF571869B5248DF36DB0D374BF6A159BF1A9839784CAD6D (expected 16DCC9399239E577); legodimensions.exe 6BE3C713229232B29C183D27B397A3560B46E2279C6AF47C64CF8A2EFA287376; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 81, FAIL 0
+arm: d11 (devoff4; frames perf; cvars framerate_limit=0;host_timer_resolution_ms=1;host_timer_throttling_optout=true;precise_guest_sleep=true;wait_timeout_round_up=true;cs_spin=true;spinlock_pause_spin=true;clock_lockfree=true;tls_bounds_fix=true; env {}; drivers/thread-cpu.ps1)
+arm: d11t (devoff4; frames perf; cvars framerate_limit=0;host_timer_resolution_ms=1;host_timer_throttling_optout=true;precise_guest_sleep=true;wait_timeout_round_up=true;cs_spin=true;spinlock_pause_spin=true;clock_lockfree=true;tls_bounds_fix=true; env REX_TIMER_WAIT_BLOCKING=1; drivers/thread-cpu.ps1)
+arm: d11p (devoff4; frames perf; cvars framerate_limit=0;host_timer_resolution_ms=1;host_timer_throttling_optout=true;precise_guest_sleep=true;wait_timeout_round_up=true;cs_spin=true;spinlock_pause_spin=true;clock_lockfree=true;tls_bounds_fix=true;timer_queue_precise_wait=true; env {}; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: 21 / 21
+NOTE: queue gap: a queue game runs (LAUNCH 22:14:45, 470 s ago); -PlanOnly at 22:22:34 after 0 s of waiting
+written: build\agent8\readout\w-followup\stage-W5b-221447.txt and inputs-W5b-221447.txt (22 files)
+===== PASS  T3 W5b r6 two arms (expect OK): exit 0 (want 0) in 37 s
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:23:10
+mode: TEST (copy in build\agent8\w-followup\test\W5b2; no bench writes)
+result: OK
+run: only=d11,d11t repeats=6 -ColdShared; -PlanOnly: 13 runs, about 30 min (runner); expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+latest start: the launcher accepts this GO before 06:45 (no start at or after it; 07:30 - 30 - 10 min would allow 06:50); started at 06:45 it ends about 07:12 by Agent 7's formula
+GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): GO W5b2 matrix-window5b.json 23575AAAE9DCBB85C9965AC8A3A8794916FFA881C09C656A6512C7EE462D5F76 only=d11,d11t repeats=6
+draft: build\agent8\w-followup\matrix-window5b.json  sha256 23575AAAE9DCBB85C9965AC8A3A8794916FFA881C09C656A6512C7EE462D5F76  6770 bytes
+matrix for the GO: build\agent8\w-followup\test\W5b2\matrix-window5b.json  sha256 23575AAAE9DCBB85C9965AC8A3A8794916FFA881C09C656A6512C7EE462D5F76
+launcher: bench\agent5\launch\run-night.ps1 sha256 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 (2026-11-22 22:11:21); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/devoff4-bin (arms d11,d11t,d11p): MANIFEST.txt sha256 16DCC9399239E5774BF571869B5248DF36DB0D374BF6A159BF1A9839784CAD6D (expected 16DCC9399239E577); legodimensions.exe 6BE3C713229232B29C183D27B397A3560B46E2279C6AF47C64CF8A2EFA287376; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 81, FAIL 0
+arm: d11 (devoff4; frames perf; cvars framerate_limit=0;host_timer_resolution_ms=1;host_timer_throttling_optout=true;precise_guest_sleep=true;wait_timeout_round_up=true;cs_spin=true;spinlock_pause_spin=true;clock_lockfree=true;tls_bounds_fix=true; env {}; drivers/thread-cpu.ps1)
+arm: d11t (devoff4; frames perf; cvars framerate_limit=0;host_timer_resolution_ms=1;host_timer_throttling_optout=true;precise_guest_sleep=true;wait_timeout_round_up=true;cs_spin=true;spinlock_pause_spin=true;clock_lockfree=true;tls_bounds_fix=true; env REX_TIMER_WAIT_BLOCKING=1; drivers/thread-cpu.ps1)
+arm: d11p (devoff4; frames perf; cvars framerate_limit=0;host_timer_resolution_ms=1;host_timer_throttling_optout=true;precise_guest_sleep=true;wait_timeout_round_up=true;cs_spin=true;spinlock_pause_spin=true;clock_lockfree=true;tls_bounds_fix=true;timer_queue_precise_wait=true; env {}; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: 21 / 21
+NOTE: queue gap: a queue game runs (LAUNCH 22:23:10, 25 s ago); -PlanOnly at 22:23:34 after 16 s of waiting
+written: build\agent8\readout\w-followup\stage-W5b2-222310.txt and inputs-W5b2-222310.txt (22 files)
+===== PASS  T4 W4c r6 (expect OK): exit 0 (want 0) in 433 s
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:23:47
+mode: TEST (copy in build\agent8\w-followup\test\W4c; no bench writes)
+result: OK
+run: only=d0,B repeats=6 -ColdShared; -PlanOnly: 13 runs, about 30 min (runner); expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+latest start: the launcher accepts this GO before 06:45 (no start at or after it; 07:30 - 30 - 10 min would allow 06:50); started at 06:45 it ends about 07:12 by Agent 7's formula
+GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): GO W4c matrix-window4c.json E2E3E4DAAF7D30C7B8B2D28D21911E6EACDA5260963F9B99095EE70C09022396 only=d0,B repeats=6
+draft: build\agent8\w-followup\matrix-window4c.json  sha256 E2E3E4DAAF7D30C7B8B2D28D21911E6EACDA5260963F9B99095EE70C09022396  4051 bytes
+matrix for the GO: build\agent8\w-followup\test\W4c\matrix-window4c.json  sha256 E2E3E4DAAF7D30C7B8B2D28D21911E6EACDA5260963F9B99095EE70C09022396
+launcher: bench\agent5\launch\run-night.ps1 sha256 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 (2026-11-22 22:11:21); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/devoff2-bin (arms d0): MANIFEST.txt sha256 B87DC2D2CA22379F2A847770F48CD31ECA2889C692566E26791E84B744F77455 (expected B87DC2D2CA22379F); legodimensions.exe 7F0B1C1C84BC66FFFCB168D13B23AA1C40E56BE70913504EC47F1DB2E98BC790; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 49, FAIL 0
+bin: build/agent2/devoffB-bin (arms B): MANIFEST.txt sha256 8709476FF477876839539354A7718A3E8F856FC3CCB7526DA18A6FB10854B0C3 (expected 8709476FF4778768); legodimensions.exe C3F8686EBDD83340343CC93E1EE05E6F97E6C2CDFF0274BD0AF9AF85EDAD0F29; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 74, FAIL 0
+arm: d0 (devoff2; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+arm: B (devoffB; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: 21 / 21
+NOTE: queue gap: a queue game runs (LAUNCH 22:23:10, 230 s ago); -PlanOnly at 22:26:59 after 1 s of waiting
+written: build\agent8\readout\w-followup\stage-W4c-222347.txt and inputs-W4c-222347.txt (24 files)
+===== PASS  T5 W8a4 r6 native4 (expect OK): exit 0 (want 0) in 30 s
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:31:01
+mode: TEST (copy in build\agent8\w-followup\test\W8a4; no bench writes)
+result: OK
+run: only=n4,n4mc repeats=6 -ColdShared; -PlanOnly: 13 runs, about 30 min (runner); expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+latest start: the launcher accepts this GO before 06:45 (no start at or after it; 07:30 - 30 - 10 min would allow 06:50); started at 06:45 it ends about 07:12 by Agent 7's formula
+GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): GO W8a4 matrix-window8a4.json 56BE00D8131981A735CC40142980316F9E834D0B51F103A143BA6105AA5DA1D1 only=n4,n4mc repeats=6
+draft: build\agent8\w-followup\matrix-window8a4.json  sha256 56BE00D8131981A735CC40142980316F9E834D0B51F103A143BA6105AA5DA1D1  4263 bytes
+matrix for the GO: build\agent8\w-followup\test\W8a4\matrix-window8a4.json  sha256 56BE00D8131981A735CC40142980316F9E834D0B51F103A143BA6105AA5DA1D1
+launcher: bench\agent5\launch\run-night.ps1 sha256 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 (2026-11-22 22:11:21); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/native4-bin (arms n4,n4mc): MANIFEST.txt sha256 00D33D4FFB46776DED60F60C2793C01029E435492013D92B39F2AE39634214DE (expected 00D33D4FFB46776D); legodimensions.exe 65432C81D8C7D29A35D80A5D971F2373A1188BC43FF3F92232CD1A8A500FB811; 8 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 107, FAIL 0
+arm: n4 (native4; frames native; cvars native_settings_frontend=false;native_fps_limit=0;framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv; drivers/thread-cpu.ps1)
+arm: n4mc (native4; frames native; cvars native_settings_frontend=false;native_fps_limit=0;framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv LEGO_NATIVE_SHADER_MISS_CACHE=1; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: 21 / 21
+NOTE: queue gap: a queue game runs (LAUNCH 22:31:01, 22 s ago); -PlanOnly at 22:31:23 after 5 s of waiting
+written: build\agent8\readout\w-followup\stage-W8a4-223101.txt and inputs-W8a4-223101.txt (22 files)
+===== PASS  T6 W4c r6 -ReplicaOnly (expect OK, my Get-Plan copy): exit 0 (want 0) in 13 s
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:31:30
+mode: TEST (copy in build\agent8\w-followup\test\W4cR; no bench writes)
+result: OK
+run: only=d0,B repeats=6 -ColdShared; -PlanOnly: 13 runs, about 30 min (runner); expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+latest start: the launcher accepts this GO before 06:45 (no start at or after it; 07:30 - 30 - 10 min would allow 06:50); started at 06:45 it ends about 07:12 by Agent 7's formula
+GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): GO W4cR matrix-window4c.json E2E3E4DAAF7D30C7B8B2D28D21911E6EACDA5260963F9B99095EE70C09022396 only=d0,B repeats=6
+draft: build\agent8\w-followup\matrix-window4c.json  sha256 E2E3E4DAAF7D30C7B8B2D28D21911E6EACDA5260963F9B99095EE70C09022396  4051 bytes
+matrix for the GO: build\agent8\w-followup\test\W4cR\matrix-window4c.json  sha256 E2E3E4DAAF7D30C7B8B2D28D21911E6EACDA5260963F9B99095EE70C09022396
+launcher: bench\agent5\launch\run-night.ps1 sha256 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 (2026-11-22 22:11:21); checked by my copies only; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/devoff2-bin (arms d0): MANIFEST.txt sha256 B87DC2D2CA22379F2A847770F48CD31ECA2889C692566E26791E84B744F77455 (expected B87DC2D2CA22379F); legodimensions.exe 7F0B1C1C84BC66FFFCB168D13B23AA1C40E56BE70913504EC47F1DB2E98BC790; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 49, FAIL 0
+bin: build/agent2/devoffB-bin (arms B): MANIFEST.txt sha256 8709476FF477876839539354A7718A3E8F856FC3CCB7526DA18A6FB10854B0C3 (expected 8709476FF4778768); legodimensions.exe C3F8686EBDD83340343CC93E1EE05E6F97E6C2CDFF0274BD0AF9AF85EDAD0F29; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 74, FAIL 0
+arm: d0 (devoff2; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+arm: B (devoffB; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: 21 / 21
+NOTE: -ReplicaOnly: the launcher functions load cleanly but were not used (my Parse-Go and Get-Plan copies; no Test-Matrix)
+NOTE: queue gap: a queue game runs (LAUNCH 22:31:01, 34 s ago); -PlanOnly at 22:31:34 after 0 s of waiting
+written: build\agent8\readout\w-followup\stage-W4cR-223130.txt and inputs-W4cR-223130.txt (24 files)
+===== PASS  N1 W8a native4b not staged (expect NOT OK, no -PlanOnly): exit 1 (want 1) in 3 s
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:31:43
+mode: TEST (copy in build\agent8\w-followup\test\W8a; no bench writes)
+result: NOT OK: build/agent2/native4b-bin has no MANIFEST.txt or no legodimensions.exe (not staged)
+run: only=n0,mc repeats=6 -ColdShared; -PlanOnly: not run or failed; expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+latest start: -
+GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): none (result NOT OK)
+draft: build\agent8\w-followup\matrix-window8a.json  sha256 A06E5E3AAEE25B079532DE8BFC9134D7462B5F842ECB9FADA19B6FD8DD8A475E  4406 bytes
+matrix for the GO: build\agent8\w-followup\test\W8a\matrix-window8a.json  sha256 -
+launcher: bench\agent5\launch\run-night.ps1 sha256 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 (2026-11-22 22:11:21); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/native4b-bin (arms n0,mc): NOT STAGED
+arm: n0 (native4b; frames native; cvars native_settings_frontend=false;native_fps_limit=0;framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv; drivers/thread-cpu.ps1)
+arm: mc (native4b; frames native; cvars native_settings_frontend=false;native_fps_limit=0;framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv LEGO_NATIVE_SHADER_MISS_CACHE=1; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: - / -
+written: build\agent8\readout\w-followup\stage-W8a-223143-NOTOK.txt
+===== PASS  N2 W9 wrong -Expect (expect NOT OK): exit 1 (want 1) in 8 s
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:31:46
+mode: TEST (copy in build\agent8\w-followup\test\W9n; no bench writes)
+result: NOT OK: devoff4b-bin MANIFEST.txt sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA does not start with -Expect 0000000000000000
+run: only=off,q0 repeats=3 -ColdShared; -PlanOnly: not run or failed; expected 7 runs; Agent 7's formula 1.70 + 2.14 x 2 x 3 = 14.5 min
+latest start: -
+GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): none (result NOT OK)
+draft: build\agent8\w-followup\matrix-window9.json  sha256 CE0AD75792B47D59876C864B39797CD877404F911D12F92E6CC9C4351D747610  6146 bytes
+matrix for the GO: build\agent8\w-followup\test\W9n\matrix-window9.json  sha256 -
+launcher: bench\agent5\launch\run-night.ps1 sha256 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 (2026-11-22 22:11:21); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/devoff4b-bin (arms off,q0,q125,q250,q500): MANIFEST.txt sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA (expected 0000000000000000); legodimensions.exe DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 102, FAIL 0
+arm: off (devoff4b; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+arm: q0 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=0 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+arm: q125 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=125 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+arm: q250 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=250 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+arm: q500 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=500 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: - / -
+written: build\agent8\readout\w-followup\stage-W9n-223146-NOTOK.txt
+===== PASS  N3 W4c ref not in only= (expect NOT OK): exit 1 (want 1) in 10 s
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:31:54
+mode: TEST (copy in build\agent8\w-followup\test\W4cn; no bench writes)
+result: NOT OK: the reference arm 'd0' is not in only=
+run: only=B repeats=6 -ColdShared; -PlanOnly: not run or failed; expected 7 runs; Agent 7's formula 1.70 + 2.14 x 1 x 6 = 14.5 min
+latest start: -
+GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): none (result NOT OK)
+draft: build\agent8\w-followup\matrix-window4c.json  sha256 E2E3E4DAAF7D30C7B8B2D28D21911E6EACDA5260963F9B99095EE70C09022396  4051 bytes
+matrix for the GO: build\agent8\w-followup\test\W4cn\matrix-window4c.json  sha256 -
+launcher: bench\agent5\launch\run-night.ps1 sha256 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 (2026-11-22 22:11:21); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/devoff2-bin (arms d0): MANIFEST.txt sha256 B87DC2D2CA22379F2A847770F48CD31ECA2889C692566E26791E84B744F77455 (expected B87DC2D2CA22379F); legodimensions.exe 7F0B1C1C84BC66FFFCB168D13B23AA1C40E56BE70913504EC47F1DB2E98BC790; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 49, FAIL 0
+bin: build/agent2/devoffB-bin (arms B): MANIFEST.txt sha256 8709476FF477876839539354A7718A3E8F856FC3CCB7526DA18A6FB10854B0C3 (expected 8709476FF4778768); legodimensions.exe C3F8686EBDD83340343CC93E1EE05E6F97E6C2CDFF0274BD0AF9AF85EDAD0F29; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 74, FAIL 0
+arm: d0 (devoff2; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+arm: B (devoffB; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: - / -
+written: build\agent8\readout\w-followup\stage-W4cn-223154-NOTOK.txt
+===== PASS  N4 env key not allowed (expect NOT OK): exit 1 (want 1) in 21 s
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:32:04
+mode: TEST (copy in build\agent8\w-followup\test\W4cE; no bench writes)
+result: NOT OK: arm B: env key 'LEGO_BOGUS_KEY' is not allowed by the launcher
+run: only=d0,B repeats=6 -ColdShared; -PlanOnly: not run or failed; expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+latest start: -
+GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): none (result NOT OK)
+draft: build\agent8\w-followup\neg\matrix-window4c-negenv.json  sha256 6E74CFD42063217E1AFB8C60BFA4905079BB1137A10AE5522E80F60FD69A2760  4075 bytes
+matrix for the GO: build\agent8\w-followup\test\W4cE\matrix-window4c-negenv.json  sha256 -
+launcher: bench\agent5\launch\run-night.ps1 sha256 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 (2026-11-22 22:11:21); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/devoff2-bin (arms d0): MANIFEST.txt sha256 B87DC2D2CA22379F2A847770F48CD31ECA2889C692566E26791E84B744F77455 (expected B87DC2D2CA22379F); legodimensions.exe 7F0B1C1C84BC66FFFCB168D13B23AA1C40E56BE70913504EC47F1DB2E98BC790; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 49, FAIL 0
+bin: build/agent2/devoffB-bin (arms B): MANIFEST.txt sha256 8709476FF477876839539354A7718A3E8F856FC3CCB7526DA18A6FB10854B0C3 (expected 8709476FF4778768); legodimensions.exe C3F8686EBDD83340343CC93E1EE05E6F97E6C2CDFF0274BD0AF9AF85EDAD0F29; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 74, FAIL 0
+arm: d0 (devoff2; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+arm: B (devoffB; frames perf; cvars framerate_limit=0; env LEGO_BOGUS_KEY=1; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: - / -
+written: build\agent8\readout\w-followup\stage-W4cE-223204-NOTOK.txt
+===== PASS  N5 -Promote from bench (expect usage exit 2): exit 2 (want 2) in 5 s
+refused: -Promote takes only build\agent8\w-followup\matrix-window*.json, not bench\agent8\run\matrix-window6.json
+===== PASS  N6 repeats 21 (expect usage exit 2): exit 2 (want 2) in 36 s
+refused: -Repeats must be 1-20 (the launcher takes repeats=1-20)
+===== SUMMARY
+PASS  T1 W9 r4 (expect OK): exit 0 (want 0) in 231 s
+PASS  T2 W5b r6 three arms (expect OK): exit 0 (want 0) in 504 s
+PASS  T3 W5b r6 two arms (expect OK): exit 0 (want 0) in 37 s
+PASS  T4 W4c r6 (expect OK): exit 0 (want 0) in 433 s
+PASS  T5 W8a4 r6 native4 (expect OK): exit 0 (want 0) in 30 s
+PASS  T6 W4c r6 -ReplicaOnly (expect OK, my Get-Plan copy): exit 0 (want 0) in 13 s
+PASS  N1 W8a native4b not staged (expect NOT OK, no -PlanOnly): exit 1 (want 1) in 3 s
+PASS  N2 W9 wrong -Expect (expect NOT OK): exit 1 (want 1) in 8 s
+PASS  N3 W4c ref not in only= (expect NOT OK): exit 1 (want 1) in 10 s
+PASS  N4 env key not allowed (expect NOT OK): exit 1 (want 1) in 21 s
+PASS  N5 -Promote from bench (expect usage exit 2): exit 2 (want 2) in 5 s
+PASS  N6 repeats 21 (expect usage exit 2): exit 2 (want 2) in 36 s

@@ -1,0 +1,66 @@
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:40:54
+mode: PROMOTE (copied to bench\agent8\run)
+result: OK
+run: only=d11,d11t,d11p repeats=6 -ColdShared; -PlanOnly: 19 runs, about 44 min (runner); expected 19 runs; Agent 7's formula 1.70 + 2.14 x 3 x 6 = 40.2 min
+latest start: the launcher accepts this GO until 06:36 (07:30 - runner estimate 44 min - slack 10 min); started then, it ends about 07:16 by Agent 7's formula
+GO line: GO W5b matrix-window5b.json 23575AAAE9DCBB85C9965AC8A3A8794916FFA881C09C656A6512C7EE462D5F76 only=d11,d11t,d11p repeats=6
+draft: build\agent8\w-followup\matrix-window5b.json  sha256 23575AAAE9DCBB85C9965AC8A3A8794916FFA881C09C656A6512C7EE462D5F76  6770 bytes
+matrix for the GO: bench\agent8\run\matrix-window5b.json  sha256 23575AAAE9DCBB85C9965AC8A3A8794916FFA881C09C656A6512C7EE462D5F76
+launcher: bench\agent5\launch\run-night.ps1 sha256 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 (2026-11-22 22:11:21); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/devoff4-bin (arms d11,d11t,d11p): MANIFEST.txt sha256 16DCC9399239E5774BF571869B5248DF36DB0D374BF6A159BF1A9839784CAD6D (expected 16DCC9399239E577); legodimensions.exe 6BE3C713229232B29C183D27B397A3560B46E2279C6AF47C64CF8A2EFA287376; 7 files listed, 7 of 7 checked match; check lines PASS 81, FAIL 0
+arm: d11 (devoff4; frames perf; cvars framerate_limit=0;host_timer_resolution_ms=1;host_timer_throttling_optout=true;precise_guest_sleep=true;wait_timeout_round_up=true;cs_spin=true;spinlock_pause_spin=true;clock_lockfree=true;tls_bounds_fix=true; env {}; drivers/thread-cpu.ps1)
+arm: d11t (devoff4; frames perf; cvars framerate_limit=0;host_timer_resolution_ms=1;host_timer_throttling_optout=true;precise_guest_sleep=true;wait_timeout_round_up=true;cs_spin=true;spinlock_pause_spin=true;clock_lockfree=true;tls_bounds_fix=true; env REX_TIMER_WAIT_BLOCKING=1; drivers/thread-cpu.ps1)
+arm: d11p (devoff4; frames perf; cvars framerate_limit=0;host_timer_resolution_ms=1;host_timer_throttling_optout=true;precise_guest_sleep=true;wait_timeout_round_up=true;cs_spin=true;spinlock_pause_spin=true;clock_lockfree=true;tls_bounds_fix=true;timer_queue_precise_wait=true; env {}; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: 21 / 21
+NOTE: queue gap: the queue is idle (last line 22:38:49: 22:38:49 idle; waiting for: [rpb0,rpm4,s4b19,s4b04,s4bV0,s4b08,s4bLV,s4b02,s4b05,s4b06,s4b03,s4b09,s4b11,s4b14,s4b10,s4b12,s4b13,s4b15,s4b16,s4b25,s4b21]); -PlanOnly at 22:40:56 after 0 s of waiting
+
+--- launcher Get-BinHashes (only= arms)
+6BE3C713229232B29C183D27B397A3560B46E2279C6AF47C64CF8A2EFA287376  build/agent2/devoff4-bin/legodimensions.exe
+16DCC9399239E5774BF571869B5248DF36DB0D374BF6A159BF1A9839784CAD6D  build/agent2/devoff4-bin/MANIFEST.txt
+
+--- run-matrix.ps1 -Matrix bench\agent8\run\matrix-window5b.json -Only d11,d11t,d11p -Repeats 6 -ColdShared -NoPrompt -PlanOnly (launcher Get-Plan)
+=== timing matrix: Window 5b (Agent 8, run-2 task #7 follow-up): TimerQueue wait modes on devoff4 (S4a), all with the 8 timer cvars. d11 (spin wait) vs d11t (blocking wait, REX_TIMER_WAIT_BLOCKING=1) vs d11p (precise wait, timer_queue_precise_wait=true) ===
+matrix   <workspace>\bench\agent8\run\matrix-window5b.json
+note     Follow-up window proposed by Agent 8 (run-2 task #7) on 2026-11-22 for the 01:00-06:45 slot; Agent 1 picks. Staged and checked with build/agent8/w-followup/stage-window.ps1. GO (a): 'GO W5b matrix-window5b.json <sha256> only=d11,d11t,d11p repeats=6': one unscored cold run (devoff4), then 6 round-robin rounds rotated each round (two full 3x3 Latin squares: each arm in each position twice): 1 + 18 = 19 runs. GO (b), the same file and sha256: 'only=d11,d11t repeats=6': 1 + 12 = 13 runs (the blocking wait alone).
+note     Question: do the new TimerQueue waits cost tail while they save CPU? W5 (build/agent8/matrix/20261122-1756; read-out build/agent8/readout/w5/READOUT.md) left one lead: d11t vs d11 (same bin and cvars, only the wait differs) p99 +8.2 % (T-std [+0.5, +16.6]*, B-block [+1.6, +15.3]*) and 1 % low -7.7 % (B-block [-13.8, -1.2]*); T-heavy 1 % low vs base: d11t -8.5 % [-14.4, -2.3]* and d11p -11.0 % [-16.7, -4.8]*. Without run 1821-d11t-r3 no CI excludes 0. Game CPU vs base: d11t -13.7 % and d11p -12.2 % (better). 6 rounds give 6 per-round differences per pair.
+note     All three arms ran in W5 (16/16 runs OK; Agent 6's logdiff: only the expected timer lines). The shared cold run is on devoff4, the bin of every arm, so every scored run is a warm run of one bin.
+note     Proof per run, checked before any fps is read (as W5's R7): every game.log shows 'Host timer resolution set to 1 ms (background opt-out on)'. Every d11p game.log has exactly one 'TimerQueue: precise wait (timer_queue_precise_wait)'; d11 and d11t have none. d11t logs nothing for the blocking wait: its proof is REX_TIMER_WAIT_BLOCKING in run.json env_set, which d11 and d11p must not have. TimerQueue CPU (threads.csv, % of one core): d11 > 20 % (spin); d11t and d11p < 15 % (the read-out gate; W5 measured 4-6 %). Then Agent 11's 3-mode slow-state check (bench/agent11/timerq_slowstate_3mode.ps1) on every run.
+note     REX_TIMER_WAIT_BLOCKING is presence-only: =0 or an empty value still turns the blocking wait on, and with both set the precise wait wins (Agent 11). The runner sets it for d11t runs only and restores the environment after every run; the launcher removes every allowed key from its own environment before each window.
+note     Window: 5 s settle + 55 s warm-up from the first frame, then 50 s measured, so every window starts >= 60 s after the first frame (min_window_after_ff_s 60, Agent 1's floor); the runner flags window_before_floor (excluded) below 59.5 s. The cold run: 55 s warm-up, 30 s window.
+note     One frame source for every arm: perf.csv (frames perf), uncapped (framerate_limit=0), the same driver (drivers/thread-cpu.ps1 -> threads.csv). Runner flags on every run: --audio_mute=true --pause_when_unfocused=false --native_settings_load=false --discord_rpc=false.
+note     sys_csv: drivers/sys-csv.ps1 logs the system state every 1 s (sys.csv, sys.json). Input during the window, the game losing the foreground, battery, battery saver, a power-plan change, a non-default input desktop or a screensaver exclude a run from summary.md (it stays in results.csv, under 'Flagged runs'). Light phase: a game.log with < 30 'FAILED: path=d:\INSTALL*.DAT' lines (normal boot: 34) is excluded (light_phase).
+note     Read-out: Agent 8's W5 procedure (perf-notes/agent8-window3.md L920-1058 and its addendum; build/agent8/scratch/w5-readout.ps1) with d11 as the reference: T-std for median ms and fps, B-block for p99 and the 1 % low, timerq3, the slow-state scan and the sys.csv audit. A timing claim needs a CI that excludes 0; otherwise the row reads 'overlap' (no measurable difference).
+note     Environment: like W4b and W5, after the 08:29 Windows Update. If the power overlay is not W5's best_efficiency, compare W5b only within itself and quote W5 only as a lead. Timing comes only from the user's unlocked desktop (Agent 5's overnight launcher); agent runs of this matrix (-Quick, hidden desktop) are functional only.
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order roundrobin; close timeout 60 s; cooldown 5 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+       d11: bin build/agent2/devoff4-bin; frames perf; x6; warm-up 55 s; window 50 s; group w5b (ref); cvars framerate_limit=0 host_timer_resolution_ms=1 host_timer_throttling_optout=true precise_guest_sleep=true wait_timeout_round_up=true cs_spin=true spinlock_pause_spin=true clock_lockfree=true tls_bounds_fix=true; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         d11 = devoff4 (S4a; MANIFEST 16DCC9399239E577) + the 8 timer cvars (Agent 11's ON bundle R3; TimerQueue spin wait, gate > 20 % of a core). W5's d11
+       d11t: bin build/agent2/devoff4-bin; frames perf; x6; warm-up 55 s; window 50 s; group w5b; cvars framerate_limit=0 host_timer_resolution_ms=1 host_timer_throttling_optout=true precise_guest_sleep=true wait_timeout_round_up=true cs_spin=true spinlock_pause_spin=true clock_lockfree=true tls_bounds_fix=true; env REX_TIMER_WAIT_BLOCKING=1; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         d11t = d11 + REX_TIMER_WAIT_BLOCKING=1 (TimerQueue blocking wait). Proof: the 1 ms line, REX_TIMER_WAIT_BLOCKING in run.json env_set, no precise line, TimerQueue < 15 % of a core. W5's d11t
+       d11p: bin build/agent2/devoff4-bin; frames perf; x6; warm-up 55 s; window 50 s; group w5b; cvars framerate_limit=0 host_timer_resolution_ms=1 host_timer_throttling_optout=true precise_guest_sleep=true wait_timeout_round_up=true cs_spin=true spinlock_pause_spin=true clock_lockfree=true tls_bounds_fix=true timer_queue_precise_wait=true; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         d11p = d11 + timer_queue_precise_wait=true (#38 precise wait; REX_TIMER_WAIT_BLOCKING must not be set). Proof: the 1 ms line and exactly one 'TimerQueue: precise wait (timer_queue_precise_wait)'; TimerQueue < 15 % of a core. W5's d11p
+cold     d11 (build/agent2/devoff4-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+         -ColdShared: one cold run for all 1 bin(s); the other bins first launch as scored round-1 runs
+round 1  d11 d11t d11p
+round 2  d11t d11p d11
+round 3  d11p d11 d11t
+round 4  d11 d11t d11p
+round 5  d11t d11p d11
+round 6  d11p d11 d11t
+order    d11 d11t d11p | d11t d11p d11 | d11p d11 d11t | d11 d11t d11p | d11t d11p d11 | d11p d11 d11t
+estimate 19 runs (1 cold), about 44 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-RHMGBOVQOK37OOH7MAMM5ZAGDE -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   14.1 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/devoff4-bin : ok (MANIFEST.txt)
+screensaver none
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   19 runs, about 44 min: done around 23:24
+!!! These runs will be FUNCTIONAL ONLY (see above): their numbers are not timing results.
+PlanOnly: nothing started.

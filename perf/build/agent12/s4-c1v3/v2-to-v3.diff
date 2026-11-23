@@ -1,0 +1,80 @@
+diff --git a/src/system/xmemory.cpp b/src/system/xmemory.cpp
+index efc04be..61f75e4 100644
+--- a/src/system/xmemory.cpp
++++ b/src/system/xmemory.cpp
+@@ -50,7 +50,8 @@ REXCVAR_DEFINE_BOOL(physical_protect_hold_global_lock, false, "Memory",
+ // S4 C1 (default off): keep the write watches on physical write protects that change
+ // no page's access. Engages only with physical_protect_hold_global_lock on; see
+ // PhysicalHeap::ProtectKeepWatch. Both cvars are init-only (C1 v2), so the settings
+-// overlay can't turn C1 on mid-run over page state from before fix (i) was on.
++// overlay can't turn C1 on mid-run over page state from before fix (i) was on, and
++// Memory::Initialize latches both (C1 v3), so no later set reaches the protect path.
+ REXCVAR_DEFINE_BOOL(physical_protect_keep_watch, false, "Memory",
+                     "Keep the write watches on physical write protects that leave every "
+                     "page's access unchanged (needs physical_protect_hold_global_lock)")
+@@ -58,6 +59,13 @@ REXCVAR_DEFINE_BOOL(physical_protect_keep_watch, false, "Memory",
+ 
+ namespace rex::memory {
+ 
++// S4 C1 v3: the two cvars above, latched once by Memory::Initialize before any heap
++// exists. PhysicalHeap::Protect reads only these copies, so a set after that (the
++// dev console still can, as nothing calls FinalizeInit) changes nothing in this
++// process. Constant-initialized to off.
++static constinit std::atomic<bool> physical_protect_hold_global_lock_latched{false};
++static constinit std::atomic<bool> physical_protect_keep_watch_latched{false};
++
+ uint32_t get_page_count(uint32_t value, uint32_t page_size, uint32_t page_size_shift) {
+   return rex::round_up(value, page_size) >> page_size_shift;
+ }
+@@ -148,12 +156,18 @@ Memory::~Memory() {
+ 
+ bool Memory::Initialize() {
+   file_name_ = fmt::format("xenia_memory_{}", chrono::Clock::QueryHostTickCount());
++  // S4 C1 v3: latch fix (i)'s and C1's cvars here, once, before any heap exists;
++  // PhysicalHeap::Protect reads only the latched copies.
++  const bool hold_on = REXCVAR_GET(physical_protect_hold_global_lock);
++  const bool keep_on = REXCVAR_GET(physical_protect_keep_watch);
++  physical_protect_hold_global_lock_latched.store(hold_on, std::memory_order_relaxed);
++  physical_protect_keep_watch_latched.store(keep_on, std::memory_order_relaxed);
+   // S4 C1 v2: whether physical_protect_keep_watch can engage (set both cvars at
+   // launch). Prints nothing while it is off.
+-  if (REXCVAR_GET(physical_protect_keep_watch)) {
++  if (keep_on) {
+     if (IsPhysicalProtectKeepWatchBlocked()) {
+       REXSYS_INFO("C1 keep-watch: on, but blocked for this process (native renderer)");
+-    } else if (!REXCVAR_GET(physical_protect_hold_global_lock)) {
++    } else if (!hold_on) {
+       REXSYS_WARN("C1 keep-watch: on, but physical_protect_hold_global_lock is off, so no "
+                   "protect is kept");
+     } else {
+@@ -774,7 +788,9 @@ static void NoteKeptProtect(uint32_t address, uint32_t size) {
+ }
+ 
+ static void NoteKeepWatchBlocked() {
+-  if (!physical_protect_keep_watch_block_logged.exchange(true, std::memory_order_relaxed)) {
++  // C1 v3: load first, so after the first line a native protect only reads the flag.
++  if (!physical_protect_keep_watch_block_logged.load(std::memory_order_relaxed) &&
++      !physical_protect_keep_watch_block_logged.exchange(true, std::memory_order_relaxed)) {
+     REXSYS_INFO("C1 keep-watch: blocked for this process (native renderer); every protect "
+                 "takes the normal path");
+   }
+@@ -2258,7 +2274,8 @@ bool PhysicalHeap::Protect(uint32_t address, uint32_t size, uint32_t protect,
+   // is already held across parent_heap_->Protect and BaseHeap::Protect (global
+   // critical region before heap_mutex_).
+   std::unique_lock<std::recursive_mutex> hold_global_lock;
+-  if ((protect & memory::kMemoryProtectWrite) && REXCVAR_GET(physical_protect_hold_global_lock)) {
++  if ((protect & memory::kMemoryProtectWrite) &&
++      physical_protect_hold_global_lock_latched.load(std::memory_order_relaxed)) {
+     hold_global_lock = global_critical_region_.Acquire();
+   }
+ 
+@@ -2266,7 +2283,8 @@ bool PhysicalHeap::Protect(uint32_t address, uint32_t size, uint32_t protect,
+   // protect that changes no page's access may keep the range's write watches armed
+   // (see ProtectKeepWatch). Off, without the hold, or with old_protect: the
+   // original path below.
+-  if (hold_global_lock.owns_lock() && !old_protect && REXCVAR_GET(physical_protect_keep_watch) &&
++  if (hold_global_lock.owns_lock() && !old_protect &&
++      physical_protect_keep_watch_latched.load(std::memory_order_relaxed) &&
+       ProtectKeepWatch(address, size, protect)) {
+     NoteKeptProtect(address, size);
+     return true;

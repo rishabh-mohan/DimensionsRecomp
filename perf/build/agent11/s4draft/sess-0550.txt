@@ -1,0 +1,14 @@
+S3300:   - Git (Agent 1): commit onto a new branch per repo (perf/s4, not main), following each repo's .gitignore. Perf notes, bench scripts/matrices and small readout reports go in perf/ on the DimensionsRecomp branch. Push without force. Commit again at the end of the grace period. Agents commit only through Agent 1.
+S3301:   - Readouts: Agents 7 and 8 (formal, both passes), Agent 6 (logdiffs), Agent 12 (gates).
+S3302:   - Agent 3: quiet-host f10a/f10b rows (finding 10).
+S3303:   - Agent 11: FINDINGS/S4-DRAFT plus perf-notes/RESUME.md (state, next steps, restart in a few days to a week; a new PC needs new baselines).
+S3304:   - Agents 5 and 8: stage the screensaver/StrictMode fix; install it after the launcher exits at 07:30.
+S3305: 
+S3306: ### 05:44 - Agent 1: S4b/S4c code pushed to GitHub; wrap-up tasks sent
+S3307: 
+S3308: - User (04:55-05:01): commit to GitHub (rishabh-mohan/DimensionsRecomp and rishabh-mohan/rexglue-sdk, both public forks); a break of a few days to a week; a 2-hour grace period from ~11-12. Aim: everything committed and a resume doc by ~13:00.
+S3309: - Code: the 16 S4b/S4c files in build/agent2/s4b/HASHES.txt were copied from build/agent2/snap1 into the live trees after a hash check (live == S4a "before" and snap1 == S4b "after" for all 16; live == "after" after the copy). Commits on perf/opt, pushed to mine without force: rexglue-sdk 5350b1d (13 files; its upstream is now mine/perf/opt) and DimensionsRecomp b0bd3b4 (memory_watch.cpp, CMakeLists.txt, new gpu_wait_backoff.cpp, SDK pointer). ls-remote shows both.
+S3310: - Third-party worktree changes stay uncommitted. Both can be rebuilt from tracked files: plume via tools/gpu-aot/prepare_plume.py + tools/gpu-aot/patches (winsdk-compat holds S1+p2), simde via rexglue-sdk/scripts/prepare_simde.py + rexglue-sdk/patches/simde-native-m64-stream.patch.
+S3311: - Notes/scripts/results are not pushed. At 04:57 I told the user they would go to a private repo, but both repos are public. I'm staging an export and will ask the user when they wake: a public perf/ folder, a private repo they create, or local only.
+S3312: - Wrap-up tasks sent: readouts (7, 8), logdiffs + dumpstacks (6), gates (12), quiet-host f10a/f10b (3), FINDINGS/S4-DRAFT/RESUME.md (11), SCRNSAVE fix staged and installed after 07:30 (5; reviews by 8 and 10), commit check + pending-diff inventory (2), screenshot kit (4), and a HANDOFF.md from every agent. No builds or timed runs this morning. The old night cron (task-139) is replaced by a wrap-up cron.
+S3313: 

@@ -1,0 +1,51 @@
+{
+    "title":  "Agent 11 task #24: execution-speed opt-out pairs, devoff2 d0 (off) vs d0e (on)",
+    "reference":  "d0",
+    "warmup_s":  55,
+    "warmup_from":  "firstframe",
+    "measure_s":  90,
+    "repeats":  3,
+    "order":  "roundrobin",
+    "settle_s":  5,
+    "cooldown_s":  5,
+    "boot_timeout_s":  240,
+    "close_timeout_s":  60,
+    "cold_run":  false,
+    "sys_csv":  true,
+    "min_window_after_ff_s":  60,
+    "notes":  [
+                  "Agent 11 task #24, FUNCTIONAL ONLY (hidden desktop). d0e = d0 plus the runner-side EXECUTION_SPEED opt-out by bench/agent11/pthrottle_sidecar.ps1 (SetProcessInformation on its own handle); game, bin, cvars and env are identical. The sidecar reads the state of d0 runs too, never sets it."
+              ],
+    "arms":  [
+                 {
+                     "id":  "d0",
+                     "group":  "pt",
+                     "ref":  true,
+                     "bin":  "build/agent2/devoff2-bin",
+                     "frames":  "perf",
+                     "cvars":  [
+                                   "framerate_limit=0"
+                               ],
+                     "env":  {
+
+                             },
+                     "driver":  "drivers/thread-cpu.ps1",
+                     "note":  "opt-out off (sidecar reads only)"
+                 },
+                 {
+                     "id":  "d0e",
+                     "group":  "pt",
+                     "ref":  false,
+                     "bin":  "build/agent2/devoff2-bin",
+                     "frames":  "perf",
+                     "cvars":  [
+                                   "framerate_limit=0"
+                               ],
+                     "env":  {
+
+                             },
+                     "driver":  "drivers/thread-cpu.ps1",
+                     "note":  "opt-out on (sidecar sets EXECUTION_SPEED controlled + off)"
+                 }
+             ]
+}

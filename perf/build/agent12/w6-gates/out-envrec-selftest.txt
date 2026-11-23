@@ -1,0 +1,17 @@
+ok   uniform overlay, strict gate: exit 0 (want 0)
+ok   one run on another overlay, relaxed gate: exit 1 (want 1)
+ok   overlay changes inside a window: exit 1 (want 1)
+ok   a run without sys data: exit 3 (want 3)
+ok   no gate given: exit 3 (want 3)
+ok   --gate wins over the log: exit 0 (want 0)
+ok   run.json fallback; Agent 5's launcher RELAXED line: exit 0 (want 0)
+ok   another overlay in every run: exit 0 (want 0)
+ok   a busy run is flagged (5.40 > median 3.00 + 1.0): exit 0 (want 0)
+ok   Agent 5's launcher GAVE UP line: no window started, exit 3: exit 3 (want 3)
+ok   no results.csv: exit 2
+ok   gate text: end time, gap to the window start, Defender range
+ok   gate gap: a gate line inside the start minute (00:09:01, dir 0009; the old code said '1440 min')
+ok   gate gap: across midnight (23:58:20, dir 0003)
+ok   gate gap: 43 min across midnight (23:20:00, dir 0003) is a WARN
+ok   gate gap: a gate line 6 min after the window start (00:15:00, dir 0009) is a WARN
+SELFTEST PASS (16/16 checks)

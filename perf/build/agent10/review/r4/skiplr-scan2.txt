@@ -1,0 +1,14 @@
+off3: mflr r12 with no textual use -> first call after it:
+  __savegprlr_N	34982
+off3: mflr r12 stored -> base register: r1=93931
+off3: mflr r12 stored -> offset (top 8): -8=93878, -24=32, -32=8, -16=5, -40=4, 56=2, -48=2
+batch: functions mentioning ctx.lr: 1
+  sub_83E5C830 legodimensions_recomp.144.cpp:34966 hits=7
+      ctx.r7.u64 = ctx.lr;
+      ctx.lr = 0x83E5C850;
+      ctx.lr = ctx.r3.u64;
+      { auto old_lr = ctx.lr;
+      ctx.lr = 0x83E5C860;
+      ctx.lr = 0x83E5C874;
+      ctx.lr = ctx.r7.u64;
+batch: headers mentioning lr: 

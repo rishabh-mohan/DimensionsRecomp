@@ -1,0 +1,860 @@
+{
+ "tool": "run_gates.py",
+ "matrix_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313",
+ "title": "Window 6 (Agent 5's draft v2, finalized 2026-11-22 21:16 for build/agent2/devoff4b-bin): upload path on the S4b bin. s0 (every switch OFF) vs p2 = #8 P2, p2f = #8 + #5 fix (i), p2fc = #8 + #5 + #4 C1 v3 keep-watch (verify off); f and fc = the decision table's arms without P2",
+ "reference": "s0",
+ "plan": {
+  "found": true,
+  "estimate": 21,
+  "estimate_cold": 1,
+  "cold": [
+   "s0"
+  ],
+  "rounds": 5,
+  "sys_csv": true
+ },
+ "plan_arms": {
+  "s0": {
+   "bin": "build/agent2/devoff4b-bin",
+   "repeats": 5
+  },
+  "p2": {
+   "bin": "build/agent2/devoff4b-bin",
+   "repeats": 5
+  },
+  "p2f": {
+   "bin": "build/agent2/devoff4b-bin",
+   "repeats": 5
+  },
+  "p2fc": {
+   "bin": "build/agent2/devoff4b-bin",
+   "repeats": 5
+  }
+ },
+ "run_arms": [
+  "s0",
+  "p2",
+  "p2f",
+  "p2fc"
+ ],
+ "p2_arms": [
+  "p2",
+  "p2f",
+  "p2fc"
+ ],
+ "kw_arms": [
+  "p2fc"
+ ],
+ "window_log": "<workspace>\\bench\\agent5\\launch\\status\\window-W6-0310.log",
+ "window_how": "its END line names this out dir",
+ "gate_log": "<workspace>\\bench\\agent5\\launch\\status\\window-W6-0310.log",
+ "gate_how": "the launcher's window log",
+ "gates": [
+  {
+   "id": "G1",
+   "name": "every switch rated",
+   "status": "MANUAL",
+   "key": "4 arms; switches beyond the common set (framerate_limit=0): s0 0, p2 1, p2f 2, p2fc 4",
+   "details": [
+    "s0 (ref): bin build/agent2/devoff4b-bin; beyond the common set: -",
+    "p2: bin build/agent2/devoff4b-bin; beyond the common set: shared_memory_single_hold_rearm=true",
+    "p2f: bin build/agent2/devoff4b-bin; beyond the common set: shared_memory_single_hold_rearm=true, physical_protect_hold_global_lock=true",
+    "p2fc: bin build/agent2/devoff4b-bin; beyond the common set: shared_memory_single_hold_rearm=true, physical_protect_hold_global_lock=true, physical_protect_keep_watch=true, physical_protect_keep_watch_verify=false",
+    "rate every switch above against W6-GATES.md G1 (Agent 10's b2r ratings): the kit only lists them"
+   ]
+  },
+  {
+   "id": "G2",
+   "name": "one bin per arm, as built",
+   "status": "PASS",
+   "key": "21/21 runs on their arm's bin (MANIFEST + exe/dll SHA-256); 1 bin; one bin required (--one-bin); s4-p2c in 1/1 P2 bin; side runs 4/4 on the P2 bin",
+   "details": [
+    "bin build/agent2/devoff4b-bin: arms s0, p2, p2f, p2fc; MANIFEST.txt sha256 DE11A914079D7DF7; TracyClient.dll 233472 B, legodimensions.exe 170350080 B, rexgpu-xenos.dll 3425792 B, rexruntime.dll 10909184 B; legodimensions.exe sha256 DFBE1D43B28861A6",
+    "p2c_check --bin build/agent2/devoff4b-bin: the counter's format string is in rexgpu-xenos.dll (this build has s4-p2c)"
+   ]
+  },
+  {
+   "id": "G3",
+   "name": "every planned run completed",
+   "status": "PASS",
+   "key": "21/21 runs OK, exit 0x00000000, wm_close, runner exit 0; plan.txt 21 runs (1 cold); arms 4/4 as planned; launcher END exit 0",
+   "details": [
+    "plan.txt: s0 x5+1 cold, p2 x5, p2f x5, p2fc x5; results.csv: s0 x5+1 cold, p2 x5, p2f x5, p2fc x5",
+    "launcher END: runner exit 0 (all runs OK) after 42.8 min (<workspace>\\bench\\agent5\\launch\\status\\window-W6-0310.log)"
+   ]
+  },
+  {
+   "id": "G4",
+   "name": "P2's fallback never runs",
+   "status": "PASS",
+   "key": "PASS in 4/4: 20261122-212406-w6-side1-p2f PASS T=0, 20261122-211914-w6-side2-p2fc PASS T=0, 20261122-215230-w6-side3-p2fc-attract PASS T=0, gate A (20261122-210906-w6-gateA-p2fcv-level) PASS T=0",
+   "details": [
+    "20261122-212406-w6-side1-p2f: log time range: 2026-11-22 21:24:10.282 .. 2026-11-22 21:28:28.804",
+    "20261122-212406-w6-side1-p2f: memexport activity: 5 of 33692 slow-frame lines (first game.2.log:2550): invalidations on memexport pages 0x 0 KB, syncs 5 (1208 KB), on demand 0 (0 KB)",
+    "20261122-212406-w6-side1-p2f: RESULT: PASS (total 0): the memexport full-buffer fallback never ran, up to the last logged frame",
+    "20261122-211914-w6-side2-p2fc: log time range: 2026-11-22 21:19:16.893 .. 2026-11-22 21:23:35.756",
+    "20261122-211914-w6-side2-p2fc: memexport activity: 5 of 35027 slow-frame lines (first game.3.log:5978): invalidations on memexport pages 0x 0 KB, syncs 5 (1208 KB), on demand 0 (0 KB)",
+    "20261122-211914-w6-side2-p2fc: RESULT: PASS (total 0): the memexport full-buffer fallback never ran, up to the last logged frame",
+    "20261122-215230-w6-side3-p2fc-attract: log time range: 2026-11-22 21:52:34.024 .. 2026-11-22 21:59:32.291",
+    "20261122-215230-w6-side3-p2fc-attract: memexport activity: 3836 of 36388 slow-frame lines (first game.2.log:9475): invalidations on memexport pages 6157x 25136556 KB, syncs 30450 (850140 KB), on demand 0 (0 KB)",
+    "20261122-215230-w6-side3-p2fc-attract: RESULT: PASS (total 0): the memexport full-buffer fallback never ran, up to the last logged frame",
+    "gate A (20261122-210906-w6-gateA-p2fcv-level): log time range: 2026-11-22 21:09:12.544 .. 2026-11-22 21:19:09.511",
+    "gate A (20261122-210906-w6-gateA-p2fcv-level): memexport activity: 347 of 7271 slow-frame lines (first game.log:979): invalidations on memexport pages 160x 182892 KB, syncs 9101 (117336 KB), on demand 0 (0 KB)",
+    "gate A (20261122-210906-w6-gateA-p2fcv-level): RESULT: PASS (total 0): the memexport full-buffer fallback never ran, up to the last logged frame"
+   ]
+  },
+  {
+   "id": "G5",
+   "name": "C1 verify on gate A",
+   "status": "PASS",
+   "key": "gate A (20261122-210906-w6-gateA-p2fcv-level): verify on 1, first kept 1, K 0, F 0; physical_protect_keep_watch_verify=true",
+   "details": []
+  },
+  {
+   "id": "G6",
+   "name": "keep only under G",
+   "status": "CODE",
+   "key": "met in code: the keep path requires owns_lock() (Agent 10, b2r S21)",
+   "details": []
+  },
+  {
+   "id": "G7",
+   "name": "inert on native",
+   "status": "CODE",
+   "key": "met in code (Agent 10, b2r S21); native-blocked lines in 0 runs",
+   "details": []
+  },
+  {
+   "id": "G8",
+   "name": "nothing stale, no new errors",
+   "status": "FAIL",
+   "key": "stale/fault/Protect-failed lines in 0/25 runs; keep-watch on+keeping 8/8; logdiff vs s0 (x6): FAIL findings in 0, NEW messages in 0/21 runs (0 kinds); sides 4 checked for fail patterns",
+   "details": [
+    "logdiff reference: s0 x6 merged (592 log lines, 5 warning/error kinds); 21/21 runs have a game*.log to compare",
+    "side gate A (20261122-210906-w6-gateA-p2fcv-level):  1 [critical] lines",
+    "by hand: the frame hash or screenshot matches the reference arm at the same point (W6-GATES G8)"
+   ]
+  },
+  {
+   "id": "G9",
+   "name": "launch-only switches as planned",
+   "status": "PASS",
+   "key": "21/21 runs: params.cvar, args, env_set and toml_set = the arm's",
+   "details": [
+    "hands off, no dev console during the window: procedural (C1 v3 latches keep_watch and hold_global_lock at init; other cvars are read live)"
+   ]
+  },
+  {
+   "id": "G10",
+   "name": "per-run validity",
+   "status": "PASS",
+   "key": "20/20 scored runs valid; proof lines ok in 21/21 runs; free RAM >= 6 GB in 21/21; slow state 0/20 scored (info)",
+   "details": [
+    "proof lines s0: none (6 runs)",
+    "proof lines p2: none (5 runs)",
+    "  p2: no log line for shared_memory_single_hold_rearm: the recorded cvar list (G9) is the proof",
+    "proof lines p2f: none (5 runs)",
+    "  p2f: no log line for shared_memory_single_hold_rearm, physical_protect_hold_global_lock: the recorded cvar list (G9) is the proof",
+    "proof lines p2fc: kw_on 1,1,1,1,1, kw_first 1,1,1,1,1 (5 runs)",
+    "  p2fc: no log line for shared_memory_single_hold_rearm, physical_protect_hold_global_lock: the recorded cvar list (G9) is the proof",
+    "slow state (info; E-cores < 800 MHz for >= 3 samples overlapping the window): 0/20 scored runs; slow samples in the window: none"
+   ]
+  },
+  {
+   "id": "G11",
+   "name": "power overlay",
+   "status": "PASS",
+   "key": "overlay best_performance in 21/21 runs, no change inside any window; scheme Balanced; AC 1; saver 0",
+   "details": [
+    "power overlay: best_performance in 21/21 runs, no change inside any window (differs from W5's best_efficiency: don't compare absolute numbers with W5)",
+    "scheme: Balanced x21; AC: 1 x21; battery saver: 0 x21",
+    "launcher: plan| note     Environment (G11, G12): keep sys_csv true. After the window: python build\\agent12\\w6-gates\\w6_env_record.py <matrix out dir> --gate-log bench\\agent5\\launch\\status\\window-<id>-<HHmm>.log --json <out>. G11: one power overlay, scheme and AC in all 13 runs; if the overlay is not W5's best_efficiency, compare W6 only within itself. G12: the launcher's gate line says STRICT or RELAXED; RELAXED means a steady ~1 core of Defender through the window, which the round-robin spreads over all arms alike (quote the MsMpEng triple in R7).",
+    "launcher: 2026-11-23 03:13:21 power scheme at the start: Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)"
+   ]
+  },
+  {
+   "id": "G12",
+   "name": "quiet gate",
+   "status": "PASS",
+   "key": "STRICT at 03:13:21 [window-W6-0310.log]; MsMpEng 0.00/0.00/0.00, OfficeClickToRun 0.00/0.00/0.00, CrossDeviceService 0.05/0.06/0.06; non-game load 3.28-3.89 cores (median 3.42), 0 flagged",
+   "details": [
+    "non-game load: 3.28-3.89 cores (median 3.42) in 20 scored runs; unscored/cold 3.39",
+    "non-game load flag (scored runs above the median 3.42 + 1.0 cores): none",
+    "quiet gate: STRICT: <workspace>\\bench\\agent5\\launch\\status\\window-W6-0310.log: '03:13:21 quiet gate: STRICT (MsMpEng 0.00/0.00/0.00, OfficeClickToRun 0.00/0.00/0.00, CrossDeviceService 0.05/0.06/0.06)' at 03:13:21; the window started at 03:13, 0 min later"
+   ]
+  }
+ ],
+ "record": "RECORD: overlay best_performance (21/21, no change); quiet gate STRICT; non-game load 3.28-3.89 cores",
+ "exit": 1,
+ "runs": [
+  {
+   "seq": 1,
+   "arm": "s0",
+   "rep": "0",
+   "scored": false,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0313-cold-s0",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 30,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 2,
+   "arm": "s0",
+   "rep": "1",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0315-s0-r1",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 3,
+   "arm": "p2",
+   "rep": "1",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0317-p2-r1",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 4,
+   "arm": "p2f",
+   "rep": "1",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0319-p2f-r1",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 5,
+   "arm": "p2fc",
+   "rep": "1",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0321-p2fc-r1",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 1,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 1,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 6,
+   "arm": "p2",
+   "rep": "2",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0323-p2-r2",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 7,
+   "arm": "p2f",
+   "rep": "2",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0325-p2f-r2",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 8,
+   "arm": "p2fc",
+   "rep": "2",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0327-p2fc-r2",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 1,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 1,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 9,
+   "arm": "s0",
+   "rep": "2",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0329-s0-r2",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 10,
+   "arm": "p2f",
+   "rep": "3",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0331-p2f-r3",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 11,
+   "arm": "p2fc",
+   "rep": "3",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0333-p2fc-r3",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 1,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 1,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 12,
+   "arm": "s0",
+   "rep": "3",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0335-s0-r3",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 13,
+   "arm": "p2",
+   "rep": "3",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0337-p2-r3",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 14,
+   "arm": "p2fc",
+   "rep": "4",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0339-p2fc-r4",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 1,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 1,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 15,
+   "arm": "s0",
+   "rep": "4",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0341-s0-r4",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 16,
+   "arm": "p2",
+   "rep": "4",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0343-p2-r4",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 17,
+   "arm": "p2f",
+   "rep": "4",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0345-p2f-r4",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 18,
+   "arm": "s0",
+   "rep": "5",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0348-s0-r5",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 19,
+   "arm": "p2",
+   "rep": "5",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0350-p2-r5",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 20,
+   "arm": "p2f",
+   "rep": "5",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0352-p2f-r5",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 21,
+   "arm": "p2fc",
+   "rep": "5",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261123-0313\\runs\\0354-p2fc-r5",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 1,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 1,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  }
+ ],
+ "sides": [
+  {
+   "label": "20261122-212406-w6-side1-p2f",
+   "dir": "build\\agent3\\runs\\20261122-212406-w6-side1-p2f",
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "cvars": {
+    "framerate_limit": "0",
+    "shared_memory_single_hold_rearm": "true",
+    "physical_protect_hold_global_lock": "true",
+    "shared_memory_upload_hash_log": "true",
+    "slow_frame_log_ms": "1"
+   }
+  },
+  {
+   "label": "20261122-211914-w6-side2-p2fc",
+   "dir": "build\\agent3\\runs\\20261122-211914-w6-side2-p2fc",
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 1,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 1,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "cvars": {
+    "framerate_limit": "0",
+    "shared_memory_single_hold_rearm": "true",
+    "physical_protect_hold_global_lock": "true",
+    "physical_protect_keep_watch": "true",
+    "physical_protect_keep_watch_verify": "false",
+    "shared_memory_upload_hash_log": "true",
+    "slow_frame_log_ms": "1"
+   }
+  },
+  {
+   "label": "20261122-215230-w6-side3-p2fc-attract",
+   "dir": "build\\agent3\\runs\\20261122-215230-w6-side3-p2fc-attract",
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 1,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 1,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "cvars": {
+    "framerate_limit": "0",
+    "shared_memory_single_hold_rearm": "true",
+    "physical_protect_hold_global_lock": "true",
+    "physical_protect_keep_watch": "true",
+    "physical_protect_keep_watch_verify": "false",
+    "slow_frame_log_ms": "1"
+   }
+  },
+  {
+   "label": "gate A (20261122-210906-w6-gateA-p2fcv-level)",
+   "dir": "build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level",
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 1,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 1,
+    "verify_on": 1,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "cvars": {
+    "framerate_limit": "0",
+    "shared_memory_single_hold_rearm": "true",
+    "physical_protect_hold_global_lock": "true",
+    "physical_protect_keep_watch": "true",
+    "physical_protect_keep_watch_verify": "true",
+    "slow_frame_log_ms": "1"
+   }
+  }
+ ]
+}

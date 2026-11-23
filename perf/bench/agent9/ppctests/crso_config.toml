@@ -1,0 +1,7 @@
+# "crso" variant for test F (tests/ppc/asm/instr_cr_so_fold.s): cr_compare_so_zero only.
+# XER stays in ctx (no xer_as_local), so a body that has no mtxer still reads ctx.xer.so
+# when any body in the binary writes XER in ctx (ctxXerWritten).
+#   rexglue recompile-tests --config bench/agent9/ppctests/crso_config.toml ...
+# Tools built before Agent 9's test_recompiler.cpp --config fix also need a file_path key
+# (RecompilerConfig::Load requires it; recompile-tests does not use it).
+cr_compare_so_zero = true

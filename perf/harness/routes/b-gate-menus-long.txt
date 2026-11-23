@@ -1,0 +1,65 @@
+# harness/routes/b-gate-menus-long.txt - b-gate-menus.txt with a 90-s idle tail (session 3, 03:15, Agent 3).
+# Why: in the first B gate pair the devoffB run (build/agent3/runs/20261122-030752-bgate-b) left the 220/534 screen on
+# its own at perf 134.7 s (220/540 fade for 60 frames, a front-end load with the 34 INSTALL0_*.DAT probes, then
+# 218/222), 59 s after that screen appeared and 20 s after the last B. Both devoff2 runs with the same inputs (bgate-dry,
+# bgate-a) stayed on 220/534 to the end (perf 139 s). Steps 1-36 are the same as b-gate-menus.txt (same inputs at the
+# same times); only the tail is longer, so each build shows when it leaves that screen without input:
+#   ~60 s after the last input: idle timer, reset by the menu inputs (expected for devoff2 if it has one);
+#   ~60 s after the screen appeared, whatever the inputs: the inputs did not reset it (devoffB in bgate-b).
+# Blind, fixed sleeps; harness/route-report.ps1 maps the marks to scenes after the run. FUNCTIONAL ONLY.
+#   powershell -NoProfile -ExecutionPolicy Bypass -File harness\run-game.ps1 -BinDir build\agent2\devoff2-bin -Seconds 420 -Tag bgate-long-devoff2 -InputScript harness\routes\b-gate-menus-long.txt
+#   powershell -NoProfile -ExecutionPolicy Bypass -File harness\run-game.ps1 -BinDir build\agent2\devoffB-bin -Seconds 420 -Tag bgate-long-devoffB -InputScript harness\routes\b-gate-menus-long.txt
+wait_first_frame 240
+mark first-frame
+sleep 50                         # pre-title (218/222, 219/226) -> title (226/1022)
+mark title
+press START                      # title -> front end
+sleep 8
+mark after-start
+press A
+sleep 8
+mark after-a1
+press A
+sleep 8
+mark after-a2
+press A
+sleep 12
+mark after-a3
+press DOWN
+sleep 2
+mark down-1
+press DOWN
+sleep 2
+mark down-2
+press UP 2
+sleep 2
+mark up-2
+press B
+sleep 5
+mark back-1
+press B
+sleep 5
+mark back-2
+press B
+sleep 5
+mark back-3
+sleep 10
+mark idle-10
+sleep 10
+mark idle-20
+sleep 10
+mark idle-30
+sleep 10
+mark idle-40
+sleep 10
+mark idle-50
+sleep 10
+mark idle-60
+sleep 10
+mark idle-70
+sleep 10
+mark idle-80
+sleep 10
+mark idle-90
+mark end
+stop

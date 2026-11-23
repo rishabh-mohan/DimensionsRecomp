@@ -1,0 +1,39 @@
+SESSION2 lines 3337
+3300:   - Git (Agent 1): commit onto a new branch per repo (perf/s4, not main), following each repo's .gitignore. Perf notes, bench scripts/matrices and small readout reports go in perf/ on the DimensionsRecomp branch. Push without force. Commit again at the end of the grace period. Agents commit only through Agent 1.
+3301:   - Readouts: Agents 7 and 8 (formal, both passes), Agent 6 (logdiffs), Agent 12 (gates).
+3302:   - Agent 3: quiet-host f10a/f10b rows (finding 10).
+3303:   - Agent 11: FINDINGS/S4-DRAFT plus perf-notes/RESUME.md (state, next steps, restart in a few days to a week; a new PC needs new baselines).
+3304:   - Agents 5 and 8: stage the screensaver/StrictMode fix; install it after the launcher exits at 07:30.
+3305: 
+3306: ### 05:44 - Agent 1: S4b/S4c code pushed to GitHub; wrap-up tasks sent
+3307: 
+3308: - User (04:55-05:01): commit to GitHub (rishabh-mohan/DimensionsRecomp and rishabh-mohan/rexglue-sdk, both public forks); a break of a few days to a week; a 2-hour grace period from ~11-12. Aim: everything committed and a resume doc by ~13:00.
+3309: - Code: the 16 S4b/S4c files in build/agent2/s4b/HASHES.txt were copied from build/agent2/snap1 into the live trees after a hash check (live == S4a "before" and snap1 == S4b "after" for all 16; live == "after" after the copy). Commits on perf/opt, pushed to mine without force: rexglue-sdk 5350b1d (13 files; its upstream is now mine/perf/opt) and DimensionsRecomp b0bd3b4 (memory_watch.cpp, CMakeLists.txt, new gpu_wait_backoff.cpp, SDK pointer). ls-remote shows both.
+3310: - Third-party worktree changes stay uncommitted. Both can be rebuilt from tracked files: plume via tools/gpu-aot/prepare_plume.py + tools/gpu-aot/patches (winsdk-compat holds S1+p2), simde via rexglue-sdk/scripts/prepare_simde.py + rexglue-sdk/patches/simde-native-m64-stream.patch.
+3311: - Notes/scripts/results are not pushed. At 04:57 I told the user they would go to a private repo, but both repos are public. I'm staging an export and will ask the user when they wake: a public perf/ folder, a private repo they create, or local only.
+3312: - Wrap-up tasks sent: readouts (7, 8), logdiffs + dumpstacks (6), gates (12), quiet-host f10a/f10b (3), FINDINGS/S4-DRAFT/RESUME.md (11), SCRNSAVE fix staged and installed after 07:30 (5; reviews by 8 and 10), commit check + pending-diff inventory (2), screenshot kit (4), and a HANDOFF.md from every agent. No builds or timed runs this morning. The old night cron (task-139) is replaced by a wrap-up cron.
+3313: 
+3314: 
+3315: ### 06:05 - Agent 1: day-draft rating; run-day regen folded into #26
+3316: 
+3317: - Agent 10 rated the day-session draft SAFE-IF (build/agent10/t27/day-draft-rating.md). Conditions: (1) regenerate run-day.ps1 from the SCRNSAVE-fixed run-night.ps1 (the current run-day.ps1 D86F6DE0 has the same bug, so the first day GO would be refused); (2) install per README-DAY L136-139 only after the night launcher has exited, then compare hashes; (3) Agent 11 rates it too. Hashes match the 23:19 list; tests 27/27 PASS. NITs N1-N4 and N6 do not block (N1: absolute user-name paths in run-day.diff L1-4, fix before publishing).
+3318: - No day runs before the break. Agent 5 does (1) staged only in build/agent5/, after the SCRNSAVE install (not installed into bench/agent5/day); Agent 10 delta-reads it; Agent 11 lists (2), (3), N1 and N6 in the RESUME.md open items. The install and Agent 11's rating wait until after the break.
+3319: - 06:03 check: launcher pid 19960 and hold manager 25948 still running (both exit 07:30); game pid 32896 since 05:58 is Agent 3's f10 rows; Agent 5's scrnsave tests write only a scratch key (HKCU:\Software\Agent5-scrnsave-test), never Control Panel\Desktop.
+3320: 
+3321: ### 06:35 - Agent 1: 06:30 check; wrap-up results so far
+3322: 
+3323: - Done: #30 Agent 9 (HANDOFF; BACKOFF-DEFAULT-ON.md design; W9 clock check: pass 2 had 4/21 lowclk runs, 04-q125-r1, 05-q250-r1, 10-q500-r2, 12-q125-r3, read as host-driven but not proven; forwarded to Agent 7). #24 Agent 12: all 7 night dirs PASS (both W6 with the known G8 / finding-10 WARN); G12 midnight bug fixed; C1 v3 is byte-identical to 5350b1d. Caveat: W5 ran best_efficiency, the night windows best_performance.
+3324: - Agent 6 night logdiffs: 135 runs exit 0, 0 STUCK-LOCK, 0 dumps; only the expected proof lines differ by arm; W9 env matches matrix.json in all 42 runs. NOTEs: 6 runs lack 'Execution complete' (exit race); W9 0128-off-r2 hit the 3 s shutdown watchdog (exit 0, first sighting). build/agent6/wnight/RESULTS.md.
+3325: - Agent 3 f10 (quiet host, untimed, devoff4b-bin): f10a and f10b PASS, no hang. Worst frame 2.9 s against the 5 s detector; the same sync-heavy frames took 5-20x less per wait than gate B under -j8 (0.98 vs 6.05 ms; 0.29-0.37 vs 1.79 ms), so a starved host, with a small margin. rpm4 PASS. Second pair approved: f10a2 started 06:32, all runs end by 07:20; the n=2 summary goes to Agents 6 and 11. Agent 12 adds a 2-line pointer to its HANDOFF.
+3326: - Agent 10: SCRNSAVE delta SAFE (build/agent10/t27/scrnsave-delta.md); day condition 1 met in staged form (run-day B67EBD6C from run-night 565D30D4). Item #21 (s4-t1) rating in build/agent10/t27/r21-s4t1.md: (a) SAFE, (b) SAFE-IF with 5 conditions incl. the new F-CA (a th2-only deadlock path that exists without #21, not seen at runtime), (c) ACCEPTED. F-CA goes to the RESUME open items; Agent 7 records it under MP4 gap 2.
+3327: - Export: export_perf.py now scrubs each copy (workspace path -> <workspace>; other profile paths and the account name -> <user>; plain, JSON-escaped and file:/// forms) and counts leftovers; checked on a sample. The full re-run waits until Agent 3's quiet runs end. Personal-schedule mentions sit in about 47 exported files (session log, FINDINGS, S4-DRAFT, agent notes): too spread out to cut, so it goes into the notes question for the user.
+3328: - Machine 06:31: launcher 19960 and hold manager 25948 up until 07:30; no HOLD.
+3329: 
+3330: ### 07:06 - Agent 1: f10 n=2 done; fresh clone verified; export scrubbed; my HANDOFF
+3331: 
+3332: - Done since 06:35: #28 Agent 2 (COMMIT-CHECK PASS; PENDING-DIFFS.md; old task #1 closed as DEFERRED, CTR/CG26 bins unbuilt, steps in its HANDOFF S4.1); #22 Agent 6 (gate B dumpstacks S7.3, quiet-host answer S7.4, night logdiffs, #33 pop-in staged in build/agent6/s33-popin/, cvar d3d12_pipeline_creation_no_wait default OFF, apply --check OK on 5350b1d, not built); #29 Agent 4 (screenshot kit build/agent4/screenshot-kit/README.md, about 25 min, user at the visible desktop); #23 Agent 3 (f10 n=2: f10a, f10a2, f10b, f10b2 all PASS; 0/4 hung on the quiet host vs 4/6 under -j8, p=0.07; rpb0 and rpm4 PASS; queue stopped, STOP file in place, last game 06:47:26).
+3333: - Agent 10: RESUME interim review R1-R32 (build/agent10/t27/resume-review.md; 3 wrong facts R20-R22, restart gaps R30-R32); SCRNSAVE install tooling SAFE (install-scrnsave.ps1, day-update.ps1). Pointed Agent 11 at the review; R19 (scrub) done on my side.
+3334: - Export re-run 07:02 with the scrub: 4529 files, 38.6 MB, 8319 edits in 1411 files, 0 files still holding the account name. Still staged, not pushed.
+3335: - Fresh clone test (https, scratch folder outside the workspace): DimensionsRecomp perf/opt b0bd3b4 and the SDK submodule 5350b1d come from the forks fine. thirdparty/plume fails ('not our ref ceaeeee0', the upstream gitlink is not on zolaware/plume); fetching the pin e0c8871 by sha, then prepare_plume.py and prepare_simde.py, gives the same git status as the live tree, and the 4 patched files are byte-identical to the live ones. Steps in build/agent1/HANDOFF.md section 3 (R32).
+3336: - Wrote build/agent1/HANDOFF.md (first version; the final pass adds the readout verdicts).
+3337: 

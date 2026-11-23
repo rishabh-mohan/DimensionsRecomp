@@ -1,0 +1,89 @@
+Minidump analysis (bench/agent11/testg_dump.ps1)
+dump: <workspace>\build\agent11\dumptest\fresh\ping.dmp (40,463 bytes, flags 0x201024)
+written: 2026-11-21 20:31:16 local
+process: pid 82344, created 2026-11-21 20:31:12, process cpu user 0 s / kernel 0 s
+threads: 6; modules: 12; unloaded modules: not recorded; handles: 82; thread names: not recorded
+bin dir: <workspace>\build\baseline-bin (default)
+frames: heuristic stack scan from RSP up: values pointing into a module right after a CALL (checked in the module file);
+        '?' = module file not readable, CALL not checked; stale return addresses left in locals can appear.
+
+modules (the exe, files of the bin dir, core system DLLs, and every module seen in a frame):
+  base              size      timestamp name                         file / symbols
+  00007FF739FF0000  0000C000  5b8ac34b  PING.EXE                     C:\Windows\System32\PING.EXE; 0 exports
+  00007FFD9ED70000  0026C000  a2b84216  ntdll.dll                    C:\Windows\System32\ntdll.dll; 2523 exports
+  00007FFD9CBB0000  000CB000  28b50dc0  kernel32.dll                 C:\Windows\System32\kernel32.dll; 1487 exports
+  00007FFD9C130000  00409000  a3ff6954  KERNELBASE.dll               C:\Windows\System32\KERNELBASE.dll; 1933 exports
+  ... and 8 other module(s)
+
+=== thread 96348 (#0): suspend 0, priority 0 (class 0x20), cpu user 15 ms / kernel 31 ms, created 20:31:12.170
+    start 00007FF739FF1300  PING+0x1300  
+    rip   00007FFD9EED6A64  ntdll!NtDelayExecution+0x14 (nearest export)
+    rsp   0000005DB9E7F328  stack 0x5DB9E7F328-0x5DB9E80000 (3,288 bytes captured)
+     0 rip        00007FFD9EED6A64  ntdll+0x166A64                 ntdll!NtDelayExecution+0x14 (nearest export)
+     1 rsp+0x0    00007FFD9EE43194  ntdll+0xD3194                  ntdll!RtlDelayExecution+0x34 (nearest export)
+     2 rsp+0x20   00007FFD9C13A0E0  KERNELBASE+0xA0E0              KERNELBASE!LocalFree+0x30 (nearest export)
+     3 rsp+0x30   00007FFD9C1BCCA1  KERNELBASE+0x8CCA1             KERNELBASE!SleepEx+0x91 (nearest export)
+     4 rsp+0xC0   00007FF739FF39DF  PING+0x39DF                    
+     5 rsp+0x2D0  00007FFD9EE9238B  ntdll+0x12238B                 ntdll!RtlWow64SuspendThread+0xD41B (nearest export)
+     6 rsp+0xB40  00007FF739FF1284  PING+0x1284                    
+     7 rsp+0xB50  00007FF739FF1309  PING+0x1309                    
+     8 rsp+0xB80  00007FFD9CBDDDA7  kernel32+0x2DDA7               kernel32!BaseThreadInitThunk+0x17 (nearest export)
+     9 rsp+0xBB0  00007FFD9EE39C5C  ntdll+0xC9C5C                  ntdll!RtlUserThreadStart+0x2C (nearest export)
+
+=== thread 63356 (#1): suspend 0, priority 0 (class 0x20), cpu user 0 ms / kernel 0 ms, created 20:31:12.292
+    start 00007FFD9ED94990  ntdll+0x24990  ntdll!TpCallbackMayRunLong+0x1690 (nearest export)
+    rip   00007FFD9EEDA0B4  ntdll!NtWaitForWorkViaWorkerFactory+0x14 (nearest export)
+    rsp   0000005DB9EFF4E8  stack 0x5DB9EFF4E8-0x5DB9F00000 (2,840 bytes captured)
+     0 rip        00007FFD9EEDA0B4  ntdll+0x16A0B4                 ntdll!NtWaitForWorkViaWorkerFactory+0x14 (nearest export)
+     1 rsp+0x0    00007FFD9ED94D0E  ntdll+0x24D0E                  ntdll!TpCallbackMayRunLong+0x1A0E (nearest export)
+     2 rsp+0x360  00007FFD9CBDDDA7  kernel32+0x2DDA7               kernel32!BaseThreadInitThunk+0x17 (nearest export)
+     3 rsp+0x390  00007FFD9EE39C5C  ntdll+0xC9C5C                  ntdll!RtlUserThreadStart+0x2C (nearest export)
+
+=== thread 27600 (#2): suspend 0, priority 0 (class 0x20), cpu user 0 ms / kernel 0 ms, created 20:31:12.292
+    start 00007FFD9ED94990  ntdll+0x24990  ntdll!TpCallbackMayRunLong+0x1690 (nearest export)
+    rip   00007FFD9EEDA0B4  ntdll!NtWaitForWorkViaWorkerFactory+0x14 (nearest export)
+    rsp   0000005DB9F7F858  stack 0x5DB9F7F858-0x5DB9F80000 (1,960 bytes captured)
+     0 rip        00007FFD9EEDA0B4  ntdll+0x16A0B4                 ntdll!NtWaitForWorkViaWorkerFactory+0x14 (nearest export)
+     1 rsp+0x0    00007FFD9ED94D0E  ntdll+0x24D0E                  ntdll!TpCallbackMayRunLong+0x1A0E (nearest export)
+     2 rsp+0x360  00007FFD9CBDDDA7  kernel32+0x2DDA7               kernel32!BaseThreadInitThunk+0x17 (nearest export)
+     3 rsp+0x390  00007FFD9EE39C5C  ntdll+0xC9C5C                  ntdll!RtlUserThreadStart+0x2C (nearest export)
+
+=== thread 76500 (#3): suspend 0, priority 0 (class 0x20), cpu user 0 ms / kernel 0 ms, created 20:31:12.294
+    start 00007FFD9ED94990  ntdll+0x24990  ntdll!TpCallbackMayRunLong+0x1690 (nearest export)
+    rip   00007FFD9EEDA0B4  ntdll!NtWaitForWorkViaWorkerFactory+0x14 (nearest export)
+    rsp   0000005DB9FFFB48  stack 0x5DB9FFFB48-0x5DBA000000 (1,208 bytes captured)
+     0 rip        00007FFD9EEDA0B4  ntdll+0x16A0B4                 ntdll!NtWaitForWorkViaWorkerFactory+0x14 (nearest export)
+     1 rsp+0x0    00007FFD9ED94D0E  ntdll+0x24D0E                  ntdll!TpCallbackMayRunLong+0x1A0E (nearest export)
+     2 rsp+0x360  00007FFD9CBDDDA7  kernel32+0x2DDA7               kernel32!BaseThreadInitThunk+0x17 (nearest export)
+     3 rsp+0x390  00007FFD9EE39C5C  ntdll+0xC9C5C                  ntdll!RtlUserThreadStart+0x2C (nearest export)
+
+=== thread 24960 (#4): suspend 0, priority 0 (class 0x20), cpu user 0 ms / kernel 0 ms, created 20:31:12.305
+    start 00007FFD9ED94990  ntdll+0x24990  ntdll!TpCallbackMayRunLong+0x1690 (nearest export)
+    rip   00007FFD9EEDA0B4  ntdll!NtWaitForWorkViaWorkerFactory+0x14 (nearest export)
+    rsp   0000005DBA07F8D8  stack 0x5DBA07F8D8-0x5DBA080000 (1,832 bytes captured)
+     0 rip        00007FFD9EEDA0B4  ntdll+0x16A0B4                 ntdll!NtWaitForWorkViaWorkerFactory+0x14 (nearest export)
+     1 rsp+0x0    00007FFD9ED94D0E  ntdll+0x24D0E                  ntdll!TpCallbackMayRunLong+0x1A0E (nearest export)
+     2 rsp+0x360  00007FFD9CBDDDA7  kernel32+0x2DDA7               kernel32!BaseThreadInitThunk+0x17 (nearest export)
+     3 rsp+0x390  00007FFD9EE39C5C  ntdll+0xC9C5C                  ntdll!RtlUserThreadStart+0x2C (nearest export)
+
+=== thread 84896 (#5): suspend 0, priority 0 (class 0x20), cpu user 0 ms / kernel 0 ms, created 20:31:12.306
+    start 00007FFD9ED94990  ntdll+0x24990  ntdll!TpCallbackMayRunLong+0x1690 (nearest export)
+    rip   00007FFD9EEDA0B4  ntdll!NtWaitForWorkViaWorkerFactory+0x14 (nearest export)
+    rsp   0000005DBA0FF9F8  stack 0x5DBA0FF9F8-0x5DBA100000 (1,544 bytes captured)
+     0 rip        00007FFD9EEDA0B4  ntdll+0x16A0B4                 ntdll!NtWaitForWorkViaWorkerFactory+0x14 (nearest export)
+     1 rsp+0x0    00007FFD9ED94D0E  ntdll+0x24D0E                  ntdll!TpCallbackMayRunLong+0x1A0E (nearest export)
+     2 rsp+0x360  00007FFD9CBDDDA7  kernel32+0x2DDA7               kernel32!BaseThreadInitThunk+0x17 (nearest export)
+     3 rsp+0x390  00007FFD9EE39C5C  ntdll+0xC9C5C                  ntdll!RtlUserThreadStart+0x2C (nearest export)
+
+=== SUMMARY
+suspended threads (SuspendCount > 0): 0
+waiting threads (RIP in an ntdll/win32u wait; first frame outside ntdll/KernelBase/kernel32/win32u): 6
+  tid 96348: NtDelayExecution [Sleep]  <-  PING+0x39DF
+  tid 63356: NtWaitForWorkViaWorkerFactory [idle thread-pool worker]  <-  (no frame outside ntdll/KernelBase/kernel32/win32u)
+  tid 27600: NtWaitForWorkViaWorkerFactory [idle thread-pool worker]  <-  (no frame outside ntdll/KernelBase/kernel32/win32u)
+  tid 76500: NtWaitForWorkViaWorkerFactory [idle thread-pool worker]  <-  (no frame outside ntdll/KernelBase/kernel32/win32u)
+  tid 24960: NtWaitForWorkViaWorkerFactory [idle thread-pool worker]  <-  (no frame outside ntdll/KernelBase/kernel32/win32u)
+  tid 84896: NtWaitForWorkViaWorkerFactory [idle thread-pool worker]  <-  (no frame outside ntdll/KernelBase/kernel32/win32u)
+threads not in a wait (running, spinning, preempted, or an unrecognised wait): 0
+UI thread: not identified (no thread has user32/win32u, SDL or ReXApp frames)
+analysis: 0.1 s

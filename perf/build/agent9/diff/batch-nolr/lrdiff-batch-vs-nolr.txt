@@ -1,0 +1,83 @@
+A = build\agent9\generated\batch\default
+B = build\agent9\generated\batch-nolr\default
+functions: A 165,023, B 165,023; only in A 0, only in B 0
+lines with ctx.lr: A 7, B 848,153 (in 129,043 B functions)
+identical after dropping ctx.lr lines: 165,017; different: 6
+changed lines over 6 differing functions (0 over 6000 lines skipped): removed 14 (8 distinct), added 14 (8 distinct)
+top removed (A only), normalised:
+          7  
+          1  extern void RepairDialogueLockReleaseOperand(PPCRegister& r3);
+          1  extern bool MissingAdventureTimeLookupNode(PPCRegister& r11);
+          1  extern void NativeCelShadingViewGate(PPCRegister& r10);
+          1  extern void NativeCelShadingMaskGate(PPCRegister& r8);
+          1  extern void NativeCelShadingTrace(PPCRegister& r9, PPCRegister& r22, PPCRegister& r30, PPCRegister& r19);
+          1  extern void NativeCelShadingDefaultBinding(PPCRegister& r4, PPCRegister& r26, PPCRegister& r22, PPCRegister& r30);
+          1  extern void NativeCelShadingIndexedBinding(PPCRegister& r4, PPCRegister& r26, PPCRegister& r22, PPCRegister& r30);
+top added (B only), normalised:
+          7  
+          1  extern void NativeCelShadingViewGate(PPCRegister& r10);
+          1  extern void NativeCelShadingMaskGate(PPCRegister& r8);
+          1  extern void NativeCelShadingTrace(PPCRegister& r9, PPCRegister& r22, PPCRegister& r30, PPCRegister& r19);
+          1  extern void NativeCelShadingDefaultBinding(PPCRegister& r4, PPCRegister& r26, PPCRegister& r22, PPCRegister& r30);
+          1  extern void NativeCelShadingIndexedBinding(PPCRegister& r4, PPCRegister& r26, PPCRegister& r22, PPCRegister& r30);
+          1  extern bool MissingAdventureTimeLookupNode(PPCRegister& r11);
+          1  extern void RepairDialogueLockReleaseOperand(PPCRegister& r3);
+different (first 50): ['sub_82BBF828', 'sub_82E22890', 'sub_8352C9AC', 'sub_83527670', 'sub_82E28228', 'sub_82BBF8C8']
+--- diff sub_82BBF828 (A -> B, ctx.lr lines dropped)
+--- 
++++ 
+@@ -24 +24,11 @@
+ }
++
++extern void NativeCelShadingViewGate(PPCRegister& r10);
++
++extern void NativeCelShadingMaskGate(PPCRegister& r8);
++
++extern void NativeCelShadingTrace(PPCRegister& r9, PPCRegister& r22, PPCRegister& r30, PPCRegister& r19);
++
++extern void NativeCelShadingDefaultBinding(PPCRegister& r4, PPCRegister& r26, PPCRegister& r22, PPCRegister& r30);
++
++extern void NativeCelShadingIndexedBinding(PPCRegister& r4, PPCRegister& r26, PPCRegister& r22, PPCRegister& r30);
+--- diff sub_82E22890 (A -> B, ctx.lr lines dropped)
+--- 
++++ 
+@@ -73,3 +73 @@
+ }
+-
+-extern void RepairDialogueLockReleaseOperand(PPCRegister& r3);
+--- diff sub_8352C9AC (A -> B, ctx.lr lines dropped)
+--- 
++++ 
+@@ -24 +24,3 @@
+ }
++
++extern bool MissingAdventureTimeLookupNode(PPCRegister& r11);
+--- diff sub_83527670 (A -> B, ctx.lr lines dropped)
+--- 
++++ 
+@@ -62,3 +62 @@
+ }
+-
+-extern bool MissingAdventureTimeLookupNode(PPCRegister& r11);
+--- diff sub_82E28228 (A -> B, ctx.lr lines dropped)
+--- 
++++ 
+@@ -26 +26,3 @@
+ }
++
++extern void RepairDialogueLockReleaseOperand(PPCRegister& r3);
+--- diff sub_82BBF8C8 (A -> B, ctx.lr lines dropped)
+--- 
++++ 
+@@ -24,11 +24 @@
+ }
+-
+-extern void NativeCelShadingViewGate(PPCRegister& r10);
+-
+-extern void NativeCelShadingMaskGate(PPCRegister& r8);
+-
+-extern void NativeCelShadingTrace(PPCRegister& r9, PPCRegister& r22, PPCRegister& r30, PPCRegister& r19);
+-
+-extern void NativeCelShadingDefaultBinding(PPCRegister& r4, PPCRegister& r26, PPCRegister& r22, PPCRegister& r30);
+-
+-extern void NativeCelShadingIndexedBinding(PPCRegister& r4, PPCRegister& r26, PPCRegister& r22, PPCRegister& r30);

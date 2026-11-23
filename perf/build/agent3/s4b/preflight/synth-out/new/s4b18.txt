@@ -1,0 +1,17 @@
+# s4b_check s4b18 s4b18 (off, scenario I420)
+run.json: exit 0 (0x00000000) dumps 0 crash_events 0 wer False; close wm_close 1.00 s; elapsed 40.0 of 420 s; cvars {}; env {"LEGO_GPU_WAIT_BACKOFF_US": "250", "LEGO_GPU_WAIT_STATS": "1"}; steps None
+summary: verdict None; first frame None s; levels null; unknown cvars None; errors 0
+log files game.log; levels {"info": 4}
+families: c1_any=0 k=0 c1_verify_on=0 c1_verify_f=0 c1_other=0 recovered_stale=0 unhandled_phys=0 protect_failed=0 split_init=0 split=0 deferred_counters=0 gpu_wait=3 memexport=0 slow_frame=0 s4_upload_hash=0 precise_wait=0 miss_cache=0 stuck_lock=0 minidump=0 fatal=0 debug_layer=0 dred=0 d3d12_msg=0 clean_exit=1
+  gpu_wait: [2026-11-22 20:10:05.000] [info] [rex] [t4242] GPU wait back-off: ON (quantum 250 us, spin 20 us); stats ON; GetData hook built.
+  gpu_wait: [2026-11-22 20:10:10.001] [info] [rex] [t4242] GPU wait stats (5 s): L1 waits 1500 polls 30000 moved 1400 gpu_off 0 sleep>moved 0 sleep>done 0 | L2 tries 800 waits 50 polls 900 delayed 10 sleep>ready 0 | kicks 120 | pause 25000 yield 4000 sleep 40 sleep_sum 10.00 ms sleep_fail 0 | L1 sum 850.25 ms m
+  gpu_wait: [2026-11-22 20:10:15.002] [info] [rex] [t4242] GPU wait stats (5 s): L1 waits 1500 polls 30000 moved 1400 gpu_off 0 sleep>moved 0 sleep>done 0 | L2 tries 800 waits 50 polls 900 delayed 10 sleep>ready 0 | kicks 120 | pause 25000 yield 4000 sleep 40 sleep_sum 10.00 ms sleep_fail 0 | L1 sum 850.25 ms m
+gpu_wait_stats fields: lines 2 (20:10:10.001..20:10:15.002); last {"interval_s": 5, "l1_waits": 1500, "l1_polls": 30000, "l1_moved": 1400, "l1_gpu_off": 0, "l1_sleep_moved": 0, "l1_sleep_done": 0, "l2_tries": 800, "l2_waits": 50, "l2_polls": 900, "l2_delayed": 10, "l2_sleep_ready": 0, "kicks": 120, "pause": 25000, "yield": 4000, "sleep": 40, "sleep_sum_ms": 10, "sleep_fail": 0, "l1_sum_ms": 850.25, "l1_max_ms": 3.512, "h_lt50us": 900, "h_lt200us": 400, "h_lt1ms": 150, "h_lt4ms": 45, "h_ge4ms": 5, "l2_sum_ms": 12.5, "l2_max_ms": 0.875}; max {"interval_s": 5, "l1_waits": 1500, "l1_polls": 30000, "l1_moved": 1400, "l1_gpu_off": 0, "l1_sleep_moved": 0, "l1_sleep_done": 0, "l2_tries": 800, "l2_waits": 50, "l2_polls": 900, "l2_delayed": 10, "l2_sleep_ready": 0, "kicks": 120, "pause": 25000, "yield": 4000, "sleep": 40, "sleep_sum_ms": 10, "sleep_fail": 0, "l1_sum_ms": 850.25, "l1_max_ms": 3.512, "h_lt50us": 900, "h_lt200us": 400, "h_lt1ms": 150, "h_lt4ms": 45, "h_ge4ms": 5, "l2_sum_ms": 12.5, "l2_max_ms": 0.875}; per frame null; monotonic {"interval_s": true, "l1_waits": true, "l1_polls": true, "l1_moved": true, "l1_gpu_off": true, "l1_sleep_moved": true, "l1_sleep_done": true, "l2_tries": true, "l2_waits": true, "l2_polls": true, "l2_delayed": true, "l2_sleep_ready": true, "kicks": true, "pause": true, "yield": true, "sleep": true, "sleep_sum_ms": true, "sleep_fail": true, "l1_sum_ms": true, "l1_max_ms": true, "h_lt50us": true, "h_lt200us": true, "h_lt1ms": true, "h_lt4ms": true, "h_ge4ms": true, "l2_sum_ms": true, "l2_max_ms": true}
+threads: no threads-s4a.csv
+sys.csv slow state: no sys.csv
+PROOF ok   GPU wait stats lines 2, 2 parsed
+PROOF ok   one "GPU wait back-off: ON (quantum 250 us, ...); ...; GetData hook built." line (ON x1, back-off lines x1): 05.000] [info] [rex] [t4242] GPU wait back-off: ON (quantum 250 us, spin 20 us); stats ON; GetData hook built.
+PROOF ok   sleep_fail = 0 (max 0 over 2 stats lines)
+PROOF ok   no STUCK-LOCK (0)
+BASE items missed: none
+VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b18)

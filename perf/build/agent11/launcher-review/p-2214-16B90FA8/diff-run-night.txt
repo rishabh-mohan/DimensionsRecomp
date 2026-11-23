@@ -1,0 +1,20 @@
+﻿diff --git a/build/agent11/launcher-review/p-2147-B0902106/run-night.ps1 b/build/agent11/launcher-review/p-2214-16B90FA8/run-night.ps1
+index d29cd0b..5601ffc 100644
+--- a/build/agent11/launcher-review/p-2147-B0902106/run-night.ps1
++++ b/build/agent11/launcher-review/p-2214-16B90FA8/run-night.ps1
+@@ -798,7 +798,14 @@ function Stop-One($X) {
+     try {
+         if ([math]::Abs(($g.StartTime - $X.CreationDate).TotalMilliseconds) -ge 2) { return "$n (left alone: the pid now belongs to another process)" }
+         $g.Kill(); [void]$g.WaitForExit(5000); return $n
+-    } catch { return "$n (NOT killed: $($_.Exception.Message))" } finally { $g.Dispose() }
++    } catch {
++        # A process that is already ending (a conhost.exe whose program was just killed) refuses the kill with "Access is
++        # denied". If it is gone within 3 s, say so instead of "NOT killed".
++        $killErr = $_.Exception.Message; $endedNow = $false
++        try { $endedNow = $g.WaitForExit(3000) } catch { }
++        if ($endedNow) { return "$n (ended on its own)" }
++        return "$n (NOT killed: $killErr)"
++    } finally { $g.Dispose() }
+ }
+ # Stops the runner and everything it started (run-timing, the game, the drivers) and logs each process: first the runner
+ # (by its handle, so it starts nothing new), then its descendants, parents first; up to 3 walks catch late starts. If the

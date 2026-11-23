@@ -1,0 +1,21 @@
+--- build/agent2/rb-chain.ps1.pre-GuardOnly
++++ build/agent2/rb-chain.ps1
+@@ -13,8 +13,9 @@
+ #    rb-chain-<v>-prep.log.
+ # 3. run-<v>.ps1 -Jobs N [-NoBuild]: the pins again, configure, gen-check, gate, build, stage with its -CompareBin
+ #    (rb1/rb2: devoff3-bin; nb: native3d-bin at S3d, native3-bin at S3). Console copy: rb-chain-<v>-run.log.
++# -GuardOnly (for rb-tools-test.ps1): step 0 only, then exit 0; nothing is written or run.
+ # Log: build/agent2/rb-chain-<v>.txt.
+-param([string]$Variant = '', [int]$Jobs = 10, [switch]$Resync, [switch]$SkipCopy, [switch]$NoBuild)
++param([string]$Variant = '', [int]$Jobs = 10, [switch]$Resync, [switch]$SkipCopy, [switch]$NoBuild, [switch]$GuardOnly)
+ $ErrorActionPreference = 'Continue'
+ $R = '<workspace>'
+ $A = "$R\build\agent2"
+@@ -37,6 +38,7 @@
+ $pat = 'rb-chain\.ps1|\bb-chain\.ps1|run-b\.ps1|prep-b\.py|run-s2\.ps1|run-s3\.ps1|run-s3d\.ps1|run-rb\d\.ps1|prep-rb\d\.py|run-nb\.ps1|prep-nb\.py|build-snap\.ps1|stage-snap-bin\.ps1|snap-patch\.py\s+apply'
+ $drv = @($procs | Where-Object { -not $mine.ContainsKey([int]$_.ProcessId) -and $_.CommandLine -match $pat })
+ if ($drv.Count) { Write-Host "STOP: another snapshot driver is running (pid $($drv[0].ProcessId): $($drv[0].CommandLine))"; exit 4 }
++if ($GuardOnly) { Write-Host "GUARD OK: -Variant $v -Jobs $Jobs, no other snapshot driver ($($mine.Count) own/ancestor processes skipped); nothing run"; exit 0 }
+ $log = "$A\rb-chain-$v.txt"
+ function Log([string]$m) { $l = "$(Get-Date -Format HH:mm:ss) [rb-chain $v] $m"; $l | Out-File -Append -Encoding utf8 $log; Write-Host $l }
+ function Tail([string]$p, [int]$n) { (@(Get-Content -LiteralPath $p -ErrorAction SilentlyContinue) | Select-Object -Last $n) -join ' | ' }

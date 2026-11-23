@@ -1,0 +1,16 @@
+﻿[status pre] 18:57:28 BatteryStatus=2 (2=AC) LoadPercentage=71
+[cmd] bench_cs.exe paired 300 20000 old,off:5000,timecas:5000,old#aa
+[power] ACLineStatus=1 (1=AC, 0=battery) BatteryFlag=0x01 battery=100%
+uncontended Enter+Leave pair, paired: 300 rounds x 20000 pairs per variant per core
+  core=P  old          median  30.49  p10  24.29  p90  42.91 ns/pair   paired diff vs old: +0.00 ns
+  core=P  off:5000     median  30.77  p10  24.74  p90  42.44 ns/pair   paired diff vs old: +0.29 ns
+  core=P  timecas:5000 median  31.06  p10  25.58  p90  44.70 ns/pair   paired diff vs old: +1.28 ns
+  core=P  old#aa       median  29.59  p10  24.45  p90  42.77 ns/pair   paired diff vs old: -0.03 ns
+  core=E  old          median  34.06  p10  30.06  p90  40.58 ns/pair   paired diff vs old: +0.00 ns
+  core=E  off:5000     median  36.05  p10  32.12  p90  42.28 ns/pair   paired diff vs old: +1.90 ns
+  core=E  timecas:5000 median  32.69  p10  29.19  p90  38.25 ns/pair   paired diff vs old: -1.56 ns
+  core=E  old#aa       median  33.39  p10  29.01  p90  40.28 ns/pair   paired diff vs old: -0.24 ns
+[cpu] process CPU time 1.62 s
+[exit] 0
+[wall] 3.6 s
+[status post] 18:57:33 BatteryStatus=2 (2=AC) LoadPercentage=71

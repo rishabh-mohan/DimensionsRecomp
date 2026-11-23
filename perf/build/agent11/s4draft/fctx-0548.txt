@@ -1,0 +1,164 @@
+F1 [99]: # Perf sprint: findings and changes (as of 12:50, session 3 resumed after a Windows Update restart)
+F2 [0]: 
+F3 [56]: ## Next: timing window 4 (still ready after the restart)
+F4 [0]: 
+F5 [14]: > [!IMPORTANT]
+F6 [765]: > **Windows Update restarted the PC at 08:29 and 08:34, before window 4 could run. Nothing was lost.** Both repos pass git's integrity check and still match your forks, every staged build and window-4 file matches its recorded hash, and no notes were cut off. Nothing was building or running at the t ... ce kept the CPU busy (90-99% at 12:15 with no game running).
+F7 [0]: 
+F8 [27]: **Before you double-click**
+F9 [76]: 1. Set the screensaver to (None). The restart turned it back on (2 minutes).
+F10 [31]: 2. Keep the charger plugged in.
+F11 [727]: 3. Close other programs and keep the PC unlocked: ChatGPT (~1.8 GB), Copilot, Roblox, Wallpaper Engine and Task Manager are open now (Roblox, Wallpaper Engine and ChatGPT weren't running overnight). **Memory matters:** the runner skips any run that would start with less than 6 GB of available memory ... l you when the machine has settled. Then close Task Manager.
+F12 [173]: 4. Leave the power mode as it is. The mode Windows applies is still "best power efficiency", the same as in every overnight run. Don't change it before or during the window.
+F13 [204]: 5. Leave NVIDIA's PresentMon helper running. It belongs to the NVIDIA app's FrameView service, runs in the background and uses about one CPU core. It ran during window 3 too, so the comparison stays fair.
+F14 [316]: 6. **If you start before 14:00, pause Windows Update first** (Settings → Windows Update → Pause updates). This PC's active hours are 14:00-08:00, and outside them Windows may restart on its own to finish an update. That's what happened at 08:29. Nothing is pending now, but a restart during the window would lose it.
+F15 [0]: 
+F16 [738]: **When it's done**, the window shows `Window 4b matrix finished (exit code N). Results: build\agent8\matrix\ (newest folder), summary.md`, then `Press any key to continue . . .`. Press a key and tell me. The results land in `summary.md` and `results.csv` in the newest folder under `build\agent8\matr ... rf-notes/agent8-window3.md#L733) ("W4b read-out procedure").
+F17 [0]: 
+F18 [321]: **What it measures:** 17 runs, all uncapped on the title screen. First 1 unscored cold run, then 4 rounds in a Latin square (each arm once per round, in rotating order). Every measurement starts at least 60 s after the first frame, well after the scene switches to its heavy phase (30-35 s in, in all but one run so far).
+F19 [0]: 
+F20 [26]: | Arm | Build | Question |
+F21 [13]: |---|---|---|
+F22 [42]: | d0 | devoff2 (batch 2) | The reference |
+F23 [278]: | B | devoffB (codegen options) | Does B's leaner game code (10.5% less machine code) give a measurable CPU or frame-rate gain? Tonight's profile suggests at most a small CPU saving: on the title screen the game mostly waits for the GPU command thread, which B doesn't change. |
+F24 [85]: | d3 | devoff3 (S3) | Does S3 (new defaults and fixes) measure the same as batch 2? |
+F25 [291]: | d11t | devoff2 + timer settings | Does stopping the timer thread's busy-wait (finding 6) free CPU or raise the frame rate in the foreground? It needs no rebuild. It turns on Agent 11's whole timer bundle (window 3's settings plus the blocking wait), so it measures the bundle as a whole. |
+F26 [0]: 
+F27 [675]: **One thing changed under window 4.** The update also installed updated packages for Intel's power-management drivers (the Dynamic Tuning Technology extension 9.1.10501.3322 and the platform framework providers 3.4.1009.0) and a Windows preview update (build 26300.10075). The base Intel drivers didn ... ower limits, which the slow state may depend on (finding 7).
+F28 [0]: 
+F29 [588]: **After window 4: the draft S4 plan.** Agent 11 collected tonight's proposals into [S4-DRAFT.md](<workspace>/perf-notes/S4-DRAFT.md). It's a draft: nothing in it is decided or built. It proposes a fast first build (~6-10 min) with the low-risk ... 0, 45 min or less each), and it repeats the questions below.
+F30 [0]: 
+F31 [89]: **Options for later windows** (each fits in 45 min; none of them is needed for window 4):
+F32 [0]: 
+F33 [37]: | Option | Length | What it answers |
+F34 [13]: |---|---|---|
+F35 [345]: | Upload matrix (Agent 5, on native3) | ~41 min, or ~28 min slimmed | Whether the old upload paths cause a bigger hitch in the first minute after launch. The 60 s scored windows will most likely tie. The staging-pool arm barely engages on the title screen, so a slimmer two-arm version is ready: ~28 min with 5 runs per arm, or ~23 min with 4. |
+F36 [415]: | Native multi-threaded draw modes (Agent 4) | ~30 min | Whether the native GPU path's threaded draw modes are faster: the default mode and three threaded modes on native3d, 3 runs each, with system CPU logged. Scored on the slowest frames as well as mean fps, because these modes raise fps but add s ...  (one per mode, CPU saturated) give no verdict (see 07:40) |
+F37 [568]: | native3d vs nativeB | to be planned | Whether B's codegen helps the native GPU path, which is limited by its main game thread. nativeB passed its static check (04:47) and its game check against native3d in both orders (05:24, 06:15). One difference is recorded: on its own, nativeB leaves the front ... nd game work sooner. Finding the root cause is an S4 item. |
+F38 [482]: | Attract-scene benchmark (Agent 3) | ~55-60 min (3 builds × 4 runs), or ~42-45 min with 3 runs each | A heavy 3D scene (up to 12.6k draws per frame) that needs no Toy Pad figures. The plan is ready (scored window, exclusion flags, runner settings). It needs a quiet machine: tonight's three trial ru ... called off because Defender never dropped below 1.8 cores. |
+F39 [0]: 
+F40 [33]: ## Overnight progress (session 3)
+F41 [0]: 
+F42 [15]: | Time | What |
+F43 [9]: |---|---|
+F44 [187]: | 01:56 | Resumed after the agy-grid relaunch. The state matches the restart prompt: game `a0bdaa7`, SDK `90e7ccd`, both pushed to your forks. No builds or games running, 259.7 GB free. |
+F45 [251]: | 01:57 | You went to sleep. The agents work on their own until ~10:00 and won't ask you anything. The checkpoint was already committed at 01:50, so the commit question is moot. The `thirdparty/simde` edit stays out of every commit until you decide. |
+F46 [73]: | ~02:00 | Tasks re-issued to Agents 2-12. All 11 had resumed by 02:15. |
+F119 [572]: | 08:00 | **The re-upload fix C1 is staged on scratch** (Agent 12), off by default, on top of the logging switch, P2 and fix (i). Each patch applies cleanly in order, a four-step apply reproduces every staged file byte for byte, and the changed files pass a compile syntax check with no new warnings. ... 10's ratings and Agent 11's final S4 draft, both by 09:30. |
+F120 [486]: | 08:10 | **Agent 10 rated the staged C1:** SAFE with its switch off, and safe to test turned on under its four conditions. Before C1 is ever turned on, it needs one addition: a counter plus a log line that prove it actually engaged. Agent 12 offered to add it now. It waits until after window 4 inst ...  quiet would be worse than the checked version staged now. |
+F121 [492]: | 08:20 | **Agent 12 wrote Agent 10's C1 rating and the follow-up plan into its notes** (notes only; the staged C1 is unchanged, and all 18 files still match their recorded hashes). It also answered a question from Agent 10's rating pass: no existing log can show that P2's export fallback never runs ... ld with P2; C1's revision follows it, before any C1 build. |
+F122 [765]: | 08:29-12:25 | **Windows Update restarted the PC twice** (08:29 and 08:34), which ended every agent's session before window 4. Nothing was building or running. After the restart I checked everything: both repos pass git's integrity check and still match your forks, every staged build and window-4 f ... er windows (see "One thing changed under window 4" above). |
+F123 [476]: | 12:40 | **Agent 10 finished its S4 rating pass.** The render-thread busy-wait fix (with Agent 6's back-off for the GPU-query poll) is SAFE to land switched off once it compiles and passes a build check, and safe to test turned on after its functional checks and the sweep. By construction it doesn' ...  after four warm-boot test runs. Nothing was rated unsafe. |
+F124 [589]: | 12:45 | **The runner is ready after the restart** (Agent 8). Everything window 4 needs at start is in place: the cached helper programs, the staged builds and the game files, with nothing to compile at launch. The runner's plan-only mode lays out the same 17 runs (~39 min) and creates nothing, so  ... window 4 before 14:00, pause updates first (step 6 above). |
+F125 [0]: 
+F126 [53]: ### Questions for you (window 4 doesn't wait on them)
+F132 [0]: 
+F133 [21]: ## Where things stand
+F134 [0]: 
+F135 [5]: | | |
+F136 [9]: |---|---|
+F137 [102]: | **Starting point** | v0.2.0 (`perf/opt` @ `127e04b`, SDK `2897c31`), built as `build/baseline-bin` |
+F138 [107]: | **Batch 1 (S1, taken at 20:15)** | `devoff1-bin` (standard GPU path) and `native-bin` (native GPU path) |
+F139 [126]: | **Batch 2 (S2, taken at 23:15)** | `devoff2-bin` and `native2-bin`, both built and checked (49/0 and 72/0 manifest checks) |
+F140 [818]: | **Source tree** | S3 plus Agent 4's warning fix, all committed and pushed on `perf/opt` to your forks (rishabh-mohan/rexglue-sdk and rishabh-mohan/DimensionsRecomp). There are three commits:<br>- **01:50, checkpoint:** S2 + Agent 11's exit fix (#27) + Agent 9's codegen sources with every option of ... and the exact S1/S2 trees in `build/agent2/` are kept too. |
+F141 [168]: | **Measured in game** | Two timing matrices. Window 3 (uncapped): batch 2 = baseline within noise; the native GPU path uses 30% less CPU but renders 12% fewer frames |
+F142 [159]: | **Native builds** | They crash at startup in our build setup (FidelityFX is off). With a workaround flag they boot and close cleanly. Fix (a) goes into S3. |
+F143 [986]: | **Next** | B is built (02:40) and passed its static check and its game check (03:25). The S3 builds (devoff3, native3) are built (02:46) and pass their start-up checks, and the new pause default passes on devoff3. `native3d` (Agent 4's warning fix) is built (03:46), passed its check on the hidden  ... 8:29-08:34; nothing was lost, and window 4 is still ready. |
+F144 [0]: 
+F145 [14]: > [!IMPORTANT]
+F146 [286]: > Most speedups below come from isolated microbenchmarks. In game, on the uncapped title screen, batch 2 measures the same as baseline (within ±1.7%). Window 4 tests the two best candidates for a measurable CPU gain: the codegen-option build (B) and the timer setting (d11t, finding 6).
+F147 [0]: 
+F148 [51]: ## Leads for the next round (S4, forming overnight)
+F149 [0]: 
+F150 [452]: Nothing here is built or turned on. These are analyses and proposals for after window 4. **Agent 11 collected them into one draft S4 plan** (07:44): [S4-DRAFT.md](<workspace>/perf-notes/S4-DRAFT.md), with every item's switch, rating, build cos ... s for you. It stays a draft until we go through it together.
+F151 [0]: 
+F152 [54]: | Lead | GPU path | Owner | Expected effect | Status |
+F153 [21]: |---|---|---|---|---|
+F154 [1043]: | Two missing native shaders (finding 9) | native | Agents 4 and 7 | ≈2-2.5 ms/frame of render-thread CPU, the skipped draws restored; maybe +15-25% fps (estimate) | The capture run (05:09) found a second missing pair, whose warning a log cap had hidden, so the fix adds 4 shaders. **Proposal done (0 ... o re-run one shader-preparation step (the runtime prelink) |
+F155 [4070]: | Memory re-uploads and re-arms on the GPU command thread | standard | Agents 5 and 12 | Every frame the game locks its vertex-buffer memory, and each lock re-applies the same memory protection. The emulator treats that as "this whole buffer may have changed", so the next draw uploads all of it agai ... one hold is needed only if the counter shows the path runs |
+F156 [747]: | Gaps in the write tracking (finding 11) | standard | Agents 12 and 10 | Correctness, not speed: after the game changes a page's memory protection, the GPU could draw from stale data. No frame-rate gain expected | Confirmed by code review (06:40). Nothing visible has been traced to it tonight. Two  ...  in this game, which only ever sets read-write protections |
+F157 [636]: | Split the end-of-frame submit (`RefreshGuestOutput`, Agent 7's R1) | standard | Agent 7 | The swap replays and submits the whole frame's commands in one go: ~1.3 ms/frame on the thread that limits the frame rate. Splitting it (stage 1), then handing it to a worker (stage 2), could save ~0.7-1.0 ms ... second: filtering redundant commands, at most 0.2 ms/frame |
+F158 [1652]: | Two busy-waiting threads: the render thread and the timer thread | standard | Agents 9 and 11 | The game's render thread spins on a fence that only the GPU command thread writes: 0.88 of a core (13 ms/frame in tonight's profile). The timer thread spins another 0.86 of a core to keep its 1 ms tick  ... ecks and the sweep; its output is the same by construction |
+F159 [240]: | Precise timer wait (finding 6) | both | Agent 11 | Most of the timer thread's 30-60% of a core | Staged, off. Agent 10 rated it SAFE to land off by default (05:24); turning it on needs a timing A/B. Window 4 tests the no-rebuild version |
+F160 [564]: | Power-throttling opt-out (finding 7) | both | Agent 11 | Might stop the slow state in agent runs | **Dropped (06:27).** In tonight's test (6 runs) the opt-out was confirmed on, and the slow state came anyway: 3 of 3 runs with it, 3 of 3 without. Agent 11 proposes logging the CPU's package power in ... t added after window 4, so window 4's files stay unchanged |
+F161 [365]: | Codegen: keep more guest registers as locals | both | Agent 9 | Fewer save/restore helper calls. The ~2 ms/frame of evidence turned out to be render-thread spin time (see the busy-wait row), so it's worth ~0 on the standard path. It may still help the native path's main game thread | Moved down th ... t (06:00). A future codegen stage, not part of the B build |
+F162 [472]: | The main game thread's scene walk | native | Agents 7 and 9 | Up to 2.35 ms/frame on the main game thread | Agent 9 (06:00): it's the UI/HUD render. Only the game's UI state decides how much work it does, it reads no timer, fence or query, and it can't reach any native-specific code. Most likely t ... onfirm that; it needs a build and a review, so it's for S4 |
+F163 [768]: | Threaded native recording (`LEGO_NATIVE_THREADED`) | native | Agents 4 and 7 | Moves ~6.3 ms/frame of recording off the render thread to worker threads | In tonight's functional native3d check, fps rose 101 → 110-117 (+8.5-15.5%), but the slowest frames got worse: frames over 33 ms went from 8 to  ... er minute) next to mean fps, with at least 3 runs per mode |
+F164 [340]: | Pre-filled shader cache for benchmarks (finding 8) | measurement | Agents 3, 6 and 8 | Removes first-view freezes from benchmark runs | Tested at 05:42 (Agent 3): first-use pipeline builds fell from 264 to 56, with none in the proposed benchmark window. The remaining slow frames are mostly waits on the GPU, plus the busy CPU (Agent 6) |
+F165 [262]: | One shader translator per thread | standard | Agent 6 | Shorter freezes on a first launch | **Dropped (06:23).** Tonight's diagnostic run showed translation is only ~1-2.5% of a freeze (31 ms against 2.2 s of pipeline creation); pipeline creation is the rest |
+F166 [401]: | Warm-boot pipeline fix (`pipeline_cache.cpp:564`, one line) | standard | Agent 6 | From the second launch, every cached pipeline is built before the game resumes (today up to ~9 can still be building) | **12:40: Agent 10 rated it output-identical** (only timing changes) **and SAFE, so it can ship  ... has never run here, so four warm-boot test runs come first |
+F167 [199]: | Don't wait for pipelines (opt-in) | standard | Agent 6 | Trades shader-compile freezes for a few frames of missing objects | Not output-identical, so off by default; you'd judge the pop-in by eye |
+F168 [402]: | Native pipeline builds on a first launch | native | Agent 6 | A scene's first visit can freeze for seconds while the driver compiles pipelines: 4.3 s for one 56-pipeline frame tonight, 0.6 s with a warm driver cache | Confirmed (06:23): with a warm driver cache, the same route built 187 pipelines  ... he cached pipelines at boot, for S4, tested after window 4 |
+F169 [884]: | A game lock held for 5+ s (watchdog "STUCK-LOCK") | both | Agent 6 | Freezes of several seconds in heavy scenes. It hit 3 runs tonight (6 reports), on both GPU paths, all between 05:03 and 05:32, the busiest stretch of the night; all recovered and closed normally | **Not a deadlock** (finding 10). ... s a second off-by-default back-off for that poll (Agent 6) |
+F170 [0]: 
+F171 [3]: ---
+F172 [0]: 
+F173 [11]: ## Findings
+F174 [0]: 
+F175 [21]: ### 1. In-game timing
+F303 [0]: 
+F304 [25]: ## What changed, by batch
+F305 [0]: 
+F306 [47]: ### Batch 1 (S1): in devoff1-bin and native-bin
+F307 [42]: - **SDK kernel and threading (Agent 11):**
+F308 [125]:   - Always on: the handle-table lock-order fix, ordered handle stash, and a per-thread precise-sleep timer that is now freed.
+F309 [210]:   - Behind OFF cvars: the timer-resolution and throttling opt-out, `clock_lockfree`, `cs_spin`, `spinlock_pause_spin`, `tls_bounds_fix`, `guest_suspend_guard`, `precise_guest_sleep` and `wait_timeout_round_up`.
+F310 [37]: - **SDK I/O and logging (Agent 12):**
+F311 [121]:   - Always on, output-identical: the XFile read split, the watch-bit atomics plus a fence, and the log-level floor check.
+F312 [55]:   - Behind OFF cvars: the I/O and log-gate cvars above.
+F313 [103]: - **Guest helper headers (Agent 10):** the vector-helper rewrite, which is always on and bit-identical.
+F314 [165]: - **App (Agent 8):** the Discord and cheat-engine wakeup changes, a cheat results cache, a list clipper, and a few small guards. All are always on and reviewed SAFE.
+F315 [22]: - **Native GPU only:**
+F316 [32]:   - Agent 4: draw-path overhead.
+F317 [30]:   - Agent 5: upload items 1-3.
+F318 [45]:   - Agent 6: pipeline-cache work, mostly OFF.
+F319 [34]:   - Agent 7: present-path changes.
+F320 [80]: - **Post-S1 patches:** p1 is Agent 7's perf.csv rows; p2 is the Windows SDK fix.
+F321 [0]: 
+F322 [48]: ### Batch 2 (S2): in devoff2-bin and native2-bin
+F323 [28]: | Change (owner) | Default |
+F324 [9]: |---|---|
+F325 [125]: | perf.csv rows, a cheaper FPS overlay redraw, and an inlined draw-preparation lookup (Agent 7, #20) | ON, output-identical |
+F326 [84]: | Async PSO creation (Agent 6, applied by Agent 4) | OFF (`LEGO_NATIVE_PSO_ASYNC`) |
+F327 [85]: | Legacy-upload toggle, texture staging pool and upload-pool budget (Agent 5) | OFF |
+F328 [77]: | Audio shutdown fix (Agent 12, #22) | OFF (`audio_shutdown_detach_worker`) |
+F329 [73]: | Plume patch added to `prepare_plume.py` (Agent 6, #26) | Tooling only |
+F330 [0]: 
+F331 [67]: ### Batch 3 (S3): built at 02:46 as `devoff3-bin` and `native3-bin`
+F332 [395]: - Separately, on top of S3: Agent 4's fix for the native warning spam (rated SAFE, 5 added lines in `draw.cpp`), built at 03:46 as `native3d-bin` (exe `B90DF683…`; the runtime DLL is the same as native3's). Native builds only: standard-GPU builds don't compile that file. It passed its check at 05:00 ... ve draw modes) and was committed as game `08933a7` at 05:02.
+F333 [75]: - Agent 11's exit fix (#27), already in the live tree and the 01:50 commit.
+F334 [64]: - The native start-up fix (a) plus fix-a-commit (see finding 3).
+F335 [187]: - `pause_safe_order` turned on, which fixes the pause deadlock. **Agent 10 rated it SAFE as the default.** Agent 11's test of the new default passed on devoff3 at 03:01 (50 of 50 pauses).
+F336 [169]: - The audio shutdown fix turned on (accepted: the replica passed, and the remaining risk follows the policy the SDK already uses for leftover guest threads at shutdown).
+F337 [70]: - Agent 9's codegen sources, with every option off (output identical).
+F338 [0]: 
+F339 [58]: ### The codegen-option build (B): first after the relaunch
+F340 [186]: - **Agent 9's codegen options:** register localization and related options, the biggest expected CPU gain. Agent 10's final review rated them SAFE, both off and on, **except `skip_lr`**.
+F341 [241]:   - `skip_lr` stops the generated code from writing the guest's link register. Some of the game's own host code reads that register to tell who called it, so with `skip_lr` a GPU copy drain could be skipped and export lookups could return 0.
+F342 [161]:   - **Dropped.** The code was regenerated without it (00:02), and Agent 10 confirmed that only the link-register lines changed, in all 165,023 functions (00:12).
+F343 [279]:   - Effect on the generated code: 481 vs 490 MB of source, 13% fewer register-context accesses, 91,606 rotate-and-mask sites lowered to 32-bit, 63,167 tail calls. Every option was checked against the original instructions with 150-400 million test evaluations, with 0 mismatches.
+F344 [62]:   - With every option off, the output is identical to today's.
+F345 [226]:   - B is built on S2, so it compares cleanly with devoff2. It then gets a game test along a route that exercises the host code that reads the link register (Agent 10's gate), and becomes the main comparison in timing window 4.
+F346 [371]:   - **Built at 02:40** as `devoffB-bin` (exe `C3F8686E…`). Its runtime DLL is identical to devoff2's. Agent 9's static check passed: the same 164,786 game functions and the same 27 hooked functions as devoff2, with 10.5% less machine code (159.3 → 142.6 MB). Without Toy Pad figures, tonight's game c ...  only start-up, the title screen and the menus (question 1).
+F347 [351]:   - **Game check passed (03:25).** On Agent 3's route on the hidden desktop (start-up, title screen, front-end menu, then the no-input attract sequence), B and devoff2 behave the same: clean exits, no new log lines, and the same scene sequence. The one difference in the first pair, B leaving the menu on its own, happens on devoff2 too (1 of 3 runs).
+F348 [2387]:   - **Open item (06:15):** B may leave the front-end menu for the attract sequence earlier than the builds without it. nativeB did so ~12 s before native3d in both orders (105.7 and 108.9 s after the first frame, against 118.9 and 120.5 s), and devoffB left in 2 of 2 runs against devoff2's 1 of 3. I ... ute for that S4 pair is ready; nothing runs before window 4.
+F349 [139]: - Items still to be profiled first: the `PPCContext` memset in guest→host calls, the `GetFunction` recursive mutex, and overlapped handles.
+F350 [0]: 
+F351 [3]: ---
+F352 [0]: 
+F353 [34]: ## Safety rules applied throughout
+F354 [264]: - **Agent 10 reviewed every change.** The only one rated UNSAFE, Agent 9's `skip_lr` codegen option, was dropped before any build used it. Only changes proven output-identical are on by default; everything else sits behind a cvar or env var that is off by default.
+F355 [122]: - Every build is cut from a hash-verified snapshot with a manifest check. The baseline and the SDK install stay untouched.
+F356 [115]: - Timing only comes from runs you start yourself in quiet windows; agent runs overnight are functional checks only.
+F357 [0]: 
+F358 [10]: ## Sources
+F359 [121]: - Session log: [SESSION2.md](<workspace>/perf-notes/SESSION2.md)
+F360 [165]: - Restart prompt and state at the pause: [RESTART-PROMPT-S3.md](<workspace>/perf-notes/RESTART-PROMPT-S3.md)
+F361 [139]: - Window 4 launcher: [RUN-WINDOW4B.cmd](<workspace>/bench/agent8/RUN-WINDOW4B.cmd)
+F362 [131]: - Window 3: [20261122-0013](<workspace>/build/agent8/matrix/20261122-0013)
+F363 [147]: - Checkpoint export: [checkpoint-1122-0127](<workspace>/build/agent1/checkpoint-1122-0127)
+F364 [139]: - Matrix 1: [summary.md](<workspace>/build/agent8/matrix/20261121-2232/summary.md)
+F365 [484]: - Safety reviews: [batch 1](<workspace>/perf-notes/agent10-batch1-review.md), [native](<workspace>/perf-notes/agent10-native-review.md), [batch 2](file:///C:/Users/<user>/.vscode/projects ... lego-dimensions-recomp/perf-notes/agent10-codegen-review.md)
+F366 [272]: - Native crash: [agent7-s3-proposal.md](<workspace>/perf-notes/agent7-s3-proposal.md), [agent6-crash-triage.md](<workspace>/perf-notes/agent6-crash-triage.md)
+F367 [756]: - Per-area reports: [agent11-kernel.md](<workspace>/perf-notes/agent11-kernel.md), [agent12-io-memory.md](<workspace>/perf-notes/agent12-io-memory.md), [agent5-uploads.md](file:///C:/Use ... mes/lego-dimensions-recomp/perf-notes/agent3-run-harness.md)
+F368 [0]: 

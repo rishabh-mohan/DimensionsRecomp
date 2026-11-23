@@ -1,0 +1,24 @@
+A build\agent2\devoff2-bin\legodimensions.map: 353,029 publics, 164,786 sub_, 165,023 guest __imp__ aliases in TU objects; hooked 99 (public in a host object) / 99 (__imp__ not at its public), criteria agree; unpaired: none
+B build\agent2\devoffB-bin\legodimensions.map: 352,896 publics, 164,786 sub_, 165,023 guest __imp__ aliases in TU objects; hooked 99 (public in a host object) / 99 (__imp__ not at its public), criteria agree; unpaired: none
+
+hooked set: 99 common, only in A none, only in B none, object differs none -> SAME
+  hooks per host object (A): crash_guards.cpp.obj 2, main_menu_extras.cpp.obj 3, name_trace.cpp.obj 5, native_atomics.cpp.obj 3, native_constants.cpp.obj 1, native_lock_elide.cpp.obj 7, native_markers.cpp.obj 2, native_memops.cpp.obj 2, native_saverest.cpp.obj 72, scene_distance.cpp.obj 2
+
+LR-gated hooks (name: purpose -> A object / B object):
+  sub_83FC49E8: placement relocation line + pool-copy drain (caller 83F9B660) -> NOT HOOKED / NOT HOOKED  FAIL
+  sub_82BD2868: CPU pool copy (lr 82BD2B44 caller test) -> NOT HOOKED / NOT HOOKED  FAIL
+  sub_839C4D08: pause-menu Options rows (lr 839D11B0) -> NOT HOOKED / NOT HOOKED  FAIL
+  sub_836F9E48: slot heap Register -> NOT HOOKED / NOT HOOKED  FAIL
+  sub_82A3B6D8: slot heap (native_slot_growth) -> NOT HOOKED / NOT HOOKED  FAIL
+  sub_82A57FE0: slot heap (native_slot_growth) -> NOT HOOKED / NOT HOOKED  FAIL
+
+Mid-asm hook functions (name -> A / B, symbol @ object):
+  MissingAdventureTimeLookupNode: SAME  A [('?MissingAdventureTimeLookupNode@@YA_NAEATRegister@ppc@rex@@@Z', 'crash_guards.cpp.obj')]
+  NativeCelShadingDefaultBinding: SAME  A [('?NativeCelShadingDefaultBinding@@YAXAEATRegister@ppc@rex@@000@Z', 'native_effects.cpp.obj')]
+  NativeCelShadingIndexedBinding: SAME  A [('?NativeCelShadingIndexedBinding@@YAXAEATRegister@ppc@rex@@000@Z', 'native_effects.cpp.obj')]
+  NativeCelShadingMaskGate: SAME  A [('?NativeCelShadingMaskGate@@YAXAEATRegister@ppc@rex@@@Z', 'native_effects.cpp.obj')]
+  NativeCelShadingTrace: SAME  A [('?NativeCelShadingTrace@@YAXAEATRegister@ppc@rex@@000@Z', 'native_effects.cpp.obj')]
+  NativeCelShadingViewGate: SAME  A [('?NativeCelShadingViewGate@@YAXAEATRegister@ppc@rex@@@Z', 'native_effects.cpp.obj')]
+  RepairDialogueLockReleaseOperand: SAME  A [('?RepairDialogueLockReleaseOperand@@YAXAEATRegister@ppc@rex@@@Z', 'crash_guards.cpp.obj')]
+
+RESULT DIFFERENT

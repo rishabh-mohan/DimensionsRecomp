@@ -1,0 +1,16 @@
+{
+  "reference": "base",
+  "warmup_s": 60,
+  "measure_s": 120,
+  "repeats": 3,
+  "settle_s": 20,
+  "cooldown_s": 10,
+  "boot_timeout_s": 240,
+  "menu_s": 60,
+  "quick": { "warmup_s": 10, "measure_s": 20, "settle_s": 5, "menu_s": 20, "cooldown_s": 5 },
+  "arms": [
+    { "id": "base", "bin": "build/baseline-bin", "cvars": [], "env": {}, "note": "reference: baseline bin as staged" },
+    { "id": "base-vsync0", "bin": "build/baseline-bin", "cvars": ["vsync=false"], "env": {},
+      "note": "same bin plus one harmless cvar (vsync already defaults to false)" }
+  ]
+}

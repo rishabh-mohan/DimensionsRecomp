@@ -1,0 +1,37 @@
+{
+  "title": "Window 8a on native4 (Agent 8, run-2 task #7 follow-up, W8a's fallback): #2 shader miss cache on native4 (S4a native). n4 (miss cache OFF) vs n4mc (LEGO_NATIVE_SHADER_MISS_CACHE=1), native frames, 6 round-robin rounds",
+  "reference": "n4",
+  "warmup_s": 55,
+  "warmup_from": "firstframe",
+  "measure_s": 50,
+  "repeats": 6,
+  "order": "roundrobin",
+  "settle_s": 5,
+  "cooldown_s": 5,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "cold_run": true,
+  "sys_csv": true,
+  "min_window_after_ff_s": 60,
+  "cold_warmup_s": 55,
+  "cold_measure_s": 30,
+  "quick": { "warmup_s": 10, "measure_s": 20, "settle_s": 5, "cooldown_s": 5, "repeats": 1, "min_window_after_ff_s": 20, "cold_warmup_s": 5, "cold_measure_s": 10 },
+  "notes": [
+    "Follow-up window proposed by Agent 8 (run-2 task #7) on 2026-11-22 for the 01:00-06:45 slot; Agent 1 picks. W8a's fallback if native4b-bin or its rows miss the 23:25 cut: the same pair on native4 (S4a native; MANIFEST 00D33D4FFB46776D, fingerprint 5e3ff55de10f4f64), where #2 already has its functional ON/OFF pair: Agent 3's r5 (native4 OFF) and r6 (#2 ON, traced, 14:17; PASS, Agent 4's verdict; the checker's C3 is a heap relocation). GO: 'GO W8a4 matrix-window8a4.json <sha256> only=n4,n4mc repeats=6': one unscored cold run (native4), then 6 round-robin rounds with the start arm alternating: 1 + 12 = 13 runs.",
+    "W8a (S4-DRAFT L373: native S4a with #2 ON). Both arms use one bin, so the pair isolates #2 (rexlego gpu_native/shaders.cpp; env var, unset = OFF). Metric: render-thread ms/f and fps on native (native-frames.csv), plus p99, the 1 % low and process CPU. S4-DRAFT row 2's estimate: about 2-2.5 ms/f of render thread in the foreground, up to ~6 ms/f in the slow state. native4 is the pin until the re-pin passes (Agent 4's REPIN.md).",
+    "No trace in a timed arm: a trace turns off buffer/texture reuse and some draw fast paths (Agent 4). Without the trace #2 ON adds no game.log line, so n4mc's ON proof is LEGO_NATIVE_SHADER_MISS_CACHE=1 in run.json env_set, which n4 must not have. Both arms set LEGO_NATIVE_FRAME_METRICS=<run>\\native-frames.csv (the native frame source; the runner expands <run> per run). cvars as the n-rows (build/agent4/repin/matrix-repin-native4b.json, arm n0old): native_settings_frontend=false, native_fps_limit=0, framerate_limit=0.",
+    "Window: 5 s settle + 55 s warm-up from the first frame, then 50 s measured, so every window starts >= 60 s after the first frame (min_window_after_ff_s 60, Agent 1's floor); the runner flags window_before_floor (excluded) below 59.5 s. The cold run: 55 s warm-up, 30 s window. One frame source for every arm: native-frames.csv (frames native), uncapped; the same driver (drivers/thread-cpu.ps1 -> threads.csv).",
+    "sys_csv: drivers/sys-csv.ps1 logs the system state every 1 s (sys.csv, sys.json). Input during the window, the game losing the foreground, battery, battery saver, a power-plan change, a non-default input desktop or a screensaver exclude a run from summary.md (it stays in results.csv, under 'Flagged runs').",
+    "Environment: after the 08:29 Windows Update; native numbers compare only with native runs under the same host state. Timing comes only from the user's unlocked desktop (Agent 5's overnight launcher); agent runs of this matrix (-Quick, hidden desktop) are functional only."
+  ],
+  "arms": [
+    { "id": "n4", "group": "w8a4", "ref": true, "repeats": 6, "frames": "native", "bin": "build/agent2/native4-bin",
+      "cvars": ["native_settings_frontend=false", "native_fps_limit=0", "framerate_limit=0"],
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv" },
+      "driver": "drivers/thread-cpu.ps1", "note": "native4 (S4a native, #2 compiled in, OFF), default serial path: Agent 4's n0old" },
+    { "id": "n4mc", "group": "w8a4", "repeats": 6, "frames": "native", "bin": "build/agent2/native4-bin",
+      "cvars": ["native_settings_frontend=false", "native_fps_limit=0", "framerate_limit=0"],
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv", "LEGO_NATIVE_SHADER_MISS_CACHE": "1" },
+      "driver": "drivers/thread-cpu.ps1", "note": "native4 + #2 miss cache ON (LEGO_NATIVE_SHADER_MISS_CACHE=1, no trace; r6's switch). ON proof: env_set only" }
+  ]
+}

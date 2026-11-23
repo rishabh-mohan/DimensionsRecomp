@@ -1,0 +1,29 @@
+sub_82FBE2A8: classes cr=4 decl=1 flush=2; SO writers: none
+== prologue differs (decl)
+  A| REX_FUNC_PROLOGUE();
+  A| PPCRegister temp{};
+  A| uint32_t ea{};
+  B| REX_FUNC_PROLOGUE();
+  B| PPCCRRegister cr6{};
+  B| PPCRegister temp{};
+  B| uint32_t ea{};
+[5] stfd f31,-32(r1)   (flush)
+  A| ctx.fpscr.disableFlushMode();
+  A| REX_STORE_U64(ctx.r1.u32 + -32, ctx.f31.u64);
+  B| REX_STORE_U64(ctx.r1.u32 + -32, ctx.f31.u64);
+[11] cmplwi cr6,r11,0   (cr)
+  A| ctx.cr6.compare<uint32_t>(ctx.r11.u32, 0, ctx.xer);
+  B| cr6.compare<uint32_t>(ctx.r11.u32, 0, {});
+[19] cmplwi cr6,r11,1   (cr)
+  A| ctx.cr6.compare<uint32_t>(ctx.r11.u32, 1, ctx.xer);
+  B| cr6.compare<uint32_t>(ctx.r11.u32, 1, {});
+[30] cmplwi cr6,r11,0   (cr)
+  A| ctx.cr6.compare<uint32_t>(ctx.r11.u32, 0, ctx.xer);
+  B| cr6.compare<uint32_t>(ctx.r11.u32, 0, {});
+[36] cmplwi cr6,r11,0   (cr)
+  A| ctx.cr6.compare<uint32_t>(ctx.r11.u32, 0, ctx.xer);
+  B| cr6.compare<uint32_t>(ctx.r11.u32, 0, {});
+[45] lfd f31,-32(r1)   (flush)
+  A| ctx.fpscr.disableFlushMode();
+  A| ctx.f31.u64 = REX_LOAD_U64(ctx.r1.u32 + -32);
+  B| ctx.f31.u64 = REX_LOAD_U64(ctx.r1.u32 + -32);

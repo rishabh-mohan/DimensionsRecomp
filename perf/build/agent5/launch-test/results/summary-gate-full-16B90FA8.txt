@@ -1,0 +1,17 @@
+group gate, 2026-11-22 22:23:57, run-night.ps1 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31
+
+test                   tag            result exit detail                                                                                                  
+----                   ---            ------ ---- ------                                                                                                  
+build running          t-build        PASS   0    ok                                                                                                      
+build all along        t-build-giveup PASS   0    ok                                                                                                      
+build at window start  t-build-start  PASS   0    ok                                                                                                      
+close list (dry run)   t-close        PASS   0    ok                                                                                                      
+STOP at start          t-stop-start   PASS   2    ok                                                                                                      
+STOP waiting for GO    t-stop-wait    PASS   0    ok                                                                                                      
+STOP in the gate       t-stop-gate    PASS   0    ok                                                                                                      
+relaxed gate           t-relaxed      FAIL   0    missing /strict gate for the first 0.25 min/ | missing /quiet gate: RELAXED \(MsMpEng 1\.02/1\.02/1\.02/
+MsMpEng unstable       t-unstable     PASS   0    ok                                                                                                      
+MsMpEng 1.25 stable    t-toohigh      PASS   0    ok                                                                                                      
+low RAM and disk       t-lowres       PASS   0    ok                                                                                                      
+matrix changed in gate t-json         PASS   0    ok                                                                                                      
+real sensors           t-real         PASS   0    ok

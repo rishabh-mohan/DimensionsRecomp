@@ -1,0 +1,27 @@
+native-frames.csv window breakdown (bytes window; mean over window rows; 'med' = median of the per-run means)
+  0030-n0-r1: rows 12262..23878 (11617 frames, 80.7 s, 143.97 fps)
+  0042-n0-r2: rows 13846..22773 (8928 frames, 64.5 s, 138.51 fps)
+  0054-n0-r3: rows 12454..18478 (6025 frames, 41.3 s, 146.05 fps)
+  0104-n0-r4: rows 10126..15429 (5304 frames, 37.3 s, 142.09 fps)
+
+column                             med      0030-n0-r1      0042-n0-r2      0054-n0-r3      0104-n0-r4
+------------------------------------------------------------------------------------------------------
+interval_ms                     6.9917    6.9457/6.67     7.2195/6.79     6.8471/6.59     7.0377/6.75 
+swap_present_cpu_ms             1.0161    1.0134/0.989    1.0111/0.99     1.0189/0.989    1.0398/1.01 
+draw_calls                      8.0000    8.0000/8        8.0000/8        8.0000/8        8.0000/8    
+output_width                 2240.0000  2240.0000/2.24e+03  2240.0000/2.24e+03  2240.0000/2.24e+03  2240.0000/2.24e+03
+scene_render_width           1920.0000  1920.0000/1.92e+03  1920.0000/1.92e+03  1920.0000/1.92e+03  1920.0000/1.92e+03
+present_source_width         1920.0000  1920.0000/1.92e+03  1920.0000/1.92e+03  1920.0000/1.92e+03  1920.0000/1.92e+03
+output_height                1294.0000  1294.0000/1.29e+03  1294.0000/1.29e+03  1294.0000/1.29e+03  1294.0000/1.29e+03
+scene_render_height          1080.0000  1080.0000/1.08e+03  1080.0000/1.08e+03  1080.0000/1.08e+03  1080.0000/1.08e+03
+present_source_height        1080.0000  1080.0000/1.08e+03  1080.0000/1.08e+03  1080.0000/1.08e+03  1080.0000/1.08e+03
+presentation_refresh_hz        60.0000   60.0000/60      60.0000/60      60.0000/60      60.0000/60   
+callbacks_enqueued              8.0000    8.0000/8        8.0000/8        8.0000/8        8.0000/8    
+callbacks_executed              8.0000    8.0000/8        8.0000/8        8.0000/8        8.0000/8    
+callbacks_pending               4.9899    4.9914/5        4.9916/5        4.9884/5        4.9859/5    
+frame_slot_wait_calls           2.0000    2.0000/2        2.0000/2        2.0000/2        2.0000/2    
+presentation_focused            1.0000    1.0000/1        1.0000/1        1.0000/1        1.0000/1    
+present_timing_enabled          1.0000    1.0000/1        1.0000/1        1.0000/1        1.0000/1    
+presentation_monitor_index      1.0000    1.0000/1        1.0000/1        1.0000/1        1.0000/1    
+
+cells: window mean/p50. all-zero in every window: texture_ms, constants_ms, vertices_ms, buffer_hash_ms, texture_hash_bytes, buffer_hash_bytes, present_cpu_ms, sync_calls, sync_ms, cpu_resource_wait_skips, sync_other_calls, sync_other_ms, sync_idle_calls, sync_idle_ms, sync_fence_calls, sync_fence_ms, sync_resource_calls, sync_resource_ms, sync_callback_calls, sync_callback_ms, sync_query_begin_calls, sync_query_begin_ms, sync_query_release_calls, sync_query_release_ms, bindings_ms, begin_ms, pipeline_ms, issue_ms, tail_ms, buffer_converted_bytes, frame_slot_wait_ms, acquire_cpu_ms, present_submit_cpu_ms, buffer_watch_hits, buffer_watch_audits, buffer_watch_mismatches, constants_shadow_ms, constants_upload_ms, constants_binding_ms, constants_texture_binding_ms, constants_restore_ms, detailed_timing_enabled, pipeline_creations, pipeline_creation_ms, temporal_pipeline_creations, temporal_pipeline_creation_ms, fsr_enabled, native_vsync, presentation_borderless, native_fps_limit_cvar, spatial_fsr_presented

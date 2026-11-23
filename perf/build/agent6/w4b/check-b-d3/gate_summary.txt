@@ -1,0 +1,64 @@
+=== arm B vs warm d0 (gate B side = arm run, A side = d0 run) ===
+arm run      d0 run      exit verdict find notes  new  gone  chg  lines A/B | levels B | unimpl A/B | crit B | fail_counts B | boot A/B | files A/B | warn kinds/lines A, B
+1545-B-r1    1542-d0-r1     0 PASS       0     0    0     0    0  98/98 | info=50 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1545-B-r1    1558-d0-r2     0 PASS       0     0    0     0    0  98/98 | info=50 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1545-B-r1    1604-d0-r3     0 PASS       0     0    0     0    0  98/98 | info=50 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1545-B-r1    1611-d0-r4     0 PASS       0     0    0     0    0  94/98 | info=50 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1551-B-r2    1542-d0-r1     0 PASS       0     0    0     0    0  98/94 | info=46 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1551-B-r2    1558-d0-r2     0 PASS       0     0    0     0    0  98/94 | info=46 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1551-B-r2    1604-d0-r3     0 PASS       0     0    0     0    0  98/94 | info=46 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1551-B-r2    1611-d0-r4     0 PASS       0     0    0     0    0  94/94 | info=46 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1606-B-r3    1542-d0-r1     0 PASS       0     0    0     0    0  98/94 | info=46 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1606-B-r3    1558-d0-r2     0 PASS       0     0    0     0    0  98/94 | info=46 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1606-B-r3    1604-d0-r3     0 PASS       0     0    0     0    0  98/94 | info=46 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1606-B-r3    1611-d0-r4     0 PASS       0     0    0     0    0  94/94 | info=46 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1613-B-r4    1542-d0-r1     0 PASS       0     0    0     0    0  98/94 | info=46 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1613-B-r4    1558-d0-r2     0 PASS       0     0    0     0    0  98/94 | info=46 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1613-B-r4    1604-d0-r3     0 PASS       0     0    0     0    0  98/94 | info=46 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1613-B-r4    1611-d0-r4     0 PASS       0     0    0     0    0  94/94 | info=46 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+per arm run, verdict/exit vs 1542-d0-r1, 1558-d0-r2, 1604-d0-r3, 1611-d0-r4:
+  1545-B-r1    PASS/0  PASS/0  PASS/0  PASS/0
+  1551-B-r2    PASS/0  PASS/0  PASS/0  PASS/0
+  1606-B-r3    PASS/0  PASS/0  PASS/0  PASS/0
+  1613-B-r4    PASS/0  PASS/0  PASS/0  PASS/0
+totals: pairs 16, PASS 16, FAIL 0, findings 0, notes 0, new 0, gone 0, count_changes 0, exit_verdict_mismatch 0, missing_json 0
+match-check strings (x pairs):
+  16 x CPU pool copy callers: A -, B -
+  16 x Native slot heap: extended: A 0, B 0
+  16 x Native slot heap: registered: A 0, B 0
+  16 x placement buffer relocation lr=83F9B660: A 0, B 0 (route-dependent count; presence must match)
+non-zero findings/notes/new/gone/count-change entries (0):
+  none
+
+=== arm d3 vs warm d0 (gate B side = arm run, A side = d0 run) ===
+arm run      d0 run      exit verdict find notes  new  gone  chg  lines A/B | levels B | unimpl A/B | crit B | fail_counts B | boot A/B | files A/B | warn kinds/lines A, B
+1547-d3-r1   1542-d0-r1     0 PASS       0     0    0     0    0  98/94 | info=46 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1547-d3-r1   1558-d0-r2     0 PASS       0     0    0     0    0  98/94 | info=46 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1547-d3-r1   1604-d0-r3     0 PASS       0     0    0     0    0  98/94 | info=46 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1547-d3-r1   1611-d0-r4     0 PASS       0     0    0     0    0  94/94 | info=46 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1553-d3-r2   1542-d0-r1     0 PASS       0     0    0     0    0  98/98 | info=50 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1553-d3-r2   1558-d0-r2     0 PASS       0     0    0     0    0  98/98 | info=50 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1553-d3-r2   1604-d0-r3     0 PASS       0     0    0     0    0  98/98 | info=50 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1553-d3-r2   1611-d0-r4     0 PASS       0     0    0     0    0  94/98 | info=50 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1600-d3-r3   1542-d0-r1     0 PASS       0     0    0     0    0  98/98 | info=50 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1600-d3-r3   1558-d0-r2     0 PASS       0     0    0     0    0  98/98 | info=50 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1600-d3-r3   1604-d0-r3     0 PASS       0     0    0     0    0  98/98 | info=50 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1600-d3-r3   1611-d0-r4     0 PASS       0     0    0     0    0  94/98 | info=50 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1615-d3-r4   1542-d0-r1     0 PASS       0     0    0     0    0  98/98 | info=50 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1615-d3-r4   1558-d0-r2     0 PASS       0     0    0     0    0  98/98 | info=50 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1615-d3-r4   1604-d0-r3     0 PASS       0     0    0     0    0  98/98 | info=50 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+1615-d3-r4   1611-d0-r4     0 PASS       0     0    0     0    0  94/98 | info=50 warning=40 | 0/0 | 0 | {} | True/True | 1/1 | 5/40, 5/40
+per arm run, verdict/exit vs 1542-d0-r1, 1558-d0-r2, 1604-d0-r3, 1611-d0-r4:
+  1547-d3-r1   PASS/0  PASS/0  PASS/0  PASS/0
+  1553-d3-r2   PASS/0  PASS/0  PASS/0  PASS/0
+  1600-d3-r3   PASS/0  PASS/0  PASS/0  PASS/0
+  1615-d3-r4   PASS/0  PASS/0  PASS/0  PASS/0
+totals: pairs 16, PASS 16, FAIL 0, findings 0, notes 0, new 0, gone 0, count_changes 0, exit_verdict_mismatch 0, missing_json 0
+match-check strings (x pairs):
+  16 x CPU pool copy callers: A -, B -
+  16 x Native slot heap: extended: A 0, B 0
+  16 x Native slot heap: registered: A 0, B 0
+  16 x placement buffer relocation lr=83F9B660: A 0, B 0 (route-dependent count; presence must match)
+non-zero findings/notes/new/gone/count-change entries (0):
+  none
+

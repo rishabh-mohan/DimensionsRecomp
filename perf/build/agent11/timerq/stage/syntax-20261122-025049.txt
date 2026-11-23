@@ -1,0 +1,31 @@
+# timerq_syntax (S3 task #10)  2026-11-22 02:50:50  config Release  candidate: staged copy
+timer_queue.cpp    pristine  exit=0   4.1s diagnostics=1  <workspace>\build\agent11\timerq\stage\pristine\timer_queue.cpp
+    | <workspace>\build\agent11\timerq\stage\pristine\timer_queue.cpp:42:40: warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    |    42 |   TimerWaitStrategy() : blocking_(std::getenv("REX_TIMER_WAIT_BLOCKING") != nullptr) {}
+    |       |                                        ^
+    | C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\stdlib.h:1183:20: note: 'getenv' has been explicitly marked deprecated here
+    |  1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+    |       |                    ^
+    | C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    |   356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+    |       |                                                       ^
+    | C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+    |   346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+    |       |                                               ^
+    | 1 warning generated.
+timer_queue.cpp    candidate exit=0   5.4s diagnostics=1  <workspace>\build\agent11\timerq\stage\timer_queue.cpp
+    | <workspace>\build\agent11\timerq\stage\timer_queue.cpp:59:20: warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+    |    59 |       : mode_(std::getenv("REX_TIMER_WAIT_BLOCKING") != nullptr ? Mode::kBlocking : Mode::kSpin) {}
+    |       |                    ^
+    | C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt\stdlib.h:1183:20: note: 'getenv' has been explicitly marked deprecated here
+    |  1183 |     _Check_return_ _CRT_INSECURE_DEPRECATE(_dupenv_s)
+    |       |                    ^
+    | C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h:356:55: note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+    |   356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+    |       |                                                       ^
+    | C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h:346:47: note: expanded from macro '_CRT_DEPRECATE_TEXT'
+    |   346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+    |       |                                               ^
+    | 1 warning generated.
+    no new diagnostics in the candidate
+RESULT: PASS

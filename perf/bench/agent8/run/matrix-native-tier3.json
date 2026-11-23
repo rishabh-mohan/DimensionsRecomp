@@ -1,0 +1,42 @@
+{
+  "title": "NATIVE ON build, tier 3 (Agent 7): pacing margin d2 vs d1, frames in flight 1 e2 vs e1, latency wait 2 g2 vs g1. Title/attract loop, no input needed",
+  "reference": "d1",
+  "warmup_s": 30,
+  "warmup_from": "firstframe",
+  "measure_s": 60,
+  "repeats": 3,
+  "order": "roundrobin",
+  "settle_s": 20,
+  "cooldown_s": 10,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "menu_s": 60,
+  "cold_run": true,
+  "quick": { "warmup_s": 10, "measure_s": 20, "settle_s": 5, "menu_s": 20, "cooldown_s": 5 },
+  "notes": [
+    "Spec: perf-notes/agent7-present.md, 'Runner specs for Agent 8', tier 3. Run it after tiers 1 and 2. BIN DIR: build/agent2/native-bin (staged 21:48).",
+    "Frame times: native-frames.csv; frames=native makes the runner set LEGO_NATIVE_FRAME_METRICS=<run>\\native-frames.csv in every arm.",
+    "Each tier-3 arm is read against its tier-2/tier-1 parent, which is repeated here as the group reference: 'pacing' d2 vs d1, 'fif' e2 vs e1, 'latency' g2 vs g1.",
+    "game.log checks: d2 'unlocked frame pacing margin=4000us'; e2 'frames-in-flight cap=1'; g2 'swap-chain latency wait=2'."
+  ],
+  "arms": [
+    { "id": "d1", "group": "pacing", "ref": true, "frames": "native", "bin": "build/agent2/native-bin", "cvars": [],
+      "env": { "LEGO_NATIVE_VSYNC": "0", "LEGO_NATIVE_FPS_LIMIT": "60", "LEGO_NATIVE_UNLOCKED_PACING": "1" },
+      "note": "Agent 7 d1 (tier 1): 60 fps limiter, VSync off, unlocked pacing, margin 2000 us" },
+    { "id": "d2", "group": "pacing", "frames": "native", "bin": "build/agent2/native-bin", "cvars": [],
+      "env": { "LEGO_NATIVE_VSYNC": "0", "LEGO_NATIVE_FPS_LIMIT": "60", "LEGO_NATIVE_UNLOCKED_PACING": "4000" },
+      "note": "Agent 7 d2: d1 with a 4000 us margin. Check 'margin=4000us'" },
+    { "id": "e1", "group": "fif", "ref": true, "frames": "native", "bin": "build/agent2/native-bin", "cvars": [],
+      "env": { "LEGO_NATIVE_COMMAND_SLOTS": "12", "LEGO_NATIVE_FRAMES_IN_FLIGHT": "2" },
+      "note": "Agent 7 e1 (tier 2): 12 command slots, frames-in-flight cap 2" },
+    { "id": "e2", "group": "fif", "frames": "native", "bin": "build/agent2/native-bin", "cvars": [],
+      "env": { "LEGO_NATIVE_COMMAND_SLOTS": "12", "LEGO_NATIVE_FRAMES_IN_FLIGHT": "1" },
+      "note": "Agent 7 e2: e1 with cap 1. Check 'cap=1'" },
+    { "id": "g1", "group": "latency", "ref": true, "frames": "native", "bin": "build/agent2/native-bin", "cvars": [],
+      "env": { "LEGO_NATIVE_VSYNC": "1", "LEGO_NATIVE_LATENCY_WAIT": "1" },
+      "note": "Agent 7 g1 (tier 2): VSync on, latency wait 1" },
+    { "id": "g2", "group": "latency", "frames": "native", "bin": "build/agent2/native-bin", "cvars": [],
+      "env": { "LEGO_NATIVE_VSYNC": "1", "LEGO_NATIVE_LATENCY_WAIT": "2" },
+      "note": "Agent 7 g2: g1 with latency wait 2. Check 'latency wait=2'" }
+  ]
+}

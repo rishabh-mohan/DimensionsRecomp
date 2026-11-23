@@ -1,0 +1,700 @@
+diff --git a/plume_d3d12.cpp b/plume_d3d12.cpp
+index dcae4e3..5d17452 100644
+--- a/plume_d3d12.cpp
++++ b/plume_d3d12.cpp
+@@ -7,6 +7,7 @@
+ 
+ #include "plume_d3d12.h"
+ 
++#include <cstdlib>
+ #include <unordered_set>
+ 
+ #include <dxgi1_5.h>
+@@ -44,6 +45,23 @@ extern "C" {
+ #endif
+ 
+ namespace plume {
++    static bool D3D12StateCacheEnabled() {
++        static const bool enabled = [] {
++            const char *value = std::getenv("PLUME_D3D12_STATE_CACHE");
++            return value != nullptr && value[0] == '1' && value[1] == '\0';
++        }();
++        return enabled;
++    }
++
++    static void D3D12ReportStateCacheConfiguration() {
++        static const bool reported = [] {
++            fprintf(stderr, "Plume D3D12 command state cache: %s\n",
++                D3D12StateCacheEnabled() ? "enabled" : "disabled");
++            return true;
++        }();
++        (void)reported;
++    }
++
+     static const uint32_t ShaderDescriptorHeapSize = 65536;
+     static const uint32_t SamplerDescriptorHeapSize = 1024;
+     static const uint32_t TargetDescriptorHeapSize = 16384;
+@@ -484,7 +502,7 @@ namespace plume {
+         case RenderHeapType::READBACK:
+             return D3D12_HEAP_TYPE_READBACK;
+         case RenderHeapType::GPU_UPLOAD:
+-            return D3D12_HEAP_TYPE_GPU_UPLOAD;
++            return static_cast<D3D12_HEAP_TYPE>(5); // = D3D12_HEAP_TYPE_GPU_UPLOAD, declared only by Windows SDK >= 10.0.26100 or the Agility SDK; this machine has 10.0.22621 (Agent 2 snapshot patch S1+p2)
+         default:
+             assert(false && "Unknown heap type.");
+             return D3D12_HEAP_TYPE_DEFAULT;
+@@ -645,7 +663,8 @@ namespace plume {
+                     return D3D12_RESOURCE_STATE_INDEX_BUFFER;
+                 }
+ 
+-                return D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
++                // GRAPHICS includes vertex and geometry shaders, as on Vulkan.
++                return D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
+             }
+         }
+ 
+@@ -660,7 +679,8 @@ namespace plume {
+         case RenderTextureLayout::SHADER_READ:
+             switch (stages) {
+             case RenderBarrierStage::GRAPHICS:
+-                return D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
++                // Vertex texture fetches require the non-pixel read bit too.
++                return D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
+             case RenderBarrierStage::COMPUTE:
+                 return D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+             default:
+@@ -1416,24 +1436,32 @@ namespace plume {
+     }
+ 
+     bool D3D12SwapChain::resize() {
+-        getWindowSize(width, height);
++        uint32_t newWidth = 0, newHeight = 0;
++        getWindowSize(newWidth, newHeight);
+ 
+         // Don't resize the swap chain at all if the window doesn't have a valid size.
+-        if ((width == 0) || (height == 0)) {
++        if ((newWidth == 0) || (newHeight == 0)) {
+             return false;
+         }
+ 
+         for (uint32_t i = 0; i < desc.textureCount; i++) {
+-            textures[i].d3d->Release();
+-            textures[i].d3d = nullptr;
++            if (textures[i].d3d != nullptr) {
++                textures[i].d3d->Release();
++                textures[i].d3d = nullptr;
++            }
+         }
+ 
+         HRESULT res = d3d->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, swapChainFlags);
+         if (FAILED(res)) {
+             fprintf(stderr, "ResizeBuffers failed with error code 0x%lX.\n", res);
++            // DXGI retains the old buffers on a failed resize. Reacquire them
++            // so a retry does not operate on released or null references.
++            setTextures();
+             return false;
+         }
+ 
++        width = newWidth;
++        height = newHeight;
+         setTextures();
+         return true;
+     }
+@@ -1888,6 +1916,8 @@ namespace plume {
+     void D3D12CommandList::begin() {
+         assert(!open);
+ 
++        D3D12ReportStateCacheConfiguration();
++        notifyCommandStateWasChangedExternally();
+         commandAllocator->Reset();
+         d3d->Reset(commandAllocator, nullptr);
+         open = true;
+@@ -1909,6 +1939,7 @@ namespace plume {
+         activeTopology = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+         activeStencilRef = 0;
+         descriptorHeapsSet = false;
++        notifyCommandStateWasChangedExternally();
+     }
+     
+     void D3D12CommandList::barriers(RenderBarrierStages stages, const RenderBufferBarrier *bufferBarriers, uint32_t bufferBarriersCount, const RenderTextureBarrier *textureBarriers, uint32_t textureBarriersCount) {
+@@ -2047,35 +2078,60 @@ namespace plume {
+         assert(pipeline != nullptr);
+ 
+         const D3D12Pipeline *interfacePipeline = static_cast<const D3D12Pipeline *>(pipeline);
++        const uint32_t pipelineType = uint32_t(interfacePipeline->type);
++        const bool cacheEnabled = D3D12StateCacheEnabled();
+         switch (interfacePipeline->type) {
+         case D3D12Pipeline::Type::Compute: {
+             const D3D12ComputePipeline *computePipeline = static_cast<const D3D12ComputePipeline *>(interfacePipeline);
+-            d3d->SetPipelineState(computePipeline->d3d);
++            if (!cacheEnabled || !cachedPipelineValid || cachedPipelineType != pipelineType ||
++                cachedPipelineObject != computePipeline->d3d) {
++                d3d->SetPipelineState(computePipeline->d3d);
++            }
++            cachedPipelineObject = computePipeline->d3d;
+             break;
+         }
+         case D3D12Pipeline::Type::Graphics: {
+             const D3D12GraphicsPipeline *graphicsPipeline = static_cast<const D3D12GraphicsPipeline *>(interfacePipeline);
+-            d3d->SetPipelineState(graphicsPipeline->d3d);
++            if (!cacheEnabled || !cachedPipelineValid || cachedPipelineType != pipelineType ||
++                cachedPipelineObject != graphicsPipeline->d3d) {
++                d3d->SetPipelineState(graphicsPipeline->d3d);
++            }
++            cachedPipelineObject = graphicsPipeline->d3d;
+             activeGraphicsPipeline = graphicsPipeline;
+             break;
+         }
+         case D3D12Pipeline::Type::Raytracing: {
+             assert(d3dV4 != nullptr);
+             const D3D12RaytracingPipeline *raytracingPipeline = static_cast<const D3D12RaytracingPipeline *>(interfacePipeline);
+-            d3dV4->SetPipelineState1(raytracingPipeline->stateObject);
++            if (!cacheEnabled || !cachedPipelineValid || cachedPipelineType != pipelineType ||
++                cachedPipelineObject != raytracingPipeline->stateObject) {
++                d3dV4->SetPipelineState1(raytracingPipeline->stateObject);
++            }
++            cachedPipelineObject = raytracingPipeline->stateObject;
+             break;
+         }
+         default:
+             assert(false && "Unknown pipeline type.");
+-            break;
++            return;
+         }
++        cachedPipelineType = pipelineType;
++        cachedPipelineValid = true;
+     }
+ 
+     void D3D12CommandList::setComputePipelineLayout(const RenderPipelineLayout *pipelineLayout) {
+         assert(pipelineLayout != nullptr);
+ 
+         const D3D12PipelineLayout *interfacePipelineLayout = static_cast<const D3D12PipelineLayout *>(pipelineLayout);
+-        d3d->SetComputeRootSignature(interfacePipelineLayout->rootSignature);
++        if (!cachedComputeRootValid || cachedComputeRootSignature != interfacePipelineLayout->rootSignature) {
++            cachedComputeTablesValid = 0;
++            cachedComputeDescriptorsValid = 0;
++        }
++        if (!D3D12StateCacheEnabled() || !cachedComputeRootValid ||
++            cachedComputeRootSignature != interfacePipelineLayout->rootSignature) {
++            d3d->SetComputeRootSignature(interfacePipelineLayout->rootSignature);
++        }
++        cachedComputeRootSignature = interfacePipelineLayout->rootSignature;
++        cachedComputeRootValid = true;
+         activeComputePipelineLayout = interfacePipelineLayout;
+     }
+ 
+@@ -2101,7 +2157,16 @@ namespace plume {
+         assert(pipelineLayout != nullptr);
+ 
+         const D3D12PipelineLayout *interfacePipelineLayout = static_cast<const D3D12PipelineLayout *>(pipelineLayout);
+-        d3d->SetGraphicsRootSignature(interfacePipelineLayout->rootSignature);
++        if (!cachedGraphicsRootValid || cachedGraphicsRootSignature != interfacePipelineLayout->rootSignature) {
++            cachedGraphicsTablesValid = 0;
++            cachedGraphicsDescriptorsValid = 0;
++        }
++        if (!D3D12StateCacheEnabled() || !cachedGraphicsRootValid ||
++            cachedGraphicsRootSignature != interfacePipelineLayout->rootSignature) {
++            d3d->SetGraphicsRootSignature(interfacePipelineLayout->rootSignature);
++        }
++        cachedGraphicsRootSignature = interfacePipelineLayout->rootSignature;
++        cachedGraphicsRootValid = true;
+         activeGraphicsPipelineLayout = interfacePipelineLayout;
+     }
+ 
+@@ -2143,7 +2208,7 @@ namespace plume {
+         if (view != nullptr) {
+             const D3D12Buffer *interfaceBuffer = static_cast<const D3D12Buffer *>(view->buffer.ref);
+             D3D12_INDEX_BUFFER_VIEW bufferView;
+-            bufferView.BufferLocation = (interfaceBuffer != nullptr) ? (interfaceBuffer->d3d->GetGPUVirtualAddress() + view->buffer.offset) : 0;
++            bufferView.BufferLocation = (interfaceBuffer != nullptr) ? (interfaceBuffer->gpuVA + view->buffer.offset) : 0;
+             bufferView.Format = toDXGI(view->format);
+             bufferView.SizeInBytes = view->size;
+             d3d->IASetIndexBuffer(&bufferView);
+@@ -2162,9 +2227,15 @@ namespace plume {
+             for (uint32_t i = 0; i < viewCount; i++) {
+                 const RenderVertexBufferView &renderView = views[i];
+                 const D3D12Buffer *interfaceBuffer = static_cast<const D3D12Buffer *>(renderView.buffer.ref);
+-                bufferViewVector[i].BufferLocation = (interfaceBuffer != nullptr) ? (interfaceBuffer->d3d->GetGPUVirtualAddress() + renderView.buffer.offset) : 0;
++                bufferViewVector[i].BufferLocation = (interfaceBuffer != nullptr) ? (interfaceBuffer->gpuVA + renderView.buffer.offset) : 0;
+                 bufferViewVector[i].SizeInBytes = renderView.size;
+ 
++                // Slots usually arrive in view order.
++                if (inputSlots[i].index == (startSlot + i)) {
++                    bufferViewVector[i].StrideInBytes = inputSlots[i].stride;
++                    continue;
++                }
++
+                 bool slotFound = false;
+                 for (uint32_t j = 0; j < viewCount; j++) {
+                     if (inputSlots[j].index == (startSlot + i)) {
+@@ -2237,12 +2308,33 @@ namespace plume {
+ 
+             const D3D12_CPU_DESCRIPTOR_HANDLE *colorDescriptors = !interfaceFramebuffer->colorHandles.empty() ? interfaceFramebuffer->colorHandles.data() : nullptr;
+             const D3D12_CPU_DESCRIPTOR_HANDLE *depthDescriptor = (interfaceFramebuffer->depthHandle.ptr != 0) ? &interfaceFramebuffer->depthHandle : nullptr;
+-            d3d->OMSetRenderTargets(UINT(interfaceFramebuffer->colorHandles.size()), colorDescriptors, false, depthDescriptor);
++            const uint32_t colorCount = uint32_t(interfaceFramebuffer->colorHandles.size());
++            // Compare the actual descriptor handles, not the framebuffer object:
++            // a recycled framebuffer allocation must never inherit stale targets.
++            bool redundant = D3D12StateCacheEnabled() && cachedFramebufferValid &&
++                (colorCount == cachedColorCount) && (colorCount <= D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT) &&
++                (cachedDepthHandle.ptr == interfaceFramebuffer->depthHandle.ptr);
++            for (uint32_t i = 0; redundant && (i < colorCount); i++) {
++                redundant = (cachedColorHandles[i].ptr == interfaceFramebuffer->colorHandles[i].ptr);
++            }
++
++            if (!redundant) {
++                d3d->OMSetRenderTargets(UINT(colorCount), colorDescriptors, false, depthDescriptor);
++                cachedFramebufferValid = colorCount <= D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT;
++                cachedColorCount = colorCount;
++                for (uint32_t i = 0; cachedFramebufferValid && (i < colorCount); i++) {
++                    cachedColorHandles[i] = interfaceFramebuffer->colorHandles[i];
++                }
++
++                cachedDepthHandle = interfaceFramebuffer->depthHandle;
++            }
++
+             targetFramebuffer = interfaceFramebuffer;
+             targetFramebufferSamplePositionsSet = false;
+         }
+         else {
+             d3d->OMSetRenderTargets(0, nullptr, false, nullptr);
++            cachedFramebufferValid = false;
+             targetFramebuffer = nullptr;
+         }
+     }
+@@ -2448,6 +2540,8 @@ namespace plume {
+ 
+     void D3D12CommandList::checkDescriptorHeaps() {
+         if (!descriptorHeapsSet) {
++            cachedGraphicsTablesValid = 0;
++            cachedComputeTablesValid = 0;
+             ID3D12DescriptorHeap *descriptorHeaps[] = { queue->device->viewHeapAllocator->heap, queue->device->samplerHeapAllocator->heap };
+             d3d->SetDescriptorHeaps(std::size(descriptorHeaps), descriptorHeaps);
+             descriptorHeapsSet = true;
+@@ -2456,6 +2550,22 @@ namespace plume {
+ 
+     void D3D12CommandList::notifyDescriptorHeapWasChangedExternally() {
+         descriptorHeapsSet = false;
++        cachedGraphicsTablesValid = 0;
++        cachedComputeTablesValid = 0;
++    }
++
++    void D3D12CommandList::notifyCommandStateWasChangedExternally() {
++        cachedPipelineObject = nullptr;
++        cachedPipelineValid = false;
++        cachedGraphicsRootSignature = nullptr;
++        cachedComputeRootSignature = nullptr;
++        cachedGraphicsRootValid = false;
++        cachedComputeRootValid = false;
++        cachedGraphicsTablesValid = 0;
++        cachedComputeTablesValid = 0;
++        cachedGraphicsDescriptorsValid = 0;
++        cachedComputeDescriptorsValid = 0;
++        cachedFramebufferValid = false;
+     }
+ 
+     void D3D12CommandList::checkTopology() {
+@@ -2540,12 +2650,21 @@ namespace plume {
+         }
+ 
+         const D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = heapAllocator->getGPUHandleAt(heapAllocation.offset);
++        assert(rootIndex < 64);
++        auto& valid = setCompute ? cachedComputeTablesValid : cachedGraphicsTablesValid;
++        auto& tables = setCompute ? cachedComputeTables : cachedGraphicsTables;
++        const uint64_t bit = uint64_t{1} << rootIndex;
++        if (D3D12StateCacheEnabled() && (valid & bit) && tables[rootIndex] == gpuHandle.ptr) {
++            return;
++        }
+         if (setCompute) {
+             d3d->SetComputeRootDescriptorTable(rootIndex, gpuHandle);
+         }
+         else {
+             d3d->SetGraphicsRootDescriptorTable(rootIndex, gpuHandle);
+         }
++        tables[rootIndex] = gpuHandle.ptr;
++        valid |= bit;
+     }
+ 
+     void D3D12CommandList::setRootDescriptor(const D3D12PipelineLayout* activePipelineLayout, RenderBufferReference bufferReference, uint32_t rootDescriptorIndex, bool setCompute) {
+@@ -2553,6 +2672,16 @@ namespace plume {
+ 
+         D3D12_GPU_VIRTUAL_ADDRESS gpuVA = static_cast<const D3D12Buffer*>(bufferReference.ref)->d3d->GetGPUVirtualAddress() + bufferReference.offset;
+         const auto& [rootParamIndex, type] = activePipelineLayout->rootDescriptorRootIndicesAndTypes[rootDescriptorIndex];
++        assert(rootParamIndex < 64);
++        const uint64_t bit = uint64_t(1) << rootParamIndex;
++        auto& valid = setCompute ? cachedComputeDescriptorsValid : cachedGraphicsDescriptorsValid;
++        auto& addresses = setCompute ? cachedComputeDescriptors : cachedGraphicsDescriptors;
++        auto& types = setCompute ? cachedComputeDescriptorTypes : cachedGraphicsDescriptorTypes;
++        if (D3D12StateCacheEnabled() && (valid & bit) && addresses[rootParamIndex] == gpuVA &&
++            types[rootParamIndex] == type) return;
++        addresses[rootParamIndex] = gpuVA;
++        types[rootParamIndex] = type;
++        valid |= bit;
+ 
+         if (setCompute) {
+             switch (type) {
+@@ -2679,7 +2808,11 @@ namespace plume {
+     }
+ 
+     std::unique_ptr<RenderCommandList> D3D12CommandQueue::createCommandList() {
+-        return std::make_unique<D3D12CommandList>(this);
++        auto commandList = std::make_unique<D3D12CommandList>(this);
++        if (commandList->d3d == nullptr || commandList->commandAllocator == nullptr) {
++            return nullptr;
++        }
++        return commandList;
+     }
+ 
+     std::unique_ptr<RenderSwapChain> D3D12CommandQueue::createSwapChain(const RenderSwapChainDesc &desc) {
+@@ -2724,7 +2857,19 @@ namespace plume {
+         assert(fence != nullptr);
+ 
+         D3D12CommandFence *interfaceFence = static_cast<D3D12CommandFence *>(fence);
+-        WaitForSingleObjectEx(interfaceFence->fenceEvent, INFINITE, FALSE);
++        const uint64_t targetValue = interfaceFence->fenceValue - 1;
++        // The auto-reset event may still belong to an earlier submission, or
++        // already have been consumed by another wait. The fence value is the
++        // completion authority; only wait while the submitted value is pending.
++        for (;;) {
++            const uint64_t completed = interfaceFence->d3d->GetCompletedValue();
++            if (completed == UINT64_MAX || completed >= targetValue) {
++                return;
++            }
++            if (WaitForSingleObjectEx(interfaceFence->fenceEvent, INFINITE, FALSE) != WAIT_OBJECT_0) {
++                return;
++            }
++        }
+     }
+ 
+     // D3D12Buffer
+@@ -2775,6 +2920,8 @@ namespace plume {
+             fprintf(stderr, "CreateResource failed with error code 0x%lX.\n", res);
+             return;
+         }
++
++        gpuVA = d3d->GetGPUVirtualAddress();
+     }
+ 
+     D3D12Buffer::~D3D12Buffer() {
+@@ -3220,7 +3367,17 @@ namespace plume {
+ 
+         psoDesc.InputLayout = { inputElements.data(), UINT(inputElements.size()) };
+ 
+-        device->d3d->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&d3d));
++        D3D12GraphicsPipelineCache *cache = GetD3D12GraphicsPipelineCache();
++        if (cache != nullptr) {
++            d3d = cache->load(psoDesc);
++        }
++
++        if (d3d == nullptr) {
++            device->d3d->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&d3d));
++            if ((cache != nullptr) && (d3d != nullptr)) {
++                cache->store(psoDesc, d3d);
++            }
++        }
+     }
+ 
+     D3D12GraphicsPipeline::~D3D12GraphicsPipeline() {
+@@ -3694,18 +3851,24 @@ namespace plume {
+             const D3D_SHADER_MODEL supportedShaderModels[] = { D3D_SHADER_MODEL_6_0 };
+ #       endif
+             D3D12_FEATURE_DATA_SHADER_MODEL dataShaderModel = {};
++            bool shaderModelSupported = false;
+             for (uint32_t i = 0; i < _countof(supportedShaderModels); i++) {
+                 dataShaderModel.HighestShaderModel = supportedShaderModels[i];
+                 res = deviceOption->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL, &dataShaderModel, sizeof(dataShaderModel));
+-                if (res != E_INVALIDARG) {
+-                    if (FAILED(res)) {
+-                        deviceOption->Release();
+-                        adapterOption->Release();
+-                        continue;
+-                    }
+-
+-                    break;
++                if (res == E_INVALIDARG) {
++                    continue;
+                 }
++
++                shaderModelSupported = SUCCEEDED(res) && dataShaderModel.HighestShaderModel >=
++                    supportedShaderModels[_countof(supportedShaderModels) - 1];
++                break;
++            }
++            // Reject this adapter once, outside the query loop. Releasing it
++            // inside that loop would continue with a freed device/adapter.
++            if (!shaderModelSupported) {
++                deviceOption->Release();
++                adapterOption->Release();
++                continue;
+             }
+ 
+             // Determine if the device supports sample locations.
+@@ -3939,7 +4102,11 @@ namespace plume {
+     }
+ 
+     std::unique_ptr<RenderCommandQueue> D3D12Device::createCommandQueue(RenderCommandListType type) {
+-        return std::make_unique<D3D12CommandQueue>(this, type);
++        auto commandQueue = std::make_unique<D3D12CommandQueue>(this, type);
++        if (commandQueue->d3d == nullptr) {
++            return nullptr;
++        }
++        return commandQueue;
+     }
+     
+     std::unique_ptr<RenderBuffer> D3D12Device::createBuffer(const RenderBufferDesc &desc) {
+@@ -3968,11 +4135,19 @@ namespace plume {
+     }
+ 
+     std::unique_ptr<RenderCommandFence> D3D12Device::createCommandFence() {
+-        return std::make_unique<D3D12CommandFence>(this);
++        auto fence = std::make_unique<D3D12CommandFence>(this);
++        if (fence->d3d == nullptr || fence->fenceEvent == 0) {
++            return nullptr;
++        }
++        return fence;
+     }
+ 
+     std::unique_ptr<RenderCommandSemaphore> D3D12Device::createCommandSemaphore() {
+-        return std::make_unique<D3D12CommandSemaphore>(this);
++        auto semaphore = std::make_unique<D3D12CommandSemaphore>(this);
++        if (semaphore->d3d == nullptr) {
++            return nullptr;
++        }
++        return semaphore;
+     }
+ 
+     std::unique_ptr<RenderFramebuffer> D3D12Device::createFramebuffer(const RenderFramebufferDesc &desc) {
+@@ -4276,4 +4451,14 @@ namespace plume {
+         std::unique_ptr<D3D12Interface> createdInterface = std::make_unique<D3D12Interface>();
+         return createdInterface->isValid() ? std::move(createdInterface) : nullptr;
+     }
++
++    static std::atomic<D3D12GraphicsPipelineCache *> g_d3d12GraphicsPipelineCache{ nullptr };
++
++    void SetD3D12GraphicsPipelineCache(D3D12GraphicsPipelineCache *cache) {
++        g_d3d12GraphicsPipelineCache.store(cache, std::memory_order_release);
++    }
++
++    D3D12GraphicsPipelineCache *GetD3D12GraphicsPipelineCache() {
++        return g_d3d12GraphicsPipelineCache.load(std::memory_order_acquire);
++    }
+ };
+diff --git a/plume_d3d12.h b/plume_d3d12.h
+index 4827452..3b87595 100644
+--- a/plume_d3d12.h
++++ b/plume_d3d12.h
+@@ -9,6 +9,7 @@
+ 
+ #include "plume_render_interface.h"
+ 
++#include <atomic>
+ #include <map>
+ #include <mutex>
+ #include <unordered_map>
+@@ -35,6 +36,18 @@ namespace plume {
+     struct D3D12Texture;
+     struct D3D12TextureView;
+ 
++    // Optional process-wide graphics PSO cache (for example an ID3D12PipelineLibrary
++    // persisted to disk). load() returns an owned reference or nullptr on a miss;
++    // store() is called with every freshly created pipeline. Both may be called
++    // from any thread.
++    struct D3D12GraphicsPipelineCache {
++        virtual ~D3D12GraphicsPipelineCache() = default;
++        virtual ID3D12PipelineState *load(const D3D12_GRAPHICS_PIPELINE_STATE_DESC &desc) = 0;
++        virtual void store(const D3D12_GRAPHICS_PIPELINE_STATE_DESC &desc, ID3D12PipelineState *pipeline) = 0;
++    };
++    void SetD3D12GraphicsPipelineCache(D3D12GraphicsPipelineCache *cache);
++    D3D12GraphicsPipelineCache *GetD3D12GraphicsPipelineCache();
++
+     struct D3D12DescriptorHeapAllocator {
+         enum : uint32_t {
+             INVALID_OFFSET = 0xFFFFFFFFU
+@@ -180,6 +193,30 @@ namespace plume {
+         const D3D12PipelineLayout *activeComputePipelineLayout = nullptr;
+         const D3D12PipelineLayout *activeGraphicsPipelineLayout = nullptr;
+         const D3D12GraphicsPipeline *activeGraphicsPipeline = nullptr;
++        // Opt-in emission caches use native identities, not last-graphics
++        // metadata: compute and ray tracing share the active pipeline state.
++        const void *cachedPipelineObject = nullptr;
++        uint32_t cachedPipelineType = 0;
++        bool cachedPipelineValid = false;
++        ID3D12RootSignature *cachedGraphicsRootSignature = nullptr;
++        ID3D12RootSignature *cachedComputeRootSignature = nullptr;
++        bool cachedGraphicsRootValid = false;
++        bool cachedComputeRootValid = false;
++        uint64_t cachedGraphicsTables[64] = {};
++        uint64_t cachedComputeTables[64] = {};
++        uint64_t cachedGraphicsTablesValid = 0;
++        uint64_t cachedComputeTablesValid = 0;
++        uint64_t cachedGraphicsDescriptors[64] = {};
++        uint64_t cachedComputeDescriptors[64] = {};
++        RenderRootDescriptorType cachedGraphicsDescriptorTypes[64] = {};
++        RenderRootDescriptorType cachedComputeDescriptorTypes[64] = {};
++        uint64_t cachedGraphicsDescriptorsValid = 0;
++        uint64_t cachedComputeDescriptorsValid = 0;
++        // Render target handles last passed to OMSetRenderTargets (state cache only).
++        D3D12_CPU_DESCRIPTOR_HANDLE cachedColorHandles[D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
++        D3D12_CPU_DESCRIPTOR_HANDLE cachedDepthHandle = {};
++        uint32_t cachedColorCount = 0;
++        bool cachedFramebufferValid = false;
+         bool descriptorHeapsSet = false;
+         D3D12_PRIMITIVE_TOPOLOGY activeTopology = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+         uint32_t activeStencilRef = 0;
+@@ -226,6 +263,9 @@ namespace plume {
+         void writeTimestamp(const RenderQueryPool *queryPool, uint32_t queryIndex) override;
+         void checkDescriptorHeaps();
+         void notifyDescriptorHeapWasChangedExternally();
++        // Invalidate PSO/root-signature emission caches after raw D3D changes.
++        // Rebind the intended pipeline/layout through Plume before draw/dispatch.
++        void notifyCommandStateWasChangedExternally();
+         void checkTopology();
+         void checkStencilRef();
+         void checkFramebufferSamplePositions();
+@@ -270,6 +310,7 @@ namespace plume {
+ 
+     struct D3D12Buffer : RenderBuffer {
+         ID3D12Resource *d3d = nullptr;
++        D3D12_GPU_VIRTUAL_ADDRESS gpuVA = 0;
+         D3D12_RESOURCE_STATES resourceStates = D3D12_RESOURCE_STATE_COMMON;
+         D3D12Device *device = nullptr;
+         D3D12MA::Allocation *allocation = nullptr;
+diff --git a/plume_vulkan.cpp b/plume_vulkan.cpp
+index 11abda8..93e34ea 100644
+--- a/plume_vulkan.cpp
++++ b/plume_vulkan.cpp
+@@ -3250,7 +3250,124 @@ namespace plume {
+             imageCopy.imageExtent.depth = srcLocation.placedFootprint.depth;
+             vkCmdCopyBufferToImage(vk, srcBuffer->vk, dstTexture->vk, toImageLayout(dstTexture->textureLayout), 1, &imageCopy);
+         }
+-        else {
++        else if ((dstLocation.type == RenderTextureCopyType::PLACED_FOOTPRINT) && (srcLocation.type == RenderTextureCopyType::SUBRESOURCE)) {
++            if ((dstBuffer == nullptr) || (srcTexture == nullptr)) {
++                assert(false && "Image-to-buffer copy requires a source texture and destination buffer.");
++                return;
++            }
++
++            const auto &footprint = dstLocation.placedFootprint;
++            if ((queue == nullptr) || (queue->type == RenderCommandListType::UNKNOWN) ||
++                (srcTexture->desc.format <= RenderFormat::UNKNOWN) || (srcTexture->desc.format >= RenderFormat::MAX) ||
++                (footprint.format <= RenderFormat::UNKNOWN) || (footprint.format >= RenderFormat::MAX) ||
++                (srcTexture->desc.multisampling.sampleCount != RenderSampleCount::COUNT_1)) {
++                assert(false && "Image-to-buffer copy requires a valid format, queue and single-sampled source.");
++                return;
++            }
++            if ((srcLocation.subresource.mipLevel >= srcTexture->desc.mipLevels) ||
++                (srcLocation.subresource.arrayIndex >= srcTexture->desc.arraySize)) {
++                assert(false && "Image-to-buffer source subresource is outside its texture.");
++                return;
++            }
++            const uint32_t blockWidth = RenderFormatBlockWidth(srcTexture->desc.format);
++            const uint32_t blockSize = RenderFormatSize(srcTexture->desc.format);
++            if ((blockWidth == 0) || (blockSize == 0) || ((blockWidth == 4) && (blockSize != 8) && (blockSize != 16))) {
++                assert(false && "Image-to-buffer copy requires a supported texel block size.");
++                return;
++            }
++            const VkImageAspectFlags aspect = toAspectFlags(srcTexture->desc.format, srcTexture->desc.flags);
++            // Buffer copies select exactly one aspect. The public copy location
++            // has no plane selector, so combined depth/stencil cannot be copied.
++            if ((aspect == 0) || ((aspect & (aspect - 1)) != 0) ||
++                (RenderFormatBlockWidth(footprint.format) != blockWidth) ||
++                (RenderFormatSize(footprint.format) != blockSize) ||
++                (RenderFormatIsDepth(srcTexture->desc.format) != ((aspect & VK_IMAGE_ASPECT_DEPTH_BIT) != 0)) ||
++                (((aspect & VK_IMAGE_ASPECT_DEPTH_BIT) != 0) && (queue->type != RenderCommandListType::DIRECT))) {
++                assert(false && "Image-to-buffer copy requires one aspect and a compatible footprint.");
++                return;
++            }
++
++            VkBufferImageCopy imageCopy = {};
++            imageCopy.imageSubresource.aspectMask = aspect;
++            imageCopy.imageSubresource.baseArrayLayer = srcLocation.subresource.arrayIndex;
++            imageCopy.imageSubresource.layerCount = 1;
++            imageCopy.imageSubresource.mipLevel = srcLocation.subresource.mipLevel;
++            const uint32_t mip = srcLocation.subresource.mipLevel;
++            const uint32_t width = mip < 32 ? std::max(1U, srcTexture->desc.width >> mip) : 1U;
++            const uint32_t height = mip < 32 ? std::max(1U, srcTexture->desc.height >> mip) : 1U;
++            const uint32_t depth = mip < 32 ? std::max(1U, srcTexture->desc.depth >> mip) : 1U;
++            if (srcBox != nullptr) {
++                if ((srcBox->left < 0) || (srcBox->top < 0) || (srcBox->front < 0) ||
++                    (srcBox->left >= srcBox->right) || (srcBox->top >= srcBox->bottom) ||
++                    (srcBox->front >= srcBox->back) || (srcBox->right > width) ||
++                    (srcBox->bottom > height) || (srcBox->back > depth)) {
++                    assert(false && "Image-to-buffer source box is outside its mip.");
++                    return;
++                }
++                imageCopy.imageOffset = { int32_t(srcBox->left), int32_t(srcBox->top), int32_t(srcBox->front) };
++                imageCopy.imageExtent = { uint32_t(srcBox->right - srcBox->left), uint32_t(srcBox->bottom - srcBox->top), uint32_t(srcBox->back - srcBox->front) };
++            }
++            else {
++                imageCopy.imageExtent = { width, height, depth };
++            }
++
++            // rowWidth is in texels, as in the upload path and D3D12's
++            // footprint conversion. Buffer offsets are in compressed blocks.
++            const uint64_t rowBlocks = (uint64_t(footprint.rowWidth) + blockWidth - 1) / blockWidth;
++            const uint64_t imageRows = (uint64_t(footprint.height) + blockWidth - 1) / blockWidth;
++            if ((footprint.width == 0) || (footprint.height == 0) || (footprint.depth == 0) ||
++                (footprint.rowWidth < footprint.width) || (rowBlocks * blockWidth > UINT32_MAX) ||
++                (imageRows * blockWidth > UINT32_MAX) ||
++                (uint64_t(dstX) + imageCopy.imageExtent.width > footprint.width) ||
++                (uint64_t(dstY) + imageCopy.imageExtent.height > footprint.height) ||
++                (uint64_t(dstZ) + imageCopy.imageExtent.depth > footprint.depth) ||
++                ((dstX % blockWidth) != 0) || ((dstY % blockWidth) != 0) ||
++                ((imageCopy.imageOffset.x % blockWidth) != 0) || ((imageCopy.imageOffset.y % blockWidth) != 0) ||
++                (((imageCopy.imageExtent.width % blockWidth) != 0) && (uint64_t(imageCopy.imageOffset.x) + imageCopy.imageExtent.width != width)) ||
++                (((imageCopy.imageExtent.height % blockWidth) != 0) && (uint64_t(imageCopy.imageOffset.y) + imageCopy.imageExtent.height != height))) {
++                assert(false && "Image-to-buffer copy does not fit its footprint or block alignment.");
++                return;
++            }
++            const uint64_t rowPitch = rowBlocks * blockSize;
++            if (rowPitch > INT32_MAX) {
++                assert(false && "Image-to-buffer row pitch exceeds Vulkan's signed 31-bit limit.");
++                return;
++            }
++            // Padding after the final copied row is not accessed. Check stride
++            // arithmetic first, then the exact last accessed byte below.
++            if ((footprint.offset > dstBuffer->desc.size) || (imageRows > UINT64_MAX / rowPitch)) {
++                assert(false && "Image-to-buffer footprint exceeds its buffer.");
++                return;
++            }
++            const uint64_t slicePitch = rowPitch * imageRows;
++            const uint64_t remaining = dstBuffer->desc.size - footprint.offset;
++            const uint64_t lastSlice = uint64_t(dstZ) + imageCopy.imageExtent.depth - 1;
++            if (lastSlice > remaining / slicePitch) {
++                assert(false && "Image-to-buffer slices exceed its buffer.");
++                return;
++            }
++            const uint64_t sliceEnd = lastSlice * slicePitch;
++            const uint64_t lastRow = uint64_t(dstY / blockWidth) + (uint64_t(imageCopy.imageExtent.height) + blockWidth - 1) / blockWidth - 1;
++            const uint64_t rowEnd = lastRow * rowPitch;
++            const uint64_t copiedRow = ((uint64_t(dstX) + imageCopy.imageExtent.width + blockWidth - 1) / blockWidth) * blockSize;
++            if ((rowEnd > remaining - sliceEnd) || (copiedRow > remaining - sliceEnd - rowEnd)) {
++                assert(false && "Image-to-buffer region exceeds its buffer.");
++                return;
++            }
++            imageCopy.bufferOffset = footprint.offset + uint64_t(dstZ) * slicePitch + uint64_t(dstY / blockWidth) * rowPitch + uint64_t(dstX / blockWidth) * blockSize;
++            // VUIDs07975/07978/07746 apply to the final offset, including
++            // destination coordinates. COPY is conservative if its selected
++            // queue family also happens to support graphics or compute.
++            const uint32_t offsetAlignment = ((aspect & VK_IMAGE_ASPECT_DEPTH_BIT) != 0 || queue->type == RenderCommandListType::COPY) ? std::max(4U, blockSize) : blockSize;
++            if ((imageCopy.bufferOffset % offsetAlignment) != 0) {
++                assert(false && "Image-to-buffer final offset is not aligned for its aspect or queue.");
++                return;
++            }
++            imageCopy.bufferRowLength = uint32_t(rowBlocks * blockWidth);
++            imageCopy.bufferImageHeight = uint32_t(imageRows * blockWidth);
++            vkCmdCopyImageToBuffer(vk, srcTexture->vk, toImageLayout(srcTexture->textureLayout), dstBuffer->vk, 1, &imageCopy);
++        }
++        else if ((dstLocation.type == RenderTextureCopyType::SUBRESOURCE) && (srcLocation.type == RenderTextureCopyType::SUBRESOURCE)) {
+             VkImageCopy imageCopy = {};
+             imageCopy.srcSubresource.aspectMask = toAspectFlags(srcTexture->desc.format, srcTexture->desc.flags);
+             imageCopy.srcSubresource.baseArrayLayer = srcLocation.subresource.arrayIndex;
+@@ -3283,6 +3400,9 @@ namespace plume {
+ 
+             vkCmdCopyImage(vk, srcTexture->vk, toImageLayout(srcTexture->textureLayout), dstTexture->vk, toImageLayout(dstTexture->textureLayout), 1, &imageCopy);
+         }
++        else {
++            assert(false && "Unsupported texture copy location combination.");
++        }
+     }
+ 
+     void VulkanCommandList::copyBuffer(const RenderBuffer *dstBuffer, const RenderBuffer *srcBuffer) {

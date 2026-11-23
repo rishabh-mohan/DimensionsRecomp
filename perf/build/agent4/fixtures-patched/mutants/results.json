@@ -1,0 +1,42 @@
+{
+  "constant-timer-on-workers": {
+    "fixture": "test_constant_timing",
+    "caught": true,
+    "reason": "Assertion failed: FakeClock::calls==sampled, file <workspace>\\build\\agent4\\fixtures-patched\\mutants\\constant-timer-on-workers\\out\\constant-timing.cpp, line 148"
+  },
+  "draw-timer-always-on": {
+    "fixture": "test_constant_timing",
+    "caught": true,
+    "reason": "Assertion failed: g_draw_timing.calls==1&&FakeClock::calls==0, file <workspace>\\build\\agent4\\fixtures-patched\\mutants\\draw-timer-always-on\\out\\constant-timing.cpp, line 96"
+  },
+  "draw-timer-serial-counts": {
+    "fixture": "test_constant_timing",
+    "caught": true,
+    "reason": "Assertion failed: g_draw_timing_prepared.calls==1&&g_draw_timing_prepared.stages_ms[0]==3&&g_draw_timing_prepared.stages_ms[1]==1, file <workspace>\\build\\agent4\\fixtures-patched\\mutants\\draw-timer-serial-counts\\out\\constant-timing.cpp, line 143"
+  },
+  "scope-no-fast-path": {
+    "fixture": "test_query_sample_pool",
+    "caught": true,
+    "reason": "Assertion failed: mutex.locks==locks, file <workspace>\\build\\agent4\\fixtures-patched\\mutants\\scope-no-fast-path\\out\\query-pool.cpp, line 122"
+  },
+  "begin-not-counted": {
+    "fixture": "test_query_retirement",
+    "caught": true,
+    "reason": "Assertion failed: active_queries==n, file <workspace>\\build\\agent4\\fixtures-patched\\mutants\\begin-not-counted\\out\\query-retirement.cpp, line 266"
+  },
+  "end-uncounts-dropped": {
+    "fixture": "test_query_retirement",
+    "caught": true,
+    "reason": "Assertion failed: active_queries==n, file <workspace>\\build\\agent4\\fixtures-patched\\mutants\\end-uncounts-dropped\\out\\query-retirement.cpp, line 266"
+  },
+  "release-not-uncounted": {
+    "fixture": "test_query_retirement",
+    "caught": true,
+    "reason": "Assertion failed: active_queries==n, file <workspace>\\build\\agent4\\fixtures-patched\\mutants\\release-not-uncounted\\out\\query-retirement.cpp, line 266"
+  },
+  "reset-keeps-count": {
+    "fixture": "test_query_retirement",
+    "caught": true,
+    "reason": "Assertion failed: active_queries==n, file <workspace>\\build\\agent4\\fixtures-patched\\mutants\\reset-keeps-count\\out\\query-retirement.cpp, line 266"
+  }
+}

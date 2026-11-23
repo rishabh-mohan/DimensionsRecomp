@@ -1,0 +1,53 @@
+W6 finalize (Agent 5, finalize-w6.ps1), 2026-11-22 22:05, -Bin build/agent2/devoff4b-bin  [PIPELINE CHECK with a stand-in bin: do not promote]
+result: OK
+matrix-window6.json  sha256 77651D948009BCD2AA59288FD1DDC4DA1A5A32F12D2F8B525C734AA36F17D0C2  (<workspace>\build\agent5\w6-draft\check\matrix-window6.json)
+RUN-WINDOW6.cmd      sha256 CBB4B2D94FE8BB7BEC32285BA356E06EDE26562D96B859EA99D0EEBFB8134131  (<workspace>\build\agent5\w6-draft\check\RUN-WINDOW6.cmd)
+bin build/agent2/devoff4b-bin  legodimensions.exe sha256 DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83
+
+Agent 8: copy matrix-window6.json to bench\agent8\run\ and RUN-WINDOW6.cmd to bench\agent8\ byte for byte, then check both sha256s.
+GO line for the overnight launcher (perf-notes\WINDOW-GO.txt, one line, only after the copy and Agent 1's go):
+GO W6 matrix-window6.json 77651D948009BCD2AA59288FD1DDC4DA1A5A32F12D2F8B525C734AA36F17D0C2 only=s0,p2,p2f,p2fc repeats=3
+
+--- MANIFEST.txt (first 40 lines)
+# build/agent2/devoff4b-bin - Agent 2 (Agent 1's batch schedule). dev OFF build 4b (S4b = S4a + SDK C1 v3 + M1 + P2c + r1r2 + #26 tool with every new switch OFF + S4c #24 and #30 OFF): NATIVE_GPU=OFF; Release, game x86-64-v3, SDK x86-64-v2.
+# staged 2026-11-22 20:49:02. Source: snapshot build/agent2/snap1/DimensionsRecomp at S4b (STATE-S4b-1950.tsv, sha256 A739468D5FF55C400A5053748B757DDECA76D388DF788B2A303C06EE62E61378); build tag snap4b; every patch applied to the snapshot since S1 is listed below.
+# SDK: build/agent2/snap1-sdk (REXGLUE_BUILD_TESTS=OFF), built from the same snapshot (incrementally after S1) and installed to snap1-sdk/install; game tree build/agent2/snap1-off; codegen 0.0.23.3 (pinned generated output hash-checked against baseline/ by gen-check.py; codegen-frozen.exe stand-in writes nothing).
+# S4b build inputs (board run 2, task #1 = old #28): snap1 at S4a (STATE-S4a-1325.tsv; the trees behind devoff4-bin and native4-bin) + 16 files. rexglue-sdk: 13 files, made by git apply of the staged diffs in the order C1 v3 -> M1 -> P2c -> r1r2 -> #26 to the S4a snap1 copies, each step hash-checked against its staging record (command_processor.cpp: P2c then r1r2, final 027204B53A271D69 = Agent 10 composite); nothing was copied from live and live was not written.
+# C1 = v3 (Agent 12, build/agent12/s4-c1v3/keep-watch-v3.diff sha256 DECCFE3373C27C3C; --c1): include/rex/graphics/shared_memory.h, include/rex/system/xmemory.h (PCH closure: a full rebuild), src/graphics/primitive_processor.cpp, src/graphics/shared_memory.cpp, src/system/xmemory.cpp; rexlego/src/gpu_native/memory_watch.cpp (native builds only) = the staged CRLF after-file 70829846C4F321A9 (== keep-watch-rexlego.diff applied to the LF form).
+# M1 (Agent 5): src/graphics/d3d12/shared_memory.cpp. P2c (Agent 12) + r1r2 (#18/#20, Agent 7): command_processor.cpp/.h, deferred_command_list.cpp/.h (REX_D3D12_DEFERRED_COUNTERS 0: counters compiled out). #26 (Agent 9): codegen tool option db16cyc_pause, default OFF; the game builds keep the pinned S1 generated output (gen-check against baseline/).
+# New switches, all OFF by default: physical_protect_keep_watch_verify (rexgpu-xenos.dll, BOOL, default false); physical_protect_keep_watch (rexruntime.dll, BOOL, default false); shared_memory_upload_nontemporal_copy (rexgpu-xenos.dll, BOOL, default false); d3d12_submit_split_kb (rexgpu-xenos.dll, UINT32, default 0).
+# S4c, the last step (Agent 9, build/agent9/s4/fence-wait/s4c/s4c-24-30.diff sha256 DC02104EA76E0BF6): rexlego/CMakeLists.txt + new rexlego/src/gpu_wait_backoff.cpp (01D9F8F3): #24 GPU wait back-off hooks on sub_83FBF7D0, sub_83FAF180, sub_83FB09E8, sub_83FC0C10, OFF builds only (LEGO_GPU_WAIT_HOOK_GETDATA=1); env LEGO_GPU_WAIT_BACKOFF_US unset = OFF (every hook calls the original at once), LEGO_GPU_WAIT_SPIN_US, LEGO_GPU_WAIT_STATS; #30 CMake option LEGODIMENSIONS_SCENE_WALK_PROBE, default OFF.
+# B4 deferred. Per-file hashes: build/agent2/s4b/HASHES.txt; new strings: build/agent2/S4b-strings.tsv.
+# patches in PATCHES-S1.tsv (sha256 74655029008CAFE72595CDA70BE7A85479742022E9E295E12AD157BE7C779499); before -> after sha256 prefixes:
+#   S1+p1 rexlego/src/gpu_native/device.cpp: 4C15043E486A6225 -> 4DC63FA0B804C5FE
+#   S1+p2 thirdparty/plume/plume_d3d12.cpp: B88E4E86DE5E5DEC -> 564568D4D5853F22
+# patches in PATCHES-S2.tsv (sha256 B25547164383CC7514498BBFC1B6EDDC3B505DDA1223B26D3368DEBFF6729C6F); before -> after sha256 prefixes:
+#   S2 A12 rexglue-sdk/include/rex/audio/audio_system.h: 8F8A2E71A05258B0 -> 4836B139802D3438
+#   S2 A12 rexglue-sdk/src/audio/audio_system.cpp: 7E129AF6EA359947 -> C281FA8625435EFE
+#   S2 A5 rexlego/src/gpu_native/buffers.cpp: DB8FE4864DBAF207 -> 75025044C39FF910
+#   S2 A7 rexlego/src/gpu_native/device.cpp: 4DC63FA0B804C5FE -> 3D01E63142DBFB50
+#   S2 A7 rexlego/src/gpu_native/device.h: 12391F5CE364E280 -> 703939AA91EFEA81
+#   S2 A6 (applied by A4) rexlego/src/gpu_native/draw.cpp: 751C219EA5CCCD2F -> 50AA3B1DEE615678
+#   S2 A7 rexlego/src/gpu_native/fps_counter.h: 79FC841E3180CA0D -> E05D6A554042B302
+#   S2 A6 rexlego/src/gpu_native/pipeline_snapshot.h: A0B71DB586139545 -> 42318B849FAE030B
+#   S2 A5 rexlego/src/gpu_native/texture_scratch.h: D1F0A5C3BB8427D6 -> 8F6A12AE70994065
+#   S2 A5 rexlego/src/gpu_native/texture_upload_source.h: E8BD27D3713FFE28 -> FF9E11417227A8BA
+#   S2 A5 rexlego/src/gpu_native/texture_volume_upload.h: 328DFCEC476599C2 -> D0601ECF0150DF8F
+#   S2 A5 (+A4 (a)) rexlego/src/gpu_native/textures.cpp: A6B45772D017F8D4 -> 3011ADD45516123F
+#   S2 A5 rexlego/src/gpu_native/upload_buffer_pool.h: 3EDE3AFC0F6A368E -> 853E6C16BE4082B9
+#   S2 A5 rexlego/src/gpu_native/upload_legacy_paths.h: ABSENT -> 5C823F13B067C93A
+#   S2 A5 rexlego/src/gpu_native/vertex_upload.h: 7FC6952362FF4B8E -> FFD2B023AC4CC6D5
+#   S2 A6 tools/gpu-aot/patches/plume-winsdk-compat.patch: ABSENT -> E03D29D0758E6150
+#   S2 A6 tools/gpu-aot/prepare_plume.py: CED19F81CF923329 -> B3C877379038091E
+#   S2 A6 tools/gpu-aot/test_prepare_plume.py: 82039EBA12F58180 -> DA360ABA28D609A3
+# patches in PATCHES-S3.tsv (sha256 2DA2AB6CA49E3723AFD4E26FA07927511E9C5C9FC71C54701EE599C88430F3B0); before -> after sha256 prefixes:
+#   S3 A1 .gitignore: 09246E1BCE8B929F -> 600E2436DED4671D
+#   S3 A1 (user fork url) .gitmodules: E7D25A2108620FFC -> C6E629165C283832
+#   S3 A9 rexglue-sdk/include/rex/codegen/config.h: 929EEDA15600105B -> D07C575FF2904B87
+#   S3 A9 rexglue-sdk/include/rex/codegen/function_types.h: 7331CDE11B9BFACE -> 3CBD9F6DC3850CD1
+#   S3 A12 rexglue-sdk/src/audio/audio_system.cpp: C281FA8625435EFE -> 4331A312A9FE8F15
+#   S3 A9 rexglue-sdk/src/codegen/builders/builder_context.h: 2168678C8A40CA4B -> 873A69BBC0134BBA
+#   S3 A9 rexglue-sdk/src/codegen/builders/context.cpp: AA887012DA1F7F1D -> 7710107CE9C577CA
+#   S3 A9 rexglue-sdk/src/codegen/builders/control_flow.cpp: 046462FCB7B46677 -> 61538970604512DB
+
+--- run-matrix.ps1 -Matrix <matrix-window6.json> -Only s0,p2,p2f,p2fc -Repeats 3 -ColdShared -NoPrompt -PlanOnly (skipped: -NoPlan)

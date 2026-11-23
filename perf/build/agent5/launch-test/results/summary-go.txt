@@ -1,0 +1,20 @@
+group go, 2026-11-23 07:52:00, run-night.ps1 565D30D40DC5025AD63FD9B9F606724BABC167BC81FCB6FBEB6362B603977112; -StopAt 2026-11-23 11:00 for the launchers without their own
+
+test                        tag             result exit detail
+----                        ---             ------ ---- ------
+good GO                     t-good          PASS   0    ok    
+bad hash                    t-badhash       PASS   0    ok    
+bin outside agent2          t-badbin        PASS   0    ok    
+disallowed env key          t-badenv        PASS   0    ok    
+driver rule x5              t-driver        PASS   0    ok    
+unknown argument            t-unknownarg    PASS   2    ok    
+refuse: end > 14 h away     t-14h           PASS   2    ok    
+latest start at GO          t-latest-go     PASS   0    ok    
+malformed GO x7             t-badgo         PASS   0    ok    
+refuse: not WinSta0\Default t-startref      PASS   2    ok    
+hooks need -DryRun          t-hooks         PASS   2    ok    
+second launcher refused     t-mutex         PASS   2    ok    
+deadline at GO              t-deadline-go   PASS   0    ok    
+deadline in gate            t-deadline-gate PASS   0    ok    
+deadline, no GO             t-deadline-wait PASS   0    ok    
+latest start in gate        t-latest-gate   PASS   0    ok

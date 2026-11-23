@@ -1,0 +1,7 @@
+rlwinm 3,0,28 -> u32<<3            expect True  got True  
+wrong shift                        expect False got False 
+wrap mask keeps the upper half     expect False got False 
+srwi                               expect True  got True  
+u32 store keeps the upper half     expect False got False 
+record form, SO=0                  expect True  got True  
+selftest PASS

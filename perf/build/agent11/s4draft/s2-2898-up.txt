@@ -1,0 +1,23 @@
+﻿
+## 21:29 Agent 1: cron 4. Gate A hang triaged; launcher MUSTs; hard stop 07:30
+
+- Hold manager running (pid 25948 since 19:29). No HOLD. native4b still compiling (ETA was ~21:20). 8.0 GB RAM free.
+- **w6gA (gate A, p2fc + verify + slow_frame_log_ms=1, L route, devoff4b): exit 1 = RECOVERED HANG** (build/agent3/runs/20261122-210906-w6-gateA-p2fcv-level).
+  - 1 STUCK-LOCK at 544.95 s (CS 0x84959edc), dump hang-36276.dmp, closed fine by WM_CLOSE.
+  - The owner is parked at lr=83FAF188, inside sub_83FAF180: #24's H1, the poll step of the L1 GPU fence wait. In devoff4b that function lives in gpu_wait_backoff.cpp; with #24 off it goes straight to `__imp__`. The callers are in the same wait path (83FBF698/83FBFA98 near sub_83FBF7D0 = H0; 83FBFBDC in sub_83FBFB30). This is the known stuck lock, finding 10 (S4-DRAFT L454: v0.2.0 hits it too).
+  - It happened while verify mode made the game about 9x slower: ~12-20 fps vs ~125-150 fps for s4bL0 (OFF) in the same 218-226-draw scene, and the -j8 compile was running. w6s2 (p2fc, no verify, uncapped, title) ran 100-440 fps, exit 0, 0 errors. So the slowness comes from the verify debug mode, not from the timed p2fc set.
+  - Gate A log check (Agent 1): `C1 verify: on` 1, `first kept protect at` 1, `C1 verify K:`/`F:` 0, `keep-watch: on (with ...hold_global_lock)` 1, `...is off` 0, `Recovered` 0. G5 and G8 pass; G4 (p2c_check) comes from Agent 3's postcheck.
+  - **Rule:** a STUCK-LOCK whose owner is in the L1 poll (sub_83FAF180), seen under verify or build load, counts as a WARN (finding 10), not a W6 FAIL. Gate A passes if G4, G5 and G8 pass. The W6 read-out reports STUCK-LOCK counts per arm (p2fc vs s0).
+- W6 finalize done by Agent 5 at 21:16-21:17: build/agent5/w6-draft/matrix-window6.json (E50D791B…), RUN-WINDOW6.cmd (3F31CBA8…), FINAL.txt. Agent 8 promotes after w6s1 passes and Agent 3 confirms G4 on gate A and side 2.
+- Launcher run-night.ps1 3EFC5312 (21:15), Agent 10's interim read: F1, F3, (6), (7) and (8) are in.
+  - New MUST: Stop-Tree must not use `taskkill /T`, because PID reuse could kill explorer or the grid. Walk a Win32_Process snapshot down from the runner, keeping only children created at or after their parent; Stop-Process each, then $P.Kill(). If CIM fails, use only $P.Kill() plus the build\agent2 legodimensions sweep.
+  - MUST: restore the driver allowlist (thread-cpu, pso-stats-at-end, io-counters) on top of the path rule.
+  - SHOULD: Get-BuildProcs in Start-WindowLocked.
+  - **Agent 1: the hard stop is 07:30, not 07:45.**
+  - **Copilot confirmed:** on this PC "Copilot" is the Microsoft 365 Copilot app (Microsoft.MicrosoftOfficeHub, the only Copilot installed). copilotapphost/copilotapp_proxy with the path check are approved. The Store Roblox Windows10Universal (path-checked) is the player: approved.
+
+## 21:33 Agent 1: W5 logdiff clean; Agent 6 on the W6 logdiff kit
+
+- Agent 6 #13 done: W5 logdiff (build/agent8/matrix/20261122-1756). All 16 runs are clean: STUCK 0, no WER or dumps, NEW/MORE/GONE/FAIL 0 for every arm against both s0 and base. The d11, d11p and d11t lines are only the expected timer lines. Base vs s0 (S3d→S4a): no line difference. The slow runs (s0-r2, base-r2, d11t-r3) have normal logs, so the cause is CPU placement or contention (P-cores 91-99 %, E-cores at their lowest clocks). d11t/d11p cut TimerQueue busy from ~50 % to ~5 % with no change in frame time. Output: build/agent6/w4b/out-20261122-1756-vs-s0/ and -vs-base/; notes §13 of perf-notes/agent6-attract-stalls.md.
+- New task for Agent 6 (read-only): (1) an independent check of whether gate A's STUCK-LOCK matches finding 10, by 22:15; (2) a W6 logdiff kit with the expected lines per arm, taken from Agent 3's devoff4b functional runs and tested on W5. The morning W6 logdiff starts on Agent 1's word.
+

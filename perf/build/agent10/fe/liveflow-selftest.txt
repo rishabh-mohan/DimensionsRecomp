@@ -1,0 +1,10 @@
+ok  write, call, read -> S                             want [('S', 'cr6', 'eq')] got [('S', 'cr6', 'eq')]
+ok  call on a path that jumps away -> clean            want [] got []
+ok  tail call in a brace block -> clean                want [] got []
+ok  non-tail call in a brace block, fallthrough -> S   want [('S', 'cr6', 'gt')] got [('S', 'cr6', 'gt')]
+ok  read before any write -> U                         want [('U', 'cr6', 'lt')] got [('U', 'cr6', 'lt')]
+ok  loop: read at the head, write later -> U on entry  want [('U', 'cr6', 'eq')] got [('U', 'cr6', 'eq')]
+ok  ctr loop with a call inside -> S at --ctr          want [('S', 'ctr', None)] got [('S', 'ctr', None)]
+ok  helper call (__savegprlr) -> clean                 want [] got []
+ok  self-update is a read then a write -> U once       want [('U', 'cr6', 'eq'), ('U', 'cr6', 'lt')] got [('U', 'cr6', 'eq'), ('U', 'cr6', 'lt')]
+liveflow selftest: 0 bad of 9

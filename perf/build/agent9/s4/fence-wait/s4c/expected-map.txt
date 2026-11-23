@@ -1,0 +1,41 @@
+# maplines (#24 S4c: expected map change; Agent 9, task #22)  2026-11-22 15:53:59
+map: build/agent2/devoff4-bin/legodimensions.map  39162310 B  mtime 11-22 13:30  sha256 DCC51E2B7A0040E2
+publics 353031; sub_ 164786 (164759 in recompiled-TU objects); __imp__sub_ aliases 164786; hooked (__imp__sub_X not at sub_X): 27
+hooked today, by the object that defines sub_X:
+  crash_guards.cpp.obj                  2  sub_82A35B90 sub_83C01C08
+  main_menu_extras.cpp.obj              3  sub_82F03C40 sub_82FBE7A8 sub_82FE4A80
+  name_trace.cpp.obj                    5  sub_82A3D980 sub_83470AF8 sub_834B8168 sub_836F5AD0 sub_83715F00
+  native_atomics.cpp.obj                3  sub_82A2A0E8 sub_82A2A138 sub_82A2A160
+  native_constants.cpp.obj              1  sub_82B7ABF0
+  native_lock_elide.cpp.obj             7  sub_82A2CAB0 sub_82A2CC20 sub_82A34E28 sub_82A34FE8 sub_82A35D28 sub_82A4CA18 sub_83F99CB8
+  native_markers.cpp.obj                2  sub_82A3E238 sub_82A3E2B8
+  native_memops.cpp.obj                 2  sub_83E45090 sub_83E46040
+  scene_distance.cpp.obj                2  sub_82C6F428 sub_83A11F50
+format (the raw lines of one hooked function today):
+   0001:0976c660       sub_82A2A0E8               000000014976d660     native_atomics.cpp.obj
+   0001:01653690       __imp__sub_82A2A0E8        0000000141654690     legodimensions_recomp.65.cpp.obj
+the 4 #24 targets today (each must be unhooked: sub_X at __imp__sub_X, in the same recompiled TU):
+  H0 sub_83FBF7D0 (fence wait, loop L1): unhooked (legodimensions_recomp.248.cpp.obj)
+     0001:0558ed90       sub_83FBF7D0               000000014558fd90     legodimensions_recomp.248.cpp.obj
+     0001:0558ed90       __imp__sub_83FBF7D0        000000014558fd90     legodimensions_recomp.248.cpp.obj
+  H1 sub_83FAF180 (L1's poll step): unhooked (legodimensions_recomp.107.cpp.obj)
+     0001:0251b220       sub_83FAF180               000000014251c220     legodimensions_recomp.107.cpp.obj
+     0001:0251b220       __imp__sub_83FAF180        000000014251c220     legodimensions_recomp.107.cpp.obj
+  H2 sub_83FB09E8 (GetData, loop L2; needs LEGO_GPU_WAIT_HOOK_GETDATA): unhooked (legodimensions_recomp.422.cpp.obj)
+     0001:091a8990       sub_83FB09E8               00000001491a9990     legodimensions_recomp.422.cpp.obj
+     0001:091a8990       __imp__sub_83FB09E8        00000001491a9990     legodimensions_recomp.422.cpp.obj
+  H3 sub_83FC0C10 (kick counter, STATS only; needs LEGO_GPU_WAIT_HOOK_GETDATA): unhooked (legodimensions_recomp.232.cpp.obj)
+     0001:04fe8910       sub_83FC0C10               0000000144fe9910     legodimensions_recomp.232.cpp.obj
+     0001:04fe8910       __imp__sub_83FC0C10        0000000144fe9910     legodimensions_recomp.232.cpp.obj
+expected after S4c on the OFF devoff bin (the CMake block sets LEGO_GPU_WAIT_HOOK_GETDATA=1):
+  H0  sub_83FBF7D0 -> gpu_wait_backoff.cpp.obj   (__imp__sub_83FBF7D0 stays at 0001:0558ED90 in legodimensions_recomp.248.cpp.obj)
+  H1  sub_83FAF180 -> gpu_wait_backoff.cpp.obj   (__imp__sub_83FAF180 stays at 0001:0251B220 in legodimensions_recomp.107.cpp.obj)
+  H2  sub_83FB09E8 -> gpu_wait_backoff.cpp.obj   (__imp__sub_83FB09E8 stays at 0001:091A8990 in legodimensions_recomp.422.cpp.obj)
+  H3  sub_83FC0C10 -> gpu_wait_backoff.cpp.obj   (__imp__sub_83FC0C10 stays at 0001:04FE8910 in legodimensions_recomp.232.cpp.obj)
+  hooked aliases 27 -> 31. The other 27 stay as they are, and the sub_ and __imp__ name sets do not change (the new TU defines only these 4 sub_ publics plus its own statics).
+  Without the define (H0/H1 only): 27 -> 29. Native bins: no change (the file is not compiled when LEGODIMENSIONS_NATIVE_GPU is ON; native defines sub_83FB09E8 and sub_83FC0C10 itself, gpu_native/queries.cpp:320 and hooks_device.cpp:340).
+  template: the H0 line today with the object replaced (the address moves into the rexlego objects):
+     ????:????????       sub_83FBF7D0               ????????????????     gpu_wait_backoff.cpp.obj
+expected hooked set after S4c (31 names, sorted):
+  sub_82A2A0E8 sub_82A2A138 sub_82A2A160 sub_82A2CAB0 sub_82A2CC20 sub_82A34E28 sub_82A34FE8 sub_82A35B90 sub_82A35D28 sub_82A3D980 sub_82A3E238 sub_82A3E2B8 sub_82A4CA18 sub_82B7ABF0 sub_82C6F428 sub_82F03C40 sub_82FBE7A8 sub_82FE4A80 sub_83470AF8 sub_834B8168 sub_836F5AD0 sub_83715F00 sub_83A11F50 sub_83C01C08 sub_83E45090 sub_83E46040 sub_83F99CB8 sub_83FAF180 sub_83FB09E8 sub_83FBF7D0 sub_83FC0C10
+RESULT: PASS: 27 hooked today, all 4 targets unhooked  (3.4s)

@@ -1,0 +1,35 @@
+# Matrix recheck: <workspace>\build\agent8\matrix\20261122-0349
+
+Session 3 functional checks (agent slot, hidden desktop, NOT timing): d0t = devoff2 + REX_TIMER_WAIT_BLOCKING=1, d11t = window 3's d11 + REX_TIMER_WAIT_BLOCKING=1 (Agent 11), d0f = devoff2
+
+3 result rows; 3 scored runs kept (0 of them with only benign problems); min window cover 90%; valid_timing ignored (--all); 0 scored runs flagged excluded (dropped); 3 scored runs with the slow state in their window (E-cores < 800 MHz for 3+ samples; kept; --drop-slow drops them).
+
+## Runs
+
+| seq | round | arm | rep | status | kept | median ms | fps | p99 ms | >33 | >100 | window s | marks s | ff->win s | light | slow | cpu cores | top1 thread busy % (name) | gpu util % | flags | notes |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 1 | d0t | 1 | OK | yes | 7.62 | 78.0 | 73.7 | 403 | 12 | 50.0 | 50.1 | 60.0 | 0.323 | 69 s / 84% ! | 2.00 | 74.7 (XThreadAA38 (F80001A8)) | 32 | never_foreground |  |
+| 2 | 1 | d11t | 1 | OK | yes | 7.17 | 62.0 | 71.3 | 573 | 2 | 50.0 | 50.0 | 60.0 | 0.181 | 42 s / 44% ! | 1.77 | 76.4 (XThread17394 (F80001A8)) | 33 | never_foreground |  |
+| 3 | 1 | d0f | 1 | OK | yes | 9.40 | 52.2 | 80.9 | 588 | 8 | 50.0 | 50.0 | 60.0 | 0.117 | 61 s / 100% ! | 2.23 | 79.2 (XThread16AE0 (F80001A8)) | 27 | ticks_skipped never_foreground |  |
+
+`marks s` is the wall time between the measure marks (summary.txt `align` line); it should be close to the planned window. `ff->win s` is first-frame signal to window start (floor: min_window_after_ff_s); `light` is the share of window frames under light_ms; flags ending in `!` are excluding flags. `slow` is the slow-state onset in s after the first-frame signal / the share of window sys.csv samples with the E-cores under 800 MHz; `!` = a stretch of 3+ such samples overlaps the window (Agent 11: not a result); `no` = never; `-` = no sys.csv.
+
+## Arms (kept runs)
+
+| group | arm | ref | n | median of medians (min..max) ms | p99 ms | p99.9 ms | >33 ms per min | >100 ms per min | cpu cores (min..max) | boot s | fps | top1 thread busy % (min..max), n | thread cores | gpu util % mean (p90) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| s3 | d0t |  | 1 | 7.622 (7.622..7.622) | 73.7 | 116.8 | 483.5 | 14.40 | 2.00 (2.00..2.00) | 9.0 | 78.0 | 74.7 (74.7..74.7), 1 | 1.99 | 32 (50) |
+| s3 | d11t |  | 1 | 7.167 (7.167..7.167) | 71.3 | 96.5 | 687.6 | 2.40 | 1.77 (1.77..1.77) | 10.0 | 62.0 | 76.4 (76.4..76.4), 1 | 1.76 | 33 (44) |
+| s3 | d0f | * | 1 | 9.405 (9.405..9.405) | 80.9 | 132.0 | 705.3 | 9.60 | 2.23 (2.23..2.23) | 9.0 | 52.2 | 79.2 (79.2..79.2), 1 | 2.27 | 27 (33) |
+
+## Deltas against each group reference
+
+| group | arm | vs | delta median ms (%) | paired by round: median delta (min..max), rounds faster | delta p99 ms | delta >33/min | delta cpu cores | delta fps % | paired delta top1 busy pts (n) | verdict |
+|---|---|---|---|---|---|---|---|---|---|---|
+| s3 | d0t | d0f | -1.783 (-19.0%) | -1.783 (-1.783..-1.783), 1 of 1 | -7.2 | -221.8 | -0.24 | 49.6 | -4.5 (1) | FASTER: every run below the reference range |
+| s3 | d11t | d0f | -2.238 (-23.8%) | -2.238 (-2.238..-2.238), 1 of 1 | -9.6 | -17.7 | -0.46 | 18.8 | -2.8 (1) | FASTER: every run below the reference range |
+
+## One-line results
+
+- d0t vs d0f: median 7.62 vs 9.40 ms (delta -1.78, -19.0%; paired -1.78, 1/1 rounds faster), fps 78.0 vs 52.2 (49.6%), p99 73.7 vs 80.9, >33/min 483.5 vs 705.3, >100/min 14.40 vs 9.60, cpu 2.00 vs 2.23 cores, top1 thread busy 74.7 vs 79.2 % (paired -4.5); ref range 9.40..9.40; n 1/1; FASTER: every run below the reference range
+- d11t vs d0f: median 7.17 vs 9.40 ms (delta -2.24, -23.8%; paired -2.24, 1/1 rounds faster), fps 62.0 vs 52.2 (18.8%), p99 71.3 vs 80.9, >33/min 687.6 vs 705.3, >100/min 2.40 vs 9.60, cpu 1.77 vs 2.23 cores, top1 thread busy 76.4 vs 79.2 % (paired -2.8); ref range 9.40..9.40; n 1/1; FASTER: every run below the reference range

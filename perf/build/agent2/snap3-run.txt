@@ -1,0 +1,29 @@
+﻿02:42:07 [off] verify S3 : exit 0 : verify S3 against STATE-S3-0241.tsv: 23843 files, 0 hashed (size/mtime changed), 25 backups checked, 0 extra file(s) in snap1, 0 problem(s), 1.1s
+02:42:07 [off] START S3 off (tag snap3, -j 10) -> devoff3-bin
+02:42:07 [off] BEGIN build : <workspace>\build\agent2\build-snap.ps1 -Phase all -Tag snap3 -Jobs 10 -KeepGoing -SkipConfigure
+02:44:01 [off] END   build exit=0 wall=113.6s freeC=255.00GB
+02:44:02 [off] rexruntime.dll in snap1-off == install/bin (D1D66AC3716835AC)
+02:44:02 [off] BEGIN stage : <workspace>\build\agent2\stage-snap-bin.ps1 -Variant off -SnapTag S3 -BuildTag snap3 -RuntimeStrings audio_shutdown_detach_worker,leave it running and leak what it can still reach -ExeStrings which can hang when the guest pauses -ManifestNotesFile <workspace>\build\agent2\S3-notes.txt
+02:44:18 [off] END   stage exit=0 wall=16.1s freeC=254.79GB
+02:44:18 [off]   PASS staged copy identical: FiraSans-Regular.ttf
+02:44:18 [off]   staged 7 files into <workspace>\build\agent2\devoff3-bin (214.3 MB)
+02:44:19 [off]   staged legodimensions.exe: 170335232 B, sha256 2522D43605D8A9BF2A5EEE31490E6C349274D3258C8E0E1474DBB561CDE86F57
+02:44:19 [off]   staged legodimensions.map: 39162310 B, sha256 CE2836A0574BDB56FDB4C106B1208A8B47161C5C38154E5CF26C0DF359506DB1
+02:44:19 [off]   staged rexruntime.dll: 10889728 B, sha256 D1D66AC3716835AC40E1C61BC0600C147564563AE20E0D339AE7A00A77E3A1D8
+02:44:19 [off]   staged MANIFEST.txt: 21346 B, sha256 B9C5175DA19042353A084E355CBA22D09C50A6B8CE95A1E0A8B17BF64E40FEFE
+02:44:19 [off] DONE S3 off, total wall 132.0s
+02:44:40 [native] verify S3 : exit 0 : verify S3 against STATE-S3-0241.tsv: 23843 files, 0 hashed (size/mtime changed), 25 backups checked, 0 extra file(s) in snap1, 0 problem(s), 0.3s
+02:44:40 [native] START S3 native (tag snap3, -j 10) -> native3-bin
+02:44:40 [native] BEGIN build : <workspace>\build\agent2\build-snap.ps1 -Phase game -Native -Tag snap3 -Jobs 10 -PrelinkJobs 10 -KeepGoing
+02:45:32 [native] END   build exit=0 wall=51.8s freeC=254.79GB
+02:45:33 [native] rexruntime.dll in snap1-on == install/bin (D1D66AC3716835AC)
+02:45:34 [native] BEGIN stage : <workspace>\build\agent2\stage-snap-bin.ps1 -Variant native -SnapTag S3 -BuildTag snap3 -RuntimeStrings audio_shutdown_detach_worker,leave it running and leak what it can still reach -ExeStrings which can hang when the guest pauses,LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD,LEGO_NATIVE_FPS_CELL_RECTS,LEGO_NATIVE_TEXTURE_STAGING_POOL -ManifestNotesFile <workspace>\build\agent2\S3-notes.txt
+02:46:01 [native] END   stage exit=0 wall=27.6s freeC=254.48GB
+02:46:01 [native]   PASS staged copy identical: amd_fidelityfx_dx12.dll
+02:46:01 [native]   staged 8 files into <workspace>\build\agent2\native3-bin (363.7 MB)
+02:46:02 [native]   staged legodimensions.exe: 315790336 B, sha256 7F7F8586D219465C15082FB80F3B60130244FD865BC785AC4E7BFD8B0B140AAD
+02:46:02 [native]   staged legodimensions.map: 43712449 B, sha256 F96136D0A323980ED90DCF100C46BC09256B1A0823A5189550FFFA5E5DB6C53A
+02:46:03 [native]   staged rexruntime.dll: 10889728 B, sha256 D1D66AC3716835AC40E1C61BC0600C147564563AE20E0D339AE7A00A77E3A1D8
+02:46:03 [native]   staged MANIFEST.txt: 23574 B, sha256 B50FE8D4A16565DAEC5FA0883E02036759E60A0E3025A27F7FEFF0755069EB52
+02:46:03 [native]   native GPU fingerprint: LEGO Dimensions native GPU 8f849b69907d4006
+02:46:03 [native] DONE S3 native, total wall 82.5s

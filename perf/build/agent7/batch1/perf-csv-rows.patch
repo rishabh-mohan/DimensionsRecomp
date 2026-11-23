@@ -1,0 +1,13 @@
+diff --git a/rexlego/src/gpu_native/device.cpp b/rexlego/src/gpu_native/device.cpp
+index 1204920..fa0e8dc 100644
+--- a/rexlego/src/gpu_native/device.cpp
++++ b/rexlego/src/gpu_native/device.cpp
+@@ -2262,6 +2262,8 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
+     rex::perf::SetCounter(rex::perf::CounterId::kFrameTimeUs,int64_t(frame_ms*1000.0+0.5));
+     rex::perf::SetCounter(rex::perf::CounterId::kFps,int64_t(fps));
+     rex::perf::ResetFrameCounters();
++    // Profiler::Flip() also writes the --perf_log_csv row (no-op without it).
++    rex::perf::WriteCsvFrame();
+   }
+   if (state.gpu_timestamps)
+     state.gpu_timestamps->PresentResult(slot, presented);

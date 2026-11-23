@@ -1,0 +1,33 @@
+# HASHES.txt (Agent 9, run-2 task #17): #26 codegen db16cyc -> simde_mm_pause(), option db16cyc_pause (default OFF)
+# SHA-256. SDK paths are relative to the SDK root; toml paths to DimensionsRecomp/. Made by stage.py.
+
+live SDK  DimensionsRecomp/rexglue-sdk HEAD c5fe668e76853630ffc6df2761e9cd8ed5368476 Sun Nov 22 02:21:16 2026 -0600
+snap1 SDK build/agent2/snap1/DimensionsRecomp/rexglue-sdk (S4a snap; codegen untouched)
+
+## SDK files: base (live == snap1), new
+base D07C575FF2904B8753FA4B4306847375EC2EB69156355947E874AFFFC19F46C2  include/rex/codegen/config.h  6941 B  (live = snap1)
+new  CD39B0E110D3E0FD9E602446111183CB941478BF9057389BB815F125060D2087  include/rex/codegen/config.h  7032 B  (+1 lines)
+base 0ED529B7E5F0F4E7CC0A4551A1C5C3A3191F03D28D491D517850898D5062FCFD  src/codegen/config.cpp  23576 B  (live = snap1)
+new  4706A7F22C3859D6DBE8E7A3150B3403548856BAD626952818F7B96B3D5935DF  src/codegen/config.cpp  23701 B  (+2 lines)
+base D1269273636B5A1A57BE6E467CE19326EAEA38F7E0E5A0C157D4B23998D10506  src/codegen/builders/system.cpp  12635 B  (live = snap1)
+new  FAD4372074D32D69D5B2CB0B100F283E239A426C3E015DBD66C22BCB693998D2  src/codegen/builders/system.cpp  12947 B  (+4 lines)
+diff AC554DBBD965BF941BADE6391D0E0F483BE075B8A72434EEE8CB9D189ED61452  db16cyc-pause.diff  1969 B  (apply from the SDK root: git apply -p1, or patch -p1)
+     patch --binary -p1 onto base/: exit 0, result == new/: yes  [patching file include/rex/codegen/config.h | patching file src/codegen/config.cpp | patching file src/codegen/builders/system.cpp]
+
+## codegen config toml (one line each; root key, before [functions])
+B base E60EAF1CEB575572BA0274AA5F52E97F25A35C01690B41E6A637739408E6A090  build/agent9/install/batch-nolr/legodimensions_config.toml  19002 B  (= build/agent2/snapB/DimensionsRecomp/rexlego/legodimensions_config.toml)
+B new  FFC119BFE2639E30E8CEC4E5258F1428DB06C62E0E880003DCF9EF1113B7B570  +1 line after line 36: db16cyc_pause = true (CRLF)
+B diff 5D5892D33D09AF9D6889AF5BC991C82CD4443A8F7493053584BF6889261585B3  toml-db16cyc-pause-B.diff  (apply from DimensionsRecomp/: patch --binary -p1)
+       patch onto base: exit 0, result == new: yes  [patching file rexlego/legodimensions_config.toml]
+A base 7F775847DB9CC2DA89DC3EDE57A0AD5F30FDF58D98F5021A0E27A4E0E4DA95BF  DimensionsRecomp/rexlego/legodimensions_config.toml  18145 B  (= build/agent2/snap1/DimensionsRecomp/rexlego/legodimensions_config.toml)
+A new  11707872E82D8B524D59B2E62DEABBABB90F10E2707CB2825338A920BD4D5FCF  +1 line after line 23: db16cyc_pause = true (CRLF)
+A diff 95D901B9784705FA656145487B5611BA95A606E4DBD28FA7BE60C9E93B8F2620  toml-db16cyc-pause-A.diff  (apply from DimensionsRecomp/: patch --binary -p1)
+       patch onto base: exit 0, result == new: yes  [patching file rexlego/legodimensions_config.toml]
+
+## not changed
+harness/legodimensions.toml B763DABBE2C5FE7AFA300B3013EFDEE1FB9BF33E7A0A96738BEAC4BAF474FF54: the runtime config the EXE reads (rex_app.cpp SetupEnvironment);
+  codegen never reads it, so no diff is staged against it.
+8235C8C77CF06B6614E9082E84B610B2C1D705F5DF7839D31071A9FCDFEBFA28  src/codegen/codegen_writer.cpp  (read, unchanged)
+41E38ADD35929B8BE1105997DE45B2F39C3C3F715925CA1D6F89AC68E1B81D14  src/codegen/project_recompiler.cpp  (read, unchanged)
+141BA8703D562CA8D8825B6156EABDEE52260A62DB94ED568A810A48EF92B1EA  src/codegen/output_stamp.cpp  (read, unchanged)
+36C396BC44281A1FCD8673F44A3E9ECE6A38F13AED4022F5B5FD9187E431C48F  src/codegen/output_partition.cpp  (read, unchanged)

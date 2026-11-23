@@ -1,0 +1,10 @@
+# pthrottle_runner_probe (S4 task #19, the runner proposal)  2026-11-22 04:42:35  PowerShell 5.1.26100.9818, CLR 4.0.30319.42000
+child: PING.EXE pid 51492 (Start-Process -PassThru, $p.Handle as in run-timing.ps1)
+PASS  1. the child starts with C=0x0 S=0x0 (read error 0)
+PASS  2. the game's call (C=0x4 S=0x0) reads back C=0x4 S=0x0 (error 0)
+PASS  3. opt-out via $p.Handle: C=0x4 S=0x0 -> C=0x5 S=0x0 (result 0; the timer bit is kept)
+PASS  4. again via an OpenProcess(SET_INFORMATION | QUERY_LIMITED_INFORMATION) handle: C=0x5 S=0x0 -> C=0x5 S=0x0 (result 0; idempotent)
+PASS  5. an EcoQoS opt-in C=0x1 S=0x1 -> C=0x1 S=0x0 (result 0)
+PASS  6. a plain Set of C=0x1 on C=0x4 reads back C=0x1 S=0x0: replaced, so the runner must read first
+child stopped (exited: True)
+RESULT: PASS

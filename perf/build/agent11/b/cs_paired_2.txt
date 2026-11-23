@@ -1,0 +1,25 @@
+﻿[status pre] 18:42:03 BatteryStatus=2 (2=AC) LoadPercentage=100
+[cmd] bench_cs.exe paired 300 20000 old,time:5000,timecas:5000
+bench_cs.exe : [bench] waiting for another agent11 
+bench to finish...
+At C:\Users\<user>\.vscode\projects\games\lego-dimen
+sions-recomp\build\agent11\b\round3.ps1:14 char:3
++   & (Join-Path $b $exe) @a 2>&1 | Out-File 
+-FilePath $f -Encoding utf ...
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([benc 
+   h] waiting...ch to finish...:String) [], Remot  
+  eException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[power] ACLineStatus=1 (1=AC, 0=battery) BatteryFlag=0x01 battery=100%
+uncontended Enter+Leave pair, paired: 300 rounds x 20000 pairs per variant per core
+  core=P  old          median  25.09  p10  19.81  p90  35.83 ns/pair   paired diff vs old: +0.00 ns
+  core=P  time:5000    median  27.86  p10  23.14  p90  37.21 ns/pair   paired diff vs old: +2.39 ns
+  core=P  timecas:5000 median  25.83  p10  20.88  p90  36.37 ns/pair   paired diff vs old: +0.35 ns
+  core=E  old          median  29.15  p10  27.89  p90  30.36 ns/pair   paired diff vs old: +0.00 ns
+  core=E  time:5000    median  29.32  p10  28.22  p90  30.78 ns/pair   paired diff vs old: +0.16 ns
+  core=E  timecas:5000 median  27.54  p10  26.84  p90  28.45 ns/pair   paired diff vs old: -1.58 ns
+[cpu] process CPU time 1.06 s
+[wall] 13.5 s
+[status post] 18:42:18 BatteryStatus=2 (2=AC) LoadPercentage=62

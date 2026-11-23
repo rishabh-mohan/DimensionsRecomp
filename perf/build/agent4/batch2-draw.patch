@@ -1,0 +1,127 @@
+diff --git a/build/agent4/scratch/draw.before-b2.cpp b/DimensionsRecomp/rexlego/src/gpu_native/draw.cpp
+index eab37fd..a2c5b73 100644
+--- a/build/agent4/scratch/draw.before-b2.cpp
++++ b/DimensionsRecomp/rexlego/src/gpu_native/draw.cpp
+@@ -1,5 +1,6 @@
+ #include "gpu_native/native_recording.h"
+ #include "gpu_native/draw_work_pool.h"
++#include "gpu_native/pipeline_async.h"
+ #include "gpu_native/pipeline_creation_gate.h"
+ #include "gpu_native/preparation_dependencies.h"
+ #include "gpu_native/guest_metadata.h"
+@@ -421,6 +422,8 @@ PipelineCreationGate<PipelineKey, PipelineKeyHash> g_temporal_pipeline_creation;
+ std::unordered_map<PipelineKey, std::unique_ptr<plume::RenderPipeline>,
+                    PipelineKeyHash>
+     g_pipelines;
++// LEGO_NATIVE_PSO_ASYNC: g_pipelines compiles in flight (pipeline_async.h).
++AsyncPipelineTable<PipelineKey, PipelineKeyHash> g_async_pipelines;
+ std::unordered_map<PipelineKey, std::unique_ptr<plume::RenderPipeline>, PipelineKeyHash> g_temporal_pipelines;
+ std::atomic<u32> g_unsupported_draw_logs{0};
+ DrawTiming g_draw_timing_serial;
+@@ -1664,6 +1667,27 @@ void PrepareDrawWork(ParallelDrawWork& work) {
+   if (!work.geometry_ready) work.geometry_valid = PrepareDrawGeometry(work);
+ }
+ 
++// Post-create checks shared by the synchronous and async paths of GetPipeline.
++// Null when D3D12 rejected the pipeline.
++std::unique_ptr<plume::RenderPipeline> FinishPipeline(std::unique_ptr<plume::RenderPipeline> pipeline,
++    const plume::RenderGraphicsPipelineDesc& desc, const PipelineKey& key) {
++    if (!pipeline || !static_cast<plume::D3D12GraphicsPipeline*>(pipeline.get())->d3d) {
++      static std::atomic<u32> failed_pipeline_logs{0};
++      if (failed_pipeline_logs.fetch_add(1) < 16)
++        REXLOG_ERROR("Native GPU: D3D12 rejected pipeline VS=0x{:08X} PS=0x{:08X} decl=0x{:08X}",
++                     key.vertex_shader, key.pixel_shader, key.declaration);
++      return nullptr;
++  }
++  SetNativePipelineStencilReference(pipeline.get(), desc);
++  static std::atomic<u32> mrt_logs{0};
++  if (desc.renderTargetCount > 1 && mrt_logs.fetch_add(1, std::memory_order_relaxed) < 16)
++    REXLOG_INFO("Native GPU: MRT pipeline targets={} formats={},{},{},{} masks={:04X} blends={:08X},{:08X},{:08X},{:08X}",
++        desc.renderTargetCount, key.render_target_formats[0], key.render_target_formats[1],
++        key.render_target_formats[2], key.render_target_formats[3], key.color_write_mask,
++        key.blend_controls[0], key.blend_controls[1], key.blend_controls[2], key.blend_controls[3]);
++  return pipeline;
++}
++
+ plume::RenderPipeline* GetPipeline(
+     const PipelineKey& key, const VertexDeclarationView& declaration,
+     plume::RenderPrimitiveTopology topology, plume::RenderFormat depth_format) {
+@@ -1671,12 +1695,23 @@ plume::RenderPipeline* GetPipeline(
+   if (const auto it = g_pipelines.find(key); it != g_pipelines.end()) {
+     return it->second.get();
+   }
++  // LEGO_NATIVE_PSO_ASYNC (default off): join a compile already in flight.
++  const bool async = AsyncPipelineCompileEnabled();
++  if (auto compile = async ? g_async_pipelines.Find(key) : nullptr)
++    return AwaitAsyncPipeline(lock, g_pipelines, key, std::move(compile));
+   lock.unlock();
+   auto creation = g_pipeline_creation.Acquire(key);
+   lock.lock();
+   if (const auto it = g_pipelines.find(key); it != g_pipelines.end()) {
+     return it->second.get();
+   }
++  if (auto compile = async ? g_async_pipelines.Find(key) : nullptr) {
++    creation.Release();
++    return AwaitAsyncPipeline(lock, g_pipelines, key, std::move(compile));
++  }
++  // The posted compile keeps the shaders resolved below alive.
++  ShaderBindingsSnapshot owners;
++  if (async) owners = CurrentShaderOwners();
+   const bool float_indices = FloatBlendIndicesInput({declaration.elements, declaration.element_count}) &&
+       bool(FindFloatBlendIndicesDxil(key.vertex_shader_hash, key.spec_constants));
+   const bool precise_position = bool(FindPositionPrecisionDxil(key.vertex_shader_hash, key.spec_constants));
+@@ -1817,27 +1852,24 @@ plume::RenderPipeline* GetPipeline(
+   // Variant resolution above remains serialized, but the expensive driver
+   // compile need not exclude workers building an unrelated pipeline.
+   auto* device = HostDevice::Device();
++  if (async) {
++    // The entry is visible before the lock drops, so the lease can go now.
++    // The job owns its arrays and shader owners; it never touches g_draw_timing.
++    creation.Release();
++    return CompilePipelineAsync(lock, g_pipelines, g_async_pipelines, key,
++        [device, key, owned = OwnedPipelineDesc(desc), owners] {
++          return FinishPipeline(device->createGraphicsPipeline(owned.desc), owned.desc, key);
++        });
++  }
+   lock.unlock();
+   const auto creation_start = std::chrono::steady_clock::now();
+   auto pipeline = device->createGraphicsPipeline(desc);
+   ++g_draw_timing.pipeline_creations;
+   g_draw_timing.pipeline_creation_ms += std::chrono::duration<double, std::milli>(
+       std::chrono::steady_clock::now() - creation_start).count();
+-    if (!pipeline || !static_cast<plume::D3D12GraphicsPipeline*>(pipeline.get())->d3d) {
+-      static std::atomic<u32> failed_pipeline_logs{0};
+-      if (failed_pipeline_logs.fetch_add(1) < 16)
+-        REXLOG_ERROR("Native GPU: D3D12 rejected pipeline VS=0x{:08X} PS=0x{:08X} decl=0x{:08X}",
+-                     key.vertex_shader, key.pixel_shader, key.declaration);
+-      return nullptr;
+-  }
+-  SetNativePipelineStencilReference(pipeline.get(), desc);
++  pipeline = FinishPipeline(std::move(pipeline), desc, key);
++  if (!pipeline) return nullptr;
+   auto* result = pipeline.get();
+-  static std::atomic<u32> mrt_logs{0};
+-  if (desc.renderTargetCount > 1 && mrt_logs.fetch_add(1, std::memory_order_relaxed) < 16)
+-    REXLOG_INFO("Native GPU: MRT pipeline targets={} formats={},{},{},{} masks={:04X} blends={:08X},{:08X},{:08X},{:08X}",
+-        desc.renderTargetCount, key.render_target_formats[0], key.render_target_formats[1],
+-        key.render_target_formats[2], key.render_target_formats[3], key.color_write_mask,
+-        key.blend_controls[0], key.blend_controls[1], key.blend_controls[2], key.blend_controls[3]);
+   lock.lock();
+   g_pipelines.emplace(key, std::move(pipeline));
+   return result;
+@@ -5679,6 +5711,7 @@ DrawTiming ConsumeDrawTiming() {
+ }
+ 
+ void ResetDrawResources() {
++  DrainAsyncPipelineJobs();  // posted compiles publish under g_pipeline_mutex
+   std::lock_guard lock(g_pipeline_mutex);
+   g_prepared_draw.Reset();
+   pass_profile::Reset();
+@@ -5691,6 +5724,7 @@ void ResetDrawResources() {
+   g_temporal_scene_depth_surface = 0;
+   g_temporal_scene_depth_dirty = false;
+   g_pipelines.clear();
++  g_async_pipelines.Clear();
+   g_pipeline_creation.ClearAfterDrain();
+   g_quad_indices.Clear();
+   g_temporal_pipelines.clear();

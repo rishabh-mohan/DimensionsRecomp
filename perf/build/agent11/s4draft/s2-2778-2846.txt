@@ -1,0 +1,69 @@
+S2L2778: 
+S2L2779: ### 20:30: Hook-failure episode over; Agent 7 #6 done (T-std); W6 power-mode option; Agent 7 → #14
+S2L2780: 
+S2L2781: - **Hook failures, 20:17-20:23:** Agents 2 and 9 got 3 PreToolUse failures in a row and stopped; two of my reads failed too. During the episode a trivial command took 1-2 min. The machine was overloaded: Agent 3's 2nd exploration game, the S4b SDK install, game configure and gen-check, and many agents and subagents at once.
+S2L2782:   - Readings at 20:26: node starts in 0.12 s, disk 94-98 % idle, 8.3 GB RAM and 34.7 GB commit free, CPU 72-85 % with no clang and no game. Tool calls take 1-2 s again.
+S2L2783:   - Every agent was told to resume and to run heavy scripts at Below Normal. If the failures come back while S4b compiles, Agent 2 restarts ninja at -j6.
+S2L2784: - **Agent 7 #6 done** ([RESULTS.md](../build/agent7/w4b-noise/RESULTS.md)). The read-out method for W5 and later is **T-std**: frames are split at the runner's 4.5 ms threshold and re-mixed at the median heavy-time share. When rounds matter (as in W4b) it is **B-block T-std**.
+S2L2785:   - Median-ms CV: W4b 12.2 → 2.3 % (B-block 1.4 %); W5 6.5 → 2.1 %. The 95 % band for 3 vs 3 runs is about ±4 %, against raw's ±12.5 %.
+S2L2786:   - Guards on every read-out: light share per arm with its F test, raw GM deltas, and the host-flag list (P util ≥90 % and E-cores <600 MHz). The flag catches exactly W5's 3 slow runs.
+S2L2787:   - **W5 (T-std):** all four S4a arms are 1-2.5 % slower than S3d, none significant. d11t p99 is +8.8 % [+1.0, +17.2]*, and d11t/d11p heavy-frame 1 % lows are 8.5-11 % worse*. That points at REX_TIMER_WAIT_BLOCKING=1, but many tests were run, so it is a lead only.
+S2L2788:   - **W4b (B-block T-std):** d3 and d11t equal d0 within ±3-4 %. Codegen B may be a few % faster (fps +6.0 % [+0.5, +11.8]*, n = 3), which is a hint only.
+S2L2789: - **W6 option for the user (ask at ~23:30):** Agent 7 traces the noise to the host state: the Balanced scheme with the best_efficiency overlay, under which the E-cores drop to ~550 MHz while the P-threads saturate. Setting Power mode to **Best performance** before the double-click would likely remove most of the spread at the source. Agent 12's gate G11 already handles this: one overlay for the whole window, and W6 is then compared only within itself, not with W5's absolute numbers.
+S2L2790: - **Agent 8** uses T-std for the W5 read-out (RESULTS.md, "Recommendation for W5's read-out").
+S2L2791: - **Agent 7 → #14:** a T-std read-out kit for W6-W10 that works on any matrix folder and reproduces the W4b/W5 numbers exactly, plus a repeats/CI note for choosing repeats=<n> in the GO lines.
+S2L2792: - **Agent 4 (#12), 20:29:**
+S2L2793:   - The expected native4b fingerprint is **9b40acbbef4c57b3**. It is provisional until step 1b re-confirms it after the snap1-on CMake re-run (build.ninja is still from 13:33).
+S2L2794:   - REPIN.md and matrix-repin-native4b.json are adapted.
+S2L2795:   - New: a 1-run frontend-on boot matrix, matrix-repin-native4b-boot.json. native3_boot_check group A fails with native_settings_frontend=false, which every repin arm uses.
+S2L2796:   - So Agent 3 gets 5 runs (~19 min) instead of 4. Approved.
+S2L2797: 
+S2L2798: ### 20:32: T3 Code closed (user's request); Agent 12 #11 done → #15
+S2L2799: 
+S2L2800: - **T3 Code:** the user allowed closing it to cut load (20:30). Its window was hidden, so CloseMainWindow did nothing, and all 14 processes were force-stopped. That includes its backend, t3-resource-monitor and its cloudflared tunnel.
+S2L2801:   - First I checked that no agent descends from T3 Code: the chain is agy ← cmd ← agy-grid electron 18700. agy-grid and all 12 agy processes are untouched.
+S2L2802:   - Free RAM went from 8.4 to 9.4 GB. CPU is 78-90 % with 8 clang++ (the S4b game compile at -j8, as expected).
+S2L2803: - **Agent 12 #11 done:** `build/agent12/p2c-check/p2c_check.py` prints P2's memexport full-buffer fallback counter per game process. Exits: PASS 0, FAIL 1, NO DATA/PARTIAL 3, ERROR 4. Its path went to Agent 3.
+S2L2804:   - W6-GATES.md now includes G11 (power overlay, via w6_env_record.py) and G12 (strict or relaxed quiet gate).
+S2L2805: - **Agent 12 → #15:** one command that runs every W6 gate (G1-G12) on a finished window folder and is generic for W7-W10. It gets tested on W5/W4b, and Agent 12 checks that the launcher logs give G11/G12 what they need.
+S2L2806: 
+S2L2807: ### 20:38: Launcher pre-read SAFE (Agent 10); fixes sent to Agent 5; pin freeze 23:30; functional matrix runs must stay out of build/agent8/matrix
+S2L2808: 
+S2L2809: - **Agent 10 pre-read** of run-night.ps1 00BFECD70584FC8E, RUN-NIGHT.cmd FCB0441883AC468D and the README 01C4D90F89DAAF9B: **SAFE so far**. P1-P5 pass (pinned runner only, the 5 apps only, screensaver restored in the main finally, refuses when locked/on battery/past deadline, writes only its own folders plus GO/HOLD/STOP). The relaxed gate matches 19:31.
+S2L2810:   - The formal rating comes after a second reader, when Agent 5 asks.
+S2L2811: - **Fixes sent to Agent 5, due 23:00:**
+S2L2812:   1. Close-Programs: a try/catch around each process, including WaitForExit.
+S2L2813:   2. Set-Hold/Clear-Hold: write HOLD only if none exists, with a marker, and delete only its own. A foreign HOLD at gate time counts as a gate fail.
+S2L2814:   3. Get-Power: a failed battery query must not count as AC (use GetSystemPowerStatus).
+S2L2815:   4. RUN-NIGHT.cmd: save with CRLF, then one smoke test with a temporary STOP file, expecting exit 2.
+S2L2816:   - Also adopted: -NonInteractive; log the bin exe/MANIFEST sha at GO and re-check it at start; log leftover REX_*/LEGO_* variables; README notes.
+S2L2817:   - **Roblox Studio comes off the close list** (unsaved work). The user's "Roblox" is read as the player.
+S2L2818: - **HOLD interplay** (for fix 2): my hold manager overwrites the launcher's HOLD once the runner creates the matrix folder. It clears the HOLD when summary.md appears, or after 6 min with no game and no writes. So the launcher's Clear-Hold will often find nothing of its own, which is fine.
+S2L2819: - **Pin freeze from 23:30** (told to Agents 5 and 8, the only owners). No edits to bench/agent8/run *.ps1/*.py/*.cs, drivers/*, the harness toml, nvml.cs, run-night.ps1 or RUN-NIGHT.cmd, and no new *.py/*.cs in bench/agent8/run. The launcher pins these at the double-click. Matrix JSONs and RUN-WINDOWn.cmd can still be added, because the GO line pins the JSON's sha.
+S2L2820: - **Risk found:** REPIN.md runs run-matrix.ps1 with no -OutDir, so its output lands in build/agent8/matrix/<stamp>.
+S2L2821:   - Any new folder there trips the hold manager. HOLD then pauses every agent, and Agent 2's run-s4b kills ninja (exit 30).
+S2L2822:   - Agents 3 and 4 were told to pass `-OutDir build\agent3\runs\<name>` for all functional matrix runs.
+S2L2823: 
+S2L2824: ### 20:42: Agent 2 progress; W5 bins re-hash unchanged; re-pin after Agent 3's queue
+S2L2825: 
+S2L2826: - **Agent 2 (#1):**
+S2L2827:   - The OFF game phase is a full rebuild: 462 edges, because the C1/P2c SDK headers changed. It was at [200/462] at 20:39, so the build should finish ~20:52 and devoff4b be staged ~20:55.
+S2L2828:   - Gate 5's second half passed early (20:35): all 27 rows match W5-INPUTS-1731, and devoff3-bin and devoff4-bin match their MANIFESTs (B9C5175D…, 16DCC939…). Report: `build/agent2/s4b/checks/w5-rehash-2035.txt`.
+S2L2829:   - The CTR and CG26 helpers passed their dry runs and get built after native4b, at -j8.
+S2L2830: - **W6 draft** (`build/agent5/w6-draft/matrix-w6.json`): 6 arms × 3 repeats, all on the S4b bin, no native arms. The ref is s0; the w6 group is p2, p2f and p2fc; the w6-noP2 group is f and fc.
+S2L2831:   - So Agent 3 runs its S4b queue first. The native4b re-pin runs (boot plus 4 runs, ~19 min) come after it or in its gaps, and exploration stops once devoff4b is staged.
+S2L2832: 
+S2L2833: ### 20:45: Agent 8 interim read-outs (W4b, W5); W6 bin = devoff4b, no timer bundle; I write the GO
+S2L2834: 
+S2L2835: - **W4b** ([READOUT.md](../build/agent8/readout/w4b/READOUT.md)): strict rules FAIL, so there is no timing verdict.
+S2L2836:   - Rows that ignore R3/R4/R6 all overlap d0 (fps: B +6.4 %, d3 +3.8 %, d11t -0.8 %).
+S2L2837:   - d11t game CPU is -15.3 % in every variant.
+S2L2838:   - The B-block T-std hint for codegen B (fps +6.0 % [+0.5, +11.8]*, n = 3) awaits its independent check (~21:15).
+S2L2839: - **W5** ([READOUT.md](../build/agent8/readout/w5/READOUT.md)): strict rules FAIL (R3 drops 15/15, R6 drops 1821). Without the drops, every arm overlaps base.
+S2L2840:   - T-std: no median or fps CI excludes 0. The one lead is d11t p99 +8.8 % [+1.0, +17.2]* (1 of 16 tests).
+S2L2841:   - Game CPU: d11t -13.7 %, d11p -12.2 %.
+S2L2842:   - "P saturation" = P util 91-98.5 % (time-based P busy 80-87 %).
+S2L2843:   - **W5 result:** the S4a arms equal S3d within about ±4 % (T-std). The timer bundle cuts game CPU by 12-14 %. There is a p99 tail lead against d11t.
+S2L2844:   - Procedure: agent8-window3.md L920-1058, plus the step-9 addendum at L1060 (T-std primary).
+S2L2845: - **W6 promotion tool:** `build/agent8/w6-stage/promote-w6.ps1` checks Agent 5's finalize output, copies it byte for byte, runs -PlanOnly, hashes 29 inputs and prints the GO line.
+S2L2846:   - Its test on the devoff4 dry run passed: 13 runs, ~30 min, no new matrix folder. With -Promote pointed at a dry run, it refuses (exit 1) and writes nothing to bench.

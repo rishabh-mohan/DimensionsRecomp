@@ -1,0 +1,19 @@
+# s4a_check 20261122-143031-s102-r4-t0-devoff4 (off)
+run.json: exit 0 (0x00000000) dumps 0 crash_events 0 wer False; close wm_close 0.82 s; elapsed 90.88 of 90 s; cvars {}; args --d3d12_pipeline_creation_threads=0; env -; script None steps None
+  seed storage: [2026-11-22 14:30:35.612] [info] [core] [t24980] Initializing shader storage for title 5752084B...
+  seed storage: [2026-11-22 14:30:35.636] [info] [gpu] [t34836] Translated 229 shaders from the storage in 20 milliseconds
+  seed storage: [2026-11-22 14:30:36.827] [info] [gpu] [t34836] Created 214 graphics pipelines (not including reading the descriptions) from the storage in 1191 milliseconds
+summary: verdict RUNNING; first frame 10.0 s; levels {"info": 44, "warning": 40}; unknown cvars []; errors 0
+log files game.log; greps s4_upload_hash=0 slow_frame=0 precise_wait=0 miss_cache=0 protect_failed=0 stuck_lock=0 minidump=0 fatal=0 storage=2 storage_init=1 clean_exit=1; gap after "Initializing shader storage" 0.024 s
+  storage: [2026-11-22 14:30:35.636] [info] [gpu] [t34836] Translated 229 shaders from the storage in 20 milliseconds
+  storage: [2026-11-22 14:30:36.827] [info] [gpu] [t34836] Created 214 graphics pipelines (not including reading the descriptions) from the storage in 1191 milliseconds
+frames (perf.csv rows) 4906; per frame: s4_upload_hash 0.000 slow_frame 0.000
+logdiff vs 20261122-142856-s102-r4-t0-devoff3: NEW 0 (+0 allowed) MORE 0 (+0 allowed) GONE 4 (0 non-Toypad) FLAG 0; NEW at info 4 (0 non-Toypad)
+levels (game*.log) cand {"info": 44, "warning": 40} vs 20261122-142856-s102-r4-t0-devoff3 {"info": 44, "warning": 40}; [error] 0 vs 0
+scenes (>= 2 s) base 20261122-142856-s102-r4-t0-devoff3: 226/1022:40s 218/222:17s 219/226:15s
+scenes (>= 2 s) cand: 226/1022:53s 219/226:15s 218/222:14s
+  missing in cand: -; extra in cand: -
+threads (% of one core, window [20.0, 70.0] s from the first frame, 50.0 s): XThread21A0 (F80001A8) x1 92.5 | rex::thread::TimerQueue x1 28.4 | Main XThread (F800002C) x1 20.1 | GPU Commands (F8000018) x1 16.4 | (unnamed) x32 15.4 | XThread8338 (F8000144) x1 8.3 | XThread3988 (F8000114) x1 6.1 | 0xc0550001 x1 5.6 | XThread0BD8 (F800010C) x1 2.6 | GPU VSync (F800001C) x1 2.3 | XThread3EB0 (F8000070) x1 1.2 | Audio Worker (F8000014) x1 0.7
+  TimerQueue: {"rex::thread::TimerQueue": {"pct": 28.38, "threads": 1}}
+  TimerQueue ticks (tid 34720): 45 samples over [-8.0, 80.0] s (step median 2.0 s), cycles non-rising in 0 of 44 steps 
+sys.csv slow state: {"rows": 82, "onset_s": null, "slow_pct": 0.0, "e_eff_mhz_median": 1538, "cpu_util_pct_median": 84.9, "slow": false}

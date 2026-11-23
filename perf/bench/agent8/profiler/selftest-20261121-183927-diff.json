@@ -1,0 +1,178 @@
+{
+ "tool": "analyze_profile.py",
+ "schema": 1,
+ "mode": "diff",
+ "unit": "/s",
+ "a": {
+  "profile": "<workspace>\\build\\agent8\\profiler\\profile-695028062.bin",
+  "map": "<workspace>\\build\\agent8\\profiler\\profiler_selftest.map",
+  "samples": 95,
+  "duration": {
+   "rounds": 16,
+   "rounds_estimated": 16,
+   "seconds": 3.2790811,
+   "source": "trailer",
+   "rounds_per_s": 4.9
+  },
+  "timer_observer_effect": false
+ },
+ "b": {
+  "profile": "<workspace>\\build\\agent8\\profiler\\profile-695028062.bin",
+  "map": "<workspace>\\build\\agent8\\profiler\\profiler_selftest.map",
+  "samples": 95,
+  "duration": {
+   "rounds": 16,
+   "rounds_estimated": 16,
+   "seconds": 3.2790811,
+   "source": "trailer",
+   "rounds_per_s": 4.9
+  },
+  "timer_observer_effect": false
+ },
+ "counting": "busy samples",
+ "categories": [
+  {
+   "name": "[wait]",
+   "a": 20.128,
+   "b": 20.128,
+   "delta": 0.0,
+   "delta_pct": 0.0,
+   "a_samples": 66,
+   "b_samples": 66
+  },
+  {
+   "name": "guest",
+   "a": 4.574,
+   "b": 4.574,
+   "delta": 0.0,
+   "delta_pct": 0.0,
+   "a_samples": 15,
+   "b_samples": 15
+  },
+  {
+   "name": "rexlego",
+   "a": 4.269,
+   "b": 4.269,
+   "delta": 0.0,
+   "delta_pct": 0.0,
+   "a_samples": 14,
+   "b_samples": 14
+  }
+ ],
+ "self": [
+  {
+   "name": "sub_8200BEEF [guest 0x8200BEEF]",
+   "a": 4.574,
+   "b": 4.574,
+   "delta": 0.0,
+   "delta_pct": 0.0,
+   "a_samples": 15,
+   "b_samples": 15
+  },
+  {
+   "name": "lsp_selftest_hot",
+   "a": 4.269,
+   "b": 4.269,
+   "delta": 0.0,
+   "delta_pct": 0.0,
+   "a_samples": 14,
+   "b_samples": 14
+  }
+ ],
+ "inclusive": [
+  {
+   "name": "KERNEL32.DLL!BaseThreadInitThunk",
+   "a": 8.844,
+   "b": 8.844,
+   "delta": 0.0,
+   "delta_pct": 0.0,
+   "a_samples": 29,
+   "b_samples": 29
+  },
+  {
+   "name": "ntdll.dll!RtlUserThreadStart",
+   "a": 8.844,
+   "b": 8.844,
+   "delta": 0.0,
+   "delta_pct": 0.0,
+   "a_samples": 29,
+   "b_samples": 29
+  },
+  {
+   "name": "selftest::GuestLoop",
+   "a": 4.574,
+   "b": 4.574,
+   "delta": 0.0,
+   "delta_pct": 0.0,
+   "a_samples": 15,
+   "b_samples": 15
+  },
+  {
+   "name": "std::thread::_Invoke<class std::tuple<class `extern \"C\" main'::`1'::<lambda_0>>, 0>",
+   "a": 4.574,
+   "b": 4.574,
+   "delta": 0.0,
+   "delta_pct": 0.0,
+   "a_samples": 15,
+   "b_samples": 15
+  },
+  {
+   "name": "sub_8200BEEF [guest 0x8200BEEF]",
+   "a": 4.574,
+   "b": 4.574,
+   "delta": 0.0,
+   "delta_pct": 0.0,
+   "a_samples": 15,
+   "b_samples": 15
+  },
+  {
+   "name": "thread_start<unsigned int (__cdecl *)(void *), 1>",
+   "a": 4.574,
+   "b": 4.574,
+   "delta": 0.0,
+   "delta_pct": 0.0,
+   "a_samples": 15,
+   "b_samples": 15
+  },
+  {
+   "name": "__scrt_common_main_seh",
+   "a": 4.269,
+   "b": 4.269,
+   "delta": 0.0,
+   "delta_pct": 0.0,
+   "a_samples": 14,
+   "b_samples": 14
+  },
+  {
+   "name": "lsp_selftest_hot",
+   "a": 4.269,
+   "b": 4.269,
+   "delta": 0.0,
+   "delta_pct": 0.0,
+   "a_samples": 14,
+   "b_samples": 14
+  },
+  {
+   "name": "lsp_selftest_outer",
+   "a": 4.269,
+   "b": 4.269,
+   "delta": 0.0,
+   "delta_pct": 0.0,
+   "a_samples": 14,
+   "b_samples": 14
+  },
+  {
+   "name": "main",
+   "a": 4.269,
+   "b": 4.269,
+   "delta": 0.0,
+   "delta_pct": 0.0,
+   "a_samples": 14,
+   "b_samples": 14
+  }
+ ],
+ "max_abs_delta_self": 0.0,
+ "warnings": [
+  "profile-695028062.bin: low sampling rate (5 rounds/s, nominal ~1000): the machine was probably CPU-saturated (each SuspendThread/GetThreadContext waits until the target thread is scheduled); attribution is still usable but noisy"
+ ]
+}

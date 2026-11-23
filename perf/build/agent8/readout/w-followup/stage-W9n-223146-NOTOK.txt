@@ -1,0 +1,19 @@
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:31:46
+mode: TEST (copy in build\agent8\w-followup\test\W9n; no bench writes)
+result: NOT OK: devoff4b-bin MANIFEST.txt sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA does not start with -Expect 0000000000000000
+run: only=off,q0 repeats=3 -ColdShared; -PlanOnly: not run or failed; expected 7 runs; Agent 7's formula 1.70 + 2.14 x 2 x 3 = 14.5 min
+latest start: -
+GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): none (result NOT OK)
+draft: build\agent8\w-followup\matrix-window9.json  sha256 CE0AD75792B47D59876C864B39797CD877404F911D12F92E6CC9C4351D747610  6146 bytes
+matrix for the GO: build\agent8\w-followup\test\W9n\matrix-window9.json  sha256 -
+launcher: bench\agent5\launch\run-night.ps1 sha256 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 (2026-11-22 22:11:21); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/devoff4b-bin (arms off,q0,q125,q250,q500): MANIFEST.txt sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA (expected 0000000000000000); legodimensions.exe DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 102, FAIL 0
+arm: off (devoff4b; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+arm: q0 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=0 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+arm: q125 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=125 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+arm: q250 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=250 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+arm: q500 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=500 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: - / -
+
+--- run-matrix.ps1 -Matrix build\agent8\w-followup\test\W9n\matrix-window9.json -Only off,q0 -Repeats 3 -ColdShared -NoPrompt -PlanOnly (launcher Get-Plan)
+(not run)

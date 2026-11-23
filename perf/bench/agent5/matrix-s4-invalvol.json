@@ -1,0 +1,25 @@
+{
+  "title": "S4 invalidation volume (Agent 5, task #20): one functional devoff2 run with slow_frame_log_ms=1 (logging only, not for timing)",
+  "reference": "a-vol",
+  "warmup_s": 60,
+  "warmup_from": "firstframe",
+  "measure_s": 150,
+  "repeats": 1,
+  "order": "fixed",
+  "settle_s": 10,
+  "cooldown_s": 10,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "cold_run": false,
+  "sys_csv": true,
+  "notes": [
+    "Purpose: per-frame CPU-side invalidation volume on the devoff GPU path, for S4 (perf-notes/agent5-uploads.md, S4 section). slow_frame_log_ms=1 makes the existing ReportSlowFrame (rexglue-sdk src/graphics/d3d12/command_processor.cpp:242-283, called once per swap at :2193) log every frame. Its 'cpu-write invalidations Nx K KB' is the count and requested bytes of every PhysicalHeap::TriggerCallbacks call that hit a GPU-watched page: the game's MmSetAddressProtect (PhysicalHeap::Protect, xmemory.cpp:2132-2136), CPU write faults, file reads, alloc/free. It is a volume and an upper bound for the re-upload. It cannot show whether the re-uploaded bytes changed; no existing counter can.",
+    "Same bin, phase and window as a-prof in build/agent8/matrix/20261122-0357: devoff2-bin, framerate_limit=0, title/attract loop, 10 s settle + 60 s warm-up after the first frame, 150 s window. The volume then lines up with that profile's 3.6 ms/f upload cost. No profiler, no input.",
+    "Analysis: python bench/agent5/s4_slowframe.py <run dir> (window 70-220 s after the first logged frame, the a-prof window) prints the per-frame count and KB distribution and MB/s. Logging every frame costs a little time, so this run is functional only, never timing.",
+    "Checks (Agent 8): status OK, clean WM_CLOSE, about one 'slow frame #' line per frame (the script reports index gaps), [error] count no higher than a-prof (0)."
+  ],
+  "arms": [
+    { "id": "a-vol", "group": "functional", "ref": true, "bin": "build/agent2/devoff2-bin", "cvars": ["framerate_limit=0", "slow_frame_log_ms=1"], "env": {},
+      "note": "devoff2 + slow_frame_log_ms=1 (logging only), uncapped like a-prof; functional, not for timing" }
+  ]
+}

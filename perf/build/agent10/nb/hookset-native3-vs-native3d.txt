@@ -1,0 +1,29 @@
+A build\agent2\native3-bin\legodimensions.map: 358,788 publics, 164,786 sub_, 165,023 guest __imp__ aliases in TU objects; hooked 181 (public in a host object) / 181 (__imp__ not at its public), criteria agree; unpaired: none
+B build\agent2\native3d-bin\legodimensions.map: 358,788 publics, 164,786 sub_, 165,023 guest __imp__ aliases in TU objects; hooked 181 (public in a host object) / 181 (__imp__ not at its public), criteria agree; unpaired: none
+
+hooked set: 181 common, only in A none, only in B none, object differs none -> SAME
+  hooks per host object (A): crash_guards.cpp.obj 2, draw.cpp.obj 7, hooks_buffer.cpp.obj 8, hooks_device.cpp.obj 11, hooks_portrait.cpp.obj 2, hooks_shader.cpp.obj 8, hooks_state.cpp.obj 16, hooks_texture.cpp.obj 5, main_menu_extras.cpp.obj 3, name_trace.cpp.obj 5, native_atomics.cpp.obj 3, native_constants.cpp.obj 1, native_lock_elide.cpp.obj 7, native_markers.cpp.obj 2, native_memops.cpp.obj 2, native_saverest.cpp.obj 72, native_skin_diagnostics.cpp.obj 6, native_slot_growth.cpp.obj 3, queries.cpp.obj 4, scene_distance.cpp.obj 2, settings_native_hooks.cpp.obj 12
+
+LR-gated hooks (name: purpose -> A object / B object):
+  sub_83FC49E8: placement relocation line + pool-copy drain (caller 83F9B660) -> hooks_buffer.cpp.obj / hooks_buffer.cpp.obj  ok
+  sub_82BD2868: CPU pool copy (lr 82BD2B44 caller test) -> hooks_buffer.cpp.obj / hooks_buffer.cpp.obj  ok
+  sub_839C4D08: pause-menu Options rows (lr 839D11B0) -> settings_native_hooks.cpp.obj / settings_native_hooks.cpp.obj  ok
+  sub_836F9E48: slot heap Register -> native_slot_growth.cpp.obj / native_slot_growth.cpp.obj  ok
+  sub_82A3B6D8: slot heap (native_slot_growth) -> native_slot_growth.cpp.obj / native_slot_growth.cpp.obj  ok
+  sub_82A57FE0: slot heap (native_slot_growth) -> native_slot_growth.cpp.obj / native_slot_growth.cpp.obj  ok
+
+Mid-asm hook functions (name -> A / B, symbol @ object):
+  MissingAdventureTimeLookupNode: SAME  A [('?MissingAdventureTimeLookupNode@@YA_NAEATRegister@ppc@rex@@@Z', 'crash_guards.cpp.obj')]
+  NativeCelShadingDefaultBinding: SAME  A [('?NativeCelShadingDefaultBinding@@YAXAEATRegister@ppc@rex@@000@Z', 'native_effects.cpp.obj')]
+  NativeCelShadingIndexedBinding: SAME  A [('?NativeCelShadingIndexedBinding@@YAXAEATRegister@ppc@rex@@000@Z', 'native_effects.cpp.obj')]
+  NativeCelShadingMaskGate: SAME  A [('?NativeCelShadingMaskGate@@YAXAEATRegister@ppc@rex@@@Z', 'native_effects.cpp.obj')]
+  NativeCelShadingTrace: SAME  A [('?NativeCelShadingTrace@@YAXAEATRegister@ppc@rex@@000@Z', 'native_effects.cpp.obj')]
+  NativeCelShadingViewGate: SAME  A [('?NativeCelShadingViewGate@@YAXAEATRegister@ppc@rex@@@Z', 'native_effects.cpp.obj')]
+  RepairDialogueLockReleaseOperand: SAME  A [('?RepairDialogueLockReleaseOperand@@YAXAEATRegister@ppc@rex@@@Z', 'crash_guards.cpp.obj')]
+
+source cross-reference (build\agent2\snap1\DimensionsRecomp\rexlego\src): 121 REX_HOOK/REX_HOOK_RAW targets
+  token-pasted prefixes, hooked count in A: __restfpr_* 18, __restgprlr_* 18, __savefpr_* 18, __savegprlr_* 18
+  in source, not hooked in A (compiled out or not a sub_): [('sub_82691090', 'area_watch.cpp'), ('sub_82A2A260', 'tt_lock_trace.cpp'), ('sub_82A2A2B0', 'tt_lock_trace.cpp'), ('sub_82B73D48', 'tt_lock_trace.cpp'), ('sub_82E9FB80', 'icon_probe.cpp'), ('sub_83AEF048', 'icon_probe.cpp'), ('sub_83AEFCA0', 'icon_probe.cpp'), ('sub_83AEFCC0', 'icon_probe.cpp')]
+  hooked in A, not a REX_HOOK target in this source dir (SDK or other host code): none
+
+RESULT PASS

@@ -1,0 +1,94 @@
+# make_s4r1s2.py proofs
+
+diff: include/rex/graphics/d3d12/command_processor.h  +59/-0  
+diff: include/rex/graphics/d3d12/deferred_command_list.h  +7/-0  
+diff: src/graphics/d3d12/command_processor.cpp  +248/-1  
+diff: src/graphics/d3d12/shared_memory.cpp  +3/-0  
+diff: src/graphics/d3d12/texture_cache.cpp  +3/-0  
+total: +320/-1
+
+PASS P1 orig == snap1 bytes: include/rex/graphics/d3d12/command_processor.h (67F4E8380C879377)
+PASS P1 == S4b after-hash in PATCHES-S4b.tsv: include/rex/graphics/d3d12/command_processor.h 67F4E8380C879377
+PASS P1 orig == snap1 bytes: include/rex/graphics/d3d12/deferred_command_list.h (9F6CC70A6922232D)
+PASS P1 == S4b after-hash in PATCHES-S4b.tsv: include/rex/graphics/d3d12/deferred_command_list.h 9F6CC70A6922232D
+PASS P1 orig == snap1 bytes: src/graphics/d3d12/command_processor.cpp (027204B53A271D69)
+PASS P1 == S4b after-hash in PATCHES-S4b.tsv: src/graphics/d3d12/command_processor.cpp 027204B53A271D69
+PASS P1 orig == snap1 bytes: src/graphics/d3d12/shared_memory.cpp (2A5ADF13B5E433F1)
+PASS P1 == S4b after-hash in PATCHES-S4b.tsv: src/graphics/d3d12/shared_memory.cpp 2A5ADF13B5E433F1
+PASS P1 orig == snap1 bytes: src/graphics/d3d12/texture_cache.cpp (949CCF4F4D80975D)
+PASS P1 not patched in S4b (S4a/S1 bytes): src/graphics/d3d12/texture_cache.cpp
+PASS P1 orig == snap1 bytes: src/graphics/d3d12/deferred_command_list.cpp (30FF57446EFB5D76)
+PASS P1 == S4b after-hash in PATCHES-S4b.tsv: src/graphics/d3d12/deferred_command_list.cpp 30FF57446EFB5D76
+PASS P2 E1 anchor exactly once in base include/rex/graphics/d3d12/command_processor.h (found 1)
+PASS P2 E1 anchor once before applying
+PASS P2 E2 anchor exactly once in base include/rex/graphics/d3d12/command_processor.h (found 1)
+PASS P2 E2 anchor once before applying
+PASS P2 E3 anchor exactly once in base include/rex/graphics/d3d12/command_processor.h (found 1)
+PASS P2 E3 anchor once before applying
+PASS P2 E4 anchor exactly once in base include/rex/graphics/d3d12/command_processor.h (found 1)
+PASS P2 E4 anchor once before applying
+PASS P2 E5 anchor exactly once in base include/rex/graphics/d3d12/command_processor.h (found 1)
+PASS P2 E5 anchor once before applying
+PASS P2 E6 anchor exactly once in base include/rex/graphics/d3d12/deferred_command_list.h (found 1)
+PASS P2 E6 anchor once before applying
+PASS P2 E7 anchor exactly once in base src/graphics/d3d12/command_processor.cpp (found 1)
+PASS P2 E7 anchor once before applying
+PASS P2 E8 anchor exactly once in base src/graphics/d3d12/command_processor.cpp (found 1)
+PASS P2 E8 anchor once before applying
+PASS P2 E9 anchor exactly once in base src/graphics/d3d12/command_processor.cpp (found 1)
+PASS P2 E9 anchor once before applying
+PASS P2 E10 anchor exactly once in base src/graphics/d3d12/command_processor.cpp (found 1)
+PASS P2 E10 anchor once before applying
+PASS P2 E11 anchor exactly once in base src/graphics/d3d12/command_processor.cpp (found 1)
+PASS P2 E11 anchor once before applying
+PASS P2 E12 anchor exactly once in base src/graphics/d3d12/command_processor.cpp (found 1)
+PASS P2 E12 anchor once before applying
+PASS P2 E13 anchor exactly once in base src/graphics/d3d12/command_processor.cpp (found 1)
+PASS P2 E13 anchor once before applying
+PASS P2 E14 anchor exactly once in base src/graphics/d3d12/command_processor.cpp (found 1)
+PASS P2 E14 anchor once before applying
+PASS P2 E15 anchor exactly once in base src/graphics/d3d12/shared_memory.cpp (found 1)
+PASS P2 E15 anchor once before applying
+PASS P2 E16 anchor exactly once in base src/graphics/d3d12/texture_cache.cpp (found 1)
+PASS P2 E16 anchor once before applying
+PASS P9 LF only, final newline: include/rex/graphics/d3d12/command_processor.h
+PASS P9 LF only, final newline: include/rex/graphics/d3d12/deferred_command_list.h
+PASS P9 LF only, final newline: src/graphics/d3d12/command_processor.cpp
+PASS P9 LF only, final newline: src/graphics/d3d12/shared_memory.cpp
+PASS P9 LF only, final newline: src/graphics/d3d12/texture_cache.cpp
+PASS P3 only removed line: cp.cpp MaybeSplitSubmission "} else if (EndSubmission(false)) {" (got 1)
+PASS P3 its replacement: submit_async_ ? EndSubmissionAsync() : EndSubmission(false) (false arm == the removed call)
+PASS P4 E3 (include/rex/graphics/d3d12/command_processor.h) adds only guarded lines ['DrainAsyncSubmissions();', 'if (submit_async_) {', '}']
+PASS P4 E9 (src/graphics/d3d12/command_processor.cpp) adds only guarded lines ['ShutdownAsyncSubmit();']
+PASS P4 E10 (src/graphics/d3d12/command_processor.cpp) adds only guarded lines ['DrainAsyncSubmissions();', 'if (submit_async_) {', '}']
+PASS P4 E11 (src/graphics/d3d12/command_processor.cpp) adds only guarded lines ['DrainAsyncSubmissions();', 'if (submit_async_) {', '}']
+PASS P4 E12 (src/graphics/d3d12/command_processor.cpp) adds only guarded lines ['DrainAsyncSubmissions();', 'if (submit_async_) {', '}']
+PASS P4 E15 (src/graphics/d3d12/shared_memory.cpp) adds only guarded lines ['command_processor_.FlushAsyncSubmissions();']
+PASS P4 E16 (src/graphics/d3d12/texture_cache.cpp) adds only guarded lines ['command_processor_.FlushAsyncSubmissions();']
+PASS P5 command_processor.cpp:4037 CheckSubmissionFence: if (SUCCEEDED(direct_queue->Signal(queue_operations_since_su -> drain before
+PASS P5 command_processor.cpp:4364 EndSubmission: direct_queue->ExecuteCommandLists(1, execute_command_lists); -> drain before
+PASS P5 command_processor.cpp:4378 EndSubmission: direct_queue->Signal(submission_fence_, submission_current_+ -> drain before
+PASS P5 command_processor.cpp:4631 AsyncSubmitThread: direct_queue->ExecuteCommandLists(1, execute_command_lists); -> submit thread
+PASS P5 command_processor.cpp:4632 AsyncSubmitThread: direct_queue->Signal(submission_fence_, chunk.submission); -> submit thread
+PASS P5 shared_memory.cpp:493 AllocateSparseHostGpuMemoryRange: direct_queue->UpdateTileMappings(buffer_, 1, &region_start_c -> drain before
+PASS P5 texture_cache.cpp:1264 EnsureScaledResolveMemoryCommitted: direct_queue->UpdateTileMappings( -> drain before
+PASS P6 submit thread members ['async_submit_count_', 'async_submit_first_', 'async_submit_idle_cond_', 'async_submit_mutex_', 'async_submit_slots_', 'async_submit_stats_', 'async_submit_stop_', 'async_submit_work_cond_', 'command_list_', 'command_list_1_', 'submission_fence_']
+PASS P7 command_processor.h balance {}: +6/+6
+PASS P7 command_processor.h balance (): +15/+15
+PASS P7 command_processor.h balance []: +1/+1
+PASS P7 deferred_command_list.h balance {}: +1/+1
+PASS P7 deferred_command_list.h balance (): +5/+5
+PASS P7 deferred_command_list.h balance []: +0/+0
+PASS P7 command_processor.cpp balance {}: +47/+47
+PASS P7 command_processor.cpp balance (): +112/+112
+PASS P7 command_processor.cpp balance []: +7/+7
+PASS P7 shared_memory.cpp balance {}: +0/+0
+PASS P7 shared_memory.cpp balance (): +1/+1
+PASS P7 shared_memory.cpp balance []: +0/+0
+PASS P7 texture_cache.cpp balance {}: +0/+0
+PASS P7 texture_cache.cpp balance (): +1/+1
+PASS P7 texture_cache.cpp balance []: +0/+0
+PASS P8 MaybeSplitSubmission: 45 lines, 1 differ
+PASS P10 EndSubmission == base + the guarded drain only (123 -> 129 lines)
+
+RESULT: ALL PASS

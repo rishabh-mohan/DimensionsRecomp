@@ -1,0 +1,31 @@
+--- A/snap1/sub_82FB90B8
++++ B/snapB3/sub_82FB90B8
+@@ -1,5 +1,7 @@
+ DEFINE_REX_FUNC(sub_82FB90B8) {
+ 	REX_FUNC_PROLOGUE();
++	PPCRegister ctr{};
++	PPCCRRegister cr6{};
+ 	uint32_t ea{};
+ 	// mflr r12
+ 	ctx.r12.u64 = ctx.lr;
+@@ -24,16 +26,16 @@
+ 	// lwz r9,0(r11)
+ 	ctx.r9.u64 = REX_LOAD_U32(ctx.r11.u32 + 0);
+ 	// mtctr r9
+-	ctx.ctr.u64 = ctx.r9.u64;
++	ctr.u64 = ctx.r9.u64;
+ 	// bctrl
+ 	ctx.lr = 0x82FB90E8;
+-	REX_CALL_INDIRECT_FUNC(ctx.ctr.u32);
++	REX_CALL_INDIRECT_FUNC(ctr.u32);
+ 	// clrlwi r8,r3,24
+ 	ctx.r8.u64 = ctx.r3.u32 & 0xFF;
+ 	// cmplwi cr6,r8,0
+-	ctx.cr6.compare<uint32_t>(ctx.r8.u32, 0, ctx.xer);
++	cr6.compare<uint32_t>(ctx.r8.u32, 0, {});
+ 	// beq cr6,0x82fb910c
+-	if (ctx.cr6.eq) goto loc_82FB910C;
++	if (cr6.eq) goto loc_82FB910C;
+ 	// lis r10,-31585
+ 	ctx.r10.s64 = -2069954560;
+ 	// li r11,0

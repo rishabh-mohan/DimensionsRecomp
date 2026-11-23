@@ -1,0 +1,809 @@
+diff --git a/include/rex/graphics/shared_memory.h b/include/rex/graphics/shared_memory.h
+index f9932ba..9295551 100644
+--- a/include/rex/graphics/shared_memory.h
++++ b/include/rex/graphics/shared_memory.h
+@@ -191,6 +191,19 @@ class SharedMemory {
+   static std::pair<uint32_t, uint32_t> MemoryInvalidationCallbackThunk(
+       void* context_ptr, uint32_t physical_address_start, uint32_t length, bool exact_range);
+ 
++  // S4 C1 (physical_protect_keep_watch): keep-watch guard, called with the global
++  // critical region held and before any heap mutex; it takes no lock.
++  static bool MemoryKeepWatchGuardThunk(void* context_ptr, uint32_t physical_address_start,
++                                        uint32_t length);
++  bool MemoryKeepWatchGuard(uint32_t physical_address_start, uint32_t length);
++  // physical_protect_keep_watch_verify: per-page hashes of CPU uploads (0: none),
++  // allocated by the first record. Protected by global_critical_region.
++  void KeepWatchVerifyRecord(uint32_t page_first, uint32_t page_last, bool written_by_gpu);
++  bool KeepWatchVerifyCheck(uint32_t page_first, uint32_t page_last, bool at_protect);
++  std::unique_ptr<uint64_t[]> keep_watch_verify_hashes_;
++  uint64_t keep_watch_verify_protect_mismatches_ = 0;
++  uint64_t keep_watch_verify_fault_mismatches_ = 0;
++
+   struct GlobalWatch {
+     GlobalWatchCallback callback;
+     void* callback_context;
+diff --git a/include/rex/system/xmemory.h b/include/rex/system/xmemory.h
+index f5abfa2..985fb03 100644
+--- a/include/rex/system/xmemory.h
++++ b/include/rex/system/xmemory.h
+@@ -205,6 +205,12 @@ class BaseHeap {
+   virtual bool Protect(uint32_t address, uint32_t size, uint32_t protect,
+                        uint32_t* old_protect = nullptr);
+ 
++  // S4 C1 (physical_protect_keep_watch): true if Protect(address, size, protect)
++  // would leave the access of every page unchanged (Protect's rounding; committed
++  // pages of one region). With apply, it also stores protect in those page table
++  // entries, as Protect does. Takes heap_mutex_ only.
++  bool ProtectAccessUnchanged(uint32_t address, uint32_t size, uint32_t protect, bool apply);
++
+   // Queries information about the given region of pages.
+   bool QueryRegionInfo(uint32_t base_address, HeapAllocationInfo* out_info);
+ 
+@@ -340,6 +346,9 @@ class PhysicalHeap : public BaseHeap {
+  protected:
+   bool IsHostPageWriteWatched(uint32_t host_page_number) const override;
+   void SetDataProviders(uint32_t physical_address, uint32_t length, bool enable);
++  // S4 C1: PhysicalHeap::Protect's keep-watch path (see the definition). The caller
++  // holds the global critical region.
++  bool ProtectKeepWatch(uint32_t address, uint32_t size, uint32_t protect);
+ 
+   // Allocation on these heaps delegates to parent_heap_, whose own reconcile
+   // pass takes the global critical region. Acquire whenever this heap or its
+@@ -514,6 +523,22 @@ class Memory {
+   // RegisterPhysicalMemoryInvalidationCallback.
+   void UnregisterPhysicalMemoryInvalidationCallback(void* callback_handle);
+ 
++  // S4 C1 (physical_protect_keep_watch): a keep-watch guard returns true if a write
++  // protect may leave this callback's write watches armed over the physical range
++  // instead of firing them. It is called with the global critical region held and
++  // before any heap mutex, so it must take no lock and must not call into a heap.
++  typedef bool (*PhysicalMemoryKeepWatchGuard)(void* context_ptr, uint32_t physical_address_start,
++                                               uint32_t length);
++  // As above, plus a keep-watch guard (nullptr: none). While a callback without a
++  // guard is registered, every write protect takes the normal path.
++  void* RegisterPhysicalMemoryInvalidationCallback(PhysicalMemoryInvalidationCallback callback,
++                                                   void* callback_context,
++                                                   PhysicalMemoryKeepWatchGuard keep_watch_guard);
++  // Turns physical_protect_keep_watch off for the rest of the process. Lock-free, so
++  // a static initializer may call it (rexlego's native renderer does).
++  static void BlockPhysicalProtectKeepWatch();
++  static bool IsPhysicalProtectKeepWatchBlocked();
++
+   // Enables physical memory access callbacks for the specified memory range,
+   // snapped to system page boundaries.
+   void EnablePhysicalMemoryAccessCallbacks(uint32_t physical_address, uint32_t length,
+@@ -660,6 +685,10 @@ class Memory {
+   rex::thread::global_critical_region global_critical_region_;
+   std::vector<std::pair<PhysicalMemoryInvalidationCallback, void*>*>
+       physical_memory_invalidation_callbacks_;
++  // S4 C1: keep-watch guards by callback handle, guarded like the callbacks above.
++  std::vector<std::pair<std::pair<PhysicalMemoryInvalidationCallback, void*>*,
++                        PhysicalMemoryKeepWatchGuard>>
++      physical_memory_keep_watch_guards_;
+   PhysicalMemoryDataProvider physical_memory_data_provider_ = nullptr;
+   void* physical_memory_data_provider_context_ = nullptr;
+ };
+diff --git a/src/graphics/d3d12/shared_memory.cpp b/src/graphics/d3d12/shared_memory.cpp
+index a5c97a0..a1ada09 100644
+--- a/src/graphics/d3d12/shared_memory.cpp
++++ b/src/graphics/d3d12/shared_memory.cpp
+@@ -10,6 +10,7 @@
+  */
+ 
+ #include <cstring>
++#include <mutex>
+ #include <utility>
+ #include <vector>
+ 
+@@ -17,6 +18,7 @@
+ #include <rex/cvar.h>
+ #include <rex/graphics/d3d12/command_processor.h>
+ #include <rex/graphics/d3d12/shared_memory.h>
++#include <rex/hash.h>
+ #include <rex/logging.h>
+ #include <rex/math.h>
+ #include <rex/ui/d3d12/d3d12_util.h>
+@@ -25,8 +27,138 @@ REXCVAR_DEFINE_BOOL(d3d12_tiled_shared_memory, true, "GPU/D3D12",
+                     "Use tiled shared memory on D3D12")
+     .lifecycle(rex::cvar::Lifecycle::kRequiresRestart);
+ 
++// S4 u diagnostic (logging only, default off). When on, every successful
++// UploadRanges call hashes the guest pages it uploaded and compares each hash
++// with the one from that page's previous upload. One info line per frame that
++// had uploads. Off: UploadRanges runs its original code plus one cvar load and
++// one untaken branch per successful call.
++REXCVAR_DEFINE_BOOL(shared_memory_upload_hash_log, false, "GPU/D3D12",
++                    "Diagnostic: log per frame how many re-uploaded shared memory pages are "
++                    "byte-identical to their previous upload (costs one XXH3 pass over "
++                    "every uploaded byte on the GPU thread)");
++
+ namespace rex::graphics::d3d12 {
+ 
++namespace {
++
++// State of the shared_memory_upload_hash_log diagnostic. Only touched while the
++// cvar is on, and then always under the mutex.
++struct UploadHashLog {
++  // Keeping the write watch over a lock (S4 P1) turns guest writes into write
++  // watch faults, and a fault invalidates and unwatches the whole 256 KB block:
++  // the shared memory and primitive processor callbacks both widen non-exact
++  // ranges to 256 KB. The block counters estimate that.
++  static constexpr uint32_t kBlockSizeLog2 = 18;
++  static constexpr uint32_t kBlockCount = SharedMemory::kBufferSize >> kBlockSizeLog2;
++
++  std::mutex mutex;
++  uint32_t page_size_log2 = 0;
++  std::vector<uint64_t> page_hashes;  // per page, meaningful where page_hashed is set
++  std::vector<uint64_t> page_hashed;  // bit set: the page was hashed by an earlier upload
++  uint64_t frame = 0;
++  // Counters of the frame being collected.
++  uint32_t calls = 0, ranges = 0, pages = 0, pages_first = 0, pages_unchanged = 0;
++  uint64_t blocks_uploaded[kBlockCount / 64] = {};
++  uint64_t blocks_changed[kBlockCount / 64] = {};
++  uint32_t block_pages_rehashed[kBlockCount] = {};  // re-uploaded pages (not first) per block
++};
++UploadHashLog upload_hash_log;
++
++void UploadHashLogFlushFrame(UploadHashLog& log) {
++  if (log.pages) {
++    uint32_t pages_rehashed = log.pages - log.pages_first;
++    uint32_t blocks = 0, blocks_changed = 0, pages_in_changed_blocks = 0;
++    for (uint32_t block = 0; block < UploadHashLog::kBlockCount; ++block) {
++      uint64_t block_bit = uint64_t(1) << (block & 63);
++      if (log.blocks_uploaded[block >> 6] & block_bit) {
++        ++blocks;
++      }
++      if (log.blocks_changed[block >> 6] & block_bit) {
++        ++blocks_changed;
++        pages_in_changed_blocks += log.block_pages_rehashed[block];
++      }
++    }
++    // u_page: share of the re-uploaded pages that are byte-identical to their
++    // previous upload. u_block: share of the re-uploaded pages in 256 KB blocks
++    // with no changed page. -1 if the frame only had first uploads. Both are
++    // upper bounds for P1: an identical rewrite counts as unchanged here but
++    // still faults and re-uploads under P1.
++    double u_page = -1.0, u_block = -1.0;
++    if (pages_rehashed) {
++      u_page = double(log.pages_unchanged) / double(pages_rehashed);
++      u_block = 1.0 - double(pages_in_changed_blocks) / double(pages_rehashed);
++    }
++    REXGPU_INFO(
++        "S4 upload hash: frame {} calls {} ranges {} pages {} ({} KB) first {} unchanged {} "
++        "changed {} blocks {} changed_blocks {} pages_in_changed_blocks {} u_page {:.4f} "
++        "u_block {:.4f}",
++        log.frame, log.calls, log.ranges, log.pages,
++        (uint64_t(log.pages) << log.page_size_log2) >> 10, log.pages_first,
++        log.pages_unchanged, pages_rehashed - log.pages_unchanged, blocks, blocks_changed,
++        pages_in_changed_blocks, u_page, u_block);
++  }
++  log.calls = 0;
++  log.ranges = 0;
++  log.pages = 0;
++  log.pages_first = 0;
++  log.pages_unchanged = 0;
++  std::memset(log.blocks_uploaded, 0, sizeof(log.blocks_uploaded));
++  std::memset(log.blocks_changed, 0, sizeof(log.blocks_changed));
++  std::memset(log.block_pages_rehashed, 0, sizeof(log.block_pages_rehashed));
++}
++
++void UploadHashLogBeginCall(UploadHashLog& log, uint64_t frame, uint32_t page_size_log2) {
++  if (log.page_hashes.empty()) {
++    log.page_size_log2 = page_size_log2;
++    size_t page_count = size_t(SharedMemory::kBufferSize) >> page_size_log2;
++    log.page_hashes.assign(page_count, 0);
++    log.page_hashed.assign((page_count + 63) / 64, 0);
++  }
++  if (frame != log.frame) {
++    UploadHashLogFlushFrame(log);
++    log.frame = frame;
++  }
++  ++log.calls;
++}
++
++void UploadHashLogPages(UploadHashLog& log, const uint8_t* guest_pages, uint32_t page_first,
++                        uint32_t page_count) {
++  uint32_t page_total = uint32_t(log.page_hashes.size());
++  if (page_first >= page_total) {
++    return;
++  }
++  if (page_count > page_total - page_first) {
++    page_count = page_total - page_first;
++  }
++  ++log.ranges;
++  size_t page_size = size_t(1) << log.page_size_log2;
++  for (uint32_t i = 0; i < page_count; ++i) {
++    uint32_t page = page_first + i;
++    uint64_t hash = XXH3_64bits(guest_pages + page_size * i, page_size);
++    uint32_t block =
++        uint32_t((uint64_t(page) << log.page_size_log2) >> UploadHashLog::kBlockSizeLog2);
++    uint64_t block_bit = uint64_t(1) << (block & 63);
++    log.blocks_uploaded[block >> 6] |= block_bit;
++    uint64_t& hashed_bits = log.page_hashed[page >> 6];
++    uint64_t hashed_bit = uint64_t(1) << (page & 63);
++    if (!(hashed_bits & hashed_bit)) {
++      hashed_bits |= hashed_bit;
++      ++log.pages_first;
++    } else {
++      ++log.block_pages_rehashed[block];
++      if (log.page_hashes[page] == hash) {
++        ++log.pages_unchanged;
++      } else {
++        log.blocks_changed[block >> 6] |= block_bit;
++      }
++    }
++    log.page_hashes[page] = hash;
++  }
++  log.pages += page_count;
++}
++
++}  // namespace
++
+ D3D12SharedMemory::D3D12SharedMemory(D3D12CommandProcessor& command_processor,
+                                      memory::Memory& memory)
+     : SharedMemory(memory), command_processor_(command_processor) {}
+@@ -335,6 +467,19 @@ bool D3D12SharedMemory::UploadRanges(
+       upload_range_length -= upload_buffer_pages;
+     }
+   }
++  if (REXCVAR_GET(shared_memory_upload_hash_log)) {
++    // S4 u diagnostic: hash the guest copy of every page just uploaded (never
++    // the write-combined upload mapping, which is very slow to read).
++    std::lock_guard<std::mutex> upload_hash_log_lock(upload_hash_log.mutex);
++    UploadHashLogBeginCall(upload_hash_log, command_processor_.GetCurrentFrame(),
++                           page_size_log2());
++    for (const auto& upload_range : upload_page_ranges) {
++      UploadHashLogPages(upload_hash_log,
++                         static_cast<const uint8_t*>(
++                             memory().TranslatePhysical(upload_range.first << page_size_log2())),
++                         upload_range.first, upload_range.second);
++    }
++  }
+   return true;
+ }
+ 
+diff --git a/src/graphics/primitive_processor.cpp b/src/graphics/primitive_processor.cpp
+index 3d3ee83..0213b45 100644
+--- a/src/graphics/primitive_processor.cpp
++++ b/src/graphics/primitive_processor.cpp
+@@ -85,6 +85,10 @@ REXCVAR_DEFINE_INT32(primitive_processor_cache_min_indices, 0, "GPU",
+ 
+ namespace rex::graphics {
+ 
++// S4 C1: the converted index cache lets a keep-watch protect keep its write watches;
++// a later CPU write still faults and invalidates the cached conversions.
++static bool MemoryKeepWatchGuardAlwaysAllow(void*, uint32_t, uint32_t) { return true; }
++
+ // SIMD processing here assumes that alignment is not required (neither AVX nor
+ // Neon requires it) and there's no punishment for using an unaligned access
+ // instruction when the data is actually aligned (AVX has separate aligned /
+@@ -1362,7 +1366,7 @@ PrimitiveProcessor::CacheTransaction::CacheTransaction(PrimitiveProcessor& proce
+     if (!processor_.memory_invalidation_callback_handle_) {
+       processor_.memory_invalidation_callback_handle_ =
+           processor_.memory_.RegisterPhysicalMemoryInvalidationCallback(
+-              MemoryInvalidationCallbackThunk, &processor_);
++              MemoryInvalidationCallbackThunk, &processor_, MemoryKeepWatchGuardAlwaysAllow);
+     }
+     processor_.memory_.EnablePhysicalMemoryAccessCallbacks(key_.base, size_bytes, true, false);
+   }
+diff --git a/src/graphics/shared_memory.cpp b/src/graphics/shared_memory.cpp
+index 4b23b0d..59a636d 100644
+--- a/src/graphics/shared_memory.cpp
++++ b/src/graphics/shared_memory.cpp
+@@ -16,11 +16,35 @@
+ 
+ #include <rex/assert.h>
+ #include <rex/bit.h>
++#include <rex/cvar.h>
+ #include <rex/dbg.h>
+ #include <rex/graphics/shared_memory.h>
++#include <rex/hash.h>
++#include <rex/logging.h>
+ #include <rex/math.h>
+ #include <rex/memory.h>
+ 
++// S4 P2 (default off). When on, MakeRangeValid holds the global critical region
++// once over the valid-bit update and the write-watch re-arm, and
++// RangeWrittenByGpu holds it once over FireWatches and MakeRangeValid. The inner
++// acquires (the scope in MakeRangeValid, FireWatches, EnableAccessCallbacks in
++// each view) become recursive re-entries, so G is released, and a waiter woken,
++// once per call instead of 4 (MakeRangeValid) or 5 (RangeWrittenByGpu) times.
++// Off: one cvar load and one untaken branch per call; the original code runs.
++REXCVAR_DEFINE_BOOL(shared_memory_single_hold_rearm, false, "GPU",
++                    "Hold the global lock once across a shared memory range's valid-bit "
++                    "update and its write-watch re-arm (fewer lock releases and waiter "
++                    "wakes on the GPU thread)");
++
++// S4 C1 verify (default off; set it at launch). Hashes every page of each CPU upload
++// once its write watch is armed. A keep-watch protect (K) or a write fault (F) that
++// finds a still-valid page changed logs it, and K sends that protect down the
++// normal path. With physical_protect_keep_watch off, the F count is today's rate.
++REXCVAR_DEFINE_BOOL(physical_protect_keep_watch_verify, false, "GPU",
++                    "Verify physical_protect_keep_watch: hash CPU uploads and log pages that "
++                    "changed without a write fault (slow; diagnostics only)")
++    .lifecycle(rex::cvar::Lifecycle::kRequiresRestart);
++
+ namespace rex::graphics {
+ 
+ SharedMemory::SharedMemory(memory::Memory& memory) : memory_(memory) {
+@@ -39,8 +63,9 @@ void SharedMemory::InitializeCommon() {
+   system_page_flags_valid_.assign(num_system_page_flags_, 0);
+   system_page_flags_valid_and_gpu_written_.assign(num_system_page_flags_, 0);
+ 
+-  memory_invalidation_callback_handle_ =
+-      memory_.RegisterPhysicalMemoryInvalidationCallback(MemoryInvalidationCallbackThunk, this);
++  // S4 C1: with SharedMemory's keep-watch guard (condition 3, verify mode's K check).
++  memory_invalidation_callback_handle_ = memory_.RegisterPhysicalMemoryInvalidationCallback(
++      MemoryInvalidationCallbackThunk, this, MemoryKeepWatchGuardThunk);
+ }
+ 
+ void SharedMemory::InitializeSparseHostGpuMemory(uint32_t granularity_log2) {
+@@ -283,6 +308,13 @@ void SharedMemory::RangeWrittenByGpu(uint32_t start, uint32_t length) {
+   uint32_t page_first = start >> page_size_log2_;
+   uint32_t page_last = end >> page_size_log2_;
+ 
++  // S4 P2 (shared_memory_single_hold_rearm): one G hold for the watch firing and
++  // the re-arm. FireWatches and MakeRangeValid then acquire G recursively.
++  std::unique_lock<std::recursive_mutex> single_hold_lock;
++  if (REXCVAR_GET(shared_memory_single_hold_rearm)) {
++    single_hold_lock = global_critical_region_.Acquire();
++  }
++
+   // Trigger modification callbacks so, for instance, resolved data is loaded to
+   // the texture.
+   FireWatches(page_first, page_last, true);
+@@ -311,6 +343,16 @@ void SharedMemory::MakeRangeValid(uint32_t start, uint32_t length, bool written_
+   uint32_t valid_block_first = valid_page_first >> 6;
+   uint32_t valid_block_last = valid_page_last >> 6;
+ 
++  // S4 P2 (shared_memory_single_hold_rearm): hold G from the valid-bit update
++  // through EnablePhysicalMemoryAccessCallbacks below. The scope's acquire and
++  // the acquire in each view's EnableAccessCallbacks become recursive re-entries,
++  // so G is released once per call instead of 4 times. The memcpy that follows
++  // in UploadRanges still runs without G.
++  std::unique_lock<std::recursive_mutex> single_hold_lock;
++  if (REXCVAR_GET(shared_memory_single_hold_rearm)) {
++    single_hold_lock = global_critical_region_.Acquire();
++  }
++
+   {
+     auto global_lock = global_critical_region_.Acquire();
+ 
+@@ -333,6 +375,12 @@ void SharedMemory::MakeRangeValid(uint32_t start, uint32_t length, bool written_
+         valid_page_first << page_size_log2_,
+         (valid_page_last - valid_page_first + 1) << page_size_log2_, true, false);
+   }
++
++  // S4 C1 verify: hash the pages once the watch is armed (a later write faults and
++  // clears valid before it lands).
++  if (REXCVAR_GET(physical_protect_keep_watch_verify) && memory_invalidation_callback_handle_) {
++    KeepWatchVerifyRecord(valid_page_first, valid_page_last, written_by_gpu);
++  }
+ }
+ 
+ void SharedMemory::UnlinkWatchRange(WatchRange* range) {
+@@ -528,6 +576,12 @@ std::pair<uint32_t, uint32_t> SharedMemory::MemoryInvalidationCallback(
+ 
+   auto global_lock = global_critical_region_.Acquire();
+ 
++  // S4 C1 verify (F): a write fault comes before its write lands, so a page that is
++  // still valid must still match its upload hash.
++  if (!exact_range && keep_watch_verify_hashes_) {
++    KeepWatchVerifyCheck(page_first, page_last, false);
++  }
++
+   if (!exact_range) {
+     // Check if a somewhat wider range (up to 256 KB with 4 KB pages) can be
+     // invalidated - if no GPU-written data nearby that was not intended to be
+@@ -574,6 +628,116 @@ std::pair<uint32_t, uint32_t> SharedMemory::MemoryInvalidationCallback(
+                                                            << page_size_log2_);
+ }
+ 
++bool SharedMemory::MemoryKeepWatchGuardThunk(void* context_ptr, uint32_t physical_address_start,
++                                             uint32_t length) {
++  return reinterpret_cast<SharedMemory*>(context_ptr)
++      ->MemoryKeepWatchGuard(physical_address_start, length);
++}
++
++// S4 C1 condition 3: a write protect may keep the watches on a range only if no
++// valid page in it holds GPU-written data. Called by PhysicalHeap::ProtectKeepWatch
++// with the global critical region held and before any heap mutex; takes no lock.
++// In verify mode it also refuses a range whose CPU-uploaded pages changed (K).
++bool SharedMemory::MemoryKeepWatchGuard(uint32_t physical_address_start, uint32_t length) {
++  if (length == 0 || physical_address_start >= kBufferSize) {
++    return true;
++  }
++  length = std::min(length, kBufferSize - physical_address_start);
++  uint32_t page_first = physical_address_start >> page_size_log2_;
++  uint32_t page_last = (physical_address_start + (length - 1)) >> page_size_log2_;
++  uint32_t block_first = page_first >> 6;
++  uint32_t block_last = page_last >> 6;
++  for (uint32_t i = block_first; i <= block_last; ++i) {
++    uint64_t gpu_written_bits = system_page_flags_valid_and_gpu_written_[i];
++    if (i == block_first) {
++      gpu_written_bits &= ~((uint64_t(1) << (page_first & 63)) - 1);
++    }
++    if (i == block_last && (page_last & 63) != 63) {
++      gpu_written_bits &= (uint64_t(1) << ((page_last & 63) + 1)) - 1;
++    }
++    if (gpu_written_bits) {
++      return false;
++    }
++  }
++  return !keep_watch_verify_hashes_ || KeepWatchVerifyCheck(page_first, page_last, true);
++}
++
++// Verify mode only: whether the host page at host can be read, so hashing it can't
++// fault (a valid page can be no-access in the physical view). readable_end caches
++// the end of the last readable host region, for ascending pages.
++static bool KeepWatchVerifyReadable(uint8_t* host, size_t page_size, uint8_t*& readable_end) {
++  if (readable_end && host < readable_end) {
++    return true;
++  }
++  size_t length = page_size;
++  memory::PageAccess access;
++  if (!memory::QueryProtect(host, length, access) || access == memory::PageAccess::kNoAccess) {
++    return false;
++  }
++  readable_end = host + length;
++  return true;
++}
++
++// Verify mode: hash each page of a CPU upload after its write watch is armed (any
++// later write faults and clears valid first). GPU-written and unreadable pages get
++// 0, which the checks skip.
++void SharedMemory::KeepWatchVerifyRecord(uint32_t page_first, uint32_t page_last,
++                                         bool written_by_gpu) {
++  auto global_lock = global_critical_region_.Acquire();
++  if (!keep_watch_verify_hashes_) {
++    keep_watch_verify_hashes_ = std::make_unique<uint64_t[]>(kBufferSize >> page_size_log2_);
++    REXGPU_INFO(
++        "C1 verify: on. Hashing CPU uploads; K checks keep-watch protects, F checks write "
++        "faults");
++  }
++  const size_t page_size = size_t(1) << page_size_log2_;
++  uint8_t* readable_end = nullptr;
++  for (uint32_t page = page_first; page <= page_last; ++page) {
++    uint64_t hash = 0;
++    if (!written_by_gpu) {
++      uint8_t* host = memory_.TranslatePhysical(page << page_size_log2_);
++      if (KeepWatchVerifyReadable(host, page_size, readable_end)) {
++        hash = XXH3_64bits(host, page_size) | 1;
++      }
++    }
++    keep_watch_verify_hashes_[page] = hash;
++  }
++}
++
++// Verify mode: compare still-valid CPU-uploaded pages with their upload hashes.
++// Called with the global critical region held: K from the keep-watch guard (no lock
++// taken; the logger's lock is a leaf), F from a write fault before its write lands.
++// Returns false if any page changed.
++bool SharedMemory::KeepWatchVerifyCheck(uint32_t page_first, uint32_t page_last,
++                                        bool at_protect) {
++  const size_t page_size = size_t(1) << page_size_log2_;
++  uint8_t* readable_end = nullptr;
++  bool unchanged = true;
++  for (uint32_t page = page_first; page <= page_last; ++page) {
++    uint64_t hash = keep_watch_verify_hashes_[page];
++    uint64_t page_bit = uint64_t(1) << (page & 63);
++    if (!hash || !(system_page_flags_valid_[page >> 6] & page_bit) ||
++        (system_page_flags_valid_and_gpu_written_[page >> 6] & page_bit)) {
++      continue;
++    }
++    uint8_t* host = memory_.TranslatePhysical(page << page_size_log2_);
++    if (!KeepWatchVerifyReadable(host, page_size, readable_end) ||
++        (XXH3_64bits(host, page_size) | 1) == hash) {
++      continue;
++    }
++    unchanged = false;
++    uint64_t& mismatches =
++        at_protect ? keep_watch_verify_protect_mismatches_ : keep_watch_verify_fault_mismatches_;
++    ++mismatches;
++    if (mismatches <= 256 || !(mismatches & 4095)) {
++      REXGPU_WARN("C1 verify {}: page {:08X} changed since its upload ({} so far){}",
++                  at_protect ? 'K' : 'F', page << page_size_log2_, mismatches,
++                  at_protect ? "; protect keeps the normal path" : "");
++    }
++  }
++  return unchanged;
++}
++
+ bool SharedMemory::EnsureHostGpuMemoryAllocated(uint32_t start, uint32_t length) {
+   if (host_gpu_memory_sparse_granularity_log2_ == UINT32_MAX) {
+     return true;
+diff --git a/src/system/xmemory.cpp b/src/system/xmemory.cpp
+index 8f613a5..efc04be 100644
+--- a/src/system/xmemory.cpp
++++ b/src/system/xmemory.cpp
+@@ -42,6 +42,20 @@ REXCVAR_DEFINE_BOOL(protect_on_release, false, "Memory",
+ 
+ REXCVAR_DEFINE_BOOL(scribble_heap, false, "Memory", "Scribble 0xCD into all allocated heap memory");
+ 
++// S4.7 fix (i), default off: see PhysicalHeap::Protect.
++REXCVAR_DEFINE_BOOL(physical_protect_hold_global_lock, false, "Memory",
++                    "Hold the global lock across both host protects in PhysicalHeap::Protect")
++    .lifecycle(rex::cvar::Lifecycle::kInitOnly);
++
++// S4 C1 (default off): keep the write watches on physical write protects that change
++// no page's access. Engages only with physical_protect_hold_global_lock on; see
++// PhysicalHeap::ProtectKeepWatch. Both cvars are init-only (C1 v2), so the settings
++// overlay can't turn C1 on mid-run over page state from before fix (i) was on.
++REXCVAR_DEFINE_BOOL(physical_protect_keep_watch, false, "Memory",
++                    "Keep the write watches on physical write protects that leave every "
++                    "page's access unchanged (needs physical_protect_hold_global_lock)")
++    .lifecycle(rex::cvar::Lifecycle::kInitOnly);
++
+ namespace rex::memory {
+ 
+ uint32_t get_page_count(uint32_t value, uint32_t page_size, uint32_t page_size_shift) {
+@@ -134,6 +148,18 @@ Memory::~Memory() {
+ 
+ bool Memory::Initialize() {
+   file_name_ = fmt::format("xenia_memory_{}", chrono::Clock::QueryHostTickCount());
++  // S4 C1 v2: whether physical_protect_keep_watch can engage (set both cvars at
++  // launch). Prints nothing while it is off.
++  if (REXCVAR_GET(physical_protect_keep_watch)) {
++    if (IsPhysicalProtectKeepWatchBlocked()) {
++      REXSYS_INFO("C1 keep-watch: on, but blocked for this process (native renderer)");
++    } else if (!REXCVAR_GET(physical_protect_hold_global_lock)) {
++      REXSYS_WARN("C1 keep-watch: on, but physical_protect_hold_global_lock is off, so no "
++                  "protect is kept");
++    } else {
++      REXSYS_INFO("C1 keep-watch: on (with physical_protect_hold_global_lock)");
++    }
++  }
+   // A breadcrumb: the arena is the first thing that can fail for reasons
+   // outside the game (address space, page file, a hook DLL squatting on the
+   // range), and a log that ends right before it says where to look.
+@@ -684,6 +710,19 @@ void* Memory::RegisterPhysicalMemoryInvalidationCallback(
+   return entry;
+ }
+ 
++// S4 C1: as above, and the guard is kept by handle for PhysicalHeap::ProtectKeepWatch.
++void* Memory::RegisterPhysicalMemoryInvalidationCallback(
++    PhysicalMemoryInvalidationCallback callback, void* callback_context,
++    PhysicalMemoryKeepWatchGuard keep_watch_guard) {
++  auto entry = new std::pair<PhysicalMemoryInvalidationCallback, void*>(callback, callback_context);
++  auto lock = global_critical_region_.Acquire();
++  physical_memory_invalidation_callbacks_.push_back(entry);
++  if (keep_watch_guard) {
++    physical_memory_keep_watch_guards_.emplace_back(entry, keep_watch_guard);
++  }
++  return entry;
++}
++
+ void Memory::UnregisterPhysicalMemoryInvalidationCallback(void* callback_handle) {
+   auto entry =
+       reinterpret_cast<std::pair<PhysicalMemoryInvalidationCallback, void*>*>(callback_handle);
+@@ -695,10 +734,52 @@ void Memory::UnregisterPhysicalMemoryInvalidationCallback(void* callback_handle)
+     if (it != physical_memory_invalidation_callbacks_.end()) {
+       physical_memory_invalidation_callbacks_.erase(it);
+     }
++    // S4 C1: drop the callback's keep-watch guard, if any, with it.
++    auto guard_it = std::find_if(physical_memory_keep_watch_guards_.begin(),
++                                 physical_memory_keep_watch_guards_.end(),
++                                 [entry](const auto& item) { return item.first == entry; });
++    if (guard_it != physical_memory_keep_watch_guards_.end()) {
++      physical_memory_keep_watch_guards_.erase(guard_it);
++    }
+   }
+   delete entry;
+ }
+ 
++// S4 C1: process-wide latch, read by PhysicalHeap::ProtectKeepWatch. Constant-
++// initialized, so a static initializer in another translation unit can set it.
++static constinit std::atomic<bool> physical_protect_keep_watch_blocked{false};
++
++void Memory::BlockPhysicalProtectKeepWatch() {
++  physical_protect_keep_watch_blocked.store(true, std::memory_order_relaxed);
++}
++
++bool Memory::IsPhysicalProtectKeepWatchBlocked() {
++  return physical_protect_keep_watch_blocked.load(std::memory_order_relaxed);
++}
++
++// S4 C1 v2: log lines that show whether the keep-watch path engaged. Both helpers
++// run with the global critical region held; the logger's lock is a leaf. Kept
++// protects log the first one, the powers of two below 4096, then every 4096th, so
++// the last line gives the total to within 4096.
++static constinit std::atomic<uint64_t> physical_protect_kept_count{0};
++static constinit std::atomic<bool> physical_protect_keep_watch_block_logged{false};
++
++static void NoteKeptProtect(uint32_t address, uint32_t size) {
++  const uint64_t kept = physical_protect_kept_count.fetch_add(1, std::memory_order_relaxed) + 1;
++  if (kept == 1) {
++    REXSYS_INFO("C1 keep-watch: first kept protect at {:08X}, {} bytes", address, size);
++  } else if (!(kept & (kept - 1)) || !(kept & 4095)) {
++    REXSYS_INFO("C1 keep-watch: {} protects kept so far", kept);
++  }
++}
++
++static void NoteKeepWatchBlocked() {
++  if (!physical_protect_keep_watch_block_logged.exchange(true, std::memory_order_relaxed)) {
++    REXSYS_INFO("C1 keep-watch: blocked for this process (native renderer); every protect "
++                "takes the normal path");
++  }
++}
++
+ void Memory::EnablePhysicalMemoryAccessCallbacks(uint32_t physical_address, uint32_t length,
+                                                  bool enable_invalidation_notifications,
+                                                  bool enable_data_providers) {
+@@ -1798,6 +1879,43 @@ bool BaseHeap::Protect(uint32_t address, uint32_t size, uint32_t protect, uint32
+   return true;
+ }
+ 
++// S4 C1: see the declaration. Same rounding and bounds as Protect; a zero size, an
++// out-of-range or wrapping request, or guest pages smaller than host pages (Protect
++// reconciles those after the table change) return false. Only heap_mutex_ is
++// taken, so a caller that needs the global critical region holds it already.
++bool BaseHeap::ProtectAccessUnchanged(uint32_t address, uint32_t size, uint32_t protect,
++                                      bool apply) {
++  if (!size || page_size_ < memory_->system_page_size_) {
++    return false;
++  }
++  uint32_t start_page_number = (address - heap_base_) >> page_size_shift_;
++  if (start_page_number >= page_table_.size()) {
++    return false;
++  }
++  uint32_t end_page_number =
++      uint32_t((uint64_t(address) + size - 1 - heap_base_) >> page_size_shift_);
++  if (end_page_number >= page_table_.size()) {
++    return false;
++  }
++  const memory::PageAccess access = ToPageAccess(protect);
++  std::lock_guard<std::recursive_mutex> heap_lock(heap_mutex_);
++  const uint32_t base_address = page_table_[start_page_number].base_address;
++  for (uint32_t page_number = start_page_number; page_number <= end_page_number; ++page_number) {
++    const auto& page_entry = page_table_[page_number];
++    if (page_entry.base_address != base_address ||
++        !(page_entry.state & memory::kMemoryAllocationCommit) ||
++        ToPageAccess(page_entry.current_protect) != access) {
++      return false;
++    }
++  }
++  if (apply) {
++    for (uint32_t page_number = start_page_number; page_number <= end_page_number; ++page_number) {
++      page_table_[page_number].current_protect = protect;
++    }
++  }
++  return true;
++}
++
+ bool BaseHeap::QueryRegionInfo(uint32_t base_address, HeapAllocationInfo* out_info) {
+   uint32_t start_page_number = (base_address - heap_base_) >> page_size_shift_;
+   if (start_page_number > page_table_.size()) {
+@@ -2129,6 +2247,31 @@ bool PhysicalHeap::Protect(uint32_t address, uint32_t size, uint32_t protect,
+                            uint32_t* old_protect) {
+   auto global_lock = global_critical_region_.Acquire();
+ 
++  // S4.7 fix (i), physical_protect_hold_global_lock (default off). TriggerCallbacks
++  // below takes global_lock by value and drops it on return. Without this hold, an
++  // EnableAccessCallbacks on another thread can run between that invalidation and
++  // the host protects below: it watches the page and makes it read-only, then the
++  // host protect makes it writable again, so the watch bit stays set but the page
++  // never faults (EnableAccessCallbacks skips pages already watched). This second,
++  // recursive hold keeps the global critical region locked until return, error
++  // path included. Lock order is unchanged: without kMemoryProtectWrite, global_lock
++  // is already held across parent_heap_->Protect and BaseHeap::Protect (global
++  // critical region before heap_mutex_).
++  std::unique_lock<std::recursive_mutex> hold_global_lock;
++  if ((protect & memory::kMemoryProtectWrite) && REXCVAR_GET(physical_protect_hold_global_lock)) {
++    hold_global_lock = global_critical_region_.Acquire();
++  }
++
++  // S4 C1, physical_protect_keep_watch (default off): with fix (i)'s hold, a write
++  // protect that changes no page's access may keep the range's write watches armed
++  // (see ProtectKeepWatch). Off, without the hold, or with old_protect: the
++  // original path below.
++  if (hold_global_lock.owns_lock() && !old_protect && REXCVAR_GET(physical_protect_keep_watch) &&
++      ProtectKeepWatch(address, size, protect)) {
++    NoteKeptProtect(address, size);
++    return true;
++  }
++
+   // Only invalidate if making writable again, for simplicity - not when simply
+   // marking some range as immutable, for instance.
+   if (protect & memory::kMemoryProtectWrite) {
+@@ -2143,6 +2286,101 @@ bool PhysicalHeap::Protect(uint32_t address, uint32_t size, uint32_t protect,
+   return BaseHeap::Protect(address, size, protect);
+ }
+ 
++// S4 C1, physical_protect_keep_watch (default off). Protect calls this only for a
++// write protect without old_protect and with fix (i)'s hold, so the global critical
++// region (G) is held, twice, until Protect returns. When every page keeps its
++// access, the normal path's host protects change nothing on a page whose host
++// protection matches its table entry, and its TriggerCallbacks fires and drops the
++// write watches on the range. Here the watches stay armed instead: a later CPU
++// write still faults and fires them, and a range that is never written keeps its
++// GPU copy. Returns true if the protect is done; false sends Protect down the
++// normal path, with nothing changed except at most page table entries set to the
++// value that path writes too. Required, all checked under G:
++//  1. every page (Protect's rounding) keeps its access in this heap and in the
++//     parent heap, and they are committed pages of one region (as Protect needs);
++//  2. every invalidation callback has a keep-watch guard and the guard allows the
++//     range (TriggerCallbacks' physical range); a callback without one, such as
++//     rexlego's, keeps the normal path;
++//  3. SharedMemory's guard: no valid page in the range holds GPU-written data;
++//  4. no host page of the guest pages Protect would change waits for its data
++//     provider (the normal path makes those host-writable without providing data).
++// The guards run first, under G and before any heap mutex, and take no lock. Then
++// G -> this heap_mutex_, released, and G -> the parent's heap_mutex_: the two heap
++// mutexes are never nested. Memory::BlockPhysicalProtectKeepWatch (rexlego's native
++// renderer, from static init) turns this off for the process.
++bool PhysicalHeap::ProtectKeepWatch(uint32_t address, uint32_t size, uint32_t protect) {
++  if (Memory::IsPhysicalProtectKeepWatchBlocked()) {
++    NoteKeepWatchBlocked();
++    return false;
++  }
++  // Inside this heap, not empty and not wrapping; anything else keeps the normal path.
++  if (!size || address < heap_base_ || address - heap_base_ >= heap_size_ ||
++      size > heap_size_ - (address - heap_base_)) {
++    return false;
++  }
++  uint32_t heap_relative_address = address - heap_base_;
++
++  // 2 and 3: the guards, with the physical range TriggerCallbacks would pass to the
++  // callbacks.
++  uint32_t system_page_first = (heap_relative_address + host_address_offset()) / system_page_size_;
++  uint32_t system_page_last =
++      (heap_relative_address + size - 1 + host_address_offset()) / system_page_size_;
++  if (system_page_last >= system_page_count_) {
++    return false;
++  }
++  uint32_t physical_address_offset = GetPhysicalAddress(heap_base_);
++  uint32_t physical_address_start =
++      rex::sat_sub(system_page_first * system_page_size_, host_address_offset()) +
++      physical_address_offset;
++  uint32_t physical_length =
++      std::min(rex::sat_sub(system_page_last * system_page_size_ + system_page_size_,
++                            host_address_offset()) +
++                   physical_address_offset - physical_address_start,
++               heap_size_ - (physical_address_start - physical_address_offset));
++  for (auto invalidation_callback : memory_->physical_memory_invalidation_callbacks_) {
++    Memory::PhysicalMemoryKeepWatchGuard guard = nullptr;
++    for (const auto& item : memory_->physical_memory_keep_watch_guards_) {
++      if (item.first == invalidation_callback) {
++        guard = item.second;
++        break;
++      }
++    }
++    if (!guard || !guard(invalidation_callback->second, physical_address_start, physical_length)) {
++      return false;
++    }
++  }
++
++  // 4: data providers, over the host pages of the guest pages Protect would change.
++  uint32_t provide_page_first =
++      ((heap_relative_address & ~(page_size_ - 1)) + host_address_offset()) / system_page_size_;
++  uint32_t provide_page_last =
++      (((heap_relative_address + (size - 1)) | (page_size_ - 1)) + host_address_offset()) /
++      system_page_size_;
++  provide_page_last = std::min(provide_page_last, system_page_count_ - 1);
++  for (uint32_t i = provide_page_first >> 6; i <= (provide_page_last >> 6); ++i) {
++    uint64_t block = system_page_flags_[i].provide_data;
++    if (i == (provide_page_first >> 6)) {
++      block &= ~((uint64_t(1) << (provide_page_first & 63)) - 1);
++    }
++    if (i == (provide_page_last >> 6) && (provide_page_last & 63) != 63) {
++      block &= (uint64_t(1) << ((provide_page_last & 63) + 1)) - 1;
++    }
++    if (block) {
++      return false;
++    }
++  }
++
++  // 1: the access of every page in both page tables. Check both, then store both,
++  // each under its own heap_mutex_ only.
++  uint32_t parent_address = GetPhysicalAddress(address);
++  if (!ProtectAccessUnchanged(address, size, protect, false) ||
++      !parent_heap_->ProtectAccessUnchanged(parent_address, size, protect, false)) {
++    return false;
++  }
++  return ProtectAccessUnchanged(address, size, protect, true) &&
++         parent_heap_->ProtectAccessUnchanged(parent_address, size, protect, true);
++}
++
+ // notify_on_invalidation is only written with the global critical region held,
+ // but MayHaveWriteWatches reads it without the lock, so the stores and that
+ // lockless load go through atomic_ref. Plain loads under the lock stay as-is.

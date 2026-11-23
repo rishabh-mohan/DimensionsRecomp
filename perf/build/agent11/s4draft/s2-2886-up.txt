@@ -1,0 +1,13 @@
+﻿S2886: 
+S2887: ## 21:04 Agent 1: Android report done
+S2888: 
+S2889: - Agent 9 #8 done: perf-notes/ANDROID-FEASIBILITY.md v1.1 (752 lines, 21:01). About 349 citations were re-checked by 3 subagents. Verdict: feasible, but as a port project of ≈17-42 person-weeks. Top blockers: arm64 memory ordering in the generated code; the Vulkan backend ("not ready"); Android build and surface glue. Cheapest first step, P0a: the Windows build with REXGLUE_USE_VULKAN=ON and gpu_backend = vulkan, on the PC, no phone needed. Not tonight (builds stop at 23:40); it's the user's decision. Agent 9 stays idle, with no new task, to keep the load down.
+S2890: 
+S2891: ## 21:15 Agent 1: F1 env list approved, W6 promotion rule
+S2892: 
+S2893: - F1 approved as is: build/agent8/w8w9/ENV-KEYS-F1.txt (sha256 D1AE6D57…B35C). 11 exact-case keys: REX_TIMER_WAIT_BLOCKING, LEGO_GPU_WAIT_STATS, LEGO_GPU_WAIT_BACKOFF_US, LEGO_GPU_WAIT_SPIN_US, LEGO_NATIVE_FRAME_METRICS, LEGO_NATIVE_SHADER_MISS_CACHE, LEGO_NATIVE_THREADED, LEGO_NATIVE_PREPARE_THREADS, LEGO_NATIVE_SNAPSHOT_STATE, LEGO_NATIVE_FULL_DRAW_PREPARATION, LEGO_NATIVE_CHAIN_PRIORITY. Agent 8 checked them against the bins. The W8b keys stay, so the launcher won't need another change.
+S2894: - W8b can't run tonight: #21 isn't built, so LEGO_NATIVE_CHAIN_PRIORITY is in no bin.
+S2895: - W9 (devoff4b, #24, 16 runs, ~40 min) and W8a (native4b after the re-pin, 13 runs, ~33 min) are possible follow-ups if their functional rows pass. W9 uses SPIN_US=30 (the default) tonight.
+S2896: - W6: Agent 8 dry-tested finalize on a copy (13 runs, ~30 min) and ran promote-w6 in test mode (PASS 102 / FAIL 0). Promotion happens once (a) Agent 5's real finalize is in build/agent5/w6-draft (by 22:00) and (b) Agent 3's interim W6 rows (w6gA, w6s2, w6s1) pass. Agent 1 writes the GO only after all of Agent 3's W6 rows pass (including w6s3, ~22:38) and the user has left. Repeats are set after Agent 7's note (22:30).
+S2897: - Agent 3's queue: s4b01 (20:54-20:57) and s4bL0 (21:01-21:09) are done; w6gA has been running since 21:09.
+S2898: 

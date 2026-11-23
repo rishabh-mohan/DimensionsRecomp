@@ -1,0 +1,54 @@
+{
+  "passed": true,
+  "game_launched": false,
+  "gpu_tested": false,
+  "actual_sdk_memory": true,
+  "records": [
+    {
+      "name": "production",
+      "exit": 0,
+      "output": "PASS 1440 actual native decode cases: six formats, 2D/cube/volume, linear/tiled, packed mips, endian modes, raw/A/C/E/F storage; retained hash/decode survives later CPU edits; bank/bounds/failure cases. CPU SDK only; no game/GPU.\n",
+      "error": ""
+    },
+    {
+      "name": "previous-live-decode",
+      "exit": 23,
+      "output": "",
+      "error": "line 90: Decode(resource,fetch,retained,actual)&&actual==expected\n"
+    },
+    {
+      "name": "ignore-selected-mip-bank",
+      "exit": 23,
+      "output": "",
+      "error": "line 53: snapshot&&snapshot->Slice(false,0x1000,16)[0]==0x11&&snapshot->Slice(true,0x1000,16)[0]==0x22\n"
+    },
+    {
+      "name": "missing-slice-bounds",
+      "exit": 23,
+      "output": "",
+      "error": "line 54: snapshot->Slice(false,0x100F,2).empty()&&snapshot->Slice(true,0x0FFF,1).empty()&&snapshot->Slice(true,0x1000,0).empty()\n"
+    },
+    {
+      "name": "previous-inherited-alias-rejection",
+      "exit": 23,
+      "output": "",
+      "error": "capture address=A0020000 format=6 dim=1 tiled=0 packed=0 endian=0 base=3968 mip=8992 readable=0/0\nline 82: retained\n"
+    }
+  ],
+  "sources": {
+    "<workspace>\\DimensionsRecomp\\rexlego\\src\\gpu_native\\textures.cpp": "7c9971dcdaab730ea7a950bedad3e76d0aa2f2b506efba60db37437e6792f34b",
+    "<workspace>\\DimensionsRecomp\\rexlego\\src\\gpu_native\\texture_upload_source.h": "1948ff0aceca4910f494dd5af3f4cadf4b89462ac1d4628eeaaccc9b26bdccf2",
+    "<workspace>\\DimensionsRecomp\\rexlego\\src\\gpu_native\\texture_upload_cache.h": "74a323f658f1ae1681b638692e84517c8c5810566947f9f7a3c59ea274bc6251",
+    "<workspace>\\DimensionsRecomp\\rexlego\\src\\gpu_native\\texture_volume_upload.h": "3bed1c686df0048b49a2236b58f05c9df83663bb45809cf90950e37652aefd8e",
+    "<workspace>\\DimensionsRecomp\\rexlego\\src\\gpu_native\\texture_alpha4_upload.h": "f45f27a019f213c8f9425523f2d7141d04831a63030a5b371b39b2be6f917df0",
+    "<workspace>\\DimensionsRecomp\\rexlego\\src\\gpu_native\\texture_endian.h": "ff9b84347ba06096ba177a9c5a2362ba41e9618ae391b2aa61826dd6a637fe89",
+    "<workspace>\\DimensionsRecomp\\rexlego\\src\\gpu_native\\format.cpp": "34f582ed8f1a796f29836d4a57ba63a7c5a49f2cb213e4590900344dc1f4fe6d",
+    "<workspace>\\DimensionsRecomp\\tools\\gpu-aot\\test_texture_upload_retention_sdk.cpp": "51c06846f53ecff9c167328d2228a535840ae1db40686532dd8d7cef9441dc56",
+    "<workspace>\\DimensionsRecomp\\tools\\gpu-aot\\test_texture_upload_retention_sdk.py": "973743119ff69919c17de0e0c10cde76a99995824cb534c171bf23d23ded3f24"
+  },
+  "scope": "Retained upload bytes through actual native decode loops and SDK layouts/mappings; CPU only.",
+  "limits": [
+    "Production residency/copy/decode loop and SDK layouts execute; resource description and upload command submission are fixture boundaries.",
+    "The snapshot is currently taken within one CPU upload, not on draw submission. Native GPU-provider settlement, immutable capture-time versions, replay cache order and GPU/world/performance acceptance remain incomplete."
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "reference": "d0",
+  "forbid_all": ["Recovered stale physical page protection", "Unhandled guest physical write fault", "PhysicalHeap::Protect failed", "BaseHeap::Protect failed"],
+  "note_all": ["STUCK-LOCK", "Minidump written to"],
+  "levels": {"warning": 40, "error": 0, "critical": 0},
+  "arms": {
+    "d0":   {"require": ["Reserving the guest memory arena"],
+             "forbid": ["Host timer resolution set to 1 ms", "TimerQueue: precise wait (timer_queue_precise_wait)", "C1 keep-watch:", "C1 verify", "S4 upload hash:", "slow frame #", "GPU wait back-off", "GPU wait stats"]},
+    "b":    {"require": ["Reserving the guest memory arena"],
+             "forbid": ["Host timer resolution set to 1 ms", "TimerQueue: precise wait (timer_queue_precise_wait)", "C1 keep-watch:", "C1 verify", "S4 upload hash:", "slow frame #", "GPU wait back-off", "GPU wait stats"]},
+    "d3":   {"require": ["Reserving the guest memory arena"],
+             "forbid": ["Host timer resolution set to 1 ms", "TimerQueue: precise wait (timer_queue_precise_wait)", "C1 keep-watch:", "C1 verify", "S4 upload hash:", "slow frame #", "GPU wait back-off", "GPU wait stats"]},
+    "d11t": {"require": ["Reserving the guest memory arena", "Host timer resolution set to 1 ms"],
+             "forbid": ["TimerQueue: precise wait (timer_queue_precise_wait)", "C1 keep-watch:", "C1 verify", "S4 upload hash:", "slow frame #", "GPU wait back-off", "GPU wait stats"],
+             "exact": {"Host timer resolution set to 1 ms": 1}}
+  },
+  "count": ["STUCK-LOCK", "still not acquired after", "Minidump written to", "Recovered stale physical page protection", "Unhandled guest physical write fault", "PhysicalHeap::Protect failed", "BaseHeap::Protect failed", "Host timer resolution set to 1 ms", "TimerQueue: precise wait (timer_queue_precise_wait)", "[NtCreateFile] FAILED", "Reserving the guest memory arena", "Title terminated"],
+  "notes": [
+    "Expectations for build/agent6/w6/w6_kit.py on window 4c, written by Agent 6 for task #19 (22:54 brief). Source of the arms: bench/agent8/run/matrix-window4c.json (read-only): reference d0; arms d0 = bin build/agent2/devoff2-bin and B = bin build/agent2/devoffB-bin (S2 sources + codegen B, MANIFEST 8709476FF4778768); both cvars ['framerate_limit=0'], env {}, repeats 6. build/agent6/wnight/cmp_arms.py (23:01) checked bin, cvars and env against the arms of the same name in the W4b folder's matrix.json (build/agent8/matrix/20261122-1541): identical; only group and repeats differ. Arm keys are lowercased by the kit, so B's rules are under 'b'.",
+    "d0 and B set no switch beyond framerate_limit=0, so their rules are a boot sanity line plus forbids: no timer line (no timer cvars), no precise-wait line, no C1, S4 upload hash or slow-frame line, and no GPU wait line (devoff2 and devoffB predate S4b's gpu_wait_backoff.cpp). B differs from d0 only in codegen, so its log must match d0's: task #5's read-out (build/agent6/w4b/out-20261122-1541) had B vs d0 FAIL findings 0, NEW 0, MORE 0, GONE 0, ONLY 0.",
+    "d3 and d11t are NOT W4c arms. They are here only so that the test on W4b checks all 17 runs with task #5's read-out: d3 (devoff3-bin, framerate_limit=0) logs like d0; d11t (devoff2-bin + the 8 timer cvars + REX_TIMER_WAIT_BLOCKING=1) adds only the 1 ms line (ONLY 1). The cold run uses its arm's rules (cold-d0 -> d0).",
+    "Tested 23:06 with RUN-W4C-LOGDIFF.cmd on W4b (build/agent8/matrix/20261122-1541 -> build/agent6/wnight/out-W4C-20261122-1541): exit 1. The one FAIL is 1551-B-r2 'valid_timing false: build processes clang++', the known W4b flag in Agent 8's run.json. Every rule check passes in all 17 runs (status OK, exit 0, 40/0/0, no STUCK or dump). Logdiff vs d0: B, d3 and cold-d0 0/0/0/0/0; d11t ONLY 1 = the 1 ms line. Same result as task #5."
+  ]
+}

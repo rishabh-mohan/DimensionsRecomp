@@ -1,0 +1,3658 @@
+diff --git a/rexlego/src/cheat_engine.cpp b/rexlego/src/cheat_engine.cpp
+index 3fc3564..913f3ee 100644
+--- a/rexlego/src/cheat_engine.cpp
++++ b/rexlego/src/cheat_engine.cpp
+@@ -34,6 +34,10 @@ constexpr int kScanNew = 0;
+ constexpr int kScanExact = 1;
+ constexpr int kScanCompare = 2;
+ 
++// Leading results cached when a filtering scan finishes. The menu lists 200;
++// TakeResults walks the bitmap only for a longer list than this.
++constexpr size_t kCachedResults = 1024;
++
+ double LoadValue(const uint8_t* p, CheatEngine::ValueType type) {
+   switch (type) {
+     case CheatEngine::ValueType::kUInt8:
+@@ -128,7 +132,12 @@ CheatEngine::CheatEngine(rex::memory::Memory* memory, std::filesystem::path save
+ CheatEngine::~CheatEngine() {
+   // Stop the freeze thread first: it runs continuously and touches memory_,
+   // snapshot_ and the mutex, all of which must not be live when Join() runs.
+-  freeze_running_ = false;
++  // The flag changes under the mutex so the thread cannot miss the notify.
++  {
++    std::lock_guard<std::mutex> lock(apply_mutex_);
++    freeze_running_ = false;
++  }
++  freeze_cv_.notify_all();
+   if (freeze_thread_.joinable()) {
+     freeze_thread_.join();
+   }
+@@ -289,6 +298,7 @@ void CheatEngine::RunScan(int kind, double value, CompareOp op) {
+     ResetMask();
+     unfiltered_ = true;
+     result_count_ = 0;
++    cached_results_.clear();
+     TakeSnapshot();
+     scanning_ = false;
+     return;
+@@ -355,6 +365,9 @@ void CheatEngine::RunScan(int kind, double value, CompareOp op) {
+   }
+ 
+   result_count_ = kept;
++  // Published with the results by the scanning_ store below.
++  cached_results_.clear();
++  CollectResults(kCachedResults, cached_results_);
+   TakeSnapshot();
+   scanning_ = false;
+ }
+@@ -364,6 +377,19 @@ std::vector<uint32_t> CheatEngine::TakeResults(size_t limit) const {
+   if (scanning_ || unfiltered_ || mask_.empty()) {
+     return out;
+   }
++  // The cache holds the first min(kCachedResults, result_count_) addresses, so
++  // it answers any request no longer than itself, and every request once it
++  // holds them all.
++  if (limit <= cached_results_.size() || cached_results_.size() == result_count_.load()) {
++    out.assign(cached_results_.begin(),
++               cached_results_.begin() + std::min(limit, cached_results_.size()));
++    return out;
++  }
++  CollectResults(limit, out);
++  return out;
++}
++
++void CheatEngine::CollectResults(size_t limit, std::vector<uint32_t>& out) const {
+   const uint32_t value_size = uint32_t(ValueTypeSize(scan_type_));
+   out.reserve(std::min<size_t>(limit, size_t(result_count_.load())));
+   for (size_t word_index = 0; word_index < mask_.size() && out.size() < limit; ++word_index) {
+@@ -374,7 +400,6 @@ std::vector<uint32_t> CheatEngine::TakeResults(size_t limit) const {
+       out.push_back(uint32_t(((uint64_t(word_index) << 6) + uint64_t(bit)) * value_size));
+     }
+   }
+-  return out;
+ }
+ 
+ // ---------------------------------------------------------------------------
+@@ -408,6 +433,7 @@ void CheatEngine::SetFrozen(uint32_t phys_addr, ValueType type, double value, bo
+     } else {
+       frozen_.push_back({phys_addr, type, value});
+     }
++    freeze_cv_.notify_one();
+   } else if (it != frozen_.end()) {
+     frozen_.erase(it);
+   }
+@@ -442,6 +468,7 @@ void CheatEngine::AddCheat(const std::string& name, uint32_t phys_addr, ValueTyp
+   cheat.enabled = true;
+   cheat.writes.push_back({phys_addr, type, value});
+   cheats_.push_back(std::move(cheat));
++  freeze_cv_.notify_one();
+ }
+ 
+ void CheatEngine::RemoveCheat(size_t index) {
+@@ -455,31 +482,43 @@ void CheatEngine::SetCheatEnabled(size_t index, bool enabled) {
+   std::lock_guard<std::mutex> lock(apply_mutex_);
+   if (index < cheats_.size()) {
+     cheats_[index].enabled = enabled;
++    if (enabled) {
++      freeze_cv_.notify_one();
++    }
+   }
+ }
+ 
+ void CheatEngine::FreezeMain() {
++  // Same 50 ms cadence as a sleep loop while there is anything to apply. With
++  // nothing to apply it waits for a notify (new work or shutdown) instead of
++  // waking 20 times a second; the mutex is released while it waits.
++  std::unique_lock<std::mutex> lock(apply_mutex_);
+   while (freeze_running_) {
+-    {
+-      std::lock_guard<std::mutex> lock(apply_mutex_);
+-      auto apply = [&](const CheatWrite& write) {
+-        if (IsWritableAddress(write.phys_addr, ValueTypeSize(write.type))) {
+-          StoreValue(memory_->physical_membase() + write.phys_addr, write.type, write.value);
+-        }
+-      };
+-      for (const CheatWrite& write : frozen_) {
+-        apply(write);
++    bool has_work = false;
++    auto apply = [&](const CheatWrite& write) {
++      // Unwritable addresses still count: they are retried every tick, as before.
++      has_work = true;
++      if (IsWritableAddress(write.phys_addr, ValueTypeSize(write.type))) {
++        StoreValue(memory_->physical_membase() + write.phys_addr, write.type, write.value);
+       }
+-      for (const Cheat& cheat : cheats_) {
+-        if (!cheat.enabled) {
+-          continue;
+-        }
+-        for (const CheatWrite& write : cheat.writes) {
+-          apply(write);
+-        }
++    };
++    for (const CheatWrite& write : frozen_) {
++      apply(write);
++    }
++    for (const Cheat& cheat : cheats_) {
++      if (!cheat.enabled) {
++        continue;
+       }
++      for (const CheatWrite& write : cheat.writes) {
++        apply(write);
++      }
++    }
++    if (has_work) {
++      // Only shutdown ends this wait early; new work waits for the next tick.
++      freeze_cv_.wait_for(lock, std::chrono::milliseconds(50), [this] { return !freeze_running_; });
++    } else {
++      freeze_cv_.wait(lock);
+     }
+-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+   }
+ }
+ 
+@@ -545,6 +584,7 @@ void CheatEngine::Load() {
+       cheats_.push_back(std::move(cheat));
+     }
+   }
++  freeze_cv_.notify_one();
+ }
+ 
+ }  // namespace legodimensions::cheats
+diff --git a/rexlego/src/cheat_engine.h b/rexlego/src/cheat_engine.h
+index 945c6f3..e9c54cf 100644
+--- a/rexlego/src/cheat_engine.h
++++ b/rexlego/src/cheat_engine.h
+@@ -15,6 +15,7 @@
+ #pragma once
+ 
+ #include <atomic>
++#include <condition_variable>
+ #include <cstdint>
+ #include <filesystem>
+ #include <mutex>
+@@ -79,15 +80,17 @@ class CheatEngine {
+   bool unfiltered() const { return unfiltered_; }
+   ValueType scan_type() const { return scan_type_; }
+   uint64_t result_count() const { return result_count_; }
+-  // First |limit| matching addresses. Cheap enough to call per frame once the
+-  // count is small; returns nothing while a scan is running.
++  // First |limit| matching addresses. The scan thread caches the leading ones
++  // as it finishes, so a per-frame call does not walk the bitmap; returns
++  // nothing while a scan is running.
+   std::vector<uint32_t> TakeResults(size_t limit) const;
+ 
+   // --- Direct access ---
+   double ReadValue(uint32_t phys_addr, ValueType type) const;
+   void WriteValue(uint32_t phys_addr, ValueType type, double value);
+ 
+-  // --- Freezing (re-applied ~20x a second by a worker thread) ---
++  // --- Freezing (re-applied ~20x a second by a worker thread that sleeps
++  // while there is nothing to apply) ---
+   void SetFrozen(uint32_t phys_addr, ValueType type, double value, bool on);
+   bool IsFrozen(uint32_t phys_addr) const;
+   void ClearFrozen();
+@@ -118,6 +121,8 @@ class CheatEngine {
+   void MaskSet(uint64_t slot, bool on);
+ 
+   void RunScan(int kind, double value, CompareOp op);
++  // Appends the first |limit| set bits of mask_ as addresses, lowest first.
++  void CollectResults(size_t limit, std::vector<uint32_t>& out) const;
+   void Join();
+   void FreezeMain();
+ 
+@@ -131,6 +136,8 @@ class CheatEngine {
+   bool unfiltered_ = true;
+   std::vector<uint8_t> snapshot_;
+   std::vector<uint64_t> mask_;
++  // CollectResults(kCachedResults) as of the end of the last filtering scan.
++  std::vector<uint32_t> cached_results_;
+   std::atomic<uint64_t> result_count_{0};
+   std::atomic<bool> scanning_{false};
+   std::thread scan_thread_;
+@@ -139,6 +146,9 @@ class CheatEngine {
+   mutable std::mutex apply_mutex_;
+   std::vector<CheatWrite> frozen_;
+   std::vector<Cheat> cheats_;
++  // Wakes the freeze thread when there may be something new to apply, and on
++  // shutdown. Waited on with apply_mutex_.
++  std::condition_variable freeze_cv_;
+ 
+   std::atomic<bool> freeze_running_{true};
+   std::thread freeze_thread_;
+diff --git a/rexlego/src/cheat_menu.cpp b/rexlego/src/cheat_menu.cpp
+index 5dac773..7e16423 100644
+--- a/rexlego/src/cheat_menu.cpp
++++ b/rexlego/src/cheat_menu.cpp
+@@ -195,15 +195,21 @@ class CheatMenuDialog final : public rex::ui::ImGuiDialog {
+       return;
+     }
+     ImGui::BeginChild("##scan_results", ImVec2(0.0f, 150.0f), true);
+-    for (int i = 0; i < int(results_.size()); ++i) {
+-      const uint32_t address = results_[size_t(i)];
+-      const double current = engine->ReadValue(address, engine->scan_type());
+-      char label[64];
+-      std::snprintf(label, sizeof(label), "%08X = %.6g%s", address, current,
+-                    engine->IsFrozen(address) ? "  [frozen]" : "");
+-      if (ImGui::Selectable(label, selected_address_ == int64_t(address))) {
+-        selected_address_ = int64_t(address);
+-        std::snprintf(edit_value_text_, sizeof(edit_value_text_), "%g", current);
++    // Only the visible rows are submitted: each one reads guest memory behind
++    // a VirtualQuery and takes the freeze lock.
++    ImGuiListClipper clipper;
++    clipper.Begin(int(results_.size()));
++    while (clipper.Step()) {
++      for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i) {
++        const uint32_t address = results_[size_t(i)];
++        const double current = engine->ReadValue(address, engine->scan_type());
++        char label[64];
++        std::snprintf(label, sizeof(label), "%08X = %.6g%s", address, current,
++                      engine->IsFrozen(address) ? "  [frozen]" : "");
++        if (ImGui::Selectable(label, selected_address_ == int64_t(address))) {
++          selected_address_ = int64_t(address);
++          std::snprintf(edit_value_text_, sizeof(edit_value_text_), "%g", current);
++        }
+       }
+     }
+     if (engine->result_count() > results_.size()) {
+diff --git a/rexlego/src/discord_presence.cpp b/rexlego/src/discord_presence.cpp
+index 4597600..874addf 100644
+--- a/rexlego/src/discord_presence.cpp
++++ b/rexlego/src/discord_presence.cpp
+@@ -18,9 +18,11 @@
+ 
+ #include <atomic>
+ #include <chrono>
++#include <condition_variable>
+ #include <cstdint>
+ #include <cstring>
+ #include <ctime>
++#include <mutex>
+ #include <string>
+ #include <string_view>
+ #include <thread>
+@@ -283,6 +285,9 @@ class IpcConnection {
+ 
+ std::atomic<bool> g_running{false};
+ std::thread g_thread;
++// Stop() notifies this, so the thread never sits out the rest of a 2 s wait.
++std::mutex g_wake_mutex;
++std::condition_variable g_wake;
+ 
+ // Handshake, then the activity. Returns true once Discord has acknowledged the
+ // activity. On any failure the connection is dropped so the caller retries from
+@@ -384,11 +389,11 @@ void ThreadMain() {
+       }
+     }
+ 
+-    // Reconnect attempts and keepalive pumping both sit at 2 s, sliced so
+-    // Stop() does not wait out a long sleep.
+-    for (int i = 0; i < 20 && g_running.load(std::memory_order_relaxed); ++i) {
+-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+-    }
++    // Reconnect attempts and keepalive pumping both sit at 2 s. One timed wait
++    // rather than 100 ms slices: Stop() wakes it, so nothing needs to poll.
++    std::unique_lock<std::mutex> lock(g_wake_mutex);
++    g_wake.wait_for(lock, std::chrono::seconds(2),
++                    [] { return !g_running.load(std::memory_order_relaxed); });
+   }
+ }
+ 
+@@ -407,9 +412,15 @@ void Start() {
+ }
+ 
+ void Stop() {
+-  if (!g_running.exchange(false, std::memory_order_relaxed)) {
+-    return;
++  {
++    // Cleared under the wake mutex, so the thread cannot test the flag and
++    // then start waiting after the notify has gone.
++    std::lock_guard<std::mutex> lock(g_wake_mutex);
++    if (!g_running.exchange(false, std::memory_order_relaxed)) {
++      return;
++    }
+   }
++  g_wake.notify_all();
+   if (g_thread.joinable()) {
+     g_thread.join();
+   }
+diff --git a/rexlego/src/gpu_native/buffers.cpp b/rexlego/src/gpu_native/buffers.cpp
+index 81410a6..8eee56e 100644
+--- a/rexlego/src/gpu_native/buffers.cpp
++++ b/rexlego/src/gpu_native/buffers.cpp
+@@ -14,6 +14,7 @@
+ #include "gpu_native/memory_watch.h"
+ #include "gpu_native/vertex_upload.h"
+ #include "gpu_native/upload_buffer_pool.h"
++#include "gpu_native/upload_legacy_paths.h"
+ 
+ #include <cstring>
+ #include <cstdlib>
+@@ -150,25 +151,11 @@ void TraceBufferAllocation(const BufferResource& resource, const VertexByteOrder
+ 
+ void ByteSwapElements(void* destination, const void* source, size_t size,
+                       u32 element_size) {
+-  auto* dst = static_cast<u8*>(destination);
+-  const auto* src = static_cast<const u8*>(source);
+-  size_t offset = 0;
+-  if (element_size == 2) {
+-    for (; offset + 2 <= size; offset += 2) {
+-      dst[offset + 0] = src[offset + 1];
+-      dst[offset + 1] = src[offset + 0];
+-    }
+-  } else {
+-    for (; offset + 4 <= size; offset += 4) {
+-      dst[offset + 0] = src[offset + 3];
+-      dst[offset + 1] = src[offset + 2];
+-      dst[offset + 2] = src[offset + 1];
+-      dst[offset + 3] = src[offset + 0];
+-    }
+-  }
+-  if (offset != size) {
+-    std::memcpy(dst + offset, src + offset, size - offset);
+-  }
++  // SSSE3/AVX2 shuffles in vertex_upload.h, byte-identical to the old scalar
++  // loop: 16-bit swaps for element_size 2, 32-bit swaps otherwise, and a
++  // trailing partial element copied unchanged. The buffers never overlap.
++  SwapUploadElementBytes(static_cast<u8*>(destination), static_cast<const u8*>(source), size,
++                         element_size);
+ }
+ 
+ }  // namespace
+@@ -493,14 +480,18 @@ plume::RenderBuffer* ResolveBufferContents(const std::shared_ptr<BufferResource>
+     // UPLOAD heaps can be write-combined. Read/modify/write there (the packed
+     // vertex swizzle below) is extremely slow. Transform in cacheable CPU RAM,
+     // then perform a sequential write-only copy into the new GPU version.
+-    std::vector<u8> converted;
++    // Not zero-filled: ByteSwapElements writes every byte (whole elements plus
++    // the copied tail) before ApplyVertexByteOrder permutes within the range.
++    std::unique_ptr<u8[]> converted;
+     void* conversion_target = mapped;
+     const bool fused_upload = kind == BufferKind::kVertex &&
+         WriteAlignedVertexUpload(static_cast<u8*>(mapped), conversion_source, resource->length, conversion_order);
+     if (!fused_upload) {
+       if (kind == BufferKind::kVertex && !byte_order.reversed_elements.empty()) {
+-        converted.resize(resource->length);
+-        conversion_target = converted.data();
++        // LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD=1 (in-game A/B): zero-filled, as the old vector was.
++        converted.reset(LegacyUploadPathsEnabled() ? new u8[resource->length]()
++                                                   : new u8[resource->length]);
++        conversion_target = converted.get();
+       }
+       ByteSwapElements(conversion_target, conversion_source, resource->length, element_size);
+     }
+@@ -512,7 +503,7 @@ plume::RenderBuffer* ResolveBufferContents(const std::shared_ptr<BufferResource>
+                   byte_order.stride);
+       return nullptr;
+     }
+-    if (!converted.empty()) std::memcpy(mapped, converted.data(), converted.size());
++    if (converted && resource->length) std::memcpy(mapped, converted.get(), resource->length);
+     next_buffer->unmap();
+     // UPLOAD memory can be write-combined. Flush stores before another CPU
+     // preparation job may consume this immutable allocation through the cache.
+diff --git a/rexlego/src/gpu_native/device.cpp b/rexlego/src/gpu_native/device.cpp
+index 72d7589..dc685d2 100644
+--- a/rexlego/src/gpu_native/device.cpp
++++ b/rexlego/src/gpu_native/device.cpp
+@@ -252,6 +252,7 @@ struct State {
+   std::shared_ptr<PresentGammaSurface> gamma_surface;
+   DisplayGammaTable gamma_table;
+   bool gamma_table_valid = false;
++  bool gamma_identity = false;  // DisplayGammaIsIdentity(gamma_table)
+   std::unique_ptr<plume::RenderShader> resolve_pixel_shader;
+   std::unique_ptr<plume::RenderShader> scaled_resolve_pixel_shader;
+   std::array<std::unique_ptr<plume::RenderPipeline>, 5> resolve_pipelines;
+@@ -311,6 +312,9 @@ struct State {
+   std::vector<bool> texture_slots;
+   DescriptorRetirement retired_descriptors{65536, command_slot_count};
+   Backend backend = Backend::kD3D12;
++  // LEGO_NATIVE_FRAMES_IN_FLIGHT: present submission serial by present number.
++  std::array<u64, 8> present_serials{};
++  bool latency_configured = false;
+ };
+ 
+ constexpr u32 kBindlessTextureCount = 65536;
+@@ -749,7 +753,6 @@ plume::RenderCommandList* BeginFrameCommandsLocked(State& state) {
+ }  // namespace
+ 
+ thread_local DrawPreparationContext* t_draw_preparation = nullptr;
+-DrawPreparationContext* CurrentDrawPreparation() { return t_draw_preparation; }
+ std::shared_ptr<void> FindPinnedOwner(unsigned char kind, u32 address) {
+   if (!t_draw_preparation || !address) return {};
+   for (const auto& pin : t_draw_preparation->pinned)
+@@ -1676,6 +1679,109 @@ int32_t ReadConfigInt(const char* name, int32_t fallback) {
+   return fallback;
+ }
+ 
++// The ramp buffer is R10G10B10A2_UNORM and the pass writes RGBA8: output i
++// is exact when |255 * level - 1023 * i| <= 409 (under 0.4 ULP) for every
++// entry and channel, which holds for a linear ramp rounded to 10 bits. The
++// pass then copies RGB exactly; its alpha 1 only reaches back-buffer alpha,
++// which presentation ignores (overlays blend with their own source alpha).
++bool DisplayGammaIsIdentity(const DisplayGammaTable& table) {
++  for (int i = 0; i < 256; ++i) {
++    for (const int shift : {20, 10, 0}) {
++      const int level = int((table.words[i] >> shift) & 0x3FF);
++      if (std::abs(255 * level - 1023 * i) > 409) return false;
++    }
++  }
++  return true;
++}
++
++// LEGO_NATIVE_FRAMES_IN_FLIGHT=1..6 (default off): after each present, wait
++// until the present submitted that many presents earlier has completed. It
++// caps queued frames when LEGO_NATIVE_COMMAND_SLOTS=12 lets guest kickoffs
++// use more slots. It only waits; ring bookkeeping is unchanged.
++u32 NativeFramesInFlight() {
++  static const u32 frames = [] {
++    const char* value = std::getenv("LEGO_NATIVE_FRAMES_IN_FLIGHT");
++    const int parsed = value ? std::atoi(value) : 0;
++    const u32 result = parsed >= 1 && parsed <= 6 ? u32(parsed) : 0;
++    if (value) REXLOG_INFO("Native GPU: frames-in-flight cap={} (0 = off)", result);
++    return result;
++  }();
++  return frames;
++}
++
++struct PresentThrottle {
++  ID3D12Fence* fence = nullptr;  // AddRef'd by FindPresentThrottleLocked
++  u64 value = 0;
++};
++
++PresentThrottle FindPresentThrottleLocked(const State& state, u64 serial) {
++  if (!serial || serial <= state.completed_submission || state.backend != Backend::kD3D12) return {};
++  for (u32 slot = 0; slot < state.command_slot_count; ++slot) {
++    if (!state.frame_submitted[slot] || state.slot_submission[slot] != serial) continue;
++    auto* fence = static_cast<plume::D3D12CommandFence*>(state.frame_fences[slot].get());
++    if (!fence || !fence->d3d || fence->fenceValue <= 1) return {};
++    fence->d3d->AddRef();
++    return {fence->d3d, fence->fenceValue - 1};
++  }
++  // A slot is reused only after a verified wait, so that submission is done.
++  return {};
++}
++
++void WaitPresentThrottle(const PresentThrottle& throttle, u32 frames_in_flight) {
++  static HANDLE event = CreateEventW(nullptr, FALSE, FALSE, nullptr);
++  static u32 presents = 0, waits = 0;
++  static double waited_ms = 0;
++  if (throttle.fence) {
++    const u64 completed = throttle.fence->GetCompletedValue();
++    if (event && completed != UINT64_MAX && completed < throttle.value) {
++      const auto start = std::chrono::steady_clock::now();
++      ResetEvent(event);
++      if (SUCCEEDED(throttle.fence->SetEventOnCompletion(throttle.value, event)))
++        WaitForSingleObject(event, 1000);
++      ++waits;
++      waited_ms += std::chrono::duration<double, std::milli>(
++          std::chrono::steady_clock::now() - start).count();
++    }
++    throttle.fence->Release();
++  }
++  if (++presents == 600) {
++    REXLOG_INFO("Native GPU: frames-in-flight cap={} waited on {} of the last 600 presents, {:.2f} ms total",
++                frames_in_flight, waits, waited_ms);
++    presents = waits = 0;
++    waited_ms = 0;
++  }
++}
++
++// LEGO_NATIVE_LATENCY_WAIT=1..3 (default off): set the swap chain's maximum
++// frame latency and wait on its waitable object after each present.
++u32 NativeLatencyWait() {
++  static const u32 frames = [] {
++    const char* value = std::getenv("LEGO_NATIVE_LATENCY_WAIT");
++    const int parsed = value ? std::atoi(value) : 0;
++    const u32 result = parsed >= 1 && parsed <= 3 ? u32(parsed) : 0;
++    if (value) REXLOG_INFO("Native GPU: swap-chain latency wait={} (0 = off)", result);
++    return result;
++  }();
++  return frames;
++}
++
++// Published by PublishFramePace for HostDevice::PaceFrameBeforeLock.
++std::atomic<int64_t> g_pace_next{0};  // steady_clock ticks of the next deadline
++std::atomic<int32_t> g_pace_limit{0};
++
++// LEGO_NATIVE_UNLOCKED_PACING=1 (2 ms margin) or 500..20000 microseconds;
++// unset or 0 (the default) turns HostDevice::PaceFrameBeforeLock off.
++int64_t UnlockedPacingMarginUs() {
++  static const int64_t margin = [] {
++    const char* value = std::getenv("LEGO_NATIVE_UNLOCKED_PACING");
++    const long long parsed = value ? std::atoll(value) : 0;
++    const int64_t result = parsed <= 0 ? 0 : parsed == 1 ? 2000 : std::clamp<long long>(parsed, 500, 20000);
++    if (value) REXLOG_INFO("Native GPU: unlocked frame pacing margin={}us (0 = off)", result);
++    return result;
++  }();
++  return margin;
++}
++
+ // Legacy resolver is used only without the coordinated native-menu runtime.
+ int32_t LegacyFrameRateLimit() {
+   static const int32_t override_limit = [] {
+@@ -1714,6 +1820,24 @@ void LimitFrameRate(int32_t limit) {
+   // Do not bank time after a slow frame: never schedule in the past.
+   next = (std::max)(next + period, now);
+ }
++
++// Mirrors LimitFrameRate's schedule for HostDevice::PaceFrameBeforeLock,
++// outside its body (tools/gpu-aot/test_frame_rate_settings.py compiles that
++// body alone). On both of its branches LimitFrameRate sets next to
++// max(next + period, now); with now replaced by the time it was entered,
++// this copy is never later, and earlier only by the gap between the reads.
++void PublishFramePace(int32_t limit, std::chrono::steady_clock::time_point entered) {
++  using clock = std::chrono::steady_clock;
++  static clock::time_point next;
++  static int32_t previous_limit = -1;
++  if (previous_limit != limit) { next = entered; previous_limit = limit; }
++  g_pace_limit.store(limit, std::memory_order_relaxed);
++  if (limit <= 0) return;
++  const auto period = std::chrono::duration_cast<clock::duration>(
++      std::chrono::duration<double>(1.0 / limit));
++  next = (std::max)(next + period, entered);
++  g_pace_next.store(next.time_since_epoch().count(), std::memory_order_release);
++}
+ }  // namespace
+ 
+ void HostDevice::SetDisplayGamma(const DisplayGammaTable& table) {
+@@ -1722,8 +1846,30 @@ void HostDevice::SetDisplayGamma(const DisplayGammaTable& table) {
+   if (!g_state || (g_state->gamma_table_valid && g_state->gamma_table == table)) return;
+   g_state->gamma_table = table;
+   g_state->gamma_table_valid = true;
+-  REXLOG_INFO("Native GPU: display gamma updated from title ramp black={:08X} mid={:08X} white={:08X}",
+-              table.words[0], table.words[128], table.words[255]);
++  g_state->gamma_identity = DisplayGammaIsIdentity(table);
++  REXLOG_INFO("Native GPU: display gamma updated from title ramp black={:08X} mid={:08X} white={:08X} identity={}",
++              table.words[0], table.words[128], table.words[255], g_state->gamma_identity);
++}
++
++void HostDevice::PaceFrameBeforeLock() {
++  // Opt-in (UnlockedPacingMarginUs): sleep the bulk of the frame-rate gap
++  // before SwapHook takes the recording gate. LimitFrameRate still waits for
++  // the same deadline under the gate; presents keep their schedule while the
++  // work from here to the limiter fits in the margin. Takes no lock.
++  const int64_t margin_us = UnlockedPacingMarginUs();
++  if (!margin_us || g_pace_limit.load(std::memory_order_relaxed) <= 0) return;
++  using clock = std::chrono::steady_clock;
++  const auto wake = clock::time_point(clock::duration(g_pace_next.load(std::memory_order_acquire))) -
++                    std::chrono::microseconds(margin_us);
++  const auto now = clock::now();
++  if (wake <= now) return;
++  const auto sleep_for = (std::min)(wake - now, clock::duration(std::chrono::seconds(1)));
++  static thread_local HANDLE timer = CreateWaitableTimerExW(nullptr, nullptr,
++      CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_ALL_ACCESS);
++  LARGE_INTEGER due;
++  due.QuadPart = -std::chrono::duration_cast<std::chrono::nanoseconds>(sleep_for).count() / 100;
++  if (timer && SetWaitableTimer(timer, &due, 0, nullptr, nullptr, FALSE))
++    WaitForSingleObject(timer, INFINITE);
+ }
+ 
+ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
+@@ -1733,7 +1879,10 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
+   const auto settings_frame = settings_runtime ? settings_runtime->Active() : nullptr;
+   const auto* settings = settings_frame ? &settings_frame->values : nullptr;
+   const int32_t fps_limit = settings ? settings->fps_limit : LegacyFrameRateLimit();
++  const bool publish_pace = UnlockedPacingMarginUs() != 0;
++  const auto pace_entered = publish_pace ? std::chrono::steady_clock::now() : std::chrono::steady_clock::time_point{};
+   LimitFrameRate(fps_limit);
++  if (publish_pace) PublishFramePace(fps_limit, pace_entered);
+   const int32_t requested_anisotropy = settings ? settings->anisotropy : NativeAnisotropicRequested();
+   if (g_anisotropic_override.exchange(requested_anisotropy, std::memory_order_acq_rel) != requested_anisotropy)
+     REXLOG_INFO("Native GPU: texture filtering changed to {} at presentation boundary", requested_anisotropy);
+@@ -1749,7 +1898,21 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
+   }
+   SnapshotTexture(texture, "present", false);
+ 
+-  std::lock_guard lock(g_mutex);
++  // Window queries enter win32k; make them before g_mutex. This relies on
++  // g_state and its swap chain being replaced only under the full recording
++  // gate (Create, Shutdown), which is held above. Replacing them under
++  // g_mutex alone (e.g. device-lost recovery) would make these reads race.
++  HWND presentation_window = nullptr;
++  bool presentation_focused = false, presentation_borderless = false;
++  HMONITOR presentation_monitor = nullptr;
++  if (g_state && g_state->swap_chain) {
++    presentation_window = g_state->swap_chain->getWindow();
++    presentation_focused = GetForegroundWindow() == presentation_window;
++    presentation_borderless = (GetWindowLongPtrW(presentation_window, GWL_STYLE) & WS_POPUP) != 0;
++    presentation_monitor = MonitorFromWindow(presentation_window, MONITOR_DEFAULTTONEAREST);
++  }
++
++  std::unique_lock lock(g_mutex);
+   if (!g_state || !g_state->copy_pipeline || !TextureSlotLive(*g_state, descriptor_index)) {
+     return false;
+   }
+@@ -1801,7 +1964,13 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
+   // The reference renderer applies the display ramp before spatial output
+   // scaling. Keep FSR 1 and FSR 3's scene processing unchanged and apply the
+   // original XDK-converted ramp once to the resolved input of presentation.
+-  if (state.gamma_table_valid) {
++  // An identity ramp makes that pass an exact RGB copy, so present the input
++  // directly (DisplayGammaIsIdentity); LEGO_NATIVE_FORCE_GAMMA_PASS=1 restores it.
++  static const bool force_gamma_pass = [] {
++    const char* value = std::getenv("LEGO_NATIVE_FORCE_GAMMA_PASS");
++    return value && *value == '1';
++  }();
++  if (state.gamma_table_valid && (!state.gamma_identity || force_gamma_pass)) {
+     const auto input = static_cast<plume::D3D12Texture*>(texture)->d3d->GetDesc();
+     const bool supported = input.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE2D &&
+         input.DepthOrArraySize == 1 && input.MipLevels == 1 && input.SampleDesc.Count == 1 &&
+@@ -1876,10 +2045,20 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
+   const auto source_desc = static_cast<plume::D3D12Texture*>(texture)->d3d->GetDesc();
+   const auto present_rect = FitPresentRect(u32(source_desc.Width), source_desc.Height,
+                                          width, height);
++  const bool fsr1_requested = !NativeFsr3Enabled() && (settings ? settings->fsr1 : rex::cvar::GetFlagByName("present_effect") == "fsr");
+   // Clear the whole acquired image, including bars left by a previous size.
+-  commands->clearColor(0, plume::RenderColor(0.0f, 0.0f, 0.0f, 1.0f));
++  // Skip it when the copy below covers every texel: viewport equals the
++  // image, opaque blend, full write mask, no discard. FSR 1 keeps the clear;
++  // LEGO_NATIVE_FULL_PRESENT_CLEAR=1 always clears.
++  static const bool always_clear = [] {
++    const char* value = std::getenv("LEGO_NATIVE_FULL_PRESENT_CLEAR");
++    return value && *value == '1';
++  }();
++  const auto back_desc = static_cast<plume::D3D12Texture*>(back)->d3d->GetDesc();
++  if (always_clear || fsr1_requested || !PresentRectCoversTarget(present_rect, width, height) ||
++      back_desc.Width != width || back_desc.Height != height)
++    commands->clearColor(0, plume::RenderColor(0.0f, 0.0f, 0.0f, 1.0f));
+   bool spatial_presented = false;
+-  const bool fsr1_requested = !NativeFsr3Enabled() && (settings ? settings->fsr1 : rex::cvar::GetFlagByName("present_effect") == "fsr");
+   if (fsr1_requested) {
+     if (!state.fsr1_presenter) state.fsr1_presenter = std::make_unique<Fsr1Presenter>();
+     const double requested = settings ? settings->fsr1_sharpness_reduction : rex::cvar::Query<double>("present_fsr_sharpness_reduction");
+@@ -1947,6 +2126,15 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
+         x += 12;
+         divisor /= 10;
+       } while (divisor);
++      // Touching cells clear as one rect: the same pixels in each colour, fewer clears.
++      // LEGO_NATIVE_FPS_CELL_RECTS=1 keeps one clear per cell.
++      static const bool cell_rects = std::getenv("LEGO_NATIVE_FPS_CELL_RECTS") != nullptr;
++      if (!cell_rects) {
++        used = MergeTouchingRects(pixels.data(), used);
++        for (u32 i = 0; i < used; ++i)
++          shadows[i] = plume::RenderRect(pixels[i].left + 1, pixels[i].top + 1,
++                                         pixels[i].right + 1, pixels[i].bottom + 1);
++      }
+       static const bool batched = std::getenv("LEGO_NATIVE_FPS_OVERLAY_BATCHED") != nullptr;
+       if (batched) {
+         commands->clearColor(0, plume::RenderColor(0, 0, 0, 1), shadows.data(), used);
+@@ -1998,12 +2186,18 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
+   const bool requested_vsync = settings ? settings->vsync : NativeVsyncRequested();
+   state.swap_chain->setVsyncEnabled(requested_vsync);
+   auto* presentation_chain = static_cast<plume::D3D12SwapChain*>(state.swap_chain.get());
+-  const auto presentation_window = presentation_chain->getWindow();
+-  const bool presentation_focused = GetForegroundWindow() ==
+-      presentation_window;
+-  const bool presentation_borderless =
+-      (GetWindowLongPtrW(presentation_window, GWL_STYLE) & WS_POPUP) != 0;
+-  const auto presentation_monitor = MonitorFromWindow(presentation_window, MONITOR_DEFAULTTONEAREST);
++  if (!state.latency_configured) {
++    // Plume requests maxFrameLatency 0 at creation; record what DXGI kept.
++    state.latency_configured = true;
++    UINT latency = 0;
++    const HRESULT queried = presentation_chain->d3d->GetMaximumFrameLatency(&latency);
++    HRESULT configured = S_FALSE;
++    if (NativeLatencyWait()) configured = presentation_chain->d3d->SetMaximumFrameLatency(NativeLatencyWait());
++    REXLOG_INFO("Native GPU: swap-chain max frame latency={} query={:08X} waitable={} latency_wait={} set={:08X}",
++                latency, u32(queried), presentation_chain->waitableObject != nullptr,
++                NativeLatencyWait(), u32(configured));
++  }
++  const HANDLE latency_waitable = NativeLatencyWait() ? presentation_chain->waitableObject : nullptr;
+   // Stable small IDs retain monitor identity in numeric CSV readers without
+   // converting a pointer-sized HMONITOR to an imprecise floating-point value.
+   static std::vector<HMONITOR> presentation_monitors;
+@@ -2078,6 +2272,8 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
+     rex::perf::SetCounter(rex::perf::CounterId::kFrameTimeUs,int64_t(frame_ms*1000.0+0.5));
+     rex::perf::SetCounter(rex::perf::CounterId::kFps,int64_t(fps));
+     rex::perf::ResetFrameCounters();
++    // Profiler::Flip() also writes the --perf_log_csv row (no-op without it).
++    rex::perf::WriteCsvFrame();
+   }
+   if (state.gpu_timestamps)
+     state.gpu_timestamps->PresentResult(slot, presented);
+@@ -2204,11 +2400,20 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
+   state.snapshot_number = 0;
+   state.snapshot_draw_number = 0;
+   state.frame_slot = (slot + 1) % state.command_slot_count;
++  PresentThrottle throttle;
++  const u32 frames_in_flight = NativeFramesInFlight();
++  if (frames_in_flight) {
++    state.present_serials[state.present_number % state.present_serials.size()] = state.slot_submission[slot];
++    if (state.present_number > frames_in_flight)
++      throttle = FindPresentThrottleLocked(state,
++          state.present_serials[(state.present_number - frames_in_flight) % state.present_serials.size()]);
++  }
+   if (!presented) {
+     LongProbeEvent("present_failed", true, "frame=", state.present_number);
+     REXLOG_ERROR("Native GPU: swap-chain present failed");
+   }
+-  if (std::getenv("LEGO_NATIVE_GPU_DEBUG")) {
++  static const bool gpu_debug = std::getenv("LEGO_NATIVE_GPU_DEBUG") != nullptr;
++  if (gpu_debug) {
+     auto* native = static_cast<plume::D3D12Device*>(state.device.get());
+     ID3D12InfoQueue* info = nullptr;
+     if (SUCCEEDED(native->d3d->QueryInterface(IID_PPV_ARGS(&info)))) {
+@@ -2227,6 +2432,11 @@ bool HostDevice::PresentTexture(plume::RenderTexture* texture,
+       info->Release();
+     }
+   }
++  // Optional throttles wait after g_mutex is released, still under the
++  // recording gate like the frame-rate limiter.
++  lock.unlock();
++  if (frames_in_flight) WaitPresentThrottle(throttle, frames_in_flight);
++  if (latency_waitable && presented) WaitForSingleObjectEx(latency_waitable, 1000, FALSE);
+   return presented;
+ }
+ 
+diff --git a/rexlego/src/gpu_native/device.h b/rexlego/src/gpu_native/device.h
+index ece52af..13470a6 100644
+--- a/rexlego/src/gpu_native/device.h
++++ b/rexlego/src/gpu_native/device.h
+@@ -90,7 +90,9 @@ struct DrawPreparationContext {
+ constexpr unsigned char kPinTexture = 0, kPinBuffer = 1, kPinDeclaration = 2;
+ std::shared_ptr<void> FindPinnedOwner(unsigned char kind, u32 address);
+ 
+-DrawPreparationContext* CurrentDrawPreparation();
++// Defined in device.cpp. Inline: draws and texture lookups call this per use.
++extern thread_local DrawPreparationContext* t_draw_preparation;
++inline DrawPreparationContext* CurrentDrawPreparation() { return t_draw_preparation; }
+ class DrawPreparationScope {
+   DrawPreparationContext* previous_;
+  public:
+@@ -156,6 +158,9 @@ class HostDevice {
+   static bool PresentTexture(plume::RenderTexture* texture,
+                              u32 descriptor_index, float sample_offset_x = 0,
+                              float sample_offset_y = 0);
++  // Opt-in (LEGO_NATIVE_UNLOCKED_PACING): sleep most of the frame-rate cap
++  // gap before SwapHook takes the recording gate. Takes no lock.
++  static void PaceFrameBeforeLock();
+   // Recorder-ordered snapshot of the original XDK-converted display ramp.
+   static void SetDisplayGamma(const DisplayGammaTable& table);
+   // Exact texel color scale into UNORM16 storage or a float32 sampling mirror.
+diff --git a/rexlego/src/gpu_native/draw.cpp b/rexlego/src/gpu_native/draw.cpp
+index 49e24c9..a2c5b73 100644
+--- a/rexlego/src/gpu_native/draw.cpp
++++ b/rexlego/src/gpu_native/draw.cpp
+@@ -1,5 +1,6 @@
+ #include "gpu_native/native_recording.h"
+ #include "gpu_native/draw_work_pool.h"
++#include "gpu_native/pipeline_async.h"
+ #include "gpu_native/pipeline_creation_gate.h"
+ #include "gpu_native/preparation_dependencies.h"
+ #include "gpu_native/guest_metadata.h"
+@@ -102,6 +103,9 @@
+ #include "gpu_native/renderdoc_probe.h"
+ #include "gpu_native/vertex_declarations.h"
+ #include "gpu_native/state_call_diagnostic.h"
++#include "gpu_native/draw_cached_flag.h"
++#include "gpu_native/draw_log_throttle.h"
++#include "gpu_native/draw_state_shadow.h"
+ 
+ REXCVAR_DEFINE_BOOL(gpu_native_buffer_windows, false, "GPU",
+     "Upload and retain only the vertex buffer ranges fetched by native draws")
+@@ -118,23 +122,29 @@ namespace {
+ 
+ TemporalDrawHistory g_temporal_draw_history;
+ TemporalCameraAuthority g_temporal_camera_authority;
++// Each Select_g_*(preparation) overload takes the caller's CurrentDrawPreparation(). That value is fixed
++// for a draw (only DrawPreparationScope in device.cpp changes it), so hot paths read it once instead of
++// paying an out-of-line call and a TLS access per use. Each object still lives in one function.
+ QuadIndexCache<plume::RenderBuffer> g_quad_indices_serial;
+-QuadIndexCache<plume::RenderBuffer>& Select_g_quad_indices() {
+-  if (CurrentDrawPreparation()) { static thread_local QuadIndexCache<plume::RenderBuffer> state; return state; }
++QuadIndexCache<plume::RenderBuffer>& Select_g_quad_indices(const DrawPreparationContext* preparation) {
++  if (preparation) { static thread_local QuadIndexCache<plume::RenderBuffer> state; return state; }
+   return g_quad_indices_serial;
+ }
++QuadIndexCache<plume::RenderBuffer>& Select_g_quad_indices() { return Select_g_quad_indices(CurrentDrawPreparation()); }
+ #define g_quad_indices Select_g_quad_indices()
+ VertexBindingCache g_vertex_bindings_serial;
+-VertexBindingCache& Select_g_vertex_bindings() {
+-  if (CurrentDrawPreparation()) { static thread_local VertexBindingCache state; return state; }
++VertexBindingCache& Select_g_vertex_bindings(const DrawPreparationContext* preparation) {
++  if (preparation) { static thread_local VertexBindingCache state; return state; }
+   return g_vertex_bindings_serial;
+ }
++VertexBindingCache& Select_g_vertex_bindings() { return Select_g_vertex_bindings(CurrentDrawPreparation()); }
+ #define g_vertex_bindings Select_g_vertex_bindings()
+ VertexInputUsageCache g_vertex_input_usage_serial;
+-VertexInputUsageCache& Select_g_vertex_input_usage() {
+-  if (CurrentDrawPreparation()) { static thread_local VertexInputUsageCache state; return state; }
++VertexInputUsageCache& Select_g_vertex_input_usage(const DrawPreparationContext* preparation) {
++  if (preparation) { static thread_local VertexInputUsageCache state; return state; }
+   return g_vertex_input_usage_serial;
+ }
++VertexInputUsageCache& Select_g_vertex_input_usage() { return Select_g_vertex_input_usage(CurrentDrawPreparation()); }
+ #define g_vertex_input_usage Select_g_vertex_input_usage()
+ bool g_vertex_binding_backend_ready = false, g_vertex_binding_cache_enabled = false;
+ TemporalSceneDepth g_temporal_scene_depth;
+@@ -307,10 +317,11 @@ struct PreparedDrawState {
+   void Reset() { constants.Reset(); pipeline.Reset(); vertex_layout.Reset(); }
+ };
+ PreparedDrawState g_prepared_draw_serial;
+-PreparedDrawState& Select_g_prepared_draw() {
+-  if (CurrentDrawPreparation()) { static thread_local PreparedDrawState state; return state; }
++PreparedDrawState& Select_g_prepared_draw(const DrawPreparationContext* preparation) {
++  if (preparation) { static thread_local PreparedDrawState state; return state; }
+   return g_prepared_draw_serial;
+ }
++PreparedDrawState& Select_g_prepared_draw() { return Select_g_prepared_draw(CurrentDrawPreparation()); }
+ #define g_prepared_draw Select_g_prepared_draw()
+ 
+ struct CapturedMultiRateInput;
+@@ -411,25 +422,33 @@ PipelineCreationGate<PipelineKey, PipelineKeyHash> g_temporal_pipeline_creation;
+ std::unordered_map<PipelineKey, std::unique_ptr<plume::RenderPipeline>,
+                    PipelineKeyHash>
+     g_pipelines;
++// LEGO_NATIVE_PSO_ASYNC: g_pipelines compiles in flight (pipeline_async.h).
++AsyncPipelineTable<PipelineKey, PipelineKeyHash> g_async_pipelines;
+ std::unordered_map<PipelineKey, std::unique_ptr<plume::RenderPipeline>, PipelineKeyHash> g_temporal_pipelines;
+ std::atomic<u32> g_unsupported_draw_logs{0};
+ DrawTiming g_draw_timing_serial;
+-DrawTiming& Select_g_draw_timing() {
+-  if (CurrentDrawPreparation()) { static thread_local DrawTiming state; return state; }
++DrawTiming& Select_g_draw_timing(const DrawPreparationContext* preparation) {
++  if (preparation) { static thread_local DrawTiming state; return state; }
+   return g_draw_timing_serial;
+ }
++DrawTiming& Select_g_draw_timing() { return Select_g_draw_timing(CurrentDrawPreparation()); }
+ #define g_draw_timing Select_g_draw_timing()
+ bool g_seen_tiled_pass = false; // Serialized by LockRecording; diagnostics only.
+ 
++// Process-constant opt-in diagnostics (env read on first use): when off, each check on the per-draw
++// path is one load and one predictable branch (see draw_cached_flag.h).
++bool TimingEnabled() { return CachedProcessFlag<NativeTextureTimingEnabled>(); }
++bool PortraitProbeOn() { return CachedProcessFlag<PortraitProbeEnabled>(); }
++
+ struct DrawTimer {
+-  bool enabled = NativeTextureTimingEnabled();
++  bool enabled = TimingEnabled();
+   size_t stage = 0;
+   std::chrono::steady_clock::time_point last;
+   std::array<double, 7> elapsed{};
+-  DrawTimer() {
++  explicit DrawTimer(const DrawPreparationContext* preparation) {
+     // Keep workload counts available to the per-present cadence probe even
+     // when detailed per-draw clocks are disabled.
+-    ++g_draw_timing.calls;
++    ++Select_g_draw_timing(preparation).calls;
+     if (enabled) {
+       last = std::chrono::steady_clock::now();
+     }
+@@ -460,7 +479,7 @@ struct DrawTimer {
+ 
+ enum class ConstantCost : size_t { kShadow, kUpload, kBindings, kTextures, kRestore };
+ struct ConstantTimer {
+-  bool enabled = !t_preparing_draw && NativeTextureTimingEnabled();
++  bool enabled = TimingEnabled() && !t_preparing_draw;
+   ConstantCost stage;
+   std::chrono::steady_clock::time_point last;
+   explicit ConstantTimer(ConstantCost initial) : stage(initial) {
+@@ -564,6 +583,78 @@ void BindNativeDrawPipeline(plume::RenderCommandList* commands,
+   commands->setPipeline(pipeline);
+ }
+ 
++bool ReadElideStateCalls() {
++  char* value = nullptr;
++  size_t length = 0;
++  _dupenv_s(&value, &length, "LEGO_NATIVE_ELIDE_STATE_CALLS");
++  const bool enabled = value && value[0] == '1' && !value[1];
++  std::free(value);
++  return enabled;
++}
++
++// Opt-in (LEGO_NATIVE_ELIDE_STATE_CALLS=1) skipping of repeated index buffer and blend factor
++// calls by inline draws. DispatchDraw without preparation records under LockRecording or
++// NativeRecordingMutex, so one shadow serves every such caller. Full preparation replays tapes onto
++// the same list, so the shadow is off there; prepared lists are not D3D12CommandList and bypass it.
++struct InlineStateShadow {
++  DrawStateShadow state;
++  const plume::D3D12CommandList* list = nullptr;
++  const ID3D12RootSignature* root_signature = nullptr;
++};
++InlineStateShadow g_inline_state_shadow;
++
++// begin(), end() and both notify*WasChangedExternally() clear these plume flags, and binding another
++// root signature replaces the cached one: each means the list may now hold other state.
++void CheckInlineStateShadow(DrawStateShadow* shadow) {
++  const auto* list = g_inline_state_shadow.list;
++  if (shadow && (!list->descriptorHeapsSet || !list->cachedGraphicsRootValid ||
++      list->cachedGraphicsRootSignature != g_inline_state_shadow.root_signature)) {
++    shadow->Invalidate();
++  }
++}
++
++DrawStateShadow* InlineDrawStateShadow(const DrawPreparationContext* preparation,
++                                       plume::RenderCommandList* commands,
++                                       const DrawDeviceView& view) {
++  if (!CachedProcessFlag<ReadElideStateCalls>() || preparation ||
++      CachedProcessFlag<NativeFullDrawPreparationEnabled>()) return nullptr;
++  auto& shadow = g_inline_state_shadow;
++  if (shadow.state.Begin(commands, view.recording_serial, view.pipeline_layout)) {
++    shadow.list = dynamic_cast<const plume::D3D12CommandList*>(commands);
++    shadow.root_signature =
++        static_cast<const plume::D3D12PipelineLayout*>(view.pipeline_layout)->rootSignature;
++  }
++  if (!shadow.list) return nullptr;
++  CheckInlineStateShadow(&shadow.state);
++  return &shadow.state;
++}
++
++// Feeds the opt-in diagnostic; true when the shadow proves `view` is already bound.
++bool SameDrawIndexBuffer(DrawStateShadow* shadow, StateCallLedger* diagnostic,
++                         const plume::RenderIndexBufferView& view) {
++  if (!shadow && !diagnostic) [[likely]] return false;
++  const auto* buffer = static_cast<const plume::D3D12Buffer*>(view.buffer.ref);
++  const DrawStateShadow::IndexBuffer bound{buffer ? buffer->gpuVA + view.buffer.offset : 0,
++                                           view.size, u32(view.format)};
++  if (diagnostic) diagnostic->IndexBuffer(bound.address, bound.size, bound.format);
++  if (!shadow) return false;
++  CheckInlineStateShadow(shadow);
++  if (!shadow->SameIndexBuffer(bound)) return false;
++  if (diagnostic) diagnostic->SkippedIndexBuffer();
++  return true;
++}
++
++bool SameDrawBlendFactor(DrawStateShadow* shadow, StateCallLedger* diagnostic,
++                         const std::array<float, 4>& value) {
++  if (!shadow && !diagnostic) [[likely]] return false;
++  if (diagnostic) diagnostic->BlendFactor(value);
++  if (!shadow) return false;
++  CheckInlineStateShadow(shadow);
++  if (!shadow->SameBlendFactor(value)) return false;
++  if (diagnostic) diagnostic->SkippedBlendFactor();
++  return true;
++}
++
+ // Included inside draw.cpp's existing namespace. Private integration candidate.
+ struct GatheredMultiRateDraw {
+   std::array<plume::RenderVertexBufferView,kNativeVertexStreams> views;
+@@ -795,7 +886,8 @@ void BindNativeDrawVertexBuffers(plume::RenderCommandList* commands,
+     const DrawDeviceView& view,
+     const std::array<plume::RenderVertexBufferView,kNativeVertexStreams>& buffers,
+     const std::array<plume::RenderInputSlot,kNativeVertexStreams>& slots) {
+-  if (CurrentDrawPreparation()) {
++  const DrawPreparationContext* const preparation = CurrentDrawPreparation();
++  if (preparation) {
+     commands->setVertexBuffers(0, buffers.data(), buffers.size(), slots.data());
+     return;
+   }
+@@ -808,7 +900,7 @@ void BindNativeDrawVertexBuffers(plume::RenderCommandList* commands,
+   if (!g_vertex_binding_cache_enabled) {
+     commands->setVertexBuffers(0,buffers.data(),buffers.size(),slots.data());return;
+   }
+-  g_vertex_bindings.Bind(commands,view.recording_serial,buffers,slots,
++  Select_g_vertex_bindings(preparation).Bind(commands,view.recording_serial,buffers,slots,
+       [&](u32 first,u32 count) {
+         commands->setVertexBuffers(first,buffers.data()+first,count,slots.data()+first);
+       });
+@@ -1575,6 +1667,27 @@ void PrepareDrawWork(ParallelDrawWork& work) {
+   if (!work.geometry_ready) work.geometry_valid = PrepareDrawGeometry(work);
+ }
+ 
++// Post-create checks shared by the synchronous and async paths of GetPipeline.
++// Null when D3D12 rejected the pipeline.
++std::unique_ptr<plume::RenderPipeline> FinishPipeline(std::unique_ptr<plume::RenderPipeline> pipeline,
++    const plume::RenderGraphicsPipelineDesc& desc, const PipelineKey& key) {
++    if (!pipeline || !static_cast<plume::D3D12GraphicsPipeline*>(pipeline.get())->d3d) {
++      static std::atomic<u32> failed_pipeline_logs{0};
++      if (failed_pipeline_logs.fetch_add(1) < 16)
++        REXLOG_ERROR("Native GPU: D3D12 rejected pipeline VS=0x{:08X} PS=0x{:08X} decl=0x{:08X}",
++                     key.vertex_shader, key.pixel_shader, key.declaration);
++      return nullptr;
++  }
++  SetNativePipelineStencilReference(pipeline.get(), desc);
++  static std::atomic<u32> mrt_logs{0};
++  if (desc.renderTargetCount > 1 && mrt_logs.fetch_add(1, std::memory_order_relaxed) < 16)
++    REXLOG_INFO("Native GPU: MRT pipeline targets={} formats={},{},{},{} masks={:04X} blends={:08X},{:08X},{:08X},{:08X}",
++        desc.renderTargetCount, key.render_target_formats[0], key.render_target_formats[1],
++        key.render_target_formats[2], key.render_target_formats[3], key.color_write_mask,
++        key.blend_controls[0], key.blend_controls[1], key.blend_controls[2], key.blend_controls[3]);
++  return pipeline;
++}
++
+ plume::RenderPipeline* GetPipeline(
+     const PipelineKey& key, const VertexDeclarationView& declaration,
+     plume::RenderPrimitiveTopology topology, plume::RenderFormat depth_format) {
+@@ -1582,12 +1695,23 @@ plume::RenderPipeline* GetPipeline(
+   if (const auto it = g_pipelines.find(key); it != g_pipelines.end()) {
+     return it->second.get();
+   }
++  // LEGO_NATIVE_PSO_ASYNC (default off): join a compile already in flight.
++  const bool async = AsyncPipelineCompileEnabled();
++  if (auto compile = async ? g_async_pipelines.Find(key) : nullptr)
++    return AwaitAsyncPipeline(lock, g_pipelines, key, std::move(compile));
+   lock.unlock();
+   auto creation = g_pipeline_creation.Acquire(key);
+   lock.lock();
+   if (const auto it = g_pipelines.find(key); it != g_pipelines.end()) {
+     return it->second.get();
+   }
++  if (auto compile = async ? g_async_pipelines.Find(key) : nullptr) {
++    creation.Release();
++    return AwaitAsyncPipeline(lock, g_pipelines, key, std::move(compile));
++  }
++  // The posted compile keeps the shaders resolved below alive.
++  ShaderBindingsSnapshot owners;
++  if (async) owners = CurrentShaderOwners();
+   const bool float_indices = FloatBlendIndicesInput({declaration.elements, declaration.element_count}) &&
+       bool(FindFloatBlendIndicesDxil(key.vertex_shader_hash, key.spec_constants));
+   const bool precise_position = bool(FindPositionPrecisionDxil(key.vertex_shader_hash, key.spec_constants));
+@@ -1728,27 +1852,24 @@ plume::RenderPipeline* GetPipeline(
+   // Variant resolution above remains serialized, but the expensive driver
+   // compile need not exclude workers building an unrelated pipeline.
+   auto* device = HostDevice::Device();
++  if (async) {
++    // The entry is visible before the lock drops, so the lease can go now.
++    // The job owns its arrays and shader owners; it never touches g_draw_timing.
++    creation.Release();
++    return CompilePipelineAsync(lock, g_pipelines, g_async_pipelines, key,
++        [device, key, owned = OwnedPipelineDesc(desc), owners] {
++          return FinishPipeline(device->createGraphicsPipeline(owned.desc), owned.desc, key);
++        });
++  }
+   lock.unlock();
+   const auto creation_start = std::chrono::steady_clock::now();
+   auto pipeline = device->createGraphicsPipeline(desc);
+   ++g_draw_timing.pipeline_creations;
+   g_draw_timing.pipeline_creation_ms += std::chrono::duration<double, std::milli>(
+       std::chrono::steady_clock::now() - creation_start).count();
+-    if (!pipeline || !static_cast<plume::D3D12GraphicsPipeline*>(pipeline.get())->d3d) {
+-      static std::atomic<u32> failed_pipeline_logs{0};
+-      if (failed_pipeline_logs.fetch_add(1) < 16)
+-        REXLOG_ERROR("Native GPU: D3D12 rejected pipeline VS=0x{:08X} PS=0x{:08X} decl=0x{:08X}",
+-                     key.vertex_shader, key.pixel_shader, key.declaration);
+-      return nullptr;
+-  }
+-  SetNativePipelineStencilReference(pipeline.get(), desc);
++  pipeline = FinishPipeline(std::move(pipeline), desc, key);
++  if (!pipeline) return nullptr;
+   auto* result = pipeline.get();
+-  static std::atomic<u32> mrt_logs{0};
+-  if (desc.renderTargetCount > 1 && mrt_logs.fetch_add(1, std::memory_order_relaxed) < 16)
+-    REXLOG_INFO("Native GPU: MRT pipeline targets={} formats={},{},{},{} masks={:04X} blends={:08X},{:08X},{:08X},{:08X}",
+-        desc.renderTargetCount, key.render_target_formats[0], key.render_target_formats[1],
+-        key.render_target_formats[2], key.render_target_formats[3], key.color_write_mask,
+-        key.blend_controls[0], key.blend_controls[1], key.blend_controls[2], key.blend_controls[3]);
+   lock.lock();
+   g_pipelines.emplace(key, std::move(pipeline));
+   return result;
+@@ -2368,7 +2489,9 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+ #if defined(LEGODIMENSIONS_TT_LOCK_TRACE)
+   legodimensions::tt_lock_trace::NativeDrawScope native_draw_trace;
+ #endif
+-  DrawTimer timing;
++  // Fixed for the whole draw: DrawPreparationScope is never opened or closed inside DispatchDraw.
++  DrawPreparationContext* const preparation = CurrentDrawPreparation();
++  DrawTimer timing(preparation);
+   auto cpu_trace = BeginCpuDrawDiagnostic(device, primitive_type, indexed, start, count, base_vertex);
+   const u32 mesh_trace = TraceMeshDraw(device, primitive_type, indexed, start, count, base_vertex);
+   // Report early exits as well as successful submissions for each sample.
+@@ -2387,7 +2510,7 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+       float(device->viewport.height) == 0.0f) return true;
+   // Trace attempted bindings before shader/declaration/pipeline early exits.
+   // A mask on a rejected draw is diagnostic evidence, not a submitted draw.
+-  if (PortraitProbeEnabled()) {
++  if (PortraitProbeOn()) {
+     const auto portrait_bindings = SnapshotDrawBindings();
+     for (u32 i = 0; i < kNativeTextureSlots; ++i)
+       TracePortraitDraw(portrait_bindings.textures[i], i,
+@@ -2511,15 +2634,15 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+       }
+     }
+   } composition_guard{&mesh_result.submitted,composition_input.has_value(),g_probe_frame.load()};
+-  if (auto* prepared = CurrentDrawPreparation(); prepared && prepared->alias_decided) {
++  if (preparation && preparation->alias_decided) {
+     // Full preparation enqueued its initialization before draw validation.
+   } else if (!ApplySurfaceColorAliases(DecideSurfaceColorAliases(bindings.render_targets))) return false;
+   std::array<TextureResourceView, kNativeRenderTargets> colors;
+   for (u32 i = 0; i < colors.size(); ++i)
+     colors[i] = ResolveTextureResource(bindings.render_targets[i]);
+   const auto& color = colors[0];
+-  if (auto* prepared = CurrentDrawPreparation(); prepared && prepared->alias_decided) {
+-    if (!ApplySurfaceDepthAlias(prepared->alias)) return false;
++  if (preparation && preparation->alias_decided) {
++    if (!ApplySurfaceDepthAlias(preparation->alias)) return false;
+   } else if (!PrepareSurfaceDepthAlias(bindings.depth_stencil)) return false;
+   const auto depth = ResolveTextureResource(bindings.depth_stencil);
+   // Shadow maps and depth prepasses may have no color attachment. Raster
+@@ -2552,11 +2675,11 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+     if (!index_metadata.mirror_address || !index_window) return false;
+   }
+   timing.Next();
+-  auto* commands = CurrentDrawPreparation() ? CurrentDrawPreparation()->view.commands : HostDevice::BeginFrameCommands();
++  auto* commands = preparation ? preparation->view.commands : HostDevice::BeginFrameCommands();
+   if (!commands) {
+     return false;
+   }
+-  const auto draw_device = CurrentDrawPreparation() ? CurrentDrawPreparation()->view : HostDevice::CurrentDrawDeviceView();
++  const auto draw_device = preparation ? preparation->view : HostDevice::CurrentDrawDeviceView();
+   if (draw_device.commands != commands || !draw_device.recording_serial ||
+       !draw_device.pipeline_layout || !draw_device.texture_descriptors ||
+       !draw_device.sampler_descriptors || !draw_device.null_vertex_buffer) return false;
+@@ -2577,6 +2700,7 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+   }
+   commands->barriers(plume::RenderBarrierStage::GRAPHICS,
+                      texture_barriers.data(), barrier_count);
++  if (state_calls) state_calls->Framebuffer(framebuffer);
+   commands->setFramebuffer(framebuffer);
+ 
+   PipelineKey key;
+@@ -2651,7 +2775,7 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+     key.blend_controls[i] = *reinterpret_cast<const be_u32*>(
+         reinterpret_cast<const u8*>(device) + blend_offsets[i]) & 0x1FFF1FFFu;
+   static std::atomic<u32> depth_state_logs{0};
+-  if (depth_state_logs.fetch_add(1) < 32)
++  if (TakeLogBudget(depth_state_logs, 32))
+     REXLOG_INFO("Native GPU: draw depth-control=0x{:02X} target=0x{:08X}",
+                 key.depth_control, bindings.depth_stencil);
+   key.topology = static_cast<u32>(topology);
+@@ -2700,7 +2824,7 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+           !UploadNativeMultiRateInput(*captured_draw->multi_rate_input,draw_device.null_vertex_buffer,
+               multi_rate_draw,captured_draw->multi_rate_upload,captured_draw->multi_rate_upload_capacity)) return false;
+     } else {
+-      if (CurrentDrawPreparation()) return false; // missing coordinator capture
++      if (preparation) return false; // missing coordinator capture
+       if (!PrepareNativeMultiRateGather(device,bindings,declaration,index_metadata,
+               indexed,start,count,base_vertex,quads,draw_device.null_vertex_buffer,multi_rate_draw)) return false;
+     }
+@@ -2749,7 +2873,7 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+             count, std::span(declaration.elements, declaration.element_count));
+     }
+     static std::atomic<u32> instanced_logs{0};
+-    if (instanced_logs.fetch_add(1) < 16)
++    if (TakeLogBudget(instanced_logs, 16))
+       REXLOG_INFO("Native GPU: instanced fetch VS={:016X} N={} first={} count={} sequential={} -> {}",
+           key.vertex_shader_hash, vertices_per_instance, first, count, sequential,
+           !instanced_fetch ? "unchanged" : instanced_fetch.expand ? "expanded" : "instanced");
+@@ -2758,9 +2882,9 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+   if (t_recording_draw) t_recording_draw->pipeline_recorded = false;
+   const auto prepare_pipeline = [&] { return GetPipeline(key, declaration, topology, depth.format); };
+   auto* pipeline = RetainedDrawPreparationEnabled()
+-      ? g_prepared_draw.pipeline.Resolve(key, prepare_pipeline) : prepare_pipeline();
++      ? Select_g_prepared_draw(preparation).pipeline.Resolve(key, prepare_pipeline) : prepare_pipeline();
+   if (!pipeline) {
+-    g_prepared_draw.pipeline.Reset();
++    Select_g_prepared_draw(preparation).pipeline.Reset();
+     LongProbeEvent("draw_pipeline_unavailable", true, "VS=", key.vertex_shader_hash,
+         "PS=", key.pixel_shader_hash, "decl_hash=", key.declaration_hash,
+         "guest_vs=", key.vertex_shader, "guest_ps=", key.pixel_shader,
+@@ -2771,6 +2895,8 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+     return false;
+   }
+   timing.Next();
++  // Before this draw's binds, which revalidate the plume flags the shadow checks.
++  DrawStateShadow* draw_shadow = InlineDrawStateShadow(preparation, commands, draw_device);
+ 
+   {
+     ConstantTimer constant_timing(ConstantCost::kBindings);
+@@ -2850,7 +2976,8 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+   const float blend_factor[] = {guest_blend_factor[0], guest_blend_factor[1],
+                                guest_blend_factor[2], guest_blend_factor[3]};
+   const std::array<float, 4> recorded_blend{blend_factor[0], blend_factor[1], blend_factor[2], blend_factor[3]};
+-  SetNativeBlendFactor(commands, recorded_blend);
++  if (!SameDrawBlendFactor(draw_shadow, state_calls, recorded_blend))
++    SetNativeBlendFactor(commands, recorded_blend);
+ 
+   commands->setViewports(plume::RenderViewport(
+       screen_space ? 0.0f : float(device->viewport.x)*raster_scale_x + temporal_jitter_x,
+@@ -2879,6 +3006,22 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+       key.raster_control, polygonal));
+   std::array<plume::RenderVertexBufferView, kNativeVertexStreams> views;
+   std::array<plume::RenderInputSlot, kNativeVertexStreams> slots;
++  if (state_calls) {
++    // Mirrors the setViewports/setScissors arguments above (test_viewport_shadow.py compiles those alone).
++    const plume::RenderViewport viewport(
++        screen_space ? 0.0f : float(device->viewport.x)*raster_scale_x + temporal_jitter_x,
++        screen_space ? 0.0f : float(device->viewport.y)*raster_scale_y + temporal_jitter_y,
++        screen_space ? float(raster_target.width) : viewport_width*raster_scale_x,
++        screen_space ? float(raster_target.height) : viewport_height*raster_scale_y,
++        screen_space ? 0.0f : static_cast<float>(device->viewport.min_z),
++        screen_space ? 1.0f : static_cast<float>(device->viewport.max_z));
++    state_calls->Viewport({viewport.x, viewport.y, viewport.width, viewport.height,
++                           viewport.minDepth, viewport.maxDepth});
++    const plume::RenderRect scissor = CullDrawScissor(plume::RenderRect(
++        effective_scissor.left, effective_scissor.top, scissor_right, scissor_bottom),
++        key.raster_control, polygonal);
++    state_calls->Scissor({scissor.left, scissor.top, scissor.right, scissor.bottom});
++  }
+   if (!color.texture) {
+     static thread_local u32 depth_only_logs = 0;
+     if (depth_only_logs++ < 16)
+@@ -2903,7 +3046,7 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+   VertexLayoutPlan legacy_layout;
+   const auto& layout = t_recording_draw && t_recording_draw->geometry_ready ? *t_recording_draw->layout :
+       RetainedDrawPreparationEnabled() && declaration.content_hash
+-      ? g_prepared_draw.vertex_layout.Resolve({declaration.content_hash, declaration.element_count,
++      ? Select_g_prepared_draw(preparation).vertex_layout.Resolve({declaration.content_hash, declaration.element_count,
+           declaration.reversed_byte_elements, declaration.half_swapped_elements,
+           declaration.half_swapped_wide_elements}, prepare_layout)
+       : (legacy_layout = prepare_layout());
+@@ -2957,7 +3100,7 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+       const char* value=std::getenv("LEGO_NATIVE_INPUT_SIGNATURE_CACHE");
+       return !value || !*value || value[0]!='0';
+     }();
+-    const auto required_inputs=g_vertex_input_usage.Get(
++    const auto required_inputs=Select_g_vertex_input_usage(preparation).Get(
+         {key.vertex_shader_hash,input_usage_cache_enabled?declaration.content_hash:0,
+          key.spec_constants,declaration.element_count},
+         [&]() -> std::optional<u64> {
+@@ -3405,7 +3548,7 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+     const u32 element_size = source.guest_format == 1 ? 2 : 4;
+     if (indexed && (!source.buffer || !DrawIndexWindow(source_start, count, element_size, source.length)))
+       return false;
+-    auto expanded = indexed ? nullptr : g_quad_indices.Find(source_start,count);
++    auto expanded = indexed ? nullptr : Select_g_quad_indices(preparation).Find(source_start,count);
+     if (!expanded) {
+       expanded = std::shared_ptr<plume::RenderBuffer>(HostDevice::Device()->createBuffer(
+           plume::RenderBufferDesc::IndexBuffer(u64(expanded_count) * sizeof(u32),
+@@ -3429,13 +3572,14 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+       }
+       if (indexed) source.buffer->unmap();
+       expanded->unmap();
+-      if (!indexed) g_quad_indices.Remember(source_start,count,
++      if (!indexed) Select_g_quad_indices(preparation).Remember(source_start,count,
+           u64(expanded_count)*sizeof(u32),expanded,
+           [](auto old) {HostDevice::RetireResource(std::move(old));});
+     }
+     const plume::RenderIndexBufferView index_view(expanded->at(0),
+         u64(expanded_count) * sizeof(u32), plume::RenderFormat::R32_UINT);
+-    commands->setIndexBuffer(&index_view);
++    if (!SameDrawIndexBuffer(draw_shadow, state_calls, index_view))
++      commands->setIndexBuffer(&index_view);
+     if (!bind_temporal_previous(source)) return false;
+     {
+       QueryDrawScope query_scope(commands, query_sample_scale);
+@@ -3461,7 +3605,8 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+                                 : plume::RenderFormat::R32_UINT;
+     const plume::RenderIndexBufferView index_view(index.buffer->at(0),
+                                                   index.length, index_format);
+-    commands->setIndexBuffer(&index_view);
++    if (!SameDrawIndexBuffer(draw_shadow, state_calls, index_view))
++      commands->setIndexBuffer(&index_view);
+     if (!bind_temporal_previous(index)) return false;
+     {
+     QueryDrawScope query_scope(commands, query_sample_scale);
+@@ -3522,7 +3667,7 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+           std::to_string(key.pixel_shader), true);
+   }
+   static std::atomic<u32> issued_draw_logs{0};
+-  if (issued_draw_logs.fetch_add(1) < 8)
++  if (TakeLogBudget(issued_draw_logs, 8))
+     REXLOG_INFO("Native GPU: issued draw primitive={} count={} indexed={} decl=0x{:08X}",
+                  primitive_type, count, indexed, bindings.vertex_declaration);
+   mesh_result.submitted = true;
+@@ -3549,8 +3694,8 @@ bool DispatchDraw(D3DDevice* device, u32 primitive_type, bool indexed,
+       if ((mask >> (i * 4)) & 15u) MarkSurfaceWritten(targets[i]);
+     if (writes_depth) MarkSurfaceWritten(depth_target);
+   };
+-  if (auto* prepared = CurrentDrawPreparation()) {
+-    if (!prepared->writes_marked) RecordNativeCommand(commands, [mark_writes](auto*) { mark_writes(); });
++  if (preparation) {
++    if (!preparation->writes_marked) RecordNativeCommand(commands, [mark_writes](auto*) { mark_writes(); });
+   } else mark_writes();
+   return true;
+ }
+@@ -3745,10 +3890,18 @@ std::shared_ptr<D3DDevice> SnapshotDevice(const D3DDevice* device) {
+   }
+   auto copy = AcquireDeviceSnapshot();
+   // Streaming stores: the copy is read on another core, so filling this core's cache first is wasted.
++#if defined(__AVX2__)
+   static_assert(kSnapshotBytes % 32 == 0);
+   auto* to = reinterpret_cast<__m256i*>(copy.get());
+   const auto* from = reinterpret_cast<const __m256i*>(device);
+   for (size_t i = 0; i < kSnapshotBytes / 32; ++i) _mm256_stream_si256(to + i, _mm256_loadu_si256(from + i));
++#else
++  // Builds without AVX2 (x86-64-v2): the same copy in SSE2 16-byte lanes.
++  static_assert(kSnapshotBytes % 16 == 0);
++  auto* to = reinterpret_cast<__m128i*>(copy.get());
++  const auto* from = reinterpret_cast<const __m128i*>(device);
++  for (size_t i = 0; i < kSnapshotBytes / 16; ++i) _mm_stream_si128(to + i, _mm_loadu_si128(from + i));
++#endif
+   _mm_sfence();
+   return copy;
+ }
+@@ -3797,6 +3950,7 @@ DrawSnapshot SnapshotDrawDevice(const D3DDevice* device) {
+   static thread_local std::shared_ptr<D3DDevice> kept_full;
+   static thread_local u64 kept_sequence = 0;
+   static_assert(kVertexConstantsBegin % 64 == 0 && kVertexConstantsEnd % 64 == 0 && kSnapshotBytes % 64 == 0);
++#if defined(__AVX2__)
+   const auto* from = reinterpret_cast<const __m256i*>(device);
+   auto* previous = reinterpret_cast<__m256i*>(kept.data());
+   // Loads only, back to front, so the bindings and shaders at the end are compared first.
+@@ -3809,10 +3963,28 @@ DrawSnapshot SnapshotDrawDevice(const D3DDevice* device) {
+     }
+     return true;
+   };
++#else
++  // Builds without AVX2 (x86-64-v2): the same loops in SSE2. Indices stay in 32-byte units, two
++  // 16-byte lanes each, so the code below is shared.
++  const auto* from = reinterpret_cast<const __m128i*>(device);
++  auto* previous = reinterpret_cast<__m128i*>(kept.data());
++  const auto equal = [&](size_t begin, size_t end) {
++    for (size_t i = end * 2; i > begin * 2; i -= 4) {
++      const __m128i differs = _mm_or_si128(
++          _mm_or_si128(_mm_xor_si128(_mm_loadu_si128(from + i - 4), _mm_loadu_si128(previous + i - 4)),
++                       _mm_xor_si128(_mm_loadu_si128(from + i - 3), _mm_loadu_si128(previous + i - 3))),
++          _mm_or_si128(_mm_xor_si128(_mm_loadu_si128(from + i - 2), _mm_loadu_si128(previous + i - 2)),
++                       _mm_xor_si128(_mm_loadu_si128(from + i - 1), _mm_loadu_si128(previous + i - 1))));
++      if (_mm_movemask_epi8(_mm_cmpeq_epi8(differs, _mm_setzero_si128())) != 0xFFFF) return false;
++    }
++    return true;
++  };
++#endif
+   const bool same = kept_sequence && equal(kVertexConstantsEnd / 32, kSnapshotBytes / 32) &&
+       equal(0, kVertexConstantsBegin / 32);
+   DrawSnapshot result{AcquireDeviceSnapshot(), sequences.fetch_add(1, std::memory_order_relaxed) + 1};
+   // Streaming stores: the copy is read on another core.
++#if defined(__AVX2__)
+   auto* to = reinterpret_cast<__m256i*>(result.device.get());
+   const auto copy = [&](size_t begin, size_t end, bool keep) {
+     for (size_t i = begin; i < end; ++i) {
+@@ -3821,6 +3993,16 @@ DrawSnapshot SnapshotDrawDevice(const D3DDevice* device) {
+       _mm256_stream_si256(to + i, value);
+     }
+   };
++#else
++  auto* to = reinterpret_cast<__m128i*>(result.device.get());
++  const auto copy = [&](size_t begin, size_t end, bool keep) {
++    for (size_t i = begin * 2; i < end * 2; ++i) {
++      const __m128i value = _mm_loadu_si128(from + i);
++      if (keep) _mm_storeu_si128(previous + i, value);
++      _mm_stream_si128(to + i, value);
++    }
++  };
++#endif
+   copy(kVertexConstantsBegin / 32, kVertexConstantsEnd / 32, false);
+   if (same && kept_full && DeltaSnapshotsEnabled()) {
+     BlockOf(result.device.get()).base = kept_full;
+@@ -4607,7 +4789,7 @@ u32 DrawMergeRun() {
+ // Per-draw traces and probes expect to see every draw.
+ bool DrawMergeBlocked() {
+   static const bool traces = std::getenv("LEGO_NATIVE_MESH_TRACE") || std::getenv("LEGO_GPU_SNAPSHOT_DIR");
+-  return traces || g_logo_capture_api || PortraitProbeEnabled();
++  return traces || g_logo_capture_api || PortraitProbeOn();
+ }
+ 
+ void MarkDrawWrites(const u8* bytes, const DrawBindings& bindings) {
+@@ -5191,6 +5373,7 @@ u32 ResolveHook(D3DDevice* device, u32 flags, u32 source_rect,
+ 
+ u32 SwapHook(D3DDevice* /*device*/, u32 front_buffer, u32 /*parameters*/) {
+   HostDevice::PollCompletionCallbacks();
++  HostDevice::PaceFrameBeforeLock();
+   auto recording = HostDevice::LockRecording();
+   PollDrawBenchmarkMode();
+   PollFullDrawBatchLimit();
+@@ -5528,6 +5711,7 @@ DrawTiming ConsumeDrawTiming() {
+ }
+ 
+ void ResetDrawResources() {
++  DrainAsyncPipelineJobs();  // posted compiles publish under g_pipeline_mutex
+   std::lock_guard lock(g_pipeline_mutex);
+   g_prepared_draw.Reset();
+   pass_profile::Reset();
+@@ -5540,6 +5724,7 @@ void ResetDrawResources() {
+   g_temporal_scene_depth_surface = 0;
+   g_temporal_scene_depth_dirty = false;
+   g_pipelines.clear();
++  g_async_pipelines.Clear();
+   g_pipeline_creation.ClearAfterDrain();
+   g_quad_indices.Clear();
+   g_temporal_pipelines.clear();
+diff --git a/rexlego/src/gpu_native/fps_counter.h b/rexlego/src/gpu_native/fps_counter.h
+index 8cb204e..c8b900a 100644
+--- a/rexlego/src/gpu_native/fps_counter.h
++++ b/rexlego/src/gpu_native/fps_counter.h
+@@ -48,4 +48,32 @@ class NativeFpsCounter {
+   uint32_t value_ = 0;
+   bool started_ = false;
+ };
++
++// Joins rects that share a whole edge: first along rows (same top and bottom, left meets the
++// previous right), then down columns (same left and right, top meets an earlier bottom). Each
++// join replaces two rects by their union, which is a rect, so the covered pixels don't change.
++// Returns the new count. The FPS meter uses it to clear touching digit cells together.
++template <typename Rect>
++uint32_t MergeTouchingRects(Rect* rects, uint32_t count) {
++  uint32_t rows = 0;
++  for (uint32_t i = 0; i < count; ++i) {
++    if (rows && rects[rows - 1].top == rects[i].top && rects[rows - 1].bottom == rects[i].bottom &&
++        rects[rows - 1].right == rects[i].left)
++      rects[rows - 1].right = rects[i].right;
++    else
++      rects[rows++] = rects[i];
++  }
++  uint32_t merged = 0;
++  for (uint32_t i = 0; i < rows; ++i) {
++    uint32_t j = 0;
++    while (j < merged && !(rects[j].left == rects[i].left && rects[j].right == rects[i].right &&
++                           rects[j].bottom == rects[i].top))
++      ++j;
++    if (j < merged)
++      rects[j].bottom = rects[i].bottom;
++    else
++      rects[merged++] = rects[i];
++  }
++  return merged;
++}
+ }  // namespace legodimensions::gpu_native
+diff --git a/rexlego/src/gpu_native/long_probe.h b/rexlego/src/gpu_native/long_probe.h
+index 53764bb..aff8f07 100644
+--- a/rexlego/src/gpu_native/long_probe.h
++++ b/rexlego/src/gpu_native/long_probe.h
+@@ -14,6 +14,8 @@
+ #include <string_view>
+ #include <unordered_set>
+ 
++#include "draw_cached_flag.h"
++
+ namespace legodimensions::gpu_native {
+ inline const std::filesystem::path& LongProbeDirectory() {
+   static const std::filesystem::path path = [] {
+@@ -24,7 +26,9 @@ inline const std::filesystem::path& LongProbeDirectory() {
+   }();
+   return path;
+ }
+-inline bool LongProbeEnabled() { return !LongProbeDirectory().empty(); }
++inline bool LongProbeDirectorySet() { return !LongProbeDirectory().empty(); }
++// Checked on per-draw paths: with tracing off this is one byte load and one predictable branch.
++inline bool LongProbeEnabled() { return CachedProcessFlag<LongProbeDirectorySet>(); }
+ inline std::atomic<uint32_t> g_probe_frame{0};
+ inline std::atomic<bool> g_probe_capture_requested{false};
+ inline double LongProbeMilliseconds() {
+diff --git a/rexlego/src/gpu_native/pipeline_creation_gate.h b/rexlego/src/gpu_native/pipeline_creation_gate.h
+index 1aba89d..2a011e7 100644
+--- a/rexlego/src/gpu_native/pipeline_creation_gate.h
++++ b/rexlego/src/gpu_native/pipeline_creation_gate.h
+@@ -21,6 +21,14 @@ class PipelineCreationGate {
+     Lease(Lease&&) = default;
+     Lease& operator=(Lease&&) = delete;
+ 
++    // Unlocks early, once the key's work is visible to other workers (the
++    // async PSO path). Safe to call once; the destructor then does nothing.
++    void Release() {
++      if (lock_.owns_lock()) lock_.unlock();
++      lock_ = std::unique_lock<std::mutex>();
++      mutex_.reset();
++    }
++
+    private:
+     // The lock must be destroyed before its mutex owner.
+     std::shared_ptr<std::mutex> mutex_;
+diff --git a/rexlego/src/gpu_native/pipeline_library.cpp b/rexlego/src/gpu_native/pipeline_library.cpp
+index 59e0e7f..4484038 100644
+--- a/rexlego/src/gpu_native/pipeline_library.cpp
++++ b/rexlego/src/gpu_native/pipeline_library.cpp
+@@ -22,7 +22,10 @@
+ 
+ #define XXH_INLINE_ALL
+ #include <xxhash.h>
++#include "gpu_native/pipeline_parallel.h"
+ #include "gpu_native/pipeline_recipes.h"
++#include "gpu_native/pipeline_snapshot.h"
++#include "gpu_native/pipeline_stats.h"
+ 
+ namespace legodimensions::gpu_native {
+ namespace {
+@@ -101,9 +104,48 @@ std::filesystem::path CachePath() {
+   return base / "cache" / "native-pso.bin";
+ }
+ 
++// LEGO_NATIVE_PSO_PREPARE_THREADS=<n> spreads startup preparation over n
++// threads, at most 8 and at most the core count. Unset, 0 or 1: the serial loop.
++unsigned PreparationThreads() {
++  const char* value = std::getenv("LEGO_NATIVE_PSO_PREPARE_THREADS");
++  if (!value || !*value) return 1;
++  const unsigned long requested = std::strtoul(value, nullptr, 10);
++  const unsigned limit = std::clamp(std::thread::hardware_concurrency(), 1u, 8u);
++  return unsigned(std::clamp<unsigned long>(requested, 1, limit));
++}
++
++// Preparation workers run at most this many recipes ahead of the in-order commit.
++constexpr std::size_t kPrepareWindow = 64;
++
++enum class PrepareResult : uint8_t { kLoaded, kCompiled, kFailed, kRemoved };
++
++struct PreparedPipeline {
++  PrepareResult result = PrepareResult::kFailed;
++  Microsoft::WRL::ComPtr<ID3D12PipelineState> pipeline;
++  uint64_t load_ns = 0, compile_ns = 0;  // measured only while PSO stats are on
++};
++
++struct PrepareTotals {
++  uint64_t loaded = 0, compiled = 0, failed = 0;
++  uint64_t load_ns = 0, compile_ns = 0, max_compile_ns = 0;
++};
++
++// CreateGraphicsPipelineState for an auxiliary pipeline the library does not cover.
++bool CreateUncached(ID3D12Device* device, const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc,
++                    ID3D12PipelineState** pipeline) {
++  if (!pso_stats::Enabled())
++    return SUCCEEDED(device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(pipeline)));
++  const uint64_t start = pso_stats::Nanos();
++  const bool compiled = SUCCEEDED(device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(pipeline)));
++  pso_stats::OnAuxiliary(false, compiled, pso_stats::Nanos() - start);
++  return compiled;
++}
++
+ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+  public:
+   bool Open(ID3D12Device8* device) {
++    const bool stats = pso_stats::Enabled();
++    const uint64_t read_start = stats ? pso_stats::Nanos() : 0;
+     device_ = device;
+     path_ = CachePath();
+     recipe_path_ = path_.parent_path() / "native-pso-recipes.bin";
+@@ -115,11 +157,14 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+       std::ifstream file(path_, std::ios::binary);
+       if (!file.read(reinterpret_cast<char*>(blob_.data()), std::streamsize(size))) blob_.clear();
+     }
++    const uint64_t file_bytes = blob_.size();
++    const uint64_t create_start = stats ? pso_stats::Nanos() : 0;
+     // The driver rejects a blob from another driver version or adapter;
+     // start empty then, and the next save replaces the stale file.
+     HRESULT result = E_FAIL;
+     if (!blob_.empty())
+       result = device->CreatePipelineLibrary(blob_.data(), blob_.size(), IID_PPV_ARGS(&library_));
++    const bool accepted = SUCCEEDED(result);
+     if (FAILED(result)) {
+       if (!blob_.empty())
+         REXLOG_INFO("Native GPU: pipeline cache {} rejected by the driver (0x{:08X}); rebuilding",
+@@ -128,11 +173,19 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+       library_ = nullptr;
+       result = device->CreatePipelineLibrary(nullptr, 0, IID_PPV_ARGS(&library_));
+     }
++    const auto opened = [&](pso_stats::CacheState state) {
++      if (stats)
++        pso_stats::OnOpen(state, file_bytes, create_start - read_start, pso_stats::Nanos() - create_start);
++    };
+     if (FAILED(result) || !library_) {
+       REXLOG_WARN("Native GPU: pipeline cache unavailable (0x{:08X})", static_cast<uint32_t>(result));
++      opened(pso_stats::CacheState::kUnavailable);
+       return false;
+     }
+     REXLOG_INFO("Native GPU: pipeline cache {} opened ({} bytes)", path_.string(), blob_.size());
++    opened(accepted     ? pso_stats::CacheState::kLoaded
++           : file_bytes ? pso_stats::CacheState::kRejected
++                        : pso_stats::CacheState::kNoFile);
+     return true;
+   }
+ 
+@@ -149,35 +202,57 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+     }
+     const auto start = Clock::now();
+     ReadRecipes(recipe_path_, recipes_);
+-    size_t loaded = 0, compiled = 0, failed = 0;
++    const bool stats = pso_stats::Enabled();
++    const unsigned threads = PreparationThreads();
++    if (threads > 1)
++      REXLOG_INFO("Native GPU: startup pipeline preparation uses {} threads (LEGO_NATIVE_PSO_PREPARE_THREADS)",
++                  threads);
++    PrepareTotals totals;
+     auto next_progress = Clock::now() + std::chrono::seconds(2);
+     std::vector<D3D12_INPUT_ELEMENT_DESC> inputs;
+     std::unordered_set<std::wstring> prepared;
++    const auto progress = [&] {
++      if (Clock::now() >= next_progress) {
++        REXLOG_INFO("Native GPU: startup pipeline preparation processed {} recipes",
++                    totals.loaded + totals.compiled + totals.failed);
++        next_progress = Clock::now() + std::chrono::seconds(2);
++      }
++    };
++    // Applies one recipe's result on this thread, in recipe order, exactly as
++    // the serial loop always has. Returns false once the device is removed.
++    const auto commit = [&](const std::wstring& name, PreparedPipeline&& item) {
++      totals.load_ns += item.load_ns;
++      totals.compile_ns += item.compile_ns;
++      totals.max_compile_ns = std::max(totals.max_compile_ns, item.compile_ns);
++      switch (item.result) {
++        case PrepareResult::kLoaded:
++          ++totals.loaded;
++          break;
++        case PrepareResult::kCompiled:
++          ++totals.compiled;
++          Store(name, item.pipeline.Get());
++          break;
++        case PrepareResult::kFailed:
++          ++totals.failed;
++          return true;
++        case PrepareResult::kRemoved:
++          ++totals.failed;
++          return false;
++      }
++      prepared.insert(name);
++      // Keep the first pipelines resident. Later ones use the driver library.
++      constexpr size_t kMaxResident = 512;
++      if (warmed_.size() < kMaxResident) warmed_.emplace(name, std::move(item.pipeline));
++      return true;
++    };
+     const auto prepare = [&](const PipelineRecipes& source) {
++      if (threads > 1) return PrepareParallel(source, threads, stats, prepared, progress, commit);
+       for (const auto& recipe : source.Entries()) {
+         const std::wstring name(recipe->name.begin(), recipe->name.end());
+         if (prepared.contains(name)) continue;
+-        if (Clock::now() >= next_progress) {
+-          REXLOG_INFO("Native GPU: startup pipeline preparation processed {} recipes",
+-                      loaded + compiled + failed);
+-          next_progress = Clock::now() + std::chrono::seconds(2);
+-        }
++        progress();
+         const auto desc = source.Describe(*recipe, root_, inputs);
+-        Microsoft::WRL::ComPtr<ID3D12PipelineState> pipeline;
+-        if (SUCCEEDED(library_->LoadGraphicsPipeline(name.c_str(), &desc, IID_PPV_ARGS(&pipeline)))) {
+-          ++loaded;
+-        } else if (SUCCEEDED(device_->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipeline)))) {
+-          ++compiled;
+-          Store(name, pipeline.Get());
+-        } else {
+-          ++failed;
+-          if (FAILED(device_->GetDeviceRemovedReason())) return false;
+-          continue;
+-        }
+-        prepared.insert(name);
+-        // Keep the first pipelines resident. Later ones use the driver library.
+-        constexpr size_t kMaxResident = 512;
+-        if (warmed_.size() < kMaxResident) warmed_.emplace(name, std::move(pipeline));
++        if (!commit(name, stats ? PrepareOne<true>(name, desc) : PrepareOne<false>(name, desc))) return false;
+       }
+       return true;
+     };
+@@ -215,59 +290,36 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+                     old_count - recipes_.Entries().size());
+       }
+     }
+-    if (!loaded && !compiled && !failed) {
++    if (stats)
++      pso_stats::OnPrepare({totals.loaded, totals.compiled, totals.failed, warmed_.size(), threads,
++                            uint64_t(std::chrono::duration_cast<std::chrono::nanoseconds>(Clock::now() - start).count()),
++                            totals.load_ns, totals.compile_ns, totals.max_compile_ns});
++    if (!totals.loaded && !totals.compiled && !totals.failed) {
+       REXLOG_INFO("Native GPU: no startup pipeline recipes yet; recording during gameplay");
+       return;
+     }
+     REXLOG_INFO("Native GPU: startup pipelines loaded={} compiled={} failed={} resident={} elapsed_ms={}",
+-                loaded, compiled, failed, warmed_.size(),
++                totals.loaded, totals.compiled, totals.failed, warmed_.size(),
+                 std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - start).count());
+   }
+ 
+   ID3D12PipelineState* load(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc) override {
+-    const auto name = PipelineName(desc);
+-    ID3D12PipelineState* pipeline = nullptr;
+-    std::lock_guard lock(mutex_);
+-    if (root_ && desc.pRootSignature == root_) {
+-      auto entry = warmed_.find(name);
+-      if (entry != warmed_.end()) {
+-        pipeline = entry->second.Detach();
+-        warmed_.erase(entry);
+-        ++stats_.hits;
+-        return pipeline;
+-      }
+-    }
+-    if (SUCCEEDED(library_->LoadGraphicsPipeline(name.c_str(), &desc, IID_PPV_ARGS(&pipeline)))) {
+-      Record(name, desc);
+-      ++stats_.hits;
+-      return pipeline;
+-    }
+-    ++stats_.misses;
+-    return nullptr;
++    return pso_stats::Enabled() ? Load<true>(desc) : Load<false>(desc);
+   }
+ 
+   void store(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc, ID3D12PipelineState* pipeline) override {
+-    const auto name = PipelineName(desc);
+-    std::lock_guard lock(mutex_);
+-    Store(name, pipeline);
+-    Record(name, desc);
++    if (pso_stats::Enabled())
++      StoreCompiled<true>(desc, pipeline);
++    else
++      StoreCompiled<false>(desc, pipeline);
+   }
+ 
+   bool CreateAuxiliary(ID3D12Device* device, const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc,
+                        const void* root_data, std::size_t root_size,
+                        ID3D12PipelineState** pipeline) {
+-    if (device != device_ || !root_data || !root_size)
+-      return SUCCEEDED(device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(pipeline)));
+-    const auto name = L"aux-" + PipelineName(desc, root_data, root_size);
+-    std::lock_guard lock(mutex_);
+-    if (SUCCEEDED(library_->LoadGraphicsPipeline(name.c_str(), &desc, IID_PPV_ARGS(pipeline)))) {
+-      ++stats_.hits;
+-      return true;
+-    }
+-    ++stats_.misses;
+-    if (FAILED(device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(pipeline)))) return false;
+-    Store(name, *pipeline);
+-    return true;
++    if (device != device_ || !root_data || !root_size) return CreateUncached(device, desc, pipeline);
++    return pso_stats::Enabled() ? Auxiliary<true>(device, desc, root_data, root_size, pipeline)
++                                : Auxiliary<false>(device, desc, root_data, root_size, pipeline);
+   }
+ 
+   void Frame() {
+@@ -304,6 +356,130 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+   }
+ 
+  private:
++  // load(), store() and CreateAuxiliary() with the PSO stats compiled in or
++  // out. The <false> versions are the code these functions had before.
++  template <bool kStats>
++  ID3D12PipelineState* Load(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc) {
++    pso_stats::LookupTimes times;
++    if constexpr (kStats) times.start = pso_stats::Nanos();
++    const auto name = PipelineName(desc);
++    ID3D12PipelineState* pipeline = nullptr;
++    if constexpr (kStats) times.lock_begin = pso_stats::Nanos();
++    std::lock_guard lock(mutex_);
++    if constexpr (kStats) times.locked = pso_stats::Nanos();
++    if (root_ && desc.pRootSignature == root_) {
++      auto entry = warmed_.find(name);
++      if (entry != warmed_.end()) {
++        pipeline = entry->second.Detach();
++        warmed_.erase(entry);
++        ++stats_.hits;
++        if constexpr (kStats) pso_stats::OnLookup(pso_stats::Lookup::kWarm, times);
++        return pipeline;
++      }
++    }
++    if constexpr (kStats) times.load_begin = pso_stats::Nanos();
++    const HRESULT loaded = library_->LoadGraphicsPipeline(name.c_str(), &desc, IID_PPV_ARGS(&pipeline));
++    if constexpr (kStats) times.load_end = pso_stats::Nanos();
++    if (SUCCEEDED(loaded)) {
++      Record(name, desc);
++      ++stats_.hits;
++      if constexpr (kStats) pso_stats::OnLookup(pso_stats::Lookup::kLibrary, times);
++      return pipeline;
++    }
++    ++stats_.misses;
++    if constexpr (kStats) pso_stats::OnLookup(pso_stats::Lookup::kMiss, times);
++    return nullptr;
++  }
++
++  // Plume calls store() on the thread that missed, right after it compiled.
++  template <bool kStats>
++  void StoreCompiled(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc, ID3D12PipelineState* pipeline) {
++    const uint64_t begin = kStats ? pso_stats::OnStore() : 0;
++    const auto name = PipelineName(desc);
++    {
++      std::lock_guard lock(mutex_);
++      Store(name, pipeline);
++      Record(name, desc);
++    }
++    if constexpr (kStats) pso_stats::OnStored(begin);
++  }
++
++  template <bool kStats>
++  bool Auxiliary(ID3D12Device* device, const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc,
++                 const void* root_data, std::size_t root_size, ID3D12PipelineState** pipeline) {
++    const auto name = L"aux-" + PipelineName(desc, root_data, root_size);
++    std::lock_guard lock(mutex_);
++    if (SUCCEEDED(library_->LoadGraphicsPipeline(name.c_str(), &desc, IID_PPV_ARGS(pipeline)))) {
++      ++stats_.hits;
++      if constexpr (kStats) pso_stats::OnAuxiliary(true, true, 0);
++      return true;
++    }
++    ++stats_.misses;
++    const uint64_t start = kStats ? pso_stats::Nanos() : 0;
++    const bool compiled = SUCCEEDED(device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(pipeline)));
++    if constexpr (kStats) pso_stats::OnAuxiliary(false, compiled, pso_stats::Nanos() - start);
++    if (!compiled) return false;
++    Store(name, *pipeline);
++    return true;
++  }
++
++  // One startup recipe: the driver library first, then a compile. Several may
++  // run at once: the library and the device are free-threaded, and no two
++  // concurrent calls share a name (ID3D12PipelineLibrary's one restriction).
++  template <bool kStats>
++  PreparedPipeline PrepareOne(const std::wstring& name, const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc) const {
++    PreparedPipeline item;
++    const uint64_t load_start = kStats ? pso_stats::Nanos() : 0;
++    const HRESULT loaded = library_->LoadGraphicsPipeline(name.c_str(), &desc, IID_PPV_ARGS(&item.pipeline));
++    if constexpr (kStats) item.load_ns = pso_stats::Nanos() - load_start;
++    if (SUCCEEDED(loaded)) {
++      item.result = PrepareResult::kLoaded;
++      return item;
++    }
++    const uint64_t compile_start = kStats ? pso_stats::Nanos() : 0;
++    const HRESULT compiled = device_->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&item.pipeline));
++    if constexpr (kStats) item.compile_ns = pso_stats::Nanos() - compile_start;
++    if (SUCCEEDED(compiled))
++      item.result = PrepareResult::kCompiled;
++    else
++      item.result = FAILED(device_->GetDeviceRemovedReason()) ? PrepareResult::kRemoved : PrepareResult::kFailed;
++    return item;
++  }
++
++  // Prepare()'s loop over one source on `threads` threads
++  // (LEGO_NATIVE_PSO_PREPARE_THREADS). Loads and compiles run on worker
++  // threads; commit() runs on this thread in recipe order, so the library, the
++  // resident set and the counts end up as the serial loop leaves them.
++  template <class Progress, class Commit>
++  bool PrepareParallel(const PipelineRecipes& source, unsigned threads, bool stats,
++                       const std::unordered_set<std::wstring>& prepared, const Progress& progress,
++                       const Commit& commit) const {
++    const auto& entries = source.Entries();
++    std::vector<std::size_t> pending;
++    std::vector<std::wstring> names;
++    std::unordered_set<std::wstring> seen;
++    pending.reserve(entries.size());
++    names.reserve(entries.size());
++    for (std::size_t i = 0; i < entries.size(); ++i) {
++      std::wstring name(entries[i]->name.begin(), entries[i]->name.end());
++      // Names are unique within a source; never let two workers load one name.
++      if (prepared.contains(name) || !seen.insert(name).second) continue;
++      pending.push_back(i);
++      names.push_back(std::move(name));
++    }
++    return RunOrdered<PreparedPipeline>(
++        pending.size(), threads, kPrepareWindow,
++        [&](std::size_t index) {
++          std::vector<D3D12_INPUT_ELEMENT_DESC> inputs;
++          const auto desc = source.Describe(*entries[pending[index]], root_, inputs);
++          return stats ? PrepareOne<true>(names[index], desc) : PrepareOne<false>(names[index], desc);
++        },
++        [&](std::size_t index, PreparedPipeline&& item) {
++          progress();
++          return commit(names[index], std::move(item));
++        });
++  }
++
+   std::vector<std::filesystem::path> SeedPaths() const {
+     std::vector<std::filesystem::path> paths{seed_path_};
+     auto directory = seed_path_;
+@@ -379,40 +555,63 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+ 
+   void Save() {
+     SaveRecipes();
+-    std::vector<uint8_t> data;
++    const bool stats = pso_stats::Enabled();
+     uint64_t saved = 0;
+-    {
++    // The buffer is allocated outside mutex_; only the size query and Serialize
++    // run under it (see pipeline_snapshot.h). Same bytes, same file.
++    auto snapshot = SnapshotPipelineLibrary(
++        mutex_,
++        [&]() -> std::size_t {
++          if (!unsaved_) return 0;
++          const SIZE_T size = library_->GetSerializedSize();
++          // A library holding real pipelines is never this small; refuse to
++          // overwrite a good file with one that did not actually keep them.
++          if (size <= 1024 || size > kMaxLibraryBytes) {
++            unsaved_ = 0;
++            return 0;
++          }
++          return size;
++        },
++        [&](uint8_t* data, std::size_t size) {
++          if (FAILED(library_->Serialize(data, size))) return false;
++          saved = unsaved_;
++          unsaved_ = 0;
++          ++stats_.saves;
++          return true;
++        });
++    if (stats)
++      pso_stats::OnSaveSnapshot({uint64_t(snapshot.lock_us) * 1000, uint64_t(snapshot.max_lock_us) * 1000,
++                                 uint64_t(snapshot.copy_us) * 1000, uint64_t(snapshot.alloc_us) * 1000,
++                                 snapshot.retries, snapshot.allocated_under_lock});
++    if (snapshot.status == PipelineSnapshot::Status::kNoMemory) {
++      // The old resize threw std::bad_alloc on this detached thread. Retry
++      // after the next quiet period instead.
++      REXLOG_WARN("Native GPU: pipeline cache save postponed; {} bytes unavailable", snapshot.wanted);
++      if (stats) pso_stats::OnSavePostponed();
+       std::lock_guard lock(mutex_);
+-      if (!unsaved_) return;
+-      const SIZE_T size = library_->GetSerializedSize();
+-      // A library holding real pipelines is never this small; refuse to
+-      // overwrite a good file with one that did not actually keep them.
+-      if (size <= 1024 || size > kMaxLibraryBytes) {
+-        unsaved_ = 0;
+-        return;
+-      }
+-      data.resize(size);
+-      if (FAILED(library_->Serialize(data.data(), size))) return;
+-      saved = unsaved_;
+-      unsaved_ = 0;
+-      ++stats_.saves;
++      last_store_ = Clock::now();
++      return;
+     }
++    if (snapshot.status != PipelineSnapshot::Status::kCopied) return;
++    const uint64_t write_start = stats ? pso_stats::Nanos() : 0;
+     std::error_code error;
+     std::filesystem::create_directories(path_.parent_path(), error);
+     auto temporary = path_;
+     temporary += L".tmp";
+     {
+       std::ofstream file(temporary, std::ios::binary | std::ios::trunc);
+-      if (!file.write(reinterpret_cast<const char*>(data.data()), std::streamsize(data.size()))) {
++      if (!file.write(reinterpret_cast<const char*>(snapshot.data.get()), std::streamsize(snapshot.size))) {
+         REXLOG_WARN("Native GPU: could not write pipeline cache {}", temporary.string());
++        if (stats) pso_stats::OnSaveWritten(false, 0, pso_stats::Nanos() - write_start);
+         return;
+       }
+     }
+     std::filesystem::rename(temporary, path_, error);
++    if (stats) pso_stats::OnSaveWritten(!error, snapshot.size, pso_stats::Nanos() - write_start);
+     if (error)
+       REXLOG_WARN("Native GPU: could not replace pipeline cache {}: {}", path_.string(), error.message());
+     else
+-      REXLOG_INFO("Native GPU: pipeline cache saved, {} new pipelines, {} bytes", saved, data.size());
++      REXLOG_INFO("Native GPU: pipeline cache saved, {} new pipelines, {} bytes", saved, snapshot.size);
+   }
+ 
+   std::filesystem::path path_;
+@@ -435,12 +634,40 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+ 
+ PipelineLibrary* g_library = nullptr;
+ 
++// Stands in for the library while PSO stats are on and there is none
++// (LEGO_NATIVE_PSO_CACHE=0, a capture layer, or CreatePipelineLibrary failed),
++// so lookups and compiles are still counted for cache on/off comparisons.
++// Plume reads the registered pointer without a lock, so it is never deleted.
++class CountingPipelineCache final : public plume::D3D12GraphicsPipelineCache {
++ public:
++  ID3D12PipelineState* load(const D3D12_GRAPHICS_PIPELINE_STATE_DESC&) override {
++    pso_stats::OnUncachedLookup();
++    return nullptr;
++  }
++  void store(const D3D12_GRAPHICS_PIPELINE_STATE_DESC&, ID3D12PipelineState*) override {
++    pso_stats::OnStored(pso_stats::OnStore());
++  }
++};
++
++std::atomic<bool> g_counting_cache{false};
++
++void StartCountingCache(pso_stats::CacheState state) {
++  pso_stats::OnCacheState(state);
++  static auto* const cache = new CountingPipelineCache();
++  g_counting_cache.store(true);
++  plume::SetD3D12GraphicsPipelineCache(cache);
++}
++
+ }  // namespace
+ 
+ void StartPipelineLibrary(plume::RenderDevice* render_device) {
++  // LEGO_NATIVE_PSO_STATS; nothing else changes while it is off.
++  const bool stats = pso_stats::ReadEnvironment();
++  if (stats) pso_stats::Configure(CachePath().parent_path());
+   const char* value = std::getenv("LEGO_NATIVE_PSO_CACHE");
+   if (value && std::strcmp(value, "0") == 0) {
+     REXLOG_INFO("Native GPU: pipeline cache disabled by LEGO_NATIVE_PSO_CACHE=0");
++    if (stats) StartCountingCache(pso_stats::CacheState::kDisabled);
+     return;
+   }
+   // Capture layers (RenderDoc) wrap the device and do not persist pipeline
+@@ -448,6 +675,7 @@ void StartPipelineLibrary(plume::RenderDevice* render_device) {
+   // replace the real cache on disk. Leave the cache untouched in those runs.
+   if (GetModuleHandleW(L"renderdoc.dll") || std::getenv("LEGO_NATIVE_RENDERDOC_DLL")) {
+     REXLOG_INFO("Native GPU: pipeline cache skipped while a capture layer is active");
++    if (stats) StartCountingCache(pso_stats::CacheState::kCaptureLayer);
+     return;
+   }
+   if (!render_device || g_library) return;
+@@ -456,6 +684,7 @@ void StartPipelineLibrary(plume::RenderDevice* render_device) {
+   auto* library = new PipelineLibrary();
+   if (!library->Open(device)) {
+     delete library;
++    if (stats) StartCountingCache(pso_stats::CacheState::kUnavailable);
+     return;
+   }
+   g_library = library;
+@@ -463,6 +692,7 @@ void StartPipelineLibrary(plume::RenderDevice* render_device) {
+ }
+ 
+ void PipelineLibraryFrame() {
++  if (pso_stats::Enabled()) pso_stats::OnFrame();
+   if (g_library) g_library->Frame();
+ }
+ 
+@@ -480,20 +710,30 @@ bool CreateAuxiliaryPipeline(ID3D12Device* device,
+     const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc, const void* root_data,
+     std::size_t root_size, ID3D12PipelineState** pipeline) {
+   if (g_library) return g_library->CreateAuxiliary(device, desc, root_data, root_size, pipeline);
+-  return SUCCEEDED(device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(pipeline)));
++  return CreateUncached(device, desc, pipeline);
+ }
+ 
+ void StopPipelineLibrary() {
+-  if (!g_library) return;
++  if (!g_library) {
++    // The counting stand-in is unregistered but, like the library, never deleted.
++    if (g_counting_cache.exchange(false)) plume::SetD3D12GraphicsPipelineCache(nullptr);
++    if (pso_stats::Enabled()) pso_stats::LogExitSummary();
++    return;
++  }
+   plume::SetD3D12GraphicsPipelineCache(nullptr);
+   g_library->Stop();
+   g_library = nullptr;
+   // Intentionally leaked: a detached save thread can no longer start, but
+   // keeping the object avoids any use-after-free during hard exits.
++  if (pso_stats::Enabled()) pso_stats::LogExitSummary();
+ }
+ 
+ PipelineLibraryStats GetPipelineLibraryStats() {
+   return g_library ? g_library->Stats() : PipelineLibraryStats{};
+ }
+ 
++void LogPipelineStats() {
++  if (pso_stats::Enabled()) pso_stats::LogSummary("request");
++}
++
+ }  // namespace legodimensions::gpu_native
+diff --git a/rexlego/src/gpu_native/pipeline_library.h b/rexlego/src/gpu_native/pipeline_library.h
+index 52dafb8..d4df0b6 100644
+--- a/rexlego/src/gpu_native/pipeline_library.h
++++ b/rexlego/src/gpu_native/pipeline_library.h
+@@ -17,6 +17,8 @@ namespace legodimensions::gpu_native {
+ // LEGO_NATIVE_PSO_CACHE=0 disables it for A/B comparisons.
+ void StartPipelineLibrary(plume::RenderDevice* device);
+ // Prepares previously recorded graphics pipelines before the guest starts.
++// LEGO_NATIVE_PSO_PREPARE_THREADS=<n> (default 1) runs the loads and compiles
++// on n threads; results are still applied in recipe order.
+ void PreparePipelineLibrary(plume::RenderPipelineLayout* layout);
+ bool StartupPipelinePreparationEnabled();
+ // Auxiliary passes describe themselves at startup and have their own roots.
+@@ -34,5 +36,8 @@ struct PipelineLibraryStats {
+   uint64_t hits = 0, misses = 0, stored = 0, saves = 0;
+ };
+ PipelineLibraryStats GetPipelineLibraryStats();
++// Logs the PSO stats summary now. A no-op unless LEGO_NATIVE_PSO_STATS=1 (see
++// pipeline_stats.h); creating <exe>/cache/pso-stats.now does the same.
++void LogPipelineStats();
+ 
+ }  // namespace legodimensions::gpu_native
+diff --git a/rexlego/src/gpu_native/present_rect.h b/rexlego/src/gpu_native/present_rect.h
+index 2497827..6692523 100644
+--- a/rexlego/src/gpu_native/present_rect.h
++++ b/rexlego/src/gpu_native/present_rect.h
+@@ -20,4 +20,10 @@ constexpr PresentRect FitPresentRect(uint32_t source_width, uint32_t source_heig
+     height = std::max(1u, uint32_t(uint64_t(window_width) * source_height / source_width));
+   return {(window_width - width) / 2, (window_height - height) / 2, width, height};
+ }
++
++// True when a presentation viewport covers the whole target, so a draw that
++// writes every viewport texel leaves nothing of the previous contents.
++constexpr bool PresentRectCoversTarget(PresentRect rect, uint32_t width, uint32_t height) {
++  return rect.x == 0 && rect.y == 0 && rect.width == width && rect.height == height;
++}
+ } // namespace legodimensions::gpu_native
+diff --git a/rexlego/src/gpu_native/queries.cpp b/rexlego/src/gpu_native/queries.cpp
+index 11e9ed6..8b169c4 100644
+--- a/rexlego/src/gpu_native/queries.cpp
++++ b/rexlego/src/gpu_native/queries.cpp
+@@ -34,6 +34,10 @@ struct Query {
+ };
+ std::mutex mutex;
+ std::unordered_map<u32, std::shared_ptr<Query>> queries;
++// Number of entries in `queries` whose `active` is set. Changed only under `mutex`, at most once per
++// critical section. QueryDrawScope reads it before locking: draws are ordered after BEGIN/END by the
++// recording lock or, with full preparation, by the recorder barrier IssueQueryQueued submits.
++std::atomic<size_t> active_queries{0};
+ std::unordered_map<u32, unsigned> pending_issues;
+ // Query generations retain samples through every submission that uses them.
+ // The pool's sole reference is therefore proof that both GPU work and readers
+@@ -106,7 +110,9 @@ u32 IssueQuery(u32 address, u32 flags) {
+     HostDevice::RetireResource(query);
+     {
+       std::lock_guard lock(mutex);
+-      queries[address] = std::move(next);
++      auto& slot = queries[address];
++      if (!slot || !slot->active) ++active_queries;
++      slot = std::move(next);
+     }
+     return 0;
+   }
+@@ -115,6 +121,8 @@ u32 IssueQuery(u32 address, u32 flags) {
+     std::lock_guard lock(mutex);
+     if (!query->active) return kInvalid;
+     query->active = false;
++    // Not counted any more if ResetQueryResources has dropped it from the map.
++    if (const auto it = queries.find(address); it != queries.end() && it->second == query) --active_queries;
+   }
+   // Each draw has already ended/resolved its query. Submit before signaling.
+   const bool submitted = HostDevice::SubmitRecordedWork();
+@@ -200,6 +208,7 @@ u32 ReleaseQuery(u32 address) {
+     const u32 refs = Header(address)[3];
+     if (refs > 1) { Header(address)[3] = refs - 1; return refs - 1; }
+     released = std::move(queries[address]);
++    if (released->active) --active_queries;
+     released->active = false;
+     queries.erase(address);
+   }
+@@ -217,11 +226,12 @@ struct QueryDrawScope::Impl {
+   std::vector<std::shared_ptr<Query>> consumers;
+ };
+ QueryDrawScope::QueryDrawScope(plume::RenderCommandList* commands, double sample_scale) {
++  // Most draws are outside every BEGIN/END: skip the lock and the walk over all created queries.
++  if (active_queries.load(std::memory_order_acquire) == 0) return;
+   std::unique_ptr<Impl> scope;
+   {
+     std::lock_guard lock(mutex);
+-    if (std::none_of(queries.begin(),queries.end(),
+-        [](const auto& entry) { return entry.second->active; })) return;
++    if (active_queries.load(std::memory_order_relaxed) == 0) return;
+     scope = std::make_unique<Impl>();
+     for (const auto& [address, query] : queries)
+       if (query->active) scope->consumers.push_back(query);
+@@ -298,6 +308,7 @@ void ResetQueryResources() {
+   std::lock_guard lock(mutex);
+   for (const auto& [address, query] : queries) REX_KERNEL_MEMORY()->SystemHeapFree(address);
+   queries.clear();
++  active_queries.store(0);
+   pending_issues.clear();
+   sample_pool.clear();
+   query_completion.Reset();
+diff --git a/rexlego/src/gpu_native/shaders.cpp b/rexlego/src/gpu_native/shaders.cpp
+index 5be84db..47a3ede 100644
+--- a/rexlego/src/gpu_native/shaders.cpp
++++ b/rexlego/src/gpu_native/shaders.cpp
+@@ -631,6 +631,12 @@ ShaderBindingsSnapshot CaptureShaderBindings(u32 vertex, u32 pixel) {
+   return result;
+ }
+ 
++ShaderBindingsSnapshot CurrentShaderOwners() {
++  if (t_shader_bindings) return *t_shader_bindings;
++  std::lock_guard lock(g_registry_mutex);
++  return {{g_bound_shaders[0], g_bound_shaders[1]}, g_bound_shader_addresses};
++}
++
+ ShaderBindingsScope::ShaderBindingsScope(const ShaderBindingsSnapshot& bindings) : previous_(t_shader_bindings) {
+   t_shader_bindings = &bindings;
+ }
+diff --git a/rexlego/src/gpu_native/shaders.h b/rexlego/src/gpu_native/shaders.h
+index e6e7131..2faa97c 100644
+--- a/rexlego/src/gpu_native/shaders.h
++++ b/rexlego/src/gpu_native/shaders.h
+@@ -34,6 +34,10 @@ struct ShaderBindingsSnapshot {
+ };
+ ShaderBindingsSnapshot CaptureShaderBindings();
+ ShaderBindingsSnapshot CaptureShaderBindings(u32 vertex, u32 pixel);
++// Side-effect free: the snapshot in scope, else the current bindings, as
++// ResolveBoundShader sees them. Holding it keeps those shaders, and so their
++// resolved variants (never erased), alive.
++ShaderBindingsSnapshot CurrentShaderOwners();
+ class ShaderBindingsScope {
+   const ShaderBindingsSnapshot* previous_;
+  public:
+diff --git a/rexlego/src/gpu_native/state_call_diagnostic.h b/rexlego/src/gpu_native/state_call_diagnostic.h
+index 9e0f1ff..300ad9e 100644
+--- a/rexlego/src/gpu_native/state_call_diagnostic.h
++++ b/rexlego/src/gpu_native/state_call_diagnostic.h
+@@ -3,6 +3,7 @@
+ 
+ #include <array>
+ #include <cstdint>
++#include <cstring>
+ #include <filesystem>
+ #include <fstream>
+ #include <utility>
+@@ -14,6 +15,25 @@ struct StateCallCounts {
+   uint64_t layouts = 0, equal_layouts = 0;
+   uint64_t pipelines = 0, equal_pipelines = 0;
+   std::array<uint64_t, 4> descriptors{}, equal_descriptors{};
++  // skipped_* count calls LEGO_NATIVE_ELIDE_STATE_CALLS actually left out.
++  uint64_t framebuffers = 0, equal_framebuffers = 0;
++  uint64_t index_buffers = 0, equal_index_buffers = 0, skipped_index_buffers = 0;
++  uint64_t blend_factors = 0, equal_blend_factors = 0, skipped_blend_factors = 0;
++  uint64_t viewports = 0, equal_viewports = 0;
++  uint64_t scissors = 0, equal_scissors = 0;
++};
++
++// The last value requested in this recording, compared bytewise as the API receives it.
++template <class T>
++struct LastRequest {
++  T value{};
++  bool set = false;
++  bool Same(const T& next) {
++    const bool same = set && std::memcmp(&value, &next, sizeof(T)) == 0;
++    value = next;
++    set = true;
++    return same;
++  }
+ };
+ 
+ class StateCallLedger {
+@@ -31,6 +51,11 @@ class StateCallLedger {
+       serial_ = serial;
+       layout_ = pipeline_ = nullptr;
+       descriptors_.fill(nullptr);
++      framebuffer_ = {};
++      index_ = {};
++      blend_ = {};
++      viewport_ = {};
++      scissor_ = {};
+     }
+     return true;
+   }
+@@ -53,6 +78,28 @@ class StateCallLedger {
+     if (pipeline_ && pipeline_ == pipeline) ++counts_.equal_pipelines;
+     pipeline_ = pipeline;
+   }
++  void Framebuffer(const void* framebuffer) {
++    ++counts_.framebuffers;
++    if (framebuffer_.Same(framebuffer)) ++counts_.equal_framebuffers;
++  }
++  void IndexBuffer(uint64_t address, uint32_t size, uint32_t format) {
++    ++counts_.index_buffers;
++    if (index_.Same({address, size, format})) ++counts_.equal_index_buffers;
++  }
++  void SkippedIndexBuffer() { ++counts_.skipped_index_buffers; }
++  void BlendFactor(const std::array<float, 4>& value) {
++    ++counts_.blend_factors;
++    if (blend_.Same(value)) ++counts_.equal_blend_factors;
++  }
++  void SkippedBlendFactor() { ++counts_.skipped_blend_factors; }
++  void Viewport(const std::array<float, 6>& value) {
++    ++counts_.viewports;
++    if (viewport_.Same(value)) ++counts_.equal_viewports;
++  }
++  void Scissor(const std::array<int32_t, 4>& value) {
++    ++counts_.scissors;
++    if (scissor_.Same(value)) ++counts_.equal_scissors;
++  }
+   const StateCallCounts& Counts() const { return counts_; }
+   void Reset() { *this = {}; }
+ 
+@@ -63,6 +110,11 @@ class StateCallLedger {
+   const void* layout_ = nullptr;
+   const void* pipeline_ = nullptr;
+   std::array<const void*, 4> descriptors_{};
++  LastRequest<const void*> framebuffer_;
++  LastRequest<std::array<uint64_t, 3>> index_;
++  LastRequest<std::array<float, 4>> blend_;
++  LastRequest<std::array<float, 6>> viewport_;
++  LastRequest<std::array<int32_t, 4>> scissor_;
+ };
+ 
+ // One finite capture per process. Optional trigger arms the next present
+@@ -97,10 +149,14 @@ class StateCallCapture {
+       if (!file_) { exhausted_ = true; return; }
+       file_ << "# scope=guest_draw_requests;equal=adjacent_guest_request;"
+                "unobserved_helper_compute_ray_or_external_calls_not_measured;"
++               "skipped=elided_by_LEGO_NATIVE_ELIDE_STATE_CALLS;"
+                "max_frames=120;max_draws_per_frame=4096\n"
+                "frame,draws,dropped_draws,recordings,layout_calls,layout_equal,"
+                "pso_calls,pso_equal,table0_calls,table0_equal,table1_calls,table1_equal,"
+-               "table2_calls,table2_equal,table3_calls,table3_equal\n";
++               "table2_calls,table2_equal,table3_calls,table3_equal,"
++               "framebuffer_calls,framebuffer_equal,index_calls,index_equal,index_skipped,"
++               "blend_calls,blend_equal,blend_skipped,viewport_calls,viewport_equal,"
++               "scissor_calls,scissor_equal\n";
+     }
+     const auto& count = ledger_.Counts();
+     file_ << frame << ',' << count.draws << ',' << count.dropped_draws << ','
+@@ -108,6 +164,12 @@ class StateCallCapture {
+           << ',' << count.pipelines << ',' << count.equal_pipelines;
+     for (size_t i = 0; i < count.descriptors.size(); ++i)
+       file_ << ',' << count.descriptors[i] << ',' << count.equal_descriptors[i];
++    file_ << ',' << count.framebuffers << ',' << count.equal_framebuffers
++          << ',' << count.index_buffers << ',' << count.equal_index_buffers
++          << ',' << count.skipped_index_buffers << ',' << count.blend_factors
++          << ',' << count.equal_blend_factors << ',' << count.skipped_blend_factors
++          << ',' << count.viewports << ',' << count.equal_viewports
++          << ',' << count.scissors << ',' << count.equal_scissors;
+     file_ << '\n';
+     file_.flush();
+     ledger_.Reset();
+diff --git a/rexlego/src/gpu_native/texture_upload_source.h b/rexlego/src/gpu_native/texture_upload_source.h
+index 73d2f5a..6f6bc59 100644
+--- a/rexlego/src/gpu_native/texture_upload_source.h
++++ b/rexlego/src/gpu_native/texture_upload_source.h
+@@ -1,16 +1,36 @@
+ #pragma once
+ 
+ #include <cstdint>
++#include <cstring>
+ #include <new>
+ #include <optional>
+ #include <span>
+ #include <utility>
+ #include <vector>
++#include "gpu_native/upload_legacy_paths.h"
+ 
+ namespace legodimensions::gpu_native {
++namespace texture_upload_source_detail {
++// vector<uint8_t, DefaultInitAllocator> resize() leaves new bytes
++// uninitialised instead of zero-filling them.
++template <class T>
++struct DefaultInitAllocator : std::allocator<T> {
++  using value_type = T;
++  template <class U> struct rebind { using other = DefaultInitAllocator<U>; };
++  DefaultInitAllocator() noexcept = default;
++  template <class U> DefaultInitAllocator(const DefaultInitAllocator<U>&) noexcept {}
++  template <class U> void construct(U* p) noexcept { ::new (static_cast<void*>(p)) U; }
++  template <class U, class... Args> void construct(U* p, Args&&... args) {
++    ::new (static_cast<void*>(p)) U(std::forward<Args>(args)...);
++  }
++};
++}  // namespace texture_upload_source_detail
++
+ // Retained bytes for one upload transaction. The caller settles data producers
+ // and validates residency in Reader; this is not a metadata/provider bypass.
+ // Hashing, untile/decode and diagnostics must use these same immutable bytes.
++// Reader(address, span) must either fill the whole span and return true, or
++// return false (the capture is then discarded): the spans are not zero-filled.
+ class TextureUploadSource {
+  public:
+   template<class Reader>
+@@ -24,6 +44,10 @@ class TextureUploadSource {
+       TextureUploadSource result;
+       result.base_address_ = base_address; result.mip_address_ = mip_address;
+       result.base_.resize(base_size); result.mips_.resize(mip_size);
++      if (LegacyUploadPathsEnabled()) {  // in-game A/B: the old zero-filled vectors
++        std::memset(result.base_.data(), 0, base_size);
++        if (mip_size) std::memset(result.mips_.data(), 0, mip_size);
++      }
+       if (!read(base_address, std::span<uint8_t>(result.base_)) ||
+           (mip_size && !read(mip_address, std::span<uint8_t>(result.mips_)))) return {};
+       return result;
+@@ -45,6 +69,6 @@ class TextureUploadSource {
+   }
+  private:
+   uint32_t base_address_ = 0, mip_address_ = 0;
+-  std::vector<uint8_t> base_, mips_;
++  std::vector<uint8_t, texture_upload_source_detail::DefaultInitAllocator<uint8_t>> base_, mips_;
+ };
+ }  // namespace legodimensions::gpu_native
+diff --git a/rexlego/src/gpu_native/texture_volume_upload.h b/rexlego/src/gpu_native/texture_volume_upload.h
+index 4364558..65a3c93 100644
+--- a/rexlego/src/gpu_native/texture_volume_upload.h
++++ b/rexlego/src/gpu_native/texture_volume_upload.h
+@@ -5,6 +5,10 @@
+ #include <cstring>
+ #include <span>
+ #include "gpu_native/texture_endian.h"
++#include "gpu_native/upload_legacy_paths.h"
++#if defined(__SSSE3__)
++#include <tmmintrin.h>
++#endif
+ 
+ namespace legodimensions::gpu_native {
+ 
+@@ -95,4 +99,211 @@ bool CopyTextureVolumeBlocks(std::span<const uint8_t> source,
+   return true;
+ }
+ 
++// Guest addressing of one 2D/cube slice, in blocks (see CopyTexture2DBlocks).
++struct Texture2DSourceLayout {
++  bool tiled = false;
++  uint32_t offset_x = 0, offset_y = 0;  // packed-mip offset
++  uint32_t row_pitch_bytes = 0;         // guest row pitch
++};
++
++namespace texture_copy_detail {
++// rex::graphics::texture_util::GetTiledOffset2D (rexglue-sdk util.cpp), copied
++// so the run loop can inline it. Only used where TiledRowsFit holds.
++inline int32_t TiledOffset2D(int32_t x, int32_t y, uint32_t pitch,
++                             uint32_t bytes_per_block_log2) {
++  pitch = (pitch + 31u) & ~31u;
++  int32_t macro = ((x >> 5) + (y >> 5) * int32_t(pitch >> 5)) << (bytes_per_block_log2 + 7);
++  int32_t micro = ((x & 7) + ((y & 0xE) << 2)) << bytes_per_block_log2;
++  int32_t offset = macro + ((micro & ~0xF) << 1) + (micro & 0xF) + ((y & 1) << 4);
++  return ((offset & ~0x1FF) << 3) + ((y & 16) << 7) + ((offset & 0x1C0) << 2) +
++         (((((y & 8) >> 2) + (x >> 3)) & 3) << 6) + (offset & 0x3F);
++}
++
++// Every TiledOffset2D term for the slice is non-negative and below 2^31:
++// the result is < ((macro + 1) << (log2 + 10)) + 4096.
++inline bool TiledRowsFit(uint32_t width_blocks, uint32_t height_blocks,
++                         const Texture2DSourceLayout& layout, uint32_t pitch, uint32_t log2) {
++  const uint64_t last_x = uint64_t(layout.offset_x) + width_blocks - 1;
++  const uint64_t last_y = uint64_t(layout.offset_y) + height_blocks - 1;
++  if (last_x >= (1u << 30) || last_y >= (1u << 30)) return false;
++  const uint64_t macro = (last_x >> 5) + (last_y >> 5) * (((pitch + 31u) & ~31u) >> 5);
++  return macro < (1u << 21) && ((macro + 1) << (log2 + 10)) + 4096 <= 0x7FFFFFFFu;
++}
++
++// No u32 wrap in x/y + offset, and every offset + block is below 2^63.
++inline bool LinearRowsFit(uint32_t width_blocks, uint32_t height_blocks,
++                          uint32_t block_bytes, const Texture2DSourceLayout& layout) {
++  const uint64_t last_x = uint64_t(layout.offset_x) + width_blocks - 1;
++  const uint64_t last_y = uint64_t(layout.offset_y) + height_blocks - 1;
++  return last_x <= UINT32_MAX && last_y <= UINT32_MAX && block_bytes <= 16 &&
++         last_y * layout.row_pitch_bytes < (uint64_t(1) << 62);
++}
++
++// dst[k] = src[k ^ endian_xor] for whole words.
++inline void CopySwappedWords(uint8_t* dst, const uint8_t* src, size_t bytes, uint32_t endian_xor) {
++  for (size_t byte = 0; byte < bytes; byte += 4) {
++    uint32_t word;
++    std::memcpy(&word, src + byte, sizeof(word));
++    if (endian_xor & 1) word = ((word & 0xFF00FF00u) >> 8) | ((word & 0x00FF00FFu) << 8);
++    if (endian_xor & 2) word = (word >> 16) | (word << 16);
++    std::memcpy(dst + byte, &word, sizeof(word));
++  }
++}
++
++#if defined(__SSSE3__)
++inline __m128i EndianShuffle(uint32_t endian_xor) {
++  return _mm_xor_si128(_mm_setr_epi8(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15),
++                       _mm_set1_epi8(char(endian_xor)));
++}
++#endif
++
++// Tiled offsets advance by block_bytes over x-aligned runs of kRunBytes >>
++// log2 blocks (8/8/4/2/1 for 1/2/4/8/16-byte blocks), and each run starts
++// kRunBytes-aligned, so the endian XOR permutes bytes within the run.
++// Unaligned row ends use the exact per-byte copy of CopyBytewise.
++template <uint32_t kRunBytes>
++bool CopyTiledRows(std::span<const uint8_t> source, std::span<uint8_t> destination,
++                   uint32_t width_blocks, uint32_t height_blocks, uint32_t block_bytes,
++                   uint32_t log2, uint32_t row_pitch, uint32_t endian_xor,
++                   const Texture2DSourceLayout& layout) {
++  const uint32_t run_blocks = kRunBytes >> log2;
++  const uint32_t pitch = layout.row_pitch_bytes / block_bytes;
++  const uint8_t* in = source.data();
++  const uint64_t size = source.size();
++#if defined(__SSSE3__)
++  const __m128i shuffle = EndianShuffle(endian_xor);
++#endif
++  for (uint32_t y = 0; y < height_blocks; ++y) {
++    const int32_t guest_y = int32_t(y + layout.offset_y);
++    uint8_t* out = destination.data() + size_t(y) * row_pitch;
++    const auto block = [&](uint32_t x) {
++      const uint64_t offset =
++          uint32_t(TiledOffset2D(int32_t(x + layout.offset_x), guest_y, pitch, log2));
++      for (uint32_t byte = 0; byte < block_bytes; ++byte) {
++        const uint64_t src = (offset + byte) ^ endian_xor;
++        if (src >= size) return false;
++        out[size_t(x) * block_bytes + byte] = in[src];
++      }
++      return true;
++    };
++    uint32_t x = 0;
++    for (; x < width_blocks && ((x + layout.offset_x) & (run_blocks - 1)); ++x)
++      if (!block(x)) return false;
++    for (; width_blocks - x >= run_blocks; x += run_blocks) {
++      const uint32_t offset =
++          uint32_t(TiledOffset2D(int32_t(x + layout.offset_x), guest_y, pitch, log2));
++      if (uint64_t(offset) + kRunBytes > size) return false;
++      uint8_t* dst = out + size_t(x) * block_bytes;
++#if defined(__SSSE3__)
++      if constexpr (kRunBytes == 16)
++        _mm_storeu_si128(reinterpret_cast<__m128i*>(dst), _mm_shuffle_epi8(
++            _mm_loadu_si128(reinterpret_cast<const __m128i*>(in + offset)), shuffle));
++      else
++        _mm_storel_epi64(reinterpret_cast<__m128i*>(dst), _mm_shuffle_epi8(
++            _mm_loadl_epi64(reinterpret_cast<const __m128i*>(in + offset)), shuffle));
++#else
++      if (!endian_xor) std::memcpy(dst, in + offset, kRunBytes);
++      else CopySwappedWords(dst, in + offset, kRunBytes, endian_xor);
++#endif
++    }
++    for (; x < width_blocks; ++x)
++      if (!block(x)) return false;
++  }
++  return true;
++}
++
++// Linear rows are contiguous guest bytes. From a word-aligned offset the
++// endian XOR stays within words; other rows use the exact per-byte copy.
++inline bool CopyLinearRows(std::span<const uint8_t> source, std::span<uint8_t> destination,
++                           uint32_t width_blocks, uint32_t height_blocks, uint32_t block_bytes,
++                           uint32_t row_pitch, uint32_t endian_xor,
++                           const Texture2DSourceLayout& layout) {
++  const uint8_t* in = source.data();
++  const uint64_t size = source.size(), row_bytes = uint64_t(width_blocks) * block_bytes;
++#if defined(__SSSE3__)
++  const __m128i shuffle = EndianShuffle(endian_xor);
++#endif
++  for (uint32_t y = 0; y < height_blocks; ++y) {
++    const uint64_t offset = uint64_t(y + layout.offset_y) * layout.row_pitch_bytes +
++                            uint64_t(layout.offset_x) * block_bytes;
++    uint8_t* out = destination.data() + size_t(y) * row_pitch;
++    uint64_t byte = 0;
++    if (!endian_xor) {
++      if (offset + row_bytes > size) return false;
++      std::memcpy(out, in + offset, size_t(row_bytes));
++      continue;
++    }
++    if (!(offset & 3)) {
++      const uint64_t words = row_bytes & ~uint64_t(3);
++      if (offset + words > size) return false;
++#if defined(__SSSE3__)
++      for (; byte + 16 <= words; byte += 16)
++        _mm_storeu_si128(reinterpret_cast<__m128i*>(out + byte), _mm_shuffle_epi8(
++            _mm_loadu_si128(reinterpret_cast<const __m128i*>(in + offset + byte)), shuffle));
++#endif
++      CopySwappedWords(out + byte, in + offset + byte, size_t(words - byte), endian_xor);
++      byte = words;
++    }
++    for (; byte < row_bytes; ++byte) {
++      const uint64_t src = (offset + byte) ^ endian_xor;
++      if (src >= size) return false;
++      out[size_t(byte)] = in[size_t(src)];
++    }
++  }
++  return true;
++}
++}  // namespace texture_copy_detail
++
++// One 2D/cube slice: the result of CopyTextureVolumeBlocks(source, destination,
++// width_blocks, height_blocks, 1, ..., source_offset) when source_offset is the
++// guest addressing that layout describes, i.e. GetTiledOffset2D(x + offset_x,
++// y + offset_y, row_pitch_bytes / block_bytes, log2(block_bytes)) when tiled,
++// else (y + offset_y) * row_pitch_bytes + (x + offset_x) * block_bytes. Copies
++// whole runs/rows instead of single bytes. Non power-of-two blocks, or inputs
++// whose address arithmetic could overflow, keep the per-block source_offset path,
++// as does every slice when LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD=1 (in-game A/B).
++template <typename SourceOffset>
++bool CopyTexture2DBlocks(std::span<const uint8_t> source, std::span<uint8_t> destination,
++                         uint32_t width_blocks, uint32_t height_blocks, uint32_t block_bytes,
++                         uint32_t row_pitch, uint32_t endian_xor,
++                         const Texture2DSourceLayout& layout, SourceOffset source_offset) {
++  using namespace texture_copy_detail;
++  const uint32_t log2 = block_bytes == 1 ? 0 : block_bytes == 2 ? 1 : block_bytes == 4 ? 2
++      : block_bytes == 8 ? 3 : block_bytes == 16 ? 4 : 5;
++  const bool fast = log2 < 5 && width_blocks && height_blocks && endian_xor <= 3 &&
++      uint64_t(width_blocks) * block_bytes <= row_pitch &&
++      uint64_t(row_pitch) * height_blocks <= destination.size() &&
++      (layout.tiled ? TiledRowsFit(width_blocks, height_blocks, layout,
++                                   layout.row_pitch_bytes / block_bytes, log2)
++                    : LinearRowsFit(width_blocks, height_blocks, block_bytes, layout));
++  if (!fast || LegacyUploadPathsEnabled())
++    return CopyTextureVolumeBlocks(source, destination, width_blocks, height_blocks, 1,
++                                   block_bytes, row_pitch, endian_xor, source_offset);
++  if (!layout.tiled)
++    return CopyLinearRows(source, destination, width_blocks, height_blocks, block_bytes,
++                          row_pitch, endian_xor, layout);
++  return log2 ? CopyTiledRows<16>(source, destination, width_blocks, height_blocks,
++                                  block_bytes, log2, row_pitch, endian_xor, layout)
++              : CopyTiledRows<8>(source, destination, width_blocks, height_blocks,
++                                 block_bytes, log2, row_pitch, endian_xor, layout);
++}
++
++// After a successful CopyTexture2DBlocks / CopyTextureVolumeBlocks /
++// CopyTextureAlpha4Blocks, every byte of rows [0, rows) except each row's pitch
++// padding is written. Zero the rest of the level: [r * row_pitch + row_bytes,
++// (r + 1) * row_pitch) for r < rows, then [rows * row_pitch, level.size()).
++// Lets the decode buffer start uninitialised. Clamped to the level.
++inline void ZeroTextureRowPadding(std::span<uint8_t> level, uint32_t row_pitch,
++                                  uint64_t row_bytes, uint64_t rows) {
++  const uint64_t size = level.size();
++  const uint64_t written = !row_pitch ? 0 : rows <= size / row_pitch ? rows * row_pitch : size;
++  if (row_bytes < row_pitch)
++    for (uint64_t at = row_bytes; at < written; at += row_pitch) {
++      const uint64_t padding = row_pitch - row_bytes;
++      std::memset(level.data() + size_t(at), 0,
++                  size_t(padding < written - at ? padding : written - at));
++    }
++  std::memset(level.data() + size_t(written), 0, size_t(size - written));
++}
++
+ }  // namespace legodimensions::gpu_native
+diff --git a/rexlego/src/gpu_native/textures.cpp b/rexlego/src/gpu_native/textures.cpp
+index a1dbcb3..c191181 100644
+--- a/rexlego/src/gpu_native/textures.cpp
++++ b/rexlego/src/gpu_native/textures.cpp
+@@ -19,6 +19,7 @@
+ #include <fstream>
+ #include <memory>
+ #include <mutex>
++#include <shared_mutex>
+ #include <unordered_map>
+ #include <unordered_set>
+ #include <utility>
+@@ -46,6 +47,8 @@
+ #include "gpu_native/texture_upload_publication.h"
+ #include "gpu_native/texture_volume_upload.h"
+ #include "gpu_native/texture_alpha4_upload.h"
++#include "gpu_native/texture_scratch.h"
++#include "gpu_native/upload_buffer_pool.h"
+ #include "gpu_native/long_probe.h"
+ #include "gpu_native/memory_watch.h"
+ #include "gpu_native/depth_alias.h"
+@@ -173,6 +176,56 @@ struct TextureResource {
+ 
+ TextureUploadPublicationCache g_texture_upload_publications(128ull * 1024 * 1024);
+ 
++// LEGO_NATIVE_TEXTURE_STAGING_POOL=1 (default OFF) recycles the committed
++// UPLOAD buffers that stage texture uploads of up to 64 MB instead of creating
++// one per upload. A staging buffer reaches the pool only at its last owner's
++// release (the publication LRU above and RetireResource's fence slots), exactly
++// where the default path destroys it, so reuse is as safe as destruction. Each
++// use rewrites every byte its copy footprints read. The LRU still charges the
++// requested size; capacities round up to a power of two (at most 2x), plus at
++// most 64 MB idle. Unlocked draw-preparation uploads Acquire without the
++// recording lock, so a shared lock orders Acquire against Reset's state swap.
++// Start/ResetTextureResources reset it before the device that created its
++// buffers goes away; buffers released after a Reset are destroyed, not kept.
++constexpr u64 kTextureStagingPoolBudget = 64ull * 1024 * 1024;
++UploadBufferPool<plume::RenderBuffer> g_texture_staging_pool(kTextureStagingPoolBudget);
++std::shared_mutex g_texture_staging_pool_mutex;
++
++bool TextureStagingPoolEnabled() {
++  static const bool enabled = [] {
++    const char* value = std::getenv("LEGO_NATIVE_TEXTURE_STAGING_POOL");
++    const bool selected = value && value[0] && value[0] != '0';
++    if (selected) REXLOG_INFO("Native texture staging pool: enabled, 64 MB idle budget");
++    return selected;
++  }();
++  return enabled;
++}
++
++// Larger uploads keep a dedicated buffer: the pool would never retain them.
++bool UseTextureStagingPool(u64 bytes) {
++  return TextureStagingPoolEnabled() && bytes && bytes <= kTextureStagingPoolBudget;
++}
++
++std::shared_ptr<plume::RenderBuffer> AcquireTextureStaging(plume::RenderDevice* device, u32 bytes) {
++  std::shared_lock lock(g_texture_staging_pool_mutex);
++  auto buffer = g_texture_staging_pool.Acquire(bytes, 0, [&](u64 capacity) {
++    return device->createBuffer(plume::RenderBufferDesc::UploadBuffer(capacity));
++  });
++  static std::atomic<u64> calls{0};
++  if (++calls % 256 == 0) {
++    const auto stats = g_texture_staging_pool.Stats();
++    REXLOG_INFO("Native texture staging pool: hits={} misses={} idle_bytes={} idle_buffers={}",
++        stats.hits, stats.misses, stats.bytes, stats.count);
++  }
++  return buffer;
++}
++
++void ResetTextureStagingPool() {
++  if (!TextureStagingPoolEnabled()) return;
++  std::unique_lock lock(g_texture_staging_pool_mutex);
++  g_texture_staging_pool.Reset();
++}
++
+ // Caller holds the resource mutex. Every cache consumer records its version;
+ // the final recording stream decides whether that version needs a GPU copy.
+ bool QueuePreparedTextureUpload(TextureResource& resource, plume::RenderCommandList* commands) {
+@@ -2188,13 +2241,18 @@ bool UploadTextureResourceStorage(u32 guest_address,
+     const u32 upload_size = static_cast<u32>(upload_size_wide);
+     // Untiling, diagnostics and the decoded-content hash need CPU reads.
+     // Keep those in normal RAM; UPLOAD memory must be a write-only destination.
+-    std::vector<u8> decoded(upload_size);
++    // The per-thread scratch is not zero-filled: the loop zeroes each 512-byte
++    // alignment gap, and each level's row padding and tail before its copier
++    // runs, since every byte is hashed and staged.
++    TextureDecodeScratch decoded(upload_size);
+     auto* mapped = decoded.data();
+     u32 destination_offset = 0;
+     for (u32 subresource = 0; subresource < faces * resource->levels; ++subresource) {
+       const u32 face = subresource / resource->levels;
+       const u32 level = subresource % resource->levels;
+-      destination_offset = AlignUp(destination_offset, 512);
++      const u32 aligned_offset = AlignUp(destination_offset, 512);
++      std::memset(mapped + destination_offset, 0, aligned_offset - destination_offset);
++      destination_offset = aligned_offset;
+       const u32 packed_level = std::min(level, layout.packed_level);
+       const auto& guest_level = level == 0 ? layout.base : layout.mips[packed_level];
+       const u64 base_wide = (level == 0 ? u64(u32(fetch.base_address) << 12)
+@@ -2220,6 +2278,8 @@ bool UploadTextureResourceStorage(u32 guest_address,
+       const u32 height = MipDimension(resource->height, level);
+       const u32 pitch = RowPitch(resource->format, width);
+       if (alpha4) {
++        ZeroTextureRowPadding({mapped + destination_offset, LevelSize(*resource, level)}, pitch,
++            width, u64(height) * (volume ? MipDimension(resource->depth, level) : 1));
+         const bool copied = CopyTextureAlpha4Blocks(
+             {source, TextureEndianExtent(guest_level.array_slice_data_extent_bytes,endian_xor)},
+             {mapped + destination_offset, LevelSize(*resource, level)},
+@@ -2240,6 +2300,9 @@ bool UploadTextureResourceStorage(u32 guest_address,
+       }
+       if (volume) {
+         const u32 block_height = format_info->block_height;
++        ZeroTextureRowPadding({mapped + destination_offset, LevelSize(*resource, level)}, pitch,
++            u64((width + block_width - 1) / block_width) * block_bytes,
++            u64((height + block_height - 1) / block_height) * MipDimension(resource->depth, level));
+         const bool copied = CopyTextureVolumeBlocks(
+             {source, TextureEndianExtent(guest_level.array_slice_data_extent_bytes,endian_xor)},
+             {mapped + destination_offset, LevelSize(*resource, level)},
+@@ -2259,15 +2322,20 @@ bool UploadTextureResourceStorage(u32 guest_address,
+         destination_offset += LevelSize(*resource, level);
+         continue;
+       }
++      ZeroTextureRowPadding({mapped + destination_offset, LevelSize(*resource, level)}, pitch,
++          u64((width + block_width - 1) / block_width) * block_bytes,
++          (height + format_info->block_height - 1) / format_info->block_height);
+       // The checked block copier also handles one 2D/cube slice. Validate each
+       // computed address, including endian XOR and packed-mip offsets, against
+-      // the same guest extent whose residency was checked above.
+-      const bool copied = CopyTextureVolumeBlocks(
++      // the same guest extent whose residency was checked above. The layout
++      // lets it copy whole tile runs/rows; the callback is the reference path.
++      const bool copied = CopyTexture2DBlocks(
+           {source, TextureEndianExtent(guest_level.array_slice_data_extent_bytes,endian_xor)},
+           {mapped + destination_offset, LevelSize(*resource, level)},
+           (width + block_width - 1) / block_width,
+           (height + format_info->block_height - 1) / format_info->block_height,
+-          1, block_bytes, pitch, endian_xor,
++          block_bytes, pitch, endian_xor,
++          {fetch.tiled != 0, offset_x, offset_y, guest_level.row_pitch_bytes},
+           [&](u32 x, u32 y, u32) -> int64_t {
+             if (fetch.tiled)
+               return tu::GetTiledOffset2D(x + offset_x, y + offset_y,
+@@ -2297,8 +2365,10 @@ bool UploadTextureResourceStorage(u32 guest_address,
+       resource->cpu_stamp = std::move(cpu_stamp);
+       return true;
+     }
+-    auto upload = std::shared_ptr<plume::RenderBuffer>(HostDevice::Device()->createBuffer(
+-        plume::RenderBufferDesc::UploadBuffer(upload_size)).release());
++    auto upload = UseTextureStagingPool(upload_size)
++        ? AcquireTextureStaging(HostDevice::Device(), upload_size)
++        : std::shared_ptr<plume::RenderBuffer>(HostDevice::Device()->createBuffer(
++              plume::RenderBufferDesc::UploadBuffer(upload_size)).release());
+     if (!upload) return false;
+     auto* upload_bytes = upload->map();
+     if (!upload_bytes) return false;
+@@ -2367,9 +2437,11 @@ bool UploadTextureResourceStorage(u32 guest_address,
+   if (!device || upload_size == 0 || upload_size > UINT32_MAX) {
+     return false;
+   }
+-  auto upload = std::shared_ptr<plume::RenderBuffer>(
+-      device->createBuffer(plume::RenderBufferDesc::UploadBuffer(upload_size))
+-          .release());
++  auto upload = UseTextureStagingPool(upload_size)
++      ? AcquireTextureStaging(device, static_cast<u32>(upload_size))
++      : std::shared_ptr<plume::RenderBuffer>(
++            device->createBuffer(plume::RenderBufferDesc::UploadBuffer(upload_size))
++                .release());
+   if (!upload) {
+     REXLOG_ERROR("Native GPU: texture upload allocation failed ({} bytes)",
+                  upload_size);
+@@ -3073,14 +3145,14 @@ plume::RenderFramebuffer* ResolveFramebuffer(
+   // Plume requires contiguous color attachments. Reject a gap rather than
+   // renumbering shader outputs or dereferencing a null texture in Plume.
+   for (u32 i = 0; i < color_count; ++i) if (!colors[i]) return nullptr;
+-  const auto depth = FindTexture(depth_stencil);
++  const auto depth = depth_stencil ? FindTexture(depth_stencil) : std::shared_ptr<TextureResource>{};
+   if (!color_count && (!depth || !depth->texture)) {
+     return nullptr;
+   }
+   if (depth && !IsDepthFormat(depth->format)) {
+     return nullptr;
+   }
+-  const auto owner = depth ? depth : colors[0];
++  const auto& owner = depth ? depth : colors[0];
+   FramebufferKey key{render_targets, depth_stencil};
+   for (u32 i = 0; i < colors.size(); ++i) key.color_owners[i] = colors[i].get();
+   key.depth_owner = depth.get();
+@@ -3254,11 +3326,14 @@ std::shared_ptr<void> FindTextureOwner(u32 guest_address) {
+ 
+ void StartTextureResources() {
+   g_texture_upload_publications.Reset();
++  ResetTextureStagingPool();
+   surface_pool::Start();
+ }
+ 
+ void ResetTextureResources() {
+   auto recording = HostDevice::LockRecording();
++  // Stop staging reuse first: staging buffers released from here on are destroyed.
++  ResetTextureStagingPool();
+   g_texture_upload_publications.Reset();
+   // Disable recycling before clearing registries. Retained submitted-frame
+   // references may be destroyed later in HostState teardown; they must not
+diff --git a/rexlego/src/gpu_native/upload_buffer_pool.h b/rexlego/src/gpu_native/upload_buffer_pool.h
+index 648cec9..66f8c9b 100644
+--- a/rexlego/src/gpu_native/upload_buffer_pool.h
++++ b/rexlego/src/gpu_native/upload_buffer_pool.h
+@@ -15,6 +15,10 @@ namespace legodimensions::gpu_native {
+ template <typename Buffer>
+ class UploadBufferPool {
+  public:
++  static constexpr uint64_t kDefaultBudget=192*1024*1024;
++  // budget caps the idle bytes kept for reuse; each buffer is charged at least 64 KB.
++  UploadBufferPool():UploadBufferPool(kDefaultBudget) {}
++  explicit UploadBufferPool(uint64_t budget):state_(std::make_shared<State>(budget)) {}
+   struct Counters {uint64_t hits=0,misses=0,bytes=0,count=0;};
+   template <typename Create>
+   std::shared_ptr<Buffer> Acquire(uint32_t length,uint8_t kind,Create create) {
+@@ -38,7 +42,7 @@ class UploadBufferPool {
+     return std::shared_ptr<Buffer>(buffer.release(),[state,key,charge](Buffer* pointer) {
+       std::unique_ptr<Buffer> owner(pointer);
+       std::lock_guard lock(state->mutex);
+-      if (!state->alive || charge>kBudget || state->stats.bytes>kBudget-charge ||
++      if (!state->alive || charge>state->budget || state->stats.bytes>state->budget-charge ||
+           state->stats.count>=4096) return;
+       auto& free=state->free[key];
+       if (free.size()>=256) return;
+@@ -53,16 +57,17 @@ class UploadBufferPool {
+     }
+     // Older in-flight owners retain the dead state. Releasing them after a
+     // device reset cannot place an old device's buffer into the new pool.
+-    state_=std::make_shared<State>();
++    state_=std::make_shared<State>(state_->budget);
+   }
+  private:
+-  static constexpr uint64_t kBudget=192*1024*1024;
+   struct State {
++    explicit State(uint64_t limit):budget(limit) {}
++    const uint64_t budget;
+     std::mutex mutex;
+     bool alive=true;
+     Counters stats;
+     std::unordered_map<uint64_t,std::vector<std::unique_ptr<Buffer>>> free;
+   };
+-  std::shared_ptr<State> state_=std::make_shared<State>();
++  std::shared_ptr<State> state_;
+ };
+ }
+diff --git a/rexlego/src/gpu_native/vertex_upload.h b/rexlego/src/gpu_native/vertex_upload.h
+index efa6997..ff8ac9c 100644
+--- a/rexlego/src/gpu_native/vertex_upload.h
++++ b/rexlego/src/gpu_native/vertex_upload.h
+@@ -4,9 +4,13 @@
+ #include <cstring>
+ #include <numeric>
+ #include "gpu_native/vertex_byte_order.h"
++#include "gpu_native/upload_legacy_paths.h"
+ #if defined(__SSSE3__)
+ #include <tmmintrin.h>
+ #endif
++#if defined(__AVX2__)
++#include <immintrin.h>
++#endif
+ 
+ namespace legodimensions::gpu_native {
+ // Fuse DWORD endian conversion and the packed-field reversal into one
+@@ -66,4 +70,74 @@ inline bool WriteAlignedVertexUpload(uint8_t* destination, const uint8_t* source
+   if (offset != size) std::memcpy(destination + offset, source + offset, size - offset);
+   return true;
+ }
++
++// The previous buffers.cpp ByteSwapElements loop, verbatim. SwapUploadElementBytes
++// runs it instead of its shuffles when LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD=1
++// (in-game A/B); the output bytes are the same.
++inline void SwapUploadElementBytesLegacy(uint8_t* destination, const uint8_t* source,
++                                         size_t size, uint32_t element_size) {
++  auto* dst = destination;
++  const auto* src = source;
++  size_t offset = 0;
++  if (element_size == 2) {
++    for (; offset + 2 <= size; offset += 2) {
++      dst[offset + 0] = src[offset + 1];
++      dst[offset + 1] = src[offset + 0];
++    }
++  } else {
++    for (; offset + 4 <= size; offset += 4) {
++      dst[offset + 0] = src[offset + 3];
++      dst[offset + 1] = src[offset + 2];
++      dst[offset + 2] = src[offset + 1];
++      dst[offset + 3] = src[offset + 0];
++    }
++  }
++  if (offset != size) {
++    std::memcpy(dst + offset, src + offset, size - offset);
++  }
++}
++
++// Swap whole 16-bit elements (element_size == 2) or 32-bit elements (any
++// other element_size) from source into destination, and copy a trailing
++// partial element unchanged. Byte-identical to the old buffers.cpp scalar
++// loop: every 32- or 16-byte shuffle chunk holds whole elements of either
++// width. source and destination must not overlap.
++inline void SwapUploadElementBytes(uint8_t* destination, const uint8_t* source, size_t size,
++                                   uint32_t element_size) {
++  if (LegacyUploadPathsEnabled())
++    return SwapUploadElementBytesLegacy(destination, source, size, element_size);
++  const bool halves = element_size == 2;
++  size_t offset = 0;
++#if defined(__SSSE3__)
++  const __m128i mask = halves
++      ? _mm_setr_epi8(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14)
++      : _mm_setr_epi8(3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12);
++#if defined(__AVX2__)
++  const __m256i wide_mask = _mm256_broadcastsi128_si256(mask);
++  for (; size - offset >= 32; offset += 32) {
++    const auto value = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(source + offset));
++    _mm256_storeu_si256(reinterpret_cast<__m256i*>(destination + offset),
++                        _mm256_shuffle_epi8(value, wide_mask));
++  }
++#endif
++  for (; size - offset >= 16; offset += 16) {
++    const auto value = _mm_loadu_si128(reinterpret_cast<const __m128i*>(source + offset));
++    _mm_storeu_si128(reinterpret_cast<__m128i*>(destination + offset), _mm_shuffle_epi8(value, mask));
++  }
++#endif
++  if (halves) {
++    for (; size - offset >= 2; offset += 2) {
++      destination[offset + 0] = source[offset + 1];
++      destination[offset + 1] = source[offset + 0];
++    }
++  } else {
++    for (; size - offset >= 4; offset += 4) {
++      destination[offset + 0] = source[offset + 3];
++      destination[offset + 1] = source[offset + 2];
++      destination[offset + 2] = source[offset + 1];
++      destination[offset + 3] = source[offset + 0];
++    }
++  }
++  if (offset != size) std::memcpy(destination + offset, source + offset, size - offset);
++}
+ } // namespace legodimensions::gpu_native
+diff --git a/rexlego/src/name_trace.cpp b/rexlego/src/name_trace.cpp
+index b7c8dd5..0e0bbb5 100644
+--- a/rexlego/src/name_trace.cpp
++++ b/rexlego/src/name_trace.cpp
+@@ -30,8 +30,12 @@ REXCVAR_DEFINE_STRING(trace_file_names, "", "Runtime",
+ 
+ REX_HOOK_RAW(sub_82A3D980) {
+   const std::string& filter = REXCVAR_GET(trace_file_names);
++  if (filter.empty()) {  // off (the default): no name to build or match
++    __imp__sub_82A3D980(ctx, base);
++    return;
++  }
+   std::string name;
+-  if (!filter.empty()) {
++  {
+     uint32_t record = ctx.r3.u32;
+     uint32_t ptr;
+     uint16_t len;
+diff --git a/rexlego/src/native_atomics.cpp b/rexlego/src/native_atomics.cpp
+index c6503e3..47baf12 100644
+--- a/rexlego/src/native_atomics.cpp
++++ b/rexlego/src/native_atomics.cpp
+@@ -10,11 +10,18 @@ extern "C" void __imp__sub_82A2A138(PPCContext& __restrict ctx, u8* base);
+ extern "C" void __imp__sub_82A2A0E8(PPCContext& __restrict ctx, u8* base);
+ 
+ namespace {
++// Latched on first use rather than at static init, because ConfigureNative-
++// DirectStartup applies native-environment.ini with _putenv_s after static
++// init. A plain atomic instead of a magic static keeps the thread-safe-static
++// guard check off these very hot hooks; racing first calls read the same value.
++std::atomic<int8_t> g_enabled{-1};
++
+ bool Enabled() {
+-  static const bool enabled = [] {
+-    const char* value = std::getenv("LEGO_NATIVE_ATOMICS");
+-    return !value || std::strcmp(value, "0") != 0;
+-  }();
++  const int8_t latched = g_enabled.load(std::memory_order_relaxed);
++  if (latched >= 0) [[likely]] return latched != 0;
++  const char* value = std::getenv("LEGO_NATIVE_ATOMICS");
++  const bool enabled = !value || std::strcmp(value, "0") != 0;
++  g_enabled.store(enabled ? 1 : 0, std::memory_order_relaxed);
+   return enabled;
+ }
+ 
+diff --git a/rexlego/src/native_heap_journal.h b/rexlego/src/native_heap_journal.h
+index 46032c3..bdda768 100644
+--- a/rexlego/src/native_heap_journal.h
++++ b/rexlego/src/native_heap_journal.h
+@@ -3,6 +3,9 @@
+ #include <atomic>
+ #include <cstdint>
+ #include <limits>
++#if defined(_M_X64) || defined(__x86_64__)
++#include <immintrin.h>
++#endif
+ 
+ namespace native_heap_diagnostics {
+ enum class Operation : uint32_t { kAllocated = 1, kFreeBegin = 2, kFreeComplete = 3 };
+@@ -16,26 +19,49 @@ struct History { std::array<Event,8> events{}; uint32_t count = 0; };
+ // Diagnostics only. This records observations without interpreting allocator
+ // flags, changing guest memory, bypassing a free, or allocating in a hot hook.
+ // A bounded bucket can evict old observations; absence proves nothing.
++//
++// Layout for the per-alloc/free Record: a bucket's lock bit and next slot
++// share one word in a 32 KiB array, apart from its eight 32-byte slots, so a
++// Record touches one small hot word and half a cache line. A slot keeps the
++// operation in the top bits of its sequence and the key is recomputed from the
++// pointer, so Read returns exactly the Events that storing them whole would.
+ class Journal {
+-  struct Bucket {
+-    std::atomic_flag busy = ATOMIC_FLAG_INIT;
+-    std::array<Event,8> events{};
+-    uint32_t next = 0;
+-  };
+-  std::array<Bucket,8192> buckets_{};
+-  std::atomic<uint64_t> sequence_{0};
+-  struct Lock {
+-    Bucket& bucket;
+-    explicit Lock(Bucket& value) : bucket(value) {
+-      while (bucket.busy.test_and_set(std::memory_order_acquire)) {}
+-    }
+-    ~Lock() { bucket.busy.clear(std::memory_order_release); }
++  struct Slot {
++    uint64_t sequence_operation = 0;  // sequence | operation << kOperationShift
++    uint32_t pointer = 0, heap = 0, caller = 0, frame = 0, thread = 0, bytes = 0;
+   };
++  static_assert(sizeof(Slot) == 32);
++  struct alignas(64) Ring { std::array<Slot,8> slots{}; };
++  static constexpr uint32_t kBusy = 1u << 31;
++  // Sequences stay below 2^62: that many records takes centuries.
++  static constexpr int kOperationShift = 62;
++  static constexpr uint64_t kSequenceMask = (1ull << kOperationShift) - 1;
++  static_assert(uint32_t(Operation::kFreeComplete) < 4);
++  std::array<std::atomic<uint32_t>,8192> state_{};  // kBusy | next slot (0-7)
++  std::array<Ring,8192> rings_{};
++  alignas(64) std::atomic<uint64_t> sequence_{0};
+   static uint32_t Index(uint64_t key) {
+     key ^= key >> 33; key *= 0xff51afd7ed558ccdull;
+     key ^= key >> 33;
+     return uint32_t(key) & 8191;
+   }
++  // Locks one bucket and returns its next slot.
++  uint32_t Acquire(uint32_t index) {
++    auto& state = state_[index];
++    uint32_t value = state.load(std::memory_order_relaxed);
++    for (;;) {
++      if (!(value & kBusy) && state.compare_exchange_weak(value, value | kBusy,
++                                  std::memory_order_acquire, std::memory_order_relaxed))
++        return value;
++#if defined(_M_X64) || defined(__x86_64__)
++      _mm_pause();
++#endif
++      value = state.load(std::memory_order_relaxed);
++    }
++  }
++  void Release(uint32_t index, uint32_t next) {
++    state_[index].store(next, std::memory_order_release);
++  }
+  public:
+   static uint64_t Key(uint32_t pointer) {
+     if (pointer >= 0xA0000000u) {
+@@ -49,25 +75,30 @@ class Journal {
+   uint64_t Record(Operation operation, uint32_t pointer, uint32_t heap,
+                   uint32_t caller, uint32_t frame, uint32_t thread, uint32_t bytes = 0) {
+     if (!pointer) return 0;
+-    const uint64_t key = Key(pointer);
+-    auto& bucket = buckets_[Index(key)];
+-    Lock lock(bucket);
++    const uint32_t index = Index(Key(pointer));
++    const uint32_t next = Acquire(index);
+     const uint64_t sequence = sequence_.fetch_add(1,std::memory_order_relaxed) + 1;
+-    if (!sequence) return 0;
+-    bucket.events[bucket.next++ & 7] = {sequence,key,pointer,heap,caller,frame,thread,bytes,operation};
++    if (!sequence) { Release(index, next); return 0; }
++    rings_[index].slots[next] = {sequence | uint64_t(operation) << kOperationShift,
++                                 pointer,heap,caller,frame,thread,bytes};
++    Release(index, (next+1) & 7);
+     return sequence;
+   }
+   History Read(uint32_t pointer) {
+     History result;
+     if (!pointer) return result;
+     const uint64_t key = Key(pointer);
+-    auto& bucket = buckets_[Index(key)];
+-    Lock lock(bucket);
++    const uint32_t index = Index(key);
++    const uint32_t next = Acquire(index);
+     // Walk oldest-to-newest without sorting or allocating under the lock.
+     for (uint32_t n=0; n<8; ++n) {
+-      const auto& event = bucket.events[(bucket.next+n)&7];
+-      if (event.sequence && event.key == key) result.events[result.count++] = event;
++      const Slot& slot = rings_[index].slots[(next+n)&7];
++      const uint64_t sequence = slot.sequence_operation & kSequenceMask;
++      if (sequence && Key(slot.pointer) == key)
++        result.events[result.count++] = {sequence,key,slot.pointer,slot.heap,slot.caller,
++            slot.frame,slot.thread,slot.bytes,Operation(slot.sequence_operation >> kOperationShift)};
+     }
++    Release(index, next);
+     return result;
+   }
+ };
+diff --git a/rexlego/src/native_lock_elide.cpp b/rexlego/src/native_lock_elide.cpp
+index f352461..699aff2 100644
+--- a/rexlego/src/native_lock_elide.cpp
++++ b/rexlego/src/native_lock_elide.cpp
+@@ -6,13 +6,27 @@
+ #include <cstdlib>
+ #include <cstring>
+ 
+-#include "legodimensions_funcs.154.h"
+-#include "legodimensions_funcs.254.h"
+-#include "legodimensions_funcs.302.h"
+-#include "legodimensions_funcs.389.h"
+-#include "legodimensions_funcs.393.h"
+-#include "legodimensions_funcs.395.h"
+-#include "legodimensions_funcs.410.h"
++DECLARE_REX_FUNC(__imp__RtlEnterCriticalSection);
++DECLARE_REX_FUNC(__imp__RtlLeaveCriticalSection);
++DECLARE_REX_FUNC(__restgprlr_24);
++DECLARE_REX_FUNC(__restgprlr_27);
++DECLARE_REX_FUNC(__restgprlr_29);
++DECLARE_REX_FUNC(__savegprlr_24);
++DECLARE_REX_FUNC(__savegprlr_27);
++DECLARE_REX_FUNC(__savegprlr_29);
++DECLARE_REX_FUNC(sub_82A296D8);
++DECLARE_REX_FUNC(sub_82A29A28);
++DECLARE_REX_FUNC(sub_82A2C930);
++DECLARE_REX_FUNC(sub_82A2CAB0);
++DECLARE_REX_FUNC(sub_82A2CC20);
++DECLARE_REX_FUNC(sub_82A33D28);
++DECLARE_REX_FUNC(sub_82A34208);
++DECLARE_REX_FUNC(sub_82A347C8);
++DECLARE_REX_FUNC(sub_82A3C8B0);
++DECLARE_REX_FUNC(sub_82A4A538);
++DECLARE_REX_FUNC(sub_82A4C508);
++DECLARE_REX_FUNC(sub_83F99290);
++DECLARE_REX_FUNC(sub_83F9ABE0);
+ 
+ extern "C" void __imp__sub_82A2CAB0(PPCContext& __restrict ctx, uint8_t* base);
+ extern "C" void __imp__sub_82A2CC20(PPCContext& __restrict ctx, uint8_t* base);
+@@ -35,7 +49,7 @@ bool Enabled() {
+ u64 LockElidedMsr() { return ppc_global_lock_count_().load() ? 0 : 0x8000; }
+ }
+ 
+-// sub_82A2CAB0 from legodimensions_recomp.254.cpp, body sha256 814d21ddd7f64c23.
++// sub_82A2CAB0, body sha256 814d21ddd7f64c23.
+ static void Elided_82A2CAB0(PPCContext& __restrict ctx, uint8_t* base) {
+ 	REX_FUNC_PROLOGUE();
+ 	uint32_t ea{};
+@@ -310,7 +324,7 @@ REX_HOOK_RAW(sub_82A2CAB0) {
+   Elided_82A2CAB0(ctx, base);
+ }
+ 
+-// sub_82A2CC20 from legodimensions_recomp.393.cpp, body sha256 b0301511f0cd78a9.
++// sub_82A2CC20, body sha256 b0301511f0cd78a9.
+ static void Elided_82A2CC20(PPCContext& __restrict ctx, uint8_t* base) {
+ 	REX_FUNC_PROLOGUE();
+ 	uint32_t ea{};
+@@ -508,7 +522,7 @@ REX_HOOK_RAW(sub_82A2CC20) {
+   Elided_82A2CC20(ctx, base);
+ }
+ 
+-// sub_82A34E28 from legodimensions_recomp.154.cpp, body sha256 60176cf1abeb4fd5.
++// sub_82A34E28, body sha256 60176cf1abeb4fd5.
+ static void Elided_82A34E28(PPCContext& __restrict ctx, uint8_t* base) {
+ 	REX_FUNC_PROLOGUE();
+ 	uint32_t ea{};
+@@ -795,7 +809,7 @@ REX_HOOK_RAW(sub_82A34E28) {
+   Elided_82A34E28(ctx, base);
+ }
+ 
+-// sub_82A34FE8 from legodimensions_recomp.410.cpp, body sha256 0140728541209ee1.
++// sub_82A34FE8, body sha256 0140728541209ee1.
+ static void Elided_82A34FE8(PPCContext& __restrict ctx, uint8_t* base) {
+ 	REX_FUNC_PROLOGUE();
+ 	uint32_t ea{};
+@@ -1052,7 +1066,7 @@ REX_HOOK_RAW(sub_82A34FE8) {
+   Elided_82A34FE8(ctx, base);
+ }
+ 
+-// sub_82A4CA18 from legodimensions_recomp.395.cpp, body sha256 a20bb6c51e170973.
++// sub_82A4CA18, body sha256 a20bb6c51e170973.
+ static void Elided_82A4CA18(PPCContext& __restrict ctx, uint8_t* base) {
+ 	REX_FUNC_PROLOGUE();
+ 	uint32_t ea{};
+@@ -1598,7 +1612,7 @@ REX_HOOK_RAW(sub_82A4CA18) {
+   Elided_82A4CA18(ctx, base);
+ }
+ 
+-// sub_82A35D28 from legodimensions_recomp.389.cpp, body sha256 65d8ac24da1f70fa.
++// sub_82A35D28, body sha256 65d8ac24da1f70fa.
+ static void Elided_82A35D28(PPCContext& __restrict ctx, uint8_t* base) {
+ 	REX_FUNC_PROLOGUE();
+ 	uint32_t ea{};
+@@ -1828,7 +1842,7 @@ REX_HOOK_RAW(sub_82A35D28) {
+   Elided_82A35D28(ctx, base);
+ }
+ 
+-// sub_83F99CB8 from legodimensions_recomp.302.cpp, body sha256 b7da9037b9eb87c4.
++// sub_83F99CB8, body sha256 b7da9037b9eb87c4.
+ static void Elided_83F99CB8(PPCContext& __restrict ctx, uint8_t* base) {
+ 	REX_FUNC_PROLOGUE();
+ 	uint32_t ea{};
+diff --git a/rexlego/src/native_skin_diagnostics.cpp b/rexlego/src/native_skin_diagnostics.cpp
+index d2be72d..ea908e7 100644
+--- a/rexlego/src/native_skin_diagnostics.cpp
++++ b/rexlego/src/native_skin_diagnostics.cpp
+@@ -6,10 +6,10 @@
+ #include <rex/system/kernel_state.h>
+ #include "native_heap_journal.h"
+ #include "slot_growth.h"
++#include <algorithm>
+ #include <array>
+ #include <atomic>
+-#include <iomanip>
+-#include <sstream>
++#include <string>
+ 
+ REXCVAR_DEFINE_BOOL(native_scene_diagnostics, true, "Development",
+     "Log NuCpuSkin scene teardown ownership in this diagnostic development build.")
+@@ -38,9 +38,14 @@ bool ReadWords(uint32_t address, uint32_t* words, uint32_t count) {
+   return true;
+ }
+ std::string HexWords(const uint32_t* words, uint32_t count) {
+-  std::ostringstream text; text << std::hex << std::setfill('0');
+-  for (uint32_t i=0;i<count;++i) { if(i)text << ',';text << std::setw(8) << words[i]; }
+-  return text.str();
++  // The text an ostringstream gave with hex, setfill('0') and setw(8): eight
++  // lowercase digits per word, comma separated, without a stream per call.
++  static constexpr char kDigits[] = "0123456789abcdef";
++  std::string text(size_t(count)*9, ',');
++  for (uint32_t i=0;i<count;++i)
++    for (uint32_t d=0;d<8;++d) text[size_t(i)*9+d]=kDigits[(words[i]>>(28-4*d))&15];
++  if (count) text.pop_back();
++  return text;
+ }
+ void LogSkin(uint32_t self, uint32_t caller) {
+   std::array<uint32_t,84> cache{};
+diff --git a/rexlego/src/sample_profiler.cpp b/rexlego/src/sample_profiler.cpp
+index 23ca0e1..34ce809 100644
+--- a/rexlego/src/sample_profiler.cpp
++++ b/rexlego/src/sample_profiler.cpp
+@@ -1,25 +1,48 @@
+-// Opt-in sampling profiler (LEGO_SAMPLE_PROFILE=1). F9 starts recording, F9
+-// again stops it and writes profile-<tick>.bin next to the exe. Every ~1 ms
+-// each other thread is suspended, its stack is unwound with the x64 unwind
+-// tables (up to 24 frames) and resumed. Addresses are resolved offline against
+-// legodimensions.map; the file header lists the loaded modules.
++// Opt-in sampling profiler, enabled when LEGO_SAMPLE_PROFILE is set. F9 starts
++// recording, F9 again stops it and writes profile-<tick>.bin next to the exe
++// (with LEGO_SAMPLE_PROFILE_TRIGGER=<path>, it records while that file exists).
++// Every ~1 ms each other thread is suspended, its stack is unwound with the x64
++// unwind tables (up to 24 frames) and resumed. Addresses are resolved offline
++// against legodimensions.map (tools/native-cpu/analyze_profile.py); the file
++// header lists the loaded modules.
++//
++// Layout: "LSP1", u32 module count, per module {u64 base, u32 size, u32 name
++// length, name}, u64 sample count, per sample {u32 tid, u32 depth, u64
++// frames[depth]}. An "LSPX" trailer follows the samples: u32 version (1), u32
++// payload bytes, then u64 QPC frequency, u64 QPC start, u64 QPC end, u64
++// sampling rounds, u32 timer mode (0 = timeBeginPeriod(1) + Sleep, 1 =
++// high-resolution waitable timer), u32 thread count, per thread {u32 tid, u32
++// name length, UTF-8 name}. Later versions only append payload fields.
++//
++// The sampler paces itself with a high-resolution waitable timer, so it does
++// not raise the process timer resolution. Only if that timer is unavailable
++// (before Windows 10 1803) does it fall back to timeBeginPeriod(1) + Sleep,
++// which makes guest Sleep() calls ~1 ms granular while the profiler is enabled.
+ #if defined(_WIN32)
+ #include <windows.h>
+ #include <psapi.h>
+ #include <tlhelp32.h>
+ #include <timeapi.h>
+ 
++#include <algorithm>
+ #include <cstdint>
+ #include <cstdio>
+ #include <cstdlib>
+ #include <cstring>
++#include <cwchar>
+ #include <string>
+ #include <thread>
++#include <unordered_map>
++#include <utility>
+ #include <vector>
+ 
+ #pragma comment(lib, "psapi.lib")
+ #pragma comment(lib, "winmm.lib")
+ 
++#ifndef CREATE_WAITABLE_TIMER_HIGH_RESOLUTION
++#define CREATE_WAITABLE_TIMER_HIGH_RESOLUTION 0x00000002
++#endif
++
+ namespace {
+ 
+ constexpr int kMaxFrames = 24;
+@@ -30,7 +53,109 @@ struct Sample {
+   uint64_t frames[kMaxFrames];
+ };
+ 
+-void WriteProfile(const std::vector<Sample>& samples) {
++// Per-recording metadata for the LSPX trailer.
++struct Recording {
++  uint64_t qpc_start = 0;
++  uint64_t qpc_end = 0;
++  uint64_t rounds = 0;
++  std::unordered_map<uint32_t, std::string> names;  // every sampled thread
++};
++
++// Paces the sampler. A high-resolution waitable timer gives ~1 ms waits
++// without changing the process timer resolution; timeBeginPeriod(1) + Sleep is
++// the fallback.
++class Pacer {
++ public:
++  Pacer() {
++    timer_ = CreateWaitableTimerExW(nullptr, nullptr, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION,
++                                    TIMER_MODIFY_STATE | SYNCHRONIZE);
++    if (!timer_) timeBeginPeriod(1);
++  }
++
++  // 0 = timeBeginPeriod(1) + Sleep, 1 = high-resolution waitable timer.
++  uint32_t mode() const { return timer_ ? 1u : 0u; }
++
++  void Wait(DWORD ms) {
++    if (timer_) {
++      LARGE_INTEGER due{};
++      due.QuadPart = -LONGLONG(ms) * 10000;  // relative, in 100 ns units
++      if (SetWaitableTimer(timer_, &due, 0, nullptr, nullptr, FALSE) &&
++          WaitForSingleObject(timer_, INFINITE) == WAIT_OBJECT_0) {
++        return;
++      }
++      // Not expected; fall back to the legacy mode for good.
++      CloseHandle(timer_);
++      timer_ = nullptr;
++      timeBeginPeriod(1);
++    }
++    Sleep(ms);
++  }
++
++ private:
++  HANDLE timer_ = nullptr;
++};
++
++using GetThreadDescriptionFn = HRESULT(WINAPI*)(HANDLE, PWSTR*);
++
++// GetThreadDescription needs Windows 10 1607, so it is resolved at run time.
++GetThreadDescriptionFn ResolveGetThreadDescription() {
++  for (const wchar_t* dll : {L"kernel32.dll", L"kernelbase.dll"}) {
++    HMODULE module = GetModuleHandleW(dll);
++    if (!module) continue;
++    if (FARPROC proc = GetProcAddress(module, "GetThreadDescription")) {
++      return reinterpret_cast<GetThreadDescriptionFn>(reinterpret_cast<void*>(proc));
++    }
++  }
++  return nullptr;
++}
++
++// UTF-8 thread name, or empty if unnamed or unavailable. Allocates, so call it
++// only while the thread is running.
++std::string ThreadName(GetThreadDescriptionFn get_description, HANDLE thread) {
++  std::string name;
++  PWSTR wide = nullptr;
++  if (get_description && SUCCEEDED(get_description(thread, &wide)) && wide) {
++    const int length = int(std::wcslen(wide));
++    const int bytes =
++        WideCharToMultiByte(CP_UTF8, 0, wide, length, nullptr, 0, nullptr, nullptr);
++    if (bytes > 0) {
++      name.resize(size_t(bytes));
++      WideCharToMultiByte(CP_UTF8, 0, wide, length, name.data(), bytes, nullptr, nullptr);
++    }
++  }
++  if (wide) LocalFree(wide);
++  return name;
++}
++
++// Threads often name themselves after they start, so re-read the names of
++// sampled threads that are still alive when the recording ends.
++void RefreshNames(GetThreadDescriptionFn get_description, Recording& recording) {
++  if (!get_description) return;
++  const DWORD pid = GetCurrentProcessId();
++  for (auto& [tid, name] : recording.names) {
++    HANDLE thread = OpenThread(THREAD_QUERY_LIMITED_INFORMATION, FALSE, tid);
++    if (!thread) continue;
++    if (GetProcessIdOfThread(thread) == pid) {
++      std::string current = ThreadName(get_description, thread);
++      if (!current.empty()) name = std::move(current);
++    }
++    CloseHandle(thread);
++  }
++}
++
++uint64_t QpcNow() {
++  LARGE_INTEGER now{};
++  QueryPerformanceCounter(&now);
++  return uint64_t(now.QuadPart);
++}
++
++template <typename T>
++void Append(std::string& out, const T& value) {
++  out.append(reinterpret_cast<const char*>(&value), sizeof(value));
++}
++
++void WriteProfile(const std::vector<Sample>& samples, const Recording& recording,
++                  uint32_t timer_mode) {
+   wchar_t exe[MAX_PATH];
+   GetModuleFileNameW(nullptr, exe, MAX_PATH);
+   std::wstring path(exe);
+@@ -64,6 +189,32 @@ void WriteProfile(const std::vector<Sample>& samples) {
+     std::fwrite(&s.depth, 4, 1, f);
+     std::fwrite(s.frames, 8, s.depth, f);
+   }
++  // LSPX trailer, appended after the samples (see the header comment).
++  LARGE_INTEGER frequency{};
++  QueryPerformanceFrequency(&frequency);
++  std::vector<std::pair<uint32_t, const std::string*>> threads;
++  threads.reserve(recording.names.size());
++  for (const auto& [tid, name] : recording.names) threads.emplace_back(tid, &name);
++  std::sort(threads.begin(), threads.end(),
++            [](const auto& a, const auto& b) { return a.first < b.first; });
++  std::string payload;
++  Append(payload, uint64_t(frequency.QuadPart));
++  Append(payload, recording.qpc_start);
++  Append(payload, recording.qpc_end);
++  Append(payload, recording.rounds);
++  Append(payload, timer_mode);
++  Append(payload, uint32_t(threads.size()));
++  for (const auto& [tid, name] : threads) {
++    Append(payload, tid);
++    Append(payload, uint32_t(name->size()));
++    payload.append(*name);
++  }
++  const uint32_t version = 1;
++  const uint32_t payload_bytes = uint32_t(payload.size());
++  std::fwrite("LSPX", 1, 4, f);
++  std::fwrite(&version, 4, 1, f);
++  std::fwrite(&payload_bytes, 4, 1, f);
++  std::fwrite(payload.data(), 1, payload.size(), f);
+   std::fclose(f);
+   Beep(880, 150);
+ }
+@@ -93,36 +244,46 @@ uint32_t Unwind(CONTEXT context, uint64_t* frames) {
+ void SamplerThread() {
+   const DWORD self = GetCurrentThreadId();
+   const DWORD pid = GetCurrentProcessId();
++  const GetThreadDescriptionFn get_description = ResolveGetThreadDescription();
+   std::vector<Sample> samples;
++  Recording info;
+   bool recording = false;
+   bool key_was_down = false;
+   const char* trigger = std::getenv("LEGO_SAMPLE_PROFILE_TRIGGER");
+-  timeBeginPeriod(1);
++  Pacer pacer;
++  auto finish = [&] {
++    info.qpc_end = QpcNow();
++    RefreshNames(get_description, info);
++    WriteProfile(samples, info, pacer.mode());
++  };
+   for (;;) {
+     const bool key_down = trigger ? GetFileAttributesA(trigger) != INVALID_FILE_ATTRIBUTES
+                                  : (GetAsyncKeyState(VK_F9) & 0x8000) != 0;
+     if (trigger && recording && !key_down && key_was_down) {
+-      WriteProfile(samples);
++      finish();
+       samples.clear();
+       recording = false;
+     }
+     if (key_down && !key_was_down) {
+       if (recording) {
+-        WriteProfile(samples);
++        finish();
+         samples.clear();
+         samples.shrink_to_fit();
+       } else {
+         samples.reserve(1u << 20);
+         Beep(440, 150);
++        info = Recording{};
++        info.qpc_start = QpcNow();
+       }
+       recording = !recording;
+     }
+     key_was_down = key_down;
+     if (!recording) {
+-      Sleep(50);
++      pacer.Wait(50);
+       continue;
+     }
+     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
++    ++info.rounds;
+     THREADENTRY32 entry{};
+     entry.dwSize = sizeof(entry);
+     for (BOOL ok = Thread32First(snapshot, &entry); ok; ok = Thread32Next(snapshot, &entry)) {
+@@ -142,12 +303,15 @@ void SamplerThread() {
+         }
+         ResumeThread(thread);
+       }
+-      CloseHandle(thread);
+       // Allocate only after the thread runs again: it may hold the heap lock.
++      if (captured && info.names.find(sample.tid) == info.names.end()) {
++        info.names.emplace(sample.tid, ThreadName(get_description, thread));
++      }
++      CloseHandle(thread);
+       if (captured) samples.push_back(sample);
+     }
+     CloseHandle(snapshot);
+-    Sleep(1);
++    pacer.Wait(1);
+   }
+ }
+ 
+diff --git a/rexlego/src/scene_distance.cpp b/rexlego/src/scene_distance.cpp
+index c38274e..9758213 100644
+--- a/rexlego/src/scene_distance.cpp
++++ b/rexlego/src/scene_distance.cpp
+@@ -54,7 +54,8 @@ u32 LevelSettings(u32 level,u8* base){
+ REX_HOOK_RAW(sub_82C6F428) {
+   const u32 instance=ctx.r3.u32;
+   std::unique_lock lock(distance_mutex);
+-  Restore(instance_distances,instance,base);
++  // Nothing is recorded at the default scale; skip the two hash lookups.
++  if(!instance_distances.empty())Restore(instance_distances,instance,base);
+   lock.unlock();
+   __imp__sub_82C6F428(ctx,base);
+   const double scale=legodimensions::SceneDistanceScale(REXCVAR_GET(native_scene_draw_distance_scale));
+diff --git a/tools/gpu-aot/prepare_plume.py b/tools/gpu-aot/prepare_plume.py
+index c7225ba..c0789ae 100644
+--- a/tools/gpu-aot/prepare_plume.py
++++ b/tools/gpu-aot/prepare_plume.py
+@@ -74,6 +74,7 @@ def main():
+         (root / "tools/gpu-aot/patches/plume-buffer-address.patch", "Native Plume cached buffer addresses"),
+         (root / "tools/gpu-aot/patches/plume-adapter-query.patch", "Native Plume adapter query fixes"),
+         (root / "tools/gpu-aot/patches/plume-graphics-read.patch", "Native Plume graphics shader read states"),
++        (root / "tools/gpu-aot/patches/plume-winsdk-compat.patch", "Native Plume Windows SDK compatibility fixes"),
+     )
+ 
+     def git(*arguments, check=False):
+diff --git a/tools/gpu-aot/test_prepare_plume.py b/tools/gpu-aot/test_prepare_plume.py
+index c0b175b..c2ee285 100644
+--- a/tools/gpu-aot/test_prepare_plume.py
++++ b/tools/gpu-aot/test_prepare_plume.py
+@@ -37,6 +37,7 @@ def main():
+     buffer_patch = root / "tools/gpu-aot/patches/plume-buffer-address.patch"
+     adapter_patch = root / "tools/gpu-aot/patches/plume-adapter-query.patch"
+     graphics_read_patch = root / "tools/gpu-aot/patches/plume-graphics-read.patch"
++    winsdk_patch = root / "tools/gpu-aot/patches/plume-winsdk-compat.patch"
+     git_executable = shutil.which("git")
+     if git_executable is None:
+         parser.error("Git is required for the offline public-source fixture")
+@@ -93,7 +94,7 @@ def main():
+         git(expected, "apply", str(cache_patch))
+         git(expected, "apply", "--check", str(readback_patch))
+         git(expected, "apply", str(readback_patch))
+-        for extra_patch in (buffer_patch, adapter_patch, graphics_read_patch):
++        for extra_patch in (buffer_patch, adapter_patch, graphics_read_patch, winsdk_patch):
+             git(expected, "apply", "--check", str(extra_patch))
+             git(expected, "apply", str(extra_patch))
+         expected_vulkan_sha = digest(expected / "plume_vulkan.cpp")
+@@ -285,6 +286,27 @@ runpy.run_path(preparer, run_name='__main__')
+             raise AssertionError("Graphics-read upgrade differs from independent real patch")
+         checks.append("graphics-read missing/false-success checks and exact upgrade")
+ 
++        winsdk_noop = clone("successful-no-op-winsdk-compat-git")
++        for earlier in (patch, cache_patch, readback_patch, buffer_patch, adapter_patch, graphics_read_patch):
++            git(winsdk_noop, "apply", str(earlier))
++        winsdk_before = digest(winsdk_noop / "plume_d3d12.cpp")
++        prepare(winsdk_noop, "--check", expect=2,
++                oracle="Native Plume Windows SDK compatibility fixes are missing or incomplete")
++        if digest(winsdk_noop / "plume_d3d12.cpp") != winsdk_before:
++            raise AssertionError("Missing Windows SDK compatibility --check modified source")
++        winsdk_wrapper = wrapper.replace("and 'apply' in argv:",
++            "and 'apply' in argv and any('plume-winsdk-compat.patch' in str(v) for v in argv):")
++        for mode in ("already", "apply"):
++            command([sys.executable, "-c", winsdk_wrapper, mode, str(preparer), str(winsdk_noop)], unrelated,
++                    expect=2, oracle="Native Plume source verification failed: missing patched hunk")
++            if digest(winsdk_noop / "plume_d3d12.cpp") != winsdk_before:
++                raise AssertionError("Windows SDK compatibility no-op fixture modified source")
++        prepare(winsdk_noop, oracle="Applied native fence/resize/command-allocation fixes")
++        prepare(winsdk_noop, "--check", oracle="PASS: public Plume")
++        if digest(winsdk_noop / "plume_d3d12.cpp") != expected_sha:
++            raise AssertionError("Windows SDK compatibility upgrade differs from independent real patch")
++        checks.append("winsdk-compat missing/false-success checks and exact upgrade")
++
+ 
+     after = {
+         "head": git(source, "rev-parse", "HEAD").stdout,
+@@ -303,6 +325,7 @@ runpy.run_path(preparer, run_name='__main__')
+               "buffer_address_patch_sha256": digest(buffer_patch),
+               "adapter_query_patch_sha256": digest(adapter_patch),
+               "graphics_read_patch_sha256": digest(graphics_read_patch),
++              "winsdk_compat_patch_sha256": digest(winsdk_patch),
+               "patched_vulkan_sha256": expected_vulkan_sha,
+               "public_source_sha256": hashlib.sha256(public_blob).hexdigest(),
+               "patched_source_sha256": expected_sha,
+diff --git a/tools/gpu-aot/test_texture_upload_retention_sdk.py b/tools/gpu-aot/test_texture_upload_retention_sdk.py
+index 7d4d0f8..55612e3 100644
+--- a/tools/gpu-aot/test_texture_upload_retention_sdk.py
++++ b/tools/gpu-aot/test_texture_upload_retention_sdk.py
+@@ -1,8 +1,9 @@
+ """Retained upload bytes through actual native decode loops and SDK layouts/mappings; CPU only."""
+ from pathlib import Path
+ import argparse,hashlib,json,os,shutil,subprocess
+-p=argparse.ArgumentParser(__doc__);p.add_argument('output',type=Path);p.add_argument('--runtime-dir',required=True,type=Path);p.add_argument('--previous-textures',required=True,type=Path);a=p.parse_args()
+-root=Path(__file__).resolve().parents[2];src=root/'rexlego/src';sdk=root.parent/'dev-assets/sdk-install';out=a.output.resolve();out.mkdir(parents=True,exist_ok=True)
++p=argparse.ArgumentParser(__doc__);p.add_argument('output',type=Path);p.add_argument('--runtime-dir',required=True,type=Path);p.add_argument('--previous-textures',required=True,type=Path)
++p.add_argument('--sdk',type=Path,help='SDK install with include/ and lib/rexruntime.lib (default: dev-assets/sdk-install beside DimensionsRecomp)');a=p.parse_args()
++root=Path(__file__).resolve().parents[2];src=root/'rexlego/src';sdk=(a.sdk or root.parent/'dev-assets/sdk-install').resolve();out=a.output.resolve();out.mkdir(parents=True,exist_ok=True)
+ text=(src/'gpu_native/textures.cpp').read_text();format_text=(src/'gpu_native/format.cpp').read_text();fixture=Path(__file__).with_suffix('.cpp')
+ def block(text,signature):
+     start=text.index(signature);end=text.index('{',start)+1;depth=1
+@@ -10,11 +11,13 @@ def block(text,signature):
+     return text[start:end]
+ helpers='\n'.join([block(text,s) for s in ['bool ReadableUploadSpan(','bool CopyTextureUploadSpan(','u32 AlignUp(','u32 MipDimension(',
+  'u32 RowPitch(','u32 RowCount(','u32 LevelSize(']]+[block(format_text,s) for s in ['bool IsBlockCompressedFormat(','u32 FormatBlockBytes(']])
+-def decode(text):
+-    upload=block(text,'bool UploadTextureResourceStorage(');start=upload.index('    u32 destination_offset = 0;',upload.index('std::vector<u8> decoded(upload_size)'))
++def decode(text):  # the decode loop after the CPU decode buffer (an uninitialised per-thread scratch since agent5 item 2)
++    upload=block(text,'bool UploadTextureResourceStorage(');anchor=[s for s in ['TextureDecodeScratch decoded(upload_size)','std::vector<u8> decoded(upload_size)'] if s in upload][0]
++    start=upload.index('    u32 destination_offset = 0;',upload.index(anchor))
+     return upload[start:upload.index('    DumpTextureUpload',start)]
+ header=(src/'gpu_native/texture_upload_source.h').read_text();records=[]
+-for name in ['rexruntime.dll','amd_fidelityfx_dx12.dll']:shutil.copy2(a.runtime_dir/name,out/name)
++for name in ['rexruntime.dll','amd_fidelityfx_dx12.dll']:  # runtimes built without FidelityFX ship no FFX DLL
++    if name=='rexruntime.dll' or (a.runtime_dir/name).exists():shutil.copy2(a.runtime_dir/name,out/name)
+ def run(label,loop,source_header=header,copy_helpers=helpers):
+     (out/'source-under-test.h').write_text(source_header);(out/'retained-helpers.inc').write_text(copy_helpers);(out/'retained-decode.inc').write_text(loop)
+     exe=out/(label+'.exe');r=subprocess.run(['clang-cl',str(fixture),'/std:c++latest','/O2','/MD','/EHsc','/D_CRT_SECURE_NO_WARNINGS',
+diff --git a/tools/native-cpu/gen_lock_elide.py b/tools/native-cpu/gen_lock_elide.py
+index e8030eb..2616775 100644
+--- a/tools/native-cpu/gen_lock_elide.py
++++ b/tools/native-cpu/gen_lock_elide.py
+@@ -28,6 +28,7 @@ RE_CMP = re.compile(r'^ctx\.cr\d\.compare<u?int(32|64)_t>\(ctx\.r\d+\.[su](32|64
+ RE_GOTO = re.compile(r'^if \(!?ctx\.cr\d\.(eq|lt|gt|so)\) goto (loc_[0-9A-F]+);$')
+ RE_REGOP = re.compile(r'^ctx\.r\d+\.[su](32|64) = [^;]*;$')
+ RE_LABEL = re.compile(r'^(loc_[0-9A-F]+):$')
++RE_CALL = re.compile(r'(?<![\w.])([A-Za-z_]\w*)\(ctx, base\);')
+ 
+ 
+ def bodies():
+@@ -114,9 +115,10 @@ def generate(all_bodies):
+     parts = ['// Generated by tools/native-cpu/gen_lock_elide.py from the codegen output; do not edit.',
+              '// Each body is the generated function with only the global-lock enter/leave removed.',
+              '#include "legodimensions_pch.h"', '#include <rex/hook.h>', '', '#include <cstdlib>', '#include <cstring>', '']
+-    headers = sorted({p.name.replace('recomp', 'funcs').replace('.cpp', '.h') for p, _ in
+-                      (all_bodies['sub_' + f] for f in FUNCS)})
+-    parts += ['#include "%s"' % h for h in headers]
++    # Declare each direct callee, as the generated funcs headers do. Including those partition headers instead would tie
++    # this file to codegen.partition.json, whose layout depends on the history of the generated tree.
++    callees = sorted({c for f in FUNCS for c in RE_CALL.findall(all_bodies['sub_' + f][1])})
++    parts += ['DECLARE_REX_FUNC(%s);' % c for c in callees]
+     parts += [''] + ['extern "C" void __imp__sub_%s(PPCContext& __restrict ctx, uint8_t* base);' % f for f in FUNCS]
+     parts += ['', 'namespace {', 'bool Enabled() {', '  static const bool enabled = [] {',
+               '    const char* value = std::getenv("LEGO_NATIVE_LOCK_ELIDE");',
+@@ -127,7 +129,7 @@ def generate(all_bodies):
+         name = 'sub_' + f
+         path, body = all_bodies[name]
+         digest = hashlib.sha256(body.encode()).hexdigest()[:16]
+-        parts += ['// %s from %s, body sha256 %s.' % (name, path.name, digest),
++        parts += ['// %s, body sha256 %s.' % (name, digest),
+                   'static void Elided_%s(PPCContext& __restrict ctx, uint8_t* base) {' % f,
+                   elide(body).rstrip('\n'), '}', '',
+                   'REX_HOOK_RAW(%s) {' % name,
+@@ -137,6 +139,12 @@ def generate(all_bodies):
+ 
+ 
+ def main():
++    args = sys.argv[1:]
++    if any(a not in ('--check', '--scan') for a in args):
++        # --help and unknown flags only print the usage; nothing is parsed or written.
++        help_only = all(a in ('-h', '--help') for a in args)
++        print(__doc__.strip(), file=sys.stdout if help_only else sys.stderr)
++        return 0 if help_only else 2
+     all_bodies = bodies()
+     if '--scan' in sys.argv:
+         ok = [n for n, (_, b) in sorted(all_bodies.items()) if validate(b) is None]

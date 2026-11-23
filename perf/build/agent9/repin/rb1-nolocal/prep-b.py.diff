@@ -1,0 +1,37 @@
+--- build/agent2/prep-b.py
++++ build/agent9/repin/rb1-nolocal/prep-b.py
+@@ -30,11 +30,11 @@
+ BASE_GEN = os.path.join(R, 'baseline', 'DimensionsRecomp', 'rexlego', 'generated')
+ STEPS = os.path.join(R, 'build', 'agent9', 'logs', 'install-steps.txt')
+ # Build B uses only install/batch-nolr (Agent 1, 02:05: never install/batch, whose skip_lr is unsafe for LEGO)
+-VARIANT = 'batch-nolr'
++VARIANT = 'rb1-nolocal'  # rollback re-pin (Agent 9, recipe step 9.1): was 'batch-nolr'
+ INSTALL = os.path.join(R, 'build', 'agent9', 'install', VARIANT)
+ BATCH_CFG = os.path.join(R, 'build', 'agent9', 'configs', VARIANT + '.toml')
+-SUMS_SHA = '24ce1493fb8dae37e00b556eb8871d633921e44378d960de4359b104b16cdb8e'  # install/batch-nolr/SHA256SUMS.txt (23:54)
+-CFG_SHA = 'e60eaf1ceb575572ba0274aa5f52e97f25a35c01690b41e6a637739408e6a090'  # configs/batch-nolr.toml (S2.10, no skip_lr)
++SUMS_SHA = 'a966cf18e3ec736f5685ca413a93c7e97b436547560e285894d43d4e1a9ed917'  # install/rb1-nolocal/SHA256SUMS.txt (02:08:57)
++CFG_SHA = 'ae9f8f967fbb264919a63463ca4958f856c18a0405a4895440d6c36a31084eec'  # configs/rb1-nolocal.toml (S2.10 minus ctr_as_local, xer_as_local, reserved_as_local, cr_as_local, cr_compare_so_zero; no skip_lr)
+ TOOL = os.path.join(R, 'build', 'agent9', 'bin', 'rexglue.exe')
+ TOOL_SHA = '37b32713b7516402344bb4ddb402a3cd4131353adc1aef10e1602122e9b6036a'
+ LOG = os.path.join(A, 'snapB-prep.txt')
+@@ -130,7 +130,7 @@
+     ap = argparse.ArgumentParser()
+     ap.add_argument('--resync', action='store_true', help='robocopy /MIR snap1 -> snapB again (after a new S-batch)')
+     ap.add_argument('--skip-copy', action='store_true', help='keep the snapB copy; re-check it and redo steps 3-4')
+-    ap.add_argument('--install', default=INSTALL, help='only build/agent9/install/batch-nolr is accepted')
++    ap.add_argument('--install', default=INSTALL, help='only build/agent9/install/rb1-nolocal is accepted')
+     a = ap.parse_args()
+     I = os.path.abspath(a.install)
+     t0 = time.time()
+@@ -163,8 +163,8 @@
+             fail('bad SHA256SUMS.txt line: ' + line)
+         sums[os.path.normcase(os.path.normpath(mm[2]))] = mm[1].lower()
+     sums_sha = sha(sums_path)
+-    if sums_sha != SUMS_SHA or len(sums) != 872:
+-        fail('SHA256SUMS.txt sha256 %s with %d entries; build B expects the pinned %s (872 entries)'
++    if sums_sha != SUMS_SHA or len(sums) != 880:
++        fail('SHA256SUMS.txt sha256 %s with %d entries; build B expects the pinned %s (880 entries)'
+              % (sums_sha, len(sums), SUMS_SHA))
+     found, links = walk(I)
+     if links:

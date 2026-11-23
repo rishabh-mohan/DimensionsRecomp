@@ -1,0 +1,206 @@
+--- build/agent2/prep-b.py
++++ build/agent2/prep-nb.py
+@@ -1,6 +1,13 @@
+-"""Agent 2 - prepare Agent 9's codegen build B (perf-notes/agent9-codegen.md, 'Session 2: regen+build recipe', steps
+-3-5) in a separate source tree, so snap1 (S2, the base for S3) and its build trees stay untouched and A =
+-build/agent2/devoff2-bin stays the exact reference (Agent 1, 23:40: base snapB on S2). Copies and hashing only.
+-  python build\\agent2\\prep-b.py [--resync] [--skip-copy] [--install DIR]
++"""Agent 2 - nativeB, at Agent 1's GO only (task #14; decided ~04:15, only if the B gate passes): prepare a native
++build of Agent 9's batch-nolr codegen on an S3 base, for the native-hook checks Agent 10 left open. A clone of
++build/agent2/prep-b.py made by build/agent2/make-rb-clones.py (diff: build/agent2/RB-diffs/prep-nb.py.diff);
++run-nb.ps1 builds and stages it. Agent 1, 03:11: the base is snap1's current tree (S3, or S3d once applied;
++snap1-sdk/install is the S3 SDK) in the new copy build/agent2/snapB3; snapB and snapB-off stay untouched; A =
++build/agent2/native3d-bin when copied at S3d, native3-bin at S3. Changed from prep-b.py: the copy dir and the log and
++notes names (snapB -> snapB3), rexlego/out is copied (Agent 6's native banks, which the native flags read), the
++snapshot tag (the newest PATCHES file, S3 or S3d, with its STATE file; the PATCHES pattern now takes S3d, whose row
++then counts), --check-only, and the notes text. Copies and hashing only.
++  python build\\agent2\\prep-nb.py [--resync] [--skip-copy] [--check-only] [--install DIR]
++  --check-only: step 1 (the install tree, read only) and the snapshot tag, then stop before the copy.
+ 1. Agent 9's install tree: ONLY build/agent9/install/batch-nolr (Agent 1, 02:05: --install exists for the negative test
+    and refuses anything else; install/batch has skip_lr, which is unsafe for LEGO, Agent 10 Review 4 row 21). The last
+@@ -9,15 +16,15 @@
+    legodimensions_config.toml == build/agent9/configs/batch-nolr.toml == the pinned E60EAF1C...; generated/rexglue.cmake
+    and generated/default/codegen.d == baseline's; sources.cmake lists the TUs + init + register, ending at the last TU.
+-2. Copy build/agent2/snap1/DimensionsRecomp -> build/agent2/snapB/DimensionsRecomp with robocopy (/E, mtimes kept;
+-   --resync: /MIR after a new S-batch on snap1), except rexglue-sdk/out (snap1-sdk's output dir), rexlego/out
+-   (Agent 6's native banks; the OFF build never reads them: snap1-off/build.ninja names none), rexlego/generated and
+-   rexlego/legodimensions_config.toml (step 3 writes those). Then every copied file must match snap1 in size and mtime,
++2. Copy build/agent2/snap1/DimensionsRecomp -> build/agent2/snapB3/DimensionsRecomp with robocopy (/E, mtimes kept;
++   --resync: /MIR after a new S-batch on snap1), except rexglue-sdk/out (snap1-sdk's output dir), rexlego/generated
++   and rexlego/legodimensions_config.toml (step 3 writes those); rexlego/out (Agent 6's native banks) is copied: the
++   native flags read it. Then every copied file must match snap1 in size and mtime,
+    and every patched file (snap1/PATCHES-S*.tsv, last row per file) its sha256.
+-3. Agent 9's step 4 into snapB/DimensionsRecomp/rexlego: refuse unless rexlego and rexlego/generated are real
+-   directories that resolve under build/agent2/snapB (the live rexlego/generated is a junction to baseline/); the config
++3. Agent 9's step 4 into snapB3/DimensionsRecomp/rexlego: refuse unless rexlego and rexlego/generated are real
++   directories that resolve under build/agent2/snapB3 (the live rexlego/generated is a junction to baseline/); the config
+    first, then robocopy /MIR <install>/generated, then touch every generated file (mtime = now).
+-4. gen-check.py --base <install>/generated --snap <snapB>/rexlego/generated must pass (it rewrites codegen.d once to
+-   snapB paths). Writes build/agent2/snapB-manifest-notes.txt (ASCII) for stage-snap-bin.ps1 -ManifestNotesFile.
+-Log: build/agent2/snapB-prep.txt (robocopy output: snapB-robocopy.log). Exit 0 = ready for run-b.ps1.
++4. gen-check.py --base <install>/generated --snap <snapB3>/rexlego/generated must pass (it rewrites codegen.d once to
++   snapB3 paths). Writes build/agent2/snapB3-manifest-notes.txt (ASCII) for stage-snap-bin.ps1 -ManifestNotesFile.
++Log: build/agent2/snapB3-prep.txt (robocopy output: snapB3-robocopy.log). Exit 0 = ready for run-b.ps1.
+ """
+ import argparse, hashlib, os, re, shutil, stat, subprocess, sys, time
+@@ -26,5 +33,5 @@
+ A = os.path.join(R, 'build', 'agent2')
+ SRC = os.path.join(A, 'snap1', 'DimensionsRecomp')
+-DST_ROOT = os.path.join(A, 'snapB')
++DST_ROOT = os.path.join(A, 'snapB3')
+ DST = os.path.join(DST_ROOT, 'DimensionsRecomp')
+ BASE_GEN = os.path.join(R, 'baseline', 'DimensionsRecomp', 'rexlego', 'generated')
+@@ -38,8 +45,8 @@
+ TOOL = os.path.join(R, 'build', 'agent9', 'bin', 'rexglue.exe')
+ TOOL_SHA = '37b32713b7516402344bb4ddb402a3cd4131353adc1aef10e1602122e9b6036a'
+-LOG = os.path.join(A, 'snapB-prep.txt')
+-RCLOG = os.path.join(A, 'snapB-robocopy.log')
+-NOTES = os.path.join(A, 'snapB-manifest-notes.txt')
+-EXCL_DIRS = [r'rexglue-sdk\out', r'rexlego\out', r'rexlego\generated']
++LOG = os.path.join(A, 'snapB3-prep.txt')
++RCLOG = os.path.join(A, 'snapB3-robocopy.log')
++NOTES = os.path.join(A, 'snapB3-manifest-notes.txt')
++EXCL_DIRS = [r'rexglue-sdk\out', r'rexlego\generated']  # nativeB: rexlego/out (Agent 6's native banks) is copied
+ EXCL_FILES = [r'rexlego\legodimensions_config.toml']
+ 
+@@ -129,11 +136,12 @@
+ def main():
+     ap = argparse.ArgumentParser()
+-    ap.add_argument('--resync', action='store_true', help='robocopy /MIR snap1 -> snapB again (after a new S-batch)')
+-    ap.add_argument('--skip-copy', action='store_true', help='keep the snapB copy; re-check it and redo steps 3-4')
++    ap.add_argument('--resync', action='store_true', help='robocopy /MIR snap1 -> snapB3 again (after a new S-batch)')
++    ap.add_argument('--skip-copy', action='store_true', help='keep the snapB3 copy; re-check it and redo steps 3-4')
+     ap.add_argument('--install', default=INSTALL, help='only build/agent9/install/batch-nolr is accepted')
++    ap.add_argument('--check-only', action='store_true', help='step 1 and the snapshot tag only: nothing is copied')
+     a = ap.parse_args()
+     I = os.path.abspath(a.install)
+     t0 = time.time()
+-    log('START prep-b: install tree %s, snapshot copy %s' % (I, DST))
++    log('START prep-nb: install tree %s, snapshot copy %s' % (I, DST))
+     # refuse before anything is read or written: build B uses only install/batch-nolr (never install/batch)
+     if os.path.normcase(os.path.realpath(I)) != os.path.normcase(os.path.realpath(INSTALL)):
+@@ -207,6 +215,21 @@
+            'matches' if tool == TOOL_SHA else 'DIFFERS FROM'))
+ 
+-    # 2. snapB = snap1 (S2) minus the excluded dirs and the config. Every write below goes under build/agent2/snapB:
+-    #    stop if build/agent2, snapB or snapB/DimensionsRecomp is a link or resolves elsewhere.
++    # snapshot tag (task #14): the newest PATCHES-S<N>[suffix].tsv in apply order (S1, S2, S3, S3d); the newest STATE
++    # file must be that tag's (snap-patch.py apply writes both), and only an S3 or S3d base is accepted
++    pfiles = sorted((f for f in os.listdir(os.path.join(A, 'snap1')) if re.fullmatch(r'PATCHES-S\d+[a-z]*\.tsv', f)),
++                    key=lambda f: (int(re.match(r'PATCHES-S(\d+)', f)[1]), f))
++    snap_tag = pfiles[-1][8:-4] if pfiles else '?'
++    states = sorted((f for f in os.listdir(os.path.join(A, 'snap1')) if re.fullmatch(r'STATE-S\d+[a-z]*-\d{4}\.tsv', f)),
++                    key=lambda f: os.stat(os.path.join(A, 'snap1', f)).st_mtime_ns)
++    if snap_tag not in ('S3', 'S3d') or not states or not states[-1].startswith('STATE-%s-' % snap_tag):
++        fail('snap1: newest PATCHES tag %s, newest STATE file %s: an S3 or S3d base with its STATE file is required'
++             % (snap_tag, states[-1] if states else None))
++    log('snapshot tag %s: PATCHES %s; newest STATE file %s' % (snap_tag, ', '.join(f[8:-4] for f in pfiles), states[-1]))
++    if a.check_only:
++        log('DONE --check-only: step 1 passed, snapshot tag %s; nothing copied (%s %s)'
++            % (snap_tag, DST, 'exists' if os.path.exists(DST) else 'does not exist yet'))
++        return 0
++    # 2. snapB3 = snap1 (S3 or S3d) minus the excluded dirs and the config. Every write below goes under build/agent2/snapB3:
++    #    stop if build/agent2, snapB3 or snapB3/DimensionsRecomp is a link or resolves elsewhere.
+     for p in (A, DST_ROOT, DST):
+         if os.path.lexists(p) and (is_link(p) or os.path.normcase(os.path.realpath(p)) != os.path.normcase(
+@@ -220,21 +243,19 @@
+         mode = '/MIR' if a.resync else '/E'
+         rc, dt = robocopy([SRC, DST, mode, '/COPY:DAT', '/DCOPY:DAT', '/R:1', '/W:1', '/MT:8', '/XJ', '/NFL', '/NDL',
+-                           '/NP', '/XD'] + xd + ['/XF'] + xf, 'snap1 -> snapB')
+-        log('robocopy snap1 -> snapB (%s): exit %d, %.1fs' % (mode, rc, dt))
++                           '/NP', '/XD'] + xd + ['/XF'] + xf, 'snap1 -> snapB3')
++        log('robocopy snap1 -> snapB3 (%s): exit %d, %.1fs' % (mode, rc, dt))
+     t = time.time()
+     sf, sl = walk(SRC, EXCL_DIRS, EXCL_FILES)
+     df, dl = walk(DST, EXCL_DIRS, EXCL_FILES)
+     if sl or dl:
+-        fail('linked dirs: snap1 %s, snapB %s' % (sl[:3], dl[:3]))
++        fail('linked dirs: snap1 %s, snapB3 %s' % (sl[:3], dl[:3]))
+     miss, extra = sorted(set(sf) - set(df)), sorted(set(df) - set(sf))
+     diff = [r for r in sorted(set(sf) & set(df))
+             if sf[r].st_size != df[r].st_size or sf[r].st_mtime_ns != df[r].st_mtime_ns]
+     if miss or extra or diff:
+-        fail('snapB vs snap1: %d missing %s, %d extra %s, %d size/mtime differ %s'
++        fail('snapB3 vs snap1: %d missing %s, %d extra %s, %d size/mtime differ %s'
+              % (len(miss), miss[:3], len(extra), extra[:3], len(diff), diff[:3]))
+     nb = sum(s.st_size for s in df.values())
+     longest = max((len(DST) + 1 + len(r) for r in df), default=0)
+-    pfiles = sorted((f for f in os.listdir(os.path.join(A, 'snap1')) if re.fullmatch(r'PATCHES-S\d+\.tsv', f)),
+-                    key=lambda f: int(f[9:-4]))
+     rows = {}
+     for pf in pfiles:
+@@ -254,11 +275,11 @@
+         if after == 'deleted':
+             if os.path.lexists(lp(p)):
+-                bad.append(rel + ' (deleted in snap1, present in snapB)')
++                bad.append(rel + ' (deleted in snap1, present in snapB3)')
+             continue
+         if not os.path.isfile(lp(p)) or sha(p) != after:
+             bad.append(rel)
+     if bad:
+-        fail('%d patched file(s) in snapB differ from their PATCHES rows: %s' % (len(bad), bad[:5]))
+-    log('snapB copy verified: %d files, %d bytes, all equal to snap1 in size and mtime (longest path %d chars); %d '
++        fail('%d patched file(s) in snapB3 differ from their PATCHES rows: %s' % (len(bad), bad[:5]))
++    log('snapB3 copy verified: %d files, %d bytes, all equal to snap1 in size and mtime (longest path %d chars); %d '
+         'patched files (%s) hash-equal their last PATCHES row%s; %.1fs'
+         % (len(df), nb, longest, len(rows) - len(skipped), ', '.join(pfiles),
+@@ -280,10 +301,10 @@
+         rp = os.path.normcase(os.path.realpath(p))
+         if not rp.startswith(root_n):
+-            fail('%s resolves to %s, outside build/agent2/snapB' % (p, rp))
++            fail('%s resolves to %s, outside build/agent2/snapB3' % (p, rp))
+     log('guards: %s and %s are real directories (generated %s) and every target resolves under %s'
+         % (S, G, 'existed' if existed else 'created', DST_ROOT))
+     shutil.copy2(os.path.join(I, 'legodimensions_config.toml'), os.path.join(S, 'legodimensions_config.toml'))
+     rc, dt = robocopy([os.path.join(I, 'generated'), G, '/MIR', '/COPY:DAT', '/R:1', '/W:1', '/MT:8', '/NFL', '/NDL',
+-                       '/NP'], 'install generated -> snapB generated')
++                       '/NP'], 'install generated -> snapB3 generated')
+     now = time.time()
+     n = 0
+@@ -293,9 +314,9 @@
+             n += 1
+     touched = time.strftime('%H:%M:%S', time.localtime(now))
+-    log('step 4: config copied first, robocopy /MIR install generated -> snapB generated exit %d (%.1fs), touched %d '
++    log('step 4: config copied first, robocopy /MIR install generated -> snapB3 generated exit %d (%.1fs), touched %d '
+         'files at %s' % (rc, dt, n, touched))
+ 
+-    # 4. gen-check against the install tree (rewrites codegen.d to snapB paths once)
+-    gcl = os.path.join(A, 'snapB-prep-gen-check.log')
++    # 4. gen-check against the install tree (rewrites codegen.d to snapB3 paths once)
++    gcl = os.path.join(A, 'snapB3-prep-gen-check.log')
+     with open(gcl, 'wb') as f:
+         rc = subprocess.call([sys.executable, os.path.join(A, 'gen-check.py'), '--base', os.path.join(I, 'generated'),
+@@ -306,21 +327,24 @@
+         fail('gen-check exit %d: %s' % (rc, ' | '.join(out[-4:])))
+     if sha(os.path.join(S, 'legodimensions_config.toml')) != cfg:
+-        fail('the snapB config differs from the install tree\'s')
++        fail('the snapB3 config differs from the install tree\'s')
+     log('gen-check PASS: ' + summ)
+     s2cfg = sha(os.path.join(SRC, 'rexlego', 'legodimensions_config.toml'))
+     notes = [
+-        "codegen build B (Agent 9's codegen option; perf-notes/agent9-codegen.md 'Session 2: regen+build recipe'): "
++        "nativeB = native codegen build B (Agent 9's codegen option; "
++        "perf-notes/agent9-codegen.md 'Session 2: regen+build recipe'): "
+         "generated by build/agent9/bin/rexglue.exe (sha256 %s) with build/agent9/configs/%s.toml (no skip_lr)."
+         % (tool, VARIANT),
+         'install tree build/agent9/install/%s, %s' % (VARIANT, ends[-1]),
+         'install SHA256SUMS.txt sha256 %s: %d entries, every file verified at %s; legodimensions_config.toml sha256 %s '
+-        '(the S2 snapshot config is %s).' % (sums_sha, len(sums), sums_time, cfg, s2cfg),
+-        'snapB = build/agent2/snap1/DimensionsRecomp at S2, copied by prep-b.py (robocopy, mtimes kept) without '
+-        'rexglue-sdk/out and rexlego/out: %d files, %d bytes, all equal to snap1 in size and mtime; the %d patched '
+-        'files hash-equal their PATCHES rows.' % (len(df), nb, len(rows) - len(skipped)),
+-        'snapB rexlego/legodimensions_config.toml and rexlego/generated = the install tree (step 4: config first, '
+-        'robocopy /MIR, %d generated files touched at %s); gen-check.py rewrote codegen.d to snapB paths.' % (n, touched),
++        '(the %s snapshot config is %s).' % (sums_sha, len(sums), sums_time, cfg, snap_tag, s2cfg),
++        'snapB3 = build/agent2/snap1/DimensionsRecomp at %s, copied by prep-nb.py (robocopy, mtimes kept) without '
++        'rexglue-sdk/out (rexlego/out, the native banks, copied): %d files, %d bytes, all equal to snap1 in size and mtime; the %d patched '
++        'files hash-equal their last PATCHES row (%s).' % (snap_tag, len(df), nb, len(rows) - len(skipped),
++                                                          ', '.join(f[8:-4] for f in pfiles)),
++        'snapB3 rexlego/legodimensions_config.toml and rexlego/generated = the install tree (step 4: config first, '
++        'robocopy /MIR, %d generated files touched at %s); gen-check.py rewrote codegen.d to snapB3 paths.' % (n, touched),
+         'gen-check at prep: ' + summ,
+-        'A (the same snapshot and SDK, pinned 0.0.23.3 codegen): build/agent2/devoff2-bin.',
++        'A (the same snapshot and SDK, pinned 0.0.23.3 codegen): build/agent2/%s.'
++        % ('native3d-bin' if snap_tag == 'S3d' else 'native3-bin'),
+     ]
+     with open(NOTES, 'w', encoding='ascii', errors='replace') as f:

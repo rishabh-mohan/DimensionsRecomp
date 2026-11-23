@@ -1,0 +1,19 @@
+# pthrottle_readout 2026-11-22 06:19:01: <workspace>\build\agent11\pthrottle\pairs\20261122-0600\runs (slow state: E below 800 MHz for 3+ samples, from the first frame)
+
+run         arm status applied readback                                     reapplied held_pct pt_ok onset_s slow_pct span_s e_mhz e_mhz_slow e_util_slow p_mhz tz_min fg
+---         --- ------ ------- --------                                     --------- -------- ----- ------- -------- ------ ----- ---------- ----------- ----- ------ --
+0600-d0-r1  d0  OK       False C=0x0 S=0x0 -> C=0x0 S=0x0, last C=0x0 S=0x0         0        0  True     103       24    163  1455        555          33  1946 -      0 
+0604-d0e-r1 d0e OK        True C=0x0 S=0x0 -> C=0x1 S=0x0, last C=0x0 S=0x0         1     99.6 False      40       40    155   938        596          36  1947 -      0 
+0607-d0e-r2 d0e OK        True C=0x0 S=0x0 -> C=0x1 S=0x0, last C=0x0 S=0x0         1     99.7 False      49       12    157  1448        697          42  1693 -      0 
+0610-d0-r2  d0  OK       False C=0x0 S=0x0 -> C=0x0 S=0x0, last C=0x0 S=0x0         0        0  True      71       37    158  1156        756          45  1692 -      0 
+0613-d0-r3  d0  OK       False C=0x0 S=0x0 -> C=0x0 S=0x0, last C=0x0 S=0x0         0        0  True      37       41    159   988        558          33  1949 -      0 
+0616-d0e-r3 d0e OK        True C=0x0 S=0x0 -> C=0x1 S=0x0, last C=0x0 S=0x0         1     99.6 False      47       34    154  1003        619          37  1897 -      0 
+
+
+
+arm d0  : 3 runs, 3 counted, 3 with the slow state (onsets 103,71,37 s; slow share % per counted run 24,37,41); read-back ok in 3/3
+arm d0e : 3 runs, 0 counted, 0 with the slow state (onsets  s; slow share % per counted run ); read-back ok in 0/3
+not counted: 0604-d0e-r1: opt-out not verified
+not counted: 0607-d0e-r2: opt-out not verified
+not counted: 0616-d0e-r3: opt-out not verified
+VERDICT: INCOMPLETE: an arm has no counted runs

@@ -1,0 +1,185 @@
+﻿static2 20:40:09
+--- hold-manager.ps1
+2293 B, mtime 17:57:50, sha D060F913D1C333F8
+  1: # Agent 1: sets perf-notes/WINDOW-HOLD.txt while a timed window runs, so agents stop even if Agent 1 is busy.
+  2: # A window = a new folder in build/agent8/matrix. Cleared when its summary.md appears, or when no game has
+  3: # run and nothing in the folder changed for 6 min. Runs until 07:30. Reads only; writes the HOLD file and its log.
+  4: $ErrorActionPreference = 'SilentlyContinue'
+  5: $w   = '<workspace>'
+  6: $m   = Join-Path $w 'build\agent8\matrix'
+  7: $h   = Join-Path $w 'perf-notes\WINDOW-HOLD.txt'
+  8: $log = Join-Path $w 'build\agent1\hold\hold-manager.log'
+  9: $end = [datetime]'2026-11-23T07:30:00'
+ 10: function L([string]$t) { $s = '{0} {1}' -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), $t; [IO.File]::AppendAllText($log, $s + "`n"); $s }
+ 11: $known  = @(Get-ChildItem -LiteralPath $m -Directory | ForEach-Object Name)
+ 12: $active = $null
+ 13: L ('start: {0} matrix folders; HOLD file present: {1}' -f $known.Count, (Test-Path -LiteralPath $h))
+ 14: while ((Get-Date) -lt $end) {
+ 15:   if (-not $active) {
+ 16:     $new = @(Get-ChildItem -LiteralPath $m -Directory | ForEach-Object Name | Where-Object { $known -notcontains $_ })
+ 17:     if ($new.Count) {
+ 18:       $known += $new
+ 19:       $active = @($new | Sort-Object)[-1]   # @(): with one new folder, a bare string's [-1] is its last char ('6' at 17:56)
+ 20:       [IO.File]::WriteAllText($h, ("HOLD since {0}: a timed window is running (build/agent8/matrix/{1}). Run no commands until this file is gone; Agent 1 sends a resume message.`n" -f (Get-Date -Format 'HH:mm:ss'), $active))
+ 21:       L "HOLD set: $active"
+ 22:     }
+ 23:   } else {
+ 24:     $d     = Join-Path $m $active
+ 25:     $done  = Test-Path -LiteralPath (Join-Path $d 'summary.md')
+ 26:     $lastF = Get-ChildItem -LiteralPath $d -File -Recurse | Sort-Object LastWriteTime | Select-Object -Last 1   # -Recurse: runs\ gets the per-second writes
+ 27:     $game  = @(Get-Process -Name legodimensions -ErrorAction SilentlyContinue).Count
+ 28:     $stale = ($game -eq 0) -and $lastF -and (((Get-Date) - $lastF.LastWriteTime).TotalMinutes -gt 6)
+ 29:     if ($done -or $stale) {
+ 30:       Remove-Item -LiteralPath $h -Force
+ 31:       L ('HOLD cleared: {0} ({1})' -f $active, $(if ($done) { 'summary.md written' } else { 'stale: no game and no write for 6 min' }))
+ 32:       $active = $null
+ 33:     }
+ 34:   }
+ 35:   Start-Sleep -Seconds 5
+ 36: }
+ 37: L 'end (07:30)'
+--- run-matrix.ps1 L340-460
+340:     foreach ($e in $P.errors) { $L.Add("!!! ERROR $e") }
+341:     return , $L
+342: }
+343: 
+344: # ---------- pick the matrix ----------
+345: $onlyIds = @($Only | ForEach-Object { $_ -split '[,;\s]+' } | Where-Object { $_ })
+346: if (-not $Matrix) {
+347:     $default = Join-Path $PSScriptRoot 'matrix.json'
+348:     $cands = @(Get-ChildItem -LiteralPath $PSScriptRoot -Filter 'matrix*.json' -File | Sort-Object @{ Expression = { $_.Name -ne 'matrix.json' } }, Name)
+349:     if ($NoPrompt -or $PlanOnly -or $cands.Count -le 1) { $Matrix = $default }
+350:     else {
+351:         Write-Host 'Timing matrices:' -ForegroundColor Cyan
+352:         for ($i = 0; $i -lt $cands.Count; $i++) {
+353:             $r0 = Read-Matrix $cands[$i].FullName
+354:             if ($r0.errors.Count) { Write-Host ("  [{0}] {1}: INVALID ({2})" -f ($i + 1), $cands[$i].Name, ($r0.errors -join '; ')) -ForegroundColor Red; continue }
+355:             $p0 = Build-Plan $r0 @()
+356:             $runnable0 = @($p0.arms.Values | Where-Object { -not $_.skip }).Count
+357:             $miss = @($p0.arms.Values | Where-Object { $_.skip } | ForEach-Object { $_.bin } | Sort-Object -Unique)
+358:             Write-Host ("  [{0}] {1}: {2}" -f ($i + 1), $cands[$i].Name, $r0.title)
+359:             Write-Host ("        {0} runnable arms of {1}, {2} runs, about {3} min{4}" -f $runnable0, $p0.arms.Count, $p0.runs.Count, [math]::Ceiling($p0.est_s / 60),
+360:                         $(if ($miss.Count) { "; MISSING BINS: $($miss -join ', ')" } else { '' }))
+361:         }
+362:         $ans = Read-Host 'Pick a number (Enter = matrix.json)'
+363:         if ($ans -match '^\s*(\d+)\s*$' -and [int]$Matches[1] -ge 1 -and [int]$Matches[1] -le $cands.Count) { $Matrix = $cands[[int]$Matches[1] - 1].FullName }
+364:         elseif ($ans.Trim()) { Write-Host "not a number in the list: $ans" -ForegroundColor Red; exit 2 }
+365:         else { $Matrix = $default }
+366:     }
+367: }
+368: if (-not [IO.Path]::IsPathRooted($Matrix)) {
+369:     $found = $null
+370:     foreach ($b in @((Get-Location).Path, (Split-Path -Parent $PSScriptRoot), $PSScriptRoot, $repoRoot)) { $c = Join-Path $b $Matrix; if (Test-Path -LiteralPath $c -PathType Leaf) { $found = (Resolve-Path -LiteralPath $c).Path; br [...]
+371:     $Matrix = if ($found) { $found } else { Join-Path $PSScriptRoot $Matrix }
+372: }
+373: $R = Read-Matrix $Matrix
+374: if ($R.errors.Count) { foreach ($e in $R.errors) { Write-Host "!!! MATRIX ERROR: $e" -ForegroundColor Red }; "matrix $Matrix is not valid: nothing started"; exit 2 }
+375: $mx = $R.mx
+376: $P = Build-Plan $R $onlyIds
+377: $planLines = Get-PlanLines $R $P
+378: # Arms skipped for a missing bin: also show the plan as it will be once the bins are staged (order, seeds, estimate).
+379: $stagedErrors = @()
+380: if (@($P.arms.Values | Where-Object { $_.skip -like 'bin *' }).Count) {
+381:     $P2 = Build-Plan $R $onlyIds $true
+382:     $planLines.Add("staged   once the missing bins are staged: order $(if ($P2.rounds.Count) { ($P2.rounds | ForEach-Object { $_ -join ' ' }) -join ' | ' } else { '(none)' }); $($P2.runs.Count) runs, about $([math]::Ceiling($P2.es [...]
+383:     $stagedErrors = @($P2.errors | Where-Object { $P.errors -notcontains $_ })
+384:     foreach ($e in $stagedErrors) { $planLines.Add("!!! ERROR once staged: $e") }
+385: }
+386: $planLines | ForEach-Object { if ($_ -like '!!!*') { Write-Host $_ -ForegroundColor Red } else { $_ } }
+387: 
+388: # ---------- preflight ----------
+389: $fatal = New-Object System.Collections.Generic.List[string]
+390: foreach ($e in $P.errors) { $fatal.Add($e) }
+391: foreach ($e in $stagedErrors) { $fatal.Add("once staged: $e") }
+392: if ($P.runs.Count -eq 0) { $fatal.Add('no runnable arms') }
+393: $pre = New-Object System.Collections.Generic.List[string]
+394: $desk = Get-DesktopName; $deskOk = Test-TimingDesktop $desk
+395: $pre.Add("desktop    $desk -> $(if ($deskOk) { 'interactive desktop: timing can be valid' } else { 'FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid' })")
+396: $lu = Test-LogonUI
+397: $pre.Add("LogonUI    $(if ($lu) { 'RUNNING: the PC is locked or at the lock screen -> timing not valid' } else { 'not running' })")
+398: $pw = Get-PowerInfo
+399: $pre.Add("power      $($pw.text)$(if (-not $pw.ac) { ' -> plug in the charger' })")
+400: $ram = Get-FreeRamGB
+401: $pre.Add("free RAM   $ram GB$(if ($ram -lt 6) { ' -> UNDER 6 GB: runs will not start' })")
+402: $games = @(Get-Process -Name legodimensions -ErrorAction SilentlyContinue)
+403: if ($games.Count) {
+404:     $gl = ($games | ForEach-Object { "pid $($_.Id)" }) -join ', '
+405:     if ($AllowRunningGame) { $pre.Add("game       legodimensions.exe RUNNING ($gl): allowed by -AllowRunningGame (self-test)") }
+406:     else { $pre.Add("game       legodimensions.exe RUNNING ($gl) -> close it first"); $fatal.Add("legodimensions.exe is running ($gl)") }
+407: } else { $pre.Add('game       no legodimensions.exe running') }
+408: $bp = @(Get-BuildProcs)
+409: $pre.Add("builds     $(if ($bp.Count) { "RUNNING: $($bp -join ' ') -> timing not valid while they run" } else { "none ($(Get-BuildProcPatternText))" })")
+410: foreach ($b in @($P.arms.Values | ForEach-Object { $_.bin } | Sort-Object -Unique)) {
+411:     $ab = Resolve-RepoPath $b
+412:     $ok = Test-Path -LiteralPath (Join-Path $ab 'MANIFEST.txt') -PathType Leaf
+413:     $users = @($P.arms.Values | Where-Object { $_.bin -eq $b } | ForEach-Object { $_.id })
+414:     $pre.Add("bin        $b : $(if ($ok) { 'ok (MANIFEST.txt)' } else { 'MISSING -> arms skipped: ' + ($users -join ' ') })")
+415: }
+416: $scr = Get-ItemProperty -LiteralPath 'HKCU:\Control Panel\Desktop' -ErrorAction SilentlyContinue
+417: $scrExe = if ($scr) { [string]$scr.'SCRNSAVE.EXE' } else { '' }
+418: if ($scr -and [string]$scr.ScreenSaveActive -eq '1' -and $scrExe) {
+419:     $pre.Add("screensaver $(Split-Path -Leaf $scrExe) after $($scr.ScreenSaveTimeOut) s$(if ([string]$scr.ScreenSaverIsSecure -eq '1') { ', LOCKS on resume' }): the keep-awake request should hold it off; if it starts during timing [...]
+420: } else { $pre.Add('screensaver none') }
+421: if ([bool](Get-P $mx 'sys_csv' $false)) {
+422:     $sysDrvPath = Join-Path $PSScriptRoot 'drivers\sys-csv.ps1'
+423:     if (Test-Path -LiteralPath $sysDrvPath -PathType Leaf) { $pre.Add('sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)') }
+424:     else { $pre.Add('sys.csv    MISSING drivers\sys-csv.ps1'); $fatal.Add('sys_csv is true but drivers\sys-csv.ps1 is missing') }
+425: }
+426: $eta = (Get-Date).AddSeconds($P.est_s)
+427: $pre.Add("estimate   $($P.runs.Count) runs, about $([math]::Ceiling($P.est_s / 60)) min: done around $($eta.ToString('HH:mm'))")
+428: $valid0 = $deskOk -and -not $lu -and $bp.Count -eq 0 -and -not $Quick
+429: ''
+430: '--- preflight ---'
+431: foreach ($l in $pre) { if ($l -match 'RUNNING|MISSING|FUNCTIONAL|UNDER|charger') { Write-Host $l -ForegroundColor Yellow } else { $l } }
+432: foreach ($f in $fatal) { Write-Host "!!! FATAL: $f" -ForegroundColor Red }
+433: if (-not $valid0 -and -not $fatal.Count) { Write-Host '!!! These runs will be FUNCTIONAL ONLY (see above): their numbers are not timing results.' -ForegroundColor Yellow }
+434: if ($PlanOnly) {
+435:     # PlanOnly checks the matrix: exit 2 only for matrix/plan errors, not for the state of this PC (bins, game, RAM).
+436:     'PlanOnly: nothing started.'
+437:     if ($P.errors.Count -or $stagedErrors.Count) { exit 2 } else { exit 0 }
+438: }
+439: if ($fatal.Count) { 'not started.'; exit 2 }
+440: if (-not $NoPrompt) {
+441:     Write-Host ''
+442:     Write-Host 'Do not touch the PC while the matrix runs (no mouse, no keyboard, no other programs), except for MENU prompts.' -ForegroundColor Cyan
+443:     [void](Read-Host 'Press Enter to start (Ctrl+C to cancel)')
+444: }
+445: 
+446: # ---------- run ----------
+447: if (-not $OutDir) { $OutDir = Join-Path 'build\agent8\matrix' (Get-Date -Format 'yyyyMMdd-HHmm') }
+448: $OutDir = Resolve-RepoPath $OutDir
+449: if (Test-Path -LiteralPath $OutDir) { $i = 2; while (Test-Path -LiteralPath "$OutDir-$i") { $i++ }; $OutDir = "$OutDir-$i" }
+450: $runsRoot = Join-Path $OutDir 'runs'; $logDir = Join-Path $OutDir 'logs'
+451: New-Item -ItemType Directory -Force -Path $runsRoot, $logDir | Out-Null
+452: Copy-Item -LiteralPath $R.path -Destination (Join-Path $OutDir 'matrix.json')
+453: ($planLines + @('', '--- preflight ---') + $pre) | Set-Content -LiteralPath (Join-Path $OutDir 'plan.txt') -Encoding utf8
+454: $resultsCsv = Join-Path $OutDir 'results.csv'
+455: $rows = New-Object System.Collections.Generic.List[object]
+456: $matrixStart = Get-Date
+457: foreach ($k in @('LEGO_SAMPLE_PROFILE', 'LEGO_SAMPLE_PROFILE_TRIGGER', 'LEGO_NATIVE_FRAME_METRICS')) { [Environment]::SetEnvironmentVariable($k, $null, 'Process') }
+458: "out dir: $OutDir"
+459: 
+460: function Get-RunSplat($Ai, $Run) {
+--- S4-DRAFT rows (first 4 columns)
+169: | 1 | **AOT shader pack:** the 4 missing native placement shaders (VS 0xAC449538 / PS 0xAC448F28 + a 2nd pair) (A4, with A7; uses A6's tools) | No source edit. A4's `build/agent4/s35` output: `runtime-cache.cpp` (4 entries) via `-DLEGO_NATIVE_RUNTIME_SHADER_CACHE...| [switch]  none: a data change. Rollback = the previous cache / native3d-bin 
+170: | 2 | **Miss-cache stopgap** `LEGO_NATIVE_SHADER_MISS_CACHE` (A4; `shaders.cpp` is not an A4 file) | rexlego `gpu_native/shaders.cpp` only | [switch]  env var; unset/0 = OFF (forced OFF when `LEGO_DUMP_MISSING_SHADERS` is set) 
+172: | 4 | **C1 = P1 `physical_protect_keep_watch`:** keep the watches on protects that don't change access (A5's design; A12 staged v1 at 07:45-07:55) | SDK `system/xmemory.cpp` + `include/rex/system/xmemory.h` (the fast path in `PhysicalHeap::Protect`), `graphics/shared_...| [switch]  cvars `physical_protect_keep_watch` (false, group Memory) and `physical_protect_keep_watch_verify` (false, group GPU, kRequiresRestart: verify mode, Â§21 A). C1 v2 may also make `physical_protect_keep_watch` and fix (i)'s `physical_protect_hold_global_lock` r...
+173: | 5 | **Fix (i) for the Protect race** (form 1, RWâ†’RW): when a protect adds Write, `PhysicalHeap::Protect` takes G a second time, so G stays held through...| SDK `system/xmemory.cpp` only (+19/-0, pure additions) | [switch]  cvar `physical_protect_hold_global_lock`, false (group Memory) 
+175: | 7 | **Upload-hash diagnostic ("u")** `shared_memory_upload_hash_log` (A12) | SDK `graphics/d3d12/shared_memory.cpp` only | [switch]  cvar, false (hot-reload) 
+176: | 8 | **P2 `shared_memory_single_hold_rearm`:** one G hold per re-arm instead of 4-5 (A12) | SDK `graphics/shared_memory.cpp` only (+30/-0, pure additions) | [switch]  cvar, false (group GPU) 
+191: | 18 | **R1 stage 1: split the end-of-frame submit** in `RefreshGuestOutput` (A7) | SDK `graphics/d3d12/command_processor.cpp/.h`, `d3d12/deferred_command_list.h` | [switch]  cvar `d3d12_submit_split_kb`, 0 = OFF; kInitOnly (b2r Â§17 cond 4) 
+192: | 19 | R1 stage 2: hand the submit to a worker (A7) | as #18, plus the worker (not itemized in my sources) | [switch]  cvar `d3d12_async_submit`, OFF 
+193: | 20 | R2: filter redundant commands (A7) | SDK `d3d12/deferred_command_list.h/.cpp` | [switch]  cvar `d3d12_filter_redundant_commands`, OFF (Â§17 rates R2 as a default-off candidate; b2r Â§25 addendum 2) 
+194: | 21 | **S4-T1: raise the priority of the native worker chain** (A7, task #26) | rexlego `native_worker.cpp:346`, `native_recording.cpp:138`, `native_preparation.h:21-26` | [switch]  env `LEGO_NATIVE_CHAIN_PRIORITY=1`; unset = OFF 
+195: | 22 | Zero-code threaded checks (A7) | none | [switch]  env `LEGO_NATIVE_TIMING=1` (n2, n3) and `LEGO_NATIVE_PARALLEL_DRAWS=0` (n2) on native3d 
+204: | 24 | **GPU-wait back-off, stage 1** (A9; a9 S5.2.2). Merges (a2), A6's (e) (= Q 0), A6's GetData-poll fix and probe P1 (#28). Hooks: H0 `sub_83FBF7D0` (st...| rexlego only: new `src/gpu_wait_backoff.cpp` (draft `build/agent9/s4/fence-wait/gpu_wait_backoff.cpp.draft`, 07:29; a s...| [switch]  env, read once: `LEGO_GPU_WAIT_BACKOFF_US=<Q>` (unset = OFF; 0 = yield on every later poll; > 0 = one yield, then a Q Âµs sleep per poll; Q is clamped to 2000 and each timer wait to 20 ms); `LEGO_GPU_WAIT_SPIN_US=<S>` (default 30, max 200); `LEGO_GPU_WAIT_STA...
+206: | 26 | (b) codegen: `db16cyc` â†’ `_mm_pause` (A9) | SDK `src/codegen/builders/system.cpp:51-73` | [switch]  none at run time (a codegen change); codegen option `db16cyc_pause`, default OFF, set in the codegen config `rexlego/legodimensions_config.toml` (not the harness toml) 
+210: | 30 | Scene-walk count probe (A9, with A7) | new rexlego `src/scene_walk_probe.cpp/.h`; CMake option `LEGODIMENSIONS_SCENE_WALK_PROBE` (after :154); `#ifdef`s in `n...| [switch]  CMake option, OFF (compiled out) 
+--- Appx Copilot/ChatGPT
+  ROBLOXCORPORATION.ROBLOX 2.699.877.0 exe=Windows10Universal.exe loc=C:\Program Files\WindowsApps\ROBLOXCORPORATION.ROBLOX_2.699.877.0_x64__55nm5eh3cm0pr
+  OpenAI.CodexPrimaryRuntime.v26-1112-737-0 26.1112.737.0 exe= loc=C:\Program Files\WindowsApps\OpenAI.CodexPrimaryRuntime.v26-1112-737-0_26.1112.737.0_x64__3k8sg7r9htsxt
+  OpenAI.Codex 26.1117.4957.0 exe=app/ChatGPT.exe,app\resources\plugins\openai-bundled\plugins\chrome\extension-host\windows\x64\extension-host.exe,app/resources/codex-command-runner.exe loc=C:\Program Files\WindowsApps\OpenAI.Codex_26.1117.4957.0_x64__2p2nqsd0c76g0
+  OpenAI.CodexPrimaryRuntime.v26-1119-907-0 26.1119.907.0 exe= loc=C:\Program Files\WindowsApps\OpenAI.CodexPrimaryRuntime.v26-1119-907-0_26.1119.907.0_x64__3k8sg7r9htsxt
+--- W6 draft / matrices in build\agent5\w6-draft and build\agent8 (json with W6/W7/W9 in name)
+  build\agent5\w6-draft\matrix-w6.json 9207 11-22 20:32
+  build\agent5\w6-draft\check\matrix-window6.json 9199 11-22 20:35

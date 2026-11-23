@@ -1,0 +1,11 @@
+W6 finalize (Agent 5, finalize-w6.ps1), 2026-11-22 21:16, -Bin build/agent2/devoff4b-bin
+result: OK
+matrix-window6.json  sha256 E50D791B6C38638F718A1AF65EB15EAF543A78AC8EA50B69DD1CC96AB7C9A0D2  (<workspace>\build\agent5\w6-draft\matrix-window6.json)
+RUN-WINDOW6.cmd      sha256 3F31CBA8BD62C430F95048575870B3E150E2FE8E13E2017005AB49537E7A5AB5  (<workspace>\build\agent5\w6-draft\RUN-WINDOW6.cmd)
+bin build/agent2/devoff4b-bin  legodimensions.exe sha256 DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83
+
+Agent 8: copy matrix-window6.json to bench\agent8\run\ and RUN-WINDOW6.cmd to bench\agent8\ byte for byte, then check both sha256s.
+GO line for the overnight launcher (perf-notes\WINDOW-GO.txt, one line, only after the copy and Agent 1's go):
+GO W6 matrix-window6.json E50D791B6C38638F718A1AF65EB15EAF543A78AC8EA50B69DD1CC96AB7C9A0D2 only=s0,p2,p2f,p2fc repeats=3
+estimate 13 runs (1 cold), about 30 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+written: <workspace>\build\agent5\w6-draft\FINAL.txt

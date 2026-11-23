@@ -1,0 +1,54 @@
+repin_check.ps1 2026-11-22 14:27:19  DRY RUN: reads only, writes only the report
+  line snap1: tree build\agent2\snap1\DimensionsRecomp, build dir build\agent2\snap1-on, bin dir build\agent2\native4-bin; planned copies: C1 yes, pack yes
+
+[1] staged S4b files that touch native fingerprint inputs (sha256 vs the staging records)
+  [ok] C1 rexlego diff  build\agent12\s4-c1\keep-watch-rexlego.diff  4D0C10794188CF45 (record 4D0C10794188CF45; LF only, so git apply fails on the CRLF file: copy the after-file)
+  [ok] C1 after-file    build\agent12\s4-c1\new\game\rexlego\src\gpu_native\memory_watch.cpp  70829846C4F321A9 (record 70829846C4F321A9), 11-22 07:48:26
+  [ok] C1 before-file   build\agent12\s4-c1\orig\game\rexlego\src\gpu_native\memory_watch.cpp  19AE1606C6DB7273 (record 19AE1606C6DB7273)
+  [ok] C1 v2 SDK diff   build\agent12\s4-c1v2\keep-watch-v2.diff  418D3D39947DB146 (record 418D3D39947DB146; SDK only, no native fingerprint input)
+  [ok] #24 TU draft     build\agent9\s4\fence-wait\gpu_wait_backoff.cpp.draft  01D9F8F3464C8614 (record 01D9F8F3; the new TU is Xenos-only and not a fingerprint input)
+  [WARN] #24 rexlego CMakeLists.txt edit: nothing staged under build/agent9/s4 yet (no file name containing "cmake")
+
+[2] s35 pack bytes (build\agent4\s35\run-071627) against its SHA256SUMS.txt
+  [ok] runtime-cache.cpp         AEA36683202B9753 (SHA256SUMS AEA36683202B9753)
+  [ok] lego-microcode-index.cpp  E4C05782462452C3 (SHA256SUMS E4C05782462452C3)
+  [ok] index-addition.cpp        154242FB07BEDC92 (SHA256SUMS 154242FB07BEDC92)
+
+[3] tree build\agent2\snap1\DimensionsRecomp
+  [ok] memory_watch.cpp 19AE1606C6DB7273, 7613 B, 166 CRLF / 0 bare LF, 11-21 10:57:51: the pre-C1 base, so C1 is not applied yet
+  [info] CMakeLists.txt 3690D5D76AA9FBED, 11-21 10:57:51; live 3690D5D76AA9FBED (same); gpu_wait_backoff mentioned on 0 line(s), so #24 is not in yet; src/gpu_wait_backoff.cpp present: no
+  [ok] fingerprint input list, CMakeLists.txt:582-765: CMakeLists.txt listed, memory_watch.cpp listed, gpu_wait_backoff not listed; so C1 and #24 each change the fingerprint
+  [ok] shader_archive.cpp 1C5B1767B8F6871D = the archive the s35 lookups compiled
+  [info] shaders.cpp 9567FE3F3B63637D (the S4a level, with the #2 miss cache)
+  [ok] lego-microcode-index.cpp 2DB859177B465647, 1652630 B, 11-21 20:55:21: the s35 merge base 2DB85917...13A2, so the merged index can be copied
+
+[4] build dir build\agent2\snap1-on
+  [ok] CMAKE_HOME_DIRECTORY is this tree's rexlego; LEGODIMENSIONS_NATIVE_GPU=ON
+  [ok] LEGO_NATIVE_RUNTIME_PRELINKED_BANK="": empty, so the build re-runs lego_gpu_prelink_runtime, which the pack needs
+  [ok] LEGO_NATIVE_RUNTIME_SHADER_CACHE = build\agent2\snap1\DimensionsRecomp\rexlego\out\native-gpu\stubs\runtime-cache.cpp (E66C9AA34C301C60, 11-21 20:55:22): the stub, no pack
+  [ok] runtime-linked-dxil-cache.cpp 639 B, 11-21 21:08:06: 0 entries, 0 of the 4 pack hashes; no pack, consistent with the stub cache
+  [ok] built fingerprint: native-gpu-build.txt 5e3ff55de10f4f64 (11-22 13:33:43), native_gpu_build_info.h 5e3ff55de10f4f64; the native4 (S4a) pin
+  [ok] recomputed fingerprint 5e3ff55de10f4f64 from 271 inputs (12.1 s) = built: the build dir is fresh; newest input build\agent2\snap1\DimensionsRecomp\rexlego\src\gpu_native\shaders.cpp (11-22 13:25:02)
+  [info] prediction: C1 alone (memory_watch.cpp -> 70829846, nothing else changed) gives fingerprint 29582a2ca62e16e7. #24's CMakeLists.txt edit and the pack each change it again, so expect a different value after S4b
+  [ok] src\gpu_native\memory_watch.cpp.obj 11-21 21:42:04, source 11-21 10:57:51
+  [ok] out\native-gpu\lego-microcode-index.cpp.obj 11-21 21:43:10, source 11-21 20:55:21
+  [ok] src\gpu_native\runtime_shader_cache.cpp.obj 11-21 21:43:10, source 11-21 20:55:22
+  [ok] src\gpu_native\runtime_linked_shader_cache.cpp.obj 11-21 21:43:10, source 11-21 21:08:06
+
+[5] staged bins: MANIFEST fingerprints (read-only)
+  [info] build/agent2/native3d-bin: MANIFEST 368F9CE650EC56CE, fingerprint 335ff2d47268f3a1
+  [info] build/agent2/nativeB-bin: MANIFEST E5CBF30A6132B00E, fingerprint 81d1c3a71be3c096
+  [info] build/agent2/native4-bin: MANIFEST 00D33D4FFB46776D, fingerprint 5e3ff55de10f4f64
+  [ok] build\agent2\native4-bin: MANIFEST 00D33D4FFB46776D, fingerprint 5e3ff55de10f4f64; the same as the build dir
+
+[6] WOULD DO with -Go -W4bDone:
+  - C1 landing copy, memory_watch.cpp to 70829846: copy build\agent12\s4-c1\new\game\rexlego\src\gpu_native\memory_watch.cpp -> build\agent2\snap1\DimensionsRecomp\rexlego\src\gpu_native\memory_watch.cpp; back up the old file to build\agent4\repin\backup\20261122-142735-snap1; set LastWriteTime to now; then sha256 must be 70829846C4F321A9
+  - s35 runtime cache copy: copy build\agent4\s35\run-071627\runtime-cache.cpp -> build\agent2\snap1\DimensionsRecomp\rexlego\out\native-gpu\runtime-cache.cpp; back up the old file to build\agent4\repin\backup\20261122-142735-snap1; set LastWriteTime to now; then sha256 must be AEA36683202B9753
+  - s35 merged index over the merge base: copy build\agent4\s35\run-071627\lego-microcode-index.cpp -> build\agent2\snap1\DimensionsRecomp\rexlego\out\native-gpu\lego-microcode-index.cpp; back up the old file to build\agent4\repin\backup\20261122-142735-snap1; set LastWriteTime to now; then sha256 must be E4C05782462452C3
+  Not done by this script (Agent 2, after Agent 1's GO):
+    cmake -D LEGO_NATIVE_RUNTIME_SHADER_CACHE=<workspace>/build/agent2/snap1/DimensionsRecomp/rexlego/out/native-gpu/runtime-cache.cpp build/agent2/snap1-on
+    the usual native build of this build dir (it re-runs lego_gpu_prelink_runtime and the fingerprint), staged to a NEW bin folder; native4-bin and the other bins stay untouched
+    then this script again without -Go: [4] must show a fresh fingerprint, and with -Pack all 4 pack hashes in the prelinked cache
+  Rollback: copy the files in the backup folder back (then set their LastWriteTime to now); cmake -D LEGO_NATIVE_RUNTIME_SHADER_CACHE=<workspace>/build/agent2/snap1/DimensionsRecomp/rexlego/out/native-gpu/stubs/runtime-cache.cpp build/agent2/snap1-on
+
+SUMMARY: 0 FAIL, 1 WARN; exit 0

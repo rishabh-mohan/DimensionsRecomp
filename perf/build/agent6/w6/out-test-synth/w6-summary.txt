@@ -1,0 +1,72 @@
+W6 logdiff kit (Agent 6, task #16): <workspace>\build\agent6\w6\test-synth\W6SYNTH
+expect build\agent6\w6\expect-w6.json (reference s0); matrix.json build\agent6\w6\test-synth\W6SYNTH\matrix.json
+runs 6 in 2 arms: s0=3; p2fc=3
+arms in the expect file with no run here: f, fc, p2, p2f
+
+Per arm. stuck = STUCK-LOCK episodes (sites; IN = in the measured window); recov/unh/pfail = Recovered stale protection / Unhandled write fault / Protect failed lines per run; W/E/C = warning/error/critical lines per run; slow = slow runs/runs, mean slow_pct, mean onset s; logdiff vs s0 = gate FAIL findings/NEW/MORE/GONE/ONLY keys
+  arm        runs verdict stuck                  dumps recov      unh        pfail      W/E/C                      slow                   logdiff F/N/M/G/O
+  s0         3    PASS    0                      0     [0, 0, 0]  [0, 0, 0]  [0, 0, 0]  40/0/0 40/0/0 40/0/0       3/3 60.5% 20.9s        (reference)
+  p2fc       3    FAIL    2 H1=2 IN=1            2     [0, 0, 0]  [0, 0, 0]  [0, 0, 0]  40/5/1 40/5/1 40/0/0       3/3 50.4% 39.9s        2/6/0/0/8
+
+Per run. exit = run.json exit code; close = WM_CLOSE posted/clean; seq = log ends with the clean-exit lines; stuck = episodes; slow = onset s / slow_pct / span s (sys.csv rows); nogrowth = perf.csv max no-growth s in the window; free = GB at start
+  run                arm      verdict status exit  close     seq  W/E/C     stuck dmp  slow                 nogrowth free  lines
+  1800-s0-r1         s0       PASS    OK     0     1/True    ok   40/0/0    0     0    40/50/113 (113)      0        14.29 98
+  1808-s0-r2         s0       PASS    OK     0     1/True    ok   40/0/0    0     0    21/69/113 (113)      0        14.52 98
+  1827-s0-r3         s0       PASS    OK     0     1/True    ok   40/0/0    0     0    2/62/113 (113)       0        14.69 98
+  1830-p2fc-r1       p2fc     FAIL    OK     0     1/True    ok   40/5/1    1     1    40/50/113 (113)      0        14.29 106
+  1832-p2fc-r2       p2fc     NOTE    OK     0     1/True    ok   40/5/1    1     1    40/50/113 (113)      0        14.29 106
+  1834-p2fc-r3       p2fc     PASS    OK     0     1/True    ok   40/0/0    0     0    40/50/113 (113)      0        14.29 100
+
+STUCK-LOCK episodes: 2 (H1 = owner parked in sub_83FAF180, the L1 fence-wait poll; finding 10)
+  1830-p2fc-r1 2026-11-22 18:01:40.914 cs 0x84959edc after 5.0s | owner tid 0x0017 lr=83FAF188 H1 (sub_83FAF180+0x8) callers 83FBFBDC<-83FC0CA8<-83FB3AC8<-83FBF698 | waiter lr=82A2A270 sub_82A2A260+0x10 | PM4 0x22 | stall from 18:01:35.914, window IN | dump hang-36276.dmp
+  1832-p2fc-r2 2026-11-22 18:02:18.926 cs 0x84959edc after 5.0s | owner tid 0x0017 lr=83FAF188 H1 (sub_83FAF180+0x8) callers 83FBFBDC<-83FC0CA8<-83FB3AC8<-83FBF698 | waiter lr=82A2A270 sub_82A2A260+0x10 | PM4 0x22 | stall from 18:02:13.926, window after | dump hang-36276.dmp
+
+Reasons, FAIL first (per arm: its runs, then its logdiff findings)
+  FAIL p2fc     1830-p2fc-r1: STUCK-LOCK 18:01:40.914 0x84959edc after 5.0s, owner tid 0x0017 lr=83FAF188 (H1, sub_83FAF180+0x8), waiter lr=82A2A270, stall from 18:01:35.914, window IN -> timing invalid
+  NOTE p2fc     1830-p2fc-r1: "STUCK-LOCK" x5
+  NOTE p2fc     1830-p2fc-r1: "Minidump written to" x1
+  NOTE p2fc     1830-p2fc-r1: levels W/E/C 40/5/1, expected 40/0/0
+  NOTE p2fc     1830-p2fc-r1: hang dump hang-36276.dmp
+  NOTE p2fc     1832-p2fc-r2: "STUCK-LOCK" x5
+  NOTE p2fc     1832-p2fc-r2: "Minidump written to" x1
+  NOTE p2fc     1832-p2fc-r2: levels W/E/C 40/5/1, expected 40/0/0
+  NOTE p2fc     1832-p2fc-r2: STUCK-LOCK 18:02:18.926 0x84959edc after 5.0s, owner tid 0x0017 lr=83FAF188 (H1, sub_83FAF180+0x8), waiter lr=82A2A270, stall from 18:02:13.926, window after
+  NOTE p2fc     1832-p2fc-r2: hang dump hang-36276.dmp
+
+Counts per arm (lines containing each expect count text; one number per run, run-dir order)
+  STUCK-LOCK                                                   s0=[0, 0, 0]; p2fc=[5, 5, 0]
+  still not acquired after                                     s0=[0, 0, 0]; p2fc=[1, 1, 0]
+  Minidump written to                                          s0=[0, 0, 0]; p2fc=[1, 1, 0]
+  Recovered stale physical page protection                     s0=[0, 0, 0]; p2fc=[0, 0, 0]
+  Unhandled guest physical write fault                         s0=[0, 0, 0]; p2fc=[0, 0, 0]
+  PhysicalHeap::Protect failed                                 s0=[0, 0, 0]; p2fc=[0, 0, 0]
+  BaseHeap::Protect failed                                     s0=[0, 0, 0]; p2fc=[0, 0, 0]
+  C1 keep-watch:                                               s0=[0, 0, 0]; p2fc=[2, 2, 2]
+  C1 keep-watch: on (with physical_protect_hold_global_lock)   s0=[0, 0, 0]; p2fc=[1, 1, 1]
+  C1 keep-watch: on, but                                       s0=[0, 0, 0]; p2fc=[0, 0, 0]
+  C1 keep-watch: blocked                                       s0=[0, 0, 0]; p2fc=[0, 0, 0]
+  C1 keep-watch: first kept protect at                         s0=[0, 0, 0]; p2fc=[1, 1, 1]
+  protects kept so far                                         s0=[0, 0, 0]; p2fc=[0, 0, 0]
+  C1 verify                                                    s0=[0, 0, 0]; p2fc=[0, 0, 0]
+  S4 upload hash:                                              s0=[0, 0, 0]; p2fc=[0, 0, 0]
+  slow frame #                                                 s0=[0, 0, 0]; p2fc=[0, 0, 0]
+  memexport full-buffer                                        s0=[0, 0, 0]; p2fc=[0, 0, 0]
+  memexport flush reasons                                      s0=[0, 0, 0]; p2fc=[0, 0, 0]
+  [NtCreateFile] FAILED                                        s0=[35, 35, 35]; p2fc=[35, 35, 35]
+  Reserving the guest memory arena                             s0=[1, 1, 1]; p2fc=[1, 1, 1]
+  Title terminated                                             s0=[1, 1, 1]; p2fc=[1, 1, 1]
+
+ONLY keys per arm vs s0 (any level, not Toypad; in no s0 run), from w4b_logdiff
+  p2fc: 8
+    [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)
+    [info] [sys] C# keep-watch: first kept protect at #h, #h bytes
+    [error] [krnl] STUCK-LOCK: critical section #x# still not acquired after #s. owner=guest thread object #x#, lock_count=#, recursion=#; waiting thread is #x#. An owner of #, or one naming a thread that has exited, means t
+    [error] [krnl] STUCK-LOCK: the owner is tid #x# (unnamed), parked at lr=#h with r#=#h. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.
+    [error] [krnl] STUCK-LOCK: owner's callers: #h <- #h <- #h <- #h <- #h <- #h
+    [error] [krnl] STUCK-LOCK: waiter's callers: lr=#h <- #h <- #h <- #h <- #h <- #h <- #h
+    [error] [krnl] STUCK-LOCK: GPU thread: executing PM# opcode #x# | read ptr #x#, write ptr #x#
+    [critical] [core] [FATAL] Minidump written to hang-#.dmp
+
+w4b_logdiff: exit 0 in 0.2 s -> build\agent6\w6\out-test-synth\logdiff (log build\agent6\w6\out-test-synth\logdiff.log)
+w4b_extra: exit 0 in 0.2 s -> build\agent6\w6\out-test-synth\extra.txt (log build\agent6\w6\out-test-synth\extra.log)
+verdict: FAIL; runtime 0.6 s; output build\agent6\w6\out-test-synth

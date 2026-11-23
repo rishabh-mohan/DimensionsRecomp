@@ -1,0 +1,88 @@
+# 0221-d11t-r5 cluster check (cluster_0221.py; read-only)
+run dir: build/agent8/matrix/20261123-0155/runs/0221-d11t-r5/
+measure_start 2026-11-23 02:22:47.188 | measure_end 2026-11-23 02:23:37.180 | window_wall_s 49.9922714
+window T 0 = process t_s 64.037; cluster T 32.6-33.5 s = wall 02:23:19.788-02:23:20.688
+
+## perf.csv (one row per frame; window rows 19119 from row 24840)
+window frames 19119
+window median {'draw_calls': 226.0, 'command_buffer_stalls': 1.0, 'buffer_queue_depth': 0.0, 'functions_dispatched': 12.0, 'interrupt_dispatches': 12.0, 'active_threads': 30.0, 'apc_queue_depth': 0.0, 'critical_region_contentions': 0.0, 'texture_cache_misses': 0.0, 'pipeline_cache_misses': 0.0, 'xma_frames_decoded': 0.0, 'audio_frame_latency_us': 0.0}
+window max {'draw_calls': 226.0, 'command_buffer_stalls': 1.0, 'buffer_queue_depth': 8.0, 'functions_dispatched': 39.0, 'interrupt_dispatches': 34.0, 'active_threads': 30.0, 'apc_queue_depth': 0.0, 'critical_region_contentions': 0.0, 'texture_cache_misses': 0.0, 'pipeline_cache_misses': 0.0, 'xma_frames_decoded': 0.0, 'audio_frame_latency_us': 0.0}
+frames > 10 ms in window: 27; in cluster span: 19 (T 32.77-33.33)
+frames in T 32.6-33.5 s: 227, median ft 2.74 ms
+cluster sums: texture misses 0.0 | pipeline misses 0.0 | cb stalls 43.0 | critical-region contentions 0.0
+cluster buffer_queue_depth min/max: 0.0 / 8.0
+frames > 8 ms in the span:
+  T 32.611 ft 8.28 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=16 interrupt_dispatches=16 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 32.769 ft 12.55 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=24 interrupt_dispatches=22 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 32.778 ft 9.38 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=21 interrupt_dispatches=19 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 32.796 ft 11.19 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=22 interrupt_dispatches=20 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 32.818 ft 10.73 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=21 interrupt_dispatches=19 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 32.857 ft 9.33 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=20 interrupt_dispatches=18 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 32.886 ft 26.37 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=39 interrupt_dispatches=34 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 32.910 ft 23.47 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=36 interrupt_dispatches=32 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 32.920 ft 10.19 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=23 interrupt_dispatches=21 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 32.958 ft 10.39 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=21 interrupt_dispatches=19 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 32.973 ft 14.86 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=7 functions_dispatched=27 interrupt_dispatches=24 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 32.998 ft 13.82 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=25 interrupt_dispatches=23 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 33.010 ft 12.22 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=23 interrupt_dispatches=21 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 33.073 ft 17.71 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=7 functions_dispatched=31 interrupt_dispatches=27 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 33.105 ft 13.73 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=26 interrupt_dispatches=22 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 33.117 ft 12.19 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=24 interrupt_dispatches=22 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 33.126 ft 8.67 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=18 interrupt_dispatches=17 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 33.203 ft 17.58 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=30 interrupt_dispatches=27 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 33.213 ft 9.96 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=7 functions_dispatched=21 interrupt_dispatches=19 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 33.228 ft 14.92 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=25 interrupt_dispatches=23 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 33.271 ft 12.87 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=23 interrupt_dispatches=21 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 33.292 ft 20.37 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=33 interrupt_dispatches=30 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 33.308 ft 13.54 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=25 interrupt_dispatches=23 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+  T 33.326 ft 11.28 draw_calls=226 command_buffer_stalls=0 buffer_queue_depth=8 functions_dispatched=23 interrupt_dispatches=21 active_threads=30 apc_queue_depth=0 critical_region_contentions=0 texture_cache_misses=0 pipeline_cache_misses=0 xma_frames_decoded=0 audio_frame_latency_us=0
+
+## gpu.csv (~1 s samples; t_s is window-relative)
+rows 51, t_s 0.41-49.64
+window median util_gpu 100, gr_mhz 832, power_w 15.67; min util_gpu 58 at t_s 32.57
+rows with util_gpu < 90: t_s 32.57 util 58
+rows at t_s 28-38:
+  t_s 28.46 wall 02:23:15.648 pstate P0 gr_mhz 832 temp 88 power 15.67 util_gpu 98 util_mem 25 throttle 0x20
+  t_s 29.54 wall 02:23:16.728 pstate P0 gr_mhz 832 temp 88 power 15.65 util_gpu 100 util_mem 25 throttle 0x20
+  t_s 30.41 wall 02:23:17.598 pstate P0 gr_mhz 832 temp 88 power 15.66 util_gpu 100 util_mem 26 throttle 0x20
+  t_s 31.48 wall 02:23:18.668 pstate P0 gr_mhz 832 temp 88 power 15.66 util_gpu 100 util_mem 26 throttle 0x20
+  t_s 32.57 wall 02:23:19.758 pstate P0 gr_mhz 832 temp 87 power 15.22 util_gpu 58 util_mem 12 throttle 0x20
+  t_s 33.44 wall 02:23:20.628 pstate P0 gr_mhz 832 temp 88 power 14.30 util_gpu 97 util_mem 25 throttle 0x20
+  t_s 34.54 wall 02:23:21.728 pstate P0 gr_mhz 832 temp 88 power 15.58 util_gpu 100 util_mem 25 throttle 0x20
+  t_s 35.40 wall 02:23:22.588 pstate P0 gr_mhz 832 temp 88 power 15.57 util_gpu 98 util_mem 26 throttle 0x20
+  t_s 36.47 wall 02:23:23.658 pstate P0 gr_mhz 832 temp 88 power 15.74 util_gpu 100 util_mem 26 throttle 0x20
+  t_s 37.55 wall 02:23:24.738 pstate P0 gr_mhz 832 temp 88 power 15.70 util_gpu 100 util_mem 25 throttle 0x20
+
+## proc.csv (~1 s samples; window T = t_s - 64.037)
+window rows 50, median cpu_cores 2.31, min 2.07, max 2.55
+rows at window T 28-38:
+  t_s 93.01 T 28.97 phase measure cpu_cores 2.34 threads 72 handles 1297 responding True log_lines 96 note 
+  t_s 94.02 T 29.98 phase measure cpu_cores 2.31 threads 72 handles 1297 responding True log_lines 96 note 
+  t_s 95.01 T 30.97 phase measure cpu_cores 2.24 threads 72 handles 1297 responding True log_lines 96 note 
+  t_s 96.01 T 31.97 phase measure cpu_cores 2.34 threads 72 handles 1297 responding True log_lines 96 note 
+  t_s 97.01 T 32.97 phase measure cpu_cores 2.17 threads 72 handles 1297 responding True log_lines 96 note 
+  t_s 98.01 T 33.97 phase measure cpu_cores 2.16 threads 72 handles 1297 responding True log_lines 96 note 
+  t_s 99.00 T 34.96 phase measure cpu_cores 2.43 threads 72 handles 1297 responding True log_lines 96 note 
+  t_s 100.01 T 35.97 phase measure cpu_cores 2.24 threads 72 handles 1297 responding True log_lines 96 note 
+  t_s 101.01 T 36.97 phase measure cpu_cores 2.36 threads 72 handles 1297 responding True log_lines 96 note 
+  t_s 102.01 T 37.97 phase measure cpu_cores 2.52 threads 72 handles 1297 responding True log_lines 96 note 
+
+## sys.csv (~1 s samples, host-wide)
+window rows 50, medians: cpu_util_pct 46.00, eff_mhz 1975.50, p_eff_mhz 1967.00, e_eff_mhz 1971.00, p_util_pct 61.45, e_util_pct 38.02
+rows at window T 28-38:
+  wall 02:23:15.964 T 28.78 cpu_util_pct 49.30 eff_mhz 1981 p_eff_mhz 1995 e_eff_mhz 1969 p_util_pct 61.21 e_util_pct 43.35 fg_game 1 input_desktop Default
+  wall 02:23:16.980 T 29.79 cpu_util_pct 45.90 eff_mhz 1997 p_eff_mhz 2001 e_eff_mhz 1999 p_util_pct 63.15 e_util_pct 37.27 fg_game 1 input_desktop Default
+  wall 02:23:17.961 T 30.77 cpu_util_pct 42.40 eff_mhz 2042 p_eff_mhz 2103 e_eff_mhz 2013 p_util_pct 63.91 e_util_pct 31.64 fg_game 1 input_desktop Default
+  wall 02:23:18.961 T 31.77 cpu_util_pct 46.22 eff_mhz 2011 p_eff_mhz 2056 e_eff_mhz 1976 p_util_pct 62.36 e_util_pct 38.15 fg_game 1 input_desktop Default
+  wall 02:23:19.962 T 32.77 cpu_util_pct 49.43 eff_mhz 1942 p_eff_mhz 1951 e_eff_mhz 1934 p_util_pct 63.00 e_util_pct 42.64 fg_game 1 input_desktop Default
+  wall 02:23:20.965 T 33.78 cpu_util_pct 69.34 eff_mhz 1707 p_eff_mhz 1689 e_eff_mhz 1716 p_util_pct 64.88 e_util_pct 71.57 fg_game 1 input_desktop Default
+  wall 02:23:21.970 T 34.78 cpu_util_pct 52.32 eff_mhz 1644 p_eff_mhz 1627 e_eff_mhz 1656 p_util_pct 54.87 e_util_pct 51.05 fg_game 1 input_desktop Default
+  wall 02:23:22.959 T 35.77 cpu_util_pct 43.43 eff_mhz 1904 p_eff_mhz 1889 e_eff_mhz 1898 p_util_pct 60.17 e_util_pct 35.07 fg_game 1 input_desktop Default
+  wall 02:23:23.962 T 36.77 cpu_util_pct 46.21 eff_mhz 2011 p_eff_mhz 2006 e_eff_mhz 2003 p_util_pct 60.44 e_util_pct 39.10 fg_game 1 input_desktop Default
+  wall 02:23:24.970 T 37.78 cpu_util_pct 44.20 eff_mhz 1997 p_eff_mhz 2029 e_eff_mhz 1978 p_util_pct 62.62 e_util_pct 34.99 fg_game 1 input_desktop Default
+
+## game.log
+timestamped lines: 91 in all, 4 inside the window
+last line before the cluster (T 28.91, 3.69 s earlier): [2026-11-23 02:23:16.103] [info] [core] [t20512] Toypad[Read ] 0B 0C 55 09 0A 83 63 82 69 B4 B6 DD 5F DF 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+first line after the cluster (T 51.18): [2026-11-23 02:23:38.366] [info] [core] [t14288] Window closing, shutting down...
+lines inside the cluster span: 0

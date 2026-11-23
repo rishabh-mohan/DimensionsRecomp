@@ -1,0 +1,410 @@
+{
+ "run": "20261122-052901-attract-devoff3-warm",
+ "row": "s4b03",
+ "kind": "off",
+ "scenario": "A",
+ "runjson": {
+  "exit_code": 0,
+  "exit_code_hex": "0x00000000",
+  "dumps": [
+   "<workspace>\\build\\agent3\\runs\\20261122-052901-attract-devoff3-warm\\hang-69196.dmp"
+  ],
+  "crash_events": [],
+  "wer_seen": false,
+  "close_method": "wm_close",
+  "close_seconds": 2.84,
+  "elapsed_s": 363.4,
+  "seconds_requested": 360,
+  "cvars": {},
+  "exited_early": false,
+  "env_extra": {},
+  "steps": "63/91"
+ },
+ "summary": {
+  "verdict": "CRASHED",
+  "first_frame_s": 18.0,
+  "levels": {
+   "info": 126,
+   "warning": 143,
+   "error": 5,
+   "critical": 1
+  },
+  "unknown_cvars": [],
+  "errors": [
+   "185.5s [error] STUCK-LOCK: critical section 0x84959edc still not acquired after 5s. owner=guest thread object 0x30111018, lock_count=1, recursion=1; waiting thread is 0x6. An owner of 0, or one naming a thread that has exited, means the lock was leaked.",
+   "185.5s [error] STUCK-LOCK: the owner is tid 0x0017 (unnamed), parked at lr=83FBF868 with r3=00000001. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.",
+   "185.5s [error] STUCK-LOCK: owner's callers: 83FBF7B4 <- 83FBFA98 <- 83FBF868 <- 83FBFBDC <- 83FC0CA8 <- 83FB3AC8 <- 83FBF698 <- 83FBFA98 <- 82BD6BA4",
+   "185.5s [error] STUCK-LOCK: waiter's callers: lr=82A2A270 <- 82AED6BC <- 82B7132C <- 82FB01A0 <- 82B7995C <- 82AB2108 <- 82FEBDE0",
+   "185.5s [error] STUCK-LOCK: GPU thread: executing PM4 opcode 0x22 | read ptr 0x26d7, write ptr 0x28a9"
+  ]
+ },
+ "log_files": [
+  "game.log"
+ ],
+ "families": {
+  "c1_any": 0,
+  "c1_init_on": 0,
+  "c1_init_blocked": 0,
+  "c1_init_nohold": 0,
+  "c1_first": 0,
+  "c1_kept": 0,
+  "c1_blocked": 0,
+  "recovered_stale": 0,
+  "unhandled_phys": 0,
+  "protect_failed": 0,
+  "split_init": 0,
+  "split": 0,
+  "deferred_counters": 0,
+  "gpu_wait": 0,
+  "gpu_wait_stats": 0,
+  "gpu_wait_backoff": 0,
+  "memexport": 0,
+  "slow_frame": 0,
+  "s4_upload_hash": 0,
+  "precise_wait": 0,
+  "miss_cache": 0,
+  "stuck_lock": 5,
+  "minidump": 1,
+  "fatal": 1,
+  "clean_exit": 1,
+  "debug_layer": 0,
+  "d3d12_msg": 0,
+  "k": 0,
+  "c1_other": 0
+ },
+ "levels": {
+  "info": 126,
+  "warning": 143,
+  "error": 5,
+  "critical": 1
+ },
+ "lines": {
+  "stuck_lock": {
+   "first": [
+    "[2026-11-22 05:32:12.360] [error] [krnl] [t99264] STUCK-LOCK: critical section 0x84959edc still not acquired after 5s. owner=guest thread object 0x30111018, lock_count=1, recursion=1; waiting thread is 0x6. An owner of 0, or one naming a thread that has exited, means the lock was leaked.",
+    "[2026-11-22 05:32:12.361] [error] [krnl] [t99264] STUCK-LOCK: the owner is tid 0x0017 (unnamed), parked at lr=83FBF868 with r3=00000001. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.",
+    "[2026-11-22 05:32:12.361] [error] [krnl] [t99264] STUCK-LOCK: owner's callers: 83FBF7B4 <- 83FBFA98 <- 83FBF868 <- 83FBFBDC <- 83FC0CA8 <- 83FB3AC8 <- 83FBF698 <- 83FBFA98 <- 82BD6BA4"
+   ],
+   "last": [
+    "[2026-11-22 05:32:12.361] [error] [krnl] [t99264] STUCK-LOCK: waiter's callers: lr=82A2A270 <- 82AED6BC <- 82B7132C <- 82FB01A0 <- 82B7995C <- 82AB2108 <- 82FEBDE0",
+    "[2026-11-22 05:32:12.361] [error] [krnl] [t99264] STUCK-LOCK: GPU thread: executing PM4 opcode 0x22 | read ptr 0x26d7, write ptr 0x28a9"
+   ]
+  },
+  "minidump": {
+   "first": [
+    "[2026-11-22 05:32:14.077] [critical] [core] [t99264] [FATAL] Minidump written to hang-69196.dmp"
+   ],
+   "last": []
+  },
+  "fatal": {
+   "first": [
+    "[2026-11-22 05:32:14.077] [critical] [core] [t99264] [FATAL] Minidump written to hang-69196.dmp"
+   ],
+   "last": []
+  }
+ },
+ "frame_rows": 7758,
+ "logdiff": {
+  "bases": [
+   "20261122-051201-attract-devoff3"
+  ],
+  "base_scenario": "A",
+  "NEW": 6,
+  "NEW_allowed": 0,
+  "MORE": 0,
+  "MORE_allowed": 0,
+  "GONE": 74,
+  "GONE_unexpected": 0,
+  "FLAG": 1,
+  "NEW_info_other": 8,
+  "NEW_info_allowed": 0,
+  "rc": 0,
+  "new": [
+   "NEW build\\agent3\\runs\\20261122-052901-attract-devoff3-warm\\game.log x1 [critical] [core] [FATAL] Minidump written to hang-#.dmp",
+   "NEW build\\agent3\\runs\\20261122-052901-attract-devoff3-warm\\game.log x1 [error] [krnl] STUCK-LOCK: GPU thread: executing PM# opcode #x# | read ptr #x#, write ptr #x#",
+   "NEW build\\agent3\\runs\\20261122-052901-attract-devoff3-warm\\game.log x1 [error] [krnl] STUCK-LOCK: critical section #x# still not acquired after #s. owner=guest thread object #x#, lock_count=#, recursion=#; waiting thread is #x#. An owner of #, or one naming a thread that has exited, me",
+   "NEW build\\agent3\\runs\\20261122-052901-attract-devoff3-warm\\game.log x1 [error] [krnl] STUCK-LOCK: owner's callers: #h <- #h <- #h <- #h <- #h <- #h <- #h <- #h <- #h",
+   "NEW build\\agent3\\runs\\20261122-052901-attract-devoff3-warm\\game.log x1 [error] [krnl] STUCK-LOCK: the owner is tid #x# (unnamed), parked at lr=#h with r#=#h. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.",
+   "NEW build\\agent3\\runs\\20261122-052901-attract-devoff3-warm\\game.log x1 [error] [krnl] STUCK-LOCK: waiter's callers: lr=#h <- #h <- #h <- #h <- #h <- #h <- #h"
+  ],
+  "new_allowed": [],
+  "more": [],
+  "gone_unexpected": [],
+  "flag": [
+   "FLAG build\\agent3\\runs\\20261122-052901-attract-devoff3-warm\\game.log fatal=1 (baseline max 0)"
+  ],
+  "new_info_other": [
+   "NEW build\\agent3\\runs\\20261122-052901-attract-devoff3-warm\\game.log x1 [critical] [core] [FATAL] Minidump written to hang-#.dmp",
+   "NEW build\\agent3\\runs\\20261122-052901-attract-devoff3-warm\\game.log x1 [error] [krnl] STUCK-LOCK: GPU thread: executing PM# opcode #x# | read ptr #x#, write ptr #x#",
+   "NEW build\\agent3\\runs\\20261122-052901-attract-devoff3-warm\\game.log x1 [error] [krnl] STUCK-LOCK: critical section #x# still not acquired after #s. owner=guest thread object #x#, lock_count=#, recursion=#; waiting thread is #x#. An owner of #, or one naming a thread that has exited, me",
+   "NEW build\\agent3\\runs\\20261122-052901-attract-devoff3-warm\\game.log x1 [error] [krnl] STUCK-LOCK: owner's callers: #h <- #h <- #h <- #h <- #h <- #h <- #h <- #h <- #h",
+   "NEW build\\agent3\\runs\\20261122-052901-attract-devoff3-warm\\game.log x1 [error] [krnl] STUCK-LOCK: the owner is tid #x# (unnamed), parked at lr=#h with r#=#h. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.",
+   "NEW build\\agent3\\runs\\20261122-052901-attract-devoff3-warm\\game.log x1 [error] [krnl] STUCK-LOCK: waiter's callers: lr=#h <- #h <- #h <- #h <- #h <- #h <- #h",
+   "NEW build\\agent3\\runs\\20261122-052901-attract-devoff3-warm\\game.log x1 [info] [gpu] Created # graphics pipelines (not including reading the descriptions) from the storage in # milliseconds",
+   "NEW build\\agent3\\runs\\20261122-052901-attract-devoff3-warm\\game.log x1 [info] [gpu] Translated # shaders from the storage in # milliseconds"
+  ],
+  "new_info_allowed": []
+ },
+ "scenes": {
+  "base": "20261122-051201-attract-devoff3",
+  "missing_in_cand": [
+   "788/31613",
+   "790/31625",
+   "8019/1043795"
+  ],
+  "extra_in_cand": [],
+  "cand_major": {
+   "220/534": 52.8,
+   "218/222": 28.9,
+   "226/1022": 28.5,
+   "219/226": 15.3,
+   "220/528": 11.3,
+   "594/2813": 2.8
+  },
+  "base_major": {
+   "220/534": 68.4,
+   "218/222": 29.6,
+   "226/1022": 25.8,
+   "219/226": 14.9,
+   "220/528": 11.5,
+   "790/31625": 6.3,
+   "788/31613": 4.0,
+   "594/2813": 3.2,
+   "8019/1043795": 2.2,
+   "839/31674": 2.2
+  }
+ },
+ "marks": {
+  "prefix": 44,
+  "prefix_diff": [
+   [
+    "idle-50",
+    "220/534",
+    "218/222"
+   ],
+   [
+    "idle-60",
+    "220/534",
+    "594/2813"
+   ],
+   [
+    "idle-70",
+    "218/222",
+    "839/31674"
+   ],
+   [
+    "idle-80",
+    "594/2813",
+    "800/35657"
+   ],
+   [
+    "idle-90",
+    "791/31631",
+    "800/35657"
+   ],
+   [
+    "idle-100",
+    "790/31625",
+    "800/35657"
+   ],
+   [
+    "idle-110",
+    "2830/409094",
+    "851/50089"
+   ],
+   [
+    "idle-120",
+    "5268/809402",
+    "851/50089"
+   ],
+   [
+    "idle-130",
+    "5268/809402",
+    "5103/1140281"
+   ],
+   [
+    "idle-140",
+    "5620/922665",
+    "3765/577329"
+   ],
+   [
+    "idle-150",
+    "5620/922665",
+    "2782/741788"
+   ],
+   [
+    "idle-160",
+    "1833/641504",
+    "1143/477855"
+   ],
+   [
+    "idle-170",
+    "1145/331738",
+    "8129/762743"
+   ],
+   [
+    "idle-180",
+    "8445/1068370",
+    "8129/762743"
+   ],
+   [
+    "idle-190",
+    "4952/764631",
+    "1944/1132026"
+   ],
+   [
+    "idle-200",
+    "1952/1150294",
+    "1944/1132026"
+   ],
+   [
+    "idle-210",
+    "1952/1150294",
+    "1747/853115"
+   ],
+   [
+    "idle-220",
+    "1952/1150294",
+    "1747/853115"
+   ],
+   [
+    "idle-230",
+    "1680/898519",
+    "1334/749375"
+   ],
+   [
+    "idle-240",
+    "2714/1091625",
+    "9052/974873"
+   ],
+   [
+    "idle-250",
+    "1271/738595",
+    "4117/630005"
+   ],
+   [
+    "idle-260",
+    "4565/723643",
+    "missing"
+   ],
+   [
+    "idle-270",
+    "737/66810",
+    "missing"
+   ],
+   [
+    "idle-280",
+    "793/126892",
+    "missing"
+   ],
+   [
+    "idle-290",
+    "770/112364",
+    "missing"
+   ],
+   [
+    "idle-300",
+    "770/113644",
+    "missing"
+   ],
+   [
+    "idle-310",
+    "770/115468",
+    "missing"
+   ],
+   [
+    "idle-320",
+    "770/115244",
+    "missing"
+   ],
+   [
+    "idle-330",
+    "770/115052",
+    "missing"
+   ],
+   [
+    "idle-340",
+    "770/112268",
+    "missing"
+   ],
+   [
+    "idle-350",
+    "767/111628",
+    "missing"
+   ],
+   [
+    "idle-360",
+    "767/111244",
+    "missing"
+   ],
+   [
+    "idle-370",
+    "767/111692",
+    "missing"
+   ],
+   [
+    "idle-380",
+    "767/111500",
+    "missing"
+   ],
+   [
+    "end",
+    "767/111500",
+    "missing"
+   ]
+  ],
+  "all_diff": 21,
+  "cand": {
+   "first-frame": "218/222",
+   "title": "226/1022",
+   "after-start": "226/1022",
+   "after-a1": "220/528",
+   "after-a2": "220/534",
+   "idle-10": "220/534",
+   "idle-20": "220/534",
+   "idle-30": "220/534",
+   "idle-40": "220/534",
+   "idle-50": "218/222",
+   "idle-60": "594/2813",
+   "idle-70": "839/31674",
+   "idle-80": "800/35657",
+   "idle-90": "800/35657",
+   "idle-100": "800/35657",
+   "idle-110": "851/50089",
+   "idle-120": "851/50089",
+   "idle-130": "5103/1140281",
+   "idle-140": "3765/577329",
+   "idle-150": "2782/741788",
+   "idle-160": "1143/477855",
+   "idle-170": "8129/762743",
+   "idle-180": "8129/762743",
+   "idle-190": "1944/1132026",
+   "idle-200": "1944/1132026",
+   "idle-210": "1747/853115",
+   "idle-220": "1747/853115",
+   "idle-230": "1334/749375",
+   "idle-240": "9052/974873",
+   "idle-250": "4117/630005"
+  }
+ },
+ "slow_state": null,
+ "proofs": [
+  {
+   "ok": true,
+   "text": "no S4a/S4b item line {}"
+  }
+ ],
+ "base_misses": [
+  "base scenes missing in cand: ['788/31613', '790/31625', '8019/1043795']",
+  "marks differ before up-2: idle-50 220/534->218/222 idle-60 220/534->594/2813 idle-70 218/222->839/31674 idle-80 594/2813->800/35657 idle-90 791/31631->800/35657 idle-100 790/31625->800/35657 idle-110 2830/409094->851/50089 idle-120 5268/809402->851/50089 idle-130 5268/809402->5103/1140281 idle-140 5620/922665->3765/577329 idle-150 5620/922665->2782/741788 idle-160 1833/641504->1143/477855 idle-170 1145/331738->8129/762743 idle-180 8445/1068370->8129/762743 idle-190 4952/764631->1944/1132026 idle-200 1952/1150294->1944/1132026 idle-210 1952/1150294->1747/853115 idle-220 1952/1150294->1747/853115 idle-230 1680/898519->1334/749375 idle-240 2714/1091625->9052/974873 idle-250 1271/738595->4117/630005 idle-260 4565/723643->missing idle-270 737/66810->missing idle-280 793/126892->missing idle-290 770/112364->missing idle-300 770/113644->missing idle-310 770/115468->missing idle-320 770/115244->missing idle-330 770/115052->missing idle-340 770/112268->missing idle-350 767/111628->missing idle-360 767/111244->missing idle-370 767/111692->missing idle-380 767/111500->missing end 767/111500->missing",
+  "logdiff NEW 6",
+  "logdiff FLAG 1",
+  "attract route steps 63/91 vs base 91/91",
+  "dumps 1",
+  "[error] 5 [critical] 1",
+  "stuck_lock 5",
+  "minidump 1",
+  "fatal 1"
+ ],
+ "hint": "LOOK"
+}

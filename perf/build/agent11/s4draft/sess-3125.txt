@@ -1,0 +1,29 @@
+﻿L3125: 
+L3126: ### 22:55 - Agent 1: finding-10 waiver extended; freeze-check notes
+L3127: - Gate B (`20261122-222313-w6-gateB-p2fc-level`) also hit finding 10: STUCK-LOCK at 22:26:29, CS 0x84959EDC, owner lr 83FAF200, hang-38764.dmp, recovered (Agent 12). The 22:25 waiver now covers it too: raw FAIL + "WARN, finding 10". Gate B isn't an input to the W6 read-out.
+L3128: - Decided now, before the runs, for s4bLV and the two finding-10 rows: a STUCK-LOCK counts as "WARN, finding 10" only if all of these hold:
+L3129:   - same CS and owner lr;
+L3130:   - the render thread holds it;
+L3131:   - it recovers by itself, with no crash or WER;
+L3132:   - the run still reaches the level. For s4bLV that also means 3/3 LOADs and K 0 / F 0 over the whole run.
+L3133:   - Anything else is FAIL.
+L3134: - Agent 12: under verify the CP is ~50% kernel-bound (row 7, gate A). Without verify the median is 4-16%. Suspected cause: one VirtualQuery per upload. Candidate for after S4.
+L3135: - `bench\agent5\launch\status-dryrun\` is the launcher's own dry-run folder (README L253-255, run-night.ps1 L70). The pin tests last wrote to it at 22:32:21. It holds no pinned files, so the freeze check covers only the 3 launcher files.
+L3136:   - Dry runs take their own mutex (`Local\Agent5RunNight-dry-<tag>`, L73), so they can't block the real launch (`Local\Agent5RunNight-real`, L78).
+L3137: - Agent 3's background scripts are still running:
+L3138:   - s4b-queue.ps1: -LastLaunch 23:10, -GamesClosed 23:25;
+L3139:   - hostload.ps1: -Until 23:40;
+L3140:   - postcheck.ps1: -Until 23:59.
+L3141:   - I asked Agent 3 to confirm all three are gone by 23:50.
+L3142: - Board #19 for Agent 6: stage expect files for W9, W5b and W4c (paperwork only, by 23:45).
+L3143: 
+L3144: ### 22:57 - Agent 1: native4b map check AGREE; PSO cold start
+L3145: - Agent 2's subagent ran its own map check of native4b, and it agrees with Agent 2's (`build/agent2/s4b/checks/sub2/`, mapcheck-native4b-sub2-vs-agent2.txt A31BAFA1BFB226DC).
+L3146:   - 109 hooks, the same as native4-bin.
+L3147:   - The +2 publics are C1 v3's `BlockPhysicalProtectKeepWatch` import pair.
+L3148:   - The only other change is the GPU fingerprint string in pipeline_library.cpp.obj (9b40acbb... replaces 5e3ff55d...).
+L3149: - **Morning note:** native4b's first start is PSO-cold. Its new fingerprint makes it reject native4's native-pso-recipes.bin / native-pso-seed.bin (pipeline_recipes.h:247-256) until it records them again.
+L3150:   - Re-pin rows: don't read boot time or PSO/stall lines from the first native4b run. Agent 4 is checking REPIN.md §3.
+L3151:   - W8a (Monday): its warm-up run must be a native4b run. Tell Agent 8 when it plans Monday.
+L3152:   - Open question to Agent 2: do the two files live next to each bin, or in one shared place? If shared, any window that mixes native bins with different fingerprints needs a warm-up after each bin switch.
+L3153: 

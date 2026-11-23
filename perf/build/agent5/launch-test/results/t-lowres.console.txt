@@ -1,0 +1,36 @@
+2026-11-22 22:22:39 [dry] launcher start: DRY RUN, files in <workspace>\bench\agent5\launch\status-dryrun\t-lowres; pid 30392; PowerShell 5.1.26100.10068; repo <workspace>
+2026-11-22 22:22:39 [dry] dry-run hooks: -DryRunTag t-lowres -SkipStartChecks True -MatrixDir build\agent5\launch-test -PollSeconds 1 -SampleSeconds 1 -GiveUpMinutes 0.2 -MaxGo 1 -GateFixture <workspace>\build\agent5\launch-test\gate-lowres.json
+2026-11-22 22:22:40 [dry] start checks: desktop 'WinSta0\exebox-MC6SAMJNH7HMPPKIAKGSJGHVBX'; LogonUI not running; power AC (ACLineStatus 1, BatteryFlag 1, battery 100 %); ends at 2026-11-23 07:30:00; latest window start 2026-11-23 06:45:00; a window still running at 2026-11-23 07:30:00 is stopped
+2026-11-22 22:22:40 [dry] start checks would refuse: this is desktop 'WinSta0\exebox-MC6SAMJNH7HMPPKIAKGSJGHVBX', not the user's own desktop WinSta0\Default (ignored: -DryRun -SkipStartChecks)
+2026-11-22 22:22:40 [dry] pinned 19 files (status: pins.txt)
+2026-11-22 22:22:40 [dry] environment: no other REX_*/LEGO_* variables
+2026-11-22 22:22:40 [dry] console Quick Edit: not changed in a dry run
+2026-11-22 22:22:40 [dry] screensaver: would set (None) (now ScreenSaveActive=0, SCRNSAVE.EXE '') and restore it at the end
+2026-11-22 22:22:41 [dry] keep-awake: would request SetThreadExecutionState(continuous+system+display) until the end
+2026-11-22 22:22:41 [dry] waiting for <workspace>\bench\agent5\launch\status-dryrun\t-lowres\WINDOW-GO.txt (checked every 1 s) until 2026-11-23 07:30:00, or until <workspace>\bench\agent5\launch\status-dryrun\t-lowres\WINDOW-STOP.txt appears
+2026-11-22 22:22:42 [dry] GO read and deleted: 'GO T1 t-good.json 4D7D689B799F6102E6325B4CED12688E60F1D2FCE82397C06956574B2B025DFD only=base,s0 repeats=1'
+2026-11-22 22:22:50 [dry] HOLD written: <workspace>\bench\agent5\launch\status-dryrun\t-lowres\WINDOW-HOLD.txt
+2026-11-22 22:22:52 [dry] GO ACCEPTED: window T1: t-good.json (sha256 ok), only=base,s0, repeats=1; runner estimate 3 runs, about 7 min
+2026-11-22 22:22:52 [dry] bin build/agent2/devoff3-bin/legodimensions.exe sha256 2522D43605D8A9BF2A5EEE31490E6C349274D3258C8E0E1474DBB561CDE86F57
+2026-11-22 22:22:52 [dry] bin build/agent2/devoff3-bin/MANIFEST.txt sha256 B9C5175DA19042353A084E355CBA22D09C50A6B8CE95A1E0A8B17BF64E40FEFE
+2026-11-22 22:22:52 [dry] bin build/agent2/devoff4-bin/legodimensions.exe sha256 6BE3C713229232B29C183D27B397A3560B46E2279C6AF47C64CF8A2EFA287376
+2026-11-22 22:22:52 [dry] bin build/agent2/devoff4-bin/MANIFEST.txt sha256 16DCC9399239E5774BF571869B5248DF36DB0D374BF6A159BF1A9839784CAD6D
+2026-11-22 22:22:52 [dry] WARN: run-matrix.ps1 -PlanOnly says: note     Timing comes only from this double-click run on the unlocked desktop (screensaver None, AC power, hands off). Agent runs of this matrix (-Quick, hidden desktop) are functional only.
+2026-11-22 22:22:52 [dry] WARN: run-matrix.ps1 -PlanOnly says: desktop    WinSta0\exebox-MC6SAMJNH7HMPPKIAKGSJGHVBX -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+2026-11-22 22:22:52 [dry] WARN: run-matrix.ps1 -PlanOnly says: !!! These runs will be FUNCTIONAL ONLY (see above): their numbers are not timing results.
+2026-11-22 22:22:53 [dry] programs (GO accepted): would close Taskmgr pid 23844
+2026-11-22 22:22:53 [dry] gate: simulated samples from <workspace>\build\agent5\launch-test\gate-lowres.json (fields set to 'real' use this PC)
+2026-11-22 22:22:53 [dry] gate 1 (+0.1 min): cpu n/a; builds none; RAM 5.5 GB; C: 5 GB; LogonUI False; AC True -> wait: available RAM 5.5 GB < 6; free on C: 5 GB < 6; 0 of 3 consecutive one-minute CPU averages so far
+2026-11-22 22:22:54 [dry] gate 2 (+0.1 min): cpu MsMpEng 0.02, OfficeClickToRun 0.00, CrossDeviceService 0.01; builds none; RAM 5.5 GB; C: 5 GB; LogonUI False; AC True -> wait: available RAM 5.5 GB < 6; free on C: 5 GB < 6; 1 of 3 consecutive one-minute CPU averages so far
+2026-11-22 22:22:55 [dry] gate 3 (+0.1 min): cpu MsMpEng 0.02, OfficeClickToRun 0.00, CrossDeviceService 0.01; builds none; RAM 5.5 GB; C: 5 GB; LogonUI False; AC True -> wait: available RAM 5.5 GB < 6; free on C: 5 GB < 6; 2 of 3 consecutive one-minute CPU averages so far
+2026-11-22 22:22:56 [dry] gate 4 (+0.1 min): cpu MsMpEng 0.02, OfficeClickToRun 0.00, CrossDeviceService 0.01; builds none; RAM 5.5 GB; C: 5 GB; LogonUI False; AC True -> wait: available RAM 5.5 GB < 6; free on C: 5 GB < 6; sample 1: RAM/disk/lock/power/read error not clean; sample 2: RAM/disk/lock/power/read error not clean
+2026-11-22 22:22:57 [dry] gate 5 (+0.1 min): cpu MsMpEng 0.02, OfficeClickToRun 0.00, CrossDeviceService 0.01; builds none; RAM 5.5 GB; C: 5 GB; LogonUI False; AC True -> wait: available RAM 5.5 GB < 6; free on C: 5 GB < 6; sample 1: RAM/disk/lock/power/read error not clean; sample 2: RAM/disk/lock/power/read error not clean
+2026-11-22 22:22:58 [dry] gate 6 (+0.1 min): cpu MsMpEng 0.02, OfficeClickToRun 0.00, CrossDeviceService 0.01; builds none; RAM 5.5 GB; C: 5 GB; LogonUI False; AC True -> wait: available RAM 5.5 GB < 6; free on C: 5 GB < 6; sample 1: RAM/disk/lock/power/read error not clean; sample 2: RAM/disk/lock/power/read error not clean
+2026-11-22 22:22:59 [dry] gate 7 (+0.2 min): cpu MsMpEng 0.02, OfficeClickToRun 0.00, CrossDeviceService 0.01; builds none; RAM 5.5 GB; C: 5 GB; LogonUI False; AC True -> wait: available RAM 5.5 GB < 6; free on C: 5 GB < 6; sample 1: RAM/disk/lock/power/read error not clean; sample 2: RAM/disk/lock/power/read error not clean
+2026-11-22 22:23:00 [dry] gate 8 (+0.2 min): cpu MsMpEng 0.02, OfficeClickToRun 0.00, CrossDeviceService 0.01; builds none; RAM 5.5 GB; C: 5 GB; LogonUI False; AC True -> wait: available RAM 5.5 GB < 6; free on C: 5 GB < 6; sample 1: RAM/disk/lock/power/read error not clean; sample 2: RAM/disk/lock/power/read error not clean
+2026-11-22 22:23:01 [dry] gate 9 (+0.2 min): cpu MsMpEng 0.02, OfficeClickToRun 0.00, CrossDeviceService 0.01; builds none; RAM 5.5 GB; C: 5 GB; LogonUI False; AC True -> wait: available RAM 5.5 GB < 6; free on C: 5 GB < 6; sample 1: RAM/disk/lock/power/read error not clean; sample 2: RAM/disk/lock/power/read error not clean
+22:23:02 quiet gate: GAVE UP (MsMpEng 0.02/0.02/0.02, OfficeClickToRun 0.00/0.00/0.00, CrossDeviceService 0.01/0.01/0.01; after 0 min; window not started)
+2026-11-22 22:23:02 [dry] GATE REFUSED: gave up: the quiet gate did not pass in 0.2 min (last wait: available RAM 5.5 GB < 6; free on C: 5 GB < 6; sample 1: RAM/disk/lock/power/read error not clean; sample 2: RAM/disk/lock/power/read error not clean)
+2026-11-22 22:23:02 [dry] HOLD removed
+2026-11-22 22:23:02 [dry] -MaxGo 1 reached: the launcher ends
+2026-11-22 22:23:02 [dry] launcher end: -MaxGo, exit 0

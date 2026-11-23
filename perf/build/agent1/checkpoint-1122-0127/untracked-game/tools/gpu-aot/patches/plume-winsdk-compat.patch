@@ -1,0 +1,12 @@
+diff --git a/plume_d3d12.cpp b/plume_d3d12.cpp
+--- a/plume_d3d12.cpp
++++ b/plume_d3d12.cpp
+@@ -502,7 +502,7 @@ namespace plume {
+         case RenderHeapType::READBACK:
+             return D3D12_HEAP_TYPE_READBACK;
+         case RenderHeapType::GPU_UPLOAD:
+-            return D3D12_HEAP_TYPE_GPU_UPLOAD;
++            return static_cast<D3D12_HEAP_TYPE>(5); // = D3D12_HEAP_TYPE_GPU_UPLOAD, declared only by Windows SDK >= 10.0.26100 or the Agility SDK; this machine has 10.0.22621 (Agent 2 snapshot patch S1+p2)
+         default:
+             assert(false && "Unknown heap type.");
+             return D3D12_HEAP_TYPE_DEFAULT;

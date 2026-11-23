@@ -1,0 +1,185 @@
+{
+  "baseline": [
+    {
+      "run": "build\\agent8\\matrix\\20261122-0452\\runs\\0452-n0-r1",
+      "lines": 480,
+      "warning_lines": 66,
+      "threaded_on": 0,
+      "batches": []
+    }
+  ],
+  "rows": [
+    {
+      "row": "n2",
+      "run": "build\\agent8\\matrix\\20261122-0452\\runs\\0454-n2-r1",
+      "checks": [
+        {
+          "check": "run.json status OK",
+          "ok": true,
+          "detail": "status=OK problems=[] runner_error=None"
+        },
+        {
+          "check": "env as expected",
+          "ok": true,
+          "detail": "ok"
+        },
+        {
+          "check": "game.log present, boot lines kept",
+          "ok": true,
+          "detail": "514 lines in game.log 62207 B"
+        },
+        {
+          "check": "threaded recording ON once",
+          "ok": true,
+          "detail": "ON lines=1 off lines=0"
+        },
+        {
+          "check": "'Native draw batches: parallel workers=2'",
+          "ok": true,
+          "detail": "found ['parallel workers=2']"
+        },
+        {
+          "check": "worker line per 600 presents",
+          "ok": true,
+          "detail": "26 lines for 16145 presents (expect ~26.9)"
+        },
+        {
+          "check": "worker thread names",
+          "ok": true,
+          "detail": "ok: Native GPU preparation, Native GPU prepare 1, Native GPU prepare 2, Native GPU recording"
+        },
+        {
+          "check": "no new warning/error types vs n0",
+          "ok": true,
+          "detail": "none"
+        },
+        {
+          "check": "no baseline warning type > 2x n0 max",
+          "ok": true,
+          "detail": "none"
+        },
+        {
+          "check": "clean close",
+          "ok": true,
+          "detail": "exit seen after 1.09 s, killed False, exit 0x00000000"
+        }
+      ],
+      "info": {
+        "cpu_cores_mean": 1.83,
+        "cpu_cores_max": 2.57,
+        "threads_seen": 67,
+        "peak_threads_proc_csv": 72.0,
+        "top_threads": [
+          "Native GPU preparation 55.8%",
+          "rex::thread::TimerQueue 37%",
+          "Main XThread (F8000024) 32.7%",
+          "XThread10C7C (F8000128) 16.5%",
+          "Native GPU recording 11%"
+        ],
+        "gpu_util_mean": 36.1,
+        "window_frames": 6578,
+        "mean_fps_not_timing": 109.626,
+        "median_ms_not_timing": 7.2119,
+        "p99_ms_not_timing": 33.6926,
+        "worker_mean_per_600": {
+          "tasks": 35060.8,
+          "inline": 10.1,
+          "drains": 1.2,
+          "drain_wait_ms": 6.0,
+          "throttle_wait_ms": 2708.7
+        },
+        "valid_timing": false,
+        "warning_lines_total": 66
+      },
+      "new_types": [],
+      "increased_types": [],
+      "pass": true
+    },
+    {
+      "row": "n3",
+      "run": "build\\agent8\\matrix\\20261122-0452\\runs\\0456-n3-r1",
+      "checks": [
+        {
+          "check": "run.json status OK",
+          "ok": true,
+          "detail": "status=OK problems=[] runner_error=None"
+        },
+        {
+          "check": "env as expected",
+          "ok": true,
+          "detail": "ok"
+        },
+        {
+          "check": "game.log present, boot lines kept",
+          "ok": true,
+          "detail": "499 lines in game.log 60963 B"
+        },
+        {
+          "check": "threaded recording ON once",
+          "ok": true,
+          "detail": "ON lines=1 off lines=0"
+        },
+        {
+          "check": "no 'Native draw batches' line (full-prep path)",
+          "ok": true,
+          "detail": "absent, as the code predicts"
+        },
+        {
+          "check": "worker line per 600 presents",
+          "ok": true,
+          "detail": "27 lines for 16580 presents (expect ~27.6)"
+        },
+        {
+          "check": "worker thread names",
+          "ok": true,
+          "detail": "ok: Native GPU preparation, Native GPU prepare 1, Native GPU prepare 2, Native GPU reclaim, Native GPU recording"
+        },
+        {
+          "check": "no new warning/error types vs n0",
+          "ok": true,
+          "detail": "none"
+        },
+        {
+          "check": "no baseline warning type > 2x n0 max",
+          "ok": true,
+          "detail": "none"
+        },
+        {
+          "check": "clean close",
+          "ok": true,
+          "detail": "exit seen after 2.92 s, killed False, exit 0x00000000"
+        }
+      ],
+      "info": {
+        "cpu_cores_mean": 2.07,
+        "cpu_cores_max": 2.81,
+        "threads_seen": 68,
+        "peak_threads_proc_csv": 73.0,
+        "top_threads": [
+          "Native GPU recording 55.4%",
+          "rex::thread::TimerQueue 39.4%",
+          "Main XThread (F8000024) 37.2%",
+          "Native GPU preparation 20.7%",
+          "XThread161E8 (F8000128) 16.2%"
+        ],
+        "gpu_util_mean": 39.7,
+        "window_frames": 7003,
+        "mean_fps_not_timing": 116.706,
+        "median_ms_not_timing": 6.6794,
+        "p99_ms_not_timing": 32.2597,
+        "worker_mean_per_600": {
+          "tasks": 65975.9,
+          "inline": 0.0,
+          "drains": 0.0,
+          "drain_wait_ms": 30.3,
+          "throttle_wait_ms": 2969.1
+        },
+        "valid_timing": false,
+        "warning_lines_total": 58
+      },
+      "new_types": [],
+      "increased_types": [],
+      "pass": true
+    }
+  ]
+}

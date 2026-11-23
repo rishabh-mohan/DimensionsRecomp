@@ -1,0 +1,311 @@
+{
+  "baseline": [
+    {
+      "run": "build\\agent8\\matrix\\20261122-0013\\runs\\0016-cold-n0",
+      "lines": 481,
+      "warning_lines": 67,
+      "threaded_on": 0,
+      "batches": []
+    },
+    {
+      "run": "build\\agent8\\matrix\\20261122-0013\\runs\\0030-n0-r1",
+      "lines": 484,
+      "warning_lines": 66,
+      "threaded_on": 0,
+      "batches": []
+    },
+    {
+      "run": "build\\agent8\\matrix\\20261122-0013\\runs\\0042-n0-r2",
+      "lines": 484,
+      "warning_lines": 66,
+      "threaded_on": 0,
+      "batches": []
+    },
+    {
+      "run": "build\\agent8\\matrix\\20261122-0013\\runs\\0054-n0-r3",
+      "lines": 480,
+      "warning_lines": 66,
+      "threaded_on": 0,
+      "batches": []
+    },
+    {
+      "run": "build\\agent8\\matrix\\20261122-0013\\runs\\0104-n0-r4",
+      "lines": 480,
+      "warning_lines": 66,
+      "threaded_on": 0,
+      "batches": []
+    }
+  ],
+  "rows": [
+    {
+      "row": "n1",
+      "run": "build\\agent8\\matrix\\s3-n123-0205\\runs\\0205-n1-r1",
+      "checks": [
+        {
+          "check": "run.json status OK",
+          "ok": true,
+          "detail": "status=OK problems=[] runner_error=None"
+        },
+        {
+          "check": "env as expected",
+          "ok": true,
+          "detail": "ok"
+        },
+        {
+          "check": "game.log present, boot lines kept",
+          "ok": true,
+          "detail": "500 lines in game.log 60401 B"
+        },
+        {
+          "check": "threaded recording ON once",
+          "ok": true,
+          "detail": "ON lines=1 off lines=0"
+        },
+        {
+          "check": "'Native draw batches: serial workers=0'",
+          "ok": true,
+          "detail": "found ['serial workers=0']"
+        },
+        {
+          "check": "worker line per 600 presents",
+          "ok": true,
+          "detail": "19 lines for 11674 presents (expect ~19.5)"
+        },
+        {
+          "check": "worker thread names",
+          "ok": true,
+          "detail": "ok: Native GPU recording"
+        },
+        {
+          "check": "no new warning/error types vs n0",
+          "ok": true,
+          "detail": "none"
+        },
+        {
+          "check": "no baseline warning type > 2x n0 max",
+          "ok": true,
+          "detail": "none"
+        },
+        {
+          "check": "clean close",
+          "ok": true,
+          "detail": "exit seen after 2.37 s, killed False, exit 0x00000000"
+        }
+      ],
+      "info": {
+        "cpu_cores_mean": 1.75,
+        "cpu_cores_max": 2.27,
+        "threads_seen": 66,
+        "peak_threads_proc_csv": 69.0,
+        "top_threads": [
+          "Native GPU recording 80.5%",
+          "rex::thread::TimerQueue 32.6%",
+          "Main XThread (F8000024) 31.2%",
+          "XThread5AC4 (F8000128) 11.7%",
+          "XThread17DFC (F800018C) 7.9%"
+        ],
+        "gpu_util_mean": 40.9,
+        "window_frames": 6506,
+        "mean_fps_not_timing": 108.427,
+        "median_ms_not_timing": 8.036,
+        "p99_ms_not_timing": 41.4128,
+        "worker_mean_per_600": {
+          "tasks": 66195.5,
+          "inline": 48.2,
+          "drains": 1.0,
+          "drain_wait_ms": 4.6,
+          "throttle_wait_ms": 3318.0
+        },
+        "valid_timing": false,
+        "warning_lines_total": 67
+      },
+      "new_types": [],
+      "increased_types": [],
+      "pass": true
+    },
+    {
+      "row": "n2",
+      "run": "build\\agent8\\matrix\\s3-n2-0210\\runs\\0210-n2-r1",
+      "checks": [
+        {
+          "check": "run.json status OK",
+          "ok": true,
+          "detail": "status=OK problems=[] runner_error=None"
+        },
+        {
+          "check": "env as expected",
+          "ok": true,
+          "detail": "ok"
+        },
+        {
+          "check": "game.log present, boot lines kept",
+          "ok": true,
+          "detail": "67730 lines in game.1.log 5242814 B, game.log 2011592 B"
+        },
+        {
+          "check": "threaded recording ON once",
+          "ok": true,
+          "detail": "ON lines=1 off lines=0"
+        },
+        {
+          "check": "'Native draw batches: parallel workers=2'",
+          "ok": true,
+          "detail": "found ['parallel workers=2']"
+        },
+        {
+          "check": "worker line per 600 presents",
+          "ok": true,
+          "detail": "22 lines for 13573 presents (expect ~22.6)"
+        },
+        {
+          "check": "worker thread names",
+          "ok": true,
+          "detail": "ok: Native GPU preparation, Native GPU prepare 1, Native GPU prepare 2, Native GPU recording"
+        },
+        {
+          "check": "no new warning/error types vs n0",
+          "ok": false,
+          "detail": "67220x [warning] [core] Native GPU shader cache miss: hash=X"
+        },
+        {
+          "check": "no baseline warning type > 2x n0 max",
+          "ok": true,
+          "detail": "none"
+        },
+        {
+          "check": "clean close",
+          "ok": true,
+          "detail": "exit seen after 2.73 s, killed False, exit 0x00000000"
+        }
+      ],
+      "info": {
+        "cpu_cores_mean": 1.92,
+        "cpu_cores_max": 2.35,
+        "threads_seen": 71,
+        "peak_threads_proc_csv": 73.0,
+        "top_threads": [
+          "Native GPU preparation 60%",
+          "Main XThread (F8000024) 42.8%",
+          "rex::thread::TimerQueue 28.6%",
+          "XThread13778 (F8000128) 11.4%",
+          "XThread9120 (F8000190) 9.3%"
+        ],
+        "gpu_util_mean": 43.6,
+        "window_frames": 8125,
+        "mean_fps_not_timing": 135.414,
+        "median_ms_not_timing": 6.6639,
+        "p99_ms_not_timing": 24.7184,
+        "worker_mean_per_600": {
+          "tasks": 34462.6,
+          "inline": 4.0,
+          "drains": 0.7,
+          "drain_wait_ms": 3.9,
+          "throttle_wait_ms": 2434.7
+        },
+        "valid_timing": false,
+        "warning_lines_total": 67286
+      },
+      "new_types": [
+        {
+          "type": "[warning] [core] Native GPU shader cache miss: hash=X",
+          "count": 67220,
+          "first": "game.1.log:424: [2026-11-22 02:11:05.541] [warning] [core] [t38688] Native GPU shader cache miss: hash=0x0000000000000000"
+        }
+      ],
+      "increased_types": [],
+      "pass": false
+    },
+    {
+      "row": "n3",
+      "run": "build\\agent8\\matrix\\s3-n123-0205\\runs\\0208-n3-r1",
+      "checks": [
+        {
+          "check": "run.json status OK",
+          "ok": true,
+          "detail": "status=OK problems=[] runner_error=None"
+        },
+        {
+          "check": "env as expected",
+          "ok": true,
+          "detail": "ok"
+        },
+        {
+          "check": "game.log present, boot lines kept",
+          "ok": true,
+          "detail": "45457 lines in game.log 4870834 B"
+        },
+        {
+          "check": "threaded recording ON once",
+          "ok": true,
+          "detail": "ON lines=1 off lines=0"
+        },
+        {
+          "check": "no 'Native draw batches' line (full-prep path)",
+          "ok": true,
+          "detail": "absent, as the code predicts"
+        },
+        {
+          "check": "worker line per 600 presents",
+          "ok": true,
+          "detail": "17 lines for 10577 presents (expect ~17.6)"
+        },
+        {
+          "check": "worker thread names",
+          "ok": true,
+          "detail": "ok: Native GPU preparation, Native GPU prepare 1, Native GPU prepare 2, Native GPU reclaim, Native GPU recording"
+        },
+        {
+          "check": "no new warning/error types vs n0",
+          "ok": false,
+          "detail": "44968x [warning] [core] Native GPU shader cache miss: hash=X"
+        },
+        {
+          "check": "no baseline warning type > 2x n0 max",
+          "ok": true,
+          "detail": "none"
+        },
+        {
+          "check": "clean close",
+          "ok": true,
+          "detail": "exit seen after 0.8 s, killed False, exit 0x00000000"
+        }
+      ],
+      "info": {
+        "cpu_cores_mean": 1.98,
+        "cpu_cores_max": 2.33,
+        "threads_seen": 71,
+        "peak_threads_proc_csv": 73.0,
+        "top_threads": [
+          "Native GPU preparation 59%",
+          "rex::thread::TimerQueue 33.5%",
+          "Main XThread (F8000024) 31.7%",
+          "Native GPU recording 31.5%",
+          "XThreadF8A4 (F8000128) 11.4%"
+        ],
+        "gpu_util_mean": 36.5,
+        "window_frames": 5414,
+        "mean_fps_not_timing": 90.228,
+        "median_ms_not_timing": 10.5293,
+        "p99_ms_not_timing": 25.341,
+        "worker_mean_per_600": {
+          "tasks": 63818.4,
+          "inline": 0.0,
+          "drains": 0.0,
+          "drain_wait_ms": 31.7,
+          "throttle_wait_ms": 3756.4
+        },
+        "valid_timing": false,
+        "warning_lines_total": 45026
+      },
+      "new_types": [
+        {
+          "type": "[warning] [core] Native GPU shader cache miss: hash=X",
+          "count": 44968,
+          "first": "game.log:415: [2026-11-22 02:08:25.326] [warning] [core] [t66320] Native GPU shader cache miss: hash=0x0000000000000000"
+        }
+      ],
+      "increased_types": [],
+      "pass": false
+    }
+  ]
+}

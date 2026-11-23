@@ -1,0 +1,565 @@
+{
+ "run": "20261122-210906-w6-gateA-p2fcv-level",
+ "row": "w6gA",
+ "kind": "off",
+ "scenario": "level-l.txt",
+ "runjson": {
+  "exit_code": 0,
+  "exit_code_hex": "0x00000000",
+  "dumps": [
+   "<workspace>\\build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\hang-36276.dmp"
+  ],
+  "crash_events": [],
+  "wer_seen": false,
+  "close_method": "wm_close",
+  "close_seconds": 0.89,
+  "elapsed_s": 601.03,
+  "seconds_requested": 600,
+  "cvars": {
+   "framerate_limit": "0",
+   "shared_memory_single_hold_rearm": "true",
+   "physical_protect_hold_global_lock": "true",
+   "physical_protect_keep_watch": "true",
+   "physical_protect_keep_watch_verify": "true",
+   "slow_frame_log_ms": "1"
+  },
+  "exited_early": false,
+  "env_extra": {},
+  "steps": "104/119"
+ },
+ "summary": {
+  "verdict": "RECOVERED HANG (STUCK-LOCK + dump)",
+  "first_frame_s": 17.0,
+  "levels": {
+   "info": 7378,
+   "warning": 142,
+   "error": 5,
+   "critical": 1
+  },
+  "unknown_cvars": [],
+  "errors": [
+   "544.95s [error] STUCK-LOCK: critical section 0x84959edc still not acquired after 5s. owner=guest thread object 0x30111018, lock_count=1, recursion=1; waiting thread is 0x6. An owner of 0, or one naming a thread that has exited, means the lock was leaked.",
+   "544.95s [error] STUCK-LOCK: the owner is tid 0x0017 (unnamed), parked at lr=83FAF188 with r3=7048F7E0. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.",
+   "544.95s [error] STUCK-LOCK: owner's callers: 83FBFBDC <- 83FC0CA8 <- 83FB3AC8 <- 83FBF698 <- 83FBFA98 <- 82BD6BA4",
+   "544.95s [error] STUCK-LOCK: waiter's callers: lr=82A2A270 <- 82AED6BC <- 82B7132C <- 82FB01A0 <- 82B7995C <- 82AB2108 <- 82FEBDE0",
+   "544.95s [error] STUCK-LOCK: GPU thread: executing PM4 opcode 0x22 | read ptr 0x2665, write ptr 0x26fb"
+  ]
+ },
+ "log_files": [
+  "game.log"
+ ],
+ "families": {
+  "c1_any": 21,
+  "c1_init_on": 1,
+  "c1_init_blocked": 0,
+  "c1_init_nohold": 0,
+  "c1_first": 1,
+  "c1_kept": 19,
+  "c1_blocked": 0,
+  "c1_verify_on": 1,
+  "c1_verify_f": 0,
+  "recovered_stale": 0,
+  "unhandled_phys": 0,
+  "protect_failed": 0,
+  "split_init": 0,
+  "split": 0,
+  "deferred_counters": 0,
+  "gpu_wait": 0,
+  "gpu_wait_stats": 0,
+  "gpu_wait_backoff": 0,
+  "gpu_wait_on": 0,
+  "memexport": 7271,
+  "slow_frame": 7271,
+  "s4_upload_hash": 0,
+  "precise_wait": 0,
+  "miss_cache": 0,
+  "stuck_lock": 5,
+  "minidump": 1,
+  "fatal": 1,
+  "clean_exit": 1,
+  "debug_layer": 0,
+  "dred": 0,
+  "d3d12_msg": 0,
+  "k": 0,
+  "c1_other": 0
+ },
+ "levels": {
+  "info": 7378,
+  "warning": 142,
+  "error": 5,
+  "critical": 1
+ },
+ "lines": {
+  "c1_any": {
+   "first": [
+    "[2026-11-22 21:09:13.865] [info] [sys] [t1016] C1 keep-watch: on (with physical_protect_hold_global_lock)",
+    "[2026-11-22 21:09:16.473] [info] [sys] [t8520] C1 keep-watch: first kept protect at ED19F000, 299892736 bytes",
+    "[2026-11-22 21:09:16.475] [info] [sys] [t8520] C1 keep-watch: 2 protects kept so far"
+   ],
+   "last": [
+    "[2026-11-22 21:17:00.548] [info] [sys] [t19856] C1 keep-watch: 24576 protects kept so far",
+    "[2026-11-22 21:17:12.972] [info] [sys] [t19856] C1 keep-watch: 28672 protects kept so far",
+    "[2026-11-22 21:17:23.308] [info] [sys] [t19856] C1 keep-watch: 32768 protects kept so far"
+   ]
+  },
+  "c1_verify_on": {
+   "first": [
+    "[2026-11-22 21:09:20.026] [info] [gpu] [t17104] C1 verify: on. Hashing CPU uploads; K checks keep-watch protects, F checks write faults"
+   ],
+   "last": []
+  },
+  "memexport": {
+   "first": [
+    "[2026-11-22 21:09:20.185] [info] [gpu] [t17104] slow frame #2: 87.6 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.2 (2x), new 3 | texture load 2.5 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)",
+    "[2026-11-22 21:09:20.265] [info] [gpu] [t17104] slow frame #3: 80.9 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 1x 4 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)",
+    "[2026-11-22 21:09:20.411] [info] [gpu] [t17104] slow frame #4: 145.6 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 2x 8 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)"
+   ],
+   "last": [
+    "[2026-11-22 21:19:08.772] [info] [gpu] [t17104] slow frame #7270: 189.0 ms | gpu-thread idle 19.6 | host-gpu wait 9.4 (2x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.3 (41x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 3x 392 KB (on memexport pages 1x 352 KB) | memexport syncs 2 (108 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)",
+    "[2026-11-22 21:19:09.085] [info] [gpu] [t17104] slow frame #7271: 312.7 ms | gpu-thread idle 0.0 | host-gpu wait 27.9 (16x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.2 (41x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 6x 7392 KB (on memexport pages 2x 4328 KB) | memexport syncs 16 (400 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)",
+    "[2026-11-22 21:19:09.311] [info] [gpu] [t17104] slow frame #7272: 225.8 ms | gpu-thread idle 21.1 | host-gpu wait 6.4 (2x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 1 | texture load 0.4 (55x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 3x 36 KB (on memexport pages 1x 28 KB) | memexport syncs 2 (40 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)"
+   ]
+  },
+  "slow_frame": {
+   "first": [
+    "[2026-11-22 21:09:20.185] [info] [gpu] [t17104] slow frame #2: 87.6 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.2 (2x), new 3 | texture load 2.5 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)",
+    "[2026-11-22 21:09:20.265] [info] [gpu] [t17104] slow frame #3: 80.9 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 1x 4 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)",
+    "[2026-11-22 21:09:20.411] [info] [gpu] [t17104] slow frame #4: 145.6 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 2x 8 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)"
+   ],
+   "last": [
+    "[2026-11-22 21:19:08.772] [info] [gpu] [t17104] slow frame #7270: 189.0 ms | gpu-thread idle 19.6 | host-gpu wait 9.4 (2x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.3 (41x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 3x 392 KB (on memexport pages 1x 352 KB) | memexport syncs 2 (108 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)",
+    "[2026-11-22 21:19:09.085] [info] [gpu] [t17104] slow frame #7271: 312.7 ms | gpu-thread idle 0.0 | host-gpu wait 27.9 (16x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.2 (41x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 6x 7392 KB (on memexport pages 2x 4328 KB) | memexport syncs 16 (400 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)",
+    "[2026-11-22 21:19:09.311] [info] [gpu] [t17104] slow frame #7272: 225.8 ms | gpu-thread idle 21.1 | host-gpu wait 6.4 (2x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 1 | texture load 0.4 (55x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 3x 36 KB (on memexport pages 1x 28 KB) | memexport syncs 2 (40 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)"
+   ]
+  },
+  "stuck_lock": {
+   "first": [
+    "[2026-11-22 21:18:17.497] [error] [krnl] [t8520] STUCK-LOCK: critical section 0x84959edc still not acquired after 5s. owner=guest thread object 0x30111018, lock_count=1, recursion=1; waiting thread is 0x6. An owner of 0, or one naming a thread that has exited, means the lock was leaked.",
+    "[2026-11-22 21:18:17.497] [error] [krnl] [t8520] STUCK-LOCK: the owner is tid 0x0017 (unnamed), parked at lr=83FAF188 with r3=7048F7E0. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.",
+    "[2026-11-22 21:18:17.497] [error] [krnl] [t8520] STUCK-LOCK: owner's callers: 83FBFBDC <- 83FC0CA8 <- 83FB3AC8 <- 83FBF698 <- 83FBFA98 <- 82BD6BA4"
+   ],
+   "last": [
+    "[2026-11-22 21:18:17.497] [error] [krnl] [t8520] STUCK-LOCK: waiter's callers: lr=82A2A270 <- 82AED6BC <- 82B7132C <- 82FB01A0 <- 82B7995C <- 82AB2108 <- 82FEBDE0",
+    "[2026-11-22 21:18:17.497] [error] [krnl] [t8520] STUCK-LOCK: GPU thread: executing PM4 opcode 0x22 | read ptr 0x2665, write ptr 0x26fb"
+   ]
+  },
+  "minidump": {
+   "first": [
+    "[2026-11-22 21:18:20.628] [critical] [core] [t8520] [FATAL] Minidump written to hang-36276.dmp"
+   ],
+   "last": []
+  },
+  "fatal": {
+   "first": [
+    "[2026-11-22 21:18:20.628] [critical] [core] [t8520] [FATAL] Minidump written to hang-36276.dmp"
+   ],
+   "last": []
+  }
+ },
+ "c1_kept_last": 32768,
+ "memexport": {
+  "lines": 7271,
+  "last_total": 0,
+  "max_total": 0,
+  "sum_x": 0,
+  "lines_x_gt0": 0
+ },
+ "slow_last": "[2026-11-22 21:19:09.311] [info] [gpu] [t17104] slow frame #7272: 225.8 ms | gpu-thread idle 21.1 | host-gpu wait 6.4 (2x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 1 | texture load 0.4 (55x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 3x 36 KB (on memexport pages 1x 28 KB) | memexport syncs 2 (40 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)",
+ "frame_rows": 7272,
+ "logdiff": {
+  "bases": [
+   "20261122-210059-s4b-L0-off-level"
+  ],
+  "base_scenario": "level-l.txt",
+  "NEW": 6,
+  "NEW_allowed": 0,
+  "MORE": 0,
+  "MORE_allowed": 0,
+  "GONE": 103,
+  "GONE_unexpected": 6,
+  "FLAG": 1,
+  "NEW_info_other": 10,
+  "NEW_info_allowed": 1,
+  "rc": 0,
+  "new": [
+   "NEW build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log x1 [critical] [core] [FATAL] Minidump written to hang-#.dmp",
+   "NEW build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log x1 [error] [krnl] STUCK-LOCK: GPU thread: executing PM# opcode #x# | read ptr #x#, write ptr #x#",
+   "NEW build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log x1 [error] [krnl] STUCK-LOCK: critical section #x# still not acquired after #s. owner=guest thread object #x#, lock_count=#, recursion=#; waiting thread is #x#. An owner of #, or one naming a thread that has exited, me",
+   "NEW build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log x1 [error] [krnl] STUCK-LOCK: owner's callers: #h <- #h <- #h <- #h <- #h <- #h",
+   "NEW build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log x1 [error] [krnl] STUCK-LOCK: the owner is tid #x# (unnamed), parked at lr=#h with r#=#h. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.",
+   "NEW build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log x1 [error] [krnl] STUCK-LOCK: waiter's callers: lr=#h <- #h <- #h <- #h <- #h <- #h <- #h"
+  ],
+  "new_allowed": [],
+  "more": [],
+  "gone_unexpected": [
+   "GONE build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log [info] [core] Toypad: pad # mode # lit # #E # (on # off # count # speed #)",
+   "GONE build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log [info] [core] Toypad: pad # mode # lit FE # # (on # off # count # speed #)",
+   "GONE build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log [info] [core] Toypad: pad # mode # lit FF # # (on # off # count # speed #)",
+   "GONE build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log [info] [core] Toypad: pad # mode # lit FF #E # (on # off # count # speed #)",
+   "GONE build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log [warning] [krnl] [NtCreateFile] FAILED: path='ttappdat<path>' -> #x#",
+   "GONE build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log [warning] [krnl] __imp__XNetLogonGetTitleID STUB"
+  ],
+  "flag": [
+   "FLAG build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log fatal=1 (baseline max 0)"
+  ],
+  "new_info_other": [
+   "NEW build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log x1 [critical] [core] [FATAL] Minidump written to hang-#.dmp",
+   "NEW build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log x1 [error] [krnl] STUCK-LOCK: GPU thread: executing PM# opcode #x# | read ptr #x#, write ptr #x#",
+   "NEW build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log x1 [error] [krnl] STUCK-LOCK: critical section #x# still not acquired after #s. owner=guest thread object #x#, lock_count=#, recursion=#; waiting thread is #x#. An owner of #, or one naming a thread that has exited, me",
+   "NEW build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log x1 [error] [krnl] STUCK-LOCK: owner's callers: #h <- #h <- #h <- #h <- #h <- #h",
+   "NEW build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log x1 [error] [krnl] STUCK-LOCK: the owner is tid #x# (unnamed), parked at lr=#h with r#=#h. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.",
+   "NEW build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log x1 [error] [krnl] STUCK-LOCK: waiter's callers: lr=#h <- #h <- #h <- #h <- #h <- #h <- #h",
+   "NEW build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log x1 [info] [gpu] C# verify: on. Hashing CPU uploads; K checks keep-watch protects, F checks write faults",
+   "NEW build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log x19 [info] [sys] C# keep-watch: # protects kept so far",
+   "NEW build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log x1 [info] [sys] C# keep-watch: first kept protect at #h, #h bytes",
+   "NEW build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log x1 [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)"
+  ],
+  "new_info_allowed": [
+   "NEW build\\agent3\\runs\\20261122-210906-w6-gateA-p2fcv-level\\game.log x7271 [info] [gpu] slow frame ##: # ms | gpu-thread idle # | host-gpu wait # (#x) | shader translate # (#x) | pipeline create # (#x), new # | texture load # (#x) | readback #x # KB, # stalled | cpu-write invalidations #"
+  ]
+ },
+ "scenes": {
+  "base": "20261122-210059-s4b-L0-off-level",
+  "missing_in_cand": [
+   "788/31613",
+   "790/31625",
+   "841/31696"
+  ],
+  "extra_in_cand": [],
+  "cand_major": {
+   "220/534": 194.6,
+   "218/222": 176.3,
+   "220/528": 43.6,
+   "219/226": 14.8,
+   "594/2813": 10.4,
+   "226/1022": 5.5
+  },
+  "base_major": {
+   "220/534": 81.5,
+   "218/222": 25.7,
+   "226/1022": 23.8,
+   "220/528": 17.3,
+   "219/226": 14.9,
+   "594/2813": 3.6,
+   "788/31613": 2.6,
+   "841/31696": 2.6,
+   "790/31625": 2.2
+  }
+ },
+ "marks": {
+  "prefix": 4,
+  "prefix_diff": [
+   [
+    "title",
+    "226/1022",
+    "219/244"
+   ],
+   [
+    "pads-white",
+    "220/528",
+    "226/1022"
+   ],
+   [
+    "tags-placed",
+    "220/528",
+    "226/1022"
+   ]
+  ],
+  "all_diff": 9,
+  "cand": {
+   "first-frame": "218/222",
+   "title": "219/244",
+   "pads-white": "226/1022",
+   "tags-placed": "226/1022",
+   "m01": "220/528",
+   "m02": "220/528",
+   "m03": "220/528",
+   "m04": "220/528",
+   "m05": "220/528",
+   "m06": "220/528",
+   "m07": "220/534",
+   "m08": "220/534",
+   "m09": "220/534",
+   "m10": "220/534",
+   "story-load": "220/534"
+  }
+ },
+ "threads": {
+  "window_s": 552.4,
+  "window": [
+   20.0,
+   572.4
+  ],
+  "by_name": {
+   "(unnamed)": {
+    "pct": 10.76,
+    "threads": 33
+   },
+   "rex::thread::TimerQueue": {
+    "pct": 22.56,
+    "threads": 1
+   },
+   "DeviceHotplugThread": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "D3D Background Thread 0": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "D3D Background Thread 1": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "D3D Background Thread 2": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "D3D Background Thread 3": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "0x16c00001": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "0xc0550001": {
+    "pct": 3.27,
+    "threads": 1
+   },
+   "XMA Decoder (F8000010)": {
+    "pct": 0.2,
+    "threads": 1
+   },
+   "Audio Worker (F8000014)": {
+    "pct": 0.75,
+    "threads": 1
+   },
+   "GPU Commands (F8000018)": {
+    "pct": 52.82,
+    "threads": 1
+   },
+   "GPU VSync (F800001C)": {
+    "pct": 0.84,
+    "threads": 1
+   },
+   "D3D12 Pipelines": {
+    "pct": 0.92,
+    "threads": 9
+   },
+   "Kernel Dispatch (F8000028)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "Main XThread (F800002C)": {
+    "pct": 15.28,
+    "threads": 1
+   },
+   "D3D12 Storage writer": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread9088 (F8000070)": {
+    "pct": 0.15,
+    "threads": 1
+   },
+   "XThread4D90 (F80000F4)": {
+    "pct": 10.93,
+    "threads": 1
+   },
+   "XThread6EA4 (F80000FC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread8798 (F8000104)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread92E4 (F800010C)": {
+    "pct": 0.59,
+    "threads": 1
+   },
+   "XThread5A84 (F8000114)": {
+    "pct": 0.96,
+    "threads": 1
+   },
+   "XThread03FC (F8000120)": {
+    "pct": 0.07,
+    "threads": 1
+   },
+   "XThread7120 (F8000128)": {
+    "pct": 0.86,
+    "threads": 1
+   },
+   "XThread35A8 (F800012C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread52EC (F8000140)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread393C (F8000144)": {
+    "pct": 3.94,
+    "threads": 1
+   },
+   "SDLWASAPIMgmt": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "SDLAudioP19": {
+    "pct": 0.44,
+    "threads": 1
+   },
+   "XThread928C (F8000164)": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "XThread32F4 (F800016C)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread7734 (F8000188)": {
+    "pct": 0.09,
+    "threads": 1
+   },
+   "XThread20BC (F8000190)": {
+    "pct": 0.33,
+    "threads": 1
+   },
+   "XThread1DEC (F8000198)": {
+    "pct": 0.34,
+    "threads": 1
+   },
+   "XThread8484 (F80001A8)": {
+    "pct": 46.52,
+    "threads": 1
+   },
+   "XThread6758 (F80001BC)": {
+    "pct": 0.16,
+    "threads": 1
+   },
+   "XThread481C (F800026C)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread30FC (F80002BC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread9410 (F80002C4)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread30E8 (F80002D0)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread76B4 (F80002D8)": {
+    "pct": 0.03,
+    "threads": 1
+   },
+   "XThread87A4 (F8000324)": {
+    "pct": 0.0,
+    "threads": 1
+   }
+  },
+  "ticks": {
+   "38752": {
+    "name": "rex::thread::TimerQueue",
+    "samples": 299,
+    "steps": 298,
+    "non_rising": 0,
+    "non_rising_at_s": [],
+    "step_s_median": 2.0,
+    "span_s": [
+     -13.6,
+     582.4
+    ]
+   }
+  }
+ },
+ "slow_state": {
+  "rows": 581,
+  "onset_s": null,
+  "slow_pct": 0.0,
+  "e_eff_mhz_median": 2424,
+  "cpu_util_pct_median": 136.1,
+  "slow": false
+ },
+ "proofs": [
+  {
+   "ok": true,
+   "text": "init \"C1 keep-watch: on (with physical_protect_hold_global_lock)\" x1"
+  },
+  {
+   "ok": true,
+   "text": "\"first kept protect\" x1 (gate D / positive control)"
+  },
+  {
+   "ok": true,
+   "text": "kept count: last \"kept so far\" = 32768 (19 such lines)"
+  },
+  {
+   "ok": true,
+   "text": "C1 verify armed: \"C1 verify: on. Hashing CPU uploads ...\" x1 (without it K = 0 proves nothing)"
+  },
+  {
+   "ok": true,
+   "text": "verify-mismatch (K) lines 0 (gate A / G5, through the level load)"
+  },
+  {
+   "ok": true,
+   "text": "G5: C1 verify F lines 0 (G5 needs 0 K and 0 F) -"
+  },
+  {
+   "ok": true,
+   "text": "kept count rises through the level load: first 2 -> last 32768 (19 \"kept so far\" lines)"
+  },
+  {
+   "ok": true,
+   "text": "gate D zero lines: \"Recovered stale physical page protection\" 0, \"Unhandled guest physical write fault\" 0"
+  },
+  {
+   "ok": true,
+   "text": "no blocked/no-hold C1 line (0/0/0)"
+  },
+  {
+   "ok": true,
+   "text": "slow-frame lines 7271"
+  },
+  {
+   "ok": true,
+   "text": "the last slow-frame line ends with the memexport suffix: ...memexport pages 1x 28 KB) | memexport syncs 2 (40 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)"
+  },
+  {
+   "ok": true,
+   "text": "P2 COUNTER: memexport full-buffer total (last line) = 0; max 0; sum Nx 0; lines with Nx > 0: 0 -> closes P2 memexport gate"
+  },
+  {
+   "ok": true,
+   "text": "W6 cvars in run.json: single_hold_rearm=true hold_global_lock=true"
+  },
+  {
+   "ok": true,
+   "text": "W6 w6gA cvars in run.json (6 expected): all as W6-GATES.md v2"
+  },
+  {
+   "ok": true,
+   "text": "G8 bad lines: \"PhysicalHeap::Protect failed\" 0, \"Recovered stale physical page protection\" 0, \"Unhandled guest physical write fault\" 0"
+  }
+ ],
+ "base_misses": [
+  "marks differ before up-2: title 226/1022->219/244 pads-white 220/528->226/1022 tags-placed 220/528->226/1022",
+  "logdiff NEW 6",
+  "logdiff FLAG 1",
+  "logdiff GONE 6 beyond Toypad/u-diag lines",
+  "dumps 1",
+  "steps 104/119",
+  "[error] 5 [critical] 1",
+  "stuck_lock 5",
+  "minidump 1",
+  "fatal 1"
+ ],
+ "hint": "LOOK"
+}

@@ -1,0 +1,42 @@
+{
+  "title": "NATIVE ON build, PSO stutter (Agent 6: P1 cold, P2 warm, P3 no cache, P4a/P4b prepare threads 1 vs 4). Fixed order, 1 run each, no input needed",
+  "reference": "p1",
+  "warmup_s": 60,
+  "warmup_from": "launch",
+  "measure_s": 180,
+  "repeats": 1,
+  "order": "fixed",
+  "settle_s": 20,
+  "cooldown_s": 10,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "menu_s": 60,
+  "cold_run": false,
+  "quick": { "warmup_s": 10, "measure_s": 20, "settle_s": 5, "menu_s": 20, "cooldown_s": 5 },
+  "notes": [
+    "BIN DIR: build/agent2/native-bin (staged by Agent 2 at 21:48). Spec: perf-notes/agent6-runspecs.md. Warm-up counts from launch here, as Agent 6 wrote it; the PSO counters come from game.log, the frame stats from the window.",
+    "Exit caveat (Agent 6, 21:53): native WM_CLOSE terminates the process 250 ms later, so the PSO exit summary is usually lost. Every arm runs drivers/pso-stats-at-end.ps1: after the window it creates the pso-stats.now trigger (path from the 'PSO stats on' line, else <run>\\cache\\pso-stats.now), waits up to 15 s for 'Native GPU PSO stats (pso-stats.now)' and the 'PSO frames' line, and only then does the runner send WM_CLOSE. driver.out.txt says whether the summary was seen.",
+    "Order matters: p2 seeds its cache from p1's run, p4a/p4b seed recipes only from p2's run. The seed is the last idle autosave (written after 3 s without new PSOs), since the exit save is cut short. No unscored cold run: p1 must be the first run (the per-run app cache is always cold; the driver's own shader cache is not under our control).",
+    "Grep after the matrix: 'Native GPU PSO stats', 'PSO minute', 'startup pipelines loaded=', 'pipeline cache hits=', 'pipeline cache saved'."
+  ],
+  "arms": [
+    { "id": "p1", "frames": "native", "bin": "build/agent2/native-bin", "cvars": [], "driver": "drivers/pso-stats-at-end.ps1",
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv", "LEGO_NATIVE_PSO_STATS": "1", "LEGO_NATIVE_PSO_STATS_INTERVAL": "10" },
+      "note": "P1 pso-cold: empty cache" },
+    { "id": "p2", "frames": "native", "bin": "build/agent2/native-bin", "cvars": [], "seed_cache": "p1", "driver": "drivers/pso-stats-at-end.ps1",
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv", "LEGO_NATIVE_PSO_STATS": "1", "LEGO_NATIVE_PSO_STATS_INTERVAL": "10" },
+      "note": "P2 pso-warm: cache seeded from p1" },
+    { "id": "p3", "frames": "native", "bin": "build/agent2/native-bin", "cvars": [], "driver": "drivers/pso-stats-at-end.ps1",
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv", "LEGO_NATIVE_PSO_STATS": "1", "LEGO_NATIVE_PSO_STATS_INTERVAL": "10",
+               "LEGO_NATIVE_PSO_CACHE": "0" },
+      "note": "P3 pso-nocache: control, no load and no save" },
+    { "id": "p4a", "frames": "native", "bin": "build/agent2/native-bin", "cvars": [], "seed_cache": "p2", "seed_recipes_only": true, "driver": "drivers/pso-stats-at-end.ps1",
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv", "LEGO_NATIVE_PSO_STATS": "1", "LEGO_NATIVE_PSO_STATS_INTERVAL": "10",
+               "LEGO_NATIVE_PSO_PREPARE_THREADS": "1" },
+      "note": "P4a pso-prep1: recipes without the blob, serial startup preparation" },
+    { "id": "p4b", "frames": "native", "bin": "build/agent2/native-bin", "cvars": [], "seed_cache": "p2", "seed_recipes_only": true, "driver": "drivers/pso-stats-at-end.ps1",
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv", "LEGO_NATIVE_PSO_STATS": "1", "LEGO_NATIVE_PSO_STATS_INTERVAL": "10",
+               "LEGO_NATIVE_PSO_PREPARE_THREADS": "4" },
+      "note": "P4b pso-prep4: same, 4 preparation threads. loaded/compiled/failed/resident must equal p4a's" }
+  ]
+}

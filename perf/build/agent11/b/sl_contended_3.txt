@@ -1,0 +1,22 @@
+﻿[status pre] 18:49:40 BatteryStatus=2 (2=AC) LoadPercentage=80
+[cmd] bench_spinlock.exe contended 9 150 100 old,ttast:5000,ttast:10000 none,pp,ee,pe 500 20000 200
+[power] ACLineStatus=1 (1=AC, 0=battery) battery=100%  tsc=2.6112 GHz
+contended spinlock: 2 threads, 150 ms x 9 reps, hold 100 ns (every 500-th: 20000 ns), gap 200 ns. Medians.
+Contended acquire = one that failed at least one CAS; wait = its acquire latency (p50/p99 from a log histogram, +-12%; max = median over reps of the run max).
+aff  variant        ns/acq      min      max cpu_ns/acq  util  yield/1M   fail/1M   cont/1M  wait_avg wait_p50 wait_p99  wait_max  fair
+none old             775.0    501.0    978.6     634.9  0.77       332       332       185   3522623  3212543 16062716  19125448 0.371
+none ttast:5000      642.6    430.8   1028.6     677.9  0.97       479     63860     63659      9223      588     1569  15912971 0.474
+none ttast:10000     739.0    412.4    980.9     625.0  0.83       254     43329     43249     17153      588     2353  24372160 0.352
+pp   old            1271.8    424.8   1585.6     627.2  0.55     84977     84977     40475     23688      686     9412  49486638 0.399
+pp   ttast:5000     1077.5    446.2   2513.7     659.0  0.62       473     93334     92943      8967      588     1373  32371919 0.415
+pp   ttast:10000     938.5    667.5   1367.6     658.4  0.80       484     58917     58487     12156      588     1569  25747081 0.338
+ee   old             813.9    655.1   1076.3     645.4  0.78      1417      1417       787   1146520   150588 16062716  19406456 0.424
+ee   ttast:5000      771.3    591.1   1034.6     787.1  1.00       761    113882    113384      6979      686     1961  14209563 0.460
+ee   ttast:10000     775.5    519.4   1402.9     772.8  0.97       725    100263    100014      7882      686     1961  14360452 0.441
+pe   old             820.2    578.4   1294.8     607.3  0.74       157       157        81   9787920  8031358 38550518  35896236 0.215
+pe   ttast:5000      806.7    499.2   1230.9     648.1  0.86       217     22819     22797     25529      588     2353  33446124 0.254
+pe   ttast:10000     758.9    645.1   1322.4     622.3  0.81        81     16806     16757     43179      588     2745  34291933 0.289
+mutual exclusion check: OK
+[cpu] process CPU time 17.38 s
+[wall] 24.0 s
+[status post] 18:50:06 BatteryStatus=2 (2=AC) LoadPercentage=100

@@ -1,0 +1,152 @@
+@@ run18.py
+<<<
+landed by 06:31 (Agent 12's gates,
+===
+landed by 06:40 (Agent 12's gates,
+>>>
+<<<
+'**The pass-2 tail is a host episode, not a p2fc property.**', 'From about 03:25 to 03:41, a host episode hit 8 consecutive runs across all four arms.',
+===
+'**The pass-2 tail comes from an episode that hit all four arms, not from p2fc.**', 'From about 03:25 to 03:41, an episode hit 8 consecutive runs across all four arms.',
+>>>
+<<<
+'Each of those runs had 33-58 frames over 6 ms, against 1-6 in the other pass-2 runs.', "The episode covered 3 of p2fc's 5 pass-2 runs",
+===
+'Each of those runs had 33-58 frames over 6 ms, against 1-6 in the other pass-2 runs (21 in 0352, all in one burst).', "The episode covered 3 of p2fc's 5 pass-2 runs", 'No recorded host CPU, clock, GPU or memory counter shows its cause (audit §5.1).', "**The episode's cause is unknown.** No recorded host or game counter shows it (audit §5.1)",
+>>>
+<<<
+'one discarded warm-up run after the cold run, or a randomized first arm', 'reads as WARN')
+===
+'**Cause: GPU warm-up (audit §5.5).**', 'the GPU ran above its steady clock in the first runs', "Almost every other run sat at 832 MHz, the GPU's thermal limit", 'Run fps follows the GPU clock', 'The earlier lead (the fast state removes the cost C1 removes) is withdrawn.', '**Lead: at steady state this host looks GPU-limited.** After round 1, s0, p2 and p2f ran at 97-100 % GPU utilisation.', 'p2fc ran at 86-89 % (82 % in the host-loaded 0023) while giving 18 % more fps.', 'That is roughly 27 % less GPU-busy time per frame (utilisation ÷ fps, from a coarse NVML counter).', 'So p2fc probably also cuts GPU-side work, and a change that only saves CPU would show up as fewer cores rather than more fps.', 'warm the GPU before scoring, since tonight its clock settled only after 5-13 min of game load.', 'add discarded runs until gpu.csv shows the steady clock.', 'Also rotate the first arm across rounds.', 'reads as WARN')
+>>>
+<<<
+'one discarded warm-up run after the cold run, or a randomized first arm')
+===
+'W4b showed B at +6.4 % fps (+15.1 % without its run 6).', "so W4c refutes the hint only for tonight's host", 'The per-second audit shows host CPU load in both: a 2-second burst in 0251 and raised load through 0253.', 'Telling 1 % apart from 0 would need a second pass with a GPU warm-up before scoring', '**Cause: GPU warm-up (audit §5.5).**', 'the GPU ran above its steady 832 MHz in the first runs', 'In W4c that was 1021 MHz for d0-r1 and 855 MHz for B-r1; every later run sat at 832 MHz.', '**Lead: at steady state this host looks GPU-limited.** d0 and B ran at 98-100 % GPU utilisation at 832 MHz.', 'warm the GPU before scoring, since tonight its clock settled only after 5-13 min of game load.', 'Also rotate the first arm across rounds.')
+>>>
+<<<
+read-out (06:31, 
+===
+read-out (06:39, 
+>>>
+<<<
+and round 1 favours s0 in both passes: without it the paired median is −12.2 % "
+===
+and round 1 favours s0 in both passes, from GPU warm-up (after the idle gap the GPU ran above its steady 832 MHz, its thermal limit, in the first runs, and run fps follows the GPU clock; audit §5.5): without round 1 the paired median is −12.2 % "
+>>>
+<<<
+"is a host episode, not p2fc:** from about
+===
+"comes from an episode that hit all four arms, not from p2fc:** from about
+>>>
+<<<
+"them p2fc's; the paired p99.9 difference
+===
+"them p2fc's, and no recorded host or game counter shows its cause (audit §5.1); the paired p99.9 difference
+>>>
+<<<
+"1 % low fps doesn't move (−1.3 % [−4.9, +2.5]). All 42 runs clean:
+===
+"1 % low fps doesn't move (−1.3 % [−4.9, +2.5]). Lead: at steady state this host looks GPU-limited: after round 1, s0, p2 and p2f ran at 97-100 % GPU utilisation and p2fc at 86-89 % while giving 18 % more fps, roughly 27 % less GPU-busy time per frame (a coarse NVML counter), so p2fc probably also cuts GPU-side work, and a change that only saves CPU would show up as fewer cores rather than more fps. All 42 runs clean:
+>>>
+<<<
+read-out (06:17, 
+===
+read-out (06:40, 
+>>>
+<<<
+0253 is the window's only flagged run), and without them B's tails match d0's. All 13 runs clean. W4b ran on "
+===
+0253 is the window's only flagged run), where the per-second audit shows host CPU load (a 2 s burst in 0251, raised load through 0253), and without them B's tails match d0's. All 13 runs clean. W4b showed B at +6.4 % fps (+15.1 % without its run 6), outside W4c's fps CI, but W4b ran on "
+>>>
+<<<
+"best_efficiency and before the Defender exclusion, so W4c shows that B gives no gain on tonight's host, not why W4b's hint appeared. "
+===
+"best_efficiency and before the Defender exclusion, so W4c refutes the hint only for tonight's host and doesn't show why it appeared. "
+>>>
+<<<
+        "**Verdict: don't adopt B for performance.**")
+===
+        "**Verdict: don't adopt B for performance;** telling 1 % from 0 would need a second pass with a GPU warm-up before scoring.")
+>>>
+<<<
+W4c (06:17) and W6 (06:31), under their bullets above;
+===
+W4c and W6 (first posted 06:17 and 06:31, revised 06:40 and 06:39), under their bullets above;
+>>>
+<<<
+which shrinks the paired gains; Agent 8 suggests one "
+===
+which shrinks the paired gains. The cause is GPU warm-up (audit §5.5): after each idle gap the GPU ran above its steady 832 MHz, its thermal limit, in the first runs, and run fps follows the GPU clock. Agent 8 suggests "
+>>>
+<<<
+"discarded warm-up run after the cold run, or a randomized first arm. An independent
+===
+"warming the GPU before scoring, for example with discarded runs until gpu.csv shows the steady clock (it settled after 5-13 min of game load), and rotating the first arm across rounds. Lead: at steady state this host looks GPU-limited (every arm without C1 ran at 97-100 % GPU utilisation at 832 MHz in W6 and W4c), so a change that only saves CPU would show up as fewer cores rather than more fps. An independent
+>>>
+<<<
+- **05:58-06:31 (the formal sources;
+===
+- **05:58-06:40 (the formal sources;
+>>>
+<<<
+"W4c, no gain for B (06:17), and W6, p2fc's gain solid and all from C1 (06:31). W9's and W5b's read-outs are pending.")
+===
+"W4c, no gain for B (06:17), and W6, p2fc's gain solid and all from C1 (06:31), revised at 06:40 and 06:39 with the same numbers (the pass-2 tail's episode has no recorded cause, round 1's bias is GPU warm-up, and a lead that the host is GPU-limited at steady state). W9's and W5b's read-outs are pending.")
+>>>
+<<<
+(Agent 8, 06:31; 10 rounds pooled)
+===
+(Agent 8, 06:39; 10 rounds pooled)
+>>>
+<<<
+p2 and p2f no timing effect; the pass-2 p99.9 was a host episode "
+===
+p2 and p2f no timing effect; the pass-2 p99.9 came from an episode "
+>>>
+<<<
+"(~03:25-03:41) that hit all four arms, not p2fc;
+===
+"(~03:25-03:41, cause unrecorded) that hit all four arms, not from p2fc;
+>>>
+<<<
+(Agent 8, 06:17): no gain;
+===
+(Agent 8, 06:40): no gain;
+>>>
+<<<
+W4b ran on best_efficiency, before the Defender exclusion, so this shows no gain on tonight's host, "
+===
+W4b (B +6.4 % fps) ran on best_efficiency, before the Defender exclusion, so this refutes its hint only for tonight's host "
+>>>
+<<<
+"not why W4b's hint appeared. **Verdict: don't adopt B for performance.**")
+===
+"and doesn't show why it appeared. **Verdict: don't adopt B for performance.**")
+>>>
+@@ fnd5.py
+<<<
+'**The pass-2 tail is a host episode, not a p2fc property.**', 'It hit every arm, and the medians stayed in line.',
+===
+'**The pass-2 tail comes from an episode that hit all four arms, not from p2fc.**', 'It hit every arm, and the medians stayed in line.', "**The episode's cause is unknown.**",
+>>>
+<<<
+'one discarded warm-up run after the cold run, or a randomized first arm')
+===
+'**Cause: GPU warm-up (audit §5.5).**', 'the GPU ran above its steady clock in the first runs', "Almost every other run sat at 832 MHz, the GPU's thermal limit", 'warm the GPU before scoring, since tonight its clock settled only after 5-13 min of game load.', 'Also rotate the first arm across rounds.', '**Lead: at steady state this host looks GPU-limited.**', 'a change that only saves CPU would show up as fewer cores rather than more fps')
+>>>
+<<<
+"older windows. Agent 8 also found that each window's first scored run was unusually fast, which makes the measured gains a little smaller; "
+===
+"older windows. Agent 8 also found that each window's first scored run was unusually fast: after the idle gap the graphics chip was still cool and ran above its steady, heat-limited speed for the first 5 to 13 minutes. That makes the measured gains a little smaller, so "
+>>>
+<<<
+"future windows should throw away one warm-up run or start with a random arm.")
+===
+"future windows should warm the chip up with throw-away runs first and rotate which arm goes first. Once warm, this PC looks limited by its graphics chip (a lead), so a change that only saves CPU time would show up as lower CPU use rather than more fps.")
+>>>
+<<<
+was a short disturbance on the PC that hit every arm, not C1.
+===
+came from a short spell of slow frames that hit every arm (its cause wasn't recorded), not from C1.
+>>>

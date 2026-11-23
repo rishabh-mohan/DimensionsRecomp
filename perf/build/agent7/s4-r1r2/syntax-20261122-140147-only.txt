@@ -1,0 +1,175 @@
+# s4r1r2_syntax (S4 #18 R1 stage 1 + #20 step 1 R2 counters, both default off)  2026-11-22 14:01:48  config Release
+# control = build\agent7\s4-r1r2\orig\sdk (or the live source) + live headers; candidate = new\sdk (or the live source) + new\sdk\include first
+# -Only 'deferred_command_list': only the units whose label matches are compiled
+header include/rex/graphics/d3d12/command_processor.h       live 41F32B80BABA213C (= HASHES orig)  staged 67F4E8380C879377 (= HASHES new)
+header include/rex/graphics/d3d12/deferred_command_list.h   live DA2F58B6CE3D7F6A (= HASHES orig)  staged 9F6CC70A6922232D (= HASHES new)
+source src/graphics/d3d12/command_processor.cpp             live 3AB3AA5360D4E987 (= HASHES orig)
+source src/graphics/d3d12/deferred_command_list.cpp         live FFDF7FB66EC81715 (= HASHES orig)
+src/graphics/d3d12/deferred_command_list.cpp     control   exit=0  10.6s diagnostics=12  sha FFDF7FB66EC81715 (= HASHES)  <workspace>\build\agent7\s4-r1r2\orig\sdk\src\graphics\d3d12\deferred_command_list.cpp
+    | In file included from <workspace>\build\agent7\s4-r1r2\orig\sdk\src\graphics\d3d12\deferred_command_list.cpp:14:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/command_processor.h:27:
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/command_processor.h:187:48: warning: unused parameter 'why' [-Wunused-parameter]
+    |   187 |   virtual void OnGuestVisibleWrite(const char* why) {}
+    |       |                                                ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/command_processor.h:189:43: warning: unused parameter 'physical_address' [-Wunused-parameter]
+    |   189 |   virtual void OnGuestMemoryPoll(uint32_t physical_address) {}
+    |       |                                           ^
+    | In file included from <workspace>\build\agent7\s4-r1r2\orig\sdk\src\graphics\d3d12\deferred_command_list.cpp:14:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/command_processor.h:30:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/pipeline_cache.h:29:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/render_target_cache.h:27:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/texture_cache.h:24:
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:171:53: warning: first argument in call to 'memcpy' is a pointer to non-trivially copyable type 'rex::graphics::TextureCache::TextureKey' [-Wnontrivial-memcall]
+    |   171 |     TextureKey(const TextureKey& key) { std::memcpy(this, &key, sizeof(*this)); }
+    |       |                                                     ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:171:53: note: explicitly cast the pointer to silence this warning
+    |   171 |     TextureKey(const TextureKey& key) { std::memcpy(this, &key, sizeof(*this)); }
+    |       |                                                     ^
+    |       |                                                     (void*)
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:173:19: warning: first argument in call to 'memcpy' is a pointer to non-trivially copyable type 'rex::graphics::TextureCache::TextureKey' [-Wnontrivial-memcall]
+    |   173 |       std::memcpy(this, &key, sizeof(*this));
+    |       |                   ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:173:19: note: explicitly cast the pointer to silence this warning
+    |   173 |       std::memcpy(this, &key, sizeof(*this));
+    |       |                   ^
+    |       |                   (void*)
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:178:19: warning: first argument in call to 'memset' is a pointer to non-trivially copyable type 'rex::graphics::TextureCache::TextureKey' [-Wnontrivial-memcall]
+    |   178 |       std::memset(this, 0, sizeof(*this));
+    |       |                   ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:178:19: note: explicitly cast the pointer to silence this warning
+    |   178 |       std::memset(this, 0, sizeof(*this));
+    |       |                   ^
+    |       |                   (void*)
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:227:70: warning: unused parameter 'global_lock' [-Wunused-parameter]
+    |   227 |     bool base_outdated(const std::unique_lock<std::recursive_mutex>& global_lock) const {
+    |       |                                                                      ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:230:70: warning: unused parameter 'global_lock' [-Wunused-parameter]
+    |   230 |     bool mips_outdated(const std::unique_lock<std::recursive_mutex>& global_lock) const {
+    |       |                                                                      ^
+src/graphics/d3d12/deferred_command_list.cpp     candidate exit=0  12.2s diagnostics=12  sha 30FF57446EFB5D76 (= HASHES)  <workspace>\build\agent7\s4-r1r2\new\sdk\src\graphics\d3d12\deferred_command_list.cpp
+    | In file included from <workspace>\build\agent7\s4-r1r2\new\sdk\src\graphics\d3d12\deferred_command_list.cpp:14:
+    | In file included from <workspace>\build\agent7\s4-r1r2\new\sdk\include\rex/graphics/d3d12/command_processor.h:28:
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/command_processor.h:187:48: warning: unused parameter 'why' [-Wunused-parameter]
+    |   187 |   virtual void OnGuestVisibleWrite(const char* why) {}
+    |       |                                                ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/command_processor.h:189:43: warning: unused parameter 'physical_address' [-Wunused-parameter]
+    |   189 |   virtual void OnGuestMemoryPoll(uint32_t physical_address) {}
+    |       |                                           ^
+    | In file included from <workspace>\build\agent7\s4-r1r2\new\sdk\src\graphics\d3d12\deferred_command_list.cpp:14:
+    | In file included from <workspace>\build\agent7\s4-r1r2\new\sdk\include\rex/graphics/d3d12/command_processor.h:31:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/pipeline_cache.h:29:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/render_target_cache.h:27:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/texture_cache.h:24:
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:171:53: warning: first argument in call to 'memcpy' is a pointer to non-trivially copyable type 'rex::graphics::TextureCache::TextureKey' [-Wnontrivial-memcall]
+    |   171 |     TextureKey(const TextureKey& key) { std::memcpy(this, &key, sizeof(*this)); }
+    |       |                                                     ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:171:53: note: explicitly cast the pointer to silence this warning
+    |   171 |     TextureKey(const TextureKey& key) { std::memcpy(this, &key, sizeof(*this)); }
+    |       |                                                     ^
+    |       |                                                     (void*)
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:173:19: warning: first argument in call to 'memcpy' is a pointer to non-trivially copyable type 'rex::graphics::TextureCache::TextureKey' [-Wnontrivial-memcall]
+    |   173 |       std::memcpy(this, &key, sizeof(*this));
+    |       |                   ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:173:19: note: explicitly cast the pointer to silence this warning
+    |   173 |       std::memcpy(this, &key, sizeof(*this));
+    |       |                   ^
+    |       |                   (void*)
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:178:19: warning: first argument in call to 'memset' is a pointer to non-trivially copyable type 'rex::graphics::TextureCache::TextureKey' [-Wnontrivial-memcall]
+    |   178 |       std::memset(this, 0, sizeof(*this));
+    |       |                   ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:178:19: note: explicitly cast the pointer to silence this warning
+    |   178 |       std::memset(this, 0, sizeof(*this));
+    |       |                   ^
+    |       |                   (void*)
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:227:70: warning: unused parameter 'global_lock' [-Wunused-parameter]
+    |   227 |     bool base_outdated(const std::unique_lock<std::recursive_mutex>& global_lock) const {
+    |       |                                                                      ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:230:70: warning: unused parameter 'global_lock' [-Wunused-parameter]
+    |   230 |     bool mips_outdated(const std::unique_lock<std::recursive_mutex>& global_lock) const {
+    |       |                                                                      ^
+    no new diagnostics in the candidate
+src/graphics/d3d12/deferred_command_list.cpp -DREX_D3D12_DEFERRED_COUNTERS=1 control   exit=0  20.3s diagnostics=12  sha FFDF7FB66EC81715 (= HASHES)  <workspace>\build\agent7\s4-r1r2\orig\sdk\src\graphics\d3d12\deferred_command_list.cpp
+    | In file included from <workspace>\build\agent7\s4-r1r2\orig\sdk\src\graphics\d3d12\deferred_command_list.cpp:14:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/command_processor.h:27:
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/command_processor.h:187:48: warning: unused parameter 'why' [-Wunused-parameter]
+    |   187 |   virtual void OnGuestVisibleWrite(const char* why) {}
+    |       |                                                ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/command_processor.h:189:43: warning: unused parameter 'physical_address' [-Wunused-parameter]
+    |   189 |   virtual void OnGuestMemoryPoll(uint32_t physical_address) {}
+    |       |                                           ^
+    | In file included from <workspace>\build\agent7\s4-r1r2\orig\sdk\src\graphics\d3d12\deferred_command_list.cpp:14:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/command_processor.h:30:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/pipeline_cache.h:29:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/render_target_cache.h:27:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/texture_cache.h:24:
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:171:53: warning: first argument in call to 'memcpy' is a pointer to non-trivially copyable type 'rex::graphics::TextureCache::TextureKey' [-Wnontrivial-memcall]
+    |   171 |     TextureKey(const TextureKey& key) { std::memcpy(this, &key, sizeof(*this)); }
+    |       |                                                     ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:171:53: note: explicitly cast the pointer to silence this warning
+    |   171 |     TextureKey(const TextureKey& key) { std::memcpy(this, &key, sizeof(*this)); }
+    |       |                                                     ^
+    |       |                                                     (void*)
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:173:19: warning: first argument in call to 'memcpy' is a pointer to non-trivially copyable type 'rex::graphics::TextureCache::TextureKey' [-Wnontrivial-memcall]
+    |   173 |       std::memcpy(this, &key, sizeof(*this));
+    |       |                   ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:173:19: note: explicitly cast the pointer to silence this warning
+    |   173 |       std::memcpy(this, &key, sizeof(*this));
+    |       |                   ^
+    |       |                   (void*)
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:178:19: warning: first argument in call to 'memset' is a pointer to non-trivially copyable type 'rex::graphics::TextureCache::TextureKey' [-Wnontrivial-memcall]
+    |   178 |       std::memset(this, 0, sizeof(*this));
+    |       |                   ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:178:19: note: explicitly cast the pointer to silence this warning
+    |   178 |       std::memset(this, 0, sizeof(*this));
+    |       |                   ^
+    |       |                   (void*)
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:227:70: warning: unused parameter 'global_lock' [-Wunused-parameter]
+    |   227 |     bool base_outdated(const std::unique_lock<std::recursive_mutex>& global_lock) const {
+    |       |                                                                      ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:230:70: warning: unused parameter 'global_lock' [-Wunused-parameter]
+    |   230 |     bool mips_outdated(const std::unique_lock<std::recursive_mutex>& global_lock) const {
+    |       |                                                                      ^
+src/graphics/d3d12/deferred_command_list.cpp -DREX_D3D12_DEFERRED_COUNTERS=1 candidate exit=0  16.1s diagnostics=12  sha 30FF57446EFB5D76 (= HASHES)  <workspace>\build\agent7\s4-r1r2\new\sdk\src\graphics\d3d12\deferred_command_list.cpp
+    | In file included from <workspace>\build\agent7\s4-r1r2\new\sdk\src\graphics\d3d12\deferred_command_list.cpp:14:
+    | In file included from <workspace>\build\agent7\s4-r1r2\new\sdk\include\rex/graphics/d3d12/command_processor.h:28:
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/command_processor.h:187:48: warning: unused parameter 'why' [-Wunused-parameter]
+    |   187 |   virtual void OnGuestVisibleWrite(const char* why) {}
+    |       |                                                ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/command_processor.h:189:43: warning: unused parameter 'physical_address' [-Wunused-parameter]
+    |   189 |   virtual void OnGuestMemoryPoll(uint32_t physical_address) {}
+    |       |                                           ^
+    | In file included from <workspace>\build\agent7\s4-r1r2\new\sdk\src\graphics\d3d12\deferred_command_list.cpp:14:
+    | In file included from <workspace>\build\agent7\s4-r1r2\new\sdk\include\rex/graphics/d3d12/command_processor.h:31:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/pipeline_cache.h:29:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/render_target_cache.h:27:
+    | In file included from <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/d3d12/texture_cache.h:24:
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:171:53: warning: first argument in call to 'memcpy' is a pointer to non-trivially copyable type 'rex::graphics::TextureCache::TextureKey' [-Wnontrivial-memcall]
+    |   171 |     TextureKey(const TextureKey& key) { std::memcpy(this, &key, sizeof(*this)); }
+    |       |                                                     ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:171:53: note: explicitly cast the pointer to silence this warning
+    |   171 |     TextureKey(const TextureKey& key) { std::memcpy(this, &key, sizeof(*this)); }
+    |       |                                                     ^
+    |       |                                                     (void*)
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:173:19: warning: first argument in call to 'memcpy' is a pointer to non-trivially copyable type 'rex::graphics::TextureCache::TextureKey' [-Wnontrivial-memcall]
+    |   173 |       std::memcpy(this, &key, sizeof(*this));
+    |       |                   ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:173:19: note: explicitly cast the pointer to silence this warning
+    |   173 |       std::memcpy(this, &key, sizeof(*this));
+    |       |                   ^
+    |       |                   (void*)
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:178:19: warning: first argument in call to 'memset' is a pointer to non-trivially copyable type 'rex::graphics::TextureCache::TextureKey' [-Wnontrivial-memcall]
+    |   178 |       std::memset(this, 0, sizeof(*this));
+    |       |                   ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:178:19: note: explicitly cast the pointer to silence this warning
+    |   178 |       std::memset(this, 0, sizeof(*this));
+    |       |                   ^
+    |       |                   (void*)
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:227:70: warning: unused parameter 'global_lock' [-Wunused-parameter]
+    |   227 |     bool base_outdated(const std::unique_lock<std::recursive_mutex>& global_lock) const {
+    |       |                                                                      ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/graphics/pipeline/texture/cache.h:230:70: warning: unused parameter 'global_lock' [-Wunused-parameter]
+    |   230 |     bool mips_outdated(const std::unique_lock<std::recursive_mutex>& global_lock) const {
+    |       |                                                                      ^
+    no new diagnostics in the candidate
+rexlego: includes neither d3d12 command_processor.h nor deferred_command_list.h (grep), so no game TU is compiled here
+RESULT: PASS

@@ -1,0 +1,25 @@
+# syntax_check_codegen (#17 step 4: #26 db16cyc_pause)  2026-11-22 14:15:06
+clang: clang version 23.1.6 (https://github.com/llvm/llvm-project 5b10d2d74929eae78912771222c9855af97496f4)
+SDK entries: build\agent2\snap1-sdk\compile_commands.json (2277 entries, Release), dir build/agent2/snap1-sdk; '-o <obj> -c <src>' -> '-fsyntax-only <src>'
+gen entry:   build\agent2\snapB-off\compile_commands.json (469 entries), dir build/agent2/snapB-off
+SDK pch: build/agent2/snap1-sdk/src/codegen/CMakeFiles/rexcodegen.dir/Release/cmake_pch.hxx.pch  32.2 MB  2026-11-22 02:42
+source  build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\codegen\builders\system.cpp  sha D1269273636B5A1A  = staged base\src\codegen\builders\system.cpp: yes
+source  build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\codegen\config.cpp  sha 0ED529B7E5F0F4E7  = staged base\src\codegen\config.cpp: yes
+overlay build\agent9\s4\spin\db16cyc-pause\new\include\rex\codegen\config.h  sha CD39B0E110D3E0FD
+gen     build\agent2\snapB\DimensionsRecomp\rexlego\generated\default\legodimensions_recomp.383.cpp  sha AE1749B6121491A5; copy +8 lines -> build\agent9\s4\spin\db16cyc-pause\syntax\legodimensions_recomp.383.cpp (as expected: 8)
+--- syntax ---
+sys-control    exit=0   33.2s diagnostics=0  build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\codegen\builders\system.cpp  (ok)
+sys-candidate  exit=0   14.2s diagnostics=0  -I new\include build\agent9\s4\spin\db16cyc-pause\new\src\codegen\builders\system.cpp  (ok)
+    no new diagnostic text vs sys-control
+sys-negative   exit=1    8.2s diagnostics=1  build\agent9\s4\spin\db16cyc-pause\new\src\codegen\builders\system.cpp  (fails as expected)
+    | build\agent9\s4\spin\db16cyc-pause\new\src\codegen\builders\system.cpp:56:20: error: no member named 'db16cycPause' in 'rex::codegen::RecompilerConfig'
+    |    56 |   if (ctx.config().db16cycPause)
+    |       |       ~~~~~~~~~~~~ ^
+    | 1 error generated.
+cfg-control    exit=0   10.8s diagnostics=0  build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\codegen\config.cpp  (ok)
+cfg-candidate  exit=0    2.8s diagnostics=0  -I new\include build\agent9\s4\spin\db16cyc-pause\new\src\codegen\config.cpp  (ok)
+    no new diagnostic text vs cfg-control
+gen-control    exit=0    4.3s diagnostics=0  build\agent2\snapB\DimensionsRecomp\rexlego\generated\default\legodimensions_recomp.383.cpp  (ok)
+gen-candidate  exit=0    4.5s diagnostics=0  build\agent9\s4\spin\db16cyc-pause\syntax\legodimensions_recomp.383.cpp  (ok)
+    no new diagnostic text vs gen-control
+RESULT: PASS

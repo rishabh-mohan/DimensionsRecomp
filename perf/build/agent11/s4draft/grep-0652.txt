@@ -1,0 +1,22 @@
+﻿06:51:16
+--- delta SAFE
+L5: **Verdict: SAFE.** Install it with `install-scrnsave.ps1`, as the "Install" section of `build/agent5/scrnsave-fix/README.md` says (L75-87 in EDA4D4F9…; it was L73-84 in 7B367721…, the version I read first). Findings: 0 BLOCKER, 0 SHOULD, 4 NIT, 3 info. Either half alone fixes the refused GO, so the 
+L58: 6. **Test safety.**
+L65: 8. **Public safety.** scrnsave-fix/ has no user name and no absolute user path. The e2e case files are redacted to `<repo>` (test-scrnsave.ps1 L233). The headers in new/day/run-day.diff are relative (`a/scrnsave-fix/new/run-night.ps1`).
+L73: - **N-4 (NIT).** install-scrnsave.ps1 L34 refuses on any powershell.exe or pwsh.exe, other than itself, whose command line names run-night.ps1 or run-day.ps1. That includes another agent's read-only command, such as a hash check, running at the same moment. It fails safe (nothing is copied); just ru
+L98: **Verdict: SAFE.** Both scripts copy nothing unless every check passes, and they enforce the order: install-scrnsave.ps1, then day-update.ps1, then the tests (README L85-86, L96).
+--- install-log
+build\agent5\scrnsave-fix\install-log.txt 1326 06:36:22
+2026-11-23 06:36:00  day-update: REFUSED: bench\agent5\launch\run-night.ps1 has sha256 16B90FA8, not 565D30D4: run install-scrnsave.ps1 first
+2026-11-23 06:36:20  install-scrnsave.ps1 -Check starts
+2026-11-23 06:36:21  night launcher state: state      waiting-for-go (since 2026-11-23 05:30:42)
+2026-11-23 06:36:21  screensaver-saved.txt: saved 2026-11-22 23:47:20 from HKCU:\Control Panel\Desktop by launcher pid 19960 / ScreenSaveActive=0 / SCRNSAVE.EXE present=True value=''
+2026-11-23 06:36:21  Desktop key now: SCRNSAVE.EXE present ''; ScreenSaveActive 0
+2026-11-23 06:36:22  bench\agent8\run\run-matrix.ps1: FEDCEB13, to be replaced by 1A522CDF
+2026-11-23 06:36:22  bench\agent5\launch\run-night.ps1: 16B90FA8, to be replaced by 565D30D4
+2026-11-23 06:36:22  bench\agent5\launch\README.md: 0058C8F6, to be replaced by B7CEBD63
+2026-11-23 06:36:22  REFUSED: Local\Agent5RunNight-real is held: a real night or day launcher is running
+2026-11-23 06:36:22  REFUSED: a launcher process is running: pid 19960
+2026-11-23 06:36:22  REFUSED: bench\agent5\launch\status\state.txt does not say 'ended': state      waiting-for-go (since 2026-11-23 05:30:42)
+2026-11-23 06:36:22  REFUSED: bench\agent5\launch\status\screensaver-saved.txt has no restored line: the screensaver was not put back
+2026-11-23 06:36:22  nothing was copied

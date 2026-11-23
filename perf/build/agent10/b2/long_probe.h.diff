@@ -1,0 +1,31 @@
+﻿diff --git a/baseline/DimensionsRecomp/rexlego/src/gpu_native/long_probe.h b/DimensionsRecomp/rexlego/src/gpu_native/long_probe.h
+index 53764bb..aff8f07 100644
+--- a/baseline/DimensionsRecomp/rexlego/src/gpu_native/long_probe.h
++++ b/DimensionsRecomp/rexlego/src/gpu_native/long_probe.h
+@@ -12,21 +12,25 @@
+ #include <span>
+ #include <string>
+ #include <string_view>
+ #include <unordered_set>
+ 
++#include "draw_cached_flag.h"
++
+ namespace legodimensions::gpu_native {
+ inline const std::filesystem::path& LongProbeDirectory() {
+   static const std::filesystem::path path = [] {
+     char* value = nullptr; size_t length = 0;
+     _dupenv_s(&value, &length, "LEGO_NATIVE_TRACE_DIR");
+     std::filesystem::path result(value ? value : "");
+     std::free(value); return result;
+   }();
+   return path;
+ }
+-inline bool LongProbeEnabled() { return !LongProbeDirectory().empty(); }
++inline bool LongProbeDirectorySet() { return !LongProbeDirectory().empty(); }
++// Checked on per-draw paths: with tracing off this is one byte load and one predictable branch.
++inline bool LongProbeEnabled() { return CachedProcessFlag<LongProbeDirectorySet>(); }
+ inline std::atomic<uint32_t> g_probe_frame{0};
+ inline std::atomic<bool> g_probe_capture_requested{false};
+ inline double LongProbeMilliseconds() {
+   static const auto start = std::chrono::steady_clock::now();
+   return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now()-start).count();

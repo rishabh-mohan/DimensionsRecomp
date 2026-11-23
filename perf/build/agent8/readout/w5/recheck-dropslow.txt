@@ -1,0 +1,41 @@
+# Matrix recheck: <workspace>\build\agent8\matrix\20261122-1756
+
+Window 5, S3d line (Agent 8's task #10 draft, promoted by Agent 1 at 16:42 after W4b): S4 baseline + timer modes. base = devoff3 (S3d); s0, d11, d11t, d11p = devoff4 (S4a)
+
+16 result rows; 0 scored runs kept (0 of them with only benign problems); min window cover 90%; 0 scored runs flagged excluded (dropped); 15 scored runs with the slow state in their window (E-cores < 800 MHz for 3+ samples; dropped: --drop-slow).
+
+## Runs
+
+| seq | round | arm | rep | status | kept | median ms | fps | p99 ms | >33 | >100 | window s | marks s | ff->win s | light | slow | cpu cores | top1 thread busy % (name) | gpu util % | flags | notes |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 0 | base | 0 | OK | no | 2.44 | 395.8 | 5.2 | 0 | 0 | 30.0 | 30.0 | 60.0 | 0.966 | no | 2.72 | - | - | light_share_high | unscored (cold) |
+| 2 | 1 | base | 1 | OK | no | 2.41 | 384.6 | 6.4 | 0 | 0 | 50.0 | 50.0 | 60.0 | 0.945 | 87 s / 26% ! | 2.90 | 87.8 (Main XThread (F800002C)) | 75 | light_share_high | SLOW STATE in window (E-cores < 800 MHz, onset 87 s): dropped (--drop-slow) |
+| 3 | 1 | s0 | 1 | OK | no | 2.69 | 333.4 | 7.6 | 0 | 0 | 50.0 | 50.0 | 60.0 | 0.869 | 40 s / 68% ! | 3.19 | 85.2 (Main XThread (F800002C)) | 69 | light_share_high | SLOW STATE in window (E-cores < 800 MHz, onset 40 s): dropped (--drop-slow) |
+| 4 | 1 | d11 | 1 | OK | no | 2.62 | 350.3 | 7.2 | 0 | 0 | 50.0 | 50.0 | 60.0 | 0.894 | 6 s / 86% ! | 3.18 | 84.8 (Main XThread (F800002C)) | 73 | light_share_high | SLOW STATE in window (E-cores < 800 MHz, onset 6 s): dropped (--drop-slow) |
+| 5 | 1 | d11t | 1 | OK | no | 2.65 | 338.5 | 7.8 | 0 | 0 | 50.0 | 50.0 | 60.0 | 0.886 | 13 s / 94% ! | 2.72 | 83.6 (Main XThread (F800002C)) | 71 | light_share_high | SLOW STATE in window (E-cores < 800 MHz, onset 13 s): dropped (--drop-slow) |
+| 6 | 1 | d11p | 1 | OK | no | 2.62 | 343.3 | 7.7 | 0 | 0 | 50.0 | 50.0 | 60.0 | 0.892 | 3 s / 88% ! | 2.77 | 82.5 (Main XThread (F800002C)) | 70 | light_share_high | SLOW STATE in window (E-cores < 800 MHz, onset 3 s): dropped (--drop-slow) |
+| 7 | 2 | s0 | 2 | OK | no | 2.76 | 309.9 | 8.3 | 0 | 0 | 50.0 | 50.0 | 60.0 | 0.822 | 21 s / 94% ! | 3.38 | 80.4 (GPU Commands (F8000018)) | 67 | light_share_high | SLOW STATE in window (E-cores < 800 MHz, onset 21 s): dropped (--drop-slow) |
+| 8 | 2 | d11 | 2 | OK | no | 2.61 | 351.3 | 7.5 | 0 | 0 | 50.0 | 50.0 | 60.0 | 0.903 | 35 s / 86% ! | 3.19 | 84.2 (Main XThread (F800002C)) | 71 | light_share_high | SLOW STATE in window (E-cores < 800 MHz, onset 35 s): dropped (--drop-slow) |
+| 9 | 2 | d11t | 2 | OK | no | 2.55 | 358.8 | 7.6 | 0 | 0 | 50.0 | 50.0 | 60.0 | 0.916 | 1 s / 76% ! | 2.67 | 85.1 (Main XThread (F800002C)) | 73 | light_share_high | SLOW STATE in window (E-cores < 800 MHz, onset 1 s): dropped (--drop-slow) |
+| 10 | 2 | d11p | 2 | OK | no | 2.58 | 356.9 | 7.5 | 0 | 0 | 50.0 | 50.0 | 60.0 | 0.917 | 2 s / 94% ! | 2.69 | 83.7 (Main XThread (F800002C)) | 74 | light_share_high | SLOW STATE in window (E-cores < 800 MHz, onset 2 s): dropped (--drop-slow) |
+| 11 | 2 | base | 2 | OK | no | 2.93 | 289.2 | 8.1 | 0 | 0 | 50.0 | 50.0 | 60.0 | 0.765 | 4 s / 100% ! | 3.46 | 84.3 (GPU Commands (F8000018)) | 63 | light_share_high | SLOW STATE in window (E-cores < 800 MHz, onset 4 s): dropped (--drop-slow) |
+| 12 | 3 | d11 | 3 | OK | no | 2.56 | 352.5 | 7.6 | 0 | 0 | 50.0 | 50.0 | 60.0 | 0.902 | 2 s / 76% ! | 3.16 | 85.3 (Main XThread (F800002C)) | 72 | light_share_high | SLOW STATE in window (E-cores < 800 MHz, onset 2 s): dropped (--drop-slow) |
+| 13 | 3 | d11t | 3 | OK | no | 3.03 | 277.1 | 10.0 | 0 | 0 | 50.0 | 50.0 | 60.0 | 0.763 | 4 s / 100% ! | 2.83 | 76.4 (GPU Commands (F8000018)) | 71 | light_share_high | SLOW STATE in window (E-cores < 800 MHz, onset 4 s): dropped (--drop-slow) |
+| 14 | 3 | d11p | 3 | OK | no | 2.65 | 335.3 | 8.3 | 0 | 0 | 50.0 | 50.0 | 60.0 | 0.881 | 2 s / 96% ! | 2.78 | 84.0 (Main XThread (F800002C)) | 71 | light_share_high | SLOW STATE in window (E-cores < 800 MHz, onset 2 s): dropped (--drop-slow) |
+| 15 | 3 | base | 3 | OK | no | 2.55 | 355.6 | 7.5 | 0 | 0 | 50.0 | 50.0 | 60.0 | 0.900 | 22 s / 72% ! | 3.15 | 86.6 (Main XThread (F800002C)) | 72 | light_share_high | SLOW STATE in window (E-cores < 800 MHz, onset 22 s): dropped (--drop-slow) |
+| 16 | 3 | s0 | 3 | OK | no | 2.52 | 360.0 | 7.4 | 0 | 0 | 50.0 | 50.0 | 60.0 | 0.909 | 2 s / 74% ! | 3.08 | 87.2 (Main XThread (F800002C)) | 71 | light_share_high | SLOW STATE in window (E-cores < 800 MHz, onset 2 s): dropped (--drop-slow) |
+
+`marks s` is the wall time between the measure marks (summary.txt `align` line); it should be close to the planned window. `ff->win s` is first-frame signal to window start (floor: min_window_after_ff_s); `light` is the share of window frames under light_ms; flags ending in `!` are excluding flags. `slow` is the slow-state onset in s after the first-frame signal / the share of window sys.csv samples with the E-cores under 800 MHz; `!` = a stretch of 3+ such samples overlaps the window (Agent 11: not a result); `no` = never; `-` = no sys.csv.
+
+## Arms (kept runs)
+
+| group | arm | ref | n | median of medians (min..max) ms | p99 ms | p99.9 ms | >33 ms per min | >100 ms per min | cpu cores (min..max) | boot s | fps | top1 thread busy % (min..max), n | thread cores | gpu util % mean (p90) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+
+## Deltas against each group reference
+
+| group | arm | vs | delta median ms (%) | paired by round: median delta (min..max), rounds faster | delta p99 ms | delta >33/min | delta cpu cores | delta fps % | paired delta top1 busy pts (n) | verdict |
+|---|---|---|---|---|---|---|---|---|---|---|
+
+## One-line results
+

@@ -1,0 +1,53 @@
+test-scrnsave -Set installed -E2E at 2026-11-23 07:34:45; real desktop key: SCRNSAVE.EXE present '' String; ScreenSaveActive 0
+  matrix 1A522CDFE9DC36F8F976D374D020D8EB3102AAB4327BF10BAED31B0F369358CB  bench\agent8\run\run-matrix.ps1
+  night 565D30D40DC5025AD63FD9B9F606724BABC167BC81FCB6FBEB6362B603977112  bench\agent5\launch\run-night.ps1
+  day B67EBD6C2C9A378C8897558DD71AD383DCC85015952601F3EDF2FAED415ADC65  build\agent5\day-draft\run-day.ps1
+  old matrix FEDCEB13AB46FE790598EEFD97B5EF5FF545D5D24FADFB3BA03B1CE1CA0CBB89
+  old night 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31
+  old day D86F6DE04B3EDA47A4811CD7139B9BEE21B43E0E368AAB4287143F45B8C59E98
+PASS  s-parse-matrix  parse errors 0, non-ASCII or CR bytes 0
+PASS  s-parse-night  parse errors 0, non-ASCII or CR bytes 0
+PASS  s-parse-day  parse errors 0, non-ASCII or CR bytes 0
+PASS  s-matrix-reads  plain $scr.<name> reads left: 0
+PASS  s-night-remove  Remove-ItemProperty 1 time(s), only in Restore-Screensaver; Set-ScreensaverNone sets ''
+PASS  s-day-remove  Remove-ItemProperty 1 time(s), only in Restore-Screensaver; Set-ScreensaverNone sets ''
+PASS  s-day-same  run-day.ps1: screensaver functions identical to run-night.ps1 True; '# DAY:' lines 7; header names 565D30D4
+PASS  s-day-diff-relative  run-day.diff next to run-day.ps1: header lines 3, with an absolute or quoted path 0: diff --git a/bench/agent5/launch/run-night.ps1 b/build/agent5/day-draft/run-day.ps1
+PASS  m-missing  new block: screensaver none
+PASS  m-empty  new block: screensaver none
+PASS  m-active  new block: screensaver Mystify.scr after 300 s, LOCKS on resume: the keep-awake request should hold it off; if it starts during timing runs, set it to (None)
+PASS  m-active-bare  new block: screensaver Mystify.scr after ? s: the keep-awake request should hold it off; if it starts during timing runs, set it to (None)
+PASS  m-off  new block: screensaver none
+PASS  m-no-values  new block: screensaver none
+PASS  m-no-key  new block: screensaver none
+PASS  m-empty-same  old and new blocks print the same line: screensaver none
+PASS  m-active-same  old and new blocks print the same line: screensaver Mystify.scr after 300 s, LOCKS on resume: the keep-awake request should hold it off; if it starts during timing runs, set it to (None)
+PASS  m-off-same  old and new blocks print the same line: screensaver none
+PASS  m-old-missing-throws  control, old block with SCRNSAVE.EXE missing: threw: The property 'SCRNSAVE.EXE' cannot be found on this object. Verify that the property exists.
+PASS  night-missing-set  after Set-ScreensaverNone: SCRNSAVE.EXE present '' String; SPI calls 17,0,3
+PASS  night-missing-plan  while set: new run-matrix block screensaver none; old block ok too (the value is there)
+PASS  night-missing-restore  after Restore-Screensaver: SCRNSAVE.EXE absent (want absent); SPI calls 17,0,3;17,0,3; 'restored' line True; warnings 0
+PASS  night-empty-set  after Set-ScreensaverNone: SCRNSAVE.EXE present '' String; SPI calls 17,0,3
+PASS  night-empty-plan  while set: new run-matrix block screensaver none; old block ok too (the value is there)
+PASS  night-empty-restore  after Restore-Screensaver: SCRNSAVE.EXE present '' String (want present '' String); SPI calls 17,0,3;17,0,3; 'restored' line True; warnings 0
+PASS  night-active-set  after Set-ScreensaverNone: SCRNSAVE.EXE present '' String; SPI calls 17,0,3
+PASS  night-active-plan  while set: new run-matrix block screensaver none; old block ok too (the value is there)
+PASS  night-active-restore  after Restore-Screensaver: SCRNSAVE.EXE present 'C:\Windows\System32\Mystify.scr' String (want present 'C:\Windows\System32\Mystify.scr' String); SPI calls 17,0,3;17,1,3; 'restored' line True; warnings 0
+PASS  night-dry  dry run: SCRNSAVE.EXE absent then absent; SPI calls 0
+PASS  day-missing-set  after Set-ScreensaverNone: SCRNSAVE.EXE present '' String; SPI calls 17,0,3
+PASS  day-missing-plan  while set: new run-matrix block screensaver none; old block ok too (the value is there)
+PASS  day-missing-restore  after Restore-Screensaver: SCRNSAVE.EXE absent (want absent); SPI calls 17,0,3;17,0,3; 'restored' line True; warnings 0
+PASS  day-empty-set  after Set-ScreensaverNone: SCRNSAVE.EXE present '' String; SPI calls 17,0,3
+PASS  day-empty-plan  while set: new run-matrix block screensaver none; old block ok too (the value is there)
+PASS  day-empty-restore  after Restore-Screensaver: SCRNSAVE.EXE present '' String (want present '' String); SPI calls 17,0,3;17,0,3; 'restored' line True; warnings 0
+PASS  day-active-set  after Set-ScreensaverNone: SCRNSAVE.EXE present '' String; SPI calls 17,0,3
+PASS  day-active-plan  while set: new run-matrix block screensaver none; old block ok too (the value is there)
+PASS  day-active-restore  after Restore-Screensaver: SCRNSAVE.EXE present 'C:\Windows\System32\Mystify.scr' String (want present 'C:\Windows\System32\Mystify.scr' String); SPI calls 17,0,3;17,1,3; 'restored' line True; warnings 0
+PASS  day-dry  dry run: SCRNSAVE.EXE absent then absent; SPI calls 0
+PASS  old-night-empty  control, old launcher: after Set-ScreensaverNone SCRNSAVE.EXE absent (the 23:47 removal); old run-matrix block threw (the 00:03:40 refusal); new block ok: screensaver none; after restore present '' String
+PASS  e2e-old-missing  control: build\agent5\sfx-base\run-matrix.ps1: E2E-THREW=The property 'SCRNSAVE.EXE' cannot be found on this object. Verify that the property exists.; desktop-key reads redirected 1; ; estimate 21 runs (1 cold), about 48 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+PASS  e2e-new-missing  bench\agent8\run\run-matrix.ps1: E2E-EXIT=0; desktop-key reads redirected 1; screensaver none; estimate 21 runs (1 cold), about 48 min (warm boot 12 s, cold boot 25 s, close 5 s per run) | estimate   21 runs, about 48 min: done around 08:22
+PASS  e2e-new-empty  bench\agent8\run\run-matrix.ps1: E2E-EXIT=0; desktop-key reads redirected 1; screensaver none; estimate 21 runs (1 cold), about 48 min (warm boot 12 s, cold boot 25 s, close 5 s per run) | estimate   21 runs, about 48 min: done around 08:22
+PASS  e2e-new-active  bench\agent8\run\run-matrix.ps1: E2E-EXIT=0; desktop-key reads redirected 1; screensaver Mystify.scr after 300 s, LOCKS on resume: the keep-awake request should hold it off; if it starts during timing runs, set it to (None); estimate 21 runs (1 cold), about 48 min (warm boot 12 s, cold boot 25 s, close 5 s per run) | estimate   21 runs, about 48 min: done around 08:22
+PASS  real-untouched  real desktop key before: SCRNSAVE.EXE present '' String; ScreenSaveActive 0; after: SCRNSAVE.EXE present '' String; ScreenSaveActive 0; scratch key removed True; sandboxes removed True
+45/45 PASS

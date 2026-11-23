@@ -1,0 +1,19 @@
+profiler self-test 20261121-184411 : PASS
+profile: <workspace>\bench\agent8\profiler\selftest-20261121-184411.bin (53 samples, 6 threads, duration 3.4753963 s [trailer], rounds 9, ~3 rounds/s)
+threads: main=98172 guest=31892 waiter=60324 sleeper=97288
+PASS  main: busy leaf in lsp_selftest_hot >= 80%: 7/8 = 87.5%
+PASS  guest: self in sub_8200BEEF [guest 0x8200BEEF] >= 80%: "sub_8200BEEF [guest 0x8200BEEF]" cat=guest: 8/8 = 100.0%
+PASS  map: hook / hooked original of 0x8200CAFE detected: "__imp__sub_8200CAFE" 0x5E10 (hooked original), "sub_8200CAFE" 0x5E50 (hook)
+PASS  waiter: >= 90% waiting: 9/9 = 100.0%
+PASS  sleeper: >= 90% waiting: 9/9 = 100.0%
+PASS  demangle: waiter role is selftest::Waiter: role="selftest::Waiter", sleeper role="selftest::Sleeper"
+PASS  main: lsp_selftest_outer inclusive >= 80% of busy: 8/8 = 100.0%
+PASS  --focus lsp_selftest_hot: caller lsp_selftest_outer: caller 7 samples (100.0% of focus 7)
+PASS  --folded has outer;hot stacks: 3 lines, 1 with outer;hot
+PASS  --by module lists profiler_selftest.exe: 15 busy samples (93.75%)
+PASS  --fold-guest folds sub_8200BEEF into guest: top self "guest [folded]" 8
+PASS  --diff self vs self: all deltas 0: max |delta| = 0.0 /s
+PASS  trailer: parsed, timer_mode 1, rounds > 0, duration > 0: timer_mode=1 rounds=9 duration=3.475s observer_effect=False
+PASS  trailer: thread names map to the right tids: main/guest/waiter/sleeper ok
+cpu seconds: build 0.0, exe 7.6, analysis 6.5 (total 14.1)
+reports: <workspace>\bench\agent8\profiler\selftest-20261121-184411-*.json / *.txt

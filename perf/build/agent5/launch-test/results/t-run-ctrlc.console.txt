@@ -1,0 +1,51 @@
+2026-11-22 22:21:04 [dry] launcher start: DRY RUN, files in <workspace>\bench\agent5\launch\status-dryrun\t-run-ctrlc; pid 8852; PowerShell 5.1.26100.10068; repo <workspace>
+2026-11-22 22:21:04 [dry] dry-run hooks: -DryRunTag t-run-ctrlc -SkipStartChecks True -MatrixDir build\agent5\launch-test -PollSeconds 1 -SampleSeconds 1 -MaxGo 1 -GateFixture <workspace>\build\agent5\launch-test\gate-quiet.json -FakeRunner <workspace>\build\agent5\launch-test\fake-runner.ps1
+2026-11-22 22:21:05 [dry] start checks: desktop 'WinSta0\exebox-AWCLA7JRX7DBFNVTEKQ7VU4PRX'; LogonUI not running; power AC (ACLineStatus 1, BatteryFlag 1, battery 100 %); ends at 2026-11-23 07:30:00; latest window start 2026-11-23 06:45:00; a window still running at 2026-11-23 07:30:00 is stopped
+2026-11-22 22:21:05 [dry] start checks would refuse: this is desktop 'WinSta0\exebox-AWCLA7JRX7DBFNVTEKQ7VU4PRX', not the user's own desktop WinSta0\Default (ignored: -DryRun -SkipStartChecks)
+2026-11-22 22:21:07 [dry] pinned 19 files (status: pins.txt)
+2026-11-22 22:21:07 [dry] environment: no other REX_*/LEGO_* variables
+2026-11-22 22:21:07 [dry] console Quick Edit: not changed in a dry run
+2026-11-22 22:21:08 [dry] screensaver: would set (None) (now ScreenSaveActive=0, SCRNSAVE.EXE '') and restore it at the end
+2026-11-22 22:21:08 [dry] keep-awake: would request SetThreadExecutionState(continuous+system+display) until the end
+2026-11-22 22:21:08 [dry] waiting for <workspace>\bench\agent5\launch\status-dryrun\t-run-ctrlc\WINDOW-GO.txt (checked every 1 s) until 2026-11-23 07:30:00, or until <workspace>\bench\agent5\launch\status-dryrun\t-run-ctrlc\WINDOW-STOP.txt appears
+2026-11-22 22:21:10 [dry] GO read and deleted: 'GO T1 t-good.json 4D7D689B799F6102E6325B4CED12688E60F1D2FCE82397C06956574B2B025DFD only=base,s0 repeats=1'
+2026-11-22 22:21:35 [dry] HOLD written: <workspace>\bench\agent5\launch\status-dryrun\t-run-ctrlc\WINDOW-HOLD.txt
+2026-11-22 22:21:41 [dry] GO ACCEPTED: window T1: t-good.json (sha256 ok), only=base,s0, repeats=1; runner estimate 3 runs, about 7 min
+2026-11-22 22:21:41 [dry] bin build/agent2/devoff3-bin/legodimensions.exe sha256 2522D43605D8A9BF2A5EEE31490E6C349274D3258C8E0E1474DBB561CDE86F57
+2026-11-22 22:21:42 [dry] bin build/agent2/devoff3-bin/MANIFEST.txt sha256 B9C5175DA19042353A084E355CBA22D09C50A6B8CE95A1E0A8B17BF64E40FEFE
+2026-11-22 22:21:42 [dry] bin build/agent2/devoff4-bin/legodimensions.exe sha256 6BE3C713229232B29C183D27B397A3560B46E2279C6AF47C64CF8A2EFA287376
+2026-11-22 22:21:43 [dry] bin build/agent2/devoff4-bin/MANIFEST.txt sha256 16DCC9399239E5774BF571869B5248DF36DB0D374BF6A159BF1A9839784CAD6D
+2026-11-22 22:21:43 [dry] WARN: run-matrix.ps1 -PlanOnly says: note     Timing comes only from this double-click run on the unlocked desktop (screensaver None, AC power, hands off). Agent runs of this matrix (-Quick, hidden desktop) are functional only.
+2026-11-22 22:21:43 [dry] WARN: run-matrix.ps1 -PlanOnly says: desktop    WinSta0\exebox-AWCLA7JRX7DBFNVTEKQ7VU4PRX -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+2026-11-22 22:21:44 [dry] programs (GO accepted): would close Taskmgr pid 23844
+2026-11-22 22:21:45 [dry] gate: simulated samples from <workspace>\build\agent5\launch-test\gate-quiet.json (fields set to 'real' use this PC)
+2026-11-22 22:21:46 [dry] gate 1 (+0.2 min): cpu n/a; builds none; RAM 12 GB; C: 50 GB; LogonUI False; AC True -> wait: 0 of 3 consecutive one-minute CPU averages so far
+2026-11-22 22:21:47 [dry] gate 2 (+0.2 min): cpu MsMpEng 0.02, OfficeClickToRun 0.00, CrossDeviceService 0.01; builds none; RAM 12 GB; C: 50 GB; LogonUI False; AC True -> wait: 1 of 3 consecutive one-minute CPU averages so far
+2026-11-22 22:21:49 [dry] gate 3 (+0.2 min): cpu MsMpEng 0.02, OfficeClickToRun 0.00, CrossDeviceService 0.01; builds none; RAM 12 GB; C: 50 GB; LogonUI False; AC True -> wait: 2 of 3 consecutive one-minute CPU averages so far
+2026-11-22 22:21:51 [dry] gate 4 (+0.3 min): cpu MsMpEng 0.02, OfficeClickToRun 0.00, CrossDeviceService 0.01; builds none; RAM 12 GB; C: 50 GB; LogonUI False; AC True -> PASS
+22:21:51 quiet gate: STRICT (MsMpEng 0.02/0.02/0.02, OfficeClickToRun 0.00/0.00/0.00, CrossDeviceService 0.01/0.01/0.01)
+2026-11-22 22:21:52 [dry] programs (window start): would close Taskmgr pid 23844
+2026-11-22 22:22:00 [dry] last checks would refuse: this is desktop 'WinSta0\exebox-AWCLA7JRX7DBFNVTEKQ7VU4PRX', not the user's own desktop WinSta0\Default (ignored: -DryRun -SkipStartChecks)
+2026-11-22 22:22:00 [dry] bins unchanged since the GO (4 files)
+2026-11-22 22:22:02 [dry] power scheme at the start: Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+2026-11-22 22:22:03 [dry] DRY RUN, would start window T1 now, without REX_TIMER_WAIT_BLOCKING / LEGO_GPU_WAIT_STATS / LEGO_GPU_WAIT_BACKOFF_US / LEGO_GPU_WAIT_SPIN_US / LEGO_NATIVE_FRAME_METRICS / LEGO_NATIVE_SHADER_MISS_CACHE / LEGO_NATIVE_THREADED / LEGO_NATIVE_PREPARE_THREADS / LEGO_NATIVE_SNAPSHOT_STATE / LEGO_NATIVE_FULL_DRAW_PREPARATION / LEGO_NATIVE_CHAIN_PRIORITY in its environment:
+2026-11-22 22:22:03 [dry]   "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File <workspace>\bench\agent8\run\run-matrix.ps1 -Matrix <workspace>\build\agent5\launch-test\t-good.json -Only base,s0 -Repeats 1 -ColdShared -NoPrompt
+2026-11-22 22:22:03 [dry] DRY RUN with -FakeRunner: the fake runner below runs instead (tests the run, STOP and end-time handling)
+2026-11-22 22:22:04 [dry] window T1 START (estimate 7 min, about 22:29): "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File <workspace>\build\agent5\launch-test\fake-runner.ps1 -Dir <workspace>\bench\agent5\launch\status-dryrun\t-run-ctrlc
+2026-11-22 22:22:04 [dry] runner pid 1948; a STOP file, or the end time 2026-11-23 07:30:00, stops it and everything it started
+fake runner pid 1948 starting (seconds 120, exit 0, child 300 s)
+fake child pid 26464
+out dir: <workspace>\bench\agent5\launch\status-dryrun\t-run-ctrlc\fake-out
+fake run tick 1
+fake runner stderr line
+fake run tick 2
+fake run tick 3
+fake run tick 4
+fake run tick 5
+fake run tick 6
+fake run tick 7
+2026-11-22 22:22:19 [dry] !!! the launcher was interrupted (Ctrl+C?) while the runner was running: the runner (pid 1948) and every process it started are killed now
+2026-11-22 22:22:19 [dry] runner pid 1948 had already ended
+2026-11-22 22:22:21 [dry] killed (walk 1): powershell.exe:26464, conhost.exe:38832 (ended on its own)
+2026-11-22 22:22:21 [dry] runner stopped: yes
+2026-11-22 22:22:21 [dry] HOLD removed

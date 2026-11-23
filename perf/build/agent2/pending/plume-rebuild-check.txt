@@ -1,0 +1,26 @@
+# plume rebuild check (Agent 2, task #28), 2026-11-23 06:27:34
+
+- Question: live `DimensionsRecomp/thirdparty/plume` == PIN e0c8871b930d + the 7 tracked patches of `DimensionsRecomp/tools/gpu-aot/patches` in prepare_plume.py order, exactly?
+- Method: PIN blobs via `git show` (read-only), GNU patch --fuzz=0 in `build/agent2/scratch/plume-rebuild`, compare with the live files after CRLF -> LF.
+
+- plume HEAD: e0c8871b930dc1a6544bf457f2348c456b9d7e13 (PIN)
+- files modified in the live checkout (diff --name-only HEAD): plume_d3d12.cpp, plume_d3d12.h, plume_vulkan.cpp
+- files the 7 patches touch: plume_d3d12.cpp, plume_d3d12.h, plume_vulkan.cpp
+
+| # | patch | sha256 (16) | GNU patch exit | output |
+|---|---|---|---|---|
+| 1 | `plume-lego.patch` | FCB74C7EF5EC9A99 | 0 | patching file plume_d3d12.cpp |
+| 2 | `plume-state-cache.patch` | 66C6E7E85E9E04BC | 0 | patching file plume_d3d12.h / patching file plume_d3d12.cpp |
+| 3 | `plume-vulkan-readback.patch` | 9C8BD6EC9F2E6302 | 0 | patching file plume_vulkan.cpp |
+| 4 | `plume-buffer-address.patch` | 4F193746AC492A7E | 0 | patching file plume_d3d12.h / patching file plume_d3d12.cpp |
+| 5 | `plume-adapter-query.patch` | 74D16AABCC9A6A19 | 0 | patching file plume_d3d12.cpp |
+| 6 | `plume-graphics-read.patch` | D6C9CFDE21498505 | 0 | patching file plume_d3d12.cpp / Hunk #1 succeeded at 663 (offset 3 lines). |
+| 7 | `plume-winsdk-compat.patch` | E03D29D0758E6150 | 0 | patching file plume_d3d12.cpp |
+
+| file | live sha256 (16, as on disk) | live EOL | rebuilt == live (LF-normalized) |
+|---|---|---|---|
+| `plume_d3d12.cpp` | 564568D4D5853F22 | CRLF | yes |
+| `plume_d3d12.h` | 2F8B444CE676AEE5 | CRLF | yes |
+| `plume_vulkan.cpp` | 71938A4CAFB8E474 | CRLF | yes |
+
+RESULT: PASS: the live plume checkout is exactly PIN + the 7 tracked patches  (0.9 s)

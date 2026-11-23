@@ -1,0 +1,77 @@
+# cg26_check.py (Agent 9, run-2 task #18)  2026-11-22 22:39:03  kit sha256 A179EB13F3B21CC2
+# arm A; R2.17 sites sub_83FAF180 TU107 x8, sub_83F99F80 TU116 x2, sub_83F9A5B0 TU321 x2, sub_83FCB608 TU205 x2, sub_83E66CD8 TU169 x1, sub_83EA90D0 TU153 x1, sub_83E63F38 TU432 x1, sub_83E96348 TU304 x1, sub_83E70320 TU284 x1, sub_83E64900 TU125 x1
+# gen    build\agent2\cg26\DimensionsRecomp\rexlego\generated  (codegen dir default)
+# ref    build\agent2\snap1\DimensionsRecomp\rexlego\generated
+# config build\agent2\cg26\DimensionsRecomp\rexlego\legodimensions_config.toml
+# tool   build\agent2\cg26\tool\rexglue.exe
+# bin    build\agent2\nativeB-bin
+# hold   perf-notes\WINDOW-HOLD.txt
+# scanned 887 + 887 files, 980.0 MB, 5.2 s
+== (a) the toml line and the new codegen tool are in the same build
+PASS config toml has exactly one root-level 'db16cyc_pause = true' (before the first [table]): line 24
+PASS config toml minus that line == the arm-A base toml 7F775847DB9CC2DA: 7F775847DB9CC2DA
+NOTE config toml sha256 11707872E82D8B52 == Agent 9 staged new-A toml (HASHES.txt)
+FAIL codegen.d names a config toml with this content: <workspace>/build/agent2/snap1/DimensionsRecomp/rexlego/legodimensions_config.toml 7F775847DB9CC2DA (another path)
+NOTE codegen.d target is <workspace>/build/agent2/snap1/DimensionsRecomp/rexlego/generated/default/codegen.build.stamp (this output was written elsewhere and copied)
+PASS codegen.stamp is a version-1 stamp with a fingerprint: 58c23c7e7cdb95afd17a35c5148cb3e9
+PASS codegen.build.stamp == the codegen.stamp fingerprint (one regen wrote both): 58c23c7e7cdb95afd17a35c5148cb3e9 vs 58c23c7e7cdb95afd17a35c5148cb3e9
+FAIL the fingerprint differs from the reference (the inputs changed since the reference): gen 58c23c7e7cdb95afd17a35c5148cb3e9, ref 58c23c7e7cdb95afd17a35c5148cb3e9
+PASS the stamp lists the same outputs as the reference (883)
+PASS every stamp output exists
+FAIL the regen ran after the toml landed: codegen.stamp 2026-11-21 18:15:54, toml 2026-11-22 20:54:29
+PASS the tool has the db16cyc_pause option (sha256 9145166CDBEF5500): 'db16cyc_pause' yes, '\tsimde_mm_pause();' yes
+NOTE the tool file (2026-11-22 20:36:11) is newer than codegen.stamp (2026-11-21 18:15:54): re-staged after the regen?
+FAIL the regen emitted the pauses (both the toml line and the new tool were in effect): 0 of 20
+NOTE ADVICE: no pause lines, so no regen ran with both the line and the new tool. If codegen.stamp is newer than the toml, an old tool took the stamp and a new-tool run will skip the regen: delete codegen.stamp (or touch the toml) and force one regen with the new tool.
+NOTE the bin MANIFEST names: the tool sha256 no, the config toml sha256 no, ON TU sha256s 0/10
+PASS the staged exe is newer than the regen: exe 2026-11-22 04:33:29, newest of the 10 TUs 2026-11-21 18:03:14
+== (b) the 20 pause sites
+PASS the reference has the 20 db16cyc sites in the arm-A TUs: 20 sites in 10 TUs
+PASS the reference has no _mm_pause text
+PASS gen has the same db16cyc comment lines per TU as the reference: 20 sites in 10 TUs
+FAIL exactly 20 pause lines (\tsimde_mm_pause();): 0
+PASS no other '_mm_pause' text anywhere in gen (887 files scanned): 0 occurrence(s) in 0 file(s)
+PASS no pause outside the arm-A 10 TUs
+PASS every pause is in its expected function and TU
+PASS every pause line directly follows a '\t// db16cyc ' line
+FAIL per-function pause counts == R2.17 (8, 2, 2, 2 and six 1s): sub_83E63F38 0 (want 1); sub_83E64900 0 (want 1); sub_83E66CD8 0 (want 1); sub_83E70320 0 (want 1); sub_83E96348 0 (want 1); sub_83EA90D0 0 (want 1); sub_83F99F80 0 (want 2); sub_83F9A5B0 0 (want 2); sub_83FAF180 0 (want 8); sub_83FCB608 0 (want 2)
+FAIL TU107 sub_83FAF180: 8 pause line(s), one after each db16cyc site; minus them == the reference: inserted 0, db16cyc sites without a pause 8, rest identical yes
+FAIL TU116 sub_83F99F80: 2 pause line(s), one after each db16cyc site; minus them == the reference: inserted 0, db16cyc sites without a pause 2, rest identical yes
+FAIL TU125 sub_83E64900: 1 pause line(s), one after each db16cyc site; minus them == the reference: inserted 0, db16cyc sites without a pause 1, rest identical yes
+FAIL TU153 sub_83EA90D0: 1 pause line(s), one after each db16cyc site; minus them == the reference: inserted 0, db16cyc sites without a pause 1, rest identical yes
+FAIL TU169 sub_83E66CD8: 1 pause line(s), one after each db16cyc site; minus them == the reference: inserted 0, db16cyc sites without a pause 1, rest identical yes
+FAIL TU205 sub_83FCB608: 2 pause line(s), one after each db16cyc site; minus them == the reference: inserted 0, db16cyc sites without a pause 2, rest identical yes
+FAIL TU284 sub_83E70320: 1 pause line(s), one after each db16cyc site; minus them == the reference: inserted 0, db16cyc sites without a pause 1, rest identical yes
+FAIL TU304 sub_83E96348: 1 pause line(s), one after each db16cyc site; minus them == the reference: inserted 0, db16cyc sites without a pause 1, rest identical yes
+FAIL TU321 sub_83F9A5B0: 2 pause line(s), one after each db16cyc site; minus them == the reference: inserted 0, db16cyc sites without a pause 2, rest identical yes
+FAIL TU432 sub_83E63F38: 1 pause line(s), one after each db16cyc site; minus them == the reference: inserted 0, db16cyc sites without a pause 1, rest identical yes
+== (c) codegen.partition.json and the rest of the tree unchanged
+PASS same file list as the reference: 887 files
+PASS no file differs except the 10 TUs and the 3 stamp files: 0 differ: 
+PASS codegen.partition.json unchanged: gen 22C9D89BEA8E8C6E, ref 22C9D89BEA8E8C6E
+PASS codegen.partition.json is the arm-A sidecar 22C9D89BEA8E8C6E: 22C9D89BEA8E8C6E
+PASS sources.cmake unchanged: 941C165E7B669CE4
+PASS legodimensions_funcs.h unchanged: 76EFB251276CB23D
+PASS legodimensions_init.cpp unchanged: C2B065A262CCABDB
+PASS legodimensions_init.h unchanged: D4FB8E763E0E22BA
+PASS legodimensions_register.cpp unchanged: 747F2EDADBF61A24
+PASS legodimensions_pch.h unchanged: 61BFA4CCB81A9D46
+PASS every header unchanged (441 .h files)
+NOTE codegen.stamp is identical to the reference
+NOTE codegen.build.stamp is identical to the reference
+NOTE codegen.d is identical to the reference
+== (d) the staged bin MANIFEST
+PASS MANIFEST build\agent2\nativeB-bin\MANIFEST.txt has hash rows: 8 rows
+PASS legodimensions.exe sha256 and size == MANIFEST: 01C4D5A3E36FAC50 299045376 B
+NOTE legodimensions.exe source in the MANIFEST: build\agent2\snapB3-on\legodimensions.exe
+PASS legodimensions.map sha256 and size == MANIFEST: C9259B05689E3AA5 43689378 B
+NOTE legodimensions.map source in the MANIFEST: build\agent2\snapB3-on\legodimensions.map
+PASS rexruntime.dll sha256 and size == MANIFEST: D1D66AC3716835AC 10889728 B
+PASS rexgpu-xenos.dll sha256 and size == MANIFEST: EE0A661FB0C30FCB 3385344 B
+PASS TracyClient.dll sha256 and size == MANIFEST: 85044850B6C663B5 233472 B
+PASS achievement_unlocked.wav sha256 and size == MANIFEST: A707019154484B9D 191018 B
+PASS FiraSans-Regular.ttf sha256 and size == MANIFEST: C29556A2719BF613 456996 B
+PASS amd_fidelityfx_dx12.dll sha256 and size == MANIFEST: 12A5081257EC95B0 6675664 B
+== failed: (b) exactly 20 pause lines (\tsimde_mm_pause();) | (b) per-function pause counts == R2.17 (8, 2, 2, 2 and six 1s) | (b) TU107 sub_83FAF180: 8 pause line(s), one after each db16cyc site; minus them == the reference | (b) TU116 sub_83F99F80: 2 pause line(s), one after each db16cyc site; minus them == the reference | (b) TU125 sub_83E64900: 1 pause line(s), one after each db16cyc site; minus them == the reference | (b) TU153 sub_83EA90D0: 1 pause line(s), one after each db16cyc site; minus them == the reference | (b) TU169 sub_83E66CD8: 1 pause line(s), one after each db16cyc site; minus them == the reference | (b) TU205 sub_83FCB608: 2 pause line(s), one after each db16cyc site; minus them == the reference | (b) TU284 sub_83E70320: 1 pause line(s), one after each db16cyc site; minus them == the reference | (b) TU304 sub_83E96348: 1 pause line(s), one after each db16cyc site; minus them == the reference | (b) TU321 sub_83F9A5B0: 2 pause line(s), one after each db16cyc site; minus them == the reference | (b) TU432 sub_83E63F38: 1 pause line(s), one after each db16cyc site; minus them == the reference | (a) codegen.d names a config toml with this content | (a) the fingerprint differs from the reference (the inputs changed since the reference) | (a) the regen ran after the toml landed | (a) the regen emitted the pauses (both the toml line and the new tool were in effect)
+RESULT: FAIL (16)  (7.3 s)
+-> build\agent9\cg26-check\test-20261122-223737\F1 (report.txt, diff-summary.md, sites.tsv)

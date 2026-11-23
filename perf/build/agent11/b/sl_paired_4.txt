@@ -1,0 +1,16 @@
+﻿[status pre] 18:57:34 BatteryStatus=2 (2=AC) LoadPercentage=62
+[cmd] bench_spinlock.exe paired 300 20000 old,off,ttast:10000,old#aa
+[power] ACLineStatus=1 (1=AC, 0=battery) battery=100%  tsc=2.6112 GHz
+uncontended acquire+release, paired: 300 rounds x 20000 per variant per core
+  core=P  old          median  39.12  p10  29.94  p90  58.70 ns   paired diff vs old: +0.00 ns
+  core=P  off          median  36.32  p10  30.19  p90  66.83 ns   paired diff vs old: -0.23 ns
+  core=P  ttast:10000  median  35.74  p10  29.33  p90  57.98 ns   paired diff vs old: -0.38 ns
+  core=P  old#aa       median  36.43  p10  30.02  p90  64.07 ns   paired diff vs old: -0.10 ns
+  core=E  old          median  37.67  p10  35.61  p90  39.51 ns   paired diff vs old: +0.00 ns
+  core=E  off          median  37.76  p10  35.67  p90  39.92 ns   paired diff vs old: +0.03 ns
+  core=E  ttast:10000  median  37.79  p10  36.00  p90  40.20 ns   paired diff vs old: +0.11 ns
+  core=E  old#aa       median  37.62  p10  35.91  p90  39.97 ns   paired diff vs old: -0.12 ns
+[cpu] process CPU time 1.73 s
+[exit] 0
+[wall] 4.6 s
+[status post] 18:57:40 BatteryStatus=2 (2=AC) LoadPercentage=62

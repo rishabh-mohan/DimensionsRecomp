@@ -1,0 +1,14 @@
+group hold; t-good.json sha256 4D7D689B799F6102E6325B4CED12688E60F1D2FCE82397C06956574B2B025DFD; real perf-notes files: WINDOW-GO.txt=absent WINDOW-HOLD.txt=absent WINDOW-STOP.txt=absent
+PASS  foreign HOLD at GO, then gone exit 0        
+PASS  foreign HOLD all along exit 0        
+PASS  our HOLD removed in the gate exit 0        
+PASS  our HOLD taken over in the gate exit 0        
+group hold, 2026-11-22 22:14:35, run-night.ps1 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31
+
+test                            tag            result exit detail
+----                            ---            ------ ---- ------
+foreign HOLD at GO, then gone   t-hold-foreign PASS   0    ok    
+foreign HOLD all along          t-hold-keep    PASS   0    ok    
+our HOLD removed in the gate    t-hold-gone    PASS   0    ok    
+our HOLD taken over in the gate t-hold-taken   PASS   0    ok
+real perf-notes files at the end: WINDOW-GO.txt=absent WINDOW-HOLD.txt=absent WINDOW-STOP.txt=absent

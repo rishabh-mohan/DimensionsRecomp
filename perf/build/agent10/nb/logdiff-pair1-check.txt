@@ -1,0 +1,24 @@
+# logdiff: 1 baseline logs, 1 candidate logs, min level warning
+## per log (lines by level; fail markers; clean-exit)
+BASE build\agent3\runs\20261122-045945-bgate-long-native3d\game.log | 04:59:49..05:03:26 | info=1642 warning=184 error=4 critical=1 | fatal=1 | clean-exit=1
+CAND build\agent3\runs\20261122-050343-bgate-long-nativeB\game.log | 05:03:50..05:07:31 | info=1667 warning=184 | no fail markers | clean-exit=1
+## NEW keys (level >= warning; in a candidate log, in no baseline log)
+## MORE keys (level >= warning; candidate count > baseline max + max(5, baseline max))
+## GONE keys (any level; in every baseline log, missing from a candidate log)
+GONE build\agent3\runs\20261122-050343-bgate-long-nativeB\game.log [critical] [core] [FATAL] Minidump written to hang-#.dmp
+GONE build\agent3\runs\20261122-050343-bgate-long-nativeB\game.log [error] [krnl] STUCK-LOCK: critical section #x# still not acquired after #s. owner=guest thread object #x#, lock_count=#, recursion=#; waiting thread is #x#. An owner of #, or one naming a thread that has exited, me
+GONE build\agent3\runs\20261122-050343-bgate-long-nativeB\game.log [error] [krnl] STUCK-LOCK: owner's callers: #h <- #h <- #h <- #h <- #h <- #h <- #h <- #h <- #h
+GONE build\agent3\runs\20261122-050343-bgate-long-nativeB\game.log [error] [krnl] STUCK-LOCK: the owner is tid #x# (unnamed), parked at lr=#h with r#=#h. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.
+GONE build\agent3\runs\20261122-050343-bgate-long-nativeB\game.log [error] [krnl] STUCK-LOCK: waiter's callers: lr=#h <- #h <- #h <- #h <- #h <- #h <- #h <- #h
+GONE build\agent3\runs\20261122-050343-bgate-long-nativeB\game.log [info] [core] Native GPU: placement buffer relocation type resource=#h type=# lr=#h
+GONE build\agent3\runs\20261122-050343-bgate-long-nativeB\game.log [info] [core] Toypad[Read ] #B # # # # #F # # # # # # # # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-050343-bgate-long-nativeB\game.log [info] [core] Toypad[Read ] #B #C # # # # # # # C# E# BD #A # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-050343-bgate-long-nativeB\game.log [info] [core] Toypad[Read ] #B #C # # # D# FE # # A# #F #C DA # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-050343-bgate-long-nativeB\game.log [info] [core] Toypad[Read ] #B #C # # # DD CF # # # D# B# E# # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-050343-bgate-long-nativeB\game.log [info] [core] Toypad[Read ] #B #C # # # EB D# #F B# #C C# F# # # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-050343-bgate-long-nativeB\game.log [info] [core] Toypad[Write] #B # # #A B# # # # E# C# # D# #D #D # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-050343-bgate-long-nativeB\game.log [info] [core] Toypad[Write] #B # # #A B# # # ED # BB # E# #A E# #D # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-050343-bgate-long-nativeB\game.log [info] [core] Toypad[Write] #B # # #A B# # # F# A# #F #B DC # FC FB # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-050343-bgate-long-nativeB\game.log [info] [core] Toypad[Write] #B # # #A B# # EE #D C# # # # C# # #B # # # # # # # # # # # # # # # # # 
+## MARKER CHECK (fail marker above the baseline max per log; clean-exit missing)
+# NEW total 0, marker flags 0

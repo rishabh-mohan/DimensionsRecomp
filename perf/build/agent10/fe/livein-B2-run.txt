@@ -1,0 +1,80 @@
+livein B v2 (snapB3): funcs=164786 with_locals=70213 keys=349842 never_used=21594 write_first=328220 read_first=28 read_loop_first=0 read_after_call=41 funcs_read_after_call=37  (100 s)
+
+check 1: first use is a read, by pattern (kind var: normalised line) count, examples:
+       1  read cr1.lt: ctx.R.u64 |= cr1.lt ? N : N;   e.g. sub_83E49CA0 (TU 205, line +32)
+       1  read cr1.gt: ctx.R.u64 |= cr1.gt ? N : N;   e.g. sub_83E49CA0 (TU 205, line +33)
+       1  read cr1.eq: ctx.R.u64 |= cr1.eq ? N : N;   e.g. sub_83E49CA0 (TU 205, line +34)
+       1  read cr1.so: ctx.R.u64 |= cr1.so ? N : N;   e.g. sub_83E49CA0 (TU 205, line +35)
+       1  read cr2.lt: ctx.R.u64 |= cr2.lt ? N : N;   e.g. sub_83E49CA0 (TU 205, line +36)
+       1  read cr2.gt: ctx.R.u64 |= cr2.gt ? N : N;   e.g. sub_83E49CA0 (TU 205, line +37)
+       1  read cr2.eq: ctx.R.u64 |= cr2.eq ? N : N;   e.g. sub_83E49CA0 (TU 205, line +38)
+       1  read cr2.so: ctx.R.u64 |= cr2.so ? N : N;   e.g. sub_83E49CA0 (TU 205, line +39)
+       1  read cr3.lt: ctx.R.u64 |= cr3.lt ? N : N;   e.g. sub_83E49CA0 (TU 205, line +40)
+       1  read cr3.gt: ctx.R.u64 |= cr3.gt ? N : N;   e.g. sub_83E49CA0 (TU 205, line +41)
+       1  read cr3.eq: ctx.R.u64 |= cr3.eq ? N : N;   e.g. sub_83E49CA0 (TU 205, line +42)
+       1  read cr3.so: ctx.R.u64 |= cr3.so ? N : N;   e.g. sub_83E49CA0 (TU 205, line +43)
+       1  read cr4.lt: ctx.R.u64 |= cr4.lt ? N : N;   e.g. sub_83E49CA0 (TU 205, line +44)
+       1  read cr4.gt: ctx.R.u64 |= cr4.gt ? N : N;   e.g. sub_83E49CA0 (TU 205, line +45)
+       1  read cr4.eq: ctx.R.u64 |= cr4.eq ? N : N;   e.g. sub_83E49CA0 (TU 205, line +46)
+       1  read cr4.so: ctx.R.u64 |= cr4.so ? N : N;   e.g. sub_83E49CA0 (TU 205, line +47)
+       1  read cr5.lt: ctx.R.u64 |= cr5.lt ? N : N;   e.g. sub_83E49CA0 (TU 205, line +48)
+       1  read cr5.gt: ctx.R.u64 |= cr5.gt ? N : N;   e.g. sub_83E49CA0 (TU 205, line +49)
+       1  read cr5.eq: ctx.R.u64 |= cr5.eq ? N : N;   e.g. sub_83E49CA0 (TU 205, line +50)
+       1  read cr5.so: ctx.R.u64 |= cr5.so ? N : N;   e.g. sub_83E49CA0 (TU 205, line +51)
+       1  read cr6.lt: ctx.R.u64 |= cr6.lt ? N : N;   e.g. sub_83E49CA0 (TU 205, line +52)
+       1  read cr6.gt: ctx.R.u64 |= cr6.gt ? N : N;   e.g. sub_83E49CA0 (TU 205, line +53)
+       1  read cr6.eq: ctx.R.u64 |= cr6.eq ? N : N;   e.g. sub_83E49CA0 (TU 205, line +54)
+       1  read cr6.so: ctx.R.u64 |= cr6.so ? N : N;   e.g. sub_83E49CA0 (TU 205, line +55)
+       1  read cr7.lt: ctx.R.u64 |= cr7.lt ? N : N;   e.g. sub_83E49CA0 (TU 205, line +56)
+       1  read cr7.gt: ctx.R.u64 |= cr7.gt ? N : N;   e.g. sub_83E49CA0 (TU 205, line +57)
+       1  read cr7.eq: ctx.R.u64 |= cr7.eq ? N : N;   e.g. sub_83E49CA0 (TU 205, line +58)
+       1  read cr7.so: ctx.R.u64 |= cr7.so ? N : N;   e.g. sub_83E49CA0 (TU 205, line +59)
+
+check 2: read of a volatile local after a non-tail call, last write before the call, by pattern:
+       6  ctr: --ctr.u64;   e.g. sub_834748D0 (TU 17, line +85); sub_832CF010 (TU 29, line +327); sub_83436FA8 (TU 111, line +204); sub_82A7CF18 (TU 164, line +108)
+       1  cr6.lt: if (!cr6.lt) goto loc_8321A080;   e.g. sub_83219720 (TU 12, line +1277)
+       1  cr6.lt: if (!cr6.lt) goto loc_8321A3C0;   e.g. sub_83219720 (TU 12, line +1733)
+       1  cr6.lt: if (!cr6.lt) goto loc_8321A5D4;   e.g. sub_83219720 (TU 12, line +2026)
+       1  cr6.gt: if (!cr6.gt) goto loc_827432E0;   e.g. sub_827431A8 (TU 19, line +63)
+       1  xer.ca: temp.s64 = ctx.R.s64 + xer.ca;   e.g. sub_830E4338 (TU 29, line +362)
+       1  cr6.gt: if (!cr6.gt) goto loc_82CD6318;   e.g. sub_82CD60E8 (TU 32, line +339)
+       1  cr6.gt: if (!cr6.gt) goto loc_826484EC;   e.g. sub_826483F0 (TU 66, line +63)
+       1  cr6.gt: if (!cr6.gt) goto loc_82BF5EE8;   e.g. sub_82BF5DB8 (TU 88, line +90)
+       1  cr6.gt: if (!cr6.gt) goto loc_82743170;   e.g. sub_82743038 (TU 106, line +63)
+       1  cr6.gt: if (!cr6.gt) goto loc_83659C58;   e.g. sub_83658AC0 (TU 115, line +2308)
+       1  cr0.eq: if (cr0.eq) goto loc_840238F0;   e.g. sub_84023390 (TU 117, line +686)
+       1  cr6.gt: if (!cr6.gt) goto loc_82BF4A20;   e.g. sub_82BF4900 (TU 120, line +74)
+       1  cr6.eq: if (cr6.eq) goto loc_84020910;   e.g. sub_84020838 (TU 127, line +114)
+       1  cr6.lt: if (!cr6.lt) goto loc_839BADA8;   e.g. sub_839B56D0 (TU 155, line +12811)
+       1  cr6.eq: if (!cr6.eq) goto loc_83FBF6AC;   e.g. sub_83FBF5A0 (TU 166, line +148)
+       1  cr6.gt: if (!cr6.gt) goto loc_82BF31A4;   e.g. sub_82BF2FE8 (TU 215, line +171)
+       1  cr6.eq: if (cr6.eq) goto loc_84020358;   e.g. sub_84020280 (TU 260, line +114)
+       1  cr6.eq: if (cr6.eq) goto loc_840207F0;   e.g. sub_84020718 (TU 282, line +114)
+       1  cr6.eq: if (cr6.eq) goto loc_8401D708;   e.g. sub_8401D698 (TU 299, line +62)
+       1  cr6.eq: if (cr6.eq) goto loc_8401F3F4;   e.g. sub_8401F328 (TU 302, line +108)
+       1  cr6.eq: if (cr6.eq) goto loc_8401F0BC;   e.g. sub_8401EFF0 (TU 339, line +108)
+       1  cr0.lt: if (!cr0.lt) goto loc_83F17844;   e.g. sub_83F17660 (TU 340, line +283)
+       1  cr6.gt: if (!cr6.gt) goto loc_8292CBB4;   e.g. sub_8292C7B8 (TU 341, line +610)
+       1  cr6.gt: if (!cr6.gt) goto loc_8292CC64;   e.g. sub_8292C7B8 (TU 341, line +712)
+       1  cr6.eq: if (cr6.eq) goto loc_83FAAEA4;   e.g. sub_83FAACB0 (TU 346, line +277)
+       1  cr0.eq: if (cr0.eq) goto loc_83E55138;   e.g. sub_83E54FD8 (TU 352, line +194)
+       1  cr0.eq: if (cr0.eq) goto loc_83E551B0;   e.g. sub_83E54FD8 (TU 352, line +263)
+       1  cr6.eq: if (cr6.eq) goto loc_8339D950;   e.g. sub_8339CDD8 (TU 361, line +1734)
+       1  cr6.eq: if (cr6.eq) goto loc_83E51584;   e.g. sub_83E51430 (TU 366, line +193)
+       1  cr6.eq: if (!cr6.eq) goto loc_8367D3D0;   e.g. sub_8367D250 (TU 368, line +215)
+       1  cr6.lt: if (cr6.lt) goto loc_828B3A60;   e.g. sub_828B39C8 (TU 379, line +69)
+       1  xer.ca: temp.u8 = (~ctx.R.u32 + ctx.R.u32 < ~ctx.R.u32) | (~ctx.R.u32 + ctx.R.u32 + xer.ca < xer.ca);   e.g. sub_83BAE580 (TU 389, line +325)
+       1  cr6.gt: if (!cr6.gt) goto loc_82648948;   e.g. sub_82648868 (TU 399, line +65)
+       1  cr6.eq: if (cr6.eq) goto loc_8401F1CC;   e.g. sub_8401F100 (TU 420, line +108)
+       1  cr6.gt: if (!cr6.gt) goto loc_8285D91C;   e.g. sub_8285D7F0 (TU 426, line +160)
+
+check 1 rows (first 3000):
+read sub_83E49CA0 cr1.lt line +32: ctx.r4.u64 |= cr1.lt ? 0x8000000 : 0;
+read sub_83E49CA0 cr1.gt line +33: ctx.r4.u64 |= cr1.gt ? 0x4000000 : 0;
+read sub_83E49CA0 cr1.eq line +34: ctx.r4.u64 |= cr1.eq ? 0x2000000 : 0;
+read sub_83E49CA0 cr1.so line +35: ctx.r4.u64 |= cr1.so ? 0x1000000 : 0;
+read sub_83E49CA0 cr2.lt line +36: ctx.r4.u64 |= cr2.lt ? 0x800000 : 0;
+read sub_83E49CA0 cr2.gt line +37: ctx.r4.u64 |= cr2.gt ? 0x400000 : 0;
+read sub_83E49CA0 cr2.eq line +38: ctx.r4.u64 |= cr2.eq ? 0x200000 : 0;
+read sub_83E49CA0 cr2.so line +39: ctx.r4.u64 |= cr2.so ? 0x100000 : 0;
+read sub_83E49CA0 cr3.lt line +40: ctx.r4.u64 |= cr3.lt ? 0x80000 : 0;

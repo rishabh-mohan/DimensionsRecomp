@@ -1,0 +1,78 @@
+--- run-s3d.ps1
++++ run-s3e.ps1
+@@ -1,20 +1,20 @@
+-# Agent 2 - native3d: snap1 at S3d -> build/agent2/native3d-bin, at Agent 1's explicit GO only. S3d = S3 + exactly
+-# Agent 4's live write of rexlego/src/gpu_native/draw.cpp: prep-s3d.py <sha256> --go HH:MM writes S3d-rules.txt and
+-# S3d-notes.txt, then snap-patch.py apply S3d build\agent2\S3d-rules.txt --note-file=build\agent2\S3d-notes.txt.
++# Agent 2 - native3e: snap1 at S3e -> build/agent2/native3e-bin, at Agent 1's explicit GO only. S3e = S3d + exactly
++# Agent 4's next live write (the '|| !vs' variant) of rexlego/src/gpu_native/draw.cpp: prep-s3e.py <sha256> --go HH:MM writes S3e-rules.txt and
++# S3e-notes.txt, then snap-patch.py apply S3e build\agent2\S3e-rules.txt --note-file=build\agent2\S3e-notes.txt.
+ # Native only: draw.cpp is not compiled into OFF builds (snap1-off compile_commands.json lists no gpu_native file), so
+-# devoff3-bin stays the OFF build of S3d; the SDK is not rebuilt (no SDK file changed since S3). The generated code
+-# stays the pinned S1 output, as in S1-S3. Run as a run_command background task; it stops at the first failure;
+-# build/agent2/stop-snap.ps1 kills it.
+-#   powershell -NoProfile -ExecutionPolicy Bypass -File build\agent2\run-s3d.ps1 [-Jobs 10] [-ExtraExeStrings 'a,b']
+-#       native3d game build (snap1-on, tag snap3d) with the explicit configure, as S2/S3 (the native GPU fingerprint
+-#       hashes draw.cpp), then stage-snap-bin.ps1 -Variant native -SnapTag S3d -> build/agent2/native3d-bin with
+-#       -CompareBin native3-bin: every staged file but the exe and map must equal native3's, and the exe must differ.
++# devoff3-bin stays the OFF build of S3e; the SDK is not rebuilt (no SDK file changed since S3d). The generated code
++# stays the pinned S1 output, as in S1-S3d. Run as a run_command background task; it stops at the first failure;
++# build/agent2/stop-snap.ps1 kills it. Cloned from run-s3d.ps1 by make-s3e-clones.py; -CompareBin is native3d-bin.
++#   powershell -NoProfile -ExecutionPolicy Bypass -File build\agent2\run-s3e.ps1 [-Jobs 10] [-ExtraExeStrings 'a,b']
++#       native3e game build (snap1-on, tag snap3e) with the explicit configure, as S2/S3d (the native GPU fingerprint
++#       hashes draw.cpp), then stage-snap-bin.ps1 -Variant native -SnapTag S3e -> build/agent2/native3e-bin with
++#       -CompareBin native3d-bin: every staged file but the exe and map must equal native3d's, and the exe must differ.
+ #       -ExtraExeStrings: more comma-free literals of 16+ chars the exe must contain (e.g. new in Agent 4's draw.cpp).
+-# Guards before anything builds: no start 08:30-12:00 (no builds from 08:30), -Jobs capped at 10, native3-bin staged,
+-# no other snapshot build driver running, S3d-notes.txt present, snap-patch.py verify S3d PASS (snap1 == the latest
+-# STATE-S3d-*.tsv), PATCHES-S3d.tsv holds exactly the draw.cpp row and snap1's draw.cpp has its after-hash.
++# Guards before anything builds: no start 08:30-12:00 (no builds from 08:30), -Jobs capped at 10, native3d-bin staged,
++# no other snapshot build driver running, S3e-notes.txt present, snap-patch.py verify S3e PASS (snap1 == the latest
++# STATE-S3e-*.tsv), PATCHES-S3e.tsv holds exactly the draw.cpp row and snap1's draw.cpp has its after-hash.
+ # If the tree's rexruntime.dll differs from snap1-sdk/install/bin after the build (the exe did not relink), the exe
+-# and map are renamed *.pre-S3d and the game phase runs again as tag snap3dr (gen-check + gate + relink), as in
++# and map are renamed *.pre-S3e and the game phase runs again as tag snap3er (gen-check + gate + relink), as in
+ # run-s3.ps1. Nothing is hand-copied.
+-# Log: build/agent2/snap3d-run.txt (+ build-snap's snap3d-steps.txt and logs, and snap3d-stage-native.log).
++# Log: build/agent2/snap3e-run.txt (+ build-snap's snap3e-steps.txt and logs, and snap3e-stage-native.log).
+ param([int]$Jobs = 10, [string]$ExtraExeStrings = '')
+@@ -23,6 +23,6 @@
+ $A = "$R\build\agent2"
+-$SnapTag = 'S3d'; $Stage = 'native'; $tag = 'snap3d'; $Rel = 'rexlego/src/gpu_native/draw.cpp'
++$SnapTag = 'S3e'; $Stage = 'native'; $tag = 'snap3e'; $Rel = 'rexlego/src/gpu_native/draw.cpp'
+ $runLog = "$A\$tag-run.txt"
+ $notes = "$A\$SnapTag-notes.txt"
+-$ref = "$A\native3-bin"
++$ref = "$A\native3d-bin"
+ # literals of 16+ chars, as native3 (run-s3.ps1): the tail of Agent 12's pause_safe_order description (exe), Agent
+@@ -51,6 +51,6 @@
+ if ($Jobs -gt 10) { Log "-Jobs $Jobs capped at 10"; $Jobs = 10 }
+-if (-not (Test-Path -LiteralPath "$ref\MANIFEST.txt")) { Log "STOP: native3-bin is not staged (no $ref\MANIFEST.txt; it is the -CompareBin reference)"; exit 4 }
+-$drv = @(Get-CimInstance Win32_Process | Where-Object { $_.ProcessId -ne $PID -and $_.CommandLine -match 'run-b\.ps1|b-chain\.ps1|prep-b\.py|run-s2\.ps1|run-s3\.ps1|build-snap\.ps1|stage-snap-bin\.ps1' })
++if (-not (Test-Path -LiteralPath "$ref\MANIFEST.txt")) { Log "STOP: native3d-bin is not staged (no $ref\MANIFEST.txt; it is the -CompareBin reference)"; exit 4 }
++$drv = @(Get-CimInstance Win32_Process | Where-Object { $_.ProcessId -ne $PID -and $_.CommandLine -match 'run-b\.ps1|b-chain\.ps1|prep-b\.py|run-s2\.ps1|run-s3\.ps1|run-s3d\.ps1|build-snap\.ps1|stage-snap-bin\.ps1|rb-chain\.ps1|run-rb\d\.ps1|prep-rb\d\.py|run-nb\.ps1|prep-nb\.py' })
+ if ($drv.Count) { Log "STOP: another snapshot build driver is running (pid $($drv[0].ProcessId): $($drv[0].CommandLine))"; exit 4 }
+-if (-not (Test-Path -LiteralPath $notes)) { Log "STOP: $notes is missing (the $SnapTag MANIFEST notes; prep-s3d.py writes it)"; exit 4 }
++if (-not (Test-Path -LiteralPath $notes)) { Log "STOP: $notes is missing (the $SnapTag MANIFEST notes; prep-s3e.py writes it)"; exit 4 }
+ $vo = "$A\$tag-verify-$Stage.txt"
+@@ -69,4 +69,4 @@
+ $hl = (Get-FileHash -LiteralPath ("$R\DimensionsRecomp\" + $Rel.Replace('/', '\'))).Hash
+-if ($hl -ne $hs) { Log "NOTE: live $Rel is now $($hl.Substring(0, 16)) (written again after the $SnapTag apply); native3d builds snap1's $($hs.Substring(0, 16))" }
+-$B = "$A\snap1-on"; $O = "$A\native3d-bin"
++if ($hl -ne $hs) { Log "NOTE: live $Rel is now $($hl.Substring(0, 16)) (written again after the $SnapTag apply); native3e builds snap1's $($hs.Substring(0, 16))" }
++$B = "$A\snap1-on"; $O = "$A\native3e-bin"
+ $inst = "$A\snap1-sdk\install\bin\rexruntime.dll"
+@@ -100,6 +100,6 @@
+     '-RuntimeStrings', $rtStrings, '-ExeStrings', $exeStrings, '-ManifestNotesFile', $notes, '-CompareBin', $ref,
+-    '-CompareWhy', "S3d changed $Rel", '-WhatText', 'native build 3d (S3 + the Agent 4 draw.cpp write): NATIVE_GPU=ON with Agent 6 AOT inputs')
++    '-CompareWhy', "S3e changed $Rel", '-WhatText', 'native build 3e (S3d + the second Agent 4 draw.cpp write): NATIVE_GPU=ON with Agent 6 AOT inputs')
+ $stLog = "$A\$tag-stage-$Stage.log"
+ $c = Run 'stage' $stageArgs $stLog
+-foreach ($l in @(Get-Content $stLog | Where-Object { $_ -match 'native3-bin' })) { Log "  $l" }
++foreach ($l in @(Get-Content $stLog | Where-Object { $_ -match 'native3d-bin' })) { Log "  $l" }
+ foreach ($l in @(Get-Content $stLog | Select-Object -Last 2)) { Log "  $l" }
+@@ -111,3 +111,3 @@
+ $man = @(Get-Content -Encoding UTF8 -LiteralPath "$O\MANIFEST.txt")
+-$cnt = @(foreach ($t in 'S1', 'S2', 'S3', 'S3d') { "$t $(@($man | Where-Object { $_.StartsWith("#   $t ") }).Count)" })
++$cnt = @(foreach ($t in 'S1', 'S2', 'S3', 'S3e') { "$t $(@($man | Where-Object { $_.StartsWith("#   $t ") }).Count)" })
+ $np = @($man | Where-Object { $_.StartsWith('#   PASS ') }).Count; $nf = @($man | Where-Object { $_.StartsWith('#   FAIL ') }).Count

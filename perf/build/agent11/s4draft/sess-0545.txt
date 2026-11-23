@@ -1,0 +1,114 @@
+3200: 
+3201: 
+3202: ### 23:50 - Agent 1: user started RUN-NIGHT; user in bed
+3203: - The user double-clicked RUN-NIGHT.cmd at 23:47:19 and said "bed" at 23:47:48.
+3204: - Check at 23:49:37: real launcher pid 19960 (no -DryRun), state waiting-for-go since 23:47:20, heartbeat 23:49:23, deadline 07:30, gos_read 0. Screensaver None, keep-awake ON, Quick Edit off.
+3205: - HOLD, GO and STOP are absent. No build, game or runner process.
+3206: - A "dry-run pid 7032" in that check was my own shell matching its own filter text (gone 10 s later). Process checks now exclude $PID.
+3207: - Next: pre-go W6 just after 00:00, then GO W6 if READY. Order: W6, W9, W5b, W4c.
+3208: - 23:53: the user asked about lowering the screen brightness (Fn+F6). Told them it is fine before 00:00 and to leave it alone after that: on AC, the backlight does not draw from the CPU power limit, and a level that stays the same all night affects every arm equally. Do not turn the display off, lock, sleep or close the lid.
+3209: - 23:56: the user will wake **closer to 11:00** and offered more testing if the change is quick.
+3210:   - No launcher change: run-night.ps1 is frozen, and -StopAt/-StartBy are dry-run hooks (run-night.ps1 L65), so a later end means a code change plus a new double-click. The running launcher still ends at 07:30 (latest window start 06:45).
+3211:   - The rule that windows end by ~04:00 (PROPOSAL L24) only existed so builds and tests would finish before 07:30. With the user up at ~11, the launcher time from ~03:40 to 06:45 can take a **second pass** of any window that is too close to call (same GO line). run-matrix.ps1 makes a new yyyyMMdd-HHmm folder each run (L447-449), and run-night.ps1 has no already-ran check, so a second pass cannot overwrite the first. Latest GO for a second pass = 07:30 - 10 min margin - 10 min gate - runner (W6/W9 06:22, W5b 06:26, W4c 06:40). pre-go.ps1 needs those entries first.
+3212:   - Agents start builds and tests after the last window. RUN-DAY runs when the user is up (~11:00). The morning summary will be waiting for the user.
+3213: 
+3214: ### 01:05 - Agent 1: W6 done; GO refusal fixed (screensaver value)
+3215: - **00:03:40 GO refused:** `run-matrix.ps1 -PlanOnly exit 1`.
+3216:   - Cause: at 23:47:20 the launcher's Set-ScreensaverNone (run-night.ps1 L461-467) removed HKCU\Control Panel\Desktop SCRNSAVE.EXE (it was ''). run-matrix.ps1 L417 reads `$scr.'SCRNSAVE.EXE'` under Set-StrictMode -Version 2 (common.ps1 L4), which throws when the value is missing.
+3217:   - Dry runs never change the screensaver, so the 40/40 tests could not catch this.
+3218:   - Fix at 00:05:37, with no launcher or pinned file touched: re-created SCRNSAVE.EXE = '' (the user's saved value, status/screensaver-saved.txt). ScreenSaveActive stays 0, so the screensaver is still None.
+3219:   - PlanOnly then exited 0 (21 runs, ~48 min, "screensaver none"). GO re-written 00:05:45, ACCEPTED 00:06:00.
+3220:   - **Morning todo (Agents 5 and 8, then a delta read by Agents 10 and 11), before RUN-DAY and Tuesday night:** either run-matrix L417 reads the value via PSObject.Properties, or the launcher sets SCRNSAVE.EXE to '' instead of removing it.
+3221:   - run-day.ps1 probably has the same code. The night launcher puts '' back at 07:30, and the next launcher start removes it again.
+3222: - **W6 (00:09:02-00:51:52, 42.8 min):**
+3223:   - Runner exit 0: 21/21 OK, 20 scored, 0 excluded. Gate STRICT (MsMpEng 0.00); bins unchanged; out build/agent8/matrix/20261123-0009.
+3224:   - Runner summary (not the formal readout): s0 2.44 ms median (385 fps, 2.50 cores); p2 2.47 (386 fps); p2f 2.45 (388 fps).
+3225:   - **p2fc 2.16 ms (466 fps, 2.28 cores): -11.8 % median frame time, +21 % fps, -0.22 core vs s0.**
+3226:   - C1 = p2fc - p2f per round: -0.06, -0.16, -0.30, -0.30, -0.28 ms, so p2fc was faster in 5 of 5 rounds.
+3227:   - The runner says "within noise" only because s0's band is +-21.4 %: s0 r1 ran at 2.08 ms, and round 1 was faster for every arm (likely thermal).
+3228:   - P2 alone and fix (i) alone show no change.
+3229:   - The formal readout (GPU Commands ms/f from threads.csv, R3 pairs) is for Agents 7 and 8 in the morning.
+3230: - W9 GO next (01:05).
+3231: 
+3232: ### 01:52 - Agent 1: W9 done (back-off sweep)
+3233: - **W9 (01:08:53-01:51:23, 42.5 min):** runner exit 0, 21/21 OK, 20 scored, 0 excluded. Gate STRICT (MsMpEng 0.00); bins unchanged; out build/agent8/matrix/20261123-0108.
+3234: - Runner summary (not the formal readout), as median ms / fps / CPU cores:
+3235:   - off 2.46 / 386 / 2.51 (ref); q0 2.48 / 387 / 2.49 (no change).
+3236:   - **q125 2.31 / 389 / 1.82; q250 2.31 / 389 / 1.77; q500 2.31 / 390 / 1.72.** That is 0.69-0.79 core less (-27 to -31 %), fps unchanged (+1 %), median -6 %, p99 -7 to -10 %.
+3237:   - p99 / p99.9: q125 4.47 / 5.01, q250 4.50 / 5.11, q500 4.62 / 5.52 ms (off 4.98 / 5.63). q500 saves the most CPU, but its tail is a little worse than q125/q250.
+3238:   - This matches the ~0.7-core estimate.
+3239:   - The quantum pick goes to the formal readout (Agents 7 and 8) and Agent 6's W9 logdiff (off must have no back-off init line; each q arm exactly one ON line).
+3240: - W5b GO next (01:52).
+3241: 
+3242: ### 02:36 - Agent 1: W5b done (timer wait modes)
+3243: - **W5b (01:55:28-02:33:54, 38.4 min):** runner exit 0, 19/19 OK, 18 scored, 0 excluded. Gate STRICT; bins unchanged (devoff4-bin); out build/agent8/matrix/20261123-0155.
+3244: - Runner summary (not the formal readout), as median ms / fps / CPU cores:
+3245:   - d11 (spin) 2.51 / 385 / 2.54 (ref).
+3246:   - **d11t (blocking) 2.51 / 384 / 2.31 (-0.23 core, -9 %).**
+3247:   - **d11p (precise) 2.50 / 385 / 2.34 (-0.20 core, -8 %).** d11p has the tightest spread (4.4 %) and a slightly better p99 (4.78 vs 4.85).
+3248:   - fps unchanged in both.
+3249: - Same direction and order as W5 (d11t -13.7 %, d11p -12.2 % game CPU), but smaller. The formal readout and Agent 6's W5b logdiff decide d11t vs d11p.
+3250: - W4c GO next (02:36).
+3251: 
+3252: ### 03:09 - Agent 1: W4c done (codegen B repeat); second passes start
+3253: - **W4c (02:39:46-03:05:58, 26.2 min):** runner exit 0, 13/13 OK, 12 scored, 0 excluded. Gate STRICT; bins unchanged (d0 = devoff2-bin, B = devoffB-bin); out build/agent8/matrix/20261123-0239.
+3254: - Runner summary (not the formal readout), as median ms / fps / CPU cores:
+3255:   - d0 2.47 / 385.4 / 2.53 (ref). Its band is +-10 % only because the cold run (2.19) and r1 (2.25) were fast: the same first-runs-fast pattern as W6.
+3256:   - **B 2.50 / 383.9 / 2.60: median +1.3 %, fps -0.4 %, +0.07 core.** p99 4.91 vs 4.94, p99.9 5.62 for both. Runner verdict: within noise.
+3257:   - Per round, B - d0: +0.23, +0.04, +0.05, -0.00, +0.01, +0.05 ms, so B was slower in 5 of 6 rounds and tied in 1.
+3258: - **W4b's B +6.0 % fps hint did not repeat:** codegen B shows no gain here. The keep/drop call waits for the formal readout (Agents 7 and 8) and Agent 6's W4c logdiff.
+3259: - **Second passes start now** (plan from 23:56: the user wakes ~11, so the old latest-GO-by-04:00 rule no longer applies).
+3260:   - pre-go.ps1 line 11 is now W6 06:22, W9 06:22, W5b 06:26, W4c 06:40 (07:30 - 10 min margin - 10 min gate - runner estimate; W4c is also under the 06:45 cap).
+3261:   - Same GO files, one at a time: W6 -> W9 -> W5b -> W4c. Expected ends: W6-2 ~03:56, W9-2 ~04:43, W5b-2 ~05:26, W4c-2 ~05:58.
+3262:   - Any window whose GO would be past its latest GO is skipped. Agent 8 pools or compares the two passes in the formal readout.
+3263:   - Agent work (Agent 3's quiet-host rows, Agent 2's builds, Agent 5's screensaver fix) starts after the last window.
+3264: 
+3265: ### 03:58 - Agent 1: W6-2 done (second pass); W9-2 GO
+3266: - **W6-2 (03:13:22-03:56:11, 42.8 min):** runner exit 0, 21/21 OK, 20 scored, 0 excluded. Gate STRICT; bins unchanged; out build/agent8/matrix/20261123-0313.
+3267: - Runner summary (not the formal readout), as median ms / fps / CPU cores, with the first pass in brackets:
+3268:   - s0 2.48 / 385.0 / 2.53 [2.44 / 385 / 2.50] (ref). Its band is +-8.4 %, again only because the cold run and r1 were fast.
+3269:   - p2 2.47 / 385.2 / 2.53 [2.47 / 386 / 2.52] and p2f 2.45 / 385.9 / 2.55 [2.45 / 388 / 2.56]: no change, as in the first pass.
+3270:   - **p2fc 2.13 / 469.8 / 2.26 [2.16 / 466 / 2.28]: median -14 %, fps +22 %, -0.27 core vs s0. Runner verdict this time: FASTER (outside noise).**
+3271:   - C1 = p2fc - p2f per round: -0.34, -0.27, -0.32, -0.28, -0.32 ms. p2fc was faster in 5 of 5 rounds again, so 10 of 10 over both passes.
+3272:   - Tail: p2fc p99 5.04 vs s0 5.00 (flat), p99.9 6.49 vs 5.74. p2f's p99.9 is 6.40 too, with one >33 ms frame in r5. The formal readout should check whether fix (i) or C1 adds rare slow frames.
+3273: - The second pass confirms the first: p2fc (P2 + fix (i) + C1 v3, verify off) is tonight's only frame-time win. W9's back-off and W5b's wait modes save CPU only.
+3274: - W9-2 GO next (03:58).
+3275: 
+3276: ### 04:46 - Agent 1: W9-2 done (second pass); W5b-2 GO
+3277: - **W9-2 (04:01:16-04:44:08, 42.8 min):** runner exit 0, 21/21 OK, 20 scored, 0 excluded. Gate STRICT; bins unchanged; out build/agent8/matrix/20261123-0401.
+3278: - Runner summary (not the formal readout), as median ms / fps / CPU cores, with the first pass in brackets:
+3279:   - off 2.46 / 384.9 / 2.50 [2.46 / 386 / 2.51] (ref; band +-5.8 %). q0 2.47 / 385.5 / 2.47 [2.48 / 387 / 2.49]: no change.
+3280:   - q125 2.39 / 378.9 / 1.96 [2.31 / 389 / 1.82]: -0.54 core, fps -1.6 %.
+3281:   - q250 2.37 / 382.8 / 1.95 [2.31 / 389 / 1.77]: -0.55 core, fps -0.5 %.
+3282:   - **q500 2.32 / 389.2 / 1.80 [2.31 / 390 / 1.72]: -0.70 core (-28 %), fps +1.1 %, median -5.9 %. p99 4.68 vs 4.99, p99.9 5.40 vs 5.58. Runner verdict: FASTER (outside noise).**
+3283: - q125 and q250 were less steady this pass:
+3284:   - q125 r1 and r3 ran at 2.13-2.15 cores with ~18.3k frames (other runs ~19.2-19.5k) and p99 5.1-5.4.
+3285:   - q250 r1 and r2 had ~18.9k frames (r1 at 2.11 cores).
+3286:   - q500 kept a normal frame count in all 4 runs (one run at 2.03 cores).
+3287: - Over both passes q500 saves the most CPU (0.70-0.79 core) with no fps loss, and this pass it also had the best tail. Lean: q500. The quantum pick stays with the formal readout (Agents 7 and 8, 8 runs per arm pooled) and Agent 6's W9 logdiff.
+3288: - W5b-2 GO next (04:46).
+3289: 
+3290: ### 05:33 - Agent 1: W5b-2 done; W4c second pass skipped; wrap-up for the break (GitHub)
+3291: - **W5b-2 (04:51:58-05:30:42, 38.7 min):** runner exit 0, 19/19 OK, 18 scored, 0 excluded. The quiet gate held the start back 3 min (CrossDeviceService 0.81/0.87/0.68 core at 04:46-04:49), then passed STRICT. Bins unchanged (devoff4-bin); out build/agent8/matrix/20261123-0451.
+3292: - Runner summary (not the formal readout), as median ms / fps / CPU cores, with the first pass in brackets:
+3293:   - d11 (spin) 2.51 / 385.2 / 2.56 [2.51 / 385 / 2.54] (ref; band +-1.5 %).
+3294:   - d11t (blocking) 2.52 / 382.0 / 2.35 [2.51 / 384 / 2.31]: -0.21 core, fps -0.8 % (r1 and r2 were slow: 2.65 and 2.58 ms).
+3295:   - **d11p (precise) 2.51 / 385.5 / 2.35 [2.50 / 385 / 2.34]: -0.21 core (-8 %), fps unchanged.**
+3296: - Over both passes, d11t and d11p save the same ~0.2 core. d11p kept fps in both passes; d11t lost 0.8 % this pass. Lean: d11p. The formal readout and Agent 6's W5b logdiff decide.
+3297: - **The user (04:55, 05:01):** a break of a few days to a week is coming (other ideas, hopefully more processing power). A 2-hour grace period starts ~11-12 to finish up; aim to finish by ~13:00. The work must be committed to GitHub: https://github.com/rishabh-mohan/DimensionsRecomp and https://github.com/rishabh-mohan/rexglue-sdk.
+3298: - **W4c second pass skipped** so the wrap-up can start now (codegen B showed no gain in the first pass). The launcher stays idle until it exits at 07:30. No more timed windows before the break.
+3299: - Wrap-up plan:
+3300:   - Git (Agent 1): commit onto a new branch per repo (perf/s4, not main), following each repo's .gitignore. Perf notes, bench scripts/matrices and small readout reports go in perf/ on the DimensionsRecomp branch. Push without force. Commit again at the end of the grace period. Agents commit only through Agent 1.
+3301:   - Readouts: Agents 7 and 8 (formal, both passes), Agent 6 (logdiffs), Agent 12 (gates).
+3302:   - Agent 3: quiet-host f10a/f10b rows (finding 10).
+3303:   - Agent 11: FINDINGS/S4-DRAFT plus perf-notes/RESUME.md (state, next steps, restart in a few days to a week; a new PC needs new baselines).
+3304:   - Agents 5 and 8: stage the screensaver/StrictMode fix; install it after the launcher exits at 07:30.
+3305: 
+3306: ### 05:44 - Agent 1: S4b/S4c code pushed to GitHub; wrap-up tasks sent
+3307: 
+3308: - User (04:55-05:01): commit to GitHub (rishabh-mohan/DimensionsRecomp and rishabh-mohan/rexglue-sdk, both public forks); a break of a few days to a week; a 2-hour grace period from ~11-12. Aim: everything committed and a resume doc by ~13:00.
+3309: - Code: the 16 S4b/S4c files in build/agent2/s4b/HASHES.txt were copied from build/agent2/snap1 into the live trees after a hash check (live == S4a "before" and snap1 == S4b "after" for all 16; live == "after" after the copy). Commits on perf/opt, pushed to mine without force: rexglue-sdk 5350b1d (13 files; its upstream is now mine/perf/opt) and DimensionsRecomp b0bd3b4 (memory_watch.cpp, CMakeLists.txt, new gpu_wait_backoff.cpp, SDK pointer). ls-remote shows both.
+3310: - Third-party worktree changes stay uncommitted. Both can be rebuilt from tracked files: plume via tools/gpu-aot/prepare_plume.py + tools/gpu-aot/patches (winsdk-compat holds S1+p2), simde via rexglue-sdk/scripts/prepare_simde.py + rexglue-sdk/patches/simde-native-m64-stream.patch.
+3311: - Notes/scripts/results are not pushed. At 04:57 I told the user they would go to a private repo, but both repos are public. I'm staging an export and will ask the user when they wake: a public perf/ folder, a private repo they create, or local only.
+3312: - Wrap-up tasks sent: readouts (7, 8), logdiffs + dumpstacks (6), gates (12), quiet-host f10a/f10b (3), FINDINGS/S4-DRAFT/RESUME.md (11), SCRNSAVE fix staged and installed after 07:30 (5; reviews by 8 and 10), commit check + pending-diff inventory (2), screenshot kit (4), and a HANDOFF.md from every agent. No builds or timed runs this morning. The old night cron (task-139) is replaced by a wrap-up cron.
+3313: 

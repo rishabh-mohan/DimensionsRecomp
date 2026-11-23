@@ -1,0 +1,469 @@
+# build-snap.ps1.pre-B (01B075B7B9EAB55A) -> build-snap.ps1 (166C2492DB410CD1): +34 -6 lines
+--- build-snap.ps1.pre-B
++++ build-snap.ps1
+@@ -1,9 +1,15 @@
+ # Agent 2 - dev OFF build 1 (and later the ON build) from the snapshot build/agent2/snap1 (task #1).
+ # Batch 2 (S2 = snap-patch.py apply S2 onto snap1): run the same phases with -Tag snap2. The build dirs (snap1-sdk,
+ # snap1-off, snap1-on) stay, so ninja rebuilds incrementally; only the log and gate-log names change.
++# Build B (Agent 9's codegen option; run-b.ps1 drives it, prep-b.py prepares it): -Phase game -Tag snapB
++#   -SnapDir build\agent2\snapB\DimensionsRecomp (a copy of snap1 at S2 with Agent 9's batch-nolr rexlego/generated and
++#   legodimensions_config.toml) -GameDir build\agent2\snapB-off -CodegenExe build\agent2\codegen-frozen\codegen-frozen2.exe
++#   (checks every source sources.cmake lists) -GenBase build\agent9\install\batch-nolr\generated (gen-check's reference;
++#   never install\batch, which has skip_lr). The SDK stays snap1-sdk/install: an -SnapDir run refuses the sdk phase and
++#   the snap1-off/snap1-on trees. The gate gets --snap-dir (allowed root, and the TU list from that sources.cmake).
+ # Run as a run_command background task:
+ #   powershell -NoProfile -ExecutionPolicy Bypass -File build\agent2\build-snap.ps1 -Phase sdk|game|all
+-#       [-Jobs 10] [-Affinity F] [-SkipConfigure] [-KeepGoing]
++#       [-Jobs 10] [-Affinity F] [-SkipConfigure] [-KeepGoing] [-NoBuild] [-SnapDir D -GameDir D -CodegenExe F -GenBase D]
+ # SDK : standalone, configured like build/sdk (preset win-amd64 = Ninja Multi-Config, FidelityFX OFF, SDK
+ #       x86-64-v2) but REXGLUE_BUILD_TESTS=OFF; Release libs + tools; installed to build/agent2/snap1-sdk/install.
+ #       build/sdk/install is never touched.
+@@ -16,7 +22,8 @@
+ #       and snap-gate.py (include dirs + installed-header hashes) must pass before anything compiles.
+ # -Affinity F runs the build pinned to CPUs 0-3 (hex mask for cmd's start /affinity); children inherit it.
+ param([string]$Phase = 'all', [int]$Jobs = 10, [string]$Affinity = '', [switch]$SkipConfigure, [switch]$KeepGoing,
+-      [string]$Tag = 'snap1', [switch]$Native, [int]$PrelinkJobs = 0, [switch]$NoBuild)
++      [string]$Tag = 'snap1', [switch]$Native, [int]$PrelinkJobs = 0, [switch]$NoBuild,
++      [string]$SnapDir = '', [string]$GameDir = '', [string]$CodegenExe = '', [string]$GenBase = '')
+ $ErrorActionPreference = 'Continue'
+ $R = '<workspace>'
+ Set-Location $R
+@@ -47,9 +54,19 @@
+     return $code
+ }
+ $Rf = $R -replace '\\', '/'
++function AbsR([string]$p) { if (-not [IO.Path]::IsPathRooted($p)) { $p = Join-Path $R $p }; $p.TrimEnd('\') }
+ $snap = "$R\build\agent2\snap1\DimensionsRecomp"
++if ($SnapDir) {
++    if ($Phase -ne 'game') {
++        "$(Get-Date -Format HH:mm:ss) STOP  -SnapDir needs -Phase game (the SDK is built from snap1 only)" | Out-File -Append -Encoding utf8 $steps
++        exit 2
++    }
++    $snap = AbsR $SnapDir
++}
+ $sdkBin = "$R\build\agent2\snap1-sdk"
+ $gameBin = "$R\build\agent2\snap1-off"
++$cg = "$Rf/build/agent2/codegen-frozen/codegen-frozen.exe"
++if ($CodegenExe) { $cg = (AbsR $CodegenExe) -replace '\\', '/' }
+ $pin = ''
+ if ($Affinity) { $pin = "start `"`" /b /wait /affinity $Affinity " }
+ $k = ''
+@@ -78,7 +95,7 @@
+         # Fresh tree build/agent2/snap1-on (Agent 6, section 5.2), so snap1-off stays the bootable OFF build.
+         # prepare_plume.py --check runs git in thirdparty/plume, so snap1 holds a copy of plume's gitdir.
+         $gt = 'native'; $gateLog = "$log\$Tag-native-gate.log"; $gameBin = "$R\build\agent2\snap1-on"
+-        $S = "$Rf/build/agent2/snap1/DimensionsRecomp"; $ng = "$S/rexlego/out/native-gpu"
++        $S = $snap -replace '\\', '/'; $ng = "$S/rexlego/out/native-gpu"
+         $mode = ("-DLEGODIMENSIONS_NATIVE_GPU=ON " +
+             "-DLEGO_NATIVE_SHADER_CACHE=$ng/aot/lego-dxil-cache.cpp " +
+             "-DLEGO_NATIVE_RUNTIME_SHADER_CACHE=$ng/stubs/runtime-cache.cpp " +
+@@ -92,18 +109,29 @@
+         $env:LEGO_GPU_PRELINK_JOBS = "$(if ($PrelinkJobs -gt 0) { $PrelinkJobs } else { $Jobs })"
+         "$(Get-Date -Format HH:mm:ss) NOTE  native: LEGO_GPU_PRELINK_JOBS=$env:LEGO_GPU_PRELINK_JOBS" | Out-File -Append -Encoding utf8 $steps
+     }
++    if ($GameDir) { $gameBin = AbsR $GameDir }
++    if ($SnapDir) {
++        if ($gameBin -match 'snap1-(off|on)$') {
++            "$(Get-Date -Format HH:mm:ss) STOP  -SnapDir must not use the snap1 game trees ($gameBin): pass -GameDir" | Out-File -Append -Encoding utf8 $steps
++            exit 2
++        }
++        "$(Get-Date -Format HH:mm:ss) NOTE  snapshot $snap, game tree $gameBin, codegen stand-in $cg, gen-check reference $(if ($GenBase) { AbsR $GenBase } else { 'baseline' })" | Out-File -Append -Encoding utf8 $steps
++    }
+     if (-not $SkipConfigure) {
+         $c = Step "$gt-configure" ("cmake -S `"$snap\rexlego`" -B `"$gameBin`" -G Ninja -DCMAKE_BUILD_TYPE=Release " +
+             "-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ " +
+             $mode + "-DLEGODIMENSIONS_X86_BASELINE=x86-64-v3 " +
+             "-DCMAKE_PREFIX_PATH=$Rf/build/agent2/snap1-sdk/install " +
+-            "-DREXGLUE_HOST_CODEGEN_EXECUTABLE=$Rf/build/agent2/codegen-frozen/codegen-frozen.exe " +
++            "-DREXGLUE_HOST_CODEGEN_EXECUTABLE=$cg " +
+             "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON > `"$log\$Tag-$gt-configure.log`" 2>&1")
+         if ($c -ne 0) { exit 21 }
+     }
+-    $c = Step 'gen-check' "python `"$log\gen-check.py`" > `"$log\$Tag-$gt-gen-check.log`" 2>&1"
++    $gcArgs = ''; $gArgs = ''
++    if ($SnapDir) { $gcArgs = " --snap `"$snap\rexlego\generated`" --snap-rex `"$snap\rexlego`""; $gArgs = " --snap-dir `"$snap`"" }
++    if ($GenBase) { $gcArgs += " --base `"$(AbsR $GenBase)`"" }
++    $c = Step 'gen-check' "python `"$log\gen-check.py`"$gcArgs > `"$log\$Tag-$gt-gen-check.log`" 2>&1"
+     if ($c -ne 0) { exit 24 }
+-    $c = Step 'gate' "python `"$log\snap-gate.py`" `"$gameBin`" > `"$gateLog`" 2>&1"
++    $c = Step 'gate' "python `"$log\snap-gate.py`" `"$gameBin`"$gArgs > `"$gateLog`" 2>&1"
+     if ($c -ne 0) { exit 22 }
+     # -NoBuild: configure + gen-check + gate only (e.g. the native configure while the OFF build compiles)
+     if ($NoBuild) { exit 0 }
+# stage-snap-bin.ps1.pre-B (0C5F0C76495C202E) -> stage-snap-bin.ps1 (45F623621EEEF376): +50 -14 lines
+--- stage-snap-bin.ps1.pre-B
++++ stage-snap-bin.ps1
+@@ -23,8 +23,16 @@
+ #   - every staged file hashes equal to its source. Writes <out>/MANIFEST.txt.
+ # Run: powershell -NoProfile -ExecutionPolicy Bypass -File build\agent2\stage-snap-bin.ps1 -Variant off|native
+ #        [-SnapTag S1] [-BuildTag snap1] [-ExeStrings 'literal of 16+ chars', ...] [-RuntimeStrings '...', ...]
++# Build B (run-b.ps1): -GameTree build\agent2\snapB-off -OutDir build\agent2\devoffB-bin -GameSnap
++#   build\agent2\snapB\DimensionsRecomp (the game's source copy: the game-tree freshness checks and FiraSans use it, and
++#   every patched file's copy there must hash-equal its PATCHES row; the SDK, its out tree and the PATCHES/STATE records
++#   stay snap1's) -CompareBin build\agent2\devoff2-bin (A: every staged file but the exe and map must be identical to
++#   A's, and the exe must differ) -WhatText / -CodegenNote / -ManifestNotesFile (lines, each written as '# line') for
++#   the MANIFEST text.
+ param([ValidateSet('off', 'native')][string]$Variant = 'off', [string]$SnapTag = 'S1', [string]$BuildTag = '',
+-    [string[]]$ExeStrings = @(), [string[]]$RuntimeStrings = @())
++    [string[]]$ExeStrings = @(), [string[]]$RuntimeStrings = @(),
++    [string]$GameTree = '', [string]$OutDir = '', [string]$GameSnap = '', [string]$CompareBin = '',
++    [string]$WhatText = '', [string]$CodegenNote = '', [string]$ManifestNotesFile = '')
+ $ErrorActionPreference = 'Stop'
+ # powershell -File passes "-ExeStrings a,b" as ONE string, so split on commas (no literal checked here has a comma)
+ $ExeStrings = @($ExeStrings | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+@@ -38,6 +46,11 @@
+ $O = $(if ($Variant -eq 'off') { "$A\devoff$bn-bin" } elseif ($SnapN -eq 1) { "$A\native-bin" } else { "$A\native$bn-bin" })
+ $gateLog = $(if ($Variant -eq 'off') { "$A\$BuildTag-gate.log" } else { "$A\$BuildTag-native-gate.log" })
+ $RO = "$R\toolchain\llvm-23.1.6\bin\llvm-readobj.exe"
++function AbsR([string]$p) { if (-not [IO.Path]::IsPathRooted($p)) { $p = Join-Path $R $p }; $p.TrimEnd('\') }
++if ($GameTree) { $B = AbsR $GameTree }
++if ($OutDir) { $O = AbsR $OutDir }
++$GS = $(if ($GameSnap) { AbsR $GameSnap } else { $S })
++if ($CompareBin) { $CompareBin = AbsR $CompareBin }
+ $items = [ordered]@{
+     'legodimensions.exe'       = "$B\legodimensions.exe"
+     'legodimensions.map'       = "$B\legodimensions.map"
+@@ -45,7 +58,7 @@
+     'rexgpu-xenos.dll'         = "$I\rexgpu-xenos.dll"
+     'TracyClient.dll'          = "$I\TracyClient.dll"
+     'achievement_unlocked.wav' = "$B\achievement_unlocked.wav"
+-    'FiraSans-Regular.ttf'     = "$S\rexlego\res\FiraSans-Regular.ttf"
++    'FiraSans-Regular.ttf'     = "$GS\rexlego\res\FiraSans-Regular.ttf"
+ }
+ if ($Variant -eq 'native') { $items['amd_fidelityfx_dx12.dll'] = "$B\amd_fidelityfx_dx12.dll" }
+ $fails = New-Object System.Collections.Generic.List[string]
+@@ -108,15 +121,15 @@
+     }
+     return $hits
+ }
+-function FreshCheck([string]$tree, [string[]]$rels) {
++function FreshCheck([string]$tree, [string[]]$rels, $map) {
+     # every built object that compiles or includes a patched file is newer than it; emits the rels that have one
+     $label = Split-Path -Leaf $tree
+-    $paths = @(foreach ($rel in $rels) { $rowPaths[$rel] })
++    $paths = @(foreach ($rel in $rels) { $map[$rel] })
+     if (-not $paths.Count) { return }
+     $hits = Dependents $tree $paths
+     foreach ($rel in $rels) {
+         $seen = @{}; $stale = New-Object System.Collections.Generic.List[string]; $missing = 0
+-        foreach ($p in $rowPaths[$rel]) {
++        foreach ($p in $map[$rel]) {
+             $pt = (Get-Item -LiteralPath $p).LastWriteTimeUtc
+             foreach ($obj in $hits[$p]) {
+                 if ($seen.ContainsKey($obj)) { continue }
+@@ -151,18 +164,25 @@
+ # the last row per file wins (a file patched in S1 and again in this tag is checked against this tag's version)
+ $lastRow = [ordered]@{}
+ foreach ($pr in $patchRows) { $lastRow[$pr.Rel] = $pr }
+-$rowPaths = [ordered]@{}
++# $rowPaths: what the game tree compiles or includes (the patched file in the game's source copy $GS, plus the installed
++# header copy); $rowPathsSdk: the same rows in snap1, which snap1-sdk compiles. Identical unless -GameSnap is given.
++$rowPaths = [ordered]@{}; $rowPathsSdk = [ordered]@{}
+ foreach ($pr in @($lastRow.Values | Where-Object { $_.After -ne 'DELETED' })) {
+-    $l = New-Object System.Collections.Generic.List[string]
+-    $l.Add((NormFull ("$S\" + $pr.Rel) $S))
++    $l = New-Object System.Collections.Generic.List[string]; $ls = New-Object System.Collections.Generic.List[string]
++    $gp = "$GS\" + $pr.Rel.Replace('/', '\')
++    if ($GS -eq $S -or (Test-Path -LiteralPath $gp)) { $l.Add((NormFull $gp $GS)) }
++    $ls.Add((NormFull ("$S\" + $pr.Rel) $S))
++    if ($GS -ne $S) {
++        Check ((Test-Path -LiteralPath $gp) -and ((Sha $gp) -eq $pr.After)) "game snapshot copy of $($pr.Rel) == the patched file ($(Pfx $pr.After))"
++    }
+     if ($pr.Rel.StartsWith('rexglue-sdk/include/')) {
+         $inst = "$SB\install\include\" + $pr.Rel.Substring(20).Replace('/', '\')
+         if (Test-Path -LiteralPath $inst) {
+             Check ((Sha $inst) -eq $pr.After) "snap1-sdk/install/include copy of $($pr.Rel) == the patched file ($(Pfx $pr.After))"
+-            $l.Add((NormFull $inst $S))
++            $l.Add((NormFull $inst $S)); $ls.Add((NormFull $inst $S))
+         } else { Note "$($pr.Rel) has no snap1-sdk/install/include copy" }
+     }
+-    $rowPaths[$pr.Rel] = $l
++    $rowPaths[$pr.Rel] = $l; $rowPathsSdk[$pr.Rel] = $ls
+ }
+ # freshness
+ $exe = Get-Item $items['legodimensions.exe']
+@@ -172,11 +192,11 @@
+ Check ($map.LastWriteTime -ge $exe.LastWriteTime.AddSeconds(-5)) ("map written with the exe ({0:HH:mm:ss})" -f $map.LastWriteTime)
+ Check ([bool](Select-String -Path $map.FullName -Pattern 'native_lock_elide\.cpp\.obj' -Quiet)) "map lists native_lock_elide.cpp.obj"
+ $script:depObjs = New-Object System.Collections.Generic.List[string]
+-$gameAff = @(FreshCheck $B @($rowPaths.Keys))
++$gameAff = @(FreshCheck $B @($rowPaths.Keys) $rowPaths)
+ $sdkRels = @($rowPaths.Keys | Where-Object { $_.StartsWith('rexglue-sdk/') })
+ if ($sdkRels.Count) {
+     $script:depObjs = New-Object System.Collections.Generic.List[string]
+-    $null = @(FreshCheck $SB $sdkRels)
++    $null = @(FreshCheck $SB $sdkRels $rowPathsSdk)
+     $core = @($script:depObjs | Where-Object { $_ -match '\\(rexruntime|rexcore|rexfilesystem|rexinput|rexui|rexaudio)\.dir\\' } | Sort-Object -Unique)
+     if ($core.Count) {
+         $newestCore = @($core | ForEach-Object { (Get-Item -LiteralPath $_).LastWriteTime } | Sort-Object)[-1]
+@@ -200,7 +220,19 @@
+ Check ((Sha "$I\rexruntime.dll") -eq (Sha "$sdkOut\rexruntime.dll")) "install/bin/rexruntime.dll == SDK out tree rexruntime.dll"
+ Check ((Sha "$I\rexgpu-xenos.dll") -eq (Sha "$sdkOut\rexgpu-xenos.dll")) "install/bin/rexgpu-xenos.dll == SDK out tree rexgpu-xenos.dll"
+ if ($Variant -eq 'native') {
+-    Check ((Sha "$B\amd_fidelityfx_dx12.dll") -eq (Sha "$S\rexglue-sdk\thirdparty\FidelityFX-SDK\PrebuiltSignedDLL\amd_fidelityfx_dx12.dll")) "amd_fidelityfx_dx12.dll == the snapshot's PrebuiltSignedDLL copy"
++    Check ((Sha "$B\amd_fidelityfx_dx12.dll") -eq (Sha "$GS\rexglue-sdk\thirdparty\FidelityFX-SDK\PrebuiltSignedDLL\amd_fidelityfx_dx12.dll")) "amd_fidelityfx_dx12.dll == the snapshot's PrebuiltSignedDLL copy"
++}
++# -CompareBin (build B vs A): the same snapshot and SDK, so everything but the exe and map must be identical
++if ($CompareBin) {
++    $cl = Split-Path -Leaf $CompareBin
++    foreach ($k in $items.Keys) {
++        $cp = Join-Path $CompareBin $k
++        if (-not (Test-Path -LiteralPath $cp)) { Note "$k is not in $cl"; continue }
++        $same = (Sha $items[$k]) -eq (Sha $cp)
++        if ($k -eq 'legodimensions.exe') { Check (-not $same) "legodimensions.exe differs from the one in $cl (the generated code changed)" }
++        elseif ($k -eq 'legodimensions.map') { Note ("legodimensions.map {0} the one in $cl" -f $(if ($same) { 'is identical to' } else { 'differs from' })) }
++        else { Check $same "$k == the one in $cl" }
++    }
+ }
+ # import tables: every DLL that is neither an API set nor in System32 must be staged
+ $importLines = New-Object System.Collections.Generic.List[string]
+@@ -226,9 +258,13 @@
+ New-Item -ItemType Directory -Force $O | Out-Null
+ $man = New-Object System.Collections.Generic.List[string]
+ $what = $(if ($Variant -eq 'off') { "dev OFF build ${bn}: NATIVE_GPU=OFF" } else { "native build ${bn}: NATIVE_GPU=ON with Agent 6's AOT inputs" })
++if ($WhatText) { $what = $WhatText }
+ $man.Add("# build/agent2/$(Split-Path -Leaf $O) - Agent 2 (Agent 1's batch schedule). $what; Release, game x86-64-v3, SDK x86-64-v2.")
+ $man.Add("# staged $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss'). Source: snapshot build/agent2/snap1/DimensionsRecomp at $SnapTag ($($snapMan.Name), sha256 $(Sha $snapMan.FullName)); build tag $BuildTag; every patch applied to the snapshot since S1 is listed below.")
+-$man.Add("# SDK: build/agent2/snap1-sdk (REXGLUE_BUILD_TESTS=OFF), built from the same snapshot (incrementally after S1) and installed to snap1-sdk/install; game tree build/agent2/$(Split-Path -Leaf $B); codegen 0.0.23.3 (pinned generated output hash-checked against baseline/ by gen-check.py; codegen-frozen.exe stand-in writes nothing).")
++if ($GS -ne $S) { $man.Add("# game sources: $($GS.Substring($R.Length + 1).Replace('\', '/')) = a copy of that snapshot (its rexlego/generated and rexlego/legodimensions_config.toml replaced, see below); each patched file's copy there is hash-checked.") }
++$cgText = $(if ($CodegenNote) { $CodegenNote } else { 'codegen 0.0.23.3 (pinned generated output hash-checked against baseline/ by gen-check.py; codegen-frozen.exe stand-in writes nothing)' })
++$man.Add("# SDK: build/agent2/snap1-sdk (REXGLUE_BUILD_TESTS=OFF), built from the same snapshot (incrementally after S1) and installed to snap1-sdk/install; game tree build/agent2/$(Split-Path -Leaf $B); $cgText.")
++if ($ManifestNotesFile) { foreach ($nl in @(Get-Content -Encoding UTF8 -LiteralPath (AbsR $ManifestNotesFile))) { if ($nl.Trim()) { $man.Add("# $nl") } } }
+ if ($Variant -eq 'native') {
+     foreach ($ni in @(Get-ChildItem "$A\snap1" -Filter 'NATIVE-INPUTS-*.tsv' | Sort-Object Name)) { $man.Add("# native inputs: $($ni.Name) (sha256 $(Sha $ni.FullName)).") }
+     $man.Add("# native flags: build-snap.ps1 -Native. Native GPU fingerprint (native-gpu-build.txt, checked in the exe): $((Get-Content "$B\native-gpu-build.txt" -Raw).Trim()).")
+# gen-check.py.pre-B (D7F76B8A48106035) -> gen-check.py (0E830AED27901CCA): +49 -12 lines
+--- gen-check.py.pre-B
++++ gen-check.py
+@@ -1,17 +1,25 @@
+-"""Agent 2 - gen-check: the snapshot's pinned codegen output must equal baseline/'s (task #1 follow-on, 20:50).
++"""Agent 2 - gen-check: the snapshot's pinned codegen output must equal its reference copy (task #1 follow-on, 20:50;
++reference/snapshot arguments added 23:40 for Agent 9's codegen build B).
+ 
+-The snapshot game trees (snap1-off, snap1-on) run the codegen edge with build/agent2/codegen-frozen/codegen-frozen.exe,
+-which writes nothing (Agent 1, 20:25: codegen must not be able to change the TUs). This gate runs before every game
+-build and checks build/agent2/snap1/DimensionsRecomp/rexlego/generated against baseline/DimensionsRecomp/rexlego/generated:
+-  - the same relative file set (887 files: 440 TUs, headers, stamps, sources.cmake, partition json, codegen.d);
++The snapshot game trees run the codegen edge with a stand-in that writes nothing (Agent 1, 20:25: codegen must not be
++able to change the TUs): build/agent2/codegen-frozen/codegen-frozen.exe in snap1-off/snap1-on, codegen-frozen2.exe (any
++TU count) in snapB-off. This gate runs before every game build and checks the snapshot's rexlego/generated against the
++reference:
++  - the same relative file set (default: 887 files: 440 TUs, headers, stamps, sources.cmake, partition json, codegen.d);
+   - every file sha256-identical, except codegen.d;
+-  - codegen.d must be baseline's with the baseline rexlego path replaced by the snapshot rexlego path (so ninja's deps
+-    for the codegen edge name the snapshot's stamp, config and manifest). If it is still baseline's byte-for-byte, it
+-    is rewritten here (once) and re-checked.
++  - codegen.d must be the reference's with the --base-rex path replaced by the snapshot rexlego path (so ninja's deps
++    for the codegen edge name the snapshot's stamp, config and manifest). If it is still the reference's byte-for-byte,
++    it is rewritten here (once) and re-checked. The reference's codegen.d must name --base-rex, and the snapshot must
++    resolve under build/agent2 (the live rexlego/generated is a junction to baseline/: never rewrite through it).
++Defaults (unchanged): reference baseline/DimensionsRecomp/rexlego/generated, snapshot
++build/agent2/snap1/DimensionsRecomp/rexlego/generated, --base-rex baseline/DimensionsRecomp/rexlego.
++Build B: --base build/agent9/install/batch-nolr/generated (Agent 9's batch-nolr output in baseline layout, with
++baseline's rexglue.cmake and codegen.d, so --base-rex stays the default; never install/batch, which has skip_lr) --snap
++build/agent2/snapB/DimensionsRecomp/rexlego/generated (--snap-rex defaults to the parent of --snap).
+ Exit 0 and 'RESULT: PASS', or exit 1 and 'RESULT: FAIL'.
+-Usage: python build\\agent2\\gen-check.py
++Usage: python build\\agent2\\gen-check.py [--base DIR] [--snap DIR] [--snap-rex DIR] [--base-rex DIR]
+ """
+-import hashlib, os, sys, time
++import argparse, hashlib, os, sys, time
+ 
+ R = r'<workspace>'
+ BASE = os.path.join(R, r'baseline\DimensionsRecomp\rexlego\generated')
+@@ -38,8 +46,35 @@
+ 
+ 
+ def main():
++    global BASE, SNAP, BASE_REX, SNAP_REX
++    ap = argparse.ArgumentParser(description='snapshot rexlego/generated == reference (codegen.d on snapshot paths)')
++    ap.add_argument('--base', help='reference generated/ dir (default: baseline)')
++    ap.add_argument('--snap', help='snapshot generated/ dir (default: snap1)')
++    ap.add_argument('--snap-rex', help='snapshot rexlego dir for the codegen.d rewrite (default: parent of --snap)')
++    ap.add_argument('--base-rex', help='rexlego dir the reference codegen.d names (default: baseline rexlego)')
++    a = ap.parse_args()
++    if a.base:
++        BASE = os.path.abspath(a.base)
++    if a.snap:
++        SNAP = os.path.abspath(a.snap)
++        SNAP_REX = os.path.dirname(SNAP).replace('\\', '/')
++    if a.snap_rex:
++        SNAP_REX = os.path.abspath(a.snap_rex).replace('\\', '/')
++    if a.base_rex:
++        BASE_REX = os.path.abspath(a.base_rex).replace('\\', '/')
+     t0 = time.time()
+     fails = []
++    agent2 = os.path.normcase(os.path.join(R, 'build', 'agent2')) + os.sep
++    for what, p in (('snapshot', SNAP), ('snapshot rexlego', SNAP_REX)):
++        rp = os.path.normcase(os.path.realpath(p))
++        if not rp.startswith(agent2):
++            print('# gen-check: refusing: the %s %s resolves to %s, outside build/agent2' % (what, p, rp))
++            print('RESULT: FAIL (1)')
++            return 1
++    for what, p in (('reference', BASE), ('snapshot', SNAP)):
++        if not os.path.isdir(p):
++            fails.append('%s dir missing: %s' % (what, p))
++    print('# reference %s; snapshot %s; codegen.d paths %s -> %s' % (BASE, SNAP, BASE_REX, SNAP_REX))
+     b, s = files(BASE), files(SNAP)
+     for r in sorted(b - s):
+         fails.append('missing in snapshot: ' + r)
+@@ -57,6 +92,8 @@
+     note = 'codegen.d: missing'
+     if DEPFILE in b and DEPFILE in s:
+         bd = open(os.path.join(BASE, DEPFILE), 'rb').read()
++        if BASE_REX.encode() not in bd:
++            fails.append('the reference codegen.d does not name ' + BASE_REX)
+         want = bd.replace(BASE_REX.encode(), SNAP_REX.encode())
+         sp = os.path.join(SNAP, DEPFILE)
+         cur = open(sp, 'rb').read()
+@@ -68,8 +105,8 @@
+         else:
+             note = 'codegen.d: already has snapshot paths'
+         if cur != want or BASE_REX.encode() in cur:
+-            fails.append('codegen.d is neither baseline\'s nor its snapshot-path rewrite')
+-    print('# gen-check %s: baseline %d files, snapshot %d files; %d/%d compared files identical (%.1f MB); %s; %.1fs'
++            fails.append('codegen.d is neither the reference\'s nor its snapshot-path rewrite')
++    print('# gen-check %s: reference %d files, snapshot %d files; %d/%d compared files identical (%.1f MB); %s; %.1fs'
+           % (time.strftime('%H:%M:%S'), len(b), len(s), same, len(b & s) - 1, total / 1e6, note, time.time() - t0))
+     for f in fails[:50]:
+         print('FAIL ' + f)
+# snap-gate.py.pre-B (BB2E4A8097E625D4) -> snap-gate.py (6F8B4CD18A43D7D0): +44 -15 lines
+--- snap-gate.py.pre-B
++++ snap-gate.py
+@@ -1,21 +1,32 @@
+-"""Agent 2 - gate for the snapshot game tree (dev OFF build 1 / ON build). Exit 0 = pass.
++"""Agent 2 - gate for a snapshot game tree (dev OFF / ON builds from snap1; build B from snapB). Exit 0 = pass.
+ Checks, before anything compiles:
+-  1. every -I/-isystem/-iquote/-idirafter/-imsvc dir under the workspace is inside build/agent2/snap1* (the
+-     snapshot, its SDK build/install, or the game tree); none is under build/sdk, baseline/ or the live
+-     DimensionsRecomp tree;
++  1. every -I/-isystem/-iquote/-idirafter/-imsvc dir under the workspace is inside the snapshot (build/agent2/snap1;
++     with --snap-dir only that DimensionsRecomp copy), snap1-sdk (the SDK build and install) or the game tree; none is
++     under build/sdk, baseline/ or the live DimensionsRecomp tree;
+   2. rexglue_DIR in the game cache is snap1-sdk/install/lib/cmake/rexglue;
+-  3. installed SDK headers hash-equal the snapshot sources (include/rex/** and the fmt/spdlog/simde copies);
+-     configure_file outputs (include/rex/version.h) hash-equal snap1-sdk's own configure output instead;
+-  4. the DB has the 440 generated TUs and their include dirs contain snap1-sdk/install/include.
+-Usage: python build\\agent2\\snap-gate.py [game_tree]   (default build/agent2/snap1-off)
++  3. installed SDK headers hash-equal the snap1 sources the SDK was built from (include/rex/** and the fmt/spdlog/simde
++     copies); configure_file outputs (include/rex/version.h) hash-equal snap1-sdk's own configure output instead;
++  4. the DB's generated TUs are exactly the sources listed in <snapshot>/rexlego/generated/default/sources.cmake
++     (snap1: 440 = 438 TUs + init + register; Agent 9's batch-nolr: 432), and their include dirs contain
++     snap1-sdk/install/include. (Until 23:40 this was a fixed count of 440.)
++Usage: python build\\agent2\\snap-gate.py [game_tree] [--snap-dir DIR]
++  defaults: game tree build/agent2/snap1-off; snapshot build/agent2/snap1/DimensionsRecomp (allowed root build/agent2/snap1)
++  build B:  python build\\agent2\\snap-gate.py build\\agent2\\snapB-off --snap-dir build\\agent2\\snapB\\DimensionsRecomp
+ """
+-import hashlib, json, os, re, sys
++import argparse, hashlib, json, os, re, sys
+ 
+ R = r'<workspace>'
+-GAME = sys.argv[1] if len(sys.argv) > 1 else os.path.join(R, r'build\agent2\snap1-off')
++ap = argparse.ArgumentParser()
++ap.add_argument('game', nargs='?', default=os.path.join(R, r'build\agent2\snap1-off'))
++ap.add_argument('--snap-dir', default='', help='the DimensionsRecomp copy the game tree builds (default: snap1)')
++args = ap.parse_args()
++GAME = args.game
++SNAP_DIR = os.path.abspath(args.snap_dir) if args.snap_dir else os.path.join(R, r'build\agent2\snap1\DimensionsRecomp')
++SNAP_ROOT = SNAP_DIR if args.snap_dir else os.path.join(R, r'build\agent2\snap1')
++GEN_DEFAULT = os.path.join(SNAP_DIR, r'rexlego\generated\default')
+ SNAP_SDK = os.path.join(R, r'build\agent2\snap1\DimensionsRecomp\rexglue-sdk')
+ INST = os.path.join(R, r'build\agent2\snap1-sdk\install')
+-ALLOWED = [os.path.join(R, r'build\agent2\snap1'), os.path.join(R, r'build\agent2\snap1-sdk'), GAME]
++ALLOWED = [SNAP_ROOT, os.path.join(R, r'build\agent2\snap1-sdk'), GAME]
+ 
+ 
+ def norm(p):
+@@ -35,9 +46,18 @@
+ 
+ 
+ fails = []
++listed, src_err = [], None
++try:
++    with open(os.path.join(GEN_DEFAULT, 'sources.cmake'), encoding='utf-8-sig', errors='replace') as f:
++        for line in f:
++            m = re.search(r'\$\{CMAKE_CURRENT_LIST_DIR\}/(\S+?\.cpp)', line)
++            if m:
++                listed.append(norm(os.path.join(GEN_DEFAULT, m.group(1))))
++except OSError as ex:
++    src_err = str(ex)
+ db = json.load(open(os.path.join(GAME, 'compile_commands.json'), encoding='utf-8'))
+ inc_re = re.compile(r'(?:^|\s)(?:-I|-isystem|-iquote|-idirafter|-imsvc|/I)\s*("[^"]+"|\S+)')
+-dirs, gen_dirs, n_gen = {}, None, 0
++dirs, gen_dirs, n_gen, gen_files = {}, None, 0, set()
+ for e in db:
+     cmd = e.get('command') or ' '.join(e.get('arguments', []))
+     ds = [norm(os.path.join(e['directory'], m.group(1).strip('"'))) for m in inc_re.finditer(cmd)]
+@@ -46,10 +66,12 @@
+     f = e['file'].replace('\\', '/')
+     if '/generated/' in f and '/legodimensions_' in f and f.endswith('.cpp'):
+         n_gen += 1
++        gen_files.add(norm(os.path.join(e['directory'], e['file'])))
+         if gen_dirs is None:
+             gen_dirs = ds
+ ws = norm(R)
+-print('# snap-gate %s: %d DB entries, %d generated TUs, %d distinct include dirs' % (GAME, len(db), n_gen, len(dirs)))
++print('# snap-gate %s: %d DB entries, %d generated TUs (sources.cmake lists %d), %d distinct include dirs; snapshot %s'
++      % (GAME, len(db), n_gen, len(listed), len(dirs), SNAP_DIR))
+ for d, n in sorted(dirs.items()):
+     if d.startswith(ws + os.sep):
+         ok = under(d, ALLOWED)
+@@ -58,8 +80,15 @@
+             fails.append('include dir outside the snapshot trees: ' + d)
+     else:
+         print('ext  %5d  %s' % (n, d))
+-if n_gen != 440:
+-    fails.append('expected 440 generated TUs, found %d' % n_gen)
++want_gen = set(listed)
++if src_err:
++    fails.append('cannot read %s: %s' % (os.path.join(GEN_DEFAULT, 'sources.cmake'), src_err))
++elif not listed:
++    fails.append('sources.cmake lists no sources')
++elif n_gen != len(listed) or gen_files != want_gen:
++    miss, extra = sorted(want_gen - gen_files), sorted(gen_files - want_gen)
++    fails.append('expected the %d generated TUs listed in sources.cmake, found %d (%d missing, %d extra; e.g. %s)'
++                 % (len(listed), n_gen, len(miss), len(extra), (miss + extra)[:2]))
+ if not gen_dirs or norm(os.path.join(INST, 'include')) not in gen_dirs:
+     fails.append('generated TUs do not use snap1-sdk/install/include')
+ 
+# stop-snap.ps1.pre-B (14A36888DC8F77D6) -> stop-snap.ps1 (414DF411A0F658EF): +12 -8 lines
+--- stop-snap.ps1.pre-B
++++ stop-snap.ps1
+@@ -1,11 +1,15 @@
+-# Agent 2: stop the snapshot build (build-snap.ps1, and run-s2.ps1 which drives it) and everything under it, without
+-# touching other agents' work.
++# Agent 2: stop the snapshot builds (build-snap.ps1, the run-s2.ps1 / run-b.ps1 drivers, prep-b.py) and everything
++# under them, without touching other agents' work.
+ #   powershell -NoProfile -ExecutionPolicy Bypass -File build\agent2\stop-snap.ps1
+-# 1) taskkill /T the build-snap.ps1 / run-s2.ps1 PowerShell(s) (tree: cmd -> cmake --build -> ninja -> clang/lld/...),
+-# 2) then anything left whose command line names build/agent2/snap1* (orphans), excluding this process.
++# 1) taskkill /T the driver PowerShell / python processes (tree: cmd -> cmake --build -> ninja -> clang/lld/...,
++#    robocopy),
++# 2) then anything left whose command line names build/agent2/snap1* or build/agent2/snapB* (orphans), excluding this
++#    process. (23:40: run-b.ps1, prep-b.py and snapB added for Agent 9's codegen build B; 02:15: the b-chain.ps1
++#    driver and run-s3.ps1.)
+ $me = $PID
++$drivers = 'build-snap\.ps1|run-s2\.ps1|run-s3\.ps1|run-b\.ps1|prep-b\.py|b-chain\.ps1'
+ $ps = Get-CimInstance Win32_Process | Where-Object {
+-    $_.ProcessId -ne $me -and $_.Name -match '^powershell' -and $_.CommandLine -match 'build-snap\.ps1|run-s2\.ps1' -and
++    $_.ProcessId -ne $me -and $_.Name -match '^(powershell|python)' -and $_.CommandLine -match $drivers -and
+     $_.CommandLine -notmatch 'snap\.py' -and $_.CommandLine -notmatch 'stop-snap\.ps1' }
+ foreach ($p in $ps) {
+     "kill tree $($p.ProcessId): $($p.CommandLine)"
+@@ -13,13 +17,13 @@
+ }
+ Start-Sleep -Seconds 2
+ $left = Get-CimInstance Win32_Process | Where-Object {
+-    $_.ProcessId -ne $me -and $_.CommandLine -match 'agent2[\\/]+snap1' -and $_.Name -notmatch '^powershell' }
++    $_.ProcessId -ne $me -and $_.CommandLine -match 'agent2[\\/]+snap(1|B)' -and $_.Name -notmatch '^powershell' }
+ foreach ($p in $left) {
+     "orphan $($p.ProcessId) $($p.Name)"
+     taskkill /T /F /PID $p.ProcessId 2>&1 | Out-Null
+ }
+ Start-Sleep -Seconds 1
+ $n = @(Get-CimInstance Win32_Process | Where-Object {
+-    $_.ProcessId -ne $me -and $_.CommandLine -match 'agent2[\\/]+snap1|build-snap\.ps1|run-s2\.ps1' -and
++    $_.ProcessId -ne $me -and $_.CommandLine -match ('agent2[\\/]+snap(1|B)|' + $drivers) -and
+     $_.CommandLine -notmatch 'snap\.py' -and $_.CommandLine -notmatch 'stop-snap\.ps1' }).Count
+-"remaining snap1 processes: $n"
++"remaining snapshot-build processes: $n"

@@ -1,0 +1,2429 @@
+{
+ "matrix": "<workspace>\\build\\agent8\\matrix\\20261123-0108",
+ "expect": "<workspace>\\build\\agent6\\wnight\\expect-w9.json",
+ "matrix_json": "<workspace>\\build\\agent8\\matrix\\20261123-0108\\matrix.json",
+ "reference": "off",
+ "generated": "2026-11-23T05:52:40",
+ "tools": {
+  "w4b_logdiff": {
+   "rc": 0,
+   "s": 0.5,
+   "out": "<workspace>\\build\\agent6\\wnight\\out-W9-20261123-0108\\logdiff",
+   "log": "<workspace>\\build\\agent6\\wnight\\out-W9-20261123-0108\\logdiff.log"
+  },
+  "w4b_extra": {
+   "rc": 0,
+   "s": 0.6,
+   "out": "<workspace>\\build\\agent6\\wnight\\out-W9-20261123-0108\\extra.txt",
+   "log": "<workspace>\\build\\agent6\\wnight\\out-W9-20261123-0108\\extra.log"
+  }
+ },
+ "arms": {
+  "off": {
+   "runs": [
+    "0110-off-r1",
+    "0128-off-r2",
+    "0137-off-r3",
+    "0145-off-r4"
+   ],
+   "verdict": "NOTE",
+   "fail": [],
+   "note": [
+    "0128-off-r2: levels W/E/C 41/0/0, expected 40/0/0",
+    "0128-off-r2: log does not end with the clean-exit lines: ['Toypad[Write] 0B 16 55 0A B3 0A E3 06 C2 91 1E A4 5D 6B E2 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ', 'Toypad[Read ] 0B 0C 55 09 0A CD EF 37 F6 41 36 C2 9B 25 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ', 'Shutdown wedged past the close request; hard-exiting.']"
+   ],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "unhandled": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "protect_failed": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "levels": [
+    "40/0/0",
+    "41/0/0",
+    "40/0/0",
+    "40/0/0"
+   ],
+   "slow": {
+    "runs": 4,
+    "slow_runs": 0,
+    "mean_slow_pct": 0.0,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "still not acquired after": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "Minidump written to": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "GPU wait back-off:": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "GPU wait stats (5 s):": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "is not a plain number": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     35,
+     35,
+     35,
+     35
+    ],
+    "Reserving the guest memory arena": [
+     1,
+     1,
+     1,
+     1
+    ],
+    "Title terminated": [
+     1,
+     0,
+     1,
+     1
+    ]
+   }
+  },
+  "cold-off": {
+   "runs": [
+    "0108-cold-off"
+   ],
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0
+   ],
+   "unhandled": [
+    0
+   ],
+   "protect_failed": [
+    0
+   ],
+   "levels": [
+    "40/0/0"
+   ],
+   "slow": {
+    "runs": 1,
+    "slow_runs": 0,
+    "mean_slow_pct": 0.0,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0
+    ],
+    "still not acquired after": [
+     0
+    ],
+    "Minidump written to": [
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0
+    ],
+    "GPU wait back-off:": [
+     0
+    ],
+    "GPU wait stats (5 s):": [
+     0
+    ],
+    "is not a plain number": [
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     35
+    ],
+    "Reserving the guest memory arena": [
+     1
+    ],
+    "Title terminated": [
+     1
+    ]
+   },
+   "logdiff": {
+    "fail": 0,
+    "fail_unexplained": [],
+    "new": 0,
+    "new_err": [],
+    "new_warn": [],
+    "more": [],
+    "gone": [],
+    "only": 0,
+    "only_unnamed": [],
+    "only_keys": []
+   }
+  },
+  "q0": {
+   "runs": [
+    "0112-q0-r1",
+    "0120-q0-r2",
+    "0139-q0-r3",
+    "0147-q0-r4"
+   ],
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "unhandled": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "protect_failed": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "levels": [
+    "40/0/0",
+    "40/0/0",
+    "40/0/0",
+    "40/0/0"
+   ],
+   "slow": {
+    "runs": 4,
+    "slow_runs": 0,
+    "mean_slow_pct": 0.0,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "still not acquired after": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "Minidump written to": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "GPU wait back-off:": [
+     1,
+     1,
+     1,
+     1
+    ],
+    "GPU wait stats (5 s):": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "is not a plain number": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     35,
+     35,
+     35,
+     35
+    ],
+    "Reserving the guest memory arena": [
+     1,
+     1,
+     1,
+     1
+    ],
+    "Title terminated": [
+     1,
+     1,
+     1,
+     1
+    ]
+   },
+   "logdiff": {
+    "fail": 0,
+    "fail_unexplained": [],
+    "new": 0,
+    "new_err": [],
+    "new_warn": [],
+    "more": [],
+    "gone": [],
+    "only": 1,
+    "only_unnamed": [],
+    "only_keys": [
+     "[info] [core] GPU wait back-off: ON (quantum # us, spin # us); stats OFF; GetData hook built."
+    ]
+   }
+  },
+  "q125": {
+   "runs": [
+    "0114-q125-r1",
+    "0122-q125-r2",
+    "0131-q125-r3",
+    "0149-q125-r4"
+   ],
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "unhandled": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "protect_failed": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "levels": [
+    "40/0/0",
+    "40/0/0",
+    "40/0/0",
+    "40/0/0"
+   ],
+   "slow": {
+    "runs": 4,
+    "slow_runs": 0,
+    "mean_slow_pct": 0.0,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "still not acquired after": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "Minidump written to": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "GPU wait back-off:": [
+     1,
+     1,
+     1,
+     1
+    ],
+    "GPU wait stats (5 s):": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "is not a plain number": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     35,
+     35,
+     35,
+     35
+    ],
+    "Reserving the guest memory arena": [
+     1,
+     1,
+     1,
+     1
+    ],
+    "Title terminated": [
+     1,
+     1,
+     1,
+     1
+    ]
+   },
+   "logdiff": {
+    "fail": 0,
+    "fail_unexplained": [],
+    "new": 0,
+    "new_err": [],
+    "new_warn": [],
+    "more": [],
+    "gone": [],
+    "only": 1,
+    "only_unnamed": [],
+    "only_keys": [
+     "[info] [core] GPU wait back-off: ON (quantum # us, spin # us); stats OFF; GetData hook built."
+    ]
+   }
+  },
+  "q250": {
+   "runs": [
+    "0116-q250-r1",
+    "0124-q250-r2",
+    "0133-q250-r3",
+    "0141-q250-r4"
+   ],
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "unhandled": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "protect_failed": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "levels": [
+    "40/0/0",
+    "40/0/0",
+    "40/0/0",
+    "40/0/0"
+   ],
+   "slow": {
+    "runs": 4,
+    "slow_runs": 0,
+    "mean_slow_pct": 0.0,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "still not acquired after": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "Minidump written to": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "GPU wait back-off:": [
+     1,
+     1,
+     1,
+     1
+    ],
+    "GPU wait stats (5 s):": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "is not a plain number": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     35,
+     35,
+     35,
+     35
+    ],
+    "Reserving the guest memory arena": [
+     1,
+     1,
+     1,
+     1
+    ],
+    "Title terminated": [
+     1,
+     1,
+     1,
+     1
+    ]
+   },
+   "logdiff": {
+    "fail": 0,
+    "fail_unexplained": [],
+    "new": 0,
+    "new_err": [],
+    "new_warn": [],
+    "more": [],
+    "gone": [],
+    "only": 1,
+    "only_unnamed": [],
+    "only_keys": [
+     "[info] [core] GPU wait back-off: ON (quantum # us, spin # us); stats OFF; GetData hook built."
+    ]
+   }
+  },
+  "q500": {
+   "runs": [
+    "0118-q500-r1",
+    "0126-q500-r2",
+    "0135-q500-r3",
+    "0143-q500-r4"
+   ],
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "unhandled": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "protect_failed": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "levels": [
+    "40/0/0",
+    "40/0/0",
+    "40/0/0",
+    "40/0/0"
+   ],
+   "slow": {
+    "runs": 4,
+    "slow_runs": 0,
+    "mean_slow_pct": 0.0,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "still not acquired after": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "Minidump written to": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "GPU wait back-off:": [
+     1,
+     1,
+     1,
+     1
+    ],
+    "GPU wait stats (5 s):": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "is not a plain number": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     35,
+     35,
+     35,
+     35
+    ],
+    "Reserving the guest memory arena": [
+     1,
+     1,
+     1,
+     1
+    ],
+    "Title terminated": [
+     1,
+     1,
+     1,
+     1
+    ]
+   },
+   "logdiff": {
+    "fail": 0,
+    "fail_unexplained": [],
+    "new": 0,
+    "new_err": [],
+    "new_warn": [],
+    "more": [],
+    "gone": [],
+    "only": 1,
+    "only_unnamed": [],
+    "only_keys": [
+     "[info] [core] GPU wait back-off: ON (quantum # us, spin # us); stats OFF; GetData hook built."
+    ]
+   }
+  }
+ },
+ "runs": {
+  "0108-cold-off": {
+   "arm": "cold-off",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 90.61500000953674,
+    "rows": 91
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "cold-off",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14,
+    "ff": 1795417737.85,
+    "start": "2026-11-23 01:08:54.750",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:09:57.836",
+    "m_end": "2026-11-23 01:10:27.863",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11066
+     ]
+    ],
+    "lines": 98,
+    "levels": {
+     "info": 50,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:08:55.001",
+    "last_ts": "2026-11-23 01:10:28.156"
+   }
+  },
+  "0110-off-r1": {
+   "arm": "off",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.7519998550415,
+    "rows": 113
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "off-r1",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14.04,
+    "ff": 1795417839.443,
+    "start": "2026-11-23 01:10:36.414",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:11:39.448",
+    "m_end": "2026-11-23 01:12:29.454",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      12352
+     ]
+    ],
+    "lines": 106,
+    "levels": {
+     "info": 58,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:10:36.613",
+    "last_ts": "2026-11-23 01:12:30.917"
+   }
+  },
+  "0112-q0-r1": {
+   "arm": "q0",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.5609998703003,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "q0-r1",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {
+     "LEGO_GPU_WAIT_BACKOFF_US": "0",
+     "LEGO_GPU_WAIT_SPIN_US": "30"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14.05,
+    "ff": 1795417962.015,
+    "start": "2026-11-23 01:12:38.983",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:13:42.010",
+    "m_end": "2026-11-23 01:14:32.006",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11195
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "GPU wait back-off:": 1,
+     "GPU wait back-off": 1,
+     "GPU wait back-off: ON (quantum 0 us, spin 30 us); stats OFF; GetData hook built.": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:12:39.194",
+    "last_ts": "2026-11-23 01:14:33.288"
+   }
+  },
+  "0114-q125-r1": {
+   "arm": "q125",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.49300003051758,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "q125-r1",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {
+     "LEGO_GPU_WAIT_BACKOFF_US": "125",
+     "LEGO_GPU_WAIT_SPIN_US": "30"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14.03,
+    "ff": 1795418084.386,
+    "start": "2026-11-23 01:14:41.364",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:15:44.385",
+    "m_end": "2026-11-23 01:16:34.391",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11198
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "GPU wait back-off:": 1,
+     "GPU wait back-off": 1,
+     "GPU wait back-off: ON (quantum 125 us, spin 30 us); stats OFF; GetData hook built.": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:14:41.587",
+    "last_ts": "2026-11-23 01:16:35.598"
+   }
+  },
+  "0116-q250-r1": {
+   "arm": "q250",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.50600004196167,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "q250-r1",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {
+     "LEGO_GPU_WAIT_BACKOFF_US": "250",
+     "LEGO_GPU_WAIT_SPIN_US": "30"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14.02,
+    "ff": 1795418206.674,
+    "start": "2026-11-23 01:16:43.651",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:17:46.672",
+    "m_end": "2026-11-23 01:18:36.690",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11199
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "GPU wait back-off:": 1,
+     "GPU wait back-off": 1,
+     "GPU wait back-off: ON (quantum 250 us, spin 30 us); stats OFF; GetData hook built.": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:16:43.875",
+    "last_ts": "2026-11-23 01:18:37.883"
+   }
+  },
+  "0118-q500-r1": {
+   "arm": "q500",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.53099989891052,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "q500-r1",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {
+     "LEGO_GPU_WAIT_BACKOFF_US": "500",
+     "LEGO_GPU_WAIT_SPIN_US": "30"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14.05,
+    "ff": 1795418328.97,
+    "start": "2026-11-23 01:18:45.937",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:19:48.965",
+    "m_end": "2026-11-23 01:20:38.964",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11198
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "GPU wait back-off:": 1,
+     "GPU wait back-off": 1,
+     "GPU wait back-off: ON (quantum 500 us, spin 30 us); stats OFF; GetData hook built.": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:18:46.145",
+    "last_ts": "2026-11-23 01:20:40.217"
+   }
+  },
+  "0120-q0-r2": {
+   "arm": "q0",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.86600017547607,
+    "rows": 113
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "q0-r2",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {
+     "LEGO_GPU_WAIT_BACKOFF_US": "0",
+     "LEGO_GPU_WAIT_SPIN_US": "30"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14.02,
+    "ff": 1795418451.294,
+    "start": "2026-11-23 01:20:48.273",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:21:51.299",
+    "m_end": "2026-11-23 01:22:41.307",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11195
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "GPU wait back-off:": 1,
+     "GPU wait back-off": 1,
+     "GPU wait back-off: ON (quantum 0 us, spin 30 us); stats OFF; GetData hook built.": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:20:48.496",
+    "last_ts": "2026-11-23 01:22:42.826"
+   }
+  },
+  "0122-q125-r2": {
+   "arm": "q125",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.67499995231628,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "q125-r2",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {
+     "LEGO_GPU_WAIT_BACKOFF_US": "125",
+     "LEGO_GPU_WAIT_SPIN_US": "30"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14.04,
+    "ff": 1795418573.979,
+    "start": "2026-11-23 01:22:50.948",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:23:53.973",
+    "m_end": "2026-11-23 01:24:43.982",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11185
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "GPU wait back-off:": 1,
+     "GPU wait back-off": 1,
+     "GPU wait back-off: ON (quantum 125 us, spin 30 us); stats OFF; GetData hook built.": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:22:51.161",
+    "last_ts": "2026-11-23 01:24:45.346"
+   }
+  },
+  "0124-q250-r2": {
+   "arm": "q250",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.56900000572205,
+    "rows": 111
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "q250-r2",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {
+     "LEGO_GPU_WAIT_BACKOFF_US": "250",
+     "LEGO_GPU_WAIT_SPIN_US": "30"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.99,
+    "ff": 1795418696.464,
+    "start": "2026-11-23 01:24:53.429",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:25:56.466",
+    "m_end": "2026-11-23 01:26:46.458",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11186
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "GPU wait back-off:": 1,
+     "GPU wait back-off": 1,
+     "GPU wait back-off: ON (quantum 250 us, spin 30 us); stats OFF; GetData hook built.": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:24:53.634",
+    "last_ts": "2026-11-23 01:26:47.746"
+   }
+  },
+  "0126-q500-r2": {
+   "arm": "q500",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.55599999427795,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "q500-r2",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {
+     "LEGO_GPU_WAIT_BACKOFF_US": "500",
+     "LEGO_GPU_WAIT_SPIN_US": "30"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14,
+    "ff": 1795418818.859,
+    "start": "2026-11-23 01:26:55.832",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:27:58.852",
+    "m_end": "2026-11-23 01:28:48.859",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11198
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "GPU wait back-off:": 1,
+     "GPU wait back-off": 1,
+     "GPU wait back-off: ON (quantum 500 us, spin 30 us); stats OFF; GetData hook built.": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:26:56.047",
+    "last_ts": "2026-11-23 01:28:50.128"
+   }
+  },
+  "0128-off-r2": {
+   "arm": "off",
+   "verdict": "NOTE",
+   "fail": [],
+   "note": [
+    "levels W/E/C 41/0/0, expected 40/0/0",
+    "log does not end with the clean-exit lines: ['Toypad[Write] 0B 16 55 0A B3 0A E3 06 C2 91 1E A4 5D 6B E2 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ', 'Toypad[Read ] 0B 0C 55 09 0A CD EF 37 F6 41 36 C2 9B 25 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ', 'Shutdown wedged past the close request; hard-exiting.']"
+   ],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 114.4190001487732,
+    "rows": 115
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "off-r2",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.99,
+    "ff": 1795418941.222,
+    "start": "2026-11-23 01:28:58.192",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:30:01.212",
+    "m_end": "2026-11-23 01:30:51.217",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11550
+     ]
+    ],
+    "lines": 100,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 41
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35
+    },
+    "episodes": [],
+    "exit_seq": false,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:28:58.400",
+    "last_ts": "2026-11-23 01:30:55.443"
+   }
+  },
+  "0131-q125-r3": {
+   "arm": "q125",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.64699983596802,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "q125-r3",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {
+     "LEGO_GPU_WAIT_BACKOFF_US": "125",
+     "LEGO_GPU_WAIT_SPIN_US": "30"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.99,
+    "ff": 1795419066.45,
+    "start": "2026-11-23 01:31:03.422",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:32:06.454",
+    "m_end": "2026-11-23 01:32:56.453",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11199
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "GPU wait back-off:": 1,
+     "GPU wait back-off": 1,
+     "GPU wait back-off: ON (quantum 125 us, spin 30 us); stats OFF; GetData hook built.": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:31:03.635",
+    "last_ts": "2026-11-23 01:32:57.810"
+   }
+  },
+  "0133-q250-r3": {
+   "arm": "q250",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.73299980163574,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "q250-r3",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {
+     "LEGO_GPU_WAIT_BACKOFF_US": "250",
+     "LEGO_GPU_WAIT_SPIN_US": "30"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14.01,
+    "ff": 1795419188.933,
+    "start": "2026-11-23 01:33:05.908",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:34:08.928",
+    "m_end": "2026-11-23 01:34:58.934",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11189
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "GPU wait back-off:": 1,
+     "GPU wait back-off": 1,
+     "GPU wait back-off: ON (quantum 250 us, spin 30 us); stats OFF; GetData hook built.": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:33:06.123",
+    "last_ts": "2026-11-23 01:35:00.384"
+   }
+  },
+  "0135-q500-r3": {
+   "arm": "q500",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.54299998283386,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "q500-r3",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {
+     "LEGO_GPU_WAIT_BACKOFF_US": "500",
+     "LEGO_GPU_WAIT_SPIN_US": "30"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14.02,
+    "ff": 1795419311.51,
+    "start": "2026-11-23 01:35:08.480",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:36:11.507",
+    "m_end": "2026-11-23 01:37:01.502",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11820
+     ]
+    ],
+    "lines": 103,
+    "levels": {
+     "info": 55,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "GPU wait back-off:": 1,
+     "GPU wait back-off": 1,
+     "GPU wait back-off: ON (quantum 500 us, spin 30 us); stats OFF; GetData hook built.": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:35:08.708",
+    "last_ts": "2026-11-23 01:37:02.792"
+   }
+  },
+  "0137-off-r3": {
+   "arm": "off",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.88299989700317,
+    "rows": 113
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "off-r3",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14,
+    "ff": 1795419433.844,
+    "start": "2026-11-23 01:37:10.823",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:38:13.849",
+    "m_end": "2026-11-23 01:39:03.849",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11065
+     ]
+    ],
+    "lines": 98,
+    "levels": {
+     "info": 50,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:37:11.028",
+    "last_ts": "2026-11-23 01:39:05.422"
+   }
+  },
+  "0139-q0-r3": {
+   "arm": "q0",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.94600009918213,
+    "rows": 111
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "q0-r3",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {
+     "LEGO_GPU_WAIT_BACKOFF_US": "0",
+     "LEGO_GPU_WAIT_SPIN_US": "30"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14,
+    "ff": 1795419556.541,
+    "start": "2026-11-23 01:39:13.506",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:40:16.530",
+    "m_end": "2026-11-23 01:41:06.544",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11839
+     ]
+    ],
+    "lines": 103,
+    "levels": {
+     "info": 55,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "GPU wait back-off:": 1,
+     "GPU wait back-off": 1,
+     "GPU wait back-off: ON (quantum 0 us, spin 30 us); stats OFF; GetData hook built.": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:39:13.745",
+    "last_ts": "2026-11-23 01:41:08.136"
+   }
+  },
+  "0141-q250-r4": {
+   "arm": "q250",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.52699995040894,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "q250-r4",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {
+     "LEGO_GPU_WAIT_BACKOFF_US": "250",
+     "LEGO_GPU_WAIT_SPIN_US": "30"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.97,
+    "ff": 1795419679.295,
+    "start": "2026-11-23 01:41:16.278",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:42:19.311",
+    "m_end": "2026-11-23 01:43:09.306",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11164
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "GPU wait back-off:": 1,
+     "GPU wait back-off": 1,
+     "GPU wait back-off: ON (quantum 250 us, spin 30 us); stats OFF; GetData hook built.": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:41:16.504",
+    "last_ts": "2026-11-23 01:43:10.541"
+   }
+  },
+  "0143-q500-r4": {
+   "arm": "q500",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.62999987602234,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "q500-r4",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {
+     "LEGO_GPU_WAIT_BACKOFF_US": "500",
+     "LEGO_GPU_WAIT_SPIN_US": "30"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.99,
+    "ff": 1795419801.641,
+    "start": "2026-11-23 01:43:18.617",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:44:21.653",
+    "m_end": "2026-11-23 01:45:11.648",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11198
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "GPU wait back-off:": 1,
+     "GPU wait back-off": 1,
+     "GPU wait back-off: ON (quantum 500 us, spin 30 us); stats OFF; GetData hook built.": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:43:18.854",
+    "last_ts": "2026-11-23 01:45:12.985"
+   }
+  },
+  "0145-off-r4": {
+   "arm": "off",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.69400000572205,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "off-r4",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14,
+    "ff": 1795419924.086,
+    "start": "2026-11-23 01:45:21.062",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:46:24.095",
+    "m_end": "2026-11-23 01:47:14.095",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11053
+     ]
+    ],
+    "lines": 98,
+    "levels": {
+     "info": 50,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:45:21.283",
+    "last_ts": "2026-11-23 01:47:15.478"
+   }
+  },
+  "0147-q0-r4": {
+   "arm": "q0",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.70899987220764,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "q0-r4",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {
+     "LEGO_GPU_WAIT_BACKOFF_US": "0",
+     "LEGO_GPU_WAIT_SPIN_US": "30"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14.01,
+    "ff": 1795420046.594,
+    "start": "2026-11-23 01:47:23.567",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:48:26.593",
+    "m_end": "2026-11-23 01:49:16.592",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11839
+     ]
+    ],
+    "lines": 103,
+    "levels": {
+     "info": 55,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "GPU wait back-off:": 1,
+     "GPU wait back-off": 1,
+     "GPU wait back-off: ON (quantum 0 us, spin 30 us); stats OFF; GetData hook built.": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:47:23.775",
+    "last_ts": "2026-11-23 01:49:18.001"
+   }
+  },
+  "0149-q125-r4": {
+   "arm": "q125",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.5019998550415,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "q125-r4",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "framerate_limit": "0"
+    },
+    "env": {
+     "LEGO_GPU_WAIT_BACKOFF_US": "125",
+     "LEGO_GPU_WAIT_SPIN_US": "30"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.97,
+    "ff": 1795420169.137,
+    "start": "2026-11-23 01:49:26.099",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:50:29.127",
+    "m_end": "2026-11-23 01:51:19.126",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11154
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "GPU wait back-off:": 1,
+     "GPU wait back-off": 1,
+     "GPU wait back-off: ON (quantum 125 us, spin 30 us); stats OFF; GetData hook built.": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:49:26.324",
+    "last_ts": "2026-11-23 01:51:20.370"
+   }
+  }
+ }
+}

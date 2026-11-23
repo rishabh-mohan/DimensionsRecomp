@@ -1,0 +1,49 @@
+# harness/routes/b-gate-menus.txt - B game gate route, the part that needs no figures (session 3, Agent 1): boot (the
+# export lookups), the title screen and the front-end menus. Agent 10's full route is the last section of
+# perf-notes/agent10-codegen-review.md; its level, pause-menu, cutscene, level-change and Toy Pad steps are not covered
+# (they need figures or the user; no generated Toy Pad tags tonight).
+# Blind: nothing can be seen on the hidden desktop, and the game holds perf.csv unshared while it runs, so the script
+# can't follow the scene live. It uses fixed sleeps. Every mark logs perf.csv's size (perf_bytes) and the game.log
+# position to input.csv; harness/route-report.ps1 maps each mark to its scene (median draw calls / vertices) in the
+# final perf.csv, so devoff2 and devoffB can be compared mark by mark.
+# Timing: OFF builds show the title (226/1022) ~28 s after the first frame (build/agent8/runs/0247-devoffB); baseline-bin
+# ~30-40 s.
+# Same script for both builds; each run has its own fresh user dir (no save). FUNCTIONAL ONLY.
+#   powershell -NoProfile -ExecutionPolicy Bypass -File harness\run-game.ps1 -BinDir build\agent2\devoff2-bin -Seconds 420 -Tag bgate-devoff2 -InputScript harness\routes\b-gate-menus.txt
+wait_first_frame 240
+mark first-frame
+sleep 50                         # pre-title (218/222, 219/226) -> title (226/1022)
+mark title
+press START                      # title -> front end
+sleep 8
+mark after-start
+press A
+sleep 8
+mark after-a1
+press A
+sleep 8
+mark after-a2
+press A
+sleep 12
+mark after-a3
+press DOWN
+sleep 2
+mark down-1
+press DOWN
+sleep 2
+mark down-2
+press UP 2
+sleep 2
+mark up-2
+press B
+sleep 5
+mark back-1
+press B
+sleep 5
+mark back-2
+press B
+sleep 5
+mark back-3
+sleep 20
+mark end
+stop

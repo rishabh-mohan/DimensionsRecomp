@@ -1,0 +1,95 @@
+﻿test_binding_caches.py:11: textures = (root / 'rexlego/src/gpu_native/textures.cpp').read_text()
+test_binding_caches.py:12: buffers = (root / 'rexlego/src/gpu_native/buffers.cpp').read_text()
+test_binding_caches.py:13: texture_body = textures[textures.index('TexturePreparationResult PrepareTextureBinding('):textures.index('bool ResolveTextureFromSurface(')]
+test_binding_caches.py:14: buffer_body = buffers[buffers.index('BufferResourceView ResolveBufferWindowCached('):buffers.index('BufferResourceView ResolveBufferResourceView(')]
+test_binding_caches.py:15: texture_probe = textures[textures.index('TexturePreparationSnapshot CaptureTexturePreparation('):textures.index('bool UploadTextureResource(u32 guest_address,')]
+test_binding_caches.py:16: buffer_probe = buffers[buffers.index('PreparedBufferVersion PrepareCachedBuffer('):buffers.index('BufferResourceView InspectBufferResource(')]
+test_binding_caches.py:120: authority=textures[textures.index('void RefreshPublishedTextureAuthority('):textures.index('// Only matching raw storage formats')]
+test_cull_state.py:9: def body(source, signature):
+test_cull_state.py:10: start = source.index(signature)
+test_cull_state.py:11: end = source.index('{', start) + 1
+test_cull_state.py:25: draw = (root/'rexlego/src/gpu_native/draw.cpp').read_text()
+test_cull_state.py:30: nonindex_draw = draw.index('    commands->drawInstanced(count, 1, use_windows ? 0 : start, 0);')
+test_cull_state.py:31: nonindex_begin = draw.rfind('    QueryDrawScope query_scope(commands);', 0, nonindex_draw)
+test_cull_state.py:34: submission = draw[nonindex_begin:draw.index('\n    }',nonindex_draw)]
+test_cull_state.py:35: assert 'CullDrawScissor(' in draw[draw.index('bool DispatchDraw('):]
+test_cull_state.py:36: assert draw.index('commands->setScissors(CullDrawScissor(') < draw.index(submission)
+test_cull_state.py:43: types = plume_types.read_text()
+test_cull_state.py:46: d3d = plume_d3d.read_text()
+test_cull_state.py:66: registers += body(registers_path.read_text(), 'union alignas(uint32_t) PA_SU_SC_MODE_CNTL {') + ';\n'
+test_cull_state.py:79: setter = body(path.read_text(), signature)
+test_shader_binding_failures.py:12: start = source.index(signature)
+test_shader_binding_failures.py:13: end = source.index('{', start) + 1
+test_shader_binding_failures.py:29: shaders = (root / 'rexlego/src/gpu_native/shaders.cpp').read_text()
+test_shader_binding_failures.py:30: draw = (root / 'rexlego/src/gpu_native/draw.cpp').read_text()
+test_shader_binding_failures.py:31: hooks = (root / 'rexlego/src/gpu_native/hooks_shader.cpp').read_text()
+test_shader_binding_failures.py:32: header = (root / 'rexlego/src/gpu_native/shaders.h').read_text()
+test_shader_binding_failures.py:35: assert body.index('const u32 address = ctx.r3.u32') < body.index('InvalidatePlacementShader(address)')
+test_shader_binding_failures.py:36: assert body.index('__imp__sub_' + initializer + '(ctx, base)') < body.index('RefreshPlacementShaderBinding(address)')
+test_shader_binding_failures.py:37: address_declaration_begin = header.index('u32 BoundShaderAddress(')
+test_shader_binding_failures.py:39: header.index(';', address_declaration_begin) + 1]
+test_shader_binding_failures.py:43: registry = shaders[shaders.index('struct ShaderResource {'):
+test_shader_binding_failures.py:44: shaders.index('std::shared_ptr<ShaderResource> FindResource(')]
+test_shader_binding_failures.py:54: key_types = (draw[draw.index('struct PipelineKey {'):draw.index('bool RetainedDrawPreparationEnabled()')] +
+test_shader_binding_failures.py:55: draw[draw.index('std::mutex g_pipeline_mutex;'):draw.index('g_temporal_pipelines;') + len('g_temporal_pipelines;')])
+test_shader_binding_failures.py:58: pipeline_begin = draw.index('plume::RenderPipeline* GetPipeline(')
+test_shader_binding_failures.py:59: pipeline_end = draw.index('  std::array<plume::RenderInputSlot,', pipeline_begin)
+test_shader_binding_failures.py:61: key_begin = draw.index('  PipelineKey key;', draw.index('bool DispatchDraw('))
+test_shader_binding_failures.py:62: key_end = draw.index('  const auto* state_bytes', key_begin)
+test_shader_binding_failures.py:66: index_branch_begin = draw.index('  } else if (indexed) {')
+test_shader_binding_failures.py:68: nonindex_draw = draw.index('    commands->drawInstanced(count, 1, use_windows ? 0 : start, 0);')
+test_shader_binding_failures.py:69: nonindex_begin = draw.rfind('    QueryDrawScope query_scope(commands);', 0, nonindex_draw)
+test_shader_binding_failures.py:71: nonindex_end = draw.index('\n    }', nonindex_draw)
+test_shader_binding_failures.py:133: ++adoption_calls;auto it=adoptable.find(address);
+test_shader_binding_failures.py:391: mutant.write_text(harness.replace(guard, '', 1))
+test_shader_binding_failures.py:402: mutant.write_text(harness.replace(refresh, 'void RefreshPlacementShaderBinding(u32) {}', 1))
+test_draw_index_bounds.py:12: source = (root / 'rexlego/src/gpu_native/draw.cpp').read_text()
+test_draw_index_bounds.py:13: preflight_start = source.index('  BufferResourceView index_metadata;')
+test_draw_index_bounds.py:14: preflight_end = source.index('  timing.Next();', preflight_start)
+test_draw_index_bounds.py:15: issue_start = source.index('  } else if (indexed) {')
+test_draw_index_bounds.py:16: opening = source.index('{', issue_start)
+test_nonindexed_buffer_windows.py:17: source = (root / 'rexlego/src/gpu_native/draw.cpp').read_text()
+test_nonindexed_buffer_windows.py:18: start = source.index('  std::array<VertexBufferWindow, kNativeVertexStreams> vertex_windows{};')
+test_nonindexed_buffer_windows.py:19: end = source.index('  if (mesh_trace) {', start)
+test_nonindexed_buffer_windows.py:21: issue_start = source.index('    commands->drawInstanced(count, 1,')
+test_nonindexed_buffer_windows.py:22: issue = source[issue_start:source.index('\n', issue_start)]
+test_nonindexed_buffer_windows.py:236: uploaded_unused=code.replace('active_vertex_streams=shader_streams;', '(void)shader_streams;')
+test_nonindexed_buffer_windows.py:240: replay_mask=code.replace('required_inputs && !NativeFsr3Enabled()', 'bool(required_inputs)')
+test_nonindexed_buffer_windows.py:244: ignored=code.replace('return used;', 'return u64{0};',1)
+test_nonindexed_buffer_windows.py:248: uncached=code.replace('if (!vertex_metadata_inspected[i]) {','if (true) {')
+test_nonindexed_buffer_windows.py:252: old = code.replace('use_windows = window_uploads;', 'use_windows = false;', 1)
+test_quad_buffer_windows.py:11: start = text.index(signature)
+test_quad_buffer_windows.py:12: opening = text.index('{', start)
+test_quad_buffer_windows.py:27: draw = (root / 'rexlego/src/gpu_native/draw.cpp').read_text()
+test_quad_buffer_windows.py:28: buffers = (root / 'rexlego/src/gpu_native/buffers.cpp').read_text()
+test_quad_buffer_windows.py:29: begin = draw.index('  BufferResourceView index_metadata;', draw.index('bool DispatchDraw('))
+test_quad_buffer_windows.py:30: preflight = draw[begin:draw.index('  timing.Next();', begin)]
+test_quad_buffer_windows.py:31: begin = draw.index('  std::array<VertexBufferWindow, kNativeVertexStreams> vertex_windows{};')
+test_quad_buffer_windows.py:32: streams = draw[begin:draw.index('  if (mesh_trace) {', begin)]
+test_quad_buffer_windows.py:278: const auto cached=g_quad_indices.Find(0,8);assert(cached&&cached->maps==1);
+test_quad_buffer_windows.py:290: assert(!bounded.Find(0,4)&&!lifetime.expired()&&evicted.size()==1);
+test_quad_buffer_windows.py:293: assert(evicted.size()==45);bounded.Clear();assert(!bounded.Find(299,4));
+test_quad_buffer_windows.py:334: old = code.replace('if (count) {',
+test_preparation_metadata.py:11: source = (Path(__file__).resolve().parents[2] / 'rexlego/src/gpu_native/textures.cpp').read_text()
+test_preparation_metadata.py:13: start = source.index(signature)
+test_preparation_metadata.py:14: end = source.index('{', start) + 1
+test_preparation_metadata.py:47: auto FindTexture(u32 address){std::lock_guard lock(registry);auto it=resources.find(address);return it==resources.end()?std::shared_ptr<TextureResource>{}:it->second;}
+test_query_retirement.py:14: def body(path, signature):
+test_query_retirement.py:15: text = (root / path).read_text()
+test_query_retirement.py:16: start = text.index(signature)
+test_query_retirement.py:17: end = text.index('{', start) + 1
+test_query_sample_pool.py:7: source=(root/'rexlego/src/gpu_native/queries.cpp').read_text()
+test_query_sample_pool.py:8: start=source.index('struct QueryDrawScope::Impl {');end=source.index('void FailActiveQueries()',start)
+test_portrait_probe.py:90: text=events.read_text();assert text.count('\tportrait_setup\t')==1
+test_snapshot_selection.py:7: s=(root/'rexlego/src/gpu_native/device.cpp').read_text()
+test_snapshot_selection.py:8: start=s.index('  static const bool manual_only =',s.index('void HostDevice::SnapshotTexture('))
+test_snapshot_selection.py:9: end=s.index('  // A busy character pass',start)
+test_snapshot_selection.py:27: ''' + s[start:end].replace('return;', 'return false;') + r'''
+test_frame_cadence.py:15: source = (root / "rexlego/src/gpu_native/device.cpp").read_text()
+test_frame_cadence.py:16: start = source.index("  if (timing_enabled || metrics_enabled) {")
+test_frame_cadence.py:17: end = source.index("  state.snapshot_number = 0;", start)
+test_frame_cadence.py:20: block = block.replace("if (timing_enabled || metrics_enabled)", "if (timing_enabled)")
+test_temporal_draw_route.py:11: text = (root / 'rexlego/src/gpu_native/draw.cpp').read_text()
+test_temporal_draw_route.py:12: def body(signature):
+test_temporal_draw_route.py:13: start = text.index(signature); end = text.index('{', start) + 1; depth = 1
+test_temporal_draw_route.py:67: for name, selected in [('current', production), ('stale-global-shaders', production.replace('ShaderBindingsScope shaders(programs);', ''))]:

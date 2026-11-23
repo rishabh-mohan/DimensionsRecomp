@@ -1,0 +1,10 @@
+--- stop-snap.ps1.pre-S3d
++++ stop-snap.ps1
+@@ -7,5 +7,5 @@
+ #    process. (23:40: run-b.ps1, prep-b.py and snapB added for Agent 9's codegen build B; 02:15: the b-chain.ps1
+-#    driver and run-s3.ps1.)
++#    driver and run-s3.ps1; 02:59: run-s3d.ps1, the native3d driver.)
+ $me = $PID
+-$drivers = 'build-snap\.ps1|run-s2\.ps1|run-s3\.ps1|run-b\.ps1|prep-b\.py|b-chain\.ps1'
++$drivers = 'build-snap\.ps1|run-s2\.ps1|run-s3\.ps1|run-s3d\.ps1|run-b\.ps1|prep-b\.py|b-chain\.ps1'
+ $ps = Get-CimInstance Win32_Process | Where-Object {

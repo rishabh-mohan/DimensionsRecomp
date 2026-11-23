@@ -1,0 +1,75 @@
+--- a/harness/runstats.py
++++ b/harness/runstats.py
+@@ -50,6 +50,10 @@
+ }
+ MISSING = re.compile(r"MISSING-FUNCTION 0x(?P<addr>[0-9A-Fa-f]{8})")
+ UNKNOWN_CVAR = re.compile(r"Config: unknown cvar '(?P<name>[^']*)'")
++# The guest lock watchdog (krnl, error level): one "critical section ... still not acquired after Ns" line per
++# episode, then owner/caller lines; it writes hang-<pid>.dmp into the game's working dir (the run dir).
++STUCK_LOCK = re.compile(r"STUCK-LOCK: critical section (?P<cs>0x[0-9A-Fa-f]+) still not acquired after (?P<secs>\d+)s")
++HANG_DUMP = re.compile(r"^hang-(?P<pid>\d+)\.dmp$", re.IGNORECASE)
+ BAD_LEVELS = ("error", "critical")
+ 
+ 
+@@ -74,7 +78,8 @@
+ def scan_log(run):
+     files = sorted(glob.glob(os.path.join(run, "game*.log")), key=os.path.getmtime)
+     out = dict(files=[os.path.basename(f) for f in files], lines=0, levels={}, markers={},
+-               errors=[], missing_functions=0, unknown_cvars=[], first_ts=None, last_ts=None)
++               errors=[], missing_functions=0, unknown_cvars=[], first_ts=None, last_ts=None,
++               stuck_locks=0, stuck_lock_first=None)
+     missing, unknown, t0 = set(), [], None
+     for path in files:
+         with open(path, encoding="utf-8", errors="replace") as f:
+@@ -107,6 +112,11 @@
+                 mm = UNKNOWN_CVAR.search(msg)
+                 if mm and mm["name"] not in unknown:
+                     unknown.append(mm["name"])
++                mm = STUCK_LOCK.search(msg)
++                if mm:
++                    out["stuck_locks"] += 1
++                    if out["stuck_lock_first"] is None:
++                        out["stuck_lock_first"] = f"at {at} s: critical section {mm['cs']} not acquired after {mm['secs']} s"
+                 if level in BAD_LEVELS and len(out["errors"]) < 12:
+                     out["errors"].append(f"{at}s [{level}] {msg[:300]}")
+     out["missing_functions"] = len(missing)
+@@ -330,9 +340,30 @@
+     return fr if fr.get("frames_total") else (s.get("perf") or {})
+ 
+ 
++def recovered_hang(s):
++    """A run whose only trouble is the lock watchdog: closed by the harness with exit code 0, no crash event or
++    WER report, every dump is the watchdog's hang-<pid>.dmp of this game, and game.log has a STUCK-LOCK episode.
++    The game came back by itself, so it is not reported as a crash. It still needs a look (run-game.ps1 still
++    exits 1 for any dump, and route-report.ps1 still fails 'no crash')."""
++    run = s.get("run") or {}
++    dumps = run.get("dumps") or []
++    if not dumps or run.get("exit_code") != 0 or run.get("exited_early"):
++        return False
++    if run.get("crash_events") or run.get("wer_seen") or not s["log"].get("stuck_locks"):
++        return False
++    pid = run.get("pid")
++    for d in dumps:
++        m = HANG_DUMP.match(str(d).replace("\\", "/").rsplit("/", 1)[-1])
++        if not m or (pid is not None and m["pid"] != str(pid)):
++            return False
++    return True
++
++
+ def verdict(s):
+     run, markers = s.get("run") or {}, s["log"]["markers"]
+     n = primary(s).get("frames_total", 0)
++    if recovered_hang(s):
++        return "RECOVERED HANG (STUCK-LOCK + dump)"
+     crashed = bool(run.get("crash_events") or run.get("dumps") or run.get("wer_seen")) or (
+         run.get("exited_early") and run.get("exit_code") not in (0, None))
+     if crashed:
+@@ -382,6 +413,8 @@
+                 out.append(f"         event {e.get('id')} {e.get('provider')}: {e.get('summary')}")
+         if run.get("dumps"):
+             out.append(f"         dumps: {', '.join(run['dumps'][:3])}")
++        if lg.get("stuck_locks"):
++            out.append(f"         STUCK-LOCK episodes: {lg['stuck_locks']}; first {lg['stuck_lock_first']}")
+         cpu = run.get("process") or {}
+         if cpu:
+             out.append(f"process  cpu {fmt(cpu.get('cpu_s'))} s over {fmt(run.get('elapsed_s'))} s "

@@ -1,0 +1,10 @@
+tail-chain depth test: chain_a->b->c->a..., 1000000 hops; real game flags + generated headers; default 1 MB main-thread stack; 0xC00000FD = host stack overflow
+chain_O0_mt0_esc0    musttail=0 escape=0: STACK OVERFLOW (0xC00000FD)  asm: call chain_x=4 tail jmp/jcc chain_x=0      
+chain_O0_mt1_esc0    musttail=1 escape=0: PASS                         asm: call chain_x=1 tail jmp/jcc chain_x=3 jmp  depth 1000000: 1000000 hops completed
+chain_O0_mt0_esc1    musttail=0 escape=1: STACK OVERFLOW (0xC00000FD)  asm: call chain_x=4 tail jmp/jcc chain_x=0      
+chain_O0_mt1_esc1    musttail=1 escape=1: PASS                         asm: call chain_x=1 tail jmp/jcc chain_x=3 jmp  depth 1000000: 1000000 hops completed
+chain_O2_mt0_esc0    musttail=0 escape=0: PASS                         asm: call chain_x=1 tail jmp/jcc chain_x=3 jg   depth 1000000: 1000000 hops completed
+chain_O2_mt1_esc0    musttail=1 escape=0: PASS                         asm: call chain_x=1 tail jmp/jcc chain_x=3 jg   depth 1000000: 1000000 hops completed
+chain_O2_mt0_esc1    musttail=0 escape=1: STACK OVERFLOW (0xC00000FD)  asm: call chain_x=4 tail jmp/jcc chain_x=0      
+chain_O2_mt1_esc1    musttail=1 escape=1: PASS                         asm: call chain_x=1 tail jmp/jcc chain_x=3 jmp  depth 1000000: 1000000 hops completed
+(call chain_x includes main's single entry call; tail counts recounted 21:58 from gen_out/*.s so they include jcc tail calls)

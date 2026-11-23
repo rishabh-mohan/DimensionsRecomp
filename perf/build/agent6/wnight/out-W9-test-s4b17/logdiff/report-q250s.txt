@@ -1,0 +1,13 @@
+== arm q250s (1 runs) vs off (1 runs)
+  runs\2209-q250s-r1: exit=0 close=wm_close early=False wer=False dumps=0 exit_line=1 stuck=0 | 253 lines game.log 39830, 2026-11-22 22:09:50.634..2026-11-22 22:13:28.009 (217 s) | levels info=103 raw=8 warning=142 | Toypad R/W 7/7 (1.9/1.9 per min)
+gate_logdiff FAIL findings (B = arm run, A = each base run): none
+NEW warning/error/critical keys (in an arm run, in no base run): 0
+MORE (arm run count > base max + max(5, base max)): 0
+GONE (in every base run, missing from an arm run; any level): 0
+Toypad (base: runs\2053-off-r1 {'info Write': 9, 'info Read': 9})
+  runs\2209-q250s-r1: {'info Write': 7, 'info Read': 7}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+ONLY in q250s (any level, not Toypad; in no base run): 2 keys
+  1/1 runs, counts [41], also in ['p1']  [info] [core] GPU wait stats (# s): L# waits # polls # moved # gpu_off # sleep>moved # sleep>done # | L# tries # waits # polls # delayed # sleep>ready # | kicks # | pause # yield # sleep # sleep_sum #
+      e.g. [2026-11-22 22:10:02.372] [info] [core] [t23116] GPU wait stats (5 s): L1 waits 297 polls 9821 moved 0 gpu_off 0 sleep>moved 0 sleep>done 287 | L2 tries 0 waits 0 polls 0 delayed 0 sleep>ready 0 | kicks 582 | pause 3494 yield 287 sleep 6040
+  1/1 runs, counts [1], also in -  [info] [core] GPU wait back-off: ON (quantum # us, spin # us); stats ON; GetData hook built.
+      e.g. [2026-11-22 22:09:53.415] [info] [core] [t30772] GPU wait back-off: ON (quantum 250 us, spin 30 us); stats ON; GetData hook built.

@@ -1,0 +1,42 @@
+[06:36:32] run_pack.ps1 mode=PlanOnly pid=42676 priority=BelowNormal affinity=0x2 (1 CPUs) ps=5.1.26100.9818
+[06:36:38] script sha256=D29E23BEBD05C91A661E4A8E3E98BA3B2E3CFBDA485DF7B6ECFA7085C15E8669
+[06:36:38] gate 1: Agent 7 cleared the PS words at 06:22 (build\agent7\sd\ps-words-check.txt)
+[06:36:39] gate 2: not claimed (PlanOnly)
+[06:36:40] time window: now=06:36:40 quiet(06:33-07:15)=True notAfter=08:05
+[06:36:41] PIN  gradient   ok   705980C4F6071E9B675DFBB57A33ED64C0C74BA6F8172FD7094850A76371A653 build\agent6\aot\gradient-build\gradient_compiler.exe
+[06:36:42] PIN  dxcompiler ok   0689E2FEE0A1C9DF8662A59680469F24E2A3AD7CE6BBBCC9284F7A83172BFC59 build\agent6\aot\gradient-build\dxcompiler.dll
+[06:36:46] PIN  dxil       ok   64BE2368211D257A038A7D4EA6BB3E24C878EB8D588C7B8414FCCF759B69C2AC build\agent6\aot\gradient-build\dxil.dll
+[06:36:47] PIN  fmt        ok   BB89FF51186F9E8F8F7CAE69E5A229C9D1D322562B033C0D8DD35071434A1FE5 build\agent6\aot\gradient-build\fmt.dll
+[06:36:47] PIN  common     ok   362E9EDBA0B9E4AC156982E7D75A70AF1341C6E1F1F52139BE03978DB3AA1E8F DimensionsRecomp\rexlego\out\native-gpu\current-compiler\gradients\source\shader_common.h
+[06:36:48] PIN  indexer    ok   3B5A68FE447DF23D46BCFF7913E590A8AF4A14A2FBBE28453B17EB23144BB9A1 build\agent6\aot\microcode-index\lego_gpu_microcode_index.exe
+[06:36:48] PIN  oldindex   ok   2DB859177B4656477D2858B87F37E7F068CABA420362FA21AFA1B3C8C6DD13A2 build\agent2\snap1\DimensionsRecomp\rexlego\out\native-gpu\lego-microcode-index.cpp
+[06:36:49] PIN  maincache  ok   FF9386C1CD435E7EE12781F43A6F42F97AED7062A4147D4E649AF2450157A819 build\agent2\snap1\DimensionsRecomp\rexlego\out\native-gpu\aot\lego-dxil-cache.cpp
+[06:36:49] PIN  merge      ok   20986E998AB8B6F83FC0390A15A45DABB86F37E81206A9ED06D06E205DDB1BE2 DimensionsRecomp\tools\gpu-aot\merge_microcode_index.py
+[06:36:49] PIN  lookup     ok   856D0A8E0E827D6AECF99FC0D34DDCCB0FE0F182D9EE372A20048FDC3350058B DimensionsRecomp\tools\gpu-aot\test_placement_capture_lookup.py
+[06:36:49] PIN  archive    ok   1C5B1767B8F6871D7E11DAAE59733E0CE8FA86362E95BECF7E03BC3EB67092EC DimensionsRecomp\rexlego\src\gpu_native\shader_archive.cpp
+[06:36:49] PIN  archiveh   ok   83B030F92C504D1FF5AD554371745A8DA38C52310B290DA9246A212CC3F743D5 DimensionsRecomp\rexlego\src\gpu_native\shader_archive.h
+[06:36:49] PIN  snaparch   ok   1C5B1767B8F6871D7E11DAAE59733E0CE8FA86362E95BECF7E03BC3EB67092EC build\agent2\snap1\DimensionsRecomp\rexlego\src\gpu_native\shader_archive.cpp
+[06:36:49] PIN  checker    logd 9B5BA952CF9E4F18C8E2373AEFD9E17164BA3976F6CB2C8779140DC98A41D1E4 build\agent4\s35\check_pack.py
+[06:36:49] PIN  wrapper    logd AF08DD86BC4368E2739E0DF7E1ACA527DF3899C8051F90DF7FF042A337ED6C13 build\agent4\s35\run_lookup.py
+[06:36:49] IN   vs-ACAF01F01E1C03D2.bin  ok   6C4F65C3161DF6BEE23F9C551F34971D60275BB49C3DB6327CFF9084F4317A66
+[06:36:49] IN   ps-75A4D1ABA62F7594.bin  ok   09D05274AFBC26A2605D0B91E5C2A0E0C95303C4C0C84F4D463105EB678D66EE
+[06:36:49] IN   vs-CCD7655302B54D80.bin  ok   F4EE30B28DEE9E4AB5AE2E9204D54195A0AC9D8D5497B7F2C8FAC11D90EEC65E
+[06:36:49] IN   ps-E81FD692C3AB35E1.bin  ok   58B4FA21E35500529895AA400F4B307F0DD09BBBBDB71F5C7C8E8748B31170F1
+[06:36:51] clang++ = <workspace>\toolchain\llvm-23.1.6\bin\clang++.exe | clang version 23.1.6 (https://github.com/llvm/llvm-project 5b10d2d74929eae78912771222c9855af97496f4)
+[06:36:53] python = C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\python.exe | Python 3.11.9
+[06:36:53] precheck of the pinned inputs in place (read-only): <workspace>\build\agent8\matrix\20261122-0509\runs\0509-sd-r1\shader-dumps\placement-containers
+[06:36:56]        ps-75A4D1ABA62F7594.bin     1716 B  flags=102A1100  stage=1  physical=208  microcode@64+144  first=00000000 00000000 00000000 00000000  OK
+[06:36:56]        ps-E81FD692C3AB35E1.bin     1640 B  flags=102A1100  stage=1  physical=184  microcode@64+120  first=00000000 00000000 00000000 00000000  OK
+[06:36:56]        vs-ACAF01F01E1C03D2.bin     1304 B  flags=102A1101  stage=0  physical=324  microcode@0+324  first=F2556004 600A1200 12000000 00006010  OK
+[06:36:56]        vs-CCD7655302B54D80.bin      944 B  flags=102A1101  stage=0  physical=288  microcode@0+288  first=70956004 600A1200 12000000 00005010  OK
+[06:36:57]      PRECHECK PASS
+[06:36:57] plan for -Go (all outputs under build\agent4\s35\run-HHmmss\):
+[06:36:57]   1 stage the 4 containers into runtime-input\ and re-verify sha256; precheck
+[06:36:57]   2 gradient_compiler.exe runtime-input runtime-cache.cpp shader_common.h  (XENOS_RECOMP_DXIL_ONLY=1, XENOS_RECOMP_HLSL_DUMP=hlsl\)
+[06:36:57]   3 lego_gpu_microcode_index.exe index-addition.cpp runtime-input
+[06:36:57]   4 merge_microcode_index.py <snap1 index 2DB85917> index-addition.cpp lego-microcode-index.cpp --report merge-report.json
+[06:36:57]   4b check_pack.py prelookup (static checks; no lookup is started unless they pass)
+[06:36:57]   5 run_lookup.py test_placement_capture_lookup.py runtime-input lego-microcode-index.cpp runtime-cache.cpp lookup\
+[06:36:57]   6 the same with --main-cache <snap1 lego-dxil-cache.cpp FF9386C1> into lookup-main\
+[06:36:57]   7 check_pack.py post; re-check the pins; listing diff of the watched dirs; SHA256SUMS.txt
+[06:36:57] PLAN OK (bad pins/inputs: 0, precheck exit: 0)

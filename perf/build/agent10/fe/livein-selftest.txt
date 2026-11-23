@@ -1,0 +1,30 @@
+ok  cr6.gt cr6.compare(ctx.f1.f64, ctx.f6.f64);                                        want W got W
+ok  cr6.gt if (!cr6.gt) return;                                                        want R got R
+ok  cr6.lt cr6.setFromMask(simde_mm_load_ps(ctx.v58.f32), 0xF);                        want W got W
+ok  cr6.so ctx.r11.u64 = (cr6.lt << 7) | (cr6.gt << 6) | (cr6.eq << 5) | (cr6.so << 4) want R got R
+ok  cr6.eq cr6.compare<uint32_t>(ctx.r9.u32, 0, {});                                   want W got W
+ok  cr0.eq ctx.r4.u64 |= cr0.eq ? 0x20000000 : 0;                                      want R got R
+ok  cr0.so ctx.r4.u64 |= cr0.eq ? 0x20000000 : 0;                                      want None got None
+ok  ctr.None ctr.u64 = ctx.r0.u64;                                                       want W got W
+ok  ctr.None REX_CALL_INDIRECT_FUNC(ctr.u32);                                            want R got R
+ok  cr6.eq cr6.eq = cr6.lt | cr6.eq;                                                   want R got R
+ok  cr6.lt cr6.eq = cr6.gt;                                                            want None got None
+ok  cr6.eq cr6.eq = cr6.gt;                                                            want W got W
+ok  cr6.so cr6.un = 0;                                                                 want W got W
+ok  cr6.so if (cr6.un) goto loc_1;                                                     want R got R
+ok  cr6.lt cr6.set_raw(ctx.r12.u32 >> 4);                                              want W got W
+ok  cr6.lt ctx.r3.u64 = cr6.raw();                                                     want R got R
+ok  xer.ca xer.ca = ctx.r3.u32 > ~ctx.r4.u32;                                          want W got W
+ok  xer.ca ctx.r3.u64 = ctx.r3.u64 + xer.ca;                                           want R got R
+ok  xer.so xer.ca = ctx.r3.u32 > ~ctx.r4.u32;                                          want None got None
+ok  xer.ca xer.ca = (ctx.r3.u64 + xer.ca) < xer.ca;                                    want R got R
+ok  cr6.gt if (cr6.gt) goto loc_82FE7120;                                              want R got R
+ok  cr6.lt ctx.cr6 = cr6;                                                              want R got R
+ok  cr6.lt ctx.cr6.lt = 1;                                                             want None got None
+ok  reserved.None reserved.u32 = *(uint32_t*)REX_RAW_ADDR(ea);                                want W got W
+ok  reserved.None cr0.eq = __sync_bool_compare_and_swap(p, reserved.s32, v);                  want R got R
+ok  CALL sub_82A75FD8(ctx, base);                                     sub_82A75FD8
+ok  CALL [[clang::musttail]] return sub_82FE6F98(ctx, base);          sub_82FE6F98
+ok  CALL REX_CALL_INDIRECT_FUNC(ctr.u32);                             REX_CALL_INDIRECT_FUNC
+ok  CALL __savegprlr_28(ctx, base);                                   __savegprlr_28
+selftest: 0 bad of 29

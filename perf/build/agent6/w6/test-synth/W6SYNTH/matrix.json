@@ -1,0 +1,150 @@
+{
+ "title": "Window 5, S3d line (Agent 8's task #10 draft, promoted by Agent 1 at 16:42 after W4b): S4 baseline + timer modes. base = devoff3 (S3d); s0, d11, d11t, d11p = devoff4 (S4a)",
+ "reference": "base",
+ "warmup_s": 55,
+ "warmup_from": "firstframe",
+ "measure_s": 50,
+ "repeats": 3,
+ "order": "roundrobin",
+ "settle_s": 5,
+ "cooldown_s": 5,
+ "boot_timeout_s": 240,
+ "close_timeout_s": 60,
+ "cold_run": true,
+ "sys_csv": true,
+ "min_window_after_ff_s": 60,
+ "cold_warmup_s": 55,
+ "cold_measure_s": 30,
+ "quick": {
+  "warmup_s": 10,
+  "measure_s": 20,
+  "settle_s": 5,
+  "cooldown_s": 5,
+  "repeats": 1,
+  "min_window_after_ff_s": 20,
+  "cold_warmup_s": 5,
+  "cold_measure_s": 10
+ },
+ "notes": [
+  "Promoted by Agent 1 at 16:42 on 2026-11-22, after window 4b (17/17 runs OK; codegen B within noise, so the S3d line; user delegation 14:44). Drafted by Agent 8 (task #10); the draft and its -PlanOnly checks stay in build/agent8/readout/w5-draft/.",
+  "W5 (S4-DRAFT 2c L287), RUN-WINDOW5-S3D.cmd: -Only base,s0,d11,d11t,d11p -Repeats 3 -ColdShared. One unscored cold run (base = devoff3), shared by both bins. Then 3 rounds, rotated each round: each arm once per round, never twice in the same position. base, s0, d11, d11t, d11p x3 each: 16 runs, about 37 min (runner estimate) to 40 min (S4-DRAFT, 2.5 min a run). The cold run warms the shared game data. s0 is devoff4's first launch, a scored round-1 run whose window still starts >= 60 s after the first frame (as B, d3 and d11t were in W4b).",
+  "Questions (S4-DRAFT L287): is s0 the same as base (S4a with every new switch OFF; #32 is always on)? What does the blocking wait do alone (d11 vs d11t)? Precise vs blocking wait (d11p vs d11t; they differ only in the TimerQueue wait mode)? Arm names: S4-DRAFT L278-283.",
+  "Window: 5 s settle + 55 s warm-up from the first frame, then 50 s measured, so every window starts >= 60 s after the first frame (min_window_after_ff_s 60, Agent 1's hard floor). The runner raises the warm-up when settle + warm-up is shorter. After each run it flags window_before_floor (excluded) when the first-frame signal to the start mark was < 59.5 s. The cold run too: warm-up max(cold_warmup_s, 60 - settle) = 55 s, window 30 s.",
+  "One frame source for every arm: perf.csv (frames perf), uncapped (framerate_limit=0), the same driver (drivers/thread-cpu.ps1 -> threads.csv). Runner flags on every run: --audio_mute=true --pause_when_unfocused=false --native_settings_load=false --discord_rpc=false.",
+  "sys_csv: drivers/sys-csv.ps1 logs idle time, foreground window, input desktop, screensaver, CPU util/MHz, thermal and power every 1 s (sys.csv); sys_summary.py gives sys.json for the window. On the interactive desktop, any of these excludes the run from summary.md (it stays in results.csv, listed under 'Flagged runs'): input during the window, the game losing the foreground part-way, battery, battery saver, a power-plan change, a non-default input desktop, or a screensaver.",
+  "Light phase: a run whose game.log has < 30 'FAILED: path=d:\\INSTALL*.DAT' lines (normal boot: 34) ran a lighter title phase and is excluded (light_phase); a window with >= 60 % of frames under 4.5 ms is flagged light_share_high (info). python bench/agent8/run/matrix_recheck.py <out dir> [--keep-flagged] recomputes the summary.",
+  "Proof per run, checked before any fps is read (S4-DRAFT 2c; Agent 11, 14:14). d11, d11t and d11p game.logs show 'Host timer resolution set to 1 ms (background opt-out on)'; base and s0 have none. Every d11p game.log has exactly one 'TimerQueue: precise wait (timer_queue_precise_wait)'; no other arm has it. d11t logs nothing for the blocking wait: its proof is REX_TIMER_WAIT_BLOCKING in run.json env_set.",
+  "REX_TIMER_WAIT_BLOCKING: only d11t runs may have it (in env_set). The game's check is presence-only: =0 or an empty value still turns the blocking wait on, and with both set the precise wait wins (Agent 11). The runner sets it for d11t runs only and restores the environment after every run; the .cmd removes any inherited copy before it starts.",
+  "TimerQueue CPU (threads.csv, % of one core; Agent 11's gate): base, s0 and d11 (spin wait) ~30-60%, gate d11 > 20%; d11t ~0.3-1.5% and d11p ~1-2%, gate < 5%. CPU does not separate d11t from d11p; the precise line does. Then the slow-state check per run (bench/agent11/timerq_slowstate.ps1). It groups runs by env_set only, so d11p runs fall in its spin group: W5 needs a 3-mode copy (Agent 11 offered one for after W4b).",
+  "Environment: every W5 run comes after the 08:29-08:34 Windows Update (Intel DTT extension 9.1.10501.3322, Intel IPF extensions 3.4.1009.0, KB5132057, build 26300.10075), as every W4b run does, so W5 compares with W4b. Any comparison with window 3 or overnight numbers must say so (S4-DRAFT 2c L271-275).",
+  "Timing comes only from this double-click run on the unlocked desktop (screensaver None, AC power, hands off). Agent runs of this matrix (-Quick, hidden desktop) are functional only."
+ ],
+ "arms": [
+  {
+   "id": "base",
+   "group": "w5",
+   "ref": true,
+   "repeats": 3,
+   "bin": "build/agent2/devoff3-bin",
+   "frames": "perf",
+   "cvars": [
+    "framerate_limit=0"
+   ],
+   "env": {},
+   "driver": "drivers/thread-cpu.ps1",
+   "note": "base = devoff3, the bin S4a is built on (S3d sources; MANIFEST B9C5175DA1904235, rexruntime.dll D1D66AC3716835AC; W4b's d3). No timer cvar: TimerQueue spin wait"
+  },
+  {
+   "id": "s0",
+   "group": "w5",
+   "repeats": 3,
+   "bin": "build/agent2/devoff4-bin",
+   "frames": "perf",
+   "cvars": [
+    "framerate_limit=0"
+   ],
+   "env": {},
+   "driver": "drivers/thread-cpu.ps1",
+   "note": "s0 = devoff4 = S4a: S3d + SDK #7 #8 #5(i) #38 with every new switch OFF by default, + #32 always on (MANIFEST 16DCC9399239E577, rexruntime.dll 870276A6D0E8DE57, staged 13:31). No S4 cvar is set: shared_memory_upload_hash_log, shared_memory_single_hold_rearm, physical_protect_hold_global_lock and timer_queue_precise_wait stay false"
+  },
+  {
+   "id": "d11",
+   "group": "w5",
+   "repeats": 3,
+   "bin": "build/agent2/devoff4-bin",
+   "frames": "perf",
+   "cvars": [
+    "framerate_limit=0",
+    "host_timer_resolution_ms=1",
+    "host_timer_throttling_optout=true",
+    "precise_guest_sleep=true",
+    "wait_timeout_round_up=true",
+    "cs_spin=true",
+    "spinlock_pause_spin=true",
+    "clock_lockfree=true",
+    "tls_bounds_fix=true"
+   ],
+   "env": {},
+   "driver": "drivers/thread-cpu.ps1",
+   "note": "d11 = s0 + the 8 timer cvars (window 3's d11 bundle, Agent 11 ON bundle R3; TimerQueue spin wait, gate > 20% of a core). Its game.log must show 'Host timer resolution set to 1 ms (background opt-out on)'"
+  },
+  {
+   "id": "d11t",
+   "group": "w5",
+   "repeats": 3,
+   "bin": "build/agent2/devoff4-bin",
+   "frames": "perf",
+   "cvars": [
+    "framerate_limit=0",
+    "host_timer_resolution_ms=1",
+    "host_timer_throttling_optout=true",
+    "precise_guest_sleep=true",
+    "wait_timeout_round_up=true",
+    "cs_spin=true",
+    "spinlock_pause_spin=true",
+    "clock_lockfree=true",
+    "tls_bounds_fix=true"
+   ],
+   "env": {
+    "REX_TIMER_WAIT_BLOCKING": "1"
+   },
+   "driver": "drivers/thread-cpu.ps1",
+   "note": "d11t = d11 + REX_TIMER_WAIT_BLOCKING=1 (TimerQueue blocking wait; W4b's d11t, now on S4a). Proof: the 1 ms line, REX_TIMER_WAIT_BLOCKING in run.json env_set, no precise line (blocking logs nothing), TimerQueue < 5% of a core"
+  },
+  {
+   "id": "d11p",
+   "group": "w5",
+   "repeats": 3,
+   "bin": "build/agent2/devoff4-bin",
+   "frames": "perf",
+   "cvars": [
+    "framerate_limit=0",
+    "host_timer_resolution_ms=1",
+    "host_timer_throttling_optout=true",
+    "precise_guest_sleep=true",
+    "wait_timeout_round_up=true",
+    "cs_spin=true",
+    "spinlock_pause_spin=true",
+    "clock_lockfree=true",
+    "tls_bounds_fix=true",
+    "timer_queue_precise_wait=true"
+   ],
+   "env": {},
+   "driver": "drivers/thread-cpu.ps1",
+   "note": "d11p = d11 + timer_queue_precise_wait=true (#38 precise wait; S4-DRAFT L283; confirmed by Agent 11, 14:14: keep host_timer_resolution_ms=1 so that d11p and d11t differ only in the TimerQueue wait mode; REX_TIMER_WAIT_BLOCKING must not be set). Proof: the 1 ms line and exactly one 'TimerQueue: precise wait (timer_queue_precise_wait)'; TimerQueue < 5% of a core"
+  },
+  {
+   "id": "p2fc",
+   "group": "w5",
+   "repeats": 3,
+   "bin": "build/agent2/devoff4-bin",
+   "frames": "perf",
+   "cvars": [
+    "framerate_limit=0"
+   ],
+   "env": {},
+   "driver": "drivers/thread-cpu.ps1",
+   "note": "s0 = devoff4 = S4a: S3d + SDK #7 #8 #5(i) #38 with every new switch OFF by default, + #32 always on (MANIFEST 16DCC9399239E577, rexruntime.dll 870276A6D0E8DE57, staged 13:31). No S4 cvar is set: shared_memory_upload_hash_log, shared_memory_single_hold_rearm, physical_protect_hold_global_lock and timer_queue_precise_wait stay false"
+  }
+ ]
+}

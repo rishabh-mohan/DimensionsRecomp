@@ -1,0 +1,37 @@
+{
+  "title": "IO cvars in a story level (Agent 12, dev OFF build 1): A defaults vs B five io cvars. MENU step every run (the user loads the level)",
+  "reference": "A",
+  "warmup_s": 15,
+  "warmup_from": "firstframe",
+  "measure_s": 20,
+  "repeats": 5,
+  "order": "roundrobin",
+  "settle_s": 10,
+  "cooldown_s": 10,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "menu_s": 150,
+  "cold_run": true,
+  "quick": { "warmup_s": 5, "measure_s": 10, "settle_s": 5, "menu_s": 60, "cooldown_s": 5 },
+  "notes": [
+    "Spec: perf-notes/agent12-io-memory.md, 'In-game A/B plan'. One binary (build/agent2/devoff1-bin); only the cvars differ.",
+    "Order: one unscored cold run first (Agent 12: 'discard one warm-up run'; it also warms the OS file cache for the level), then roundrobin gives A B B A A B B A A B. About 11 runs x 4.5 min = 50 min WITH THE USER AT THE PC for every MENU step; -Repeats 3 gives A B B A A B (7 runs, about 32 min).",
+    "Each run: first frame, 10 s settle, then the yellow MENU banner: load the SAME story level every run (Vorton if reachable: it exercises the PortalTrailer fixup) within 150 s and let go; then 15 s warm-up and a 20 s window standing still (Agent 12's 'stand still 20 s'), then WM_CLOSE.",
+    "Metrics: boot = the first-frame time (first frame of any kind, not the title menu); level load = post-hoc from perf.csv (Agent 12, 22:17: the build logs no level-load start or end line at the default log level; the key press that starts the load cannot be timestamped; the MENU phase is marked in proc.csv); host reads = drivers/io-counters.ps1 -> <run>\\io.csv (cumulative GetProcessIoCounters: first row = everything up to the window start, i.e. boot + menus + level load; then every second to the window end). Expected: bytes equal within noise, fewer read operations in B.",
+    "Correctness, B against A: 'Fix: PortalTrailer enabled in Vorton's loading script (read-time only)' in both whenever Vorton loads; no new error or warning lines (grep NtReadFile, ReadScatter, ERROR_NOACCESS, access violation, invalid handle, assert); clean exit, no WER dialog or dump. No screenshots in this runner.",
+    "B-io (only if A and B differ): B without log_level_gate, i.e. cvars io_lockless_watch_check=true io_coalesce_scatter_reads=true io_unlocked_file_reads=true vfs_defer_open_exists_check=true. Add it as a third arm then.",
+    "pause_safe_order and debug_pause_cycle_* are not part of this A/B (Agent 11's test G). The runner always passes --pause_when_unfocused=false."
+  ],
+  "arms": [
+    { "id": "A", "group": "io", "ref": true, "bin": "build/agent2/devoff1-bin", "cvars": [], "env": {},
+      "driver": "drivers/io-counters.ps1",
+      "menu": "LOAD THE STORY LEVEL (the same one every run, Vorton if you can reach it): Return = Start, J = A, K = B, WASD = move. When it has loaded, stand still and let go of the keyboard and mouse.",
+      "note": "Agent 12 A: the five io cvars at their defaults (false)" },
+    { "id": "B", "group": "io", "bin": "build/agent2/devoff1-bin",
+      "cvars": [ "io_lockless_watch_check=true", "io_coalesce_scatter_reads=true", "io_unlocked_file_reads=true",
+                 "vfs_defer_open_exists_check=true", "log_level_gate=true" ], "env": {},
+      "driver": "drivers/io-counters.ps1",
+      "menu": "LOAD THE STORY LEVEL (the same one every run, Vorton if you can reach it): Return = Start, J = A, K = B, WASD = move. When it has loaded, stand still and let go of the keyboard and mouse.",
+      "note": "Agent 12 B: all five io cvars on" }
+  ]
+}

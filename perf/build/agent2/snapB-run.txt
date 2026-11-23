@@ -1,0 +1,10 @@
+﻿02:22:25 [B] START codegen build B from S2 (snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp, game tree <workspace>\build\agent2\snapB-off, -j 10, install tree build\agent9\install\batch-nolr)
+02:22:26 [B] pins match: install tree <workspace>\build\agent9\install\batch-nolr (SHA256SUMS.txt 24CE1493FB8DAE37), snapB config E60EAF1CEB575572
+02:22:26 [B] BEGIN build : <workspace>\build\agent2\build-snap.ps1 -Phase game -Tag snapB -Jobs 10 -KeepGoing -SnapDir <workspace>\build\agent2\snapB\DimensionsRecomp -GameDir <workspace>\build\agent2\snapB-off -CodegenExe <workspace>\build\agent2\codegen-frozen\codegen-frozen2.exe -GenBase <workspace>\build\agent9\install\batch-nolr\generated
+02:40:07 [B] END   build exit=0 wall=1,060.4s freeC=255.19GB
+02:40:08 [B] rexruntime.dll in snapB-off == install/bin (1C45C86977EC594C)
+02:40:08 [B] BEGIN stage : <workspace>\build\agent2\stage-snap-bin.ps1 -Variant off -SnapTag S2 -BuildTag snapB -GameTree <workspace>\build\agent2\snapB-off -OutDir <workspace>\build\agent2\devoffB-bin -GameSnap <workspace>\build\agent2\snapB\DimensionsRecomp -CompareBin <workspace>\build\agent2\devoff2-bin -RuntimeStrings audio_shutdown_detach_worker,leave it running and leak what it can still reach -WhatText codegen build B: dev OFF build from S2 with Agent 9's batch-nolr codegen options, NATIVE_GPU=OFF -CodegenNote codegen: Agent 9's batch-nolr options (build/agent9/install/batch-nolr, 430 TUs, no skip_lr; the snapB generated output hash-checked against that install tree by gen-check.py --base; the codegen-frozen2.exe stand-in writes nothing) -ManifestNotesFile <workspace>\build\agent2\snapB-manifest-notes.txt
+02:40:30 [B] END   stage exit=0 wall=22.7s freeC=255.00GB
+02:40:30 [B]   PASS staged copy identical: FiraSans-Regular.ttf
+02:40:30 [B]   staged 7 files into <workspace>\build\agent2\devoffB-bin (198.3 MB)
+02:40:30 [B] DONE codegen build B -> devoffB-bin, total wall 1,084.9s

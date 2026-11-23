@@ -1,0 +1,71 @@
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:46:22
+mode: PROMOTE (copied to bench\agent8\run)
+result: OK
+run: only=off,q0,q125,q250,q500 repeats=4 -ColdShared; -PlanOnly: 21 runs, about 48 min (runner); expected 21 runs; Agent 7's formula 1.70 + 2.14 x 5 x 4 = 44.5 min
+latest start: the launcher accepts this GO until 06:32 (07:30 - runner estimate 48 min - slack 10 min); started then, it ends about 07:16 by Agent 7's formula
+GO line: GO W9 matrix-window9.json CE0AD75792B47D59876C864B39797CD877404F911D12F92E6CC9C4351D747610 only=off,q0,q125,q250,q500 repeats=4
+draft: build\agent8\w-followup\matrix-window9.json  sha256 CE0AD75792B47D59876C864B39797CD877404F911D12F92E6CC9C4351D747610  6146 bytes
+matrix for the GO: bench\agent8\run\matrix-window9.json  sha256 CE0AD75792B47D59876C864B39797CD877404F911D12F92E6CC9C4351D747610
+launcher: bench\agent5\launch\run-night.ps1 sha256 16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31 (2026-11-22 22:11:21); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/devoff4b-bin (arms off,q0,q125,q250,q500): MANIFEST.txt sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA (expected DE11A914079D7DF7); legodimensions.exe DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83; 7 files listed, 7 of 7 checked match; check lines PASS 102, FAIL 0
+arm: off (devoff4b; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+arm: q0 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=0 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+arm: q125 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=125 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+arm: q250 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=250 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+arm: q500 (devoff4b; frames perf; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=500 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: 21 / 21
+NOTE: bench\agent8\run\matrix-window9.json already holds this exact file
+NOTE: queue gap: the queue is idle (last line 22:38:49: 22:38:49 idle; waiting for: [rpb0,rpm4,s4b19,s4b04,s4bV0,s4b08,s4bLV,s4b02,s4b05,s4b06,s4b03,s4b09,s4b11,s4b14,s4b10,s4b12,s4b13,s4b15,s4b16,s4b25,s4b21]); -PlanOnly at 22:46:24 after 0 s of waiting
+
+--- launcher Get-BinHashes (only= arms)
+DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83  build/agent2/devoff4b-bin/legodimensions.exe
+DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA  build/agent2/devoff4b-bin/MANIFEST.txt
+
+--- run-matrix.ps1 -Matrix bench\agent8\run\matrix-window9.json -Only off,q0,q125,q250,q500 -Repeats 4 -ColdShared -NoPrompt -PlanOnly (launcher Get-Plan)
+=== timing matrix: Window 9 (Agent 8, run-2 task #7 follow-up): #24 GPU-wait back-off sweep on devoff4b (S4b + S4c). off (back-off OFF, nothing set) vs Q = 0 / 125 / 250 / 500 us (LEGO_GPU_WAIT_BACKOFF_US) with spin 30 us ===
+matrix   <workspace>\bench\agent8\run\matrix-window9.json
+note     Follow-up window proposed by Agent 8 (run-2 task #7) on 2026-11-22 for the 01:00-06:45 slot; Agent 1 picks. Staged and checked with build/agent8/w-followup/stage-window.ps1. GO: 'GO W9 matrix-window9.json <sha256> only=off,q0,q125,q250,q500 repeats=3': one unscored cold run (devoff4b), then 3 round-robin rounds rotated each round: 1 + 15 = 16 runs.
+note     W9 (S4-DRAFT L375; a9 S5.2.4 step 3): arms OFF, Q = 0 (Agent 6's (e)), 125, 250 and 500 us. Every Q arm sets LEGO_GPU_WAIT_SPIN_US=30, the default, explicitly (Agent 1, 21:15: no sized S tonight). Score: process and render-thread CPU, GPU Commands busy/blocked, fps, p99, the 1 % low and frames > 33 ms per minute. Pick the largest CPU drop with no loss in p99 or the 1 % low beyond the run-to-run spread; if every Q loses, go to stage 2 (#25).
+note     Gates before the GO (S4-DRAFT L375; a9 S5.2.4 steps 1-2; b2r S26): Agent 3's s4b17 (P1: LEGO_GPU_WAIT_STATS=1, back-off OFF, attract) shows positive controls > 0, and s4b18 (Q = 250 + STATS=1, menus) against the OFF menus run s4b01 has gate_logdiff NEW 0 / MORE 0 / flags 0, the same exit code, no new STUCK-LOCK and sleep_fail == 0 in every STATS line (read the fields by name: sleep_sum comes before sleep_fail).
+note     No STATS in a timed arm: gpu_wait_backoff.cpp:24-25 says profiling runs only, a STATS run never counts as a timing run (STATS adds counters, a log line every 5 s and QPC brackets around the sleeps). So sleep_fail is not visible in these runs; s4b18 is its check.
+note     Proof per run: every q* game.log has exactly one 'GPU wait back-off: ON (quantum <Q> us, spin 30 us); stats OFF; GetData hook built.' with its arm's Q, and run.json env_set holds LEGO_GPU_WAIT_BACKOFF_US=<Q> and LEGO_GPU_WAIT_SPIN_US=30. The off arm has no 'GPU wait back-off' line and no LEGO_GPU_WAIT_* key (unset = every hook calls the original at once). No arm may log 'is not a plain number'. Report STUCK-LOCK counts per arm by owner site (L1 83FAF188 / 83FAF200 / 83FBF868, L2 83FB09F0); an owner in the L1 poll is the known finding 10, a WARN (Agent 1, 21:29).
+note     Every arm uses devoff4b (MANIFEST DE11A914079D7DF7, legodimensions.exe DFBE1D43B28861A6...), the W6 bin: off is W6's s0, so off can be compared across W6 and W9 only under one host state.
+note     Window: 5 s settle + 55 s warm-up from the first frame, then 50 s measured, so every window starts >= 60 s after the first frame (min_window_after_ff_s 60, Agent 1's floor); the runner flags window_before_floor (excluded) below 59.5 s. The cold run: 55 s warm-up, 30 s window.
+note     One frame source for every arm: perf.csv (frames perf), uncapped (framerate_limit=0), the same driver (drivers/thread-cpu.ps1 -> threads.csv). Runner flags on every run: --audio_mute=true --pause_when_unfocused=false --native_settings_load=false --discord_rpc=false.
+note     sys_csv: drivers/sys-csv.ps1 logs the system state every 1 s (sys.csv, sys.json). Input during the window, the game losing the foreground, battery, battery saver, a power-plan change, a non-default input desktop or a screensaver exclude a run from summary.md (it stays in results.csv, under 'Flagged runs'). Light phase: a game.log with < 30 'FAILED: path=d:\INSTALL*.DAT' lines (normal boot: 34) is excluded (light_phase).
+note     Environment: after the 08:29 Windows Update. If the power overlay differs from W6's, compare W9 only within itself. Timing comes only from the user's unlocked desktop (Agent 5's overnight launcher); agent runs of this matrix (-Quick, hidden desktop) are functional only.
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order roundrobin; close timeout 60 s; cooldown 5 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+       off: bin build/agent2/devoff4b-bin; frames perf; x4; warm-up 55 s; window 50 s; group w9 (ref); cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         #24 back-off OFF: no LEGO_GPU_WAIT_* key, every hook calls the original at once (the S4b default; W6's s0)
+       q0: bin build/agent2/devoff4b-bin; frames perf; x4; warm-up 55 s; window 50 s; group w9; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=0 LEGO_GPU_WAIT_SPIN_US=30; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         Q = 0 (Agent 6's (e)): back-off ON with quantum 0 us, spin 30 us. Proof: 'GPU wait back-off: ON (quantum 0 us, spin 30 us); stats OFF'
+       q125: bin build/agent2/devoff4b-bin; frames perf; x4; warm-up 55 s; window 50 s; group w9; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=125 LEGO_GPU_WAIT_SPIN_US=30; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         Q = 125 us, spin 30 us. Proof: 'GPU wait back-off: ON (quantum 125 us, spin 30 us); stats OFF'
+       q250: bin build/agent2/devoff4b-bin; frames perf; x4; warm-up 55 s; window 50 s; group w9; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=250 LEGO_GPU_WAIT_SPIN_US=30; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         Q = 250 us, spin 30 us: s4b18's Q without STATS. Proof: 'GPU wait back-off: ON (quantum 250 us, spin 30 us); stats OFF'
+       q500: bin build/agent2/devoff4b-bin; frames perf; x4; warm-up 55 s; window 50 s; group w9; cvars framerate_limit=0; env LEGO_GPU_WAIT_BACKOFF_US=500 LEGO_GPU_WAIT_SPIN_US=30; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         Q = 500 us, spin 30 us. Proof: 'GPU wait back-off: ON (quantum 500 us, spin 30 us); stats OFF'
+cold     off (build/agent2/devoff4b-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+         -ColdShared: one cold run for all 1 bin(s); the other bins first launch as scored round-1 runs
+round 1  off q0 q125 q250 q500
+round 2  q0 q125 q250 q500 off
+round 3  q125 q250 q500 off q0
+round 4  q250 q500 off q0 q125
+order    off q0 q125 q250 q500 | q0 q125 q250 q500 off | q125 q250 q500 off q0 | q250 q500 off q0 q125
+estimate 21 runs (1 cold), about 48 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-3QRUYFF7HGIQBQQ4P2GTVT6UJ4 -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   13.6 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/devoff4b-bin : ok (MANIFEST.txt)
+screensaver none
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   21 runs, about 48 min: done around 23:34
+!!! These runs will be FUNCTIONAL ONLY (see above): their numbers are not timing results.
+PlanOnly: nothing started.

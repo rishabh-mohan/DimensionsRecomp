@@ -1,0 +1,48 @@
+﻿L1: # Perf sprint: findings and changes (as of 12:50, session 3 resumed after a Windows Update restart)
+L3: ## Next: timing window 4 (still ready after the restart)
+L9: 1. Set the screensaver to (None). The restart turned it back on (2 minutes).
+L10: 2. Keep the charger plugged in.
+L11: 3. Close other programs and keep the PC unlocked: ChatGPT (~1.8 GB), Copilot, Roblox, Wallpaper Engine and Task Manager are open now (Roblox, Wallpaper Engine and ChatGPT weren't running overnight). **Memory matters:** the runner skips any run that would start
+L12: 4. Leave the power mode as it is. The mode Windows applies is still "best power efficiency", the same as in every overnight run. Don't change it before or during the window.
+L13: 5. Leave NVIDIA's PresentMon helper running. It belongs to the NVIDIA app's FrameView service, runs in the background and uses about one CPU core. It ran during window 3 too, so the comparison stays fair.
+L14: 6. **If you start before 14:00, pause Windows Update first** (Settings → Windows Update → Pause updates). This PC's active hours are 14:00-08:00, and outside them Windows may restart on its own to finish an update. That's what happened at 08:29. Nothing is pen
+L40: ## Overnight progress (session 3)
+L104: | 06:23 | **The stuck game lock is not a deadlock** (Agent 6, finding 10). In all 6 reports the render thread held the graphics lock while it waited for the GPU, and the main thread waited for that lock until it was released. On the native path the wait was th
+L107: | 06:38 | **The night's last game runs are under way** (Agent 8). All are functional only and all end by ~07:30:<br>- two v0.2.0 runs of the attract scene (06:35-06:57), which check finding 10 against the original release;<br>- the quiet-machine re-check of th
+L109: | 06:48 | **v0.2.0 hits the stuck game lock too** (finding 10). Its first attract run (06:35-06:44) logged the same stuck-lock report as our builds, 219 s in: the same lock, the same owner and the same waiting thread. Then it recovered, finished the route and 
+L111: | 06:58 | **The nativeB menu-exit item looks explained** (Agent 9). B's code changes can't alter the menu's timer, and nativeB most likely finishes the same background game work sooner. Agents 10 and 3 confirm or rule this out by 08:15. Agent 9 also merged the
+L112: | 07:10 | **The night's game runs are over** (Agent 8; the last one ended at 07:00). Agent 7's three native checks ran clean: no errors, no stuck-lock reports and no crash dumps, and the timing columns were filled in. No runner or window-4 file changed. **Agen
+L113: | 07:18 | **Agent 6 confirmed from the crash dump that v0.2.0's stuck lock is the same one** (finding 10): the same lock, owner and waiting chain, so it predates our changes. One difference matters for S4. In v0.2.0's run the thread holding the lock was pollin
+L126: ### Questions for you (window 4 doesn't wait on them)
+L127: 1. May Agent 3 use generated virtual Toy Pad tags (Batman, Gandalf, Wyldstyle) in its hidden-desktop test runs? With them, the B check can also cover the pause menu and a level change. Saves stay in the run folder. **Answered 17:27: yes.** Agent 3 may use them
+L128: 2. Should the small `thirdparty/simde` edit (a Windows Clang fix) be committed as a patch file? Until you answer, it stays out.
+L129: 3. For later benchmark windows only: would you add a Windows Defender exclusion for the build folders, or turn off the NVIDIA app's PresentMon? Tonight Defender used 1-5 cores and PresentMon 1 core, which made the heavy-scene runs unusable for timing and made 
+L130: 4. Will you check the 4 native shaders on screen (finding 9), and when? Packing them changes the image by design, because draws that were skipped come back, so it needs your eyes on a side-by-side with the standard GPU path; the reference screenshot needs your
+L131: 5. Would an opt-in mode be acceptable in which objects can be missing for a few frames while their shaders compile, instead of the game freezing? If not, that item and its companion are dropped from S4.
+L133: ## Where things stand
+L143: | **Next** | B is built (02:40) and passed its static check and its game check (03:25). The S3 builds (devoff3, native3) are built (02:46) and pass their start-up checks, and the new pause default passes on devoff3. `native3d` (Agent 4's warning fix) is built 
+L148: ## Leads for the next round (S4, forming overnight)
+L158: | Two busy-waiting threads: the render thread and the timer thread | standard | Agents 9 and 11 | The game's render thread spins on a fence that only the GPU command thread writes: 0.88 of a core (13 ms/frame in tonight's profile). The timer thread spins anoth
+L169: | A game lock held for 5+ s (watchdog "STUCK-LOCK") | both | Agent 6 | Freezes of several seconds in heavy scenes. It hit 3 runs tonight (6 reports), on both GPU paths, all between 05:03 and 05:32, the busiest stretch of the night; all recovered and closed nor
+L173: ## Findings
+L175: ### 1. In-game timing
+L177: #### Window 3 (00:13-01:16, uncapped title screen, 16 scored runs)
+L200: #### Matrix 1 (window 2, 22:32-23:02, title screen, 60 fps cap, 10 scored runs)
+L213: ### 2. The 60 fps cap is just a setting
+L218: ### 3. The native GPU build crashes at startup (found 23:16, cause found 23:33)
+L232: ### 4. Bugs found and fixed
+L243: ### 5. Speedups measured in isolation
+L256: ### 6. The timer thread busy-waits (Agent 11, found 03:05, cause found 04:04)
+L263: ### 7. Agent runs on the hidden desktop can't be timed (the slow state)
+L270: ### 8. The attract sequence's first-view freezes are shader compiles (Agent 6, 04:30)
+L278: ### 9. The native GPU path misses two shaders (Agent 7, 04:40)
+L285: ### 10. The stuck game lock is a long wait, not a deadlock (Agent 6, 06:23; v0.2.0 confirmed 07:15)
+L291: - **For S4 (proposals, off by default):** the fix for the standard path's busy-waiting wait loop (see "Leads"), which now covers this too as one item, with a stuck-lock check on a loaded machine in its test plan; the same kind of back-off for the GPU-query pol
+L293: ### 11. Gaps in the emulator's write tracking (Agent 12 found, Agent 10 confirmed, 06:40)
+L302: ## What changed, by batch
+L304: ### Batch 1 (S1): in devoff1-bin and native-bin
+L320: ### Batch 2 (S2): in devoff2-bin and native2-bin
+L329: ### Batch 3 (S3): built at 02:46 as `devoff3-bin` and `native3-bin`
+L337: ### The codegen-option build (B): first after the relaunch
+L351: ## Safety rules applied throughout
+L356: ## Sources

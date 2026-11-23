@@ -1,0 +1,57 @@
+﻿# build/baseline-bin - Agent 2, task #1 step 4. NATIVE_GPU=OFF baseline, Release, game x86-64-v3, SDK x86-64-v2.
+# staged 2026-11-21 19:01:19; snapshot baseline/DimensionsRecomp (127e04b + SDK 2897c31); codegen 0.0.23.3.
+# No PDBs exist for this configuration: the exe links without /DEBUG (LINK_FLAGS = /subsystem:windows /MAP:legodimensions.map)
+# and the SDK install has none. Symbols: legodimensions.map. Runtime also needs legodimensions.toml in the working dir.
+# TracyClient.dll is staged on request only: no staged binary imports it (Release has no Tracy/REXGLUE_ENABLE_PROFILING code).
+# Not staged: the mod manager 'mods' folder (README-dev lists it for the installer package, not for running the game).
+# name	size	mtime	sha256	source
+legodimensions.exe	170414080	2026-11-21 18:40:35	FB922AC9E29D68F6F1E731F8CB889C3C3229857EADA91EF0D558AA7E5FCCC71E	build\baseline\legodimensions.exe
+legodimensions.map	39101836	2026-11-21 18:40:36	FDFE9965C6D918C110D3057E8E58E18C531D9DEF03EACBDF0568948922488AB9	build\baseline\legodimensions.map
+rexruntime.dll	10620928	2026-11-21 18:40:36	E01D461823AE36476B8A76A9845471CFC770E8956C7DE4E77E5A50774B7A5A6B	build\baseline\rexruntime.dll
+rexgpu-xenos.dll	3374592	2026-11-21 18:02:58	49825FC8326614D6BBD30459AAEDC82FABC62DF66FF287738890D66FE814E1FE	build\sdk\install\bin\rexgpu-xenos.dll
+TracyClient.dll	233472	2026-11-21 16:34:47	CF9CF365139752DF1CDF147E42D9D525A2795A086DB217C554C195EC32888E8E	build\sdk\install\bin\TracyClient.dll
+achievement_unlocked.wav	191018	2026-11-21 18:40:36	A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5	build\baseline\achievement_unlocked.wav
+FiraSans-Regular.ttf	456996	2026-11-16 08:22:04	C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23	baseline\DimensionsRecomp\rexlego\res\FiraSans-Regular.ttf
+# imports (llvm-readobj --coff-imports):
+#   legodimensions.exe imports: api-ms-win-crt-convert-l1-1-0.dll, api-ms-win-crt-environment-l1-1-0.dll, api-ms-win-crt-filesystem-l1-1-0.dll, api-ms-win-crt-heap-l1-1-0.dll, api-ms-win-crt-locale-l1-1-0.dll, api-ms-win-crt-math-l1-1-0.dll, api-ms-win-crt-runtime-l1-1-0.dll, api-ms-win-crt-stdio-l1-1-0.dll, api-ms-win-crt-string-l1-1-0.dll, api-ms-win-crt-time-l1-1-0.dll, KERNEL32.dll, MSVCP140.dll, ole32.dll, rexruntime.dll, SHELL32.dll, USER32.dll, VCRUNTIME140.dll, WINMM.dll
+#   rexruntime.dll imports: ADVAPI32.dll, api-ms-win-crt-convert-l1-1-0.dll, api-ms-win-crt-environment-l1-1-0.dll, api-ms-win-crt-filesystem-l1-1-0.dll, api-ms-win-crt-heap-l1-1-0.dll, api-ms-win-crt-locale-l1-1-0.dll, api-ms-win-crt-math-l1-1-0.dll, api-ms-win-crt-runtime-l1-1-0.dll, api-ms-win-crt-stdio-l1-1-0.dll, api-ms-win-crt-string-l1-1-0.dll, api-ms-win-crt-time-l1-1-0.dll, api-ms-win-crt-utility-l1-1-0.dll, bcrypt.dll, dxgi.dll, GDI32.dll, HID.DLL, IMM32.dll, KERNEL32.dll, MSVCP140.dll, MSVCP140_ATOMIC_WAIT.dll, ole32.dll, SETUPAPI.dll, SHELL32.dll, USER32.dll, VCRUNTIME140.dll, VCRUNTIME140_1.dll, VERSION.dll, WINMM.dll, WS2_32.dll
+#   rexgpu-xenos.dll imports: api-ms-win-crt-convert-l1-1-0.dll, api-ms-win-crt-environment-l1-1-0.dll, api-ms-win-crt-filesystem-l1-1-0.dll, api-ms-win-crt-heap-l1-1-0.dll, api-ms-win-crt-locale-l1-1-0.dll, api-ms-win-crt-math-l1-1-0.dll, api-ms-win-crt-runtime-l1-1-0.dll, api-ms-win-crt-stdio-l1-1-0.dll, api-ms-win-crt-string-l1-1-0.dll, api-ms-win-crt-time-l1-1-0.dll, KERNEL32.dll, MSVCP140.dll, ole32.dll, rexruntime.dll, VCRUNTIME140.dll
+#   TracyClient.dll imports: ADVAPI32.dll, api-ms-win-crt-convert-l1-1-0.dll, api-ms-win-crt-filesystem-l1-1-0.dll, api-ms-win-crt-heap-l1-1-0.dll, api-ms-win-crt-runtime-l1-1-0.dll, api-ms-win-crt-stdio-l1-1-0.dll, api-ms-win-crt-string-l1-1-0.dll, dbghelp.dll, KERNEL32.dll, MSVCP140.dll, USER32.dll, VCRUNTIME140.dll, WS2_32.dll
+# checks:
+#   PASS source exists: build\baseline\legodimensions.exe
+#   PASS source exists: build\baseline\legodimensions.map
+#   PASS source exists: build\baseline\rexruntime.dll
+#   PASS source exists: build\sdk\install\bin\rexgpu-xenos.dll
+#   PASS source exists: build\sdk\install\bin\TracyClient.dll
+#   PASS source exists: build\baseline\achievement_unlocked.wav
+#   PASS source exists: baseline\DimensionsRecomp\rexlego\res\FiraSans-Regular.ttf
+#   PASS exe 18:40:35 newer than newest obj native_lock_elide.cpp.obj 18:40:32
+#   PASS map written with the exe (18:40:36)
+#   PASS map lists native_lock_elide.cpp.obj (shimmed TU is linked)
+#   PASS build/baseline/rexruntime.dll == build/sdk/install/bin/rexruntime.dll
+#   PASS install/bin/rexgpu-xenos.dll == SDK out tree rexgpu-xenos.dll
+#   PASS install/bin/rexruntime.dll == SDK out tree rexruntime.dll
+#   PASS legodimensions.exe import table readable (18 DLLs)
+#   PASS legodimensions.exe imports rexruntime.dll, which is staged
+#   PASS legodimensions.exe does not import TracyClient.dll
+#   PASS rexruntime.dll import table readable (29 DLLs)
+#   PASS rexruntime.dll does not import TracyClient.dll
+#   PASS rexgpu-xenos.dll import table readable (15 DLLs)
+#   PASS rexgpu-xenos.dll imports rexruntime.dll, which is staged
+#   PASS rexgpu-xenos.dll does not import TracyClient.dll
+#   PASS TracyClient.dll import table readable (13 DLLs)
+#   PASS legodimensions.exe contains 'ui_font'
+#   PASS legodimensions.exe contains 'FiraSans-Regular.ttf'
+#   PASS legodimensions.exe contains 'depth_of_field'
+#   PASS legodimensions.exe contains 'rexruntime.dll'
+#   PASS rexgpu-xenos.dll contains 'Use bindless resources where available'
+#   PASS rexgpu-xenos.dll contains 'd3d12_readback_memexport'
+#   PASS rexruntime.dll contains 'rexcrt_heap_enable'
+#   PASS rexruntime.dll contains 'rexcrt_heap_size_mb'
+#   PASS staged copy identical: legodimensions.exe
+#   PASS staged copy identical: legodimensions.map
+#   PASS staged copy identical: rexruntime.dll
+#   PASS staged copy identical: rexgpu-xenos.dll
+#   PASS staged copy identical: TracyClient.dll
+#   PASS staged copy identical: achievement_unlocked.wav
+#   PASS staged copy identical: FiraSans-Regular.ttf

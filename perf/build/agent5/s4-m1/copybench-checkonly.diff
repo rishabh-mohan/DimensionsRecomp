@@ -1,0 +1,241 @@
+--- a/bench/agent5/m1_copybench.cpp
++++ b/bench/agent5/m1_copybench.cpp
+@@ -2,8 +2,9 @@
+ // upload copy (cvar shared_memory_upload_nontemporal_copy, default off; S4-DRAFT row 11;
+ // step 2 of the test plan in build/agent5/s4-m1/NOTE.md). No game involved.
+ //
+-// Status: staged source only. bench/agent5/m1_copybench_syntax.ps1 syntax-checks it; it has
+-// not been built or run (task #7 allows no builds or benchmarks).
++// Status: task #7 staged it; bench/agent5/m1_copybench_syntax.ps1 syntax-checks it. Task #18
++// added --check-only, the functional gate before M1 is ever ON; build/agent5/s4-m1/HASHES.txt
++// records each build and check run. The rate part has not been run (no timing allowed yet).
+ //
+ // 1. Correctness. CopyToUploadBufferNonTemporal is a verbatim copy of the M1 helper (the lines
+ //    between HELPER-BEGIN and HELPER-END; the syntax script compares them with
+@@ -12,7 +13,8 @@
+ //    misalignments. It must leave the guard bytes on both sides untouched. Two guard values
+ //    are used, so a skipped byte can't match by chance. The check runs on normal memory and
+ //    on the mapped upload buffer, which is read back with SSE4.1 streaming loads (it is
+-//    uncached).
++//    uncached). Each group of cases (memory, guard, then the src misalignment or the large
++//    size) prints its case count, failures and PASS/FAIL; a RESULT line ends part 1.
+ // 2. Rate. GB/s of four ways to copy 4 KB-aligned pages to 4 KB-aligned destinations, the
+ //    way UploadRanges does:
+ //      memcpy: the CRT memcpy that UploadRanges calls today, through a volatile pointer so it
+@@ -42,7 +44,9 @@
+ // d3d12.lib and dxgi.lib come in through #pragma comment. The DLL CRT is the one the game
+ // uses.
+ // Run: m1_copybench.exe [--adapter N] [--cpu N] [--samples N] [--mb N] [--csv FILE]
+-//                       [--skip-check] [--skip-rate]
++//                       [--skip-check] [--skip-rate] [--check-only]
++//   --skip-rate and --check-only leave the rate buffers out (no GB/s, no 256 MiB cold source);
++//   --check-only also says so in the header line and can't be combined with --skip-check.
+ // Exit: 0 = every correctness case passed and the upload buffer was available;
+ //       1 = a correctness failure; 2 = bad arguments or a setup failure.
+ 
+@@ -215,6 +219,7 @@
+   const char* csv_path = nullptr;
+   bool skip_check = false;
+   bool skip_rate = false;
++  bool check_only = false;  // --check-only: part 1 alone (also sets skip_rate)
+ };
+ 
+ FILE* g_csv = nullptr;
+@@ -282,6 +287,7 @@
+ struct CheckResult {
+   unsigned long long cases = 0;
+   unsigned long long failures = 0;
++  unsigned long long skipped = 0;  // large cases that don't fit the region (none expected)
+ };
+ 
+ // One case: guard bytes on both sides of dst, copy with the helper, read back, compare.
+@@ -329,6 +335,17 @@
+   }
+ }
+ 
++// Prints one group's line (PASS only if every case ran and matched) and adds it to total.
++void EndGroup(const char* mem, uint8_t guard, const char* what, const CheckResult& group,
++              CheckResult& total) {
++  const bool pass = group.cases != 0 && group.failures == 0 && group.skipped == 0;
++  Emit("# check %s guard 0x%02X %s: %llu cases, %llu failures, %llu skipped: %s\n", mem,
++       unsigned(guard), what, group.cases, group.failures, group.skipped, pass ? "PASS" : "FAIL");
++  total.cases += group.cases;
++  total.failures += group.failures;
++  total.skipped += group.skipped;
++}
++
+ CheckResult RunCheck(const char* mem, uint8_t* region, size_t region_bytes,
+                      const uint8_t* src_base, uint8_t* scratch, const size_t* src_mis_list,
+                      size_t src_mis_count) {
+@@ -337,28 +354,37 @@
+                                            2 * kMiB, 2 * kMiB + 33, 3844 * kKiB};
+   static constexpr size_t kLargeDstMis[] = {0, 1, 16, 63};
+   static constexpr size_t kLargeSrcMis[] = {0, 1};
+-  CheckResult result;
++  char what[96];
++  CheckResult total;
+   for (uint8_t guard : kGuards) {
+     for (size_t s = 0; s < src_mis_count; ++s) {
++      CheckResult group;
+       for (size_t dst_mis = 0; dst_mis < 64; ++dst_mis) {
+         for (size_t size = 0; size <= 300; ++size) {
+           CheckCase(mem, region, src_base, scratch, dst_mis, src_mis_list[s], size, guard,
+-                    result);
++                    group);
+         }
+       }
+-    }
+-    for (size_t src_mis : kLargeSrcMis) {
+-      for (size_t dst_mis : kLargeDstMis) {
+-        for (size_t size : kLargeSizes) {
++      std::snprintf(what, sizeof(what), "src_mis %zu: dst_mis 0-63 x size 0-300",
++                    src_mis_list[s]);
++      EndGroup(mem, guard, what, group, total);
++    }
++    for (size_t size : kLargeSizes) {
++      CheckResult group;
++      for (size_t src_mis : kLargeSrcMis) {
++        for (size_t dst_mis : kLargeDstMis) {
+           if (64 + dst_mis + size + 64 > region_bytes || src_mis + size > kCheckBytes) {
++            ++group.skipped;
+             continue;
+           }
+-          CheckCase(mem, region, src_base, scratch, dst_mis, src_mis, size, guard, result);
++          CheckCase(mem, region, src_base, scratch, dst_mis, src_mis, size, guard, group);
+         }
+       }
+-    }
+-  }
+-  return result;
++      std::snprintf(what, sizeof(what), "size %zu: dst_mis 0/1/16/63 x src_mis 0/1", size);
++      EndGroup(mem, guard, what, group, total);
++    }
++  }
++  return total;
+ }
+ 
+ size_t RoundUpToPage(size_t n) { return (n + kPage - 1) & ~(kPage - 1); }
+@@ -620,11 +646,15 @@
+       options.skip_check = true;
+     } else if (arg == "--skip-rate") {
+       options.skip_rate = true;
++    } else if (arg == "--check-only") {
++      options.check_only = true;
++      options.skip_rate = true;
+     } else {
+       return false;
+     }
+   }
+-  return options.samples >= 1 && options.mib_per_sample >= 1 && options.cpu < 64;
++  return options.samples >= 1 && options.mib_per_sample >= 1 && options.cpu < 64 &&
++         !(options.check_only && options.skip_check);
+ }
+ 
+ }  // namespace
+@@ -634,7 +664,7 @@
+   if (!ParseOptions(argc, argv, options)) {
+     std::fprintf(stderr,
+                  "usage: m1_copybench [--adapter N] [--cpu N] [--samples N] [--mb N] "
+-                 "[--csv FILE] [--skip-check] [--skip-rate]\n");
++                 "[--csv FILE] [--skip-check] [--skip-rate] [--check-only]\n");
+     return 2;
+   }
+   if (options.csv_path && fopen_s(&g_csv, options.csv_path, "w") != 0) {
+@@ -646,28 +676,38 @@
+   }
+   SYSTEMTIME now;
+   GetLocalTime(&now);
+-  Emit("# m1_copybench (S4 M1) %04u-%02u-%02u %02u:%02u:%02u; %zu samples of %zu MiB; cpu %d\n",
++  char mode[64];
++  if (options.check_only) {
++    std::snprintf(mode, sizeof(mode), "check only, no rate part");
++  } else {
++    std::snprintf(mode, sizeof(mode), "%zu samples of %zu MiB", options.samples,
++                  options.mib_per_sample);
++  }
++  Emit("# m1_copybench (S4 M1) %04u-%02u-%02u %02u:%02u:%02u; %s; cpu %d\n",
+        unsigned(now.wYear), unsigned(now.wMonth), unsigned(now.wDay), unsigned(now.wHour),
+-       unsigned(now.wMinute), unsigned(now.wSecond), options.samples, options.mib_per_sample,
+-       options.cpu);
++       unsigned(now.wMinute), unsigned(now.wSecond), mode, options.cpu);
+   PrintCpu();
+ 
++  // The rate buffers only exist when the rate part runs (cold_src alone is 256 MiB).
++  const bool rates = !options.skip_rate;
+   uint8_t* check_src = AllocPages(kCheckBytes);
+   uint8_t* check_wb = AllocPages(kCheckBytes);
+   uint8_t* scratch = AllocPages(kCheckBytes);
+-  uint8_t* warm_src = AllocPages(kWarmSrcBytes);
+-  uint8_t* cold_src = AllocPages(kColdSrcBytes);
+-  uint8_t* wb_dst = AllocPages(kUploadBytes);
+-  if (!check_src || !check_wb || !scratch || !warm_src || !cold_src || !wb_dst) {
++  uint8_t* warm_src = rates ? AllocPages(kWarmSrcBytes) : nullptr;
++  uint8_t* cold_src = rates ? AllocPages(kColdSrcBytes) : nullptr;
++  uint8_t* wb_dst = rates ? AllocPages(kUploadBytes) : nullptr;
++  if (!check_src || !check_wb || !scratch || (rates && (!warm_src || !cold_src || !wb_dst))) {
+     std::fprintf(stderr, "VirtualAlloc failed\n");
+     return 2;
+   }
+   FillPattern(check_src, kCheckBytes, 1);
+-  FillPattern(warm_src, kWarmSrcBytes, 2);
+-  FillPattern(cold_src, kColdSrcBytes, 3);
+   std::memset(check_wb, 0, kCheckBytes);
+   std::memset(scratch, 0, kCheckBytes);
+-  std::memset(wb_dst, 0, kUploadBytes);
++  if (rates) {
++    FillPattern(warm_src, kWarmSrcBytes, 2);
++    FillPattern(cold_src, kColdSrcBytes, 3);
++    std::memset(wb_dst, 0, kUploadBytes);
++  }
+ 
+   UploadTarget upload;
+   const bool have_upload = CreateUploadTarget(options.adapter, upload);
+@@ -676,23 +716,30 @@
+     _mm_sfence();
+   }
+ 
+-  unsigned long long failures = 0;
++  unsigned long long failures = 0;  // failed or skipped check cases
+   if (!options.skip_check) {
+     static constexpr size_t kWbSrcMis[] = {0, 1, 15, 33};
+     static constexpr size_t kUploadSrcMis[] = {0, 1};
+     double start = NowSeconds();
+     const CheckResult wb =
+         RunCheck("wb", check_wb, kCheckBytes, check_src, scratch, kWbSrcMis, 4);
+-    Emit("# check wb: %llu cases, %llu failures (%.1f s)\n", wb.cases, wb.failures,
+-         NowSeconds() - start);
+-    failures += wb.failures;
++    Emit("# check wb: %llu cases, %llu failures, %llu skipped (%.1f s)\n", wb.cases,
++         wb.failures, wb.skipped, NowSeconds() - start);
++    failures += wb.failures + wb.skipped;
+     if (have_upload) {
+       start = NowSeconds();
+       const CheckResult up = RunCheck("upload", upload.mapping, kUploadBytes, check_src,
+                                       scratch, kUploadSrcMis, 2);
+-      Emit("# check upload: %llu cases, %llu failures (%.1f s)\n", up.cases, up.failures,
+-           NowSeconds() - start);
+-      failures += up.failures;
++      Emit("# check upload: %llu cases, %llu failures, %llu skipped (%.1f s)\n", up.cases,
++           up.failures, up.skipped, NowSeconds() - start);
++      failures += up.failures + up.skipped;
++    }
++    if (failures) {
++      Emit("# RESULT: FAIL (%llu failed or skipped cases)\n", failures);
++    } else if (!have_upload) {
++      Emit("# RESULT: FAIL (no upload buffer, so only normal memory was checked)\n");
++    } else {
++      Emit("# RESULT: PASS (normal memory and the upload buffer)\n");
+     }
+   }
+   if (!options.skip_rate) {
+@@ -703,7 +750,9 @@
+     upload.buffer->Unmap(0, nullptr);
+   }
+   for (uint8_t* p : {check_src, check_wb, scratch, warm_src, cold_src, wb_dst}) {
+-    VirtualFree(p, 0, MEM_RELEASE);
++    if (p) {
++      VirtualFree(p, 0, MEM_RELEASE);
++    }
+   }
+   if (g_csv) {
+     std::fclose(g_csv);

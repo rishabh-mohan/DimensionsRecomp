@@ -1,0 +1,67 @@
+lines 874
+H1: # Check of Agent 7's W9 / W5b numbers against results.csv
+H2: 
+H3: Agent 8, task #20. Script: `build/agent8/readout/w-followup/a7check/check_a7_w9w5b.py` (run from the workspace root; it reads only results.csv and, for ng_t, `audit/runs.csv`; it shares no code with either pool_readout.py).
+H4: 
+H5: ## Inputs
+H6: 
+H7: - W9 pass 1: `build/agent8/matrix/20261123-0108/results.csv` sha256 823BA531C6EC402D...
+H8: - W9 pass 2: `build/agent8/matrix/20261123-0401/results.csv` sha256 45C2D73C071E23EC...
+H9: - W5b pass 1: `build/agent8/matrix/20261123-0155/results.csv` sha256 5A08241AA965ADE4...
+H10: - W5b pass 2: `build/agent8/matrix/20261123-0451/results.csv` sha256 8C6CC5147A7470E2...
+H11: - Checked files (Agent 7, read-only): `build/agent7/readout/W9.md` (07:01), `build/agent7/readout/pool-W9.md` (06:26), `build/agent7/readout/pool-W5b.md` (07:02), `build/agent7/readout/load-check.md` (06:40).
+H12: - Kept runs: scored, status OK, valid_timing, not excluded; cold runs out. W9 40 (8 per arm), W5b 36 (12 per arm).
+H13: - ng_t = `win_ngB_mean` (non-game busy cores, window mean) from `build/agent8/readout/w-followup/audit/runs.csv`.
+H14: - Agree = every recomputed number rounds to the posted number at the posted decimals (ties count as agree). "agree (rounded inputs)" = it matches only when the inputs are first rounded the way the pool run tables print them (fps 1 dp, cores 2 dp, p99 2 dp, MHz 0 dp, ng_t 2 dp); load-check.md and parts of W9.md work from those tables (the W9.md pass-2 cores % also uses the printed q500 mean).
+H15: - Gap = the largest |recomputed - posted| in a claim, in last-digit units of the posted number (0.5 = a rounding tie), taking the closer of the plain recompute and, where given, the rounded-input one. Sign flip = recomputed and posted on opposite sides of 0, with the posted number at least one unit from 0.
+H16: - Not checkable from results.csv, so not checked: T-std, B-block T-std, T-light / T-heavy, 1 % low, thread busy %, sys.json util and P/E MHz, round-effect F tests, guard (b), the thread-cycle table. Raw, CPU, count and run-level numbers are all checked.
+H17: - Categories: main = deltas, CIs and per-arm values; count = run counts; run = the per-run tables (section 8); aux = method details (band %, CV %, 4 vs 4 band, df, within-arm Spearman, t critical values) plus the per-run light share and its one-way F (light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp, so a run can differ by 0.001 and F moves; the per-arm light means are main claims).
+H18: 
+H19: ## Result
+H20: 
+H21: **728 claims, 3072 numbers: 699 agree (65 only with rounded inputs, 0 with the stated alternative), 29 disagree, 0 parse problems.**
+H22: 
+H23: Disagreements by gap (last-digit units): 0.5-0.6: 14; 0.6-1: 4; 1-2: 8; > 2: 3. Sign flips: 0. Hand-coded W9.md claims whose numbers are not on the cited line of the current file: 10.
+H24: 
+H25: | file | category | claims | numbers | agree | agree (rounded inputs) | agree (alternative) | disagree | parse |
+H26: |---|---|---|---|---|---|---|---|---|
+H27: | W9.md | main | 160 | 566 | 144 | 15 | 0 | 1 | 0 |
+H28: | W9.md | count | 15 | 31 | 15 | 0 | 0 | 0 | 0 |
+H29: | W9.md | aux | 1 | 3 | 0 | 0 | 0 | 1 | 0 |
+H30: | pool-W9.md | main | 166 | 550 | 156 | 0 | 0 | 10 | 0 |
+H31: | pool-W9.md | count | 18 | 76 | 18 | 0 | 0 | 0 | 0 |
+H32: | pool-W9.md | run | 42 | 294 | 42 | 0 | 0 | 0 | 0 |
+H33: | pool-W9.md | aux | 46 | 57 | 39 | 0 | 0 | 7 | 0 |
+H34: | pool-W5b.md | main | 100 | 324 | 93 | 0 | 0 | 7 | 0 |
+H35: | pool-W5b.md | count | 18 | 46 | 18 | 0 | 0 | 0 | 0 |
+H36: | pool-W5b.md | run | 38 | 266 | 38 | 0 | 0 | 0 | 0 |
+H37: | pool-W5b.md | aux | 42 | 53 | 39 | 0 | 0 | 3 | 0 |
+H38: | load-check.md | main | 77 | 799 | 28 | 49 | 0 | 0 | 0 |
+H39: | load-check.md | aux | 5 | 7 | 4 | 1 | 0 | 0 | 0 |
+H40: 
+H41: Claims that do not agree (main, count, run):
+H42: 
+H43: | source | claim | posted | recomputed | verdict | gap (units) | sign flips | note |
+H44: |---|---|---|---|---|---|---|---|
+H45: | pool-W9.md L57 | W9 cores q250: mean; change [CI]; GM % one-way [CI]; GM % B-block [CI] | 1.86; -0.65 [-0.76, -0.53]; -25.9 [-30.1, -21.5] *; -25.9 [-30.0, -21.7] * | 1.861 -0.645 -0.757 -0.533 -25.92 -30.12 -21.48 -25.92 -29.94 -21.68 | DISAGREE | 0.60 | 0 |  |
+M66: | source | claim | posted | recomputed | verdict | gap (units) | sign flips | note |
+M71: | pool-W9.md L201 | W9 light share one-way F (df1, df2) | 9.38 (4, 35) | 9.679 4 35 | DISAGREE | 29.86 | 0 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+M72: | pool-W9.md L220 | 0112-q0-r1: light share | 0.975 | 0.9760 | DISAGREE | 1.00 | 0 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+M73: | pool-W9.md L246 | 0415-q125-r2: light share | 0.993 | 0.9920 | DISAGREE | 1.00 | 0 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+M74: | pool-W9.md L255 | 0433-q250-r4: light share | 0.989 | 0.9880 | DISAGREE | 1.00 | 0 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+M75: | pool-W5b.md L226 | W5b light share one-way F (df1, df2) | 1.18 (2, 33) | 1.214 2 33 | DISAGREE | 3.43 | 0 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+M76: | pool-W5b.md L248 | 0219-d11p-r4: light share | 0.973 | 0.9720 | DISAGREE | 1.00 | 0 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+M77: | pool-W5b.md L263 | 0508-d11-r3: light share | 0.975 | 0.9760 | DISAGREE | 1.00 | 0 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+M78: | W9.md L78 | light share one-way F (df1, df2) | 9.38 (4, 35) | 9.679 4 35 | DISAGREE | 29.86 | 0 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+M80: ## W9 per-arm headline numbers (recomputed from results.csv)
+M117: ## W5b per-arm headline numbers (recomputed from results.csv)
+M142: ## All claims
+M144: | # | source | claim | posted | recomputed | verdict | gap (units) | note |
+M333: | 188 | pool-W9.md L201 | W9 light share one-way F (df1, df2) | 9.38 (4, 35) | 9.679 4 35 | DISAGREE | 29.86 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+M339: | 194 | pool-W9.md L220 | 0112-q0-r1: light share | 0.975 | 0.9760 | DISAGREE | 1.00 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+M391: | 246 | pool-W9.md L246 | 0415-q125-r2: light share | 0.993 | 0.9920 | DISAGREE | 1.00 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+M409: | 264 | pool-W9.md L255 | 0433-q250-r4: light share | 0.989 | 0.9880 | DISAGREE | 1.00 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+M539: | 394 | pool-W5b.md L226 | W5b light share one-way F (df1, df2) | 1.18 (2, 33) | 1.214 2 33 | DISAGREE | 3.43 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+M565: | 420 | pool-W5b.md L248 | 0219-d11p-r4: light share | 0.973 | 0.9720 | DISAGREE | 1.00 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+M595: | 450 | pool-W5b.md L263 | 0508-d11-r3: light share | 0.975 | 0.9760 | DISAGREE | 1.00 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |
+M752: | 607 | W9.md L78 | light share one-way F (df1, df2) | 9.38 (4, 35) | 9.679 4 35 | DISAGREE | 29.86 | light share: Agent 7 counts light frames from the frame data; results.csv stores frame_summary's share rounded to 3 dp |

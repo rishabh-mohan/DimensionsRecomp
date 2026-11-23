@@ -1,0 +1,163 @@
+{
+ "run": "s4b10",
+ "row": "s4b10",
+ "kind": "off",
+ "scenario": "I420",
+ "runjson": {
+  "exit_code": 0,
+  "exit_code_hex": "0x00000000",
+  "dumps": [],
+  "crash_events": [],
+  "wer_seen": false,
+  "close_method": "wm_close",
+  "close_seconds": 1.0,
+  "elapsed_s": 40.0,
+  "seconds_requested": 420,
+  "cvars": {
+   "d3d12_submit_split_kb": "40"
+  },
+  "exited_early": null,
+  "env_extra": {},
+  "steps": null
+ },
+ "summary": {
+  "verdict": null,
+  "first_frame_s": null,
+  "levels": null,
+  "unknown_cvars": null,
+  "errors": []
+ },
+ "log_files": [
+  "game.log"
+ ],
+ "families": {
+  "c1_any": 0,
+  "c1_init_on": 0,
+  "c1_init_blocked": 0,
+  "c1_init_nohold": 0,
+  "c1_first": 0,
+  "c1_kept": 0,
+  "c1_blocked": 0,
+  "recovered_stale": 0,
+  "unhandled_phys": 0,
+  "protect_failed": 0,
+  "split_init": 1,
+  "split": 2,
+  "deferred_counters": 0,
+  "gpu_wait": 0,
+  "gpu_wait_stats": 0,
+  "gpu_wait_backoff": 0,
+  "memexport": 0,
+  "slow_frame": 0,
+  "s4_upload_hash": 0,
+  "precise_wait": 0,
+  "miss_cache": 0,
+  "stuck_lock": 0,
+  "minidump": 0,
+  "fatal": 0,
+  "clean_exit": 1,
+  "debug_layer": 0,
+  "d3d12_msg": 0,
+  "k": 0,
+  "c1_other": 0
+ },
+ "levels": {
+  "info": 4
+ },
+ "lines": {
+  "split_init": {
+   "first": [
+    "[2026-11-22 20:10:05.000] [info] [gpu] [t4242] d3d12_submit_split_kb: splitting submissions at 40 KB of deferred commands"
+   ],
+   "last": []
+  },
+  "split": {
+   "first": [
+    "[2026-11-22 20:10:10.001] [info] [gpu] [t4242] d3d12_submit_split: frame=600 submission=1900 splits=1200 failed=0 held_query=3 held_scratch=0 held_pipelines=12",
+    "[2026-11-22 20:10:15.002] [info] [gpu] [t4242] d3d12_submit_split: frame=1200 submission=3800 splits=2400 failed=0 held_query=5 held_scratch=0 held_pipelines=20"
+   ],
+   "last": []
+  }
+ },
+ "split": {
+  "lines": 2,
+  "first_ts": "20:10:10.001",
+  "last_ts": "20:10:15.002",
+  "first": {
+   "frame": 600,
+   "submission": 1900,
+   "splits": 1200,
+   "failed": 0,
+   "held_query": 3,
+   "held_scratch": 0,
+   "held_pipelines": 12
+  },
+  "last": {
+   "frame": 1200,
+   "submission": 3800,
+   "splits": 2400,
+   "failed": 0,
+   "held_query": 5,
+   "held_scratch": 0,
+   "held_pipelines": 20
+  },
+  "max": {
+   "frame": 1200,
+   "submission": 3800,
+   "splits": 2400,
+   "failed": 0,
+   "held_query": 5,
+   "held_scratch": 0,
+   "held_pipelines": 20
+  },
+  "sum": {
+   "frame": 1800,
+   "submission": 5700,
+   "splits": 3600,
+   "failed": 0,
+   "held_query": 8,
+   "held_scratch": 0,
+   "held_pipelines": 32
+  },
+  "monotonic": {
+   "frame": true,
+   "submission": true,
+   "splits": true,
+   "failed": true,
+   "held_query": true,
+   "held_scratch": true,
+   "held_pipelines": true
+  },
+  "per_frame": {
+   "submission": 3.1667,
+   "splits": 2.0,
+   "failed": 0.0,
+   "held_query": 0.0033,
+   "held_scratch": 0.0,
+   "held_pipelines": 0.0133
+  },
+  "frames": 600
+ },
+ "frame_rows": null,
+ "slow_state": null,
+ "proofs": [
+  {
+   "ok": true,
+   "text": "init \"d3d12_submit_split_kb: splitting submissions at N KB\" x1: 2026-11-22 20:10:05.000] [info] [gpu] [t4242] d3d12_submit_split_kb: splitting submissions at 40 KB of deferred commands"
+  },
+  {
+   "ok": true,
+   "text": "failed=0 in every d3d12_submit_split line (max 0 over 2 lines)"
+  },
+  {
+   "ok": true,
+   "text": "splits > 0 (max 2400)"
+  },
+  {
+   "ok": null,
+   "text": "per frame: submission 3.1667, splits 2.0 (frames 600; fields monotonic {'frame': True, 'submission': True, 'splits': True, 'failed': True, 'held_query': True, 'held_scratch': True, 'held_pipelines': True})"
+  }
+ ],
+ "base_misses": [],
+ "hint": "PASS?"
+}

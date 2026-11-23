@@ -1,0 +1,214 @@
+mc_smoke_check v2  OFF=build\agent3\runs\20261122-142131-s4a-r6off-trace-native4  ON=build\agent3\runs\20261122-141746-s4a-r6on-mc-trace-native4
+
+C1 shaders.cpp warning lines (exact text, count OFF / ON):
+        4 /    4  [warning] placement pixel shader 0xAC448F28 backing 0xED23D540 prefix=0xC77B3ABB6F87ACD9 words=00000000 00000000 00000000 00000000 missing from AOT in
+        4 /    4  [warning] placement vertex shader 0xAC449538 backing 0xED23D3E0 prefix=0xDCD4AD8441398283 words=F2556004 600A1200 12000000 00006010 missing from AOT i
+        1 /    1  [warning] shader not present in AOT cache, hash=0x93B9F93B535E7CCA
+        1 /    1  [warning] shader not present in AOT cache, hash=0xA58EBA123EFB541C
+        8 /    8  [warning] unrecognized pixel shader resource 0xAC448F28
+        8 /    8  [warning] unrecognized vertex shader resource 0xAC449538
+  total 26 / 26; hash=0 lines 0 / 0; game.log lines 1902 / 1895
+  C1 PASS
+  info: adopted shaders 166 / 166; OFF-only 164, ON-only 164 (route timing can explain a few; many OFF-only = look)
+
+C2 draws/frame (frames.csv draw_calls, frames with draws > 0):
+  OFF   14521 frames  p10/p50/p90 1/2/59  max 5979  (frames.csv)
+  ON    21935 frames  p10/p50/p90 1/2/59  max 5979  (frames.csv)
+  common values (share OFF / ON):
+         1   15.1% /  13.7%
+         2   44.3% /  41.5%
+         8   27.1% /  28.5%
+        40    0.4% /   1.0%
+        41    0.5% /   0.8%
+        57    1.2% /   1.6%
+        58    0.8% /   1.1%
+        59    3.3% /   3.2%
+  C2 SAME
+
+OFF events.tsv <workspace>\build\agent3\s4a\trace\r6off-t\events.tsv: last frame 19588; unrecognized_shader 309076, draw_missing_vertex_shader 161798, texture_color_authority 64260, frame 19587, texture_fetch_changed 1284, draw_missing_pixel_shader 322
+
+ON events.tsv <workspace>\build\agent3\s4a\trace\r6on-t\events.tsv: last frame 26083; unrecognized_shader 534420, draw_missing_vertex_shader 284361, texture_color_authority 93982, frame 26082, texture_fetch_changed 2761, draw_missing_pixel_shader 840
+
+C3 unrecognized_shader (rows, frames with rows, rows per frame-with-rows), OFF | ON (tag: blank = same key, ~ = heap pair, !! = unmatched):
+  ~  VS 0xA7E1F740       38     19  2.00 |       0      0  0.00
+  ~  VS 0xA7E3F0F0       38     19  2.00 |       0      0  0.00
+  ~  VS 0xA7E41410       63     18  3.50 |       0      0  0.00
+  ~  VS 0xA7E44490        0      0  0.00 |      46     23  2.00
+  ~  VS 0xA7E45840        0      0  0.00 |      46     23  2.00
+  ~  VS 0xA7E47800        0      0  0.00 |      80     23  3.48
+     VS 0xAC449538    25110  12555  2.00 |   36698  18349  2.00
+     VS 0xAC44AFAC     7878   3939  2.00 |   12492   6246  2.00
+     VS 0xAC44C8DC     4067   1966  2.07 |    7472   3586  2.08
+     VS 0xAC44DA60      330    165  2.00 |     722    361  2.00
+     VS 0xAC4503B0     1100    550  2.00 |    2418   1209  2.00
+     VS 0xAC451838     1100    550  2.00 |    2418   1209  2.00
+     VS 0xAC46F658     1915    197  9.72 |    2830    285  9.93
+     VS 0xAC4746DC     1541    197  7.82 |    2273    285  7.98
+     VS 0xAC4750F4     1735    570  3.04 |    2909    945  3.08
+     VS 0xAC475B28        6      1  6.00 |       6      1  6.00
+     VS 0xAC4778A0      978    237  4.13 |    1326    329  4.03
+     VS 0xAC4782A8      787    197  3.99 |    1153    285  4.05
+     VS 0xAC4796D4     2598    237 10.96 |    3569    329 10.85
+     VS 0xAC47E974     2276    318  7.16 |    3926    608  6.46
+     VS 0xAC48245C     4448    562  7.91 |    8515   1223  6.96
+     VS 0xAC4831BC      911    570  1.60 |    1517    945  1.61
+     VS 0xAC48B1BC       16      8  2.00 |      18      9  2.00
+     VS 0xAC48D864       16      8  2.00 |      18      9  2.00
+     VS 0xAC490C90     1732    866  2.00 |    3356   1678  2.00
+     VS 0xAC49B1A0     3674   1837  2.00 |    6412   3206  2.00
+     VS 0xAC4A3E4C     3674   1837  2.00 |    6412   3206  2.00
+     VS 0xAC4A654C     3674   1837  2.00 |    6412   3206  2.00
+     VS 0xAC4AF3A4      256    128  2.00 |     758    379  2.00
+     VS 0xAC4B27B4     1854    927  2.00 |    3556   1778  2.00
+     VS 0xAC4B3730     3930   1965  2.00 |    7170   3585  2.00
+     VS 0xAC4BB324     3674   1837  2.00 |    6412   3206  2.00
+     VS 0xAC53CBD8     3674   1837  2.00 |    6412   3206  2.00
+     VS 0xAC54065C     1008    318  3.17 |    1978    608  3.25
+     VS 0xAC547504      524    262  2.00 |     976    488  2.00
+     VS 0xAC548DC4      494    240  2.06 |    1166    577  2.02
+     VS 0xAC549A94     2186   1093  2.00 |    3416   1708  2.00
+     VS 0xAC551078       48     24  2.00 |      32     16  2.00
+     VS 0xAC5562E0     1488    744  2.00 |    2996   1498  2.00
+     VS 0xAC56F640      118     59  2.00 |     132     66  2.00
+     VS 0xAC583BDC      690    345  2.00 |    1140    570  2.00
+     VS 0xAC59D470     5418   1965  2.76 |   10166   3585  2.84
+     VS 0xAC5A19AC     3930   1965  2.00 |    7170   3585  2.00
+     VS 0xAC5A2FC8     3930   1965  2.00 |    7170   3585  2.00
+     VS 0xAC5A4AE0      388     91  4.26 |     356     80  4.45
+     VS 0xAC5A5270      194     91  2.13 |     178     80  2.23
+     VS 0xAC5A5A20     3930   1965  2.00 |    7170   3585  2.00
+     VS 0xAC5A82D0     3674   1837  2.00 |    6412   3206  2.00
+     VS 0xAC5A9288    19650   1965 10.00 |   35850   3585 10.00
+     VS 0xAC5A9A90     3930   1965  2.00 |    7170   3585  2.00
+     VS 0xAC5AD824     5418   1965  2.76 |   10166   3585  2.84
+     VS 0xAC5AFEBC      256    128  2.00 |     758    379  2.00
+     VS 0xAC5B522C    19832   1965 10.09 |   36016   3585 10.05
+  ~  PS 0xA7E3E180       38     19  2.00 |       0      0  0.00
+  ~  PS 0xA7E3EE30       38     19  2.00 |       0      0  0.00
+  ~  PS 0xA7E3F570        0      0  0.00 |      80     23  3.48
+  ~  PS 0xA7E40190       76     19  4.00 |       0      0  0.00
+  ~  PS 0xA7E41180       63     18  3.50 |       0      0  0.00
+  ~  PS 0xA7E43EB0        0      0  0.00 |      46     23  2.00
+  ~  PS 0xA7E45590        0      0  0.00 |      46     23  2.00
+  ~  PS 0xA7E46810        0      0  0.00 |      92     23  4.00
+  ~  PS 0xAB13F250      256    128  2.00 |       0      0  0.00
+  ~  PS 0xABB69980        0      0  0.00 |     758    379  2.00
+     PS 0xAC448F28    25110  12555  2.00 |   36698  18349  2.00
+     PS 0xAC44A9D0     7878   3939  2.00 |   12492   6246  2.00
+     PS 0xAC44C300     4067   1966  2.07 |    7472   3586  2.08
+     PS 0xAC44D930      330    165  2.00 |     722    361  2.00
+     PS 0xAC4502A0     1100    550  2.00 |    2418   1209  2.00
+     PS 0xAC451728     1100    550  2.00 |    2418   1209  2.00
+     PS 0xAC46F1EC     1915    197  9.72 |    2830    285  9.93
+     PS 0xAC4745D4     1541    197  7.82 |    2273    285  7.98
+     PS 0xAC474FEC     1634    570  2.87 |    2616    945  2.77
+     PS 0xAC475A20        6      1  6.00 |       6      1  6.00
+     PS 0xAC47779C      978    237  4.13 |    1326    329  4.03
+     PS 0xAC4781A4      787    197  3.99 |    1153    285  4.05
+     PS 0xAC4795D0     2598    237 10.96 |    3569    329 10.85
+     PS 0xAC47E528     2174    318  6.84 |    3569    608  5.87
+     PS 0xAC48AE7C       16      8  2.00 |      18      9  2.00
+     PS 0xAC48D528       16      8  2.00 |      18      9  2.00
+     PS 0xAC4909DC     1732    866  2.00 |    3356   1678  2.00
+     PS 0xAC49AF4C     3674   1837  2.00 |    6412   3206  2.00
+     PS 0xAC4A3D48     3674   1837  2.00 |    6412   3206  2.00
+     PS 0xAC4A63FC     3674   1837  2.00 |    6412   3206  2.00
+     PS 0xAC4AF1C8      256    128  2.00 |     758    379  2.00
+     PS 0xAC4B25C8     1854    927  2.00 |    3556   1778  2.00
+     PS 0xAC4B361C     3930   1965  2.00 |    7170   3585  2.00
+     PS 0xAC4BB1C0     3674   1837  2.00 |    6412   3206  2.00
+     PS 0xAC53CA04     3674   1837  2.00 |    6412   3206  2.00
+     PS 0xAC5401DC     1008    318  3.17 |    1978    608  3.25
+     PS 0xAC547070      524    262  2.00 |     976    488  2.00
+     PS 0xAC548930      494    240  2.06 |    1166    577  2.02
+     PS 0xAC549548     2186   1093  2.00 |    3416   1708  2.00
+     PS 0xAC550AAC       48     24  2.00 |      32     16  2.00
+     PS 0xAC555BB4     1488    744  2.00 |    2996   1498  2.00
+     PS 0xAC56F074      118     59  2.00 |     132     66  2.00
+     PS 0xAC5A16D0     3930   1965  2.00 |    7170   3585  2.00
+     PS 0xAC5A2ECC     3930   1965  2.00 |    7170   3585  2.00
+     PS 0xAC5A41E0       16      8  2.00 |      18      9  2.00
+     PS 0xAC5A492C      388     91  4.26 |     356     80  4.45
+     PS 0xAC5A5100      194     91  2.13 |     178     80  2.23
+     PS 0xAC5A5890     3930   1965  2.00 |    7170   3585  2.00
+     PS 0xAC5A8164     3674   1837  2.00 |    6412   3206  2.00
+     PS 0xAC5A913C    19650   1965 10.00 |   35850   3585 10.00
+     PS 0xAC5A9948     3930   1965  2.00 |    7170   3585  2.00
+     PS 0xAC5AD720     5418   1965  2.76 |   10166   3585  2.84
+     PS 0xAC5AFDE0      256    128  2.00 |     758    379  2.00
+     PS 0xAC5B4F78    19832   1965 10.09 |   36016   3585 10.05
+  exact keys (same stage and address in both arms): 91
+  time-base offset OFF - ON: +4.36 s (median first-row difference over 91 exact keys)
+  heap pairs (same stage, rows/frame within 10 %, first and last row within 10 s after the offset; never paired: 0xAC448F28, 0xAC449538): 8
+    VS 0xA7E1F740 -> VS 0xA7E44490  rows/frame 2.00 / 2.00  OFF 178.8-190.8 s, ON 174.3-186.0 s (aligned 178.6-190.4 s)  candidates 2  partners none
+    VS 0xA7E3F0F0 -> VS 0xA7E45840  rows/frame 2.00 / 2.00  OFF 178.8-190.8 s, ON 174.3-186.0 s (aligned 178.6-190.4 s)  candidates 2  partners none
+    VS 0xA7E41410 -> VS 0xA7E47800  rows/frame 3.50 / 3.48  OFF 178.8-190.8 s, ON 174.3-186.0 s (aligned 178.6-190.4 s)  candidates 1  partners none
+    PS 0xA7E3E180 -> PS 0xA7E43EB0  rows/frame 2.00 / 2.00  OFF 178.8-190.8 s, ON 174.3-186.0 s (aligned 178.6-190.4 s)  candidates 2  partners none
+    PS 0xA7E3EE30 -> PS 0xA7E45590  rows/frame 2.00 / 2.00  OFF 178.8-190.8 s, ON 174.3-186.0 s (aligned 178.6-190.4 s)  candidates 2  partners none
+    PS 0xA7E40190 -> PS 0xA7E46810  rows/frame 4.00 / 4.00  OFF 178.8-190.8 s, ON 174.3-186.0 s (aligned 178.6-190.4 s)  candidates 1  partners none
+    PS 0xA7E41180 -> PS 0xA7E3F570  rows/frame 3.50 / 3.48  OFF 178.8-190.8 s, ON 174.3-186.0 s (aligned 178.6-190.4 s)  candidates 1  partners none
+    PS 0xAB13F250 -> PS 0xABB69980  rows/frame 2.00 / 2.00  OFF 117.7-124.8 s, ON 114.5-120.7 s (aligned 118.8-125.1 s)  candidates 1  partners VS 0xAC4AF3A4, VS 0xAC5AFEBC, PS 0xAC4AF1C8, PS 0xAC5AFDE0
+  unmatched OFF-only keys: 0
+  unmatched ON-only keys: 0
+  C3 PASS (91 exact, 8 heap pairs, 0 unmatched)
+
+C4 shader_miss_cache_insert:
+  OFF rows 0 -> PASS
+  VS 0xAC449538  rows  3  physical 0xED23D3E0 span 408 prefix 0xDCD4AD8441398283  first 1.7 s (frame 345); re-inserts 2, median gap 0.1 s  as expected
+  VS 0xAC44AFAC  rows  1  physical 0xED23CFA0 span 384 prefix 0x98D43959C65B882A  first 28.7 s (frame 5881)  
+  VS 0xAC44C8DC  rows  1  physical 0xED23CCE0 span 16 prefix 0xB1180A3EF38A3274  first 114.7 s (frame 22497)  
+  VS 0xAC4750F4  rows  1  physical 0xED226F20 span 408 prefix 0x3B9316BD51DD909B  first 149.5 s (frame 24427)  
+  VS 0xAC4831BC  rows  1  physical 0xED223760 span 408 prefix 0xDCD4AD8441398283  first 149.5 s (frame 24427)  
+  VS 0xAC490C90  rows  1  physical 0xED21C2C0 span 1900 prefix 0xC77B3ABB6F87ACD9  first 148.5 s (frame 24405)  
+  VS 0xAC49B1A0  rows  1  physical 0xED218820 span 1900 prefix 0xC77B3ABB6F87ACD9  first 121.7 s (frame 22877)  
+  VS 0xAC4A3E4C  rows  1  physical 0xED215780 span 1900 prefix 0xC77B3ABB6F87ACD9  first 121.6 s (frame 22877)  
+  VS 0xAC4A654C  rows  1  physical 0xED214B80 span 1900 prefix 0xC77B3ABB6F87ACD9  first 121.6 s (frame 22877)  
+  VS 0xAC4AF3A4  rows  1  physical 0xED2110A0 span 1900 prefix 0xC77B3ABB6F87ACD9  first 114.7 s (frame 22497)  
+  VS 0xAC4B27B4  rows  1  physical 0xED210140 span 1900 prefix 0xC77B3ABB6F87ACD9  first 145.6 s (frame 24305)  
+  VS 0xAC4B3730  rows  1  physical 0xED20EE80 span 1900 prefix 0xC77B3ABB6F87ACD9  first 114.7 s (frame 22497)  
+  VS 0xAC4BB324  rows  1  physical 0xED1EEF60 span 1900 prefix 0xC77B3ABB6F87ACD9  first 121.5 s (frame 22877)  
+  VS 0xAC53CBD8  rows  1  physical 0xED1C9D00 span 1900 prefix 0xC77B3ABB6F87ACD9  first 121.5 s (frame 22877)  
+  VS 0xAC549A94  rows  1  physical 0xED1C5B00 span 1900 prefix 0xC77B3ABB6F87ACD9  first 121.5 s (frame 22877)  
+  VS 0xAC5562E0  rows  1  physical 0xED1C0260 span 1900 prefix 0xC77B3ABB6F87ACD9  first 149.5 s (frame 24427)  
+  VS 0xAC59D470  rows  1  physical 0xED1A4680 span 1900 prefix 0xC77B3ABB6F87ACD9  first 114.5 s (frame 22497)  
+  VS 0xAC5A19AC  rows  1  physical 0xED1A3A00 span 1900 prefix 0xC77B3ABB6F87ACD9  first 114.5 s (frame 22497)  
+  VS 0xAC5A2FC8  rows  1  physical 0xED1A3660 span 16 prefix 0xBBCAA38FE657B293  first 114.5 s (frame 22497)  
+  VS 0xAC5A5A20  rows  1  physical 0xED1A2B80 span 1900 prefix 0xC77B3ABB6F87ACD9  first 114.6 s (frame 22497)  
+  VS 0xAC5A82D0  rows  1  physical 0xED1A1D40 span 1900 prefix 0xC77B3ABB6F87ACD9  first 121.6 s (frame 22877)  
+  VS 0xAC5A9288  rows  1  physical 0xED1A18A0 span 1900 prefix 0xC77B3ABB6F87ACD9  first 114.6 s (frame 22497)  
+  VS 0xAC5A9A90  rows  1  physical 0xED1A1660 span 1900 prefix 0xC77B3ABB6F87ACD9  first 114.6 s (frame 22497)  
+  VS 0xAC5AD824  rows  1  physical 0xED1A0760 span 1900 prefix 0xC77B3ABB6F87ACD9  first 114.5 s (frame 22497)  
+  VS 0xAC5AFEBC  rows  1  physical 0xED1A0020 span 1900 prefix 0xC77B3ABB6F87ACD9  first 114.6 s (frame 22497)  
+  VS 0xAC5B522C  rows  1  physical 0xED19F000 span 1900 prefix 0xC77B3ABB6F87ACD9  first 114.6 s (frame 22497)  
+  PS 0xABB69980  rows  9  physical 0xED2A3640 span 2024 prefix 0xC77B3ABB6F87ACD9  first 114.5 s (frame 22497); re-inserts 8, median gap 0.2 s  
+  PS 0xAC448F28  rows  3  physical 0xED23D540 span 2024 prefix 0xC77B3ABB6F87ACD9  first 1.7 s (frame 345); re-inserts 2, median gap 0.1 s  as expected
+  PS 0xAC44A9D0  rows  1  physical 0xED23D0C0 span 2024 prefix 0xC77B3ABB6F87ACD9  first 28.7 s (frame 5881)  
+  PS 0xAC44C300  rows  1  physical 0xED23CD60 span 2024 prefix 0xC77B3ABB6F87ACD9  first 114.7 s (frame 22497)  
+  PS 0xAC474FEC  rows  1  physical 0xED2270C0 span 2024 prefix 0xC77B3ABB6F87ACD9  first 149.5 s (frame 24427)  
+  PS 0xAC4909DC  rows  1  physical 0xED21C480 span 192 prefix 0x48745C8774460815  first 148.5 s (frame 24405)  
+  PS 0xAC49AF4C  rows  1  physical 0xED218920 span 2024 prefix 0xC77B3ABB6F87ACD9  first 121.7 s (frame 22877)  
+  PS 0xAC4A3D48  rows  1  physical 0xED215860 span 204 prefix 0x9F66F0CAD8A1847B  first 121.6 s (frame 22877)  
+  PS 0xAC4A63FC  rows  1  physical 0xED214C40 span 2024 prefix 0xC77B3ABB6F87ACD9  first 121.6 s (frame 22877)  
+  PS 0xAC4AF1C8  rows  1  physical 0xED211180 span 2024 prefix 0xC77B3ABB6F87ACD9  first 114.7 s (frame 22497)  
+  PS 0xAC4B25C8  rows  1  physical 0xED210220 span 2024 prefix 0xC77B3ABB6F87ACD9  first 145.6 s (frame 24305)  
+  PS 0xAC4B361C  rows  1  physical 0xED20F580 span 16 prefix 0xD12103DE3F98BB93  first 114.7 s (frame 22497)  
+  PS 0xAC4BB1C0  rows  1  physical 0xED20CBA0 span 2024 prefix 0xC77B3ABB6F87ACD9  first 121.5 s (frame 22877)  
+  PS 0xAC53CA04  rows  1  physical 0xED1C9DA0 span 2024 prefix 0xC77B3ABB6F87ACD9  first 121.5 s (frame 22877)  
+  PS 0xAC549548  rows  1  physical 0xED1C5BE0 span 2024 prefix 0xC77B3ABB6F87ACD9  first 121.5 s (frame 22877)  
+  PS 0xAC555BB4  rows  1  physical 0xED1C0340 span 2024 prefix 0xC77B3ABB6F87ACD9  first 149.5 s (frame 24427)  
+  PS 0xAC5A16D0  rows  1  physical 0xED1A3AC0 span 2024 prefix 0xC77B3ABB6F87ACD9  first 114.5 s (frame 22497)  
+  PS 0xAC5A2ECC  rows  1  physical 0xED1A36C0 span 16 prefix 0x3113C44EDDE06CE6  first 114.5 s (frame 22497)  
+  PS 0xAC5A41E0  rows  1  physical 0xED1A3420 span 16 prefix 0x3113C44EDDE06CE6  first 121.6 s (frame 22877)  
+  PS 0xAC5A5890  rows  1  physical 0xED1A2CE0 span 2024 prefix 0xC77B3ABB6F87ACD9  first 114.6 s (frame 22497)  
+  PS 0xAC5A8164  rows  1  physical 0xED1A1EC0 span 2024 prefix 0xC77B3ABB6F87ACD9  first 121.6 s (frame 22877)  
+  PS 0xAC5A913C  rows  1  physical 0xED1A1A20 span 16 prefix 0x76D1390C55DDDAA5  first 114.6 s (frame 22497)  
+  PS 0xAC5A9948  rows  1  physical 0xED1A17C0 span 16 prefix 0x590439B0DD92818A  first 114.6 s (frame 22497)  
+  PS 0xAC5AD720  rows  1  physical 0xED1A0820 span 2024 prefix 0xC77B3ABB6F87ACD9  first 114.5 s (frame 22497)  
+  PS 0xAC5AFDE0  rows  1  physical 0xED1A00E0 span 192 prefix 0x48745C8774460815  first 114.6 s (frame 22497)  
+  PS 0xAC5B4F78  rows  1  physical 0xED19F0C0 span 192 prefix 0x48745C8774460815  first 114.6 s (frame 22497)  
+  ON rows 64 (probe cap 64); VS and PS armed: yes
+
+RESULT: PASS
+Also run (not done here):
+  python build\agent10\bgate\logdiff.py --base build\agent3\runs\20261122-142131-s4a-r6off-trace-native4 --cand build\agent3\runs\20261122-141746-s4a-r6on-mc-trace-native4   (NEW 0 / MORE 0)
+  python build\agent10\nb\warntypes.py --run OFF=build\agent3\runs\20261122-142131-s4a-r6off-trace-native4 --run ON=build\agent3\runs\20261122-141746-s4a-r6on-mc-trace-native4   (equal counts)

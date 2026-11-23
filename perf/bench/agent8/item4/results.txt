@@ -1,0 +1,25 @@
+﻿=== item4_bench  2026-11-21 18:53:43  runs=7 quick=False
+load before: total CPU 100% of 12 logical CPUs; busiest (per-CPU %): test_intrinsics=171%, PresentMon_x64=102%, powershell#12=95%, powershell#8=83%, powershell#18=76%, clang++#3=53%, clang++#4=53%, svchost#17=45%
+priority: above-normal
+calibration: TSC 2.611 GHz; 50 ms spin: wall 50.00 ms, thread CPU 47.79 ms
+scene_distance EQUIVALENCE PASS: 200000 calls (57455 with records), final map size 0/0
+name_trace EQUIVALENCE PASS: 50000 calls, 5565/5565 log lines
+
+case (cpu ns/call)                    median       min       max wall median  runs
+scene instance hook, old               38.36     37.07     39.34       39.34     7
+scene instance hook, new               32.39     31.95     33.63       32.77     7
+path hash hook (filter off), old        7.62      7.37      8.10        7.65     7
+path hash hook (filter off), new        6.05      5.80      6.11        6.12     7
+guest stub only (floor)                 4.23      4.20      4.33        4.25     7
+(sink 3380891112057480704)
+scene instance hook, old               36.22     35.94     36.99       36.96     7
+scene instance hook, new               32.40     31.80     33.16       32.52     7
+path hash hook (filter off), old        8.11      7.72      8.59        8.23     7
+path hash hook (filter off), new        6.06      6.01      6.73        6.17     7
+guest stub only (floor)                 4.27      4.20      4.28        4.30     7
+(sink 3380891112057480704)
+
+RESULT PASS
+load after: total CPU 100% of 12 logical CPUs; busiest (per-CPU %): MsMpEng=198%, test_intrinsics=162%, PresentMon_x64=95%, powershell#12=79%, powershell#8=79%, clang++#5=55%, clang=51%, clang++#4=51%
+exit code: 0
+

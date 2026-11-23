@@ -1,0 +1,23 @@
+﻿=== timing matrix: selftest native + seed chain (fake exe) ===
+matrix   <workspace>\build\agent8\run-selftest\matrix-test\matrix-st-native.json   [-Quick: short settle/menu/warm-up/window, FUNCTIONAL ONLY]
+settings warm-up from firstframe (boot timeout 30 s, settle 1 s); order fixed; close timeout 15 s; cooldown 1 s
+floor    every window >= 0 s after the first-frame signal (OFF); sys.csv off
+arms:
+       N1: bin <workspace>\build\agent8\run-selftest\fake-bin; frames native; x1; warm-up 2 s; window 3 s; group n (ref)
+       N2: bin <workspace>\build\agent8\run-selftest\fake-bin; frames native; x1; warm-up 2 s; window 3 s; group n; seed from arm N1
+       N3: bin <workspace>\build\agent8\run-selftest\fake-bin; frames native; x1; warm-up 2 s; window 3 s; group n; env LEGO_NATIVE_PSO_CACHE=0; seed from arm N2 (recipes only)
+round 1  N1 N2 N3
+order    N1 N2 N3
+estimate 3 runs (0 cold), about 2 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-YOFUE7NUMYT4IYOVVGVDAXT6Q2 -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   8.93 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        <workspace>\build\agent8\run-selftest\fake-bin : ok (MANIFEST.txt)
+screensaver WPXSCR~1.SCR after 120 s: the keep-awake request should hold it off; if it starts during timing runs, set it to (None)
+estimate   3 runs, about 2 min: done around 03:30
+keep-awake ON (SetThreadExecutionState continuous+system+display until the matrix ends)

@@ -1,0 +1,396 @@
+{
+ "dir": "<workspace>\\build\\agent8\\matrix\\20261122-0349",
+ "title": "Session 3 functional checks (agent slot, hidden desktop, NOT timing): d0t = devoff2 + REX_TIMER_WAIT_BLOCKING=1, d11t = window 3's d11 + REX_TIMER_WAIT_BLOCKING=1 (Agent 11), d0f = devoff2",
+ "command": "python bench\\agent7\\w4b_readout\\w4b_readout.py build\\agent8\\matrix\\20261122-0349 --all -o build\\agent8\\readout\\dry\\w4b-0349.md --json build\\agent8\\readout\\dry\\w4b-0349.json",
+ "ref": "d0f",
+ "order": [
+  "d0t",
+  "d11t",
+  "d0f"
+ ],
+ "n_rows": 3,
+ "n_scored": 3,
+ "n_kept": 3,
+ "keep_rule": "kept = scored, frame stats, no real problems, valid timing or not (--all), not excluded",
+ "functional": 3,
+ "runs": [
+  {
+   "seq": "1",
+   "round": "1",
+   "arm": "d0t",
+   "rep": "1",
+   "name": "0349-d0t-r1",
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-0349\\runs\\0349-d0t-r1",
+   "scored": true,
+   "valid": false,
+   "excluded": false,
+   "flags_excluding": [],
+   "keep": true,
+   "why": [
+    "not timing (kept: --all)"
+   ],
+   "benign": [],
+   "frames_source": "perf",
+   "stats": {
+    "frames": 3901,
+    "window_s": 50.007373,
+    "fps": 78.00849686705199,
+    "p50_ms": 7.622,
+    "p99_ms": 73.717,
+    "low1_fps": 10.453325899857138,
+    "low1_frames": 39,
+    "over33": 403,
+    "over33_min": 483.5286988580664
+   },
+   "check": [],
+   "draws_10s": [
+    226.0,
+    226.0,
+    226.0,
+    226.0,
+    226.0
+   ],
+   "scene_d": 0.0,
+   "scene_loo": false,
+   "scene_flag": false,
+   "phase": "normal (DAT fails 34, <4.5 ms 0.32)",
+   "slow": {
+    "onset": 68.80099987983704,
+    "in_window": true,
+    "win_share": 0.84
+   },
+   "slow_txt": "69 s / 84% !",
+   "slow_win": true,
+   "timerq": {
+    "blocking": "True",
+    "onset_s": "69",
+    "slow_pct": "47",
+    "span_s": "129",
+    "fg": "0"
+   },
+   "results_fps_mean": 78.008,
+   "status": "OK",
+   "median_ms_csv": 7.622,
+   "draws_p50": 226,
+   "draws_mean": 226.0
+  },
+  {
+   "seq": "2",
+   "round": "1",
+   "arm": "d11t",
+   "rep": "1",
+   "name": "0352-d11t-r1",
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-0349\\runs\\0352-d11t-r1",
+   "scored": true,
+   "valid": false,
+   "excluded": false,
+   "flags_excluding": [],
+   "keep": true,
+   "why": [
+    "not timing (kept: --all)"
+   ],
+   "benign": [],
+   "frames_source": "perf",
+   "stats": {
+    "frames": 3098,
+    "window_s": 50.000485,
+    "fps": 61.95939899382976,
+    "p50_ms": 7.167,
+    "p99_ms": 71.31,
+    "low1_fps": 11.987887438532107,
+    "low1_frames": 30,
+    "over33": 573,
+    "over33_min": 687.5933303446957
+   },
+   "check": [],
+   "draws_10s": [
+    226.0,
+    226.0,
+    226.0,
+    226.0,
+    226.0
+   ],
+   "scene_d": 0.0,
+   "scene_loo": false,
+   "scene_flag": false,
+   "phase": "normal (DAT fails 34, <4.5 ms 0.18)",
+   "slow": {
+    "onset": 41.526000022888184,
+    "in_window": true,
+    "win_share": 0.44
+   },
+   "slow_txt": "42 s / 44% !",
+   "slow_win": true,
+   "timerq": {
+    "blocking": "True",
+    "onset_s": "42",
+    "slow_pct": "34",
+    "span_s": "118",
+    "fg": "0"
+   },
+   "results_fps_mean": 61.959,
+   "status": "OK",
+   "median_ms_csv": 7.167,
+   "draws_p50": 226,
+   "draws_mean": 226.0
+  },
+  {
+   "seq": "3",
+   "round": "1",
+   "arm": "d0f",
+   "rep": "1",
+   "name": "0354-d0f-r1",
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-0349\\runs\\0354-d0f-r1",
+   "scored": true,
+   "valid": false,
+   "excluded": false,
+   "flags_excluding": [],
+   "keep": true,
+   "why": [
+    "not timing (kept: --all)"
+   ],
+   "benign": [],
+   "frames_source": "perf",
+   "stats": {
+    "frames": 2609,
+    "window_s": 50.020571,
+    "fps": 52.158540933089306,
+    "p50_ms": 9.405,
+    "p99_ms": 80.929,
+    "low1_fps": 9.989626157451877,
+    "low1_frames": 26,
+    "over33": 588,
+    "over33_min": 705.3098214332659
+   },
+   "check": [],
+   "draws_10s": [
+    226.0,
+    226.0,
+    226.0,
+    226.0,
+    226.0
+   ],
+   "scene_d": null,
+   "scene_loo": false,
+   "scene_flag": false,
+   "phase": "normal (DAT fails 34, <4.5 ms 0.12)",
+   "slow": {
+    "onset": 60.5789999961853,
+    "in_window": true,
+    "win_share": 1.0
+   },
+   "slow_txt": "61 s / 100% !",
+   "slow_win": true,
+   "timerq": {
+    "blocking": "False",
+    "onset_s": "61",
+    "slow_pct": "48",
+    "span_s": "121",
+    "fg": "0"
+   },
+   "results_fps_mean": 52.159,
+   "status": "OK",
+   "median_ms_csv": 9.405,
+   "draws_p50": 226,
+   "draws_mean": 226.0
+  }
+ ],
+ "arms": {
+  "d0t": {
+   "n": 1,
+   "n_lt3": true,
+   "runs": [
+    "0349-d0t-r1"
+   ],
+   "slow": 1,
+   "scene_flags": 0,
+   "fps": {
+    "med": 78.00849686705199,
+    "lo": 78.00849686705199,
+    "hi": 78.00849686705199,
+    "spread_pct": 0.0
+   },
+   "p50_ms": {
+    "med": 7.622,
+    "lo": 7.622,
+    "hi": 7.622
+   },
+   "p99_ms": {
+    "med": 73.717,
+    "lo": 73.717,
+    "hi": 73.717
+   },
+   "low1_fps": {
+    "med": 10.453325899857138,
+    "lo": 10.453325899857138,
+    "hi": 10.453325899857138
+   },
+   "over33_min": {
+    "med": 483.5286988580664,
+    "lo": 483.5286988580664,
+    "hi": 483.5286988580664
+   }
+  },
+  "d11t": {
+   "n": 1,
+   "n_lt3": true,
+   "runs": [
+    "0352-d11t-r1"
+   ],
+   "slow": 1,
+   "scene_flags": 0,
+   "fps": {
+    "med": 61.95939899382976,
+    "lo": 61.95939899382976,
+    "hi": 61.95939899382976,
+    "spread_pct": 0.0
+   },
+   "p50_ms": {
+    "med": 7.167,
+    "lo": 7.167,
+    "hi": 7.167
+   },
+   "p99_ms": {
+    "med": 71.31,
+    "lo": 71.31,
+    "hi": 71.31
+   },
+   "low1_fps": {
+    "med": 11.987887438532107,
+    "lo": 11.987887438532107,
+    "hi": 11.987887438532107
+   },
+   "over33_min": {
+    "med": 687.5933303446957,
+    "lo": 687.5933303446957,
+    "hi": 687.5933303446957
+   }
+  },
+  "d0f": {
+   "n": 1,
+   "n_lt3": true,
+   "runs": [
+    "0354-d0f-r1"
+   ],
+   "slow": 1,
+   "scene_flags": 0,
+   "fps": {
+    "med": 52.158540933089306,
+    "lo": 52.158540933089306,
+    "hi": 52.158540933089306,
+    "spread_pct": 0.0
+   },
+   "p50_ms": {
+    "med": 9.405,
+    "lo": 9.405,
+    "hi": 9.405
+   },
+   "p99_ms": {
+    "med": 80.929,
+    "lo": 80.929,
+    "hi": 80.929
+   },
+   "low1_fps": {
+    "med": 9.989626157451877,
+    "lo": 9.989626157451877,
+    "hi": 9.989626157451877
+   },
+   "over33_min": {
+    "med": 705.3098214332659,
+    "lo": 705.3098214332659,
+    "hi": 705.3098214332659
+   }
+  }
+ },
+ "deltas": {
+  "d0t": {
+   "fps": {
+    "delta": 25.849955933962683,
+    "pct": 49.56035094448646,
+    "verdict": "better"
+   },
+   "p50_ms": {
+    "delta": -1.7829999999999995,
+    "pct": -18.958001063264216,
+    "verdict": "better"
+   },
+   "p99_ms": {
+    "delta": -7.212000000000003,
+    "pct": -8.911515031694451,
+    "verdict": "better"
+   },
+   "low1_fps": {
+    "delta": 0.4636997424052609,
+    "pct": 4.641812767531433,
+    "verdict": "better"
+   },
+   "over33_min": {
+    "delta": -221.78112257519956,
+    "pct": -31.444496565284783,
+    "verdict": "better"
+   },
+   "paired_fps_pct": {
+    "med": 49.56035094448646,
+    "n": 1,
+    "up": 1
+   }
+  },
+  "d11t": {
+   "fps": {
+    "delta": 9.800858060740453,
+    "pct": 18.79051423871944,
+    "verdict": "better"
+   },
+   "p50_ms": {
+    "delta": -2.2379999999999995,
+    "pct": -23.795853269537478,
+    "verdict": "better"
+   },
+   "p99_ms": {
+    "delta": -9.619,
+    "pct": -11.885726995267456,
+    "verdict": "better"
+   },
+   "low1_fps": {
+    "delta": 1.9982612810802305,
+    "pct": 20.00336398564429,
+    "verdict": "better"
+   },
+   "over33_min": {
+    "delta": -17.71649108857025,
+    "pct": -2.5118735838058264,
+    "verdict": "better"
+   },
+   "paired_fps_pct": {
+    "med": 18.79051423871944,
+    "n": 1,
+    "up": 1
+   }
+  }
+ },
+ "arms_clean": {},
+ "deltas_clean": {},
+ "scene": {
+  "pool_from": "kept",
+  "ref_runs": [
+   "0354-d0f-r1"
+  ],
+  "loo": [],
+  "threshold": 0.15,
+  "floor": 0.15,
+  "factor": 2.0,
+  "ref_p50": 226,
+  "ref_mean": 226.0
+ },
+ "timerq_note": "ran `powershell -NoProfile -ExecutionPolicy Bypass -File bench\\agent11\\timerq_slowstate.ps1 -Root <workspace>\\build\\agent8\\matrix -Since 20261122-0349 -EMhz 800 -MinRows 3`",
+ "timerq_rows": 3,
+ "slow_rule": {
+  "emhz": 800.0,
+  "rows": 3
+ },
+ "run_matrix_fps": {
+  "d0t": 78.008,
+  "d11t": 61.959,
+  "d0f": 52.159
+ }
+}

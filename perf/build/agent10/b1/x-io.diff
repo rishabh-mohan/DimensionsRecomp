@@ -1,0 +1,561 @@
+﻿diff --git a/include/rex/system/xfile.h b/include/rex/system/xfile.h
+index 6063f3c..027a4d9 100644
+--- a/include/rex/system/xfile.h
++++ b/include/rex/system/xfile.h
+@@ -13,6 +13,7 @@
+ #include <string>
+ #include <filesystem>
+ #include <mutex>
++#include <shared_mutex>
+ 
+ #include <rex/filesystem/device.h>
+ #include <rex/filesystem/entry.h>
+@@ -129,11 +130,28 @@ class XFile : public XObject {
+ 
+   X_STATUS ReadInternal(uint32_t buffer_guest_address, uint32_t buffer_length, uint64_t byte_offset,
+                         uint32_t* out_bytes_read, uint32_t apc_context, bool notify_completion);
++  // The read itself: access checks, host read, fixups and invalidation
++  // callbacks. Of this object it only uses file_ and name(), so positional
++  // reads may run it without file_lock_ (holding unlocked_read_lock_ shared).
++  X_STATUS ReadData(uint32_t buffer_guest_address, uint32_t buffer_length, uint64_t byte_offset,
++                    size_t* out_bytes_read);
++  // Position update, out value and completion notification. Needs file_lock_.
++  X_STATUS CompleteRead(X_STATUS result, uint32_t buffer_length, uint64_t byte_offset,
++                        size_t bytes_read, uint32_t* out_bytes_read, uint32_t apc_context,
++                        bool notify_completion);
++  // ReadScatter with an explicit offset: runs of contiguous pages may be read
++  // at once (coalesce), and the reads may skip file_lock_ (unlocked).
++  X_STATUS ReadScatterPositional(uint32_t segments_guest_address, uint32_t length,
++                                 uint64_t byte_offset, uint32_t* out_bytes_read,
++                                 uint32_t apc_context, bool coalesce, bool unlocked);
+ 
+   rex::filesystem::File* file_ = nullptr;
+   std::unique_ptr<rex::thread::Event> async_event_ = nullptr;
+ 
+   mutable std::mutex file_lock_;
++  // Held shared by reads running without file_lock_ (the fixups read name())
++  // and exclusively by Rename.
++  std::shared_mutex unlocked_read_lock_;
+   std::mutex completion_port_lock_;
+   std::vector<std::pair<uint32_t, object_ref<XIOCompletion>>> completion_ports_;
+ 
+@@ -145,6 +163,9 @@ class XFile : public XObject {
+   size_t find_index_ = 0;
+ 
+   bool is_synchronous_ = false;
++  // Set with file_. Positional reads may skip file_lock_ (see
++  // AllowsUnlockedReads in xfile.cpp).
++  bool unlocked_reads_ok_ = false;
+ };
+ 
+ }  // namespace rex::system
+diff --git a/include/rex/system/xmemory.h b/include/rex/system/xmemory.h
+index c5375f6..f5abfa2 100644
+--- a/include/rex/system/xmemory.h
++++ b/include/rex/system/xmemory.h
+@@ -323,6 +323,10 @@ class PhysicalHeap : public BaseHeap {
+   bool TriggerCallbacks(std::unique_lock<std::recursive_mutex> global_lock_locked_once,
+                         uint32_t virtual_address, uint32_t length, bool is_write,
+                         bool unwatch_exact_range, bool unprotect = true);
++  // Lockless pre-check for TriggerCallbacks after a host write that bypassed
++  // protection: false means no page in the range was write-watched, so the
++  // write needs no callbacks. Call it after writing the data.
++  bool MayHaveWriteWatches(uint32_t virtual_address, uint32_t length) const;
+ 
+   uint32_t GetPhysicalAddress(uint32_t address) const;
+ 
+diff --git a/src/filesystem/virtual_file_system.cpp b/src/filesystem/virtual_file_system.cpp
+index a1b4dad..3d273f5 100644
+--- a/src/filesystem/virtual_file_system.cpp
++++ b/src/filesystem/virtual_file_system.cpp
+@@ -20,6 +20,10 @@ REXCVAR_DEFINE_BOOL(allow_game_relative_writes, false, "Filesystem",
+                     "relative to game://. Used for "
+                     "generating test data to compare with original hardware.");
+ 
++REXCVAR_DEFINE_BOOL(vfs_defer_open_exists_check, false, "Filesystem",
++                    "On a read-only open of an existing cached host file, skip the host stat and "
++                    "check only if the open fails (the result is the same)");
++
+ namespace rex::filesystem {
+ 
+ VirtualFileSystem::VirtualFileSystem() {}
+@@ -229,6 +233,8 @@ X_STATUS VirtualFileSystem::OpenFile(Entry* root_entry, const std::string_view p
+     entry = !root_entry ? ResolvePath(path) : root_entry->GetChild(path);
+   }
+ 
++  // Set when the host check below is left until Open fails.
++  const HostPathEntry* deferred_host_parent = nullptr;
+   if (entry) {
+     if (entry->attributes() & kFileAttributeDirectory && is_non_directory) {
+       return X_STATUS_FILE_IS_A_DIRECTORY;
+@@ -238,10 +244,18 @@ X_STATUS VirtualFileSystem::OpenFile(Entry* root_entry, const std::string_view p
+     if (parent_entry) {
+       const auto* host_path_entry = dynamic_cast<const HostPathEntry*>(parent_entry);
+       if (host_path_entry) {
+-        const auto file_path = host_path_entry->host_path() / rex::to_path(entry->name());
+-        if (!std::filesystem::exists(file_path)) {
+-          entry->Delete();
+-          entry = nullptr;
++        if (creation_disposition == FileDisposition::kOpen &&
++            !(desired_access & (FileAccess::kFileWriteData | FileAccess::kFileAppendData)) &&
++            REXCVAR_GET(vfs_defer_open_exists_check)) {
++          // Nothing before Open depends on it for a read-only open, and Open
++          // of a file that's gone fails, so check only then.
++          deferred_host_parent = host_path_entry;
++        } else {
++          const auto file_path = host_path_entry->host_path() / rex::to_path(entry->name());
++          if (!std::filesystem::exists(file_path)) {
++            entry->Delete();
++            entry = nullptr;
++          }
+         }
+       }
+     }
+@@ -328,6 +342,12 @@ X_STATUS VirtualFileSystem::OpenFile(Entry* root_entry, const std::string_view p
+   // Open.
+   auto result = entry->Open(desired_access, out_file);
+   if (XFAILED(result)) {
++    if (deferred_host_parent &&
++        !std::filesystem::exists(deferred_host_parent->host_path() / rex::to_path(entry->name()))) {
++      // As if the eager check above had found it gone.
++      entry->Delete();
++      result = X_STATUS_NO_SUCH_FILE;
++    }
+     *out_action = FileAction::kDoesNotExist;
+   }
+   return result;
+diff --git a/src/system/xfile.cpp b/src/system/xfile.cpp
+index fa381f1..d1fe8d9 100644
+--- a/src/system/xfile.cpp
++++ b/src/system/xfile.cpp
+@@ -9,6 +9,9 @@
+  * @modified    Tom Clay, 2026 - Adapted for ReXGlue runtime
+  */
+ 
++#include <rex/cvar.h>
++#include <rex/filesystem/devices/disc_image_file.h>
++#include <rex/filesystem/devices/host_path_file.h>
+ #include <rex/filesystem/vfs.h>
+ #include <rex/logging.h>
+ #include <rex/math.h>
+@@ -22,8 +25,22 @@
+ #include <rex/system/xfile.h>
+ #include <rex/thread/mutex.h>
+ 
++#include <algorithm>
+ #include <span>
+ 
++REXCVAR_DEFINE_BOOL(io_lockless_watch_check, false, "Kernel",
++                    "After a file read into physical memory, check the write-watch bits without "
++                    "the global lock and take it only if a page in the buffer is watched");
++
++REXCVAR_DEFINE_BOOL(io_coalesce_scatter_reads, false, "Kernel",
++                    "Read runs of contiguous pages in a scatter read with an explicit offset with "
++                    "one host read. A run that fails or comes back short is redone page by page");
++
++REXCVAR_DEFINE_BOOL(io_unlocked_file_reads, false, "Kernel",
++                    "Reads at an explicit offset from read-only host or disc image files skip the "
++                    "per-handle lock (the host orders them); position and completion are still "
++                    "updated under it");
++
+ namespace rex::system {
+ 
+ namespace {
+@@ -33,6 +50,47 @@ std::vector<FileReadFixup>& FileReadFixups() {
+   static std::vector<FileReadFixup> fixups;
+   return fixups;
+ }
++
++// Positional reads through these need no per-handle lock: HostPathFile reads at
++// an explicit offset on a synchronous handle, which the host kernel orders, and
++// DiscImageFile copies from a read-only mapping. STFS seeks a shared FILE*, so
++// it keeps the lock, as does any handle that can write.
++bool AllowsUnlockedReads(rex::filesystem::File* file) {
++  using rex::filesystem::FileAccess;
++  if (!file || (file->file_access() & (FileAccess::kGenericWrite | FileAccess::kGenericAll |
++                                       FileAccess::kFileWriteData | FileAccess::kFileAppendData))) {
++    return false;
++  }
++  return dynamic_cast<rex::filesystem::HostPathFile*>(file) != nullptr ||
++         dynamic_cast<rex::filesystem::DiscImageFile*>(file) != nullptr;
++}
++
++// The host byte that ReadData writes for guest_address (same translation).
++const uint8_t* ReadDestination(const rex::memory::Memory* memory,
++                               const rex::memory::BaseHeap* heap, uint32_t guest_address) {
++  return heap->heap_type() == rex::memory::HeapType::kGuestPhysical
++             ? memory->TranslatePhysical(
++                   static_cast<const rex::memory::PhysicalHeap*>(heap)->GetPhysicalAddress(
++                       guest_address))
++             : memory->TranslateVirtual(guest_address);
++}
++
++// Whether ReadData can take [guest_address, guest_address + length) as one
++// buffer: a single heap, with contiguous host bytes behind it.
++bool IsSingleHostBuffer(const rex::memory::Memory* memory, uint32_t guest_address,
++                        uint32_t length) {
++  const uint64_t last = uint64_t(guest_address) + length - 1;
++  if (!length || last > UINT32_MAX) {
++    return false;
++  }
++  const rex::memory::BaseHeap* heap = memory->LookupHeap(guest_address);
++  if (!heap || memory->LookupHeap(uint32_t(last)) != heap) {
++    return false;
++  }
++  return ReadDestination(memory, heap, uint32_t(last)) -
++             ReadDestination(memory, heap, guest_address) ==
++         ptrdiff_t(length - 1);
++}
+ }  // namespace
+ 
+ void RegisterFileReadFixup(FileReadFixup fixup) {
+@@ -54,6 +112,7 @@ XFile::XFile(KernelState* kernel_state, rex::filesystem::File* file, bool synchr
+     : XObject(kernel_state, kObjectType), file_(file), is_synchronous_(synchronous) {
+   async_event_ = rex::thread::Event::CreateAutoResetEvent(false);
+   assert_not_null(async_event_);
++  unlocked_reads_ok_ = AllowsUnlockedReads(file_);
+ }
+ 
+ XFile::XFile() : XObject(kObjectType) {
+@@ -131,6 +190,20 @@ X_STATUS XFile::QueryDirectory(X_FILE_DIRECTORY_INFORMATION* out_info, size_t le
+ 
+ X_STATUS XFile::Read(uint32_t buffer_guest_address, uint32_t buffer_length, uint64_t byte_offset,
+                      uint32_t* out_bytes_read, uint32_t apc_context, bool notify_completion) {
++  if (unlocked_reads_ok_ && byte_offset != uint64_t(-1) && byte_offset != uint64_t(-2) &&
++      REXCVAR_GET(io_unlocked_file_reads)) {
++    // A read at an explicit offset doesn't use position_, so only the
++    // bookkeeping takes file_lock_; reads complete in the order they take it.
++    size_t bytes_read = 0;
++    X_STATUS result;
++    {
++      std::shared_lock<std::shared_mutex> read_lock(unlocked_read_lock_);
++      result = ReadData(buffer_guest_address, buffer_length, byte_offset, &bytes_read);
++    }
++    std::lock_guard<std::mutex> lock(file_lock_);
++    return CompleteRead(result, buffer_length, byte_offset, bytes_read, out_bytes_read, apc_context,
++                        notify_completion);
++  }
+   std::lock_guard<std::mutex> lock(file_lock_);
+   return ReadInternal(buffer_guest_address, buffer_length, byte_offset, out_bytes_read, apc_context,
+                       notify_completion);
+@@ -144,6 +217,14 @@ X_STATUS XFile::ReadInternal(uint32_t buffer_guest_address, uint32_t buffer_leng
+     byte_offset = position_;
+   }
+ 
++  size_t bytes_read = 0;
++  X_STATUS result = ReadData(buffer_guest_address, buffer_length, byte_offset, &bytes_read);
++  return CompleteRead(result, buffer_length, byte_offset, bytes_read, out_bytes_read, apc_context,
++                      notify_completion);
++}
++
++X_STATUS XFile::ReadData(uint32_t buffer_guest_address, uint32_t buffer_length,
++                         uint64_t byte_offset, size_t* out_bytes_read) {
+   size_t bytes_read = 0;
+   X_STATUS result = X_STATUS_SUCCESS;
+   // Zero length means success for a valid file object according to Windows
+@@ -204,22 +285,35 @@ X_STATUS XFile::ReadInternal(uint32_t buffer_guest_address, uint32_t buffer_leng
+                   bytes_read);
+             }
+ 
+-            if (buffer_physical_heap) {
++            // Most reads land in pages nothing watches, so check the bits
++            // without the global lock first (the check is conservative).
++            if (buffer_physical_heap &&
++                (!REXCVAR_GET(io_lockless_watch_check) ||
++                 buffer_physical_heap->MayHaveWriteWatches(buffer_guest_address, buffer_length))) {
+               buffer_physical_heap->TriggerCallbacks(
+                   rex::thread::global_critical_region::AcquireDirect(), buffer_guest_address,
+                   buffer_length, true, true);
+             }
+-
+-            if (byte_offset) {
+-              position_ = byte_offset;
+-            }
+-            position_ += bytes_read;
+           }
+         }
+       }
+     }
+   }
+ 
++  *out_bytes_read = bytes_read;
++  return result;
++}
++
++X_STATUS XFile::CompleteRead(X_STATUS result, uint32_t buffer_length, uint64_t byte_offset,
++                             size_t bytes_read, uint32_t* out_bytes_read, uint32_t apc_context,
++                             bool notify_completion) {
++  if (XSUCCEEDED(result) && buffer_length) {
++    if (byte_offset) {
++      position_ = byte_offset;
++    }
++    position_ += bytes_read;
++  }
++
+   if (out_bytes_read) {
+     *out_bytes_read = uint32_t(bytes_read);
+   }
+@@ -240,6 +334,17 @@ X_STATUS XFile::ReadInternal(uint32_t buffer_guest_address, uint32_t buffer_leng
+ 
+ X_STATUS XFile::ReadScatter(uint32_t segments_guest_address, uint32_t length, uint64_t byte_offset,
+                             uint32_t* out_bytes_read, uint32_t apc_context) {
++  // Offsets 0, -1 and -2 have special meanings below, so only an explicit
++  // offset that no segment offset can wrap into takes the positional path.
++  if (byte_offset && byte_offset < uint64_t(-2) - length) {
++    const bool coalesce = REXCVAR_GET(io_coalesce_scatter_reads);
++    const bool unlocked = unlocked_reads_ok_ && REXCVAR_GET(io_unlocked_file_reads);
++    if (coalesce || unlocked) {
++      return ReadScatterPositional(segments_guest_address, length, byte_offset, out_bytes_read,
++                                   apc_context, coalesce, unlocked);
++    }
++  }
++
+   std::lock_guard<std::mutex> lock(file_lock_);
+   X_STATUS result = X_STATUS_SUCCESS;
+ 
+@@ -294,6 +399,113 @@ X_STATUS XFile::ReadScatter(uint32_t segments_guest_address, uint32_t length, ui
+   return result;
+ }
+ 
++X_STATUS XFile::ReadScatterPositional(uint32_t segments_guest_address, uint32_t length,
++                                      uint64_t byte_offset, uint32_t* out_bytes_read,
++                                      uint32_t apc_context, bool coalesce, bool unlocked) {
++  // Same results as the loop in ReadScatter: segment by segment at
++  // byte_offset + read_total, stopping at the first status that isn't success.
++  // Each successful read there sets position_, so the last one is kept here and
++  // stored once at the end.
++  std::unique_lock<std::mutex> lock(file_lock_, std::defer_lock);
++  std::shared_lock<std::shared_mutex> read_lock(unlocked_read_lock_, std::defer_lock);
++  if (unlocked) {
++    read_lock.lock();
++  } else {
++    lock.lock();
++  }
++  X_STATUS result = X_STATUS_SUCCESS;
++
++  rex::be<uint32_t>* segments =
++      reinterpret_cast<rex::be<uint32_t>*>(memory()->TranslateVirtual(segments_guest_address));
++  const uint32_t page_size = 4096;
++
++  uint32_t read_total = 0;
++  uint32_t read_remain = length;
++  bool position_set = false;
++  uint64_t new_position = 0;
++  // Pages still to be read one at a time after a run that failed or came back
++  // short, so the outcome is decided exactly as in ReadScatter.
++  uint32_t single_pages = 0;
++  while (read_remain) {
++    if (coalesce && !single_pages && read_remain > page_size) {
++      // Following segments that continue the first one. Only entries that the
++      // page loop would also use are read.
++      const uint64_t run_start = uint32_t(segments[0]);
++      uint32_t run_pages = 1;
++      while (uint64_t(run_pages) * page_size < read_remain &&
++             uint32_t(segments[run_pages]) == run_start + uint64_t(run_pages) * page_size) {
++        ++run_pages;
++      }
++      if (run_pages > 1) {
++        const uint32_t run_length =
++            uint32_t(std::min<uint64_t>(uint64_t(run_pages) * page_size, read_remain));
++        const uint64_t run_offset = byte_offset + read_total;
++        size_t run_bytes = 0;
++        if (IsSingleHostBuffer(memory(), uint32_t(run_start), run_length) &&
++            ReadData(uint32_t(run_start), run_length, run_offset, &run_bytes) ==
++                X_STATUS_SUCCESS &&
++            run_bytes == run_length) {
++          position_set = true;
++          new_position = run_offset + run_length;
++          read_total += run_length;
++          read_remain -= run_length;
++          segments += run_pages;
++          continue;
++        }
++        single_pages = run_pages;
++      }
++    }
++    if (single_pages) {
++      --single_pages;
++    }
++
++    uint32_t read_length = read_remain;
++    uint32_t read_buffer = *segments;
++    if (read_length > page_size) {
++      read_length = page_size;
++      segments++;
++    }
++
++    const uint64_t read_offset = byte_offset + read_total;
++    size_t bytes_read = 0;
++    result = ReadData(read_buffer, read_length, read_offset, &bytes_read);
++    if (XSUCCEEDED(result)) {
++      position_set = true;
++      new_position = read_offset + bytes_read;
++    }
++
++    if (result != X_STATUS_SUCCESS) {
++      break;
++    }
++
++    read_total += uint32_t(bytes_read);
++    read_remain -= read_length;
++  }
++
++  if (unlocked) {
++    read_lock.unlock();
++    lock.lock();
++  }
++  if (position_set) {
++    position_ = new_position;
++  }
++
++  if (out_bytes_read) {
++    *out_bytes_read = uint32_t(read_total);
++  }
++
++  XIOCompletion::IONotification notify;
++  notify.apc_context = apc_context;
++  notify.num_bytes = uint32_t(read_total);
++  notify.status = result;
++
++  NotifyIOCompletionPorts(notify);
++
++  async_event_->Set();
++
++  return result;
++}
++
+ X_STATUS XFile::Write(uint32_t buffer_guest_address, uint32_t buffer_length, uint64_t byte_offset,
+                       uint32_t* out_bytes_written, uint32_t apc_context) {
+   std::lock_guard<std::mutex> lock(file_lock_);
+@@ -332,6 +544,8 @@ X_STATUS XFile::SetLength(size_t length) {
+ 
+ X_STATUS XFile::Rename(const std::filesystem::path& file_path) {
+   std::lock_guard<std::mutex> lock(file_lock_);
++  // Reads running without file_lock_ use the entry's name for the fixups.
++  std::unique_lock<std::shared_mutex> read_lock(unlocked_read_lock_);
+   return entry()->Rename(file_path);
+ }
+ 
+@@ -396,6 +610,7 @@ object_ref<XFile> XFile::Restore(KernelState* kernel_state, stream::ByteStream*
+   }
+ 
+   file->file_ = vfs_file;
++  file->unlocked_reads_ok_ = AllowsUnlockedReads(vfs_file);
+   file->position_ = position;
+   file->is_synchronous_ = is_synchronous;
+ 
+diff --git a/src/system/xmemory.cpp b/src/system/xmemory.cpp
+index 03f5f84..8f613a5 100644
+--- a/src/system/xmemory.cpp
++++ b/src/system/xmemory.cpp
+@@ -10,6 +10,7 @@
+  */
+ 
+ #include <algorithm>
++#include <atomic>
+ #include <cstring>
+ #include <utility>
+ 
+@@ -2142,6 +2143,17 @@ bool PhysicalHeap::Protect(uint32_t address, uint32_t size, uint32_t protect,
+   return BaseHeap::Protect(address, size, protect);
+ }
+ 
++// notify_on_invalidation is only written with the global critical region held,
++// but MayHaveWriteWatches reads it without the lock, so the stores and that
++// lockless load go through atomic_ref. Plain loads under the lock stay as-is.
++static uint64_t LoadWatchBitsRelaxed(const uint64_t& bits) {
++  return std::atomic_ref<uint64_t>(const_cast<uint64_t&>(bits)).load(std::memory_order_relaxed);
++}
++
++static void StoreWatchBitsRelaxed(uint64_t& bits, uint64_t value) {
++  std::atomic_ref<uint64_t>(bits).store(value, std::memory_order_relaxed);
++}
++
+ void PhysicalHeap::EnableAccessCallbacks(uint32_t physical_address, uint32_t length,
+                                          bool enable_invalidation_notifications,
+                                          bool enable_data_providers) {
+@@ -2230,7 +2242,8 @@ void PhysicalHeap::EnableAccessCallbacks(uint32_t physical_address, uint32_t len
+           // stricter protection.
+           // A page waiting for GPU data is already inaccessible - keep it so.
+           protect_system_page = (page_flags_block.provide_data & page_flags_bit) == 0;
+-          page_flags_block.notify_on_invalidation |= page_flags_bit;
++          StoreWatchBitsRelaxed(page_flags_block.notify_on_invalidation,
++                                page_flags_block.notify_on_invalidation | page_flags_bit);
+         }
+       }
+     }
+@@ -2251,6 +2264,10 @@ void PhysicalHeap::EnableAccessCallbacks(uint32_t physical_address, uint32_t len
+                          (system_page_last + 1 - protect_system_page_first) * system_page_size_,
+                          protect_access);
+   }
++  // Pairs with the fence in MayHaveWriteWatches. Callers read the watched
++  // memory after this returns, so a lockless writer either sees the bits set
++  // above or wrote its data before that read.
++  std::atomic_thread_fence(std::memory_order_seq_cst);
+ }
+ 
+ bool PhysicalHeap::TriggerCallbacks(std::unique_lock<std::recursive_mutex> global_lock_locked_once,
+@@ -2405,12 +2422,62 @@ bool PhysicalHeap::TriggerCallbacks(std::unique_lock<std::recursive_mutex> globa
+     if (i == block_index_last && (system_page_last & 63) != 63) {
+       mask |= ~((uint64_t(1) << ((system_page_last & 63) + 1)) - 1);
+     }
+-    system_page_flags_[i].notify_on_invalidation &= mask;
++    StoreWatchBitsRelaxed(system_page_flags_[i].notify_on_invalidation,
++                          system_page_flags_[i].notify_on_invalidation & mask);
+   }
+ 
+   return true;
+ }
+ 
++bool PhysicalHeap::MayHaveWriteWatches(uint32_t virtual_address, uint32_t length) const {
++  // The caller's data writes come before this fence and the bit loads after
++  // it. With the fence at the end of EnableAccessCallbacks this either sees a
++  // newly set bit or the watcher's later read sees the data. Bits are cleared
++  // only after the callbacks ran.
++  std::atomic_thread_fence(std::memory_order_seq_cst);
++
++  // Same range clamp and page masks as the check in TriggerCallbacks.
++  if (virtual_address < heap_base_) {
++    if (heap_base_ - virtual_address >= length) {
++      return false;
++    }
++    length -= heap_base_ - virtual_address;
++    virtual_address = heap_base_;
++  }
++  uint32_t heap_relative_address = virtual_address - heap_base_;
++  if (heap_relative_address >= heap_size_) {
++    return false;
++  }
++  length = std::min(length, heap_size_ - heap_relative_address);
++  if (length == 0) {
++    return false;
++  }
++
++  uint32_t system_page_first = (heap_relative_address + host_address_offset()) / system_page_size_;
++  uint32_t system_page_last =
++      (heap_relative_address + length - 1 + host_address_offset()) / system_page_size_;
++  system_page_last = std::min(system_page_last, system_page_count_ - 1);
++  if (system_page_first > system_page_last) {
++    // Unexpected; let TriggerCallbacks decide.
++    return true;
++  }
++  uint32_t block_index_first = system_page_first >> 6;
++  uint32_t block_index_last = system_page_last >> 6;
++  for (uint32_t i = block_index_first; i <= block_index_last; ++i) {
++    uint64_t block = LoadWatchBitsRelaxed(system_page_flags_[i].notify_on_invalidation);
++    if (i == block_index_first) {
++      block &= ~((uint64_t(1) << (system_page_first & 63)) - 1);
++    }
++    if (i == block_index_last && (system_page_last & 63) != 63) {
++      block &= (uint64_t(1) << ((system_page_last & 63) + 1)) - 1;
++    }
++    if (block) {
++      return true;
++    }
++  }
++  return false;
++}
++
+ std::unique_lock<std::recursive_mutex> PhysicalHeap::AcquireHostPageReconcileLock() const {
+   auto lock = BaseHeap::AcquireHostPageReconcileLock();
+   if (!lock.owns_lock() && parent_heap_ && parent_heap_->page_size() < memory_->system_page_size_) {

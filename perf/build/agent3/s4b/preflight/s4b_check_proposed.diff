@@ -1,0 +1,171 @@
+--- a/build/agent3/s4b/s4b_check.py
++++ b/build/agent3/s4b/s4b_check.py
+@@ -28,9 +28,25 @@
+ MEMEXPORT = re.compile(r'memexport full-buffer (\d+)x \(total (\d+)\)')
+ KEPT = re.compile(r'C1 keep-watch: (\d+) protects kept so far')
+-# K = C1's verify-mismatch line (gate A). PROVISIONAL until the text is read from the C1 source; c1_other lists every
+-# C1 line that no known family matches, so a K line with another wording still shows up there.
+-K_DEFAULT = r'(?i)(keep.?watch|verify).*(mismatch|differ|changed)'
++# GPU wait stats line (rexlego/src/gpu_wait_backoff.cpp:237-241, S4b snap1): one line per 5 s, every counter taken and
++# cleared, so each field is per interval. It has no key=value pairs (KV finds nothing in it).
++GWS = re.compile(r'GPU wait stats \((\d+) s\): L1 waits (\d+) polls (\d+) moved (\d+) gpu_off (\d+) sleep>moved (\d+) '
++                 r'sleep>done (\d+) \| L2 tries (\d+) waits (\d+) polls (\d+) delayed (\d+) sleep>ready (\d+) \| kicks (\d+) '
++                 r'\| pause (\d+) yield (\d+) sleep (\d+) sleep_sum ([\d.]+) ms sleep_fail (\d+) \| L1 sum ([\d.]+) ms '
++                 r'max ([\d.]+) ms hist <50us (\d+) <200us (\d+) <1ms (\d+) <4ms (\d+) >=4ms (\d+) \| L2 sum ([\d.]+) ms '
++                 r'max ([\d.]+) ms')
++GWS_KEYS = ['interval_s', 'l1_waits', 'l1_polls', 'l1_moved', 'l1_gpu_off', 'l1_sleep_moved', 'l1_sleep_done', 'l2_tries',
++            'l2_waits', 'l2_polls', 'l2_delayed', 'l2_sleep_ready', 'kicks', 'pause', 'yield', 'sleep', 'sleep_sum_ms',
++            'sleep_fail', 'l1_sum_ms', 'l1_max_ms', 'h_lt50us', 'h_lt200us', 'h_lt1ms', 'h_lt4ms', 'h_ge4ms', 'l2_sum_ms',
++            'l2_max_ms']
++# deferred_counters header (d3d12/deferred_command_list.cpp:668, CTR bin only): counts since the last header (reset).
++DC_HDR = re.compile(r'deferred_counters: ([\d.]+) s, (\d+) lists, (\d+) KB, (\d+) barriers')
++# K = C1's verify-mismatch line at a keep-watch protect (gate A), src/graphics/shared_memory.cpp:733-735 (S4b snap1):
++#   "C1 verify {}: page {:08X} changed since its upload ({} so far){}", {} = K (keep-watch protect, suffix "; protect
++#   keeps the normal path") or F (write fault: family c1_verify_f, not K). c1_other lists every C1 keep-watch line that
++#   no known family matches.
++K_DEFAULT = r'C1 verify K: page [0-9A-F]{8} changed since its upload \((\d+) so far\)'
+ TOY = re.compile(r'\] Toypad\[(Read |Write)\] ')
+-GONE_OK_DEFAULT = r'\] Toypad\[(Read |Write)\] |S4 upload hash|slow frame #'
++# logdiff keys print digits as '#' ("[gpu] S# upload hash: frame # calls # ..."), hence S[#\d].
++GONE_OK_DEFAULT = r'\] Toypad\[(Read |Write)\] |S[#\d] upload hash|slow frame #'
+ FRONT_END = ['218/222', '226/1022', '220/528', '220/534', '219/226']
+ # (key, needle = a plain substring the message must contain, extra regex or None)
+@@ -43,4 +59,6 @@
+     ('c1_kept', 'protects kept so far', None),
+     ('c1_blocked', 'C1 keep-watch: blocked for this process', None),
++    ('c1_verify_on', 'C1 verify: on. Hashing CPU uploads', None),
++    ('c1_verify_f', 'C1 verify F: page ', None),
+     ('recovered_stale', 'Recovered stale physical page protection', None),
+     ('unhandled_phys', 'Unhandled guest physical write fault', None),
+@@ -52,4 +70,5 @@
+     ('gpu_wait_stats', 'GPU wait stats', None),
+     ('gpu_wait_backoff', 'GPU wait back-off', None),
++    ('gpu_wait_on', 'GPU wait back-off: ON (', None),
+     ('memexport', 'memexport full-buffer', None),
+     ('slow_frame', 'slow frame #', None),
+@@ -62,12 +81,14 @@
+     ('clean_exit', 'Title terminated; hard-exiting process', None),
+     ('debug_layer', 'ebug layer', None),
++    ('dred', 'DRED (Device Removed Extended Data) enabled', None),
+     ('d3d12_msg', 'D3D12 ', re.compile(r'D3D12 (ERROR|WARNING|CORRUPTION|INFO|MESSAGE)')),
+ ]
+-ITEM_FAMS = ['c1_any', 'split_init', 'split', 'deferred_counters', 'gpu_wait', 'memexport']
++ITEM_FAMS = ['c1_any', 'c1_verify_on', 'c1_verify_f', 'k', 'split_init', 'split', 'deferred_counters', 'gpu_wait',
++             'memexport']
+ S4A_FAMS = ['s4_upload_hash', 'slow_frame', 'precise_wait', 'miss_cache']
+ C1_KNOWN = ('c1_init_on', 'c1_init_blocked', 'c1_init_nohold', 'c1_first', 'c1_kept', 'c1_blocked')
+-SHOW = ['c1_any', 'k', 'c1_other', 'recovered_stale', 'unhandled_phys', 'protect_failed', 'split_init', 'split',
+-        'deferred_counters', 'gpu_wait', 'memexport', 'slow_frame', 's4_upload_hash', 'precise_wait', 'miss_cache',
+-        'stuck_lock', 'minidump', 'fatal', 'debug_layer', 'd3d12_msg']
++SHOW = ['c1_any', 'k', 'c1_verify_on', 'c1_verify_f', 'c1_other', 'recovered_stale', 'unhandled_phys', 'protect_failed',
++        'split_init', 'split', 'deferred_counters', 'gpu_wait', 'memexport', 'slow_frame', 's4_upload_hash', 'precise_wait',
++        'miss_cache', 'stuck_lock', 'minidump', 'fatal', 'debug_layer', 'dred', 'd3d12_msg']
+ 
+ 
+@@ -126,5 +147,7 @@
+                     S['split'].append((ts[11:], kv(msg.split('d3d12_submit_split: ', 1)[1])))
+                 if 'gpu_wait_stats' in got:
+-                    S['gws'].append((ts[11:], kv(msg.split('GPU wait stats', 1)[1])))
++                    mm = GWS.search(msg)
++                    if mm:
++                        S['gws'].append((ts[11:], {k: num(v) for k, v in zip(GWS_KEYS, mm.groups())}))
+                 if 'memexport' in got:
+                     mm = MEMEXPORT.search(msg)
+@@ -133,6 +156,9 @@
+                 if 'slow_frame' in got:
+                     S['slow_last'] = ln
+-                if 'deferred_counters' in got and ('lists' in msg or 'seconds' in msg):
+-                    S['dc'].append((ts[11:], kv(msg.split('deferred_counters', 1)[1])))
++                mh = DC_HDR.search(msg) if 'deferred_counters' in got else None
++                if mh:
++                    g = [num(x) for x in mh.groups()]
++                    S['dc'].append((ts[11:], {'seconds': g[0], 'lists': g[1], 'kb': g[2], 'barriers': g[3],
++                                              'kb_per_list': round(g[2] / float(g[1]), 2) if g[1] else 0}))
+                     S['dc_block'] = [ln[:300]]
+                     cap = 40
+@@ -269,5 +295,9 @@
+         chk(kept_last is not None or n['c1_first'] >= 1, 'kept count: last "kept so far" = %s (%d such lines)' % (kept_last, n['c1_kept']))
+         if r == 's4b04':
++            chk(n['c1_verify_on'] >= 1, 'C1 verify armed: "C1 verify: on. Hashing CPU uploads ..." x%d (without it K = 0 '
++                'proves nothing)' % n['c1_verify_on'])
+             chk(n['k'] == 0, 'verify-mismatch (K) lines %d (gate A, menus part)' % n['k'])
++            chk(None, 'C1 verify F lines (write-fault side, not gate A): %d %s' % (
++                n['c1_verify_f'], (S['first']['c1_verify_f'] or ['-'])[0][-100:]))
+         chk(n['recovered_stale'] == 0 and n['unhandled_phys'] == 0,
+             'gate D zero lines: "Recovered stale physical page protection" %d, "Unhandled guest physical write fault" %d' % (
+@@ -298,9 +328,17 @@
+         chk(len(S['dc']) >= 1, 'deferred_counters headers %d (about every 10 s; elapsed %.0f s -> ~%d expected)' % (
+             len(S['dc']), el, int(el // 10)))
++        kpl = sorted(d['kb_per_list'] for _, d in S['dc'] if d.get('lists'))
++        med = kpl[len(kpl) // 2] if kpl else None
++        chk(None, 'KB per list per header: median %s (min %s, max %s; %d headers); half the median %s (QUEUE.md: <N> ~ '
++            'half; Agent 7 sets N)' % (med, kpl[0] if kpl else None, kpl[-1] if kpl else None, len(kpl),
++                                        round(med / 2.0, 1) if kpl else None))
+     if r in ('s4b10', 's4b11', 's4b12', 's4b13', 's4b15', 's4b16', 's4b25'):
+         chk(n['split_init'] == 1, 'init "d3d12_submit_split_kb: splitting submissions at N KB" x%d: %s' % (
+             n['split_init'], (S['first']['split_init'] or ['-'])[0][-120:]))
+-        chk(bool(sp) and spmax.get('failed', 0) == 0, 'failed=0 in every d3d12_submit_split line (max %s over %s lines)' % (
+-            spmax.get('failed'), sp.get('lines', 0)))
++        if sp or r != 's4b25':
++            chk(bool(sp) and spmax.get('failed', 0) == 0, 'failed=0 in every d3d12_submit_split line (max %s over %s lines)' % (
++                spmax.get('failed'), sp.get('lines', 0)))
++        else:
++            chk(None, 'no d3d12_submit_split line (printed only while a split is due, at most every 10 s): failed not judged')
+         if r != 's4b25':
+             chk(bool(sp) and spmax.get('splits', 0) > 0, 'splits > 0 (max %s)' % spmax.get('splits'))
+@@ -312,17 +350,29 @@
+             chk(spmax.get('held_scratch', 0) == 0, 'held_scratch = 0 expected (max %s)' % spmax.get('held_scratch'))
+         if r == 's4b15':
+-            chk(bool(ld) and ld['NEW'] == 0, 'no debug-layer message that row 14 lacks (NEW %s beside split lines)' % (ld and ld['NEW']))
++            chk(n['dred'] >= 1 and n['debug_layer'] == 0, 'd3d12_debug on: DRED line x%d, debug-layer enable failure x%d' % (
++                n['dred'], n['debug_layer']))
++            chk(bool(ld) and ld['NEW'] == 0, 'no NEW warning key vs row 14 (NEW %s beside split lines)' % (ld and ld['NEW']))
++            chk(None, 'debug-layer messages go to the debugger (the InfoQueue has no log callback), not game.log: "no '
++                'message row 14 lacks" is not testable headless')
+         if r == 's4b16':
+             chk(len(S['dc']) >= 1, 'deferred_counters headers %d (compare lists per 10 s with row 9)' % len(S['dc']))
+     if r == 's4b14':
+-        chk(None, 'debug-layer control: "debug layer" lines %d, D3D12 message lines %d, NEW at warning %s' % (
+-            n['debug_layer'], n['d3d12_msg'], ld and ld['NEW']))
+-    elif r == 's4b17':
++        chk(n['dred'] >= 1 and n['debug_layer'] == 0, 'd3d12_debug on: DRED line x%d, debug-layer enable failure x%d' % (
++            n['dred'], n['debug_layer']))
++        chk(None, 'debug-layer control: NEW at warning %s (debug-layer messages go to the debugger, not game.log)' % (
++            ld and ld['NEW']))
++    elif r in ('s4b17', 's4b18'):
++        chk(n['gpu_wait_stats'] >= 1 and gw.get('lines', 0) == n['gpu_wait_stats'], 'GPU wait stats lines %d, %s parsed' % (
++            n['gpu_wait_stats'], gw.get('lines', 0)))
++    if r == 's4b17':
+         for f in ('l1_waits', 'l1_polls', 'l2_tries', 'kicks'):
+-            chk(gwmax.get(f, 0) > 0, 'GPU wait stats %s > 0 (max %s)' % (f, gwmax.get(f)))
+-        chk(n['gpu_wait_backoff'] == 0 or True, 'back-off lines %d (OFF in P1)' % n['gpu_wait_backoff'])
++            chk(gwmax.get(f, 0) > 0, 'GPU wait stats %s > 0 (max per 5 s %s, sum %s)' % (f, gwmax.get(f), (gw.get('sum') or {}).get(f)))
++        chk(None, 'init lines %d (P1: one "GPU wait back-off: OFF (...); stats ON; GetData hook built."): %s' % (
++            n['gpu_wait_backoff'], (S['first']['gpu_wait_backoff'] or ['-'])[0][-110:]))
+     elif r == 's4b18':
+-        chk(n['gpu_wait_backoff'] == 1, 'one "GPU wait back-off: ON (...)" line: x%d %s' % (
+-            n['gpu_wait_backoff'], (S['first']['gpu_wait_backoff'] or ['-'])[0][-100:]))
++        on1 = (S['first']['gpu_wait_on'] or ['-'])[0]
++        chk(n['gpu_wait_on'] == 1 and n['gpu_wait_backoff'] == 1 and 'quantum 250 us' in on1 and 'GetData hook built' in on1,
++            'one "GPU wait back-off: ON (quantum 250 us, ...); ...; GetData hook built." line (ON x%d, back-off lines x%d): %s' % (
++                n['gpu_wait_on'], n['gpu_wait_backoff'], on1[-110:]))
+         chk(gwmax.get('sleep_fail', 0) == 0, 'sleep_fail = 0 (max %s over %s stats lines)' % (gwmax.get('sleep_fail'), gw.get('lines', 0)))
+         chk(n['stuck_lock'] == 0, 'no STUCK-LOCK (%d)' % n['stuck_lock'])
+@@ -494,10 +544,14 @@
+                 if low:
+                     misses.append('front-end scene(s) missing: %s' % low)
+-            if same_scn and missing:
+-                misses.append('base scenes missing in cand: %s' % missing)
++            soft = [k for k in missing if k not in FRONT_END] if scn in ('A', 'M') or scn.startswith('I') else []
++            hard = [k for k in missing if k not in soft]
++            if same_scn and hard:
++                misses.append('base scenes missing in cand: %s' % hard)
++            if same_scn and soft:
++                say('  note: attract/idle scenes missing in cand (timing after the route; not a BASE item): %s' % soft)
+         mc, mb = A.marks(cand, False, kind), A.marks(base0, False, kind)
+         if mc and mb:
+             names = list(mb.keys())
+-            pre = names[:names.index('up-2') + 1] if 'up-2' in names else names
++            pre = names[:names.index('up-2') + 1] if 'up-2' in names else [k for k in names if not k.startswith('idle-') and k != 'end']
+             pdiff = [(k, mb[k][2], mc[k][2] if k in mc else 'missing') for k in pre if k not in mc or mc[k][2] != mb[k][2]]
+             alld = [(k, mb[k][2], mc[k][2]) for k in names if k in mc and mc[k][2] != mb[k][2]]

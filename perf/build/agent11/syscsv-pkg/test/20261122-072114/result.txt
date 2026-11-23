@@ -1,0 +1,102 @@
+07:21:14 test_syscsv_pkg: stamp=20261122-072114 seconds=12 rounds=3 compare=1 pid=75528 out=<workspace>\build\agent11\syscsv-pkg\test\20261122-072114
+07:21:14 PASS Agent 8 LdSys.cs sha256 B452D25872E76ACC = 06:31 record
+07:21:14 PASS Agent 8 sys-csv.ps1 sha256 017A4F3EB6252983 = 06:31 record
+07:21:14 staged key=3d995e1d (dll cached), original key=b452d258
+07:21:14 run 1 staged : powershell -NoProfile -ExecutionPolicy Bypass -File "<workspace>\bench\agent11\syscsv-pkg\sys-csv.ps1" -GamePid 75528 -RunDir "<workspace>\build\agent11\syscsv-pkg\test\20261122-072114\01-staged" -MaxSec 12
+07:21:28 PASS staged#1 exit 0 (code=0 killed=0 wall=14.0 s)
+07:21:28 PASS staged#1 stop reason=max_sec (got max_sec)
+07:21:28 staged#1 stderr: sys-csv: counters failed at init: tz_temp:no_data tz_passive:no_data
+07:21:28 PASS staged#1 counters=6/6 (got 6/6)
+07:21:28 PASS staged#1 no power:* entry in failed (got [tz_temp:no_data tz_passive:no_data])
+07:21:28 PASS staged#1 dll=LdSys-3d995e1d.dll(cached) in build\agent11\cache (want LdSys-3d995e1d.dll)
+07:21:28 PASS staged#1 header = 24 original columns + pkg_w,pp0_w,pp1_w,dram_w
+07:21:28 PASS staged#1 rows=12 (>= 11)
+07:21:28 PASS staged#1 28 fields in every row (0 bad)
+07:21:28 staged#1 filled(24 orig cols, rows 2..n)=+++++++++++++++++--+++++
+07:21:28 staged#1 first row (not checked): pkg_w=10.749 pp0_w=5.168 pp1_w=0.004 dram_w=0.000
+07:21:28 PASS staged#1 pkg_w in (0.5, 400) W in every row after the first (0 bad)
+07:21:28 PASS staged#1 pp0_w <= pkg_w * 1.05 + 0.5 (0 bad)
+07:21:28 staged#1 pkg_w  n=11 min=9.299 med=13.048 max=18.842
+07:21:28 staged#1 pp0_w  n=11 min=3.791 med=7.046 max=13.061
+07:21:28 staged#1 pp1_w  n=11 min=0.000 med=0.000 max=0.002
+07:21:28 staged#1 dram_w n=11 min=0.000 med=0.000 max=0.000
+07:21:28 staged#1 cost: sample_ms=2.911 sample_ms_max=5.130 sample_cpu_ms=12.33/1.05/1.56 steady_cpu_pct=0.133 parts_mean_ms=[collect:2.49,user:0.10,desk:0.10,pdh:0.08,pwr:0.01,write:0.13] parts_cpu_mean_ms=[collect:0.70,user:0.08,desk:0.09,pdh:0.07,pwr:0.01,write:0.09]
+07:21:28 run 2 orig : powershell -NoProfile -ExecutionPolicy Bypass -File "<workspace>\bench\agent8\run\drivers\sys-csv.ps1" -GamePid 75528 -RunDir "<workspace>\build\agent11\syscsv-pkg\test\20261122-072114\02-orig" -MaxSec 12
+07:21:42 PASS orig#2 exit 0 (code=0 killed=0 wall=13.3 s)
+07:21:42 PASS orig#2 stop reason=max_sec (got max_sec)
+07:21:42 orig#2 stderr: sys-csv: counters failed at init: tz_temp:no_data tz_passive:no_data
+07:21:42 PASS orig#2 counters=5/5 (got 5/5)
+07:21:42 PASS orig#2 dll=LdSys-b452d258.dll(cached) (want LdSys-b452d258.dll(cached))
+07:21:42 PASS orig#2 header = the 24 original columns
+07:21:42 PASS orig#2 rows=12 (>= 11)
+07:21:42 PASS orig#2 24 fields in every row (0 bad)
+07:21:42 orig#2 filled(24 orig cols, rows 2..n)=+++++++++++++++++--+++++
+07:21:42 orig#2 cost: sample_ms=2.402 sample_ms_max=3.648 sample_cpu_ms=9.54/1.15/1.72 steady_cpu_pct=0.480 parts_mean_ms=[collect:1.93,user:0.10,desk:0.12,pdh:0.08,pwr:0.02,write:0.14] parts_cpu_mean_ms=[collect:0.73,user:0.09,desk:0.11,pdh:0.08,pwr:0.02,write:0.11]
+07:21:42 run 3 staged : powershell -NoProfile -ExecutionPolicy Bypass -File "<workspace>\bench\agent11\syscsv-pkg\sys-csv.ps1" -GamePid 75528 -RunDir "<workspace>\build\agent11\syscsv-pkg\test\20261122-072114\03-staged" -MaxSec 12
+07:21:55 PASS staged#3 exit 0 (code=0 killed=0 wall=13.8 s)
+07:21:55 PASS staged#3 stop reason=max_sec (got max_sec)
+07:21:55 staged#3 stderr: sys-csv: counters failed at init: tz_temp:no_data tz_passive:no_data
+07:21:55 PASS staged#3 counters=6/6 (got 6/6)
+07:21:55 PASS staged#3 no power:* entry in failed (got [tz_temp:no_data tz_passive:no_data])
+07:21:55 PASS staged#3 dll=LdSys-3d995e1d.dll(cached) in build\agent11\cache (want LdSys-3d995e1d.dll)
+07:21:55 PASS staged#3 header = 24 original columns + pkg_w,pp0_w,pp1_w,dram_w
+07:21:55 PASS staged#3 rows=12 (>= 11)
+07:21:55 PASS staged#3 28 fields in every row (0 bad)
+07:21:55 staged#3 filled(24 orig cols, rows 2..n)=+++++++++++++++++--+++++
+07:21:55 staged#3 first row (not checked): pkg_w=22.158 pp0_w=15.497 pp1_w=0.000 dram_w=0.000
+07:21:55 PASS staged#3 pkg_w in (0.5, 400) W in every row after the first (0 bad)
+07:21:55 PASS staged#3 pp0_w <= pkg_w * 1.05 + 0.5 (0 bad)
+07:21:55 staged#3 pkg_w  n=11 min=9.693 med=13.580 max=23.929
+07:21:56 staged#3 pp0_w  n=11 min=3.966 med=7.448 max=17.071
+07:21:56 staged#3 pp1_w  n=11 min=0.000 med=0.000 max=0.003
+07:21:56 staged#3 dram_w n=11 min=0.000 med=0.000 max=0.000
+07:21:56 staged#3 cost: sample_ms=4.462 sample_ms_max=18.793 sample_cpu_ms=11.68/1.17/1.92 steady_cpu_pct=0.465 parts_mean_ms=[collect:3.99,user:0.12,desk:0.13,pdh:0.09,pwr:0.02,write:0.11] parts_cpu_mean_ms=[collect:0.75,user:0.10,desk:0.11,pdh:0.09,pwr:0.02,write:0.10]
+07:21:56 run 4 orig : powershell -NoProfile -ExecutionPolicy Bypass -File "<workspace>\bench\agent8\run\drivers\sys-csv.ps1" -GamePid 75528 -RunDir "<workspace>\build\agent11\syscsv-pkg\test\20261122-072114\04-orig" -MaxSec 12
+07:22:10 PASS orig#4 exit 0 (code=0 killed=0 wall=14.4 s)
+07:22:10 PASS orig#4 stop reason=max_sec (got max_sec)
+07:22:10 orig#4 stderr: sys-csv: counters failed at init: tz_temp:no_data tz_passive:no_data
+07:22:10 PASS orig#4 counters=5/5 (got 5/5)
+07:22:10 PASS orig#4 dll=LdSys-b452d258.dll(cached) (want LdSys-b452d258.dll(cached))
+07:22:10 PASS orig#4 header = the 24 original columns
+07:22:10 PASS orig#4 rows=12 (>= 11)
+07:22:10 PASS orig#4 24 fields in every row (0 bad)
+07:22:10 orig#4 filled(24 orig cols, rows 2..n)=+++++++++++++++++--+++++
+07:22:10 orig#4 cost: sample_ms=2.960 sample_ms_max=3.987 sample_cpu_ms=12.60/1.34/1.89 steady_cpu_pct=0.437 parts_mean_ms=[collect:2.47,user:0.10,desk:0.14,pdh:0.09,pwr:0.02,write:0.14] parts_cpu_mean_ms=[collect:0.92,user:0.09,desk:0.12,pdh:0.08,pwr:0.02,write:0.11]
+07:22:10 run 5 staged : powershell -NoProfile -ExecutionPolicy Bypass -File "<workspace>\bench\agent11\syscsv-pkg\sys-csv.ps1" -GamePid 75528 -RunDir "<workspace>\build\agent11\syscsv-pkg\test\20261122-072114\05-staged" -MaxSec 12
+07:22:25 PASS staged#5 exit 0 (code=0 killed=0 wall=15.1 s)
+07:22:25 PASS staged#5 stop reason=max_sec (got max_sec)
+07:22:25 staged#5 stderr: sys-csv: counters failed at init: tz_temp:no_data tz_passive:no_data
+07:22:25 PASS staged#5 counters=6/6 (got 6/6)
+07:22:25 PASS staged#5 no power:* entry in failed (got [tz_temp:no_data tz_passive:no_data])
+07:22:25 PASS staged#5 dll=LdSys-3d995e1d.dll(cached) in build\agent11\cache (want LdSys-3d995e1d.dll)
+07:22:25 PASS staged#5 header = 24 original columns + pkg_w,pp0_w,pp1_w,dram_w
+07:22:25 PASS staged#5 rows=12 (>= 11)
+07:22:25 PASS staged#5 28 fields in every row (0 bad)
+07:22:25 staged#5 filled(24 orig cols, rows 2..n)=+++++++++++++++++--+++++
+07:22:25 staged#5 first row (not checked): pkg_w=13.660 pp0_w=7.422 pp1_w=0.000 dram_w=0.000
+07:22:25 PASS staged#5 pkg_w in (0.5, 400) W in every row after the first (0 bad)
+07:22:25 PASS staged#5 pp0_w <= pkg_w * 1.05 + 0.5 (0 bad)
+07:22:25 staged#5 pkg_w  n=11 min=11.762 med=13.552 max=25.949
+07:22:25 staged#5 pp0_w  n=11 min=5.608 med=7.189 max=19.317
+07:22:25 staged#5 pp1_w  n=11 min=0.000 med=0.002 max=0.003
+07:22:25 staged#5 dram_w n=11 min=0.000 med=0.000 max=0.000
+07:22:25 staged#5 cost: sample_ms=7.655 sample_ms_max=16.870 sample_cpu_ms=12.70/1.37/1.71 steady_cpu_pct=0.445 parts_mean_ms=[collect:6.60,user:0.10,desk:0.11,pdh:0.10,pwr:0.02,write:0.73] parts_cpu_mean_ms=[collect:0.96,user:0.10,desk:0.10,pdh:0.09,pwr:0.02,write:0.10]
+07:22:25 run 6 orig : powershell -NoProfile -ExecutionPolicy Bypass -File "<workspace>\bench\agent8\run\drivers\sys-csv.ps1" -GamePid 75528 -RunDir "<workspace>\build\agent11\syscsv-pkg\test\20261122-072114\06-orig" -MaxSec 12
+07:22:40 PASS orig#6 exit 0 (code=0 killed=0 wall=14.7 s)
+07:22:40 PASS orig#6 stop reason=max_sec (got max_sec)
+07:22:40 orig#6 stderr: sys-csv: counters failed at init: tz_temp:no_data tz_passive:no_data
+07:22:40 PASS orig#6 counters=5/5 (got 5/5)
+07:22:40 PASS orig#6 dll=LdSys-b452d258.dll(cached) (want LdSys-b452d258.dll(cached))
+07:22:40 PASS orig#6 header = the 24 original columns
+07:22:40 PASS orig#6 rows=12 (>= 11)
+07:22:40 PASS orig#6 24 fields in every row (0 bad)
+07:22:40 orig#6 filled(24 orig cols, rows 2..n)=+++++++++++++++++--+++++
+07:22:40 orig#6 cost: sample_ms=2.755 sample_ms_max=4.986 sample_cpu_ms=7.43/1.15/1.62 steady_cpu_pct=0.362 parts_mean_ms=[collect:2.29,user:0.13,desk:0.11,pdh:0.08,pwr:0.02,write:0.14] parts_cpu_mean_ms=[collect:0.78,user:0.09,desk:0.10,pdh:0.07,pwr:0.02,write:0.09]
+07:22:40 PASS staged header = original header + 4 columns
+07:22:40 PASS same original columns filled in both arms (staged +++++++++++++++++--+++++, orig +++++++++++++++++--+++++)
+07:22:40 PASS same counters failed at init in both arms (staged [tz_temp:no_data tz_passive:no_data], orig [tz_temp:no_data tz_passive:no_data])
+07:22:40 cost staged: runs=3 sample_ms med=4.462 sample_cpu_ms(mean) med=1.170 steady_cpu_pct med=0.445
+07:22:40 cost orig: runs=3 sample_ms med=2.755 sample_cpu_ms(mean) med=1.150 steady_cpu_pct med=0.437
+07:22:40 PASS Agent 8 LdSys.cs / sys-csv.ps1 unchanged by the test
+07:22:40 PASS build\agent8\cache listing unchanged (names, sizes, times)
+07:22:40 RESULT: PASS (58/58 checks) out=<workspace>\build\agent11\syscsv-pkg\test\20261122-072114

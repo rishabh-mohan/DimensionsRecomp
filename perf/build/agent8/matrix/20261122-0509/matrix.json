@@ -1,0 +1,31 @@
+{
+  "title": "Agent 7, task #22 step 1: shader dump run on native3d-bin (agent slot, hidden desktop OK, NOT timing). One arm: sd = n0 config + LEGO_DUMP_MISSING_SHADERS=<run>\\shader-dumps",
+  "reference": "sd",
+  "warmup_s": 30,
+  "warmup_from": "firstframe",
+  "measure_s": 60,
+  "repeats": 1,
+  "order": "fixed",
+  "settle_s": 0,
+  "cooldown_s": 5,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "menu_s": 60,
+  "cold_run": false,
+  "quick": { "warmup_s": 10, "measure_s": 20, "settle_s": 0, "menu_s": 20, "cooldown_s": 5 },
+  "notes": [
+    "Purpose (Agent 1, 04:46): capture the two placement shaders that every native build drops (VS 0xAC449538 backing 0xED23D3E0, PS 0xAC448F28 backing 0xED23D540; perf-notes/agent7-present.md Task #13 section 3) so that Agent 4 can add them to the AOT pack. Run: run-matrix.ps1 -Matrix bench\\agent7\\matrix-shader-dump.json -NoPrompt. One run, about 3 min, queued before 07:30. No game runs from 08:30.",
+    "FUNCTIONAL ONLY, never timing: LEGO_DUMP_MISSING_SHADERS also turns on the pool-copy XXH3 byte check (hooks_buffer.cpp:331-345), which hashes every pool copy twice.",
+    "LEGO_DUMP_MISSING_SHADERS is the dump ROOT, not a switch: shaders.cpp:355-372 creates <root>\\placement-raw and <root>\\placement-containers (create_directories) and writes vs-/ps-<16 hex>.bin there. Never set it to 1. That is a relative path, so the dumps would land in the game's working directory. The runner expands <run> to the absolute run dir (run-timing.ps1:10,152), so the dumps stay in the run dir.",
+    "Same settings as the n0 arm of bench/agent4/s3/matrix-native3d-functional.json (native3d-bin, exe B90DF683D0A57A21, settings frontend off, uncapped, frames native, drivers/thread-cpu.ps1, the same warm-up and window). The dump env is the only addition. No profiler, no LEGO_NATIVE_THREADED (Agent 4's n2/n3 rows cover that).",
+    "Expect in game.log: INFO lines 'Native GPU: dumped missing shader '<path>'' near the first 'placement ... missing from AOT index' warnings (those warnings are capped, the dump lines are not). Expect these files: <run>\\shader-dumps\\placement-raw\\{vs,ps}-<hash>.bin (the first capture per 8-byte prefix, at most 2048 bytes) and <run>\\shader-dumps\\placement-containers\\{vs,ps}-<hash>.bin (virtual header + 4-byte marker + physical microcode, one file per distinct content). If no ps- file appears, the PS header failed validation in CaptureMissingPlacementShader (shaders.cpp:163-180). That is a finding, not a runner fault.",
+    "After the run, Agent 7 checks the bin dir with python bench/agent7/bin_manifest_check.py build/agent2/native3d-bin (nothing may be written there). Agent 7 then lists the dumps and the dump lines, checks that the PS words are not all zero, and hands the dumps to Agent 4."
+  ],
+  "arms": [
+    { "id": "sd", "group": "native3d", "ref": true, "frames": "native", "bin": "build/agent2/native3d-bin",
+      "cvars": ["native_settings_frontend=false", "native_fps_limit=0", "framerate_limit=0"],
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv", "LEGO_DUMP_MISSING_SHADERS": "<run>\\shader-dumps" },
+      "driver": "drivers/thread-cpu.ps1",
+      "note": "Agent 7 sd: the native3d n0 arm + the missing-shader dump (functional only)" }
+  ]
+}

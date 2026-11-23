@@ -1,0 +1,18 @@
+# timerq_pair 2026-11-22 03:39:55  reference 0330-d0f-r1  test arm 0332-d0t-r1
+
+| run | TimerQueue busy % (max 1 s) | all threads, cores | window cores | fps mean | >33 ms | >100 ms | status | close | exit | WerFault | dumps | REX_TIMER_WAIT_BLOCKING |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 0330-d0f-r1 | 39.1 (52.0) | 2.43 | 2.40 | 145.2 | 163 | 1 | OK | WM_CLOSE | 0x00000000 | False | 0 | not set |
+| 0332-d0t-r1 | 0.4 (2.9) | 2.11 | 2.06 | 90.9 | 298 | 2 | OK | WM_CLOSE | 0x00000000 | False | 0 | set |
+| context: window 3 d0 (interactive desktop, mean of 4) | 62.0 | 3.48 | | | | | | | | | | not set |
+| context: verify3b d0 (hidden desktop, 23:46) | 32.9 | 2.73 | | | | | | | | | | not set |
+
+PASS  test arm TimerQueue busy <= 3 % (got 0.4; reference 39.1)
+FAIL  test arm >100 ms frames <= reference (got 2 vs 1)
+PASS  test arm closed cleanly (status OK, killed False, exit 0x00000000)
+PASS  test arm left no dump (dumps 0, WerFault False)
+PASS  REX_TIMER_WAIT_BLOCKING set in the test arm only (test True, reference False)
+TimerQueue: 39.1 -> 0.4 % of a core (0.39 cores freed on the hidden desktop; window 3 d0 had 0.62 cores)
+
+RESULT: FAIL (1)
+# log <workspace>\build\agent11\timerq\pair-20261122-033954.txt

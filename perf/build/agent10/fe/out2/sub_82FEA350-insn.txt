@@ -1,0 +1,30 @@
+sub_82FEA350: classes cr=4 decl=1 rlw=1 tail=1; SO writers: none
+== prologue differs (decl)
+  A| REX_FUNC_PROLOGUE();
+  A| PPCRegister temp{};
+  A| uint32_t ea{};
+  B| REX_FUNC_PROLOGUE();
+  B| PPCCRRegister cr6{};
+  B| PPCRegister temp{};
+  B| uint32_t ea{};
+[17] cmplwi cr6,r10,0   (cr)
+  A| ctx.cr6.compare<uint32_t>(ctx.r10.u32, 0, ctx.xer);
+  B| cr6.compare<uint32_t>(ctx.r10.u32, 0, {});
+[32] cmpwi cr6,r4,-1   (cr)
+  A| ctx.cr6.compare<int32_t>(ctx.r4.s32, -1, ctx.xer);
+  B| cr6.compare<int32_t>(ctx.r4.s32, -1, {});
+[39] cmplwi cr6,r10,0   (cr)
+  A| ctx.cr6.compare<uint32_t>(ctx.r10.u32, 0, ctx.xer);
+  B| cr6.compare<uint32_t>(ctx.r10.u32, 0, {});
+[43] cmplw cr6,r10,r11   (cr)
+  A| ctx.cr6.compare<uint32_t>(ctx.r10.u32, ctx.r11.u32, ctx.xer);
+  B| cr6.compare<uint32_t>(ctx.r10.u32, ctx.r11.u32, {});
+[47] rlwinm r8,r10,2,0,29   (rlw)
+  A| ctx.r8.u64 = __builtin_rotateleft64(ctx.r10.u32 | (ctx.r10.u64 << 32), 2) & 0xFFFFFFFC;
+  B| ctx.r8.u64 = ctx.r10.u32 << 2;
+[59] b 0x83e44fc8   (tail)
+  A| __restgprlr_28(ctx, base);
+  A| return;
+  A| }
+  B| [[clang::musttail]] return __restgprlr_28(ctx, base);
+  B| }

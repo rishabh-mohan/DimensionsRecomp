@@ -1,0 +1,17 @@
+W6 promotion (Agent 8, run-2 task #7, build\agent8\w6-stage\promote-w6.ps1), 2026-11-22 21:09:42
+mode: PROMOTE (writes bench\agent8\run\matrix-window6.json and bench\agent8\RUN-WINDOW6.cmd)
+result: NOT OK: -Promote reads only Agent 5's build\agent5\w6-draft, not build\agent8\w6pre4b | build/agent2/devoff4b-bin MANIFEST.txt sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA does not start with DEADBEEF (Agent 2's staging report)
+from: build\agent8\w6pre4b  (FINAL.txt: W6 finalize (Agent 5, finalize-w6.ps1), 2026-11-22 21:02, -Bin build/agent2/devoff4b-bin)
+bin: build/agent2/devoff4b-bin (expected: build/agent2/devoff4b-bin)  legodimensions.exe sha256 DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83 (FINAL.txt DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83)
+MANIFEST.txt sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA; 7 files listed, 7 match by sha256 and size; check lines PASS 102, FAIL 0; unlisted files: none (Agent 2's staging report: DEADBEEF)
+matrix-window6.json  FINAL.txt BD0696DA9CEE70C16B9A8548D582CE012C92DD5728CBD6476EDD6D2C0BF51E80  copy -  -> bench\agent8\run\matrix-window6.json
+RUN-WINDOW6.cmd      FINAL.txt 35F5F85E587A2918D4D811BDDFA24A5EB0BE606E2C01FEBC0A781AF2611BE1B2  copy -  -> bench\agent8\RUN-WINDOW6.cmd
+arms in the matrix: s0, p2, p2f, p2fc, f, fc; env keys: none; run: only=s0,p2,p2f,p2fc repeats=3 -ColdShared
+matrix folders before/after -PlanOnly:  / 
+GO line: none (result NOT OK)
+
+--- MANIFEST.txt (first 2 lines)
+# build/agent2/devoff4b-bin - Agent 2 (Agent 1's batch schedule). dev OFF build 4b (S4b = S4a + SDK C1 v3 + M1 + P2c + r1r2 + #26 tool with every new switch OFF + S4c #24 and #30 OFF): NATIVE_GPU=OFF; Release, game x86-64-v3, SDK x86-64-v2.
+# staged 2026-11-22 20:49:02. Source: snapshot build/agent2/snap1/DimensionsRecomp at S4b (STATE-S4b-1950.tsv, sha256 A739468D5FF55C400A5053748B757DDECA76D388DF788B2A303C06EE62E61378); build tag snap4b; every patch applied to the snapshot since S1 is listed below.
+
+--- bench\agent8> powershell -File run\run-matrix.ps1 -Matrix run\matrix-window6.json -Only s0,p2,p2f,p2fc -Repeats 3 -ColdShared -NoPrompt -PlanOnly  (exit )

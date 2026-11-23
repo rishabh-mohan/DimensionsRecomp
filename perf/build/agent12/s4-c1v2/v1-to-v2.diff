@@ -1,0 +1,90 @@
+diff --git a/src/system/xmemory.cpp b/src/system/xmemory.cpp
+index ffaa5be..efc04be 100644
+--- a/src/system/xmemory.cpp
++++ b/src/system/xmemory.cpp
+@@ -44,14 +44,17 @@ REXCVAR_DEFINE_BOOL(scribble_heap, false, "Memory", "Scribble 0xCD into all allo
+ 
+ // S4.7 fix (i), default off: see PhysicalHeap::Protect.
+ REXCVAR_DEFINE_BOOL(physical_protect_hold_global_lock, false, "Memory",
+-                    "Hold the global lock across both host protects in PhysicalHeap::Protect");
++                    "Hold the global lock across both host protects in PhysicalHeap::Protect")
++    .lifecycle(rex::cvar::Lifecycle::kInitOnly);
+ 
+ // S4 C1 (default off): keep the write watches on physical write protects that change
+ // no page's access. Engages only with physical_protect_hold_global_lock on; see
+-// PhysicalHeap::ProtectKeepWatch.
++// PhysicalHeap::ProtectKeepWatch. Both cvars are init-only (C1 v2), so the settings
++// overlay can't turn C1 on mid-run over page state from before fix (i) was on.
+ REXCVAR_DEFINE_BOOL(physical_protect_keep_watch, false, "Memory",
+                     "Keep the write watches on physical write protects that leave every "
+-                    "page's access unchanged (needs physical_protect_hold_global_lock)");
++                    "page's access unchanged (needs physical_protect_hold_global_lock)")
++    .lifecycle(rex::cvar::Lifecycle::kInitOnly);
+ 
+ namespace rex::memory {
+ 
+@@ -145,6 +148,18 @@ Memory::~Memory() {
+ 
+ bool Memory::Initialize() {
+   file_name_ = fmt::format("xenia_memory_{}", chrono::Clock::QueryHostTickCount());
++  // S4 C1 v2: whether physical_protect_keep_watch can engage (set both cvars at
++  // launch). Prints nothing while it is off.
++  if (REXCVAR_GET(physical_protect_keep_watch)) {
++    if (IsPhysicalProtectKeepWatchBlocked()) {
++      REXSYS_INFO("C1 keep-watch: on, but blocked for this process (native renderer)");
++    } else if (!REXCVAR_GET(physical_protect_hold_global_lock)) {
++      REXSYS_WARN("C1 keep-watch: on, but physical_protect_hold_global_lock is off, so no "
++                  "protect is kept");
++    } else {
++      REXSYS_INFO("C1 keep-watch: on (with physical_protect_hold_global_lock)");
++    }
++  }
+   // A breadcrumb: the arena is the first thing that can fail for reasons
+   // outside the game (address space, page file, a hook DLL squatting on the
+   // range), and a log that ends right before it says where to look.
+@@ -742,6 +757,29 @@ bool Memory::IsPhysicalProtectKeepWatchBlocked() {
+   return physical_protect_keep_watch_blocked.load(std::memory_order_relaxed);
+ }
+ 
++// S4 C1 v2: log lines that show whether the keep-watch path engaged. Both helpers
++// run with the global critical region held; the logger's lock is a leaf. Kept
++// protects log the first one, the powers of two below 4096, then every 4096th, so
++// the last line gives the total to within 4096.
++static constinit std::atomic<uint64_t> physical_protect_kept_count{0};
++static constinit std::atomic<bool> physical_protect_keep_watch_block_logged{false};
++
++static void NoteKeptProtect(uint32_t address, uint32_t size) {
++  const uint64_t kept = physical_protect_kept_count.fetch_add(1, std::memory_order_relaxed) + 1;
++  if (kept == 1) {
++    REXSYS_INFO("C1 keep-watch: first kept protect at {:08X}, {} bytes", address, size);
++  } else if (!(kept & (kept - 1)) || !(kept & 4095)) {
++    REXSYS_INFO("C1 keep-watch: {} protects kept so far", kept);
++  }
++}
++
++static void NoteKeepWatchBlocked() {
++  if (!physical_protect_keep_watch_block_logged.exchange(true, std::memory_order_relaxed)) {
++    REXSYS_INFO("C1 keep-watch: blocked for this process (native renderer); every protect "
++                "takes the normal path");
++  }
++}
++
+ void Memory::EnablePhysicalMemoryAccessCallbacks(uint32_t physical_address, uint32_t length,
+                                                  bool enable_invalidation_notifications,
+                                                  bool enable_data_providers) {
+@@ -2230,6 +2268,7 @@ bool PhysicalHeap::Protect(uint32_t address, uint32_t size, uint32_t protect,
+   // original path below.
+   if (hold_global_lock.owns_lock() && !old_protect && REXCVAR_GET(physical_protect_keep_watch) &&
+       ProtectKeepWatch(address, size, protect)) {
++    NoteKeptProtect(address, size);
+     return true;
+   }
+ 
+@@ -2271,6 +2310,7 @@ bool PhysicalHeap::Protect(uint32_t address, uint32_t size, uint32_t protect,
+ // renderer, from static init) turns this off for the process.
+ bool PhysicalHeap::ProtectKeepWatch(uint32_t address, uint32_t size, uint32_t protect) {
+   if (Memory::IsPhysicalProtectKeepWatchBlocked()) {
++    NoteKeepWatchBlocked();
+     return false;
+   }
+   // Inside this heap, not empty and not wrapping; anything else keeps the normal path.

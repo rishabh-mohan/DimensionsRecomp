@@ -1,0 +1,12 @@
+﻿19:51:03 BEGIN sdk-build : cmake --build "<workspace>\build\agent2\snap1-sdk" --config Release -j 8 -- -k 0 > "<workspace>\build\agent2\snap4b-sdk-build.log" 2>&1
+20:12:07 END   sdk-build exit=0 wall=1263.5s freeC=233.87GB
+20:12:07 BEGIN sdk-install : cmake --install "<workspace>\build\agent2\snap1-sdk" --config Release > "<workspace>\build\agent2\snap4b-sdk-install.log" 2>&1
+20:13:42 END   sdk-install exit=0 wall=95s freeC=233.82GB
+20:13:45 BEGIN game-configure : cmake -S "<workspace>\build\agent2\snap1\DimensionsRecomp\rexlego" -B "<workspace>\build\agent2\snap1-off" -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLEGODIMENSIONS_NATIVE_GPU=OFF -DLEGODIMENSIONS_X86_BASELINE=x86-64-v3 -DCMAKE_PREFIX_PATH=<workspace>/build/agent2/snap1-sdk/install -DREXGLUE_HOST_CODEGEN_EXECUTABLE=<workspace>/build/agent2/codegen-frozen/codegen-frozen.exe -DCMAKE_EXPORT_COMPILE_COMMANDS=ON > "<workspace>\build\agent2\snap4b-game-configure.log" 2>&1
+20:13:50 END   game-configure exit=0 wall=4s freeC=233.84GB
+20:13:50 BEGIN gen-check : python "<workspace>\build\agent2\gen-check.py" > "<workspace>\build\agent2\snap4b-game-gen-check.log" 2>&1
+20:25:59 END   gen-check exit=0 wall=728.7s freeC=233.08GB
+20:25:59 BEGIN gate : python "<workspace>\build\agent2\snap-gate.py" "<workspace>\build\agent2\snap1-off" > "<workspace>\build\agent2\snap4b-gate.log" 2>&1
+20:26:18 END   gate exit=0 wall=18.2s freeC=233.1GB
+20:26:18 BEGIN game-build : cmake --build "<workspace>\build\agent2\snap1-off" --target legodimensions -j 8 -- -k 0 > "<workspace>\build\agent2\snap4b-game-build.log" 2>&1
+20:48:37 END   game-build exit=0 wall=1339s freeC=230.36GB

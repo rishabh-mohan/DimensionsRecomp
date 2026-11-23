@@ -1,0 +1,58 @@
+== 20261122-140637-s4a-udiag-attract  (28810 rows, 410.92 perf s; bin <workspace>\build\agent2\devoff4-bin)
+  front end 220/534 at perf 71.05; last input L26 press A, released at perf 68.31; EXIT (220/540) at perf 133.43: idle 65.12 s / 8561 frames after the release, 62.38 s on the screen
+  A0 (218/222 load) at perf 134.43; H0 2823/366575 at perf 175.67 = A0 + 41.24 s = EXIT + 42.24 s
+  landmarks (perf s / after A0): 71.0/-63.4 front end 220/534; 133.4/-1.0 fade 220/540; 134.4/+0.0 load 218/222; 143.8/+9.4 first 3D frame 625/780; 175.7/+41.2 anchor 2823/366575; 196.6/+62.2 >= 12000 draws 12398/1422329; 316.6/+182.2 >= 12000 draws 12864/1503221
+  anchor passes 1; period -
+  shots (>= 8 frames of one signature; s after A0 / after H0, duration, frames, median/max ms, pipeline/texture misses):
+       +0.00   -41.24    9.38 s  1493  218/222           3.1    39.6 ms  pm   0 tm   0
+       +9.93   -31.30    3.36 s   267  594/2813          9.5   489.0 ms  pm   0 tm   8
+      +13.29   -27.95    0.36 s    32  644/2868          9.6    26.3 ms  pm   0 tm   0
+      +14.61   -26.62    0.69 s    78  594/2813          8.5    22.1 ms  pm   0 tm   0
+      +15.31   -25.93    0.98 s    95  644/2868          9.1    36.7 ms  pm   0 tm   0
+      +18.27   -22.97    0.39 s    20  838/31668        17.9    34.9 ms  pm   0 tm   0
+      +18.66   -22.58    2.35 s   124  839/31674        15.9    81.2 ms  pm   0 tm   1
+      +21.01   -20.23    0.29 s    18  789/31619        14.2    25.1 ms  pm   0 tm   0
+      +34.74    -6.50    0.71 s    37  790/31625        14.9    81.8 ms  pm   0 tm   0
+      +35.45    -5.79    3.92 s   261  788/31613        14.3    54.8 ms  pm   1 tm   0
+      +39.36    -1.87    0.38 s    20  790/43673        13.6   120.8 ms  pm   0 tm   5
+      +39.76    -1.48    0.52 s    35  794/60113        14.3    21.7 ms  pm   1 tm   0
+      +40.60    -0.64    0.17 s     8  1375/135371      19.8    27.3 ms  pm   0 tm   0
+      +40.85    -0.39    0.17 s     8  1379/169919      20.5    25.2 ms  pm   0 tm   0
+      +41.24    +0.00    0.36 s     9  2823/366575      40.1    48.7 ms  pm   1 tm   0
+      +41.89    +0.65    0.41 s    12  2830/409094      33.9    41.5 ms  pm   0 tm   0
+      +42.30    +1.06    0.55 s    16  2832/470486      33.9    48.9 ms  pm   0 tm   0
+      +42.98    +1.75    0.88 s    25  2838/516686      35.2    41.5 ms  pm   0 tm   0
+      +44.12    +2.88    0.53 s    16  2840/522446      32.8    37.7 ms  pm   0 tm   0
+      +46.65    +5.41    2.41 s    27  8019/1043795     89.5   102.4 ms  pm   0 tm   0
+      +49.16    +7.92    0.19 s     8  1392/564530      21.0    31.0 ms  pm   0 tm   0
+      +49.42    +8.18    0.55 s     8  5849/1023590     67.3    78.6 ms  pm   0 tm   0
+      +51.08    +9.84    0.92 s    17  5265/773966      53.7    66.5 ms  pm   0 tm   0
+      +51.99   +10.76    0.71 s    14  5267/802370      44.6    71.5 ms  pm   0 tm   0
+      +52.76   +11.52    1.18 s    20  5271/809402      58.1    72.5 ms  pm   0 tm   0
+      +54.06   +12.82    1.30 s    25  4385/821295      52.2    57.9 ms  pm   0 tm   0
+      +55.53   +14.29    0.61 s     9  4432/819117      67.2    81.3 ms  pm   0 tm   0
+      +56.45   +15.21    0.84 s     8  6353/1014219    105.6   128.9 ms  pm   0 tm   0
+      +57.84   +16.60    1.01 s    13  5194/879213      74.3   105.3 ms  pm   0 tm   0
+      +58.85   +17.61    0.59 s     9  5145/879111      65.8    80.2 ms  pm   0 tm   0
+      +60.33   +19.09    0.87 s    10  7594/1124013     83.7   124.2 ms  pm   0 tm   0
+      +61.20   +19.96    0.77 s    10  5620/922665      75.2    95.3 ms  pm   0 tm   0
+     +264.92  +223.68   10.55 s   574  766/110956       14.6   107.7 ms  pm   0 tm   0
+     +275.50  +234.26    0.99 s    55  766/110956       15.5    64.9 ms  pm   0 tm   0
+  stalls (frames >= 1000 ms; s after A0 / after H0; the frame before):
+      +16.29   -24.95   1189.4 ms  219/226        pm   0 tm   0  (prev 644/2868)
+      +62.19   +20.95   1067.1 ms  12398/1422329  pm  67 tm   8  (prev 5624/922989)
+     +128.95   +87.71   1126.7 ms  3550/1443654   pm   0 tm   1  (prev 2412/1200662)
+     +130.76   +89.52   1262.1 ms  2646/1351446   pm   0 tm   0  (prev 1954/1162622)
+     +155.98  +114.74   1484.6 ms  2096/1012321   pm   0 tm   0  (prev 1750/899985)
+  steady stretches after H0 (no frame >= 250 ms, no pipeline miss), longest first:
+    H0 +167.97 s for  67.28 s,  2120 frames, median draws   768, heavy share 0.00, median 26.2 ms, max 184.7 ms
+    H0 +119.26 s for  21.71 s,   337 frames, median draws  1310, heavy share 0.24, median 53.4 ms, max 248.5 ms
+    H0  +50.61 s for  16.43 s,   224 frames, median draws  1177, heavy share 0.29, median 55.4 ms, max 243.2 ms
+    H0 +141.24 s for  14.30 s,   142 frames, median draws  4552, heavy share 1.00, median 92.0 ms, max 180.3 ms
+    H0  +12.82 s for   8.13 s,   108 frames, median draws  5194, heavy share 1.00, median 70.1 ms, max 146.0 ms
+  window H0 +6.5 s for 11.0 s: rows 173 (perf 182.23-193.29, 8019/1043795 -> 5194/879213), median draws 5267, peak 8068, heavy share 0.95, pm 1, tm 2, frames >= 250 ms: 0
+    frames 173 over 11.06 s = 15.64 fps; ms median 59.85 p95 97.29 p99 128.94 max 135.65; >33 ms 165, >100 ms 7 (FUNCTIONAL ONLY)
+  sub-window H0 +18.2 s for 2.3 s (info only): rows 25 (perf 193.88-196.22, 9823/1356267 -> 5620/922665), median draws 7594, peak 9872, pm 0, tm 0
+    frames 25 over 2.34 s = 10.68 fps; ms median 83.67 p95 140.41 max 146.00 (FUNCTIONAL ONLY)
+  flags excluding: none; info: pipeline_misses_in_window, texture_misses_in_window; valid window: True
+

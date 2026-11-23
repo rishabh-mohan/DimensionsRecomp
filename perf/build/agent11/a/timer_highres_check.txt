@@ -1,0 +1,48 @@
+# timer_highres_check  2026-11-21 19:13:06  args: 5
+timer_highres_check: runs=5 QPF=10000000
+[start] AC=online battery=100% cpu_load=100% (GetSystemTimes, 250 ms)
+[start] NtQueryTimerResolution st=0x00000000 current=1.0000 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+
+-- 1. APC completion routine (absolute due = GetSystemTimeAsFileTime + 2 ms, as Win32Timer) --
+FAIL  high-res sync timer: APC via SleepEx 0/10 (mean set->APC -697089754.01 ms); APC via WFSOEx(timer) 0/10 (returned WAIT_IO_COMPLETION 0, WAIT_OBJECT_0 0)
+FAIL  high-res manual-reset timer: APC via SleepEx 0/10 (mean set->APC -697130634.01 ms); APC via WFSOEx(timer) 0/10 (returned WAIT_IO_COMPLETION 0, WAIT_OBJECT_0 0)
+PASS  normal sync timer: APC via SleepEx 10/10 (mean set->APC 15.57 ms); APC via WFSOEx(timer) 10/10 (returned WAIT_IO_COMPLETION 0, WAIT_OBJECT_0 10)
+PASS  normal manual-reset timer: APC via SleepEx 10/10 (mean set->APC 15.10 ms); APC via WFSOEx(timer) 10/10 (returned WAIT_IO_COMPLETION 0, WAIT_OBJECT_0 10)
+
+-- 2. CREATE_WAITABLE_TIMER_MANUAL_RESET | HIGH_RESOLUTION --
+PASS  CreateWaitableTimerExW(MANUAL_RESET|HIGH_RESOLUTION) succeeds
+PASS  manual-reset high-res timer stays signaled after the wait
+PASS  sync (auto-reset) high-res timer resets after one wait
+INFO  re-arming a signaled manual-reset timer with SetWaitableTimer clears the signal (0 ms wait -> timeout)
+
+-- 5. CancelWaitableTimer after an alertable wait returned WAIT_IO_COMPLETION --
+PASS  wait returned WAIT_IO_COMPLETION 20/20; no stray signal after cancel 20/20
+INFO  late cancel (timer already expired) left a stray signal 20/20 times; SetWaitableTimer re-arm cleared a pending signal 20/20 times
+
+-- 3/4. one-shot 2 ms error and 16 ms periodic, 5 runs, timeBeginPeriod off/on alternating --
+
+3. 2 ms one-shot error (ms), median of 5 run medians [median run p90] {min single sample}:
+   tBP off high-res relative          err med  +0.453  [p90  +0.603]  {min  +0.047}
+   tBP off high-res abs coarse (SDK)  err med  +0.175  [p90  +0.292]  {min  -0.764}
+   tBP off high-res abs precise       err med  +0.331  [p90  +0.555]  {min  +0.027}
+   tBP off normal   relative          err med  +6.652  [p90  +7.540]  {min  +1.328}
+   tBP off normal   abs coarse (SDK)  err med +13.210  [p90 +14.327]  {min  +1.137}
+   tBP off normal   abs precise       err med +13.249  [p90 +13.954]  {min  +4.483}
+   tBP on  high-res relative          err med  +0.280  [p90  +1.545]  {min  +0.043}
+   tBP on  high-res abs coarse (SDK)  err med  +0.144  [p90  +1.038]  {min  -1.208}
+   tBP on  high-res abs precise       err med  +0.234  [p90  +0.969]  {min  +0.046}
+   tBP on  normal   relative          err med  +0.203  [p90  +0.577]  {min  -0.609}
+   tBP on  normal   abs coarse (SDK)  err med  +0.254  [p90  +1.793]  {min  -0.922}
+   tBP on  normal   abs precise       err med  +0.337  [p90  +1.133]  {min  +0.029}
+PASS  high-res 2 ms one-shot (relative and precise absolute): |median error| < 0.5 ms, tBP off and on
+
+4. 16 ms periodic (lPeriod=16, absolute due = precise now + 2 ms), medians over 5 runs:
+   tBP off high-res mean period     nan ms  |period-16| p50    nan p99    nan ms  first tick after    nan ms
+   tBP off normal   mean period  29.004 ms  |period-16| p50 14.407 p99 18.296 ms  first tick after  8.795 ms
+   tBP on  high-res mean period     nan ms  |period-16| p50    nan p99    nan ms  first tick after    nan ms
+   tBP on  normal   mean period  28.319 ms  |period-16| p50 14.129 p99 23.935 ms  first tick after  2.493 ms
+FAIL  high-res periodic: mean period within 0.2 ms of 16 ms and p50 jitter < 0.5 ms, tBP off and on
+[end] NtQueryTimerResolution st=0x00000000 current=1.0000 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+
+SOME CHECKS FAILED: 3 failed check(s)
+# exit=1 wall=191s

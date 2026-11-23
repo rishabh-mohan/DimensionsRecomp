@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "game_launched": false,
+  "gpu_tested": false,
+  "scope": "Check actual publication LRU and native queue-hit promotion. CPU only.\n\nNative command execution/staging are inert lifetime boundaries here. This test\ncounts retained-cache hits, not texture decode time or game frame performance.\n",
+  "sources": {
+    "<workspace>\\DimensionsRecomp\\rexlego\\src\\gpu_native\\texture_upload_publication.h": "0e38501ce2ba571c8651dfd6fb4d8e069358090ddbd776aabf3d7d8b5aa0c3be",
+    "<workspace>\\DimensionsRecomp\\rexlego\\src\\gpu_native\\textures.cpp": "a6b45772d017f8d4b124ec02d11fce0ae6bb1f809052d5ba3639513e46eeb0b9",
+    "<workspace>\\DimensionsRecomp\\tools\\gpu-aot\\test_texture_publication_lru.cpp": "430d2e47fddc15ab8e5ad1a68175963f3a55da374f1eb32827757b6f294c1861",
+    "<workspace>\\DimensionsRecomp\\tools\\gpu-aot\\test_texture_publication_lru.py": "1b2341a6ff755bfcaef3e9974bb36ceddc14489eb55b5282aa8af9cfd2da81b1"
+  },
+  "positive": {
+    "name": "production",
+    "exit": 0,
+    "stdout": "PASS publication LRU: 10000 differential operations, 40000 concurrent operations, production queue promotion, duplicate/budget/reset and destruction outside mutex; hot/cold trace misses LRU=0 FIFO=98 (structural cache count, not FPS)\n",
+    "stderr": ""
+  },
+  "negative": [
+    {
+      "name": "fifo-without-hit-promotion",
+      "exit": 23,
+      "stdout": "",
+      "stderr": "line 34: cache.Bytes()==2&&!cache.Touch(b)&&cache.Touch(a)&&cache.Touch(c)\n"
+    },
+    {
+      "name": "queue-forgets-promotion",
+      "exit": 23,
+      "stdout": "",
+      "stderr": "line 41: !g_texture_upload_publications.Touch(b)&&g_texture_upload_publications.Touch(a)\n"
+    },
+    {
+      "name": "unbounded-retention",
+      "exit": 23,
+      "stdout": "",
+      "stderr": "line 34: cache.Bytes()==2&&!cache.Touch(b)&&cache.Touch(a)&&cache.Touch(c)\n"
+    },
+    {
+      "name": "eviction-under-cache-lock",
+      "exit": 23,
+      "stdout": "",
+      "stderr": "staging owner destroyed under cache mutex\n"
+    }
+  ],
+  "limits": [
+    "Retention budget remains128MiB in production; LRU cannot avoid eviction when the hot working set exceeds the budget.",
+    "No frame-time claim; actual GPU copies and live game performance need separate integration/owner validation."
+  ]
+}

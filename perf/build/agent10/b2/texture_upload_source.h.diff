@@ -1,0 +1,46 @@
+﻿diff --git a/baseline/DimensionsRecomp/rexlego/src/gpu_native/texture_upload_source.h b/DimensionsRecomp/rexlego/src/gpu_native/texture_upload_source.h
+index 73d2f5a..3b0d51b 100644
+--- a/baseline/DimensionsRecomp/rexlego/src/gpu_native/texture_upload_source.h
++++ b/DimensionsRecomp/rexlego/src/gpu_native/texture_upload_source.h
+@@ -6,13 +6,31 @@
+ #include <span>
+ #include <utility>
+ #include <vector>
+ 
+ namespace legodimensions::gpu_native {
++namespace texture_upload_source_detail {
++// vector<uint8_t, DefaultInitAllocator> resize() leaves new bytes
++// uninitialised instead of zero-filling them.
++template <class T>
++struct DefaultInitAllocator : std::allocator<T> {
++  using value_type = T;
++  template <class U> struct rebind { using other = DefaultInitAllocator<U>; };
++  DefaultInitAllocator() noexcept = default;
++  template <class U> DefaultInitAllocator(const DefaultInitAllocator<U>&) noexcept {}
++  template <class U> void construct(U* p) noexcept { ::new (static_cast<void*>(p)) U; }
++  template <class U, class... Args> void construct(U* p, Args&&... args) {
++    ::new (static_cast<void*>(p)) U(std::forward<Args>(args)...);
++  }
++};
++}  // namespace texture_upload_source_detail
++
+ // Retained bytes for one upload transaction. The caller settles data producers
+ // and validates residency in Reader; this is not a metadata/provider bypass.
+ // Hashing, untile/decode and diagnostics must use these same immutable bytes.
++// Reader(address, span) must either fill the whole span and return true, or
++// return false (the capture is then discarded): the spans are not zero-filled.
+ class TextureUploadSource {
+  public:
+   template<class Reader>
+   static std::optional<TextureUploadSource> Capture(uint32_t base_address, uint32_t base_size,
+       uint32_t mip_address, uint32_t mip_size, Reader&& read) {
+@@ -43,8 +61,8 @@ class TextureUploadSource {
+       return segment.second.subspan(size_t(offset), length);
+     return {};
+   }
+  private:
+   uint32_t base_address_ = 0, mip_address_ = 0;
+-  std::vector<uint8_t> base_, mips_;
++  std::vector<uint8_t, texture_upload_source_detail::DefaultInitAllocator<uint8_t>> base_, mips_;
+ };
+ }  // namespace legodimensions::gpu_native

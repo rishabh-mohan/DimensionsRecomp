@@ -1,0 +1,34 @@
+﻿=== timing matrix: Codegen B checks (Agents 9 + 10) + n-prof (Agent 7): functional gate for B = devoffB-bin (MENU step: Agent 10's route), then one profile run each of A = devoff2-bin, B and N = native2-bin (profile only, not for timing) ===
+matrix   <workspace>\bench\agent8\run\matrix-codegen-check.json
+note     Spec: perf-notes/agent9-codegen.md ('Run spec ...', step 1 = functional gate, step 3 = profile) and perf-notes/agent10-codegen-review.md ('B native game gate', the route). B = build/agent2/devoffB-bin (Agent 2 staged it at 02:45, MANIFEST 8709476FF4778768). A = build/agent2/devoff2-bin: the same S2 sources with the S1 codegen, so the codegen options are the only difference.
+note     b-gate MENU step = Agent 10's route (boot + load the save, a cel-shaded level with streaming, pause > Options > last row > back, a dialogue/cutscene, leave and load another level, toy-pad figure add/remove with audio on, save, Quit Game). With the user at the PC: do it at the yellow MENU banner (Return = Start, J = A, K = B, WASD = move) and let go at the green HANDS OFF banner. Tonight (user asleep) the gate is driven by Agent 3's harness (harness/run-game.ps1) through Agent 8's slot instead of this arm (route: boot, title and front-end menus; no figures, Agent 1); this arm is the user-present fallback.
+note     Gate verdict (Agent 10 gives it): FAIL on a crash, a hang or watchdog fingerprint, 0xC0000409, a stack overflow, an error dialog, or any REX_FATAL, __builtin_trap, 'Switch case out of range', 'not in any registered module', 'Native GPU: pool copy unsupported', 'pool copy POINTLIST contract mismatch' or 'Native slot heap: external detach verification failed' line in B's game.log, or more REX_UNIMPLEMENTED lines than A. Log diff: python bench/agent8/run/gate_logdiff.py --a <A run dir> --b <B run dir> (exit 0 pass, 1 fail) and Agent 10's build/agent10/bgate/logdiff.py --base <A> --cand <B>.
+note     a-prof, b-prof, n-prof: LEGO_SAMPLE_PROFILE for 150 s of the title/attract loop (10 s settle + 60 s warm-up after the first frame), all uncapped (framerate_limit=0; n-prof also native_fps_limit=0) like the timing arms, so A/B is symmetric and n-prof compares like for like with a-prof (Agent 7, 02:43). Analyse with DimensionsRecomp/tools/native-cpu/analyze_profile.py and each bin's legodimensions.map: top 30 guest functions and per-thread samples (Main XThread hot spots: n-prof vs a-prof, Agent 7).
+note     n-prof runs after 04:30 (after the devoff3/native3 boots and Agent 11's check). native2-bin needs native_settings_frontend=false: with the frontend on it throws at start ('Native setting is not registered: present_fsr_sharpness_reduction'; matrix-native-functional.json). frames native = native-frames.csv (LEGO_NATIVE_FRAME_METRICS).
+note     These runs are not timing: the gate has (harness or user) input and the profiler perturbs frame times. B's timing is window 4 (matrix-window4.json: B vs devoff2).
+settings warm-up from firstframe (boot timeout 240 s, settle 10 s); order fixed; close timeout 60 s; cooldown 10 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv off
+arms:
+       a-prof: bin build/agent2/devoff2-bin; frames perf; x1; warm-up 60 s; window 150 s; group profile (ref); cvars framerate_limit=0; PROFILE 150 s (not for timing)
+         Agent 9 step 3: profile of A = devoff2, uncapped (profile only, not for timing)
+       b-prof: bin build/agent2/devoffB-bin; frames perf; x1; warm-up 60 s; window 150 s; group profile; cvars framerate_limit=0; PROFILE 150 s (not for timing)
+         Agent 9 step 3: profile of B = devoffB, uncapped (profile only, not for timing)
+       n-prof: bin build/agent2/native2-bin; frames native; x1; warm-up 60 s; window 150 s; group profile; cvars native_settings_frontend=false native_fps_limit=0 framerate_limit=0; PROFILE 150 s (not for timing)
+         Agent 1 / Agent 7: profile of native2 N0, uncapped, same profiler and settings as a-prof; after 04:30, never timed
+round 1  a-prof b-prof n-prof
+order    a-prof b-prof n-prof
+estimate 3 runs (0 cold), about 13 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-XPN3CMN3BEX3PGBKSJT6XJ757P -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   8.61 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/devoff2-bin : ok (MANIFEST.txt)
+bin        build/agent2/devoffB-bin : ok (MANIFEST.txt)
+bin        build/agent2/native2-bin : ok (MANIFEST.txt)
+screensaver WPXSCR~1.SCR after 120 s: the keep-awake request should hold it off; if it starts during timing runs, set it to (None)
+estimate   3 runs, about 13 min: done around 04:09
+keep-awake ON (SetThreadExecutionState continuous+system+display until the matrix ends)

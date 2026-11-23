@@ -1,0 +1,161 @@
+route-report: <workspace>\build\agent3\test\native-sim
+  tag bgate-long-devoff2; bin <workspace>\build\agent2\devoff2-bin; started 2026-11-22T03:17:58.3316569-06:00; pid 88040
+  script <workspace>\harness\routes\b-gate-menus-long.txt (54 steps, sha256 1F3559C8DA2EC0F080991AA6205D16D8F2D13E8020F3C5D23FBF8CD385B2F014)
+
+  scene source: frames.csv draw calls (native build: perf.csv has none; 9647 of 9648 perf.csv rows matched by its 'frame' column)
+
+Steps (t = s since launch; perf = s of frame time since the first frame; scene = median draw calls/vertices of the
+30 frames on disk at that point; pad/keys = XInputGetState calls / keystroke events since the previous row):
+   1.73 L0   start                           -> slot 0 connected; 54 ste... | pad +0    keys +0  | perf      - scene -          | log +0
+  12.46 L12  wait_first_frame 240            -> ok after 10.7 s          | pad +63   keys +0  | perf    1.1 scene n218       | log +46
+          | [2026-11-22 03:18:00.329] [info] [gpu] [t48068] DXGI adapter: NVIDIA GeForce MX570 (vendor 0x10DE, device 0x25A6, 1934 MB dedicated)
+          | [2026-11-22 03:18:00.713] [info] [gpu] [t48068] Direct3D 12 device and OS features:
+          | * Max GPU virtual address bits per resource: 40
+          | * Non-zeroed heap creation: yes
+          | * Pixel-shader-specified stencil reference: no
+          | * Programmable sample positions: tier 2
+          | ... 36 more
+  12.51 L13  mark             first-frame    -> mark                     | pad +4    keys +0  | perf    1.1 scene n218       | log +0
+  62.54 L14  sleep            50             -> ok                       | pad +2954 keys +0  | perf   50.9 scene n226       | log +35
+          | [2026-11-22 03:18:11.714] [warning] [krnl] [t76784] __imp__XamBackgroundDownloadSetMode STUB
+          | [2026-11-22 03:18:16.789] [warning] [krnl] [t97048] [NtCreateFile] FAILED: path='d:\INSTALL0_2.DAT' -> 0xc000000f
+          | [2026-11-22 03:18:16.789] [warning] [krnl] [t97048] [NtCreateFile] FAILED: path='d:\INSTALL0_2.DAT' -> 0xc000000f
+          | [2026-11-22 03:18:16.789] [warning] [krnl] [t97048] [NtCreateFile] FAILED: path='d:\INSTALL0_3.DAT' -> 0xc000000f
+          | [2026-11-22 03:18:16.789] [warning] [krnl] [t97048] [NtCreateFile] FAILED: path='d:\INSTALL0_3.DAT' -> 0xc000000f
+          | [2026-11-22 03:18:16.789] [warning] [krnl] [t97048] [NtCreateFile] FAILED: path='d:\INSTALL0_4.DAT' -> 0xc000000f
+          | ... 29 more
+  62.59 L15  mark             title          -> mark                     | pad +3    keys +0  | perf   50.9 scene n226       | log +0
+  63.42 L16  press            START          -> ok x1                    | pad +50   keys +0  | perf   51.9 scene n226       | log +0
+  71.48 L17  sleep            8              -> ok                       | pad +480  keys +0  | perf   59.9 scene n226       | log +0
+  71.54 L18  mark             after-start    -> mark                     | pad +5    keys +0  | perf   59.9 scene n226       | log +0
+  72.35 L19  press            A              -> ok x1                    | pad +46   keys +0  | perf   61.0 scene n220       | log +76
+          | [2026-11-22 03:19:10.085] [info] [core] [t57708] Toypad: pad 0 mode 0 lit 00 00 00 (on 0 off 0 count 0 speed 0)
+          | [2026-11-22 03:19:10.088] [warning] [krnl] [t97048] [NtCreateFile] FAILED: path='d:\INSTALL0_2.DAT' -> 0xc000000f
+          | [2026-11-22 03:19:10.089] [warning] [krnl] [t97048] [NtCreateFile] FAILED: path='d:\INSTALL0_2.DAT' -> 0xc000000f
+          | [2026-11-22 03:19:10.089] [warning] [krnl] [t97048] [NtCreateFile] FAILED: path='d:\INSTALL0_3.DAT' -> 0xc000000f
+          | [2026-11-22 03:19:10.089] [warning] [krnl] [t97048] [NtCreateFile] FAILED: path='d:\INSTALL0_3.DAT' -> 0xc000000f
+          | [2026-11-22 03:19:10.089] [warning] [krnl] [t97048] [NtCreateFile] FAILED: path='d:\INSTALL0_4.DAT' -> 0xc000000f
+          | ... 68 more
+  80.39 L20  sleep            8              -> ok                       | pad +464  keys +0  | perf   68.2 scene n220       | log +0
+  80.41 L21  mark             after-a1       -> mark                     | pad +0    keys +0  | perf   68.2 scene n220       | log +0
+  81.29 L22  press            A              -> ok x1                    | pad +50   keys +0  | perf   69.3 scene n220       | log +0
+  89.32 L23  sleep            8              -> ok                       | pad +473  keys +0  | perf   77.5 scene n220       | log +0
+  89.33 L24  mark             after-a2       -> mark                     | pad +1    keys +0  | perf   77.5 scene n220       | log +0
+  90.23 L25  press            A              -> ok x1                    | pad +52   keys +0  | perf   78.5 scene n220       | log +0
+ 102.28 L26  sleep            12             -> ok                       | pad +691  keys +0  | perf   90.0 scene n220       | log +0
+ 102.36 L27  mark             after-a3       -> mark                     | pad +3    keys +0  | perf   90.0 scene n220       | log +0
+ 103.26 L28  press            DOWN           -> ok x1                    | pad +48   keys +0  | perf   91.1 scene n220       | log +0
+ 105.34 L29  sleep            2              -> ok                       | pad +97   keys +0  | perf   93.5 scene n220       | log +0
+ 105.46 L30  mark             down-1         -> mark                     | pad +6    keys +0  | perf   93.5 scene n220       | log +0
+ 106.33 L31  press            DOWN           -> ok x1                    | pad +45   keys +0  | perf   94.8 scene n220       | log +0
+ 108.40 L32  sleep            2              -> ok                       | pad +113  keys +0  | perf   97.0 scene n220       | log +0
+ 108.48 L33  mark             down-2         -> mark                     | pad +4    keys +0  | perf   97.0 scene n220       | log +0
+ 110.17 L34  press            UP 2           -> ok x2                    | pad +93   keys +0  | perf   98.0 scene n220       | log +0
+ 112.24 L35  sleep            2              -> ok                       | pad +122  keys +0  | perf  100.1 scene n220       | log +0
+ 112.30 L36  mark             up-2           -> mark                     | pad +4    keys +0  | perf  100.1 scene n220       | log +0
+ 113.20 L37  press            B              -> ok x1                    | pad +50   keys +0  | perf  101.2 scene n220       | log +0
+ 118.25 L38  sleep            5              -> ok                       | pad +258  keys +0  | perf  105.9 scene n220       | log +0
+ 118.36 L39  mark             back-1         -> mark                     | pad +5    keys +0  | perf  105.9 scene n220       | log +0
+ 119.22 L40  press            B              -> ok x1                    | pad +48   keys +0  | perf  107.0 scene n220       | log +0
+ 124.31 L41  sleep            5              -> ok                       | pad +288  keys +0  | perf  112.2 scene n220       | log +0
+ 124.36 L42  mark             back-2         -> mark                     | pad +3    keys +0  | perf  112.2 scene n220       | log +0
+ 125.23 L43  press            B              -> ok x1                    | pad +43   keys +0  | perf  113.5 scene n220       | log +0
+ 130.28 L44  sleep            5              -> ok                       | pad +301  keys +0  | perf  118.5 scene n220       | log +0
+ 130.29 L45  mark             back-3         -> mark                     | pad +1    keys +0  | perf  118.5 scene n220       | log +0
+ 140.30 L46  sleep            10             -> ok                       | pad +601  keys +0  | perf  128.5 scene n220       | log +0
+ 140.31 L47  mark             idle-10        -> mark                     | pad +0    keys +0  | perf  128.5 scene n220       | log +0
+ 150.31 L48  sleep            10             -> ok                       | pad +600  keys +0  | perf  138.5 scene n218       | log +46
+          | [2026-11-22 03:20:21.377] [warning] [krnl] [t97048] [NtCreateFile] FAILED: path='d:\INSTALL0_2.DAT' -> 0xc000000f
+          | [2026-11-22 03:20:21.377] [warning] [krnl] [t97048] [NtCreateFile] FAILED: path='d:\INSTALL0_2.DAT' -> 0xc000000f
+          | [2026-11-22 03:20:21.377] [warning] [krnl] [t97048] [NtCreateFile] FAILED: path='d:\INSTALL0_3.DAT' -> 0xc000000f
+          | [2026-11-22 03:20:21.377] [warning] [krnl] [t97048] [NtCreateFile] FAILED: path='d:\INSTALL0_3.DAT' -> 0xc000000f
+          | [2026-11-22 03:20:21.377] [warning] [krnl] [t97048] [NtCreateFile] FAILED: path='d:\INSTALL0_4.DAT' -> 0xc000000f
+          | [2026-11-22 03:20:21.377] [warning] [krnl] [t97048] [NtCreateFile] FAILED: path='d:\INSTALL0_4.DAT' -> 0xc000000f
+          | ... 40 more
+ 150.32 L49  mark             idle-20        -> mark                     | pad +1    keys +0  | perf  138.5 scene n218       | log +0
+ 160.35 L50  sleep            10             -> ok                       | pad +302  keys +0  | perf  148.4 scene n839       | log +5
+          | [2026-11-22 03:20:29.406] [info] [core] [t76784] Toypad: pad 1 mode 3 lit 99 42 0E (on 0 off 0 count 1 speed 15)
+          | [2026-11-22 03:20:29.406] [info] [core] [t76784] Toypad: pad 2 mode 3 lit 99 42 0E (on 0 off 0 count 1 speed 15)
+          | [2026-11-22 03:20:29.406] [info] [core] [t76784] Toypad: pad 3 mode 3 lit 99 42 0E (on 0 off 0 count 1 speed 15)
+          | [2026-11-22 03:20:29.406] [info] [core] [t37768] Toypad[Read ] 0B 04 55 01 07 5D 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ...
+ 160.36 L51  mark             idle-30        -> mark                     | pad +1    keys +0  | perf  148.4 scene n839       | log +0
+ 170.38 L52  sleep            10             -> ok                       | pad +432  keys +0  | perf  158.4 scene n790       | log +0
+ 170.40 L53  mark             idle-40        -> mark                     | pad +0    keys +0  | perf  158.4 scene n790       | log +0
+ 180.42 L54  sleep            10             -> ok                       | pad +483  keys +0  | perf  166.7 scene n788       | log +0
+ 180.48 L55  mark             idle-50        -> mark                     | pad +1    keys +0  | perf  166.7 scene n788       | log +0
+ 190.50 L56  sleep            10             -> ok                       | pad +170  keys +0  | perf  177.1 scene n1392      | log +0
+ 190.51 L57  mark             idle-60        -> mark                     | pad +0    keys +0  | perf  177.1 scene n1392      | log +0
+ 200.60 L58  sleep            10             -> ok                       | pad +166  keys +0  | perf  187.1 scene n5194      | log +0
+ 200.64 L59  mark             idle-70        -> mark                     | pad +1    keys +0  | perf  187.1 scene n5194      | log +0
+ 210.68 L60  sleep            10             -> ok                       | pad +14   keys +0  | perf  187.1 scene n5194      | log +0
+ 210.74 L61  mark             idle-80        -> mark                     | pad +0    keys +0  | perf  187.1 scene n5194      | log +0
+ 220.76 L62  sleep            10             -> ok                       | pad +12   keys +0  | perf  187.1 scene n5194      | log +0
+ 220.84 L63  mark             idle-90        -> mark                     | pad +0    keys +0  | perf  187.1 scene n5194      | log +0
+ 220.86 L64  mark             end            -> mark                     | pad +0    keys +0  | perf  187.1 scene n5194      | log +0
+ 220.86 L65  stop                            -> stop requested           | pad +0    keys +0  | perf  187.1 scene n5194      | log +0
+ 222.25 L0   end                             -> steps 54/54; timeouts 0  | pad +0    keys +0  | perf  209.5 scene n5620      | log +3
+          | [2026-11-22 03:21:39.417] [info] [core] [t48068] Window closing, shutting down...
+          | [2026-11-22 03:21:39.434] [info] [core] [t37272] Execution complete
+          | [2026-11-22 03:21:39.618] [info] [core] [t48068] Title terminated; hard-exiting process.
+
+Marks (compare devoff2 and devoffB mark by mark):
+  first-frame    t   12.51  perf    1.1  scene n218
+  title          t   62.59  perf   50.9  scene n226
+  after-start    t   71.54  perf   59.9  scene n226
+  after-a1       t   80.41  perf   68.2  scene n220
+  after-a2       t   89.33  perf   77.5  scene n220
+  after-a3       t  102.36  perf   90.0  scene n220
+  down-1         t  105.46  perf   93.5  scene n220
+  down-2         t  108.48  perf   97.0  scene n220
+  up-2           t  112.30  perf  100.1  scene n220
+  back-1         t  118.36  perf  105.9  scene n220
+  back-2         t  124.36  perf  112.2  scene n220
+  back-3         t  130.29  perf  118.5  scene n220
+  idle-10        t  140.31  perf  128.5  scene n220
+  idle-20        t  150.32  perf  138.5  scene n218
+  idle-30        t  160.36  perf  148.4  scene n839
+  idle-40        t  170.40  perf  158.4  scene n790
+  idle-50        t  180.48  perf  166.7  scene n788
+  idle-60        t  190.51  perf  177.1  scene n1392
+  idle-70        t  200.64  perf  187.1  scene n5194
+  idle-80        t  210.74  perf  187.1  scene n5194
+  idle-90        t  220.84  perf  187.1  scene n5194
+  end            t  220.86  perf  187.1  scene n5194
+
+Scene timeline (frames.csv draw calls (native build: perf.csv has none; 9647 of 9648 perf.csv rows matched by its 'frame' column); perf.csv frame time in 5-s buckets, most common scene; runs of equal buckets merged):
+      0-5     s  n218
+      5-10    s  n219
+     10-15    s  n218
+     15-30    s  n219
+     30-35    s  n218
+     35-60    s  n226
+     60-135   s  n220
+    135-140   s  n218
+    140-145   s  n594
+    145-150   s  n839
+    150-155   s  n789
+    155-165   s  n790
+    165-170   s  n788
+    170-175   s  n2838
+    175-180   s  n8019
+    180-185   s  n4385
+    185-190   s  n5194
+    195-200   s  n1382
+    200-205   s  n4660
+    205-210   s  n5165
+  9648 frame rows, 209.5 s of frame time
+
+Checks:
+  ok   exit: exit 0 (0x00000000); close wm_close in 1.18 s; elapsed 222.27 s; exited_early False
+  ok   no crash: wer_seen False; crash_events 0; dumps 0
+  ok   script ran to the end: 54/54 done; last "done"; stopped by script True; timeouts 0 ; error 
+  FAIL pad DLL loaded by the game from the run dir: pid 88040 (game 88040); <workspace>\build\agent3\runs\20261122-031756-bgate-long-devoff2\xinput1_4.dll; maps 1
+  ok   game polled the pad: XInputGetState 9652 (with input 134); XInputGetKeystroke 0 (events 0); caps 48281; set_state 9673
+  info perf.csv: held unshared by the game while it ran: True; 462363 bytes at the end; 9648 frame rows
+  ok   no "not in any registered module" lines: 0 lines
+  ok   no watchdog/hang lines: 0 lines
+  info crash guard lines (the gate compares kinds with devoff2): 0 lines; kinds: none
+  info unimplemented-instruction lines (the gate compares the count with devoff2): 0 lines
+  ok   exit sequence in game.log: line numbers 209, 210, 211 (Window closing / Execution complete / Title terminated)
+
+PROBLEMS: pad DLL loaded by the game from the run dir

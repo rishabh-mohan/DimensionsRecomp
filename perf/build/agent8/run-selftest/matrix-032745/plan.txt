@@ -1,0 +1,30 @@
+﻿=== timing matrix: selftest matrix (fake exe) ===
+matrix   <workspace>\build\agent8\run-selftest\matrix-test\matrix-st.json   [-Quick: short settle/menu/warm-up/window, FUNCTIONAL ONLY]
+note     selftest note
+settings warm-up from firstframe (boot timeout 30 s, settle 1 s); order roundrobin; close timeout 15 s; cooldown 1 s
+floor    every window >= 0 s after the first-frame signal (OFF); sys.csv off
+arms:
+       A: bin <workspace>\build\agent8\run-selftest\fake-bin; frames perf; x2; warm-up 2 s; window 3 s; group g (ref)
+         fake ref arm
+       B: bin <workspace>\build\agent8\run-selftest\fake-bin; frames perf; x2; warm-up 2 s; window 3 s; group g; cvars vsync=false; env LD_SELFTEST_ARM=B LD_PATH=<run>\x.txt; triggers <run>\t.trigger; MENU 'selftest menu step (nothing to do)' (2 s); driver <workspace>\bench\agent8\run\selftest\fake-driver.ps1 -Mode st
+  SKIP C: bin build\agent8\run-selftest\no-such-bin; frames perf; x2; warm-up 2 s; window 3 s; group g
+!!! SKIPPED ARM C: bin build\agent8\run-selftest\no-such-bin is missing or has no MANIFEST.txt (not staged yet?)
+cold     A (<workspace>\build\agent8\run-selftest\fake-bin): unscored, before round 1 (warm-up 2 s, window 3 s)
+round 1  A B
+round 2  B A
+order    A B | B A
+estimate 5 runs (1 cold), about 3 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+staged   once the missing bins are staged: order A B C | B C A; 8 runs, about 5 min
+
+--- preflight ---
+desktop    WinSta0\exebox-YOFUE7NUMYT4IYOVVGVDAXT6Q2 -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   8.5 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build\agent8\run-selftest\no-such-bin : MISSING -> arms skipped: C
+bin        <workspace>\build\agent8\run-selftest\fake-bin : ok (MANIFEST.txt)
+screensaver WPXSCR~1.SCR after 120 s: the keep-awake request should hold it off; if it starts during timing runs, set it to (None)
+estimate   5 runs, about 3 min: done around 03:30
+keep-awake ON (SetThreadExecutionState continuous+system+display until the matrix ends)

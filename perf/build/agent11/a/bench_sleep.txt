@@ -1,0 +1,178 @@
+# bench_sleep  2026-11-21 19:10:49  args: 5 40
+bench_sleep: runs=5 samples/row/run=40 QPF=10000000
+[start] NtQueryTimerResolution st=0x00000000 current=1.0000 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+high-res timer create: OK (err 0)
+[run 1] AC=online battery=100% cpu_load=100% (GetSystemTimes, 250 ms)
+[OLD phase (no timeBeginPeriod in effect)] NtQueryTimerResolution st=0x00000000 current=1.0000 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+  OLD  Sleep(1)               med   16.083  p90   24.797  p99   45.822  max   53.639 ms  (n=40)
+  OLD  SleepEx(1,TRUE)        med   17.543  p90   28.767  p99   41.581  max   42.008 ms  (n=40)
+  OLD  WFSOEx(ev,1,TRUE)      med   17.275  p90   32.658  p99   38.824  max   39.792 ms  (n=40)
+  OLD  WFSOEx(ev,1,FALSE)     med   15.960  p90   33.503  p99   44.947  max   47.562 ms  (n=40)
+  OLD  WFSOEx(ev,2,FALSE)     med   17.240  p90   28.184  p99   52.847  max   56.290 ms  (n=40)
+  OLD  HR timer 500us         med    2.986  p90   15.646  p99   43.190  max   53.657 ms  (n=40)
+  OLD  HR timer 1000us        med    5.121  p90   29.708  p99   39.568  max   39.732 ms  (n=40)
+  OLD  HR timer 2000us        med    6.492  p90   31.466  p99   41.957  max   42.875 ms  (n=40)
+  OLD  normal timer 1000us    med   17.314  p90   28.879  p99   46.080  max   48.850 ms  (n=40)
+  OLD  SleepEx(0,TRUE)        med    2.173  p90   17.124  p99   24.568  max   28.365 ms  (n=40)
+  OLD  SwitchToThread         med    1.759  p90   15.179  p99   24.948  max   25.074 ms  (n=40)
+timeBeginPeriod(1) = 0 (ok); SetProcessInformation(IGNORE_TIMER_RESOLUTION opt-out) succeeded (err 0)
+[after timeBeginPeriod(1)] NtQueryTimerResolution st=0x00000000 current=1.0000 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+  NEW  Sleep(1)               med    1.800  p90    5.837  p99   13.222  max   14.151 ms  (n=40)
+  NEW  SleepEx(1,TRUE)        med    2.014  p90    6.031  p99   18.758  max   23.052 ms  (n=40)
+  NEW  WFSOEx(ev,1,TRUE)      med    1.564  p90    7.872  p99   14.380  max   15.317 ms  (n=40)
+  NEW  WFSOEx(ev,1,FALSE)     med    1.378  p90    4.034  p99   11.991  max   12.876 ms  (n=40)
+  NEW  WFSOEx(ev,2,FALSE)     med    2.304  p90   13.722  p99   19.307  max   20.803 ms  (n=40)
+  NEW  HR timer 500us         med    1.217  p90    7.178  p99   20.610  max   27.501 ms  (n=40)
+  NEW  HR timer 1000us        med    1.814  p90    6.519  p99   10.194  max   10.560 ms  (n=40)
+  NEW  HR timer 2000us        med    2.994  p90   11.992  p99   15.558  max   15.754 ms  (n=40)
+  NEW  normal timer 1000us    med    1.083  p90    5.363  p99   36.290  max   40.738 ms  (n=40)
+  NEW  SleepEx(0,TRUE)        med    0.068  p90    3.760  p99   22.636  max   23.413 ms  (n=40)
+  NEW  SwitchToThread         med    0.023  p90    1.468  p99   21.325  max   24.040 ms  (n=40)
+[after timeEndPeriod(1)] NtQueryTimerResolution st=0x00000000 current=1.0000 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+  yield: SwitchToThread 315 ns/call (0.2% actually yielded), Sleep(0) 579 ns/call
+[run 2] AC=online battery=100% cpu_load=94% (GetSystemTimes, 250 ms)
+[OLD phase (no timeBeginPeriod in effect)] NtQueryTimerResolution st=0x00000000 current=1.0000 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+  OLD  Sleep(1)               med   14.899  p90   22.106  p99   33.986  max   35.355 ms  (n=40)
+  OLD  SleepEx(1,TRUE)        med   15.380  p90   22.200  p99   47.704  max   57.520 ms  (n=40)
+  OLD  WFSOEx(ev,1,TRUE)      med   15.272  p90   24.517  p99   43.212  max   50.490 ms  (n=40)
+  OLD  WFSOEx(ev,1,FALSE)     med   15.418  p90   23.991  p99   37.167  max   38.270 ms  (n=40)
+  OLD  WFSOEx(ev,2,FALSE)     med   16.643  p90   32.293  p99   35.923  max   36.285 ms  (n=40)
+  OLD  HR timer 500us         med    2.142  p90   13.771  p99   31.506  max   35.653 ms  (n=40)
+  OLD  HR timer 1000us        med    2.088  p90    9.642  p99   21.178  max   25.447 ms  (n=40)
+  OLD  HR timer 2000us        med    2.566  p90   18.308  p99   36.533  max   42.668 ms  (n=40)
+  OLD  normal timer 1000us    med   11.491  p90   21.478  p99   54.411  max   68.264 ms  (n=40)
+  OLD  SleepEx(0,TRUE)        med    1.181  p90    7.980  p99   40.155  max   42.164 ms  (n=40)
+  OLD  SwitchToThread         med    0.191  p90    5.447  p99   48.073  max   58.048 ms  (n=40)
+timeBeginPeriod(1) = 0 (ok); SetProcessInformation(IGNORE_TIMER_RESOLUTION opt-out) succeeded (err 0)
+[after timeBeginPeriod(1)] NtQueryTimerResolution st=0x00000000 current=1.0000 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+  NEW  Sleep(1)               med    1.520  p90    4.235  p99   10.591  max   12.579 ms  (n=40)
+  NEW  SleepEx(1,TRUE)        med    1.663  p90    6.497  p99   20.718  max   27.557 ms  (n=40)
+  NEW  WFSOEx(ev,1,TRUE)      med    1.290  p90    5.284  p99    8.992  max    9.252 ms  (n=40)
+  NEW  WFSOEx(ev,1,FALSE)     med    1.354  p90    4.700  p99   12.509  max   13.225 ms  (n=40)
+  NEW  WFSOEx(ev,2,FALSE)     med    2.527  p90    5.027  p99    9.971  max   11.551 ms  (n=40)
+  NEW  HR timer 500us         med    1.214  p90    8.840  p99   18.614  max   19.407 ms  (n=40)
+  NEW  HR timer 1000us        med    2.316  p90    5.579  p99   10.944  max   12.516 ms  (n=40)
+  NEW  HR timer 2000us        med    2.897  p90    7.021  p99   13.056  max   13.393 ms  (n=40)
+  NEW  normal timer 1000us    med    1.559  p90    4.217  p99   10.037  max   12.456 ms  (n=40)
+  NEW  SleepEx(0,TRUE)        med    0.038  p90    1.726  p99    6.945  max    8.339 ms  (n=40)
+  NEW  SwitchToThread         med    0.002  p90    1.122  p99   12.909  max   13.829 ms  (n=40)
+[after timeEndPeriod(1)] NtQueryTimerResolution st=0x00000000 current=1.0000 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+  yield: SwitchToThread 303 ns/call (0.2% actually yielded), Sleep(0) 395 ns/call
+[run 3] AC=online battery=100% cpu_load=95% (GetSystemTimes, 250 ms)
+[OLD phase (no timeBeginPeriod in effect)] NtQueryTimerResolution st=0x00000000 current=15.6250 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+  OLD  Sleep(1)               med   14.840  p90   22.642  p99   40.137  max   46.418 ms  (n=40)
+  OLD  SleepEx(1,TRUE)        med   16.140  p90   24.789  p99   39.581  max   45.739 ms  (n=40)
+  OLD  WFSOEx(ev,1,TRUE)      med   15.254  p90   22.496  p99   39.852  max   41.674 ms  (n=40)
+  OLD  WFSOEx(ev,1,FALSE)     med   15.261  p90   24.081  p99   41.588  max   48.015 ms  (n=40)
+  OLD  WFSOEx(ev,2,FALSE)     med   15.220  p90   21.755  p99   32.339  max   35.614 ms  (n=40)
+  OLD  HR timer 500us         med    1.629  p90   14.936  p99   37.335  max   38.707 ms  (n=40)
+  OLD  HR timer 1000us        med    2.033  p90   13.173  p99   27.399  max   29.852 ms  (n=40)
+  OLD  HR timer 2000us        med    3.539  p90   16.229  p99   32.216  max   32.863 ms  (n=40)
+  OLD  normal timer 1000us    med   11.414  p90   22.868  p99   26.194  max   27.011 ms  (n=40)
+  OLD  SleepEx(0,TRUE)        med    0.647  p90    7.291  p99   13.001  max   15.282 ms  (n=40)
+  OLD  SwitchToThread         med    0.141  p90    2.855  p99    9.208  max   12.046 ms  (n=40)
+timeBeginPeriod(1) = 0 (ok); SetProcessInformation(IGNORE_TIMER_RESOLUTION opt-out) succeeded (err 0)
+[after timeBeginPeriod(1)] NtQueryTimerResolution st=0x00000000 current=1.0000 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+  NEW  Sleep(1)               med    4.651  p90   20.930  p99   34.507  max   38.496 ms  (n=40)
+  NEW  SleepEx(1,TRUE)        med    3.997  p90   16.187  p99   24.729  max   25.308 ms  (n=40)
+  NEW  WFSOEx(ev,1,TRUE)      med    3.697  p90   12.014  p99   20.447  max   22.209 ms  (n=40)
+  NEW  WFSOEx(ev,1,FALSE)     med    2.466  p90   14.639  p99   31.871  max   37.055 ms  (n=40)
+  NEW  WFSOEx(ev,2,FALSE)     med    5.310  p90   17.117  p99   28.028  max   28.835 ms  (n=40)
+  NEW  HR timer 500us         med    3.615  p90   18.345  p99   41.224  max   41.383 ms  (n=40)
+  NEW  HR timer 1000us        med    5.417  p90   13.928  p99   25.809  max   28.977 ms  (n=40)
+  NEW  HR timer 2000us        med    6.701  p90   23.547  p99   33.614  max   34.931 ms  (n=40)
+  NEW  normal timer 1000us    med    3.794  p90   21.266  p99   32.593  max   32.808 ms  (n=40)
+  NEW  SleepEx(0,TRUE)        med    1.436  p90   18.407  p99   27.826  max   29.188 ms  (n=40)
+  NEW  SwitchToThread         med    0.601  p90   17.510  p99   28.739  max   33.820 ms  (n=40)
+[after timeEndPeriod(1)] NtQueryTimerResolution st=0x00000000 current=1.0000 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+  yield: SwitchToThread 22023 ns/call (6.4% actually yielded), Sleep(0) 37558 ns/call
+[run 4] AC=online battery=100% cpu_load=99% (GetSystemTimes, 250 ms)
+[OLD phase (no timeBeginPeriod in effect)] NtQueryTimerResolution st=0x00000000 current=1.0000 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+  OLD  Sleep(1)               med   18.767  p90   26.280  p99   40.914  max   46.622 ms  (n=40)
+  OLD  SleepEx(1,TRUE)        med   19.545  p90   38.613  p99   60.820  max   66.985 ms  (n=40)
+  OLD  WFSOEx(ev,1,TRUE)      med   18.607  p90   33.887  p99   50.162  max   55.353 ms  (n=40)
+  OLD  WFSOEx(ev,1,FALSE)     med   18.593  p90   32.253  p99   45.157  max   51.351 ms  (n=40)
+  OLD  WFSOEx(ev,2,FALSE)     med   22.271  p90   38.254  p99   55.357  max   58.659 ms  (n=40)
+  OLD  HR timer 500us         med    7.729  p90   27.411  p99   65.886  max   79.845 ms  (n=40)
+  OLD  HR timer 1000us        med    5.725  p90   23.621  p99   33.661  max   34.245 ms  (n=40)
+  OLD  HR timer 2000us        med    6.470  p90   25.278  p99   52.128  max   53.635 ms  (n=40)
+  OLD  normal timer 1000us    med   15.386  p90   32.215  p99   36.567  max   37.533 ms  (n=40)
+  OLD  SleepEx(0,TRUE)        med    5.875  p90   17.555  p99   26.066  max   28.338 ms  (n=40)
+  OLD  SwitchToThread         med    5.203  p90   15.538  p99   28.564  max   34.337 ms  (n=40)
+timeBeginPeriod(1) = 0 (ok); SetProcessInformation(IGNORE_TIMER_RESOLUTION opt-out) succeeded (err 0)
+[after timeBeginPeriod(1)] NtQueryTimerResolution st=0x00000000 current=1.0000 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+  NEW  Sleep(1)               med    6.197  p90   25.765  p99   34.010  max   35.217 ms  (n=40)
+  NEW  SleepEx(1,TRUE)        med    4.883  p90   25.540  p99   39.351  max   43.064 ms  (n=40)
+  NEW  WFSOEx(ev,1,TRUE)      med    4.872  p90   29.805  p99   44.911  max   46.867 ms  (n=40)
+  NEW  WFSOEx(ev,1,FALSE)     med    6.491  p90   22.447  p99   43.118  max   45.843 ms  (n=40)
+  NEW  WFSOEx(ev,2,FALSE)     med    7.637  p90   26.351  p99   31.096  max   33.462 ms  (n=40)
+  NEW  HR timer 500us         med    3.593  p90   22.018  p99   29.272  max   31.297 ms  (n=40)
+  NEW  HR timer 1000us        med    5.461  p90   18.604  p99   42.403  max   43.948 ms  (n=40)
+  NEW  HR timer 2000us        med    6.314  p90   28.688  p99   37.543  max   38.529 ms  (n=40)
+  NEW  normal timer 1000us    med    7.195  p90   21.026  p99   39.446  max   47.178 ms  (n=40)
+  NEW  SleepEx(0,TRUE)        med    3.215  p90   18.262  p99   42.702  max   45.428 ms  (n=40)
+  NEW  SwitchToThread         med    0.632  p90   20.257  p99   43.359  max   53.712 ms  (n=40)
+[after timeEndPeriod(1)] NtQueryTimerResolution st=0x00000000 current=1.0000 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+  yield: SwitchToThread 12401 ns/call (2.1% actually yielded), Sleep(0) 7730 ns/call
+[run 5] AC=online battery=100% cpu_load=100% (GetSystemTimes, 250 ms)
+[OLD phase (no timeBeginPeriod in effect)] NtQueryTimerResolution st=0x00000000 current=1.0000 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+  OLD  Sleep(1)               med   22.025  p90   48.534  p99   61.557  max   62.787 ms  (n=40)
+  OLD  SleepEx(1,TRUE)        med   23.065  p90   34.422  p99   55.112  max   55.119 ms  (n=40)
+  OLD  WFSOEx(ev,1,TRUE)      med   27.628  p90   39.193  p99   51.689  max   52.686 ms  (n=40)
+  OLD  WFSOEx(ev,1,FALSE)     med   21.537  p90   34.623  p99   46.750  max   47.475 ms  (n=40)
+  OLD  WFSOEx(ev,2,FALSE)     med   21.127  p90   37.750  p99   48.554  max   53.357 ms  (n=40)
+  OLD  HR timer 500us         med   15.371  p90   31.181  p99   56.682  max   57.122 ms  (n=40)
+  OLD  HR timer 1000us        med   17.765  p90   35.226  p99   43.339  max   45.750 ms  (n=40)
+  OLD  HR timer 2000us        med   20.560  p90   30.689  p99   50.103  max   51.281 ms  (n=40)
+  OLD  normal timer 1000us    med   20.846  p90   40.997  p99   51.432  max   53.057 ms  (n=40)
+  OLD  SleepEx(0,TRUE)        med    7.659  p90   27.479  p99   45.734  max   49.673 ms  (n=40)
+  OLD  SwitchToThread         med    7.422  p90   32.003  p99   47.706  max   53.366 ms  (n=40)
+timeBeginPeriod(1) = 0 (ok); SetProcessInformation(IGNORE_TIMER_RESOLUTION opt-out) succeeded (err 0)
+[after timeBeginPeriod(1)] NtQueryTimerResolution st=0x00000000 current=1.0000 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+  NEW  Sleep(1)               med   23.013  p90   40.551  p99   57.022  max   62.176 ms  (n=40)
+  NEW  SleepEx(1,TRUE)        med   18.293  p90   38.459  p99   47.596  max   48.219 ms  (n=40)
+  NEW  WFSOEx(ev,1,TRUE)      med   18.773  p90   44.052  p99   52.969  max   55.385 ms  (n=40)
+  NEW  WFSOEx(ev,1,FALSE)     med   20.111  p90   37.717  p99   52.188  max   52.575 ms  (n=40)
+  NEW  WFSOEx(ev,2,FALSE)     med   17.808  p90   41.861  p99   69.876  max   76.431 ms  (n=40)
+  NEW  HR timer 500us         med   19.996  p90   33.562  p99   56.194  max   63.522 ms  (n=40)
+  NEW  HR timer 1000us        med   17.018  p90   34.849  p99   51.277  max   52.251 ms  (n=40)
+  NEW  HR timer 2000us        med   21.011  p90   39.385  p99   69.304  max   80.497 ms  (n=40)
+  NEW  normal timer 1000us    med   21.340  p90   34.439  p99   45.094  max   45.892 ms  (n=40)
+  NEW  SleepEx(0,TRUE)        med   15.698  p90   35.231  p99   47.021  max   48.801 ms  (n=40)
+  NEW  SwitchToThread         med   18.028  p90   35.376  p99   55.817  max   61.886 ms  (n=40)
+[after timeEndPeriod(1)] NtQueryTimerResolution st=0x00000000 current=1.0000 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+  yield: SwitchToThread 178056 ns/call (15.6% actually yielded), Sleep(0) 153673 ns/call
+
+== SUMMARY over 5 runs: median of run medians | median of run p90s | max of run maxes | range of run medians (ms) ==
+OLD  Sleep(1)               med   16.083 | p90   24.797 | max   62.787 | [14.840 .. 22.025]
+OLD  SleepEx(1,TRUE)        med   17.543 | p90   28.767 | max   66.985 | [15.380 .. 23.065]
+OLD  WFSOEx(ev,1,TRUE)      med   17.275 | p90   32.658 | max   55.353 | [15.254 .. 27.628]
+OLD  WFSOEx(ev,1,FALSE)     med   15.960 | p90   32.253 | max   51.351 | [15.261 .. 21.537]
+OLD  WFSOEx(ev,2,FALSE)     med   17.240 | p90   32.293 | max   58.659 | [15.220 .. 22.271]
+OLD  HR timer 500us         med    2.986 | p90   15.646 | max   79.845 | [1.629 .. 15.371]
+OLD  HR timer 1000us        med    5.121 | p90   23.621 | max   45.750 | [2.033 .. 17.765]
+OLD  HR timer 2000us        med    6.470 | p90   25.278 | max   53.635 | [2.566 .. 20.560]
+OLD  normal timer 1000us    med   15.386 | p90   28.879 | max   68.264 | [11.414 .. 20.846]
+OLD  SleepEx(0,TRUE)        med    2.173 | p90   17.124 | max   49.673 | [0.647 .. 7.659]
+OLD  SwitchToThread         med    1.759 | p90   15.179 | max   58.048 | [0.141 .. 7.422]
+NEW  Sleep(1)               med    4.651 | p90   20.930 | max   62.176 | [1.520 .. 23.013]
+NEW  SleepEx(1,TRUE)        med    3.997 | p90   16.187 | max   48.219 | [1.663 .. 18.293]
+NEW  WFSOEx(ev,1,TRUE)      med    3.697 | p90   12.014 | max   55.385 | [1.290 .. 18.773]
+NEW  WFSOEx(ev,1,FALSE)     med    2.466 | p90   14.639 | max   52.575 | [1.354 .. 20.111]
+NEW  WFSOEx(ev,2,FALSE)     med    5.310 | p90   17.117 | max   76.431 | [2.304 .. 17.808]
+NEW  HR timer 500us         med    3.593 | p90   18.345 | max   63.522 | [1.214 .. 19.996]
+NEW  HR timer 1000us        med    5.417 | p90   13.928 | max   52.251 | [1.814 .. 17.018]
+NEW  HR timer 2000us        med    6.314 | p90   23.547 | max   80.497 | [2.897 .. 21.011]
+NEW  normal timer 1000us    med    3.794 | p90   21.026 | max   47.178 | [1.083 .. 21.340]
+NEW  SleepEx(0,TRUE)        med    1.436 | p90   18.262 | max   48.801 | [0.038 .. 15.698]
+NEW  SwitchToThread         med    0.601 | p90   17.510 | max   61.886 | [0.002 .. 18.028]
+yield: SwitchToThread med 12401 ns/call (yielded 2.1%), Sleep(0) med 7730 ns/call (200k calls/run)
+
+== GUEST-PATH MODEL (OLD rows from the OLD phase, NEW rows from the NEW phase) ==
+Delay(-10000) non-alertable: OLD Sleep(1) | NEW HR 1000us        OLD med  16.083 p90  24.797 max  62.787 | NEW med   5.417 p90  13.928 max  52.251 ms
+Delay(-10000) alertable: OLD SleepEx(1,TRUE) | NEW HR 1000us     OLD med  17.543 p90  28.767 max  66.985 | NEW med   5.417 p90  13.928 max  52.251 ms
+Delay(-5000) alertable: OLD SleepEx(0,TRUE) | NEW HR 500us       OLD med   2.173 p90  17.124 max  49.673 | NEW med   3.593 p90  18.345 max  63.522 ms
+Delay(-5000) non-alertable: OLD SwitchToThread | NEW HR 500us    OLD med   1.759 p90  15.179 max  58.048 | NEW med   3.593 p90  18.345 max  63.522 ms
+wait timeout 1.5 ms: OLD WFSOEx(1 ms) | NEW WFSOEx(2 ms)         OLD med  15.960 p90  32.253 max  51.351 | NEW med   5.310 p90  17.117 max  76.431 ms
+[end] NtQueryTimerResolution st=0x00000000 current=1.0000 ms min(coarsest)=15.6250 ms max(finest)=0.5000 ms
+# exit=0 wall=137s

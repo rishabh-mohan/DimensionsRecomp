@@ -1,0 +1,67 @@
+# pthrottle_pairs (S4 task #24) 2026-11-22 05:28:57: DRY RUN (no game); 3 pairs, measure 90 s, bin build/agent2/devoff2-bin
+out <workspace>\build\agent11\pthrottle\pairs\20261122-0528 ; meta <workspace>\build\agent11\pthrottle\pairs\20261122-0528-meta
+hash before: # pthrottle_w4b_hash 2026-11-22 05:29:03: 53 files, 657888905 bytes; not hashed: game\disc, game\tu23 (read-only game data) (exit 0)
+sidecar pid 96368 ready (process pthrottle_standin, max 45 min)
+dry runner order: d0-r1, d0e-r1, d0e-r2, d0-r2, d0-r3, d0e-r3
+dry run 0529-d0-r1: game-like Set C=0x4 (error 0), 2 s later C=0x4 S=0x0 (want C=0x4 S=0x0): PASS
+dry run 0529-d0e-r1: game-like Set C=0x4 (error 0), 2 s later C=0x5 S=0x0 (want C=0x5 S=0x0): PASS
+dry run 0529-d0e-r2: game-like Set C=0x4 (error 0), 2 s later C=0x5 S=0x0 (want C=0x5 S=0x0): PASS
+dry run 0529-d0-r2: game-like Set C=0x4 (error 0), 2 s later C=0x4 S=0x0 (want C=0x4 S=0x0): PASS
+dry run 0529-d0-r3: game-like Set C=0x4 (error 0), 2 s later C=0x4 S=0x0 (want C=0x4 S=0x0): PASS
+dry run 0529-d0e-r3: game-like Set C=0x4 (error 0), 2 s later C=0x5 S=0x0 (want C=0x5 S=0x0): PASS
+runner exit 0
+  sidecar: 05:29:07.262 ready: runs dir <workspace>\build\agent11\pthrottle\pairs\20261122-0528\runs\, process pthrottle_standin, opt-out arm d0e (^\d{4}-d0e-r\d+(-r\d+)?$), poll 500 ms, max 45 min, pid 96368
+  sidecar: 05:29:09.178 ignore pid 46048: not under the runs dir (<workspace>\build\agent11\pthrottle\pairs\20261122-0528-meta\outside\pthrottle_standin.exe)
+  sidecar: 05:29:11.348 start 0529-d0-r1 pid 62224 (seen 0.53 s after its start): C=0x0 S=0x0 -> C=0x0 S=0x0 (apply result 0)
+  sidecar: 05:29:19.782 end   0529-d0-r1 pid 62224 (exited): before C=0x0 S=0x0, after C=0x0 S=0x0, last C=0x4 S=0x0, reads 14 (0% opted out), reapplied 0, exit 0, ok True
+  sidecar: 05:29:20.471 start 0529-d0e-r1 pid 51872 (seen 0.89 s after its start): C=0x0 S=0x0 -> C=0x1 S=0x0 (apply result 0)
+  sidecar: 05:29:23.000 reapply 0529-d0e-r1: C=0x4 S=0x0 -> C=0x5 S=0x0 (result 0)
+  sidecar: 05:29:28.543 end   0529-d0e-r1 pid 51872 (exited): before C=0x0 S=0x0, after C=0x1 S=0x0, last C=0x5 S=0x0, reads 13 (92.3% opted out), reapplied 1, exit 0, ok True
+  sidecar: 05:29:29.160 start 0529-d0e-r2 pid 28552 (seen 0.19 s after its start): C=0x0 S=0x0 -> C=0x1 S=0x0 (apply result 0)
+  sidecar: 05:29:32.068 reapply 0529-d0e-r2: C=0x4 S=0x0 -> C=0x5 S=0x0 (result 0)
+  sidecar: 05:29:38.561 end   0529-d0e-r2 pid 28552 (exited): before C=0x0 S=0x0, after C=0x1 S=0x0, last C=0x5 S=0x0, reads 16 (93.8% opted out), reapplied 1, exit 0, ok True
+  sidecar: 05:29:39.177 start 0529-d0-r2 pid 58804 (seen 0.57 s after its start): C=0x0 S=0x0 -> C=0x0 S=0x0 (apply result 0)
+  sidecar: 05:29:47.847 start 0529-d0-r3 pid 74604 (seen 0.06 s after its start): C=0x0 S=0x0 -> C=0x0 S=0x0 (apply result 0)
+  sidecar: 05:29:47.991 end   0529-d0-r2 pid 58804 (exited): before C=0x0 S=0x0, after C=0x0 S=0x0, last C=0x4 S=0x0, reads 15 (0% opted out), reapplied 0, exit 0, ok True
+  sidecar: 05:29:57.494 end   0529-d0-r3 pid 74604 (exited): before C=0x0 S=0x0, after C=0x0 S=0x0, last C=0x4 S=0x0, reads 16 (0% opted out), reapplied 0, exit 0, ok True
+  sidecar: 05:29:58.125 start 0529-d0e-r3 pid 43836 (seen 0.61 s after its start): C=0x0 S=0x0 -> C=0x1 S=0x0 (apply result 0)
+  sidecar: 05:30:01.048 reapply 0529-d0e-r3: C=0x4 S=0x0 -> C=0x5 S=0x0 (result 0)
+  sidecar: 05:30:06.325 end   0529-d0e-r3 pid 43836 (exited): before C=0x0 S=0x0, after C=0x1 S=0x0, last C=0x5 S=0x0, reads 14 (92.9% opted out), reapplied 1, exit 0, ok True
+  sidecar: 05:30:06.998 stop file seen, nothing tracked: done
+dry check: stand-in outside the runs dir (pid 46048): state C=0x0 S=0x0, ignored by the sidecar True: PASS
+merge 0529-d0e-r1: applied True, C=0x0 S=0x0 -> C=0x1 S=0x0, last C=0x5 S=0x0, reapplied 1, held 92.3%; bom True; record ok
+merge 0529-d0e-r2: applied True, C=0x0 S=0x0 -> C=0x1 S=0x0, last C=0x5 S=0x0, reapplied 1, held 93.8%; bom True; record ok
+merge 0529-d0e-r3: applied True, C=0x0 S=0x0 -> C=0x1 S=0x0, last C=0x5 S=0x0, reapplied 1, held 92.9%; bom True; record ok
+merge 0529-d0-r1: applied False, C=0x0 S=0x0 -> C=0x0 S=0x0, last C=0x4 S=0x0, reapplied 0, held 0%; bom True; record ok
+merge 0529-d0-r2: applied False, C=0x0 S=0x0 -> C=0x0 S=0x0, last C=0x4 S=0x0, reapplied 0, held 0%; bom True; record ok
+merge 0529-d0-r3: applied False, C=0x0 S=0x0 -> C=0x0 S=0x0, last C=0x4 S=0x0, reapplied 0, held 0%; bom True; record ok
+# pthrottle_readout 2026-11-22 05:30:15: <workspace>\build\agent11\pthrottle\pairs\20261122-0528\runs (slow state: E below 800 MHz for 3+ samples, from the first frame)
+
+run         arm status applied readback                                     reapplied held_pct pt_ok onset_s slow_pct span_s e_mhz e_mhz_slow e_util_slow p_mhz tz_min fg
+---         --- ------ ------- --------                                     --------- -------- ----- ------- -------- ------ ----- ---------- ----------- ----- ------ --
+0529-d0e-r1 d0e ok        True C=0x0 S=0x0 -> C=0x1 S=0x0, last C=0x5 S=0x0         1     92.3  True -              0    150  1500 -          -            1690 -      0 
+0529-d0e-r2 d0e ok        True C=0x0 S=0x0 -> C=0x1 S=0x0, last C=0x5 S=0x0         1     93.8  True -              1    150  1500 550        95           1690 -      0 
+0529-d0e-r3 d0e ok        True C=0x0 S=0x0 -> C=0x1 S=0x0, last C=0x5 S=0x0         1     92.9  True -              0    150  1500 -          -            1690 -      0 
+0529-d0-r1  d0  ok       False C=0x0 S=0x0 -> C=0x0 S=0x0, last C=0x4 S=0x0         0        0  True 40            74    150   550 550        95           1690 -      0 
+0529-d0-r2  d0  ok       False C=0x0 S=0x0 -> C=0x0 S=0x0, last C=0x4 S=0x0         0        0  True 80            47    150  1500 550        95           1690 -      0 
+0529-d0-r3  d0  ok       False C=0x0 S=0x0 -> C=0x0 S=0x0, last C=0x4 S=0x0         0        0  True -              0    150  1500 -          -            1690 -      0 
+
+
+
+arm d0  : 3 runs, 2 with the slow state (onsets 40,80 s; slow share % per run 74,47,0); read-back ok in 3/3
+arm d0e : 3 runs, 0 with the slow state (onsets  s; slow share % per run 0,1,0); read-back ok in 3/3
+VERDICT: OPT-OUT HELPS: no opt-out run reached the slow state, most off runs did. The state follows the process QoS decision (window-visibility / EcoQoS policy), not a hard package limit alone.
+--- timerq_slowstate.ps1 cross-check
+matrix        run         blocking onset_s slow_pct span_s fg
+------        ---         -------- ------- -------- ------ --
+20261122-0528 0529-d0e-r1    False -              0    150 0 
+20261122-0528 0529-d0e-r2    False -              1    150 0 
+20261122-0528 0529-d0e-r3    False -              0    150 0 
+20261122-0528 0529-d0-r1     False 40            74    150 0 
+20261122-0528 0529-d0-r2     False 80            47    150 0 
+20261122-0528 0529-d0-r3     False -              0    150 0 
+blocking runs: 0, with slow state: 0; spin runs: 6, with slow state: 2 (E below 800 MHz for 3+ samples)
+hash after: # pthrottle_w4b_hash 2026-11-22 05:30:30: 53 files, 657888905 bytes; not hashed: game\disc, game\tu23 (read-only game data)
+hash after: tsv: <workspace>\build\agent11\pthrottle\pairs\20261122-0528-meta\w4b-after.tsv
+hash after: compare with <workspace>\build\agent11\pthrottle\pairs\20261122-0528-meta\w4b-before.tsv: 53 files before, 0 changed or missing
+RESULT: OK; bad 0; 05:30:32

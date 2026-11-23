@@ -1,0 +1,107 @@
+--- prep-s3d.py
++++ prep-s3e.py
+@@ -1,8 +1,9 @@
+-"""Agent 2 - S3d inputs, at Agent 1's explicit GO (after Agent 4's live draw.cpp write). S3d = snap1 at S3 + exactly
+-Agent 4's live rexlego/src/gpu_native/draw.cpp -> native3d-bin (native only, run-s3d.ps1).
+-  python build\\agent2\\prep-s3d.py <sha256 of the written draw.cpp, 16-64 hex digits> --go HH:MM [--owner A4]
++"""Agent 2 - S3e inputs, at Agent 1's explicit GO (after Agent 4's next live draw.cpp write, the '|| !vs'
++variant; cloned from prep-s3d.py by make-s3e-clones.py). S3e = snap1 at S3d + exactly
++Agent 4's live rexlego/src/gpu_native/draw.cpp -> native3e-bin (native only, run-s3e.ps1).
++  python build\\agent2\\prep-s3e.py <sha256 of the written draw.cpp, 16-64 hex digits> --go HH:MM [--owner A4]
+                                    [--dry-run] [--force]
+ Checks (each is printed PASS/FAIL; any FAIL and nothing is written):
+-  - S3 is snap1's current state: the newest STATE-*.tsv in snap1 (the base snap-patch.py plans against) is a
+-    STATE-S3-*.tsv, no PATCHES-S3d.tsv / STATE-S3d-*.tsv exists yet, and snap1's draw.cpp == the snap1 sha256 of its
++  - S3d is snap1's current state: the newest STATE-*.tsv in snap1 (the base snap-patch.py plans against) is a
++    STATE-S3d-*.tsv, no PATCHES-S3e.tsv / STATE-S3e-*.tsv exists yet, and snap1's draw.cpp == the snap1 sha256 of its
+     row there;
+@@ -10,9 +11,9 @@
+   - snap1-off/compile_commands.json compiles no gpu_native file (draw.cpp is not in OFF builds, so devoff3-bin stays
+-    the OFF build of S3d);
+-  - snap1-sdk/install/bin rexruntime.dll and rexgpu-xenos.dll == native3-bin's (the SDK is unchanged since S3).
+-Writes build/agent2/S3d-rules.txt (comments + one rule '<owner> | rexlego/src/gpu_native/draw.cpp | <full sha256>')
+-and build/agent2/S3d-notes.txt (3 lines, for snap-patch.py --note-file= and the native3d MANIFEST); refuses to
++    the OFF build of S3e);
++  - snap1-sdk/install/bin rexruntime.dll and rexgpu-xenos.dll == native3d-bin's (the SDK is unchanged since S3d).
++Writes build/agent2/S3e-rules.txt (comments + one rule '<owner> | rexlego/src/gpu_native/draw.cpp | <full sha256>')
++and build/agent2/S3e-notes.txt (4 lines, for snap-patch.py --note-file= and the native3e MANIFEST); refuses to
+ overwrite them without --force. --dry-run runs the checks and prints both files without writing them.
+-Next: snap-patch.py plan S3d / apply S3d build\\agent2\\S3d-rules.txt --note-file=build\\agent2\\S3d-notes.txt, then
+-snap-patch.py verify S3d, then run-s3d.ps1.
++Next: snap-patch.py plan S3e / apply S3e build\\agent2\\S3e-rules.txt --note-file=build\\agent2\\S3e-notes.txt, then
++snap-patch.py verify S3e, then run-s3e.ps1.
+ """
+@@ -33,7 +34,7 @@
+ SNAPF = os.path.join(SNAP_ROOT, 'DimensionsRecomp', *REL.split('/'))
+-RULES = os.path.join(A, 'S3d-rules.txt')
+-NOTES = os.path.join(A, 'S3d-notes.txt')
++RULES = os.path.join(A, 'S3e-rules.txt')
++NOTES = os.path.join(A, 'S3e-notes.txt')
+ CC_OFF = os.path.join(A, 'snap1-off', 'compile_commands.json')
+ SDK_BIN = os.path.join(A, 'snap1-sdk', 'install', 'bin')
+-REF = os.path.join(A, 'native3-bin')
++REF = os.path.join(A, 'native3d-bin')
+ 
+@@ -79,3 +80,3 @@
+ 
+-    # S3 must be snap1's current state
++    # S3d must be snap1's current state
+     states = sorted([p for p in glob.glob(os.path.join(SNAP_ROOT, 'STATE-*.tsv'))
+@@ -83,7 +84,7 @@
+     newest = os.path.basename(states[-1]) if states else 'none'
+-    check(re.fullmatch(r'STATE-S3-\d{4}\.tsv', newest), 'the newest STATE record in snap1 is a STATE-S3-*.tsv (%s)'
++    check(re.fullmatch(r'STATE-S3d-\d{4}\.tsv', newest), 'the newest STATE record in snap1 is a STATE-S3d-*.tsv (%s)'
+           % newest)
+-    done = sorted(os.path.basename(p) for p in glob.glob(os.path.join(SNAP_ROOT, 'PATCHES-S3d.tsv'))
+-                  + glob.glob(os.path.join(SNAP_ROOT, 'STATE-S3d-*.tsv')))
+-    check(not done, 'no S3d record in snap1 yet%s' % (' (found %s: ask Agent 1 before a second S3d)'
++    done = sorted(os.path.basename(p) for p in glob.glob(os.path.join(SNAP_ROOT, 'PATCHES-S3e.tsv'))
++                  + glob.glob(os.path.join(SNAP_ROOT, 'STATE-S3e-*.tsv')))
++    check(not done, 'no S3e record in snap1 yet%s' % (' (found %s: ask Agent 1 before a second S3e)'
+                                                       % ', '.join(done) if done else ''))
+@@ -117,6 +118,6 @@
+           % (len(cc), len(gn), ' (first %s)' % gn[0] if gn else ''))
+-    # the SDK is unchanged since S3
++    # the SDK is unchanged since S3d
+     for dll in ('rexruntime.dll', 'rexgpu-xenos.dll'):
+         hi, hr = sha(os.path.join(SDK_BIN, dll)), sha(os.path.join(REF, dll))
+-        check(hi == hr, 'snap1-sdk/install/bin/%s %s == native3-bin (%s)' % (dll, hi[:16].upper(), hr[:16].upper()))
++        check(hi == hr, 'snap1-sdk/install/bin/%s %s == native3d-bin (%s)' % (dll, hi[:16].upper(), hr[:16].upper()))
+     for ok, text in res:
+@@ -128,6 +129,6 @@
+     rules = [
+-        "# snap-patch.py rules for S3d, written %s by build/agent2/prep-s3d.py (Agent 1's GO %s)" % (now, a.go),
+-        '# base: %s (S3). S3d = S3 + exactly this one file; the live file must still have the full sha256 below.'
++        "# snap-patch.py rules for S3e, written %s by build/agent2/prep-s3e.py (Agent 1's GO %s)" % (now, a.go),
++        '# base: %s (S3d). S3e = S3d + exactly this one file; the live file must still have the full sha256 below.'
+         % newest,
+-        "# %s: Agent 4's live draw.cpp write; S3 %s; live %s, %d B, mtime %s" % (owner, s3[:16], live[:16], st.st_size, mt),
++        "# %s: Agent 4's live draw.cpp write; S3d %s; live %s, %d B, mtime %s" % (owner, s3[:16], live[:16], st.st_size, mt),
+         '%s | %s | %s' % (owner, REL, live),
+@@ -135,10 +136,13 @@
+     notes = [
+-        "S3d build inputs: S3 (%s: game commit 001336f + SDK commit c5fe668 + the uncommitted pre-sprint plume and simde "
+-        "edits) + exactly Agent 4's live write of %s, %s -> %s (%d B, live mtime %s); Agent 1's GO %s."
++        "S3e build inputs: S3d (%s: S3 = game commit 001336f + SDK commit c5fe668 + the uncommitted pre-sprint plume and simde "
++        "edits, plus Agent 4's S3d draw.cpp write in PATCHES-S3d.tsv) + exactly Agent 4's next live write of %s "
++        "(the '|| !vs' variant), %s -> %s (%d B, live mtime %s); Agent 1's GO %s."
+         % (newest, REL, s3[:16].upper(), live[:16].upper(), st.st_size, mt, a.go),
+-        'S3d is native only: draw.cpp is not compiled into OFF builds (snap1-off compile_commands.json: %d entries, no '
+-        'gpu_native file), so devoff3-bin stays the OFF build of S3d; snap1-sdk is not rebuilt (its install/bin '
+-        'rexruntime.dll and rexgpu-xenos.dll == native3-bin).' % len(cc),
+-        'Generated code: the pinned S1 output (gen-check against baseline/), as in S1-S3; only build B uses '
++        'S3e is native only: draw.cpp is not compiled into OFF builds (snap1-off compile_commands.json: %d entries, no '
++        'gpu_native file), so devoff3-bin stays the OFF build of S3e; snap1-sdk is not rebuilt (its install/bin '
++        'rexruntime.dll and rexgpu-xenos.dll == native3d-bin).' % len(cc),
++        'Generated code: the pinned S1 output (gen-check against baseline/), as in S1-S3d; only builds B and nativeB use '
+         'install/batch-nolr.',
++        "Patch rows: stage-snap-bin.ps1 lists those of S1, S2, S3 and S3e; S3d's one row (draw.cpp) is superseded "
++        "by S3e's, whose before-hash is S3d's after-hash.",
+     ]
+@@ -157,4 +161,4 @@
+         print('wrote %s (%d lines, sha256 %s)' % (p, len(lines), sha(p)[:16].upper()))
+-    print('next: python build\\agent2\\snap-patch.py plan S3d build\\agent2\\S3d-rules.txt '
+-          '--note-file=build\\agent2\\S3d-notes.txt')
++    print('next: python build\\agent2\\snap-patch.py plan S3e build\\agent2\\S3e-rules.txt '
++          '--note-file=build\\agent2\\S3e-notes.txt')
+ 

@@ -1,0 +1,25 @@
+# stage_stamp_test  2026-11-22 00:09:20  sandbox <workspace>\build\agent11\stamptest\20261122-000920
+PASS  hazard: a bare Copy-Item keeps the source stamp (copy shows 2026-11-21 21:01:00)
+    | applied: <workspace>\build\agent11\stamptest\20261122-000920\DimensionsRecomp\rexglue-sdk\src\ui\rex_app.cpp <- <workspace>\build\agent11\stamptest\20261122-000920\build\agent11\safeorder\rex_app.cpp (LastWriteTime 00:09:22)
+PASS  safeorder_stage.ps1 -Apply: exit 0
+PASS  safeorder_stage.ps1 -Apply: rex_app.cpp hash = staged
+PASS  safeorder_stage.ps1 -Apply: rex_app.cpp stamped with the copy time (00:09:22; its source copy says 2026-11-21 23:48:47)
+    | reverted: <workspace>\build\agent11\stamptest\20261122-000920\DimensionsRecomp\rexglue-sdk\src\ui\rex_app.cpp <- <workspace>\build\agent11\stamptest\20261122-000920\build\agent11\safeorder\pristine\rex_app.cpp (LastWriteTime 00:09:24)
+PASS  safeorder_stage.ps1 -Revert: exit 0
+PASS  safeorder_stage.ps1 -Revert: rex_app.cpp hash = pristine
+PASS  safeorder_stage.ps1 -Revert: rex_app.cpp stamped with the copy time (00:09:24; its source copy says 2026-11-21 19:43:51)
+    | applied: <workspace>\build\agent11\stamptest\20261122-000920\DimensionsRecomp\rexglue-sdk\src\kernel\xboxkrnl\xboxkrnl_hal.cpp <- <workspace>\build\agent11\stamptest\20261122-000920\build\agent11\exitfix\xboxkrnl_hal.cpp (LastWriteTime 00:09:25)
+    | applied: <workspace>\build\agent11\stamptest\20261122-000920\DimensionsRecomp\rexglue-sdk\src\kernel\xam\xam_ui.cpp <- <workspace>\build\agent11\stamptest\20261122-000920\build\agent11\exitfix\xam_ui.cpp (LastWriteTime 00:09:25)
+PASS  exitfix_stage.ps1 -Apply: exit 0
+PASS  exitfix_stage.ps1 -Apply: xboxkrnl_hal.cpp hash = staged
+PASS  exitfix_stage.ps1 -Apply: xboxkrnl_hal.cpp stamped with the copy time (00:09:25; its source copy says 2026-11-21 22:27:02)
+PASS  exitfix_stage.ps1 -Apply: xam_ui.cpp hash = staged
+PASS  exitfix_stage.ps1 -Apply: xam_ui.cpp stamped with the copy time (00:09:25; its source copy says 2026-11-21 22:27:02)
+    | reverted: <workspace>\build\agent11\stamptest\20261122-000920\DimensionsRecomp\rexglue-sdk\src\kernel\xboxkrnl\xboxkrnl_hal.cpp <- <workspace>\build\agent11\stamptest\20261122-000920\build\agent11\exitfix\pristine\xboxkrnl_hal.cpp (LastWriteTime 00:09:27)
+    | reverted: <workspace>\build\agent11\stamptest\20261122-000920\DimensionsRecomp\rexglue-sdk\src\kernel\xam\xam_ui.cpp <- <workspace>\build\agent11\stamptest\20261122-000920\build\agent11\exitfix\pristine\xam_ui.cpp (LastWriteTime 00:09:27)
+PASS  exitfix_stage.ps1 -Revert: exit 0
+PASS  exitfix_stage.ps1 -Revert: xboxkrnl_hal.cpp hash = pristine
+PASS  exitfix_stage.ps1 -Revert: xboxkrnl_hal.cpp stamped with the copy time (00:09:27; its source copy says 2026-11-21 11:04:45)
+PASS  exitfix_stage.ps1 -Revert: xam_ui.cpp hash = pristine
+PASS  exitfix_stage.ps1 -Revert: xam_ui.cpp stamped with the copy time (00:09:27; its source copy says 2026-11-21 11:04:45)
+RESULT: PASS

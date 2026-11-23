@@ -1,0 +1,30 @@
+map build\agent6\hang\t_owner\fake.map: 3 distinct guest function addresses
+83FB09F0: in sub_83FB09A0 (+0x50); next sub_83FB0A40; __imp__sub_83FB09A0=legodimensions_recomp.7.cpp.obj, sub_83FB09A0=hook.cpp.obj
+83FB0948: in sub_83FB0900 (+0x48); next sub_83FB09A0; __imp__sub_83FB0900=legodimensions_recomp.7.cpp.obj, sub_83FB0900=legodimensions_recomp.7.cpp.obj
+83FB0A44: in sub_83FB0A40 (+0x4); next sub_00000000; sub_83FB0A40=legodimensions_recomp.8.cpp.obj
+
+== sub_83FB09A0 in legodimensions_recomp.7.cpp:10, 10 lines; marks 83FB09EC, 83FB09F0
+  call sites (return address -> callee): 83FB09F0->sub_83FAF180
+  backward branches: L8 goto loc_83FB09E0 (label at L3; bne cr6,0x83fb09e0)
+    1  DEFINE_REX_FUNC(sub_83FB09A0) {
+    2  	REX_FUNC_PROLOGUE();
+    3  loc_83FB09E0:
+    4  	// bl 0x83faf180
+    5  	ctx.lr = 0x83FB09F0;   <<<
+    6  	sub_83FAF180(ctx, base);
+    7  	// bne cr6,0x83fb09e0
+    8  	if (!ctx.cr6.eq) goto loc_83FB09E0;
+    9  	return;
+   10  }
+
+== sub_83FB0900 in legodimensions_recomp.7.cpp:2, 8 lines; marks 83FB0944, 83FB0948
+  call sites (return address -> callee): 83FB0948->sub_83FB09A0
+  backward branches: none
+    1  DEFINE_REX_FUNC(sub_83FB0900) {
+    2  	REX_FUNC_PROLOGUE();
+    3  	// bl 0x83fb09a0
+    4  	ctx.lr = 0x83FB0948;   <<<
+    5  	sub_83FB09A0(ctx, base);
+    6  	return;
+    7  }
+    8  

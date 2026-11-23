@@ -1,0 +1,300 @@
+﻿diff --git a/build/agent11/launcher-review/v1-00BFECD7/run-night.ps1 b/build/agent11/launcher-review/v2-924321AE/run-night.ps1
+index 51e4f57..071fac0 100644
+--- a/build/agent11/launcher-review/v1-00BFECD7/run-night.ps1
++++ b/build/agent11/launcher-review/v2-924321AE/run-night.ps1
+@@ -35,9 +35,10 @@ $GateProcs = @('MsMpEng', 'OfficeClickToRun', 'CrossDeviceService')
+ # The runner's build list (timing-env.ps1 Get-BuildProcRegex) plus legodimensions; clangd / clang-format excluded.
+ $BuildInc = '^(clang.*|lld.*|ld\.lld.*|llvm-.*|ninja.*|cmake.*|dxc.*|cl|link|lib|mt|rc|msbuild.*|rexglue.*|codegen.*|sccache.*|ccache.*|rustc|cargo|legodimensions)$'
+ $BuildExc = '^(clangd.*|clang-format.*)$'
+-# The only programs it closes (exact process names, any case). ui32/ui64 only from a wallpaper_engine folder.
+-$CloseNames = @('ChatGPT', 'Copilot', 'Microsoft.Copilot', 'Roblox', 'RobloxPlayerBeta', 'RobloxPlayerLauncher', 'RobloxStudioBeta',
+-                'RobloxStudioLauncherBeta', 'Taskmgr', 'wallpaper32', 'wallpaper64', 'webwallpaper32', 'webwallpaper64')
++# The only programs it closes (exact process names, any case). ui32/ui64 only from a wallpaper_engine folder. Roblox
++# Studio is left alone (it can hold unsaved work): "Roblox" here means the player.
++$CloseNames = @('ChatGPT', 'Copilot', 'Microsoft.Copilot', 'Roblox', 'RobloxPlayerBeta', 'RobloxPlayerLauncher', 'Taskmgr',
++                'wallpaper32', 'wallpaper64', 'webwallpaper32', 'webwallpaper64')
+ $CloseWallpaperUi = @('ui32', 'ui64')
+ $MinRamGB = 6.0; $MinDiskGB = 6.0; $QuietCores = 0.1; $RelaxMaxCores = 1.2; $RelaxSpread = 0.2; $DeadlineSlackMin = 10
+ 
+@@ -119,17 +120,29 @@ public static class LdNight {
+         if ((m & 0x40) == 0) return "already off";
+         return SetConsoleMode(h, (m & ~0x40u) | 0x80u) ? "turned off" : "could not be turned off";
+     }
++    [StructLayout(LayoutKind.Sequential)]
++    public struct PowerStatus { public byte ACLineStatus, BatteryFlag, BatteryLifePercent, SystemStatusFlag; public uint BatteryLifeTime, BatteryFullLifeTime; }
++    [DllImport("kernel32.dll", SetLastError = true)] static extern bool GetSystemPowerStatus(out PowerStatus s);
++    // "ACLineStatus BatteryFlag BatteryLifePercent" from GetSystemPowerStatus, or "failed <win32 error>".
++    public static string Power() {
++        PowerStatus s;
++        if (!GetSystemPowerStatus(out s)) return "failed " + Marshal.GetLastWin32Error();
++        return s.ACLineStatus + " " + s.BatteryFlag + " " + s.BatteryLifePercent;
++    }
+ }
+ '@
+ }
+ function Get-DesktopName { try { return [LdNight]::Desktop() } catch { return '?' } }
+ function Test-LogonUI { return [bool](Get-Process -Name LogonUI -ErrorAction SilentlyContinue) }
++# GetSystemPowerStatus: on AC only if ACLineStatus = 1 (online) or BatteryFlag = 128 (no system battery). A failed
++# query or an unknown state (255) counts as not on AC, so the start check and the gate refuse.
+ function Get-Power {
+-    $bat = @(Get-CimInstance -ClassName Win32_Battery -OperationTimeoutSec 20 -ErrorAction SilentlyContinue)
+-    if ($bat.Count -eq 0) { return @{ ac = $true; text = 'AC (no battery)' } }
+-    $st = [int]$bat[0].BatteryStatus
+-    $ac = @(2, 3, 6, 7, 8, 9, 11) -contains $st
+-    return @{ ac = $ac; text = "$(if ($ac) { 'AC' } else { 'ON BATTERY' }) (battery status $st, $($bat[0].EstimatedChargeRemaining) %)" }
++    $r = ''; try { $r = [LdNight]::Power() } catch { $r = "failed ($($_.Exception.Message))" }
++    if ($r -match '^(\d+) (\d+) (\d+)$') { $line = [int]$Matches[1]; $flag = [int]$Matches[2]; $pct = [int]$Matches[3] }
++    else { return @{ ac = $false; text = "UNKNOWN (GetSystemPowerStatus $r)" } }
++    $ac = ($line -eq 1) -or ($flag -eq 128)
++    $what = if ($line -eq 1) { 'AC' } elseif ($flag -eq 128) { 'AC (no battery)' } elseif ($line -eq 0) { 'ON BATTERY' } else { 'UNKNOWN' }
++    return @{ ac = $ac; text = "$what (ACLineStatus $line, BatteryFlag $flag, battery $(if ($pct -eq 255) { '?' } else { $pct }) %)" }
+ }
+ function Get-RamGB { Add-Type -AssemblyName Microsoft.VisualBasic; return [math]::Round((New-Object Microsoft.VisualBasic.Devices.ComputerInfo).AvailablePhysicalMemory / 1GB, 2) }
+ function Get-DiskGB { return [math]::Round((New-Object IO.DriveInfo 'C').AvailableFreeSpace / 1GB, 2) }
+@@ -256,8 +269,33 @@ function Test-Matrix($Go, [string]$Path) {
+     foreach ($o in $Go.only) { if ($ids -cnotcontains $o) { $why.Add("only=: no arm '$o' in $($Go.json)") } }
+     return , $why
+ }
++# -NonInteractive: if the runner ever asked for input it would fail at once instead of waiting all night (run-matrix.ps1
++# asks only without -Matrix or without -NoPrompt).
+ function Get-RunnerArgs([string]$Path, $Go) {
+-    return @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $RunMatrix, '-Matrix', $Path, '-Only', ($Go.only -join ','), '-Repeats', [string]$Go.repeats, '-ColdShared', '-NoPrompt')
++    return @('-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', $RunMatrix, '-Matrix', $Path, '-Only', ($Go.only -join ','), '-Repeats', [string]$Go.repeats, '-ColdShared', '-NoPrompt')
++}
++# sha256 of legodimensions.exe and MANIFEST.txt in the bins of the only= arms (paths already checked by Test-Matrix).
++# Logged when the GO is accepted and compared again right before the start.
++function Get-BinHashes($Go, [string]$Path) {
++    $h = [ordered]@{}
++    $mx = [IO.File]::ReadAllText($Path) | ConvertFrom-Json
++    foreach ($a in @(Get-P $mx 'arms')) {
++        if ($Go.only -cnotcontains [string](Get-P $a 'id')) { continue }
++        $bn = (([string](Get-P $a 'bin')) -replace '\\', '/').TrimEnd('/')
++        foreach ($f in @('legodimensions.exe', 'MANIFEST.txt')) {
++            $k = "$bn/$f"; if ($h.Contains($k)) { continue }
++            $p = Join-Path $Repo (($bn -replace '/', '\') + '\' + $f)
++            $h[$k] = if (Test-Path -LiteralPath $p -PathType Leaf) { (Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash } else { 'MISSING' }
++        }
++    }
++    return $h
++}
++# Not reasons to refuse: logged as WARN in the window log.
++function Get-MatrixWarnings([string]$Path) {
++    $w = New-Object System.Collections.Generic.List[string]
++    try { $mx = [IO.File]::ReadAllText($Path) | ConvertFrom-Json } catch { return , $w }
++    if ((Get-P $mx 'sys_csv') -ne $true) { $w.Add('the matrix has no "sys_csv": true, so the runs write no sys.json (no system data for this window)') }
++    return , $w
+ }
+ # run-matrix.ps1 -PlanOnly: reads the matrix, writes nothing, starts nothing. Gives the runner's own estimate.
+ function Get-Plan([string]$Path, $Go) {
+@@ -422,38 +460,90 @@ function Set-Awake([bool]$On) {
+     } elseif ($script:Awake) { [void][LdNight]::SetThreadExecutionState([uint32]2147483648); $script:Awake = $false; Log 'keep-awake: released' }
+ }
+ function Close-Programs([string]$When) {
+-    $found = @(foreach ($p in [Diagnostics.Process]::GetProcesses()) {
+-        $n = $p.ProcessName
+-        if ($CloseNames -contains $n) { $p }
+-        elseif ($CloseWallpaperUi -contains $n) { $path = ''; try { $path = $p.MainModule.FileName } catch { }; if ($path -match 'wallpaper_engine') { $p } }
+-    })
++    # One try/catch per program: a program that cannot be closed (Task Manager runs elevated, so even waiting for it can
++    # be denied) is logged and left running. It never stops the window.
++    $found = @()
++    try {
++        $found = @(foreach ($p in [Diagnostics.Process]::GetProcesses()) {
++            $n = $p.ProcessName
++            if ($CloseNames -contains $n) { $p }
++            elseif ($CloseWallpaperUi -contains $n) { $path = ''; try { $path = $p.MainModule.FileName } catch { }; if ($path -match 'wallpaper_engine') { $p } }
++        })
++    } catch { Log "programs ($When): could not list the processes ($($_.Exception.Message)); going on" 'Yellow'; return }
+     if (-not $found.Count) { Log "programs ($When): none of ChatGPT, Copilot, Roblox, Task Manager, Wallpaper Engine running"; return }
+     foreach ($p in $found) {
+-        $tag = "$($p.ProcessName) pid $($p.Id)"
++        $tag = "pid $($p.Id)"; try { $tag = "$($p.ProcessName) pid $($p.Id)" } catch { }
+         if ($DryRun) { Log "programs ($When): would close $tag"; continue }
+-        try { [void]$p.CloseMainWindow() } catch { }
+-        if (-not $p.WaitForExit(10000)) {
+-            try { $p.Kill(); [void]$p.WaitForExit(5000); Log "programs ($When): $tag closed (killed after 10 s)" }
+-            catch { Log "programs ($When): could not close $tag ($($_.Exception.Message)); elevated? going on" 'Yellow' }
+-        } else { Log "programs ($When): $tag closed" }
++        try {
++            try { [void]$p.CloseMainWindow() } catch { }
++            if ($p.WaitForExit(10000)) { Log "programs ($When): $tag closed" }
++            else { $p.Kill(); [void]$p.WaitForExit(5000); Log "programs ($When): $tag closed (killed after 10 s)" }
++        } catch {
++            $gone = $false; try { $gone = $p.HasExited } catch { }
++            if ($gone) { Log "programs ($When): $tag closed" }
++            else { Log "programs ($When): could not close $tag ($($_.Exception.Message)); elevated? left running, going on" 'Yellow' }
++        }
+     }
+ }
+ 
+ # ---------- HOLD and STOP ----------
++# The launcher writes the HOLD file only when there is none, with a marker (window id, launcher pid, token), and deletes
++# it only while its marker is still in it. A HOLD that is not ours is never replaced or deleted, and while one exists the
++# quiet gate fails ("foreign HOLD"). Agent 1's hold manager takes the HOLD over once the runner has made its matrix
++# folder and removes it when summary.md appears, so finding nothing of ours at the end is normal.
+ $script:HoldToken = $null
++function Get-HoldState {
++    if (-not (Test-Path -LiteralPath $HoldFile)) { return @{ kind = 'none'; text = '' } }
++    $txt = ''; try { $txt = ([IO.File]::ReadAllText($HoldFile)).Trim() } catch { $txt = "(unreadable: $($_.Exception.Message))" }
++    if ($script:HoldToken -and $txt.Contains($script:HoldToken)) { return @{ kind = 'ours'; text = $txt } }
++    $one = $txt -replace '\s+', ' '; if ($one.Length -gt 160) { $one = $one.Substring(0, 160) + '...' }
++    return @{ kind = 'foreign'; text = $one }
++}
++# Writes a new HOLD (CreateNew: never over an existing file). $true = written and read back; $false = a HOLD file was
++# there first. Throws if no HOLD could be written.
+ function Set-Hold([string]$WindowId) {
+-    if (Test-Path -LiteralPath $HoldFile) { $prev = ''; try { $prev = ([IO.File]::ReadAllText($HoldFile)).Trim() } catch { }; Log "a HOLD file already existed ('$prev'): replaced by this window's" 'Yellow' }
+-    $script:HoldToken = [guid]::NewGuid().ToString('N')
+-    Set-Text $HoldFile "HOLD window $WindowId by Agent 5's overnight launcher (bench\agent5\launch\run-night.ps1), pid $PID, since $(Ts (Now)), token $($script:HoldToken)"
++    $tok = [guid]::NewGuid().ToString('N')
++    $text = "HOLD window $WindowId by Agent 5's overnight launcher (bench\agent5\launch\run-night.ps1), pid $PID, since $(Ts (Now)), token $tok"
++    $bytes = (New-Object Text.UTF8Encoding $false).GetBytes($text + "`r`n")
++    $err = 'unknown'
++    for ($k = 0; $k -lt 10; $k++) {
++        if (Test-Path -LiteralPath $HoldFile) { return $false }
++        $fs = $null
++        try { $fs = [IO.FileStream]::new($HoldFile, [IO.FileMode]::CreateNew, [IO.FileAccess]::Write, [IO.FileShare]::Read) }
++        catch { $err = $_.Exception.Message; Start-Sleep -Milliseconds 200; continue }
++        $ok = $false
++        try { $fs.Write($bytes, 0, $bytes.Length); $fs.Flush(); $ok = $true } catch { $err = $_.Exception.Message } finally { $fs.Dispose() }
++        if ($ok) { break }
++        try { Remove-Item -LiteralPath $HoldFile -Force } catch { }     # our own half-written file
++        Start-Sleep -Milliseconds 200
++    }
++    $back = ''; try { $back = [IO.File]::ReadAllText($HoldFile) } catch { }
++    if (-not $back.Contains($tok)) { if (Test-Path -LiteralPath $HoldFile) { return $false }; throw "the HOLD file $HoldFile could not be written ($err)" }
++    $script:HoldToken = $tok
+     Log "HOLD written: $HoldFile"
++    return $true
++}
++# At GO acceptance, at every gate sample and right before the start: '' when the HOLD is ours (a new one is written when
++# there is none), else the reason the window must wait.
++function Sync-Hold([string]$WindowId) {
++    $st = Get-HoldState
++    if ($st.kind -eq 'ours') { return '' }
++    if ($st.kind -eq 'none') {
++        if ($script:HoldToken) { Log 'the HOLD file was removed by someone else before the window started: it is written again' 'Yellow'; $script:HoldToken = $null }
++        if (Set-Hold $WindowId) { return '' }
++        $st = Get-HoldState
++        if ($st.kind -eq 'none') { return 'the HOLD file came and went while it was being written' }
++    }
++    if ($script:HoldToken) { Log "this window's HOLD was replaced by someone else's ('$($st.text)'): it is left as it is" 'Yellow'; $script:HoldToken = $null }
++    return "foreign HOLD ('$($st.text)')"
+ }
+ function Clear-Hold {
+     if (-not $script:HoldToken) { return }
+     try {
+-        if (Test-Path -LiteralPath $HoldFile) {
+-            if ([IO.File]::ReadAllText($HoldFile) -match [regex]::Escape($script:HoldToken)) { Remove-Item -LiteralPath $HoldFile -Force; Log 'HOLD removed' }
+-            else { Log 'HOLD file is not ours any more: left as it is' 'Yellow' }
+-        } else { Log 'HOLD already gone (the hold manager removed it)' }
++        $st = Get-HoldState
++        if ($st.kind -eq 'ours') { Remove-Item -LiteralPath $HoldFile -Force; Log 'HOLD removed' }
++        elseif ($st.kind -eq 'none') { Log 'HOLD already gone (the hold manager removed it)' }
++        else { Log "HOLD is not this window's any more (the hold manager took it over): left as it is" }
+     } catch { Log "!!! HOLD remove failed: $($_.Exception.Message)" 'Red' }
+     $script:HoldToken = $null
+ }
+@@ -476,7 +566,8 @@ function Get-Deadline {
+ 
+ # ---------- one GO ----------
+ $script:GoCount = 0; $script:StopNow = $false; $script:Stuck = ''
+-function Write-LastGo([string]$Raw, [string]$Verdict) { Set-Text (Join-Path $StatusDir 'last-go.txt') ("read     $(Ts (Now))`r`nline     $Raw`r`nverdict  $Verdict") }
++$script:GoReadAt = $null
++function Write-LastGo([string]$Raw, [string]$Verdict) { Set-Text (Join-Path $StatusDir 'last-go.txt') ("read     $(if ($script:GoReadAt) { Ts $script:GoReadAt } else { '?' })`r`nline     $Raw`r`nverdict  $Verdict`r`ndecided  $(Ts (Now))") }
+ function Write-LastResult([string]$Text) { Set-Text (Join-Path $StatusDir 'last-result.txt') ("written  $(Ts (Now))`r`n" + $Text) }
+ function Refuse([string]$Raw, [string]$Why, [string]$Stage = 'GO') {
+     Log "$Stage REFUSED: $Why" 'Red'
+@@ -494,24 +585,28 @@ function Wait-Quiet($Go, $Plan, [datetime]$Accepted) {
+     $script:FixtureIx = 0
+     $script:Fixture = if ($GateFixture) { [IO.File]::ReadAllText((Resolve-Path -LiteralPath $GateFixture).Path) | ConvertFrom-Json } else { $null }
+     if ($script:Fixture) { Log "gate: simulated samples from $GateFixture (fields set to 'real' use this PC)" 'Yellow' }
+-    $next = Now; $g = $null; $holdGone = $false
++    $next = Now; $g = $null
+     while ($true) {
+         if (Test-Stop) { return 'stop' }
+-        if ($script:HoldToken -and -not $holdGone -and -not (Test-Path -LiteralPath $HoldFile)) { $holdGone = $true; Log 'the HOLD file was removed by someone else while waiting for the quiet gate; it is not written again (the gate still decides)' 'Yellow' }
+-        $now = Now; $since = ($now - $Accepted).TotalMinutes
+-        $last = if ($g) { $g.text } else { 'no CPU figures yet' }
+-        if ($since -ge $GiveUpMinutes) { Write-GateLine "GAVE UP ($last; after $([int]$since) min; window not started)"; return "gave up: the quiet gate did not pass in $GiveUpMinutes min" }
+-        if ($now.AddMinutes($Plan.min + $DeadlineSlackMin) -gt $script:Deadline) { Write-GateLine "DEADLINE ($last; after $([int]$since) min; window not started)"; return "deadline: $($Plan.min) + $DeadlineSlackMin min no longer ends by $(Ts $script:Deadline)" }
++        $now = Now; $since = ($now - $Accepted).TotalMinutes; $mins = [int][math]::Floor($since)
++        $last = if ($g -and $g.text) { $g.text } else { 'no CPU figures yet' }
++        # The gate line keeps the format agreed with Agent 12; the last reason goes to the GATE REFUSED line and last-result.txt.
++        $lastWhy = if ($g -and $g.why -and $g.why.Count) { $g.why -join '; ' } else { 'no sample yet' }
++        if ($since -ge $GiveUpMinutes) { Write-GateLine "GAVE UP ($last; after $mins min; window not started)"; return "gave up: the quiet gate did not pass in $GiveUpMinutes min (last wait: $lastWhy)" }
++        if ($now.AddMinutes($Plan.min + $DeadlineSlackMin) -gt $script:Deadline) { Write-GateLine "DEADLINE ($last; after $mins min; window not started)"; return "deadline: $($Plan.min) + $DeadlineSlackMin min no longer ends by $(Ts $script:Deadline) (last wait: $lastWhy)" }
+         if ($now -ge $next) {
++            # The HOLD must be ours: it is written if there is none; a foreign one fails this sample.
++            $hw = ''; try { $hw = Sync-Hold $Go.id } catch { $hw = "the HOLD file could not be written ($($_.Exception.Message))" }
+             $prev = if ($samples.Count) { $samples[$samples.Count - 1] } else { $null }
+             $s = Get-Sample $prev; $samples.Add($s)
+             $g = Test-Gate $samples $since
++            if ($hw) { $g.why.Insert(0, $hw); $g.pass = $false }
+             $verdict = if ($g.pass) { if ($g.relaxed) { 'PASS (relaxed)' } else { 'PASS' } } else { 'wait: ' + ($g.why -join '; ') }
+             Log "gate $($samples.Count) (+$([math]::Round($since, 1)) min): cpu $(Fmt-Cores $s.cores); builds $(if ($s.builds.Count) { $s.builds -join ' ' } else { 'none' }); RAM $($s.ram) GB; C: $($s.disk) GB; LogonUI $($s.logonui); AC $($s.ac) -> $verdict"
+             Set-State 'waiting-for-quiet' @{ window = $Go.id; gate = $verdict; accepted = (Ts $Accepted) }
+             if ($g.pass) {
+                 if ($g.relaxed) {
+-                    Write-GateLine "RELAXED ($($g.text); after $([int]$since) min)"
++                    Write-GateLine "RELAXED ($($g.text); after $mins min)"
+                     Log "relaxed gate: MsMpEng accepted at <= $RelaxMaxCores cores within $RelaxSpread of each other after the $StrictMinutes-min strict phase; values $($g.text)" 'Yellow'
+                     Set-Text (Join-Path $StatusDir 'relaxed-gate.txt') "relaxed gate $(Ts (Now)), window $($Go.id): $($g.text) (strict phase $StrictMinutes min, MsMpEng <= $RelaxMaxCores, spread <= $RelaxSpread)"
+                 } else { Write-GateLine "STRICT ($($g.text))" }
+@@ -525,10 +620,16 @@ function Wait-Quiet($Go, $Plan, [datetime]$Accepted) {
+ function Start-Window($Go, [string]$MPath, $Plan, [string]$WTag) {
+     $why = New-Object System.Collections.Generic.List[string]
+     $diff = Compare-Pins $script:Pins (Get-Pins); if ($diff.Count) { $why.Add("pinned files changed since the start: $($diff -join '; ')") }
+-    foreach ($w in (Test-Matrix $Go $MPath)) { $why.Add($w) }
++    $mw = Test-Matrix $Go $MPath; foreach ($w in $mw) { $why.Add($w) }
++    if (-not $mw.Count) { $bd = Compare-Pins $Go.bins (Get-BinHashes $Go $MPath); if ($bd.Count) { $why.Add("bin files changed since the GO: $($bd -join '; ')") } }
+     if ((Now).AddMinutes($Plan.min + $DeadlineSlackMin) -gt $script:Deadline) { $why.Add("deadline: $($Plan.min) + $DeadlineSlackMin min would end after $(Ts $script:Deadline)") }
++    $hw = ''; try { $hw = Sync-Hold $Go.id } catch { $hw = "the HOLD file could not be written ($($_.Exception.Message))" }
++    if ($hw) { $why.Add($hw) }
+     if ($why.Count) { Refuse $Go.raw ($why -join '; ') 'START'; return }
++    Log "bins unchanged since the GO ($($Go.bins.Count) files)"
+     foreach ($k in $AllowedEnv) { if ($null -ne [Environment]::GetEnvironmentVariable($k, 'Process')) { [Environment]::SetEnvironmentVariable($k, $null, 'Process'); Log "removed $k from the environment" } }
++    $pc = 'n/a'; try { $pc = ((@(& powercfg.exe /getactivescheme) | ForEach-Object { "$_".Trim() } | Where-Object { $_ }) -join ' ') } catch { }
++    Log "power scheme at the start: $pc"
+     Close-Programs 'window start'
+     $rArgs = Get-RunnerArgs $MPath $Go
+     $cmd = "`"$PsExe`" " + ((@($rArgs) | ForEach-Object { if ($_ -match '\s') { "`"$_`"" } else { $_ } }) -join ' ')
+@@ -565,6 +666,7 @@ function Invoke-Go {
+     $t1 = $null; $t2 = $null
+     try { $t1 = Read-Text $GoFile; Start-Sleep -Seconds 1; $t2 = Read-Text $GoFile } catch { Log "GO file not readable yet: $($_.Exception.Message)"; return }
+     if ($t1 -cne $t2) { Log 'GO file is still being written: read again at the next poll'; return }
++    $script:GoReadAt = Now
+     try { Remove-Item -LiteralPath $GoFile -Force; $script:Stuck = '' } catch { $script:Stuck = $sig; Log "!!! GO file could not be deleted ($($_.Exception.Message)); this GO is used once and then ignored" 'Red' }
+     $script:GoCount++
+     $go = Parse-Go $t2
+@@ -582,9 +684,15 @@ function Invoke-Go {
+     $wTag = "$($go.id)-$($accepted.ToString('HHmm'))"
+     $script:WinLog = Join-Path $StatusDir "window-$wTag.log"
+     try {
+-        Set-Hold $go.id
++        $hw = ''
++        try { $hw = Sync-Hold $go.id } catch { Refuse $go.raw "the HOLD file could not be written: $($_.Exception.Message)"; return }
++        try { $go.bins = Get-BinHashes $go $mPath } catch { Refuse $go.raw "the bin files could not be hashed: $($_.Exception.Message)"; return }
+         Log "GO ACCEPTED: window $($go.id): $($go.json) (sha256 ok), only=$($go.only -join ','), repeats=$($go.repeats); runner estimate $($plan.runs) runs, about $($plan.min) min" 'Green'
+         Write-LastGo $go.raw "ACCEPTED at $(Ts $accepted) (estimate $($plan.runs) runs, about $($plan.min) min)"
++        if ($hw) { Log "$($hw): it is not replaced, and the quiet gate fails until it is gone" 'Yellow' }
++        foreach ($k in $go.bins.Keys) { Log "bin $k sha256 $($go.bins[$k])" }
++        foreach ($x in (Get-MatrixWarnings $mPath)) { Log "WARN: $x" 'Yellow' }
++        foreach ($l in @($plan.lines | Where-Object { $_ -match 'FUNCTIONAL ONLY' })) { Log "WARN: run-matrix.ps1 -PlanOnly says: $($l.Trim())" 'Yellow' }
+         foreach ($l in $plan.lines) { Add-Text $script:WinLog "  plan| $l" }
+         Close-Programs 'GO accepted'
+         $r = Wait-Quiet $go $plan $accepted
+@@ -636,9 +744,11 @@ try {
+         $begun = $true
+         Set-Text (Join-Path $StatusDir 'pins.txt') ("pinned $(Ts (Now)) by launcher pid $PID; any change refuses the next window`r`n" + ((@($script:Pins.Keys | ForEach-Object { "$($script:Pins[$_])  $_" })) -join "`r`n"))
+         Log "pinned $($script:Pins.Count) files (status: pins.txt)"
++        $left = @(Get-ChildItem Env: | Where-Object { $_.Name -match '^(REX_|LEGO_)' -and $AllowedEnv -notcontains $_.Name } | Sort-Object Name | ForEach-Object { $v = [string]$_.Value; if ($v.Length -gt 80) { $v = $v.Substring(0, 80) + '...' }; "$($_.Name)='$v'" })
++        if ($left.Count) { Log "environment: other REX_*/LEGO_* variables (passed on to the runner as they are): $($left -join ', ')" 'Yellow' } else { Log 'environment: no other REX_*/LEGO_* variables' }
+         foreach ($k in $AllowedEnv) { $v = [Environment]::GetEnvironmentVariable($k, 'Process'); if ($null -ne $v) { [Environment]::SetEnvironmentVariable($k, $null, 'Process'); Log "removed $k='$v' from the launcher's environment (arms set it through the matrix only)" 'Yellow' } }
+-        $qe = 'n/a'; try { $qe = [LdNight]::NoQuickEdit() } catch { }
+-        Log "console Quick Edit: $qe (a click in this window must not pause it)"
++        if ($DryRun) { Log 'console Quick Edit: not changed in a dry run' }
++        else { $qe = 'n/a'; try { $qe = [LdNight]::NoQuickEdit() } catch { }; Log "console Quick Edit: $qe (a click in this window must not pause it)" }
+         Set-ScreensaverNone
+         Set-Awake $true
+         Set-State 'waiting-for-go' @{ go_file = $GoFile; gos_read = 0 }

@@ -1,0 +1,2219 @@
+{
+ "tool": "prof_main_compare.py",
+ "schema": 1,
+ "a": {
+  "label": "a-prof",
+  "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-0357\\runs\\0357-a-prof-r1",
+  "profile": "<workspace>\\build\\agent8\\matrix\\20261122-0357\\runs\\0357-a-prof-r1\\profile-728734687.bin",
+  "profile_bytes": 1361044,
+  "map": "<workspace>\\build\\agent8\\matrix\\20261122-0357\\runs\\0357-a-prof-r1\\legodimensions.map",
+  "samples": 14766,
+  "threads_seen": 78,
+  "rounds": 191,
+  "rounds_source": "trailer",
+  "duration": {
+   "rounds": 191,
+   "rounds_estimated": 191,
+   "seconds": 150.2559161,
+   "source": "trailer",
+   "rounds_per_s": 1.3
+  },
+  "timer_mode": 1,
+  "observer_effect": false,
+  "trailer": true,
+  "fps": 67.65653063969778,
+  "fps_source": "frames.json window rows_by_end_bytes/end_bytes_window_s",
+  "w_ms_per_frame_per_sample": 0.07738502173755898,
+  "thread_select": {
+   "mode": "name /^Main XThread/",
+   "tids": [
+    39692
+   ]
+  },
+  "thread_names": [
+   "Main XThread (F800002C)"
+  ],
+  "thread_samples": 191,
+  "busy": 47,
+  "wait": 144,
+  "io": 0,
+  "busy_ms_per_frame": 3.6370960216652723,
+  "blocked_ms_per_frame": 11.143443130208494,
+  "threads_csv": null,
+  "arm_args": [
+   "--log_file=<workspace>\\build\\agent8\\matrix\\20261122-0357\\runs\\0357-a-prof-r1\\game.log",
+   "--perf_log_csv=<workspace>\\build\\agent8\\matrix\\20261122-0357\\runs\\0357-a-prof-r1\\perf.csv",
+   "--native_settings_load=false",
+   "--discord_rpc=false",
+   "--audio_mute=true",
+   "--pause_when_unfocused=false",
+   "--framerate_limit=0"
+  ],
+  "env_set": {
+   "LEGO_SAMPLE_PROFILE": "1",
+   "LEGO_SAMPLE_PROFILE_TRIGGER": "<workspace>\\build\\agent8\\matrix\\20261122-0357\\runs\\0357-a-prof-r1\\profile.trigger"
+  },
+  "timing": {
+   "read_s": 0.033,
+   "map_s": 5.924,
+   "symbolize_s": 0.922,
+   "unique_stacks": 404,
+   "unique_addresses": 1064,
+   "functions": 578
+  },
+  "warnings": [
+   "profile-728734687.bin: low sampling rate (1 rounds/s, nominal ~1000): the machine was probably CPU-saturated (each SuspendThread/GetThreadContext waits until the target thread is scheduled); attribution is still usable but noisy"
+  ]
+ },
+ "b": {
+  "label": "b-prof",
+  "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-0357\\runs\\0401-b-prof-r1",
+  "profile": "<workspace>\\build\\agent8\\matrix\\20261122-0357\\runs\\0401-b-prof-r1\\profile-728987468.bin",
+  "profile_bytes": 1341001,
+  "map": "<workspace>\\build\\agent8\\matrix\\20261122-0357\\runs\\0401-b-prof-r1\\legodimensions.map",
+  "samples": 14530,
+  "threads_seen": 78,
+  "rounds": 188,
+  "rounds_source": "trailer",
+  "duration": {
+   "rounds": 188,
+   "rounds_estimated": 188,
+   "seconds": 149.8546384,
+   "source": "trailer",
+   "rounds_per_s": 1.3
+  },
+  "timer_mode": 1,
+  "observer_effect": false,
+  "trailer": true,
+  "fps": 67.77253713229906,
+  "fps_source": "frames.json window rows_by_end_bytes/end_bytes_window_s",
+  "w_ms_per_frame_per_sample": 0.07848531516219732,
+  "thread_select": {
+   "mode": "name /^Main XThread/",
+   "tids": [
+    32908
+   ]
+  },
+  "thread_names": [
+   "Main XThread (F800002C)"
+  ],
+  "thread_samples": 188,
+  "busy": 45,
+  "wait": 143,
+  "io": 0,
+  "busy_ms_per_frame": 3.5318391822988797,
+  "blocked_ms_per_frame": 11.223400068194218,
+  "threads_csv": null,
+  "arm_args": [
+   "--log_file=<workspace>\\build\\agent8\\matrix\\20261122-0357\\runs\\0401-b-prof-r1\\game.log",
+   "--perf_log_csv=<workspace>\\build\\agent8\\matrix\\20261122-0357\\runs\\0401-b-prof-r1\\perf.csv",
+   "--native_settings_load=false",
+   "--discord_rpc=false",
+   "--audio_mute=true",
+   "--pause_when_unfocused=false",
+   "--framerate_limit=0"
+  ],
+  "env_set": {
+   "LEGO_SAMPLE_PROFILE": "1",
+   "LEGO_SAMPLE_PROFILE_TRIGGER": "<workspace>\\build\\agent8\\matrix\\20261122-0357\\runs\\0401-b-prof-r1\\profile.trigger"
+  },
+  "timing": {
+   "read_s": 0.04,
+   "map_s": 6.151,
+   "symbolize_s": 0.623,
+   "unique_stacks": 400,
+   "unique_addresses": 1085,
+   "functions": 559
+  },
+  "warnings": [
+   "profile-728987468.bin: low sampling rate (1 rounds/s, nominal ~1000): the machine was probably CPU-saturated (each SuspendThread/GetThreadContext waits until the target thread is scheduled); attribution is still usable but noisy"
+  ]
+ },
+ "units": "ms of CPU per frame (busy samples) unless noted",
+ "buckets": [
+  {
+   "key": "guest code",
+   "a": 2.8632458042896825,
+   "b": 2.3545594548659197,
+   "delta": -0.5086863494237628,
+   "se2": 1.2749442022115554,
+   "na": 37,
+   "nb": 30,
+   "noise": true
+  },
+  {
+   "key": "write-tracking fault (VEH)",
+   "a": 0.07738502173755898,
+   "b": 0.0,
+   "delta": -0.07738502173755898,
+   "se2": 0.15477004347511797,
+   "na": 1,
+   "nb": 0,
+   "noise": true
+  },
+  {
+   "key": "write-tracking arm/protect",
+   "a": 0.4643101304253539,
+   "b": 1.0203090971085653,
+   "delta": 0.5559989666832115,
+   "se2": 0.6812046112156247,
+   "na": 6,
+   "nb": 13,
+   "noise": true
+  },
+  {
+   "key": "CPU pool copy",
+   "a": 0.0,
+   "b": 0.0,
+   "delta": 0.0,
+   "se2": 0.0,
+   "na": 0,
+   "nb": 0,
+   "noise": false
+  },
+  {
+   "key": "sync/spin/yield (busy)",
+   "a": 0.15477004347511797,
+   "b": 0.0,
+   "delta": -0.15477004347511797,
+   "se2": 0.21887789453158538,
+   "na": 2,
+   "nb": 0,
+   "noise": true
+  },
+  {
+   "key": "d3d12+driver",
+   "a": 0.0,
+   "b": 0.0,
+   "delta": 0.0,
+   "se2": 0.0,
+   "na": 0,
+   "nb": 0,
+   "noise": false
+  },
+  {
+   "key": "native upload/copy/hash",
+   "a": 0.0,
+   "b": 0.0,
+   "delta": 0.0,
+   "se2": 0.0,
+   "na": 0,
+   "nb": 0,
+   "noise": false
+  },
+  {
+   "key": "native-gpu other",
+   "a": 0.0,
+   "b": 0.0,
+   "delta": 0.0,
+   "se2": 0.0,
+   "na": 0,
+   "nb": 0,
+   "noise": false
+  },
+  {
+   "key": "rexlego host",
+   "a": 0.0,
+   "b": 0.0,
+   "delta": 0.0,
+   "se2": 0.0,
+   "na": 0,
+   "nb": 0,
+   "noise": false
+  },
+  {
+   "key": "rexruntime",
+   "a": 0.07738502173755898,
+   "b": 0.15697063032439465,
+   "delta": 0.07958560858683567,
+   "se2": 0.27061656254960714,
+   "na": 1,
+   "nb": 2,
+   "noise": true
+  },
+  {
+   "key": "system/other",
+   "a": 0.0,
+   "b": 0.0,
+   "delta": 0.0,
+   "se2": 0.0,
+   "na": 0,
+   "nb": 0,
+   "noise": false
+  },
+  {
+   "key": "total busy",
+   "a": 3.6370960216652723,
+   "b": 3.5318391822988797,
+   "delta": -0.10525683936639263,
+   "se2": 1.4948635603600502,
+   "na": 47,
+   "nb": 45,
+   "noise": true
+  },
+  {
+   "key": "blocked (wait/io, not CPU)",
+   "a": 11.143443130208494,
+   "b": 11.223400068194218,
+   "delta": 0.0799569379857239,
+   "se2": 2.640611808203612,
+   "na": 144,
+   "nb": 143,
+   "noise": true
+  }
+ ],
+ "candidates": [
+  {
+   "key": "write-tracking arm/protect",
+   "a": 0.4643101304253539,
+   "b": 1.0203090971085653,
+   "delta": 0.5559989666832115,
+   "se2": 0.6812046112156247,
+   "na": 6,
+   "nb": 13,
+   "noise": true
+  },
+  {
+   "key": "rexruntime",
+   "a": 0.07738502173755898,
+   "b": 0.15697063032439465,
+   "delta": 0.07958560858683567,
+   "se2": 0.27061656254960714,
+   "na": 1,
+   "nb": 2,
+   "noise": true
+  }
+ ],
+ "leaf_categories": [
+  {
+   "key": "guest",
+   "a": 2.5537057173394464,
+   "b": 2.197588824541525,
+   "delta": -0.35611689279792147,
+   "se2": 1.2167120019769773,
+   "na": 33,
+   "nb": 28,
+   "noise": true
+  },
+  {
+   "key": "rexruntime",
+   "a": 0.07738502173755898,
+   "b": 0.15697063032439465,
+   "delta": 0.07958560858683567,
+   "se2": 0.27061656254960714,
+   "na": 1,
+   "nb": 2,
+   "noise": true
+  },
+  {
+   "key": "native-gpu",
+   "a": 0.0,
+   "b": 0.0,
+   "delta": 0.0,
+   "se2": 0.0,
+   "na": 0,
+   "nb": 0,
+   "noise": false
+  },
+  {
+   "key": "rexlego",
+   "a": 0.30954008695023594,
+   "b": 0.15697063032439465,
+   "delta": -0.1525694566258413,
+   "se2": 0.3809128811133002,
+   "na": 4,
+   "nb": 2,
+   "noise": true
+  },
+  {
+   "key": "d3d12+driver",
+   "a": 0.0,
+   "b": 0.0,
+   "delta": 0.0,
+   "se2": 0.0,
+   "na": 0,
+   "nb": 0,
+   "noise": false
+  },
+  {
+   "key": "system",
+   "a": 0.6190801739004719,
+   "b": 1.0203090971085653,
+   "delta": 0.40122892320809345,
+   "se2": 0.715504895200592,
+   "na": 8,
+   "nb": 13,
+   "noise": true
+  },
+  {
+   "key": "other",
+   "a": 0.07738502173755898,
+   "b": 0.0,
+   "delta": -0.07738502173755898,
+   "se2": 0.15477004347511797,
+   "na": 1,
+   "nb": 0,
+   "noise": true
+  },
+  {
+   "key": "unknown",
+   "a": 0.0,
+   "b": 0.0,
+   "delta": 0.0,
+   "se2": 0.0,
+   "na": 0,
+   "nb": 0,
+   "noise": false
+  }
+ ],
+ "boundary": [
+  {
+   "key": "(guest code)",
+   "a": 2.8632458042896825,
+   "b": 2.3545594548659197,
+   "delta": -0.5086863494237628,
+   "se2": 1.2749442022115554,
+   "na": 37,
+   "nb": 30,
+   "noise": true,
+   "callers": []
+  },
+  {
+   "key": "rexruntime.dll!rex::X::$MP6AXV?$MappedPtr::?$HostToGuestFunction",
+   "a": 0.5416951521629129,
+   "b": 1.0203090971085653,
+   "delta": 0.47861394494565246,
+   "se2": 0.6985653073970395,
+   "na": 7,
+   "nb": 13,
+   "noise": true,
+   "callers": [
+    [
+     "sub_82B55588 [guest 0x82B55588]",
+     13
+    ]
+   ]
+  },
+  {
+   "key": "rexruntime.dll!rex::chrono::UpdateGuestClock",
+   "a": 0.23215506521267695,
+   "b": 0.0,
+   "delta": -0.23215506521267695,
+   "se2": 0.2680695787885483,
+   "na": 3,
+   "nb": 0,
+   "noise": true,
+   "callers": [
+    [
+     "sub_83F9EA20 [guest 0x83F9EA20]",
+     3
+    ]
+   ]
+  },
+  {
+   "key": "rexruntime.dll!rex::input::UX_INPUT_STATE::$MP6AIIIV?$MappedPtr::?$HostToGuestFunction",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true,
+   "callers": [
+    [
+     "sub_82A32128 [guest 0x82A32128]",
+     1
+    ]
+   ]
+  },
+  {
+   "key": "rexruntime.dll!rex::kernel::xboxkrnl::UX_RTL_CRITICAL_SECTION::$MP6AXV?$MappedPtr::?$HostToGuestFunction",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true,
+   "callers": [
+    [
+     "sub_82BD1EC8 [guest 0x82BD1EC8]",
+     1
+    ]
+   ]
+  }
+ ],
+ "self": [
+  {
+   "key": "ntdll.dll!NtProtectVirtualMemory",
+   "a": 0.4643101304253539,
+   "b": 1.0203090971085653,
+   "delta": 0.5559989666832115,
+   "se2": 0.6812046112156247,
+   "na": 6,
+   "nb": 13,
+   "noise": true
+  },
+  {
+   "key": "sub_83FF1F88 [guest 0x83FF1F88]",
+   "a": 0.23215506521267695,
+   "b": 0.0,
+   "delta": -0.23215506521267695,
+   "se2": 0.2680695787885483,
+   "na": 3,
+   "nb": 0,
+   "noise": true
+  },
+  {
+   "key": "sub_8388BAC0 [guest 0x8388BAC0]",
+   "a": 0.0,
+   "b": 0.15697063032439465,
+   "delta": 0.15697063032439465,
+   "se2": 0.22198999429901234,
+   "na": 0,
+   "nb": 2,
+   "noise": true
+  },
+  {
+   "key": "sub_82AA4410 [guest 0x82AA4410]",
+   "a": 0.15477004347511797,
+   "b": 0.0,
+   "delta": -0.15477004347511797,
+   "se2": 0.21887789453158538,
+   "na": 2,
+   "nb": 0,
+   "noise": true
+  },
+  {
+   "key": "sub_82BD1EC8 [guest 0x82BD1EC8]",
+   "a": 0.15477004347511797,
+   "b": 0.0,
+   "delta": -0.15477004347511797,
+   "se2": 0.21887789453158538,
+   "na": 2,
+   "nb": 0,
+   "noise": true
+  },
+  {
+   "key": "sub_83E45F10 [guest 0x83E45F10]",
+   "a": 0.07738502173755898,
+   "b": 0.15697063032439465,
+   "delta": 0.07958560858683567,
+   "se2": 0.27061656254960714,
+   "na": 1,
+   "nb": 2,
+   "noise": true
+  },
+  {
+   "key": "__savegprlr_27",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "rexruntime.dll!rex::input::mnk::MnkInputDriver::OnGotFocus",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "rexruntime.dll!rex::thread::atomic_dec",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_8268F038 [guest 0x8268F038]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82A20188 [guest 0x82A20188]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82A2A2B8 [guest 0x82A2A2B8]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82A53B48 [guest 0x82A53B48]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82A9CC28 [guest 0x82A9CC28]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82AA3908 [guest 0x82AA3908]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82AFC280 [guest 0x82AFC280]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82B05880 [guest 0x82B05880]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82B31FC0 [guest 0x82B31FC0]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82B3B288 [guest 0x82B3B288]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82B70998 [guest 0x82B70998]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82BBAAC8 [guest 0x82BBAAC8]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82CA5468 [guest 0x82CA5468]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82CBDC98 [guest 0x82CBDC98]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82CEC928 [guest 0x82CEC928]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82D7CB08 [guest 0x82D7CB08]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82EE66E0 [guest 0x82EE66E0]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_83E44E60 [guest 0x83E44E60]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_83E463B8 [guest 0x83E463B8]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_83E4AD90 [guest 0x83E4AD90]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_83E4E678 [guest 0x83E4E678]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  }
+ ],
+ "incl": [
+  {
+   "key": "sub_82B79938 [guest 0x82B79938]",
+   "a": 1.0833903043258257,
+   "b": 1.883647563892736,
+   "delta": 0.8002572595669102,
+   "se2": 0.9626564391456409,
+   "na": 14,
+   "nb": 24,
+   "noise": true
+  },
+  {
+   "key": "sub_82AF9BC0 [guest 0x82AF9BC0]",
+   "a": 1.0060052825882668,
+   "b": 0.3139412606487893,
+   "delta": -0.6920640219394776,
+   "se2": 0.6402796871543871,
+   "na": 13,
+   "nb": 4,
+   "noise": false
+  },
+  {
+   "key": "sub_82AFAB68 [guest 0x82AFAB68]",
+   "a": 1.0060052825882668,
+   "b": 0.3139412606487893,
+   "delta": -0.6920640219394776,
+   "se2": 0.6402796871543871,
+   "na": 13,
+   "nb": 4,
+   "noise": false
+  },
+  {
+   "key": "sub_82AB2040 [guest 0x82AB2040]",
+   "a": 1.9346255434389745,
+   "b": 2.5115300851903144,
+   "delta": 0.5769045417513399,
+   "se2": 1.177844251178506,
+   "na": 25,
+   "nb": 32,
+   "noise": true
+  },
+  {
+   "key": "KERNELBASE.dll!VirtualProtect",
+   "a": 0.4643101304253539,
+   "b": 1.0203090971085653,
+   "delta": 0.5559989666832115,
+   "se2": 0.6812046112156247,
+   "na": 6,
+   "nb": 13,
+   "noise": true
+  },
+  {
+   "key": "ntdll.dll!NtProtectVirtualMemory",
+   "a": 0.4643101304253539,
+   "b": 1.0203090971085653,
+   "delta": 0.5559989666832115,
+   "se2": 0.6812046112156247,
+   "na": 6,
+   "nb": 13,
+   "noise": true
+  },
+  {
+   "key": "rexruntime.dll!rex::memory::BaseHeap::Protect",
+   "a": 0.4643101304253539,
+   "b": 1.0203090971085653,
+   "delta": 0.5559989666832115,
+   "se2": 0.6812046112156247,
+   "na": 6,
+   "nb": 13,
+   "noise": true
+  },
+  {
+   "key": "rexruntime.dll!rex::memory::Protect",
+   "a": 0.4643101304253539,
+   "b": 1.0203090971085653,
+   "delta": 0.5559989666832115,
+   "se2": 0.6812046112156247,
+   "na": 6,
+   "nb": 13,
+   "noise": true
+  },
+  {
+   "key": "sub_82FCB308 [guest 0x82FCB308]",
+   "a": 0.7738502173755899,
+   "b": 0.235455945486592,
+   "delta": -0.5383942718889979,
+   "se2": 0.5598723068041608,
+   "na": 10,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "sub_82FCC500 [guest 0x82FCC500]",
+   "a": 0.7738502173755899,
+   "b": 0.235455945486592,
+   "delta": -0.5383942718889979,
+   "se2": 0.5598723068041608,
+   "na": 10,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "rexruntime.dll!rex::memory::PhysicalHeap::Protect",
+   "a": 0.5416951521629129,
+   "b": 1.0203090971085653,
+   "delta": 0.47861394494565246,
+   "se2": 0.6985653073970395,
+   "na": 7,
+   "nb": 13,
+   "noise": true
+  },
+  {
+   "key": "sub_82B55588 [guest 0x82B55588]",
+   "a": 0.5416951521629129,
+   "b": 1.0203090971085653,
+   "delta": 0.47861394494565246,
+   "se2": 0.6985653073970395,
+   "na": 7,
+   "nb": 13,
+   "noise": true
+  },
+  {
+   "key": "sub_82B590E8 [guest 0x82B590E8]",
+   "a": 0.5416951521629129,
+   "b": 1.0203090971085653,
+   "delta": 0.47861394494565246,
+   "se2": 0.6985653073970395,
+   "na": 7,
+   "nb": 13,
+   "noise": true
+  },
+  {
+   "key": "sub_82CBC020 [guest 0x82CBC020]",
+   "a": 0.5416951521629129,
+   "b": 1.0203090971085653,
+   "delta": 0.47861394494565246,
+   "se2": 0.6985653073970395,
+   "na": 7,
+   "nb": 13,
+   "noise": true
+  },
+  {
+   "key": "sub_82CBC968 [guest 0x82CBC968]",
+   "a": 0.5416951521629129,
+   "b": 1.0203090971085653,
+   "delta": 0.47861394494565246,
+   "se2": 0.6985653073970395,
+   "na": 7,
+   "nb": 13,
+   "noise": true
+  },
+  {
+   "key": "sub_82F050B0 [guest 0x82F050B0]",
+   "a": 0.6964651956380309,
+   "b": 0.235455945486592,
+   "delta": -0.4610092501514389,
+   "se2": 0.5380550469691019,
+   "na": 9,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "sub_83FF23C0 [guest 0x83FF23C0]",
+   "a": 0.6964651956380309,
+   "b": 0.235455945486592,
+   "delta": -0.4610092501514389,
+   "se2": 0.5380550469691019,
+   "na": 9,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "sub_83FFE050 [guest 0x83FFE050]",
+   "a": 0.6964651956380309,
+   "b": 0.235455945486592,
+   "delta": -0.4610092501514389,
+   "se2": 0.5380550469691019,
+   "na": 9,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "sub_83FFE2A0 [guest 0x83FFE2A0]",
+   "a": 0.6964651956380309,
+   "b": 0.235455945486592,
+   "delta": -0.4610092501514389,
+   "se2": 0.5380550469691019,
+   "na": 9,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "sub_83FFFA30 [guest 0x83FFFA30]",
+   "a": 0.6964651956380309,
+   "b": 0.235455945486592,
+   "delta": -0.4610092501514389,
+   "se2": 0.5380550469691019,
+   "na": 9,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "rexruntime.dll!rex::X::$MP6AXV?$MappedPtr::?$HostToGuestFunction",
+   "a": 0.6190801739004719,
+   "b": 1.0203090971085653,
+   "delta": 0.40122892320809345,
+   "se2": 0.715504895200592,
+   "na": 8,
+   "nb": 13,
+   "noise": true
+  },
+  {
+   "key": "sub_82EF3180 [guest 0x82EF3180]",
+   "a": 0.5416951521629129,
+   "b": 0.15697063032439465,
+   "delta": -0.38472452183851824,
+   "se2": 0.46578527463833036,
+   "na": 7,
+   "nb": 2,
+   "noise": true
+  },
+  {
+   "key": "sub_82EF3B38 [guest 0x82EF3B38]",
+   "a": 0.5416951521629129,
+   "b": 0.15697063032439465,
+   "delta": -0.38472452183851824,
+   "se2": 0.46578527463833036,
+   "na": 7,
+   "nb": 2,
+   "noise": true
+  },
+  {
+   "key": "sub_82EFE948 [guest 0x82EFE948]",
+   "a": 0.5416951521629129,
+   "b": 0.15697063032439465,
+   "delta": -0.38472452183851824,
+   "se2": 0.46578527463833036,
+   "na": 7,
+   "nb": 2,
+   "noise": true
+  },
+  {
+   "key": "sub_82EF8C18 [guest 0x82EF8C18]",
+   "a": 0.6190801739004719,
+   "b": 0.235455945486592,
+   "delta": -0.3836242284138799,
+   "se2": 0.5153149204240379,
+   "na": 8,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "sub_82F0CCD8 [guest 0x82F0CCD8]",
+   "a": 0.6190801739004719,
+   "b": 0.235455945486592,
+   "delta": -0.3836242284138799,
+   "se2": 0.5153149204240379,
+   "na": 8,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "ntdll.dll!RtlUserThreadStart",
+   "a": 3.0180158477648003,
+   "b": 3.374868551974485,
+   "delta": 0.35685270420968473,
+   "se2": 1.4119870309833338,
+   "na": 39,
+   "nb": 43,
+   "noise": true
+  },
+  {
+   "key": "sub_83FF1F88 [guest 0x83FF1F88]",
+   "a": 0.5416951521629129,
+   "b": 0.235455945486592,
+   "delta": -0.3062392066763209,
+   "se2": 0.49152385583442704,
+   "na": 7,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "KERNEL32.DLL!BaseThreadInitThunk",
+   "a": 3.0954008695023596,
+   "b": 3.374868551974485,
+   "delta": 0.2794676824721254,
+   "se2": 1.4204439946799803,
+   "na": 40,
+   "nb": 43,
+   "noise": true
+  },
+  {
+   "key": "rexruntime.dll!rex::chrono::UpdateGuestClock",
+   "a": 0.23215506521267695,
+   "b": 0.0,
+   "delta": -0.23215506521267695,
+   "se2": 0.2680695787885483,
+   "na": 3,
+   "nb": 0,
+   "noise": true
+  }
+ ],
+ "guest_self": [
+  {
+   "key": "sub_83FF1F88 [guest 0x83FF1F88]",
+   "a": 0.23215506521267695,
+   "b": 0.0,
+   "delta": -0.23215506521267695,
+   "se2": 0.2680695787885483,
+   "na": 3,
+   "nb": 0,
+   "noise": true
+  },
+  {
+   "key": "sub_8388BAC0 [guest 0x8388BAC0]",
+   "a": 0.0,
+   "b": 0.15697063032439465,
+   "delta": 0.15697063032439465,
+   "se2": 0.22198999429901234,
+   "na": 0,
+   "nb": 2,
+   "noise": true
+  },
+  {
+   "key": "sub_82AA4410 [guest 0x82AA4410]",
+   "a": 0.15477004347511797,
+   "b": 0.0,
+   "delta": -0.15477004347511797,
+   "se2": 0.21887789453158538,
+   "na": 2,
+   "nb": 0,
+   "noise": true
+  },
+  {
+   "key": "sub_82BD1EC8 [guest 0x82BD1EC8]",
+   "a": 0.15477004347511797,
+   "b": 0.0,
+   "delta": -0.15477004347511797,
+   "se2": 0.21887789453158538,
+   "na": 2,
+   "nb": 0,
+   "noise": true
+  },
+  {
+   "key": "sub_83E45F10 [guest 0x83E45F10]",
+   "a": 0.07738502173755898,
+   "b": 0.15697063032439465,
+   "delta": 0.07958560858683567,
+   "se2": 0.27061656254960714,
+   "na": 1,
+   "nb": 2,
+   "noise": true
+  },
+  {
+   "key": "__savegprlr_27",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_8268F038 [guest 0x8268F038]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82A20188 [guest 0x82A20188]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82A2A2B8 [guest 0x82A2A2B8]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82A53B48 [guest 0x82A53B48]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82A9CC28 [guest 0x82A9CC28]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82AA3908 [guest 0x82AA3908]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82AFC280 [guest 0x82AFC280]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82B05880 [guest 0x82B05880]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82B31FC0 [guest 0x82B31FC0]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82B3B288 [guest 0x82B3B288]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82B70998 [guest 0x82B70998]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82BBAAC8 [guest 0x82BBAAC8]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82CA5468 [guest 0x82CA5468]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82CBDC98 [guest 0x82CBDC98]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82CEC928 [guest 0x82CEC928]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82D7CB08 [guest 0x82D7CB08]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_82EE66E0 [guest 0x82EE66E0]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_83E44E60 [guest 0x83E44E60]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_83E463B8 [guest 0x83E463B8]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_83E4AD90 [guest 0x83E4AD90]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_83E4E678 [guest 0x83E4E678]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_83E4E748 [guest 0x83E4E748]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "sub_83FA64B8 [guest 0x83FA64B8]",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true
+  },
+  {
+   "key": "__restgprlr_14",
+   "a": 0.07738502173755898,
+   "b": 0.0,
+   "delta": -0.07738502173755898,
+   "se2": 0.15477004347511797,
+   "na": 1,
+   "nb": 0,
+   "noise": true
+  }
+ ],
+ "guest_incl": [
+  {
+   "key": "sub_82B79938 [guest 0x82B79938]",
+   "a": 1.0833903043258257,
+   "b": 1.883647563892736,
+   "delta": 0.8002572595669102,
+   "se2": 0.9626564391456409,
+   "na": 14,
+   "nb": 24,
+   "noise": true
+  },
+  {
+   "key": "sub_82AF9BC0 [guest 0x82AF9BC0]",
+   "a": 1.0060052825882668,
+   "b": 0.3139412606487893,
+   "delta": -0.6920640219394776,
+   "se2": 0.6402796871543871,
+   "na": 13,
+   "nb": 4,
+   "noise": false
+  },
+  {
+   "key": "sub_82AFAB68 [guest 0x82AFAB68]",
+   "a": 1.0060052825882668,
+   "b": 0.3139412606487893,
+   "delta": -0.6920640219394776,
+   "se2": 0.6402796871543871,
+   "na": 13,
+   "nb": 4,
+   "noise": false
+  },
+  {
+   "key": "sub_82AB2040 [guest 0x82AB2040]",
+   "a": 1.9346255434389745,
+   "b": 2.5115300851903144,
+   "delta": 0.5769045417513399,
+   "se2": 1.177844251178506,
+   "na": 25,
+   "nb": 32,
+   "noise": true
+  },
+  {
+   "key": "sub_82FCB308 [guest 0x82FCB308]",
+   "a": 0.7738502173755899,
+   "b": 0.235455945486592,
+   "delta": -0.5383942718889979,
+   "se2": 0.5598723068041608,
+   "na": 10,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "sub_82FCC500 [guest 0x82FCC500]",
+   "a": 0.7738502173755899,
+   "b": 0.235455945486592,
+   "delta": -0.5383942718889979,
+   "se2": 0.5598723068041608,
+   "na": 10,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "sub_82B55588 [guest 0x82B55588]",
+   "a": 0.5416951521629129,
+   "b": 1.0203090971085653,
+   "delta": 0.47861394494565246,
+   "se2": 0.6985653073970395,
+   "na": 7,
+   "nb": 13,
+   "noise": true
+  },
+  {
+   "key": "sub_82B590E8 [guest 0x82B590E8]",
+   "a": 0.5416951521629129,
+   "b": 1.0203090971085653,
+   "delta": 0.47861394494565246,
+   "se2": 0.6985653073970395,
+   "na": 7,
+   "nb": 13,
+   "noise": true
+  },
+  {
+   "key": "sub_82CBC020 [guest 0x82CBC020]",
+   "a": 0.5416951521629129,
+   "b": 1.0203090971085653,
+   "delta": 0.47861394494565246,
+   "se2": 0.6985653073970395,
+   "na": 7,
+   "nb": 13,
+   "noise": true
+  },
+  {
+   "key": "sub_82CBC968 [guest 0x82CBC968]",
+   "a": 0.5416951521629129,
+   "b": 1.0203090971085653,
+   "delta": 0.47861394494565246,
+   "se2": 0.6985653073970395,
+   "na": 7,
+   "nb": 13,
+   "noise": true
+  },
+  {
+   "key": "sub_82F050B0 [guest 0x82F050B0]",
+   "a": 0.6964651956380309,
+   "b": 0.235455945486592,
+   "delta": -0.4610092501514389,
+   "se2": 0.5380550469691019,
+   "na": 9,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "sub_83FF23C0 [guest 0x83FF23C0]",
+   "a": 0.6964651956380309,
+   "b": 0.235455945486592,
+   "delta": -0.4610092501514389,
+   "se2": 0.5380550469691019,
+   "na": 9,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "sub_83FFE050 [guest 0x83FFE050]",
+   "a": 0.6964651956380309,
+   "b": 0.235455945486592,
+   "delta": -0.4610092501514389,
+   "se2": 0.5380550469691019,
+   "na": 9,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "sub_83FFE2A0 [guest 0x83FFE2A0]",
+   "a": 0.6964651956380309,
+   "b": 0.235455945486592,
+   "delta": -0.4610092501514389,
+   "se2": 0.5380550469691019,
+   "na": 9,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "sub_83FFFA30 [guest 0x83FFFA30]",
+   "a": 0.6964651956380309,
+   "b": 0.235455945486592,
+   "delta": -0.4610092501514389,
+   "se2": 0.5380550469691019,
+   "na": 9,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "sub_82EF3180 [guest 0x82EF3180]",
+   "a": 0.5416951521629129,
+   "b": 0.15697063032439465,
+   "delta": -0.38472452183851824,
+   "se2": 0.46578527463833036,
+   "na": 7,
+   "nb": 2,
+   "noise": true
+  },
+  {
+   "key": "sub_82EF3B38 [guest 0x82EF3B38]",
+   "a": 0.5416951521629129,
+   "b": 0.15697063032439465,
+   "delta": -0.38472452183851824,
+   "se2": 0.46578527463833036,
+   "na": 7,
+   "nb": 2,
+   "noise": true
+  },
+  {
+   "key": "sub_82EFE948 [guest 0x82EFE948]",
+   "a": 0.5416951521629129,
+   "b": 0.15697063032439465,
+   "delta": -0.38472452183851824,
+   "se2": 0.46578527463833036,
+   "na": 7,
+   "nb": 2,
+   "noise": true
+  },
+  {
+   "key": "sub_82EF8C18 [guest 0x82EF8C18]",
+   "a": 0.6190801739004719,
+   "b": 0.235455945486592,
+   "delta": -0.3836242284138799,
+   "se2": 0.5153149204240379,
+   "na": 8,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "sub_82F0CCD8 [guest 0x82F0CCD8]",
+   "a": 0.6190801739004719,
+   "b": 0.235455945486592,
+   "delta": -0.3836242284138799,
+   "se2": 0.5153149204240379,
+   "na": 8,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "sub_83FF1F88 [guest 0x83FF1F88]",
+   "a": 0.5416951521629129,
+   "b": 0.235455945486592,
+   "delta": -0.3062392066763209,
+   "se2": 0.49152385583442704,
+   "na": 7,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "sub_82A333B8 [guest 0x82A333B8]",
+   "a": 0.23215506521267695,
+   "b": 0.0,
+   "delta": -0.23215506521267695,
+   "se2": 0.2680695787885483,
+   "na": 3,
+   "nb": 0,
+   "noise": true
+  },
+  {
+   "key": "sub_82EEF2C0 [guest 0x82EEF2C0]",
+   "a": 0.23215506521267695,
+   "b": 0.0,
+   "delta": -0.23215506521267695,
+   "se2": 0.2680695787885483,
+   "na": 3,
+   "nb": 0,
+   "noise": true
+  },
+  {
+   "key": "sub_82EEFA18 [guest 0x82EEFA18]",
+   "a": 0.23215506521267695,
+   "b": 0.0,
+   "delta": -0.23215506521267695,
+   "se2": 0.2680695787885483,
+   "na": 3,
+   "nb": 0,
+   "noise": true
+  },
+  {
+   "key": "sub_82F0BFB8 [guest 0x82F0BFB8]",
+   "a": 0.23215506521267695,
+   "b": 0.0,
+   "delta": -0.23215506521267695,
+   "se2": 0.2680695787885483,
+   "na": 3,
+   "nb": 0,
+   "noise": true
+  },
+  {
+   "key": "sub_83F9EA20 [guest 0x83F9EA20]",
+   "a": 0.23215506521267695,
+   "b": 0.0,
+   "delta": -0.23215506521267695,
+   "se2": 0.2680695787885483,
+   "na": 3,
+   "nb": 0,
+   "noise": true
+  },
+  {
+   "key": "sub_82FE9068 [guest 0x82FE9068]",
+   "a": 0.23215506521267695,
+   "b": 0.3924265758109866,
+   "delta": 0.16027151059830966,
+   "se2": 0.4416561932024259,
+   "na": 3,
+   "nb": 5,
+   "noise": true
+  },
+  {
+   "key": "sub_82B70998 [guest 0x82B70998]",
+   "a": 0.15477004347511797,
+   "b": 0.3139412606487893,
+   "delta": 0.15917121717367133,
+   "se2": 0.3827096129604414,
+   "na": 2,
+   "nb": 4,
+   "noise": true
+  },
+  {
+   "key": "sub_82B3A7B0 [guest 0x82B3A7B0]",
+   "a": 0.07738502173755898,
+   "b": 0.235455945486592,
+   "delta": 0.158070923749033,
+   "se2": 0.31284677193572447,
+   "na": 1,
+   "nb": 3,
+   "noise": true
+  },
+  {
+   "key": "sub_83E4E678 [guest 0x83E4E678]",
+   "a": 0.07738502173755898,
+   "b": 0.235455945486592,
+   "delta": 0.158070923749033,
+   "se2": 0.31284677193572447,
+   "na": 1,
+   "nb": 3,
+   "noise": true
+  }
+ ],
+ "blocked": [
+  {
+   "key": "MSVCP140.dll!~_Thrd_abort",
+   "a": 0.0,
+   "b": 0.07848531516219732,
+   "delta": 0.07848531516219732,
+   "se2": 0.15697063032439465,
+   "na": 0,
+   "nb": 1,
+   "noise": true,
+   "callers": [
+    [
+     "sub_82C9DB88 [guest 0x82C9DB88]",
+     1
+    ]
+   ]
+  },
+  {
+   "key": "rexruntime.dll!rex::kernel::xboxkrnl::UX_RTL_CRITICAL_SECTION::$MP6AXV?$MappedPtr::?$HostToGuestFunction",
+   "a": 11.143443130208494,
+   "b": 11.14491475303202,
+   "delta": 0.0014716228235265305,
+   "se2": 2.6359421357154087,
+   "na": 144,
+   "nb": 142,
+   "noise": true,
+   "callers": [
+    [
+     "sub_82A2A260 [guest 0x82A2A260]",
+     142
+    ]
+   ]
+  }
+ ],
+ "fault_guest": [
+  {
+   "key": "sub_82B55588 [guest 0x82B55588]",
+   "a": 0.07738502173755898,
+   "b": 0.0,
+   "delta": -0.07738502173755898,
+   "se2": 0.15477004347511797,
+   "na": 1,
+   "nb": 0,
+   "noise": true
+  }
+ ],
+ "fault_leaf": [
+  {
+   "key": "rexgpu-xenos.dll!~rex_gpu_create",
+   "a": 0.07738502173755898,
+   "b": 0.0,
+   "delta": -0.07738502173755898,
+   "se2": 0.15477004347511797,
+   "na": 1,
+   "nb": 0,
+   "noise": true
+  }
+ ],
+ "pool_caller": [],
+ "sync_boundary": [
+  {
+   "key": "rexruntime.dll!rex::chrono::UpdateGuestClock",
+   "a": 0.15477004347511797,
+   "b": 0.0,
+   "delta": -0.15477004347511797,
+   "se2": 0.21887789453158538,
+   "na": 2,
+   "nb": 0,
+   "noise": true
+  }
+ ],
+ "threads": {
+  "a": [
+   {
+    "tid": 88804,
+    "name": "XThread15AE4 (F80001A8)",
+    "role": "render",
+    "samples": 191,
+    "busy": 179,
+    "wait": 12,
+    "io": 0,
+    "guest": 173,
+    "busy_ms_per_frame": 13.851918891023058
+   },
+   {
+    "tid": 60900,
+    "name": "rex::thread::TimerQueue",
+    "role": "timerq",
+    "samples": 191,
+    "busy": 164,
+    "wait": 27,
+    "io": 0,
+    "guest": 0,
+    "busy_ms_per_frame": 12.691143564959674
+   },
+   {
+    "tid": 1576,
+    "name": "GPU Commands (F8000018)",
+    "role": "gpu_cmd",
+    "samples": 191,
+    "busy": 109,
+    "wait": 82,
+    "io": 0,
+    "guest": 0,
+    "busy_ms_per_frame": 8.434967369393929
+   },
+   {
+    "tid": 40156,
+    "name": "XThread9CDC (F8000144)",
+    "role": "worker2",
+    "samples": 191,
+    "busy": 51,
+    "wait": 140,
+    "io": 0,
+    "guest": 43,
+    "busy_ms_per_frame": 3.9466361086155084
+   },
+   {
+    "tid": 39692,
+    "name": "Main XThread (F800002C)",
+    "role": "main",
+    "samples": 191,
+    "busy": 47,
+    "wait": 144,
+    "io": 0,
+    "guest": 37,
+    "busy_ms_per_frame": 3.6370960216652723
+   },
+   {
+    "tid": 21304,
+    "name": "XThread5338 (F8000114)",
+    "role": "xt_other",
+    "samples": 191,
+    "busy": 16,
+    "wait": 175,
+    "io": 0,
+    "guest": 9,
+    "busy_ms_per_frame": 1.2381603478009438
+   },
+   {
+    "tid": 66024,
+    "name": "0xc0550001",
+    "role": "other",
+    "samples": 191,
+    "busy": 11,
+    "wait": 180,
+    "io": 0,
+    "guest": 0,
+    "busy_ms_per_frame": 0.8512352391131488
+   },
+   {
+    "tid": 98416,
+    "name": "",
+    "role": "other",
+    "samples": 191,
+    "busy": 11,
+    "wait": 180,
+    "io": 0,
+    "guest": 0,
+    "busy_ms_per_frame": 0.8512352391131488
+   },
+   {
+    "tid": 34436,
+    "name": "Audio Worker (F8000014)",
+    "role": "audio",
+    "samples": 191,
+    "busy": 6,
+    "wait": 185,
+    "io": 0,
+    "guest": 1,
+    "busy_ms_per_frame": 0.4643101304253539
+   },
+   {
+    "tid": 35644,
+    "name": "XThread8B3C (F800010C)",
+    "role": "xt_other",
+    "samples": 191,
+    "busy": 5,
+    "wait": 186,
+    "io": 0,
+    "guest": 1,
+    "busy_ms_per_frame": 0.38692510868779495
+   },
+   {
+    "tid": 78012,
+    "name": "GPU VSync (F800001C)",
+    "role": "vsync",
+    "samples": 191,
+    "busy": 5,
+    "wait": 186,
+    "io": 0,
+    "guest": 0,
+    "busy_ms_per_frame": 0.38692510868779495
+   },
+   {
+    "tid": 57248,
+    "name": "",
+    "role": "other",
+    "samples": 191,
+    "busy": 3,
+    "wait": 188,
+    "io": 0,
+    "guest": 0,
+    "busy_ms_per_frame": 0.23215506521267695
+   }
+  ],
+  "b": [
+   {
+    "tid": 97548,
+    "name": "XThread17D0C (F80001AC)",
+    "role": "render",
+    "samples": 188,
+    "busy": 175,
+    "wait": 13,
+    "io": 0,
+    "guest": 163,
+    "busy_ms_per_frame": 13.734930153384532
+   },
+   {
+    "tid": 77220,
+    "name": "rex::thread::TimerQueue",
+    "role": "timerq",
+    "samples": 188,
+    "busy": 151,
+    "wait": 37,
+    "io": 0,
+    "guest": 0,
+    "busy_ms_per_frame": 11.851282589491795
+   },
+   {
+    "tid": 80080,
+    "name": "GPU Commands (F8000018)",
+    "role": "gpu_cmd",
+    "samples": 188,
+    "busy": 120,
+    "wait": 68,
+    "io": 0,
+    "guest": 0,
+    "busy_ms_per_frame": 9.418237819463679
+   },
+   {
+    "tid": 20872,
+    "name": "XThread5188 (F8000144)",
+    "role": "worker2",
+    "samples": 188,
+    "busy": 49,
+    "wait": 139,
+    "io": 0,
+    "guest": 44,
+    "busy_ms_per_frame": 3.8457804429476687
+   },
+   {
+    "tid": 32908,
+    "name": "Main XThread (F800002C)",
+    "role": "main",
+    "samples": 188,
+    "busy": 45,
+    "wait": 143,
+    "io": 0,
+    "guest": 30,
+    "busy_ms_per_frame": 3.5318391822988797
+   },
+   {
+    "tid": 94768,
+    "name": "XThread17230 (F8000114)",
+    "role": "xt_other",
+    "samples": 188,
+    "busy": 13,
+    "wait": 175,
+    "io": 0,
+    "guest": 7,
+    "busy_ms_per_frame": 1.0203090971085653
+   },
+   {
+    "tid": 91416,
+    "name": "0xc0550001",
+    "role": "other",
+    "samples": 188,
+    "busy": 10,
+    "wait": 178,
+    "io": 0,
+    "guest": 0,
+    "busy_ms_per_frame": 0.7848531516219732
+   },
+   {
+    "tid": 18596,
+    "name": "",
+    "role": "other",
+    "samples": 188,
+    "busy": 9,
+    "wait": 179,
+    "io": 0,
+    "guest": 0,
+    "busy_ms_per_frame": 0.706367836459776
+   },
+   {
+    "tid": 27284,
+    "name": "GPU VSync (F800001C)",
+    "role": "vsync",
+    "samples": 188,
+    "busy": 7,
+    "wait": 181,
+    "io": 0,
+    "guest": 0,
+    "busy_ms_per_frame": 0.5493972061353812
+   },
+   {
+    "tid": 90304,
+    "name": "XThread160C0 (F800010C)",
+    "role": "xt_other",
+    "samples": 188,
+    "busy": 6,
+    "wait": 182,
+    "io": 0,
+    "guest": 0,
+    "busy_ms_per_frame": 0.470911890973184
+   },
+   {
+    "tid": 91348,
+    "name": "Audio Worker (F8000014)",
+    "role": "audio",
+    "samples": 188,
+    "busy": 5,
+    "wait": 183,
+    "io": 0,
+    "guest": 0,
+    "busy_ms_per_frame": 0.3924265758109866
+   },
+   {
+    "tid": 8128,
+    "name": "SDLAudioP19",
+    "role": "audio",
+    "samples": 188,
+    "busy": 4,
+    "wait": 184,
+    "io": 0,
+    "guest": 0,
+    "busy_ms_per_frame": 0.3139412606487893
+   }
+  ]
+ },
+ "roles": [
+  {
+   "key": "main",
+   "a": 3.6370960216652723,
+   "b": 3.5318391822988797,
+   "delta": -0.10525683936639263,
+   "se2": 1.4948635603600502,
+   "na": 47,
+   "nb": 45,
+   "noise": true,
+   "guest_a": 2.8632458042896825,
+   "guest_b": 2.3545594548659197,
+   "guest_delta": -0.5086863494237628,
+   "guest_se2": 1.2749442022115554,
+   "blocked_a": 11.143443130208494,
+   "blocked_b": 11.223400068194218,
+   "threads_a": 1,
+   "threads_b": 1,
+   "names_a": "Main XThread (F800002C)",
+   "names_b": "Main XThread (F800002C)"
+  },
+  {
+   "key": "render",
+   "a": 13.851918891023058,
+   "b": 13.734930153384532,
+   "delta": -0.11698873763852546,
+   "se2": 2.9325220314997638,
+   "na": 179,
+   "nb": 175,
+   "noise": true,
+   "guest_a": 13.387608760597704,
+   "guest_b": 12.793106371438164,
+   "guest_delta": -0.5945023891595405,
+   "guest_se2": 2.8566213472692716,
+   "blocked_a": 0.9286202608507078,
+   "blocked_b": 1.0203090971085653,
+   "threads_a": 1,
+   "threads_b": 1,
+   "names_a": "XThread15AE4 (F80001A8)",
+   "names_b": "XThread17D0C (F80001AC)"
+  },
+  {
+   "key": "gpu_cmd",
+   "a": 8.434967369393929,
+   "b": 9.418237819463679,
+   "delta": 0.9832704500697496,
+   "se2": 2.3596046251601415,
+   "na": 109,
+   "nb": 120,
+   "noise": true,
+   "guest_a": 0.0,
+   "guest_b": 0.0,
+   "guest_delta": 0.0,
+   "guest_se2": 0.0,
+   "blocked_a": 6.345571782479837,
+   "blocked_b": 5.337001431029418,
+   "threads_a": 1,
+   "threads_b": 1,
+   "names_a": "GPU Commands (F8000018)",
+   "names_b": "GPU Commands (F8000018)"
+  },
+  {
+   "key": "timerq",
+   "a": 12.691143564959674,
+   "b": 11.851282589491795,
+   "delta": -0.8398609754678787,
+   "se2": 2.7656869452354234,
+   "na": 164,
+   "nb": 151,
+   "noise": true,
+   "guest_a": 0.0,
+   "guest_b": 0.0,
+   "guest_delta": 0.0,
+   "guest_se2": 0.0,
+   "blocked_a": 2.0893955869140926,
+   "blocked_b": 2.9039566610013012,
+   "threads_a": 1,
+   "threads_b": 1,
+   "names_a": "rex::thread::TimerQueue",
+   "names_b": "rex::thread::TimerQueue"
+  },
+  {
+   "key": "worker2",
+   "a": 3.9466361086155084,
+   "b": 3.8457804429476687,
+   "delta": -0.10085566566783966,
+   "se2": 1.5585221347992577,
+   "na": 51,
+   "nb": 49,
+   "noise": true,
+   "guest_a": 3.3275559347150363,
+   "guest_b": 3.4533538671366824,
+   "guest_delta": 0.12579793242164605,
+   "guest_se2": 1.454015893956709,
+   "blocked_a": 10.833903043258259,
+   "blocked_b": 10.909458807545429,
+   "threads_a": 1,
+   "threads_b": 1,
+   "names_a": "XThread9CDC (F8000144)",
+   "names_b": "XThread5188 (F8000144)"
+  },
+  {
+   "key": "vsync",
+   "a": 0.38692510868779495,
+   "b": 0.5493972061353812,
+   "delta": 0.16247209744758628,
+   "se2": 0.5405990041403276,
+   "na": 5,
+   "nb": 7,
+   "noise": true,
+   "guest_a": 0.0,
+   "guest_b": 0.0,
+   "guest_delta": 0.0,
+   "guest_se2": 0.0,
+   "blocked_a": 14.393614043185972,
+   "blocked_b": 14.205842044357716,
+   "threads_a": 1,
+   "threads_b": 1,
+   "names_a": "GPU VSync (F800001C)",
+   "names_b": "GPU VSync (F800001C)"
+  },
+  {
+   "key": "audio",
+   "a": 0.4643101304253539,
+   "b": 0.706367836459776,
+   "delta": 0.24205770603442206,
+   "se2": 0.6045499211840817,
+   "na": 6,
+   "nb": 9,
+   "noise": true,
+   "guest_a": 0.07738502173755898,
+   "guest_b": 0.0,
+   "guest_delta": -0.07738502173755898,
+   "guest_se2": 0.15477004347511797,
+   "blocked_a": 43.87730732519594,
+   "blocked_b": 43.55934991501952,
+   "threads_a": 3,
+   "threads_b": 3,
+   "names_a": "3 threads",
+   "names_b": "3 threads"
+  },
+  {
+   "key": "xt_other",
+   "a": 1.7024704782262976,
+   "b": 1.8051622487305385,
+   "delta": 0.10269177050424094,
+   "se2": 1.0458000630629387,
+   "na": 22,
+   "nb": 23,
+   "noise": true,
+   "guest_a": 0.7738502173755899,
+   "guest_b": 0.5493972061353812,
+   "guest_delta": -0.22445301124020867,
+   "guest_se2": 0.6418848144830686,
+   "blocked_a": 323.46939086299653,
+   "blocked_b": 322.8101012621176,
+   "threads_a": 22,
+   "threads_b": 22,
+   "names_a": "22 threads",
+   "names_b": "22 threads"
+  },
+  {
+   "key": "other",
+   "a": 2.0893955869140926,
+   "b": 1.7266769335683412,
+   "delta": -0.3627186533457514,
+   "se2": 1.0903333549444676,
+   "na": 27,
+   "nb": 22,
+   "noise": true,
+   "guest_a": 0.0,
+   "guest_b": 0.0,
+   "guest_delta": 0.0,
+   "guest_se2": 0.0,
+   "blocked_a": 682.3811216817951,
+   "blocked_b": 681.2525356078728,
+   "threads_a": 47,
+   "threads_b": 47,
+   "names_a": "47 threads",
+   "names_b": "47 threads"
+  },
+  {
+   "key": "all",
+   "a": 47.20486325991098,
+   "b": 47.16967441248059,
+   "delta": -0.035188847430390524,
+   "se2": 5.424048720964252,
+   "na": 610,
+   "nb": 601,
+   "noise": true,
+   "guest_a": 20.42964573871557,
+   "guest_b": 19.150416899576147,
+   "guest_delta": -1.2792288391394244,
+   "guest_se2": 3.5122500397504943,
+   "blocked_a": 1095.462367716885,
+   "blocked_b": 1093.2219548942464,
+   "threads_a": 78,
+   "threads_b": 78,
+   "names_a": "78 threads",
+   "names_b": "78 threads"
+  }
+ ],
+ "fault_linked": [
+  {
+   "key": "sub_82B55588 [guest 0x82B55588]",
+   "a": 0.0,
+   "b": 0.0,
+   "delta": 0.0,
+   "se2": 0.0,
+   "na": 0,
+   "nb": 0,
+   "noise": false,
+   "fault_a": 0.07738502173755898,
+   "fault_b": 0.0,
+   "fault_delta": -0.07738502173755898
+  }
+ ],
+ "handoff": null,
+ "warnings": [
+  "a-prof: 1 rounds/s (< 250): CPU-saturated sampler, attribution usable but noisy",
+  "b-prof: 1 rounds/s (< 250): CPU-saturated sampler, attribution usable but noisy",
+  "A: profile-728734687.bin: low sampling rate (1 rounds/s, nominal ~1000): the machine was probably CPU-saturated (each SuspendThread/GetThreadContext waits until the target thread is scheduled); attribution is still usable but noisy",
+  "B: profile-728987468.bin: low sampling rate (1 rounds/s, nominal ~1000): the machine was probably CPU-saturated (each SuspendThread/GetThreadContext waits until the target thread is scheduled); attribution is still usable but noisy"
+ ]
+}

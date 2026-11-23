@@ -1,0 +1,181 @@
+PASS p2c selftest (exit 0, want 0; 1.4 s): python build\agent12\p2c-check\p2c_check.py --selftest
+ok   PASS; rotated logs are read oldest first: PASS, total 0, exit 0
+ok   FAIL; F on logged lines plus frames not logged: FAIL, total 6, exit 1
+ok   FAIL; only frames that were not logged: FAIL, total 4, exit 1
+ok   NO DATA; slow-frame lines without the field (a build without s4-p2c): NO DATA, total None, exit 3
+ok   NO DATA; no slow-frame lines: NO DATA, total None, exit 3
+ok   two processes (the frame index restarts): FAIL, total 4, exit 1
+ok   T falls with no frame-index restart: FAIL, total 4, exit 1
+ok   last line cut off at exit: PASS with a WARN: PASS, total 0, exit 0
+ok   PARTIAL; lines from two builds in one process: PARTIAL, total 0, exit 3
+ok   memexport activity is summed: PASS, total 0, exit 0
+ok   older rotated logs gone (no process start in the logs): PASS, total 0, exit 0
+ok   start in the log but the first logged frame is #120 (threshold above 1): PASS, total 0, exit 0
+ok   FAIL; the real format with large values (1234.5 ms, T 123456789): FAIL, total 123456789, exit 1
+ok   PARTIAL; a process without the field beside one with T = 0: PARTIAL, total 0, exit 3
+ok   PARTIAL; a started process that logged no slow-frame lines: PARTIAL, total 0, exit 3
+ok   PASS with a WARN; the log goes on 56 s after the last counter line: PASS, total 0, exit 0
+ok   missing run dir: NO DATA, exit 3
+ok   explicit files keep the given order: PASS, 2 processes
+ok   --json: FAIL, total 6
+ok   LF-only log: FAIL, total 1
+ok   --bin search across a chunk boundary
+ok   --bin scans .exe/.dll files, subfolders too
+ok   RESULT line format
+ok   an exception gives RESULT: ERROR, exit 4 (not FAIL's 1)
+SELFTEST PASS (24/24 checks)
+
+PASS S4a u-diag, real log (S4a has no s4-p2c) (exit 3, want 3; 4.5 s): python build\agent12\p2c-check\p2c_check.py build\agent3\runs\20261122-133730-s4a-udiag
+P2 counter check: memexport full-buffer fallback (s4-p2c field 'memexport full-buffer Fx (total T)')
+logs, oldest first (9) in build\agent3\runs\20261122-133730-s4a-udiag: game.8.log, game.7.log, game.6.log, game.5.log, game.4.log, game.3.log, game.2.log, game.1.log, game.log
+lines 149837; slow-frame lines 74714: 0 with the counter field, 74714 without
+log time range: 2026-11-22 13:37:33.309 .. 2026-11-22 13:43:03.455
+process 1 (started game.8.log:29): frames #2..#75014 (game.8.log:39 .. game.log:4735); 0 counter lines, 74714 without the field
+memexport activity: 5 of 74714 slow-frame lines (first game.7.log:68): invalidations on memexport pages 0x 0 KB, syncs 5 (1208 KB), on demand 0 (0 KB)
+RESULT: NO DATA: 74714 slow-frame lines, none with the counter field: this build has no s4-p2c
+
+PASS S4a attract u-diag, real log (exit 3, want 3; 0.9 s): python build\agent12\p2c-check\p2c_check.py build\agent3\runs\20261122-140637-s4a-udiag-attract
+P2 counter check: memexport full-buffer fallback (s4-p2c field 'memexport full-buffer Fx (total T)')
+logs, oldest first (4) in build\agent3\runs\20261122-140637-s4a-udiag-attract: game.3.log, game.2.log, game.1.log, game.log
+lines 58056; slow-frame lines 28704: 0 with the counter field, 28704 without
+log time range: 2026-11-22 14:06:41.051 .. 2026-11-22 14:13:39.268
+process 1 (started game.3.log:27): frames #2..#28810 (game.3.log:37 .. game.log:3348); 0 counter lines, 28704 without the field
+memexport activity: 3626 of 28704 slow-frame lines (first game.3.log:15034): invalidations on memexport pages 5373x 26294644 KB, syncs 16537 (648548 KB), on demand 0 (0 KB)
+RESULT: NO DATA: 28704 slow-frame lines, none with the counter field: this build has no s4-p2c
+
+PASS W5 timed run s0-r1, real log (no slow_frame_log_ms) (exit 3, want 3; 0.4 s): python build\agent12\p2c-check\p2c_check.py build\agent8\matrix\20261122-1756\runs\1800-s0-r1
+P2 counter check: memexport full-buffer fallback (s4-p2c field 'memexport full-buffer Fx (total T)')
+logs, oldest first (1) in build\agent8\matrix\20261122-1756\runs\1800-s0-r1: game.log
+lines 98; slow-frame lines 0: 0 with the counter field, 0 without
+log time range: 2026-11-22 18:00:16.202 .. 2026-11-22 18:02:12.961
+process 1 (started game.log:29): no slow-frame lines; its log ends 2026-11-22 18:02:12.961
+RESULT: NO DATA: no slow-frame lines: slow_frame_log_ms was not set, or the log level hides info lines
+
+PASS missing run dir (exit 3, want 3; 1.1 s): python build\agent12\p2c-check\p2c_check.py build\agent3\runs\no-such-run
+P2 counter check: memexport full-buffer fallback (s4-p2c field 'memexport full-buffer Fx (total T)')
+not found: build\agent3\runs\no-such-run
+lines 0; slow-frame lines 0: 0 with the counter field, 0 without
+RESULT: NO DATA: not found: build\agent3\runs\no-such-run
+
+PASS usage error, no args (exit 2, want 2; 1.6 s): python build\agent12\p2c-check\p2c_check.py
+python.exe : usage: p2c_check.py [-h] [--json OUT] 
+[--bin PATH] [--selftest] [paths ...]
+At C:\Users\<user>\.vscode\projects\games\lego-dimen
+sions-recomp\build\agent12\p2c-check\run_tests.ps1:
+20 char:9
++   $o = (& python @A 2>&1 | Out-String)
++         ~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (usage 
+   : p2c_chec...st] [paths ...]:String) [], Remot  
+  eException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+p2c_check.py: error: give a run dir or log files
+
+PASS --bin on the S4a bin devoff4 (exit 3, want 3; 1.5 s): python build\agent12\p2c-check\p2c_check.py build\agent3\runs\20261122-133730-s4a-udiag --bin build\agent2\devoff4-bin
+P2 counter check: memexport full-buffer fallback (s4-p2c field 'memexport full-buffer Fx (total T)')
+logs, oldest first (9) in build\agent3\runs\20261122-133730-s4a-udiag: game.8.log, game.7.log, game.6.log, game.5.log, game.4.log, game.3.log, game.2.log, game.1.log, game.log
+lines 149837; slow-frame lines 74714: 0 with the counter field, 74714 without
+log time range: 2026-11-22 13:37:33.309 .. 2026-11-22 13:43:03.455
+process 1 (started game.8.log:29): frames #2..#75014 (game.8.log:39 .. game.log:4735); 0 counter lines, 74714 without the field
+memexport activity: 5 of 74714 slow-frame lines (first game.7.log:68): invalidations on memexport pages 0x 0 KB, syncs 5 (1208 KB), on demand 0 (0 KB)
+bin: the counter's format string is in none of the 4 .exe/.dll files in build\agent2\devoff4-bin (no s4-p2c)
+RESULT: NO DATA: 74714 slow-frame lines, none with the counter field: this build has no s4-p2c
+
+PASS make real-format fixtures from the u-diag log (exit 0, want 0; 1.5 s): python build\agent12\p2c-check\make_fixtures.py build\agent3\runs\20261122-133730-s4a-udiag build\agent12\p2c-check\fixtures
+pass: 9 log(s) (game.8.log, game.7.log, game.6.log, game.5.log, game.4.log, game.3.log, game.2.log, game.1.log, game.log), 74714 slow-frame lines, final T 0 -> build\agent12\p2c-check\fixtures\pass
+fail: 9 log(s) (game.8.log, game.7.log, game.6.log, game.5.log, game.4.log, game.3.log, game.2.log, game.1.log, game.log), 74714 slow-frame lines, final T 5 -> build\agent12\p2c-check\fixtures\fail
+cut: 9 log(s) (game.8.log, game.7.log, game.6.log, game.5.log, game.4.log, game.3.log, game.2.log, game.1.log, game.log), 74714 slow-frame lines, final T 0 -> build\agent12\p2c-check\fixtures\cut
+
+PASS fixture pass (real lines + field, F 0 T 0) (exit 0, want 0; 7.4 s): python build\agent12\p2c-check\p2c_check.py build\agent12\p2c-check\fixtures\pass --json build\agent12\p2c-check\fixtures\pass.json
+P2 counter check: memexport full-buffer fallback (s4-p2c field 'memexport full-buffer Fx (total T)')
+logs, oldest first (9) in build\agent12\p2c-check\fixtures\pass: game.8.log, game.7.log, game.6.log, game.5.log, game.4.log, game.3.log, game.2.log, game.1.log, game.log
+lines 149837; slow-frame lines 74714: 74714 with the counter field, 0 without
+log time range: 2026-11-22 13:37:33.309 .. 2026-11-22 13:43:03.455
+process 1 (started game.8.log:29): frames #2..#75014 (game.8.log:39 .. game.log:4735); 74714 counter lines, 0 without the field
+  last counter line game.log:4735 at 2026-11-22 13:43:03.266; its log ends 2026-11-22 13:43:03.455, 0.2 s later
+  T = 0: F on logged lines 0, in frames not logged 0
+memexport activity: 5 of 74714 slow-frame lines (first game.7.log:68): invalidations on memexport pages 0x 0 KB, syncs 5 (1208 KB), on demand 0 (0 KB)
+RESULT: PASS (total 0): the memexport full-buffer fallback never ran, up to the last logged frame
+
+PASS fixture fail (F 2 at slow line 10, +3 unlogged at 20) (exit 1, want 1; 2.8 s): python build\agent12\p2c-check\p2c_check.py build\agent12\p2c-check\fixtures\fail
+P2 counter check: memexport full-buffer fallback (s4-p2c field 'memexport full-buffer Fx (total T)')
+logs, oldest first (9) in build\agent12\p2c-check\fixtures\fail: game.8.log, game.7.log, game.6.log, game.5.log, game.4.log, game.3.log, game.2.log, game.1.log, game.log
+lines 149837; slow-frame lines 74714: 74714 with the counter field, 0 without
+log time range: 2026-11-22 13:37:33.309 .. 2026-11-22 13:43:03.455
+process 1 (started game.8.log:29): frames #2..#75014 (game.8.log:39 .. game.log:4735); 74714 counter lines, 0 without the field
+  last counter line game.log:4735 at 2026-11-22 13:43:03.266; its log ends 2026-11-22 13:43:03.455, 0.2 s later
+  T = 5: F on logged lines 2, in frames not logged 3
+  first T > 0: game.8.log:57, frame #11, 2026-11-22 13:37:39.496, F 2, T 2
+  logged frames with F > 0: 1, max F 2
+memexport activity: 5 of 74714 slow-frame lines (first game.7.log:68): invalidations on memexport pages 0x 0 KB, syncs 5 (1208 KB), on demand 0 (0 KB)
+RESULT: FAIL (total 5): the memexport full-buffer fallback ran; P2 ON waits for Agent 1's cap decision (b2r S22)
+
+PASS fixture cut (last line without the field) (exit 0, want 0; 1.7 s): python build\agent12\p2c-check\p2c_check.py build\agent12\p2c-check\fixtures\cut
+P2 counter check: memexport full-buffer fallback (s4-p2c field 'memexport full-buffer Fx (total T)')
+logs, oldest first (9) in build\agent12\p2c-check\fixtures\cut: game.8.log, game.7.log, game.6.log, game.5.log, game.4.log, game.3.log, game.2.log, game.1.log, game.log
+lines 149837; slow-frame lines 74714: 74713 with the counter field, 1 without
+log time range: 2026-11-22 13:37:33.309 .. 2026-11-22 13:43:03.455
+process 1 (started game.8.log:29): frames #2..#75014 (game.8.log:39 .. game.log:4735); 74713 counter lines, 1 without the field
+  last counter line game.log:4733 at 2026-11-22 13:43:03.263; its log ends 2026-11-22 13:43:03.455, 0.2 s later
+  T = 0: F on logged lines 0, in frames not logged 0
+memexport activity: 5 of 74714 slow-frame lines (first game.7.log:68): invalidations on memexport pages 0x 0 KB, syncs 5 (1208 KB), on demand 0 (0 KB)
+WARN: process 1: its last slow-frame line (game.log:4735) has no counter field: cut off at exit?
+RESULT: PASS (total 0): the memexport full-buffer fallback never ran, up to the last logged frame
+
+PASS w6_env_record selftest (exit 0, want 0; 2.7 s): python build\agent12\w6-gates\w6_env_record.py --selftest
+ok   uniform overlay, strict gate: exit 0 (want 0)
+ok   one run on another overlay, relaxed gate: exit 1 (want 1)
+ok   overlay changes inside a window: exit 1 (want 1)
+ok   a run without sys data: exit 3 (want 3)
+ok   no gate given: exit 3 (want 3)
+ok   --gate wins over the log: exit 0 (want 0)
+ok   run.json fallback; Agent 5's launcher RELAXED line: exit 0 (want 0)
+ok   another overlay in every run: exit 0 (want 0)
+ok   a busy run is flagged (5.40 > median 3.00 + 1.0): exit 0 (want 0)
+ok   Agent 5's launcher GAVE UP line: no window started, exit 3: exit 3 (want 3)
+ok   no results.csv: exit 2
+ok   gate text: end time, gap to the window start, Defender range
+SELFTEST PASS (12/12 checks)
+
+PASS w6_env_record on W5 + quiet-1731.log (exit 0, want 0; 1.1 s): python build\agent12\w6-gates\w6_env_record.py build\agent8\matrix\20261122-1756 --gate-log build\agent1\w5\quiet-1731.log --json build\agent12\w6-gates\w5-env-record.json
+W6 environment record: build\agent8\matrix\20261122-1756 (16 runs in results.csv; 12 logical CPUs)
+| # | arm | rep | status | flags | scheme | overlay (window) | overlay (run) | AC | saver | eff MHz (P/E) | game cores | non-game cores | sys |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | base | cold | OK | light_share_high | Balanced | best_efficiency | best_efficiency | 1 | 0 | 1795 (2052/1683) | 2.719 | 6.05 | sys.json |
+| 2 | base | 1 | OK | light_share_high | Balanced | best_efficiency | best_efficiency | 1 | 0 | 1392 (1931/1174) | 2.901 | 4.14 | sys.json |
+| 3 | s0 | 1 | OK | light_share_high | Balanced | best_efficiency | best_efficiency | 1 | 0 | 1066 (1923/725) | 3.193 | 3.53 | sys.json |
+| 4 | d11 | 1 | OK | light_share_high | Balanced | best_efficiency | best_efficiency | 1 | 0 | 1063 (1945/719) | 3.18 | 3.38 | sys.json |
+| 5 | d11t | 1 | OK | light_share_high | Balanced | best_efficiency | best_efficiency | 1 | 0 | 1027 (1941/676) | 2.719 | 3.57 | sys.json |
+| 6 | d11p | 1 | OK | light_share_high | Balanced | best_efficiency | best_efficiency | 1 | 0 | 1016 (1939/659) | 2.766 | 3.4 | sys.json |
+| 7 | s0 | 2 | OK | light_share_high | Balanced | best_efficiency | best_efficiency | 1 | 0 | 986 (1938/597) | 3.38 | 3.01 | sys.json |
+| 8 | d11 | 2 | OK | light_share_high | Balanced | best_efficiency | best_efficiency | 1 | 0 | 1043 (1929/699) | 3.187 | 3.04 | sys.json |
+| 9 | d11t | 2 | OK | light_share_high | Balanced | best_efficiency | best_efficiency | 1 | 0 | 1064 (1938/729) | 2.67 | 3.33 | sys.json |
+| 10 | d11p | 2 | OK | light_share_high | Balanced | best_efficiency | best_efficiency | 1 | 0 | 1028 (1937/684) | 2.689 | 3.22 | sys.json |
+| 11 | base | 2 | OK | light_share_high | Balanced | best_efficiency | best_efficiency | 1 | 0 | 960 (1931/554) | 3.456 | 3.19 | sys.json |
+| 12 | d11 | 3 | OK | light_share_high | Balanced | best_efficiency | best_efficiency | 1 | 0 | 1060 (1924/725) | 3.156 | 3.11 | sys.json |
+| 13 | d11t | 3 | OK | light_share_high | Balanced | best_efficiency | best_efficiency | 1 | 0 | 946 (1923/551) | 2.835 | 3.42 | sys.json |
+| 14 | d11p | 3 | OK | light_share_high | Balanced | best_efficiency | best_efficiency | 1 | 0 | 977 (1940/609) | 2.783 | 3.3 | sys.json |
+| 15 | base | 3 | OK | light_share_high | Balanced | best_efficiency | best_efficiency | 1 | 0 | 1071 (1920/740) | 3.15 | 3.14 | sys.json |
+| 16 | s0 | 3 | OK | light_share_high | Balanced | best_efficiency | best_efficiency | 1 | 0 | 1075 (1924/749) | 3.081 | 3.16 | sys.json |
+power overlay: best_efficiency in 16/16 runs, no change inside any window
+scheme: Balanced x16; AC: 1 x16; battery saver: 0 x16
+non-game load: 3.01-4.14 cores (median 3.30) in 15 scored runs; unscored/cold 6.05
+non-game load flag (scored runs above the median 3.30 + 1.0 cores): none
+quiet gate: RELAXED: build\agent1\w5\quiet-1731.log: 'NOT QUIET after 20 min' at 17:51:55 (strict limit 0.1 core; 20 one-minute samples, 20 FAIL; Defender 0.77-1.14 cores, last 10: 0.88-0.99; busy 2.76-6.38 CPUs); the window started at 17:56, 4 min later
+RECORD: overlay best_efficiency (16/16, no change); quiet gate RELAXED; non-game load 3.01-4.14 cores
+
+=== summary ===
+PASS p2c selftest (exit 0, want 0; 1.4 s): python build\agent12\p2c-check\p2c_check.py --selftest
+PASS S4a u-diag, real log (S4a has no s4-p2c) (exit 3, want 3; 4.5 s): python build\agent12\p2c-check\p2c_check.py build\agent3\runs\20261122-133730-s4a-udiag
+PASS S4a attract u-diag, real log (exit 3, want 3; 0.9 s): python build\agent12\p2c-check\p2c_check.py build\agent3\runs\20261122-140637-s4a-udiag-attract
+PASS W5 timed run s0-r1, real log (no slow_frame_log_ms) (exit 3, want 3; 0.4 s): python build\agent12\p2c-check\p2c_check.py build\agent8\matrix\20261122-1756\runs\1800-s0-r1
+PASS missing run dir (exit 3, want 3; 1.1 s): python build\agent12\p2c-check\p2c_check.py build\agent3\runs\no-such-run
+PASS usage error, no args (exit 2, want 2; 1.6 s): python build\agent12\p2c-check\p2c_check.py
+PASS --bin on the S4a bin devoff4 (exit 3, want 3; 1.5 s): python build\agent12\p2c-check\p2c_check.py build\agent3\runs\20261122-133730-s4a-udiag --bin build\agent2\devoff4-bin
+PASS make real-format fixtures from the u-diag log (exit 0, want 0; 1.5 s): python build\agent12\p2c-check\make_fixtures.py build\agent3\runs\20261122-133730-s4a-udiag build\agent12\p2c-check\fixtures
+PASS fixture pass (real lines + field, F 0 T 0) (exit 0, want 0; 7.4 s): python build\agent12\p2c-check\p2c_check.py build\agent12\p2c-check\fixtures\pass --json build\agent12\p2c-check\fixtures\pass.json
+PASS fixture fail (F 2 at slow line 10, +3 unlogged at 20) (exit 1, want 1; 2.8 s): python build\agent12\p2c-check\p2c_check.py build\agent12\p2c-check\fixtures\fail
+PASS fixture cut (last line without the field) (exit 0, want 0; 1.7 s): python build\agent12\p2c-check\p2c_check.py build\agent12\p2c-check\fixtures\cut
+PASS w6_env_record selftest (exit 0, want 0; 2.7 s): python build\agent12\w6-gates\w6_env_record.py --selftest
+PASS w6_env_record on W5 + quiet-1731.log (exit 0, want 0; 1.1 s): python build\agent12\w6-gates\w6_env_record.py build\agent8\matrix\20261122-1756 --gate-log build\agent1\w5\quiet-1731.log --json build\agent12\w6-gates\w5-env-record.json

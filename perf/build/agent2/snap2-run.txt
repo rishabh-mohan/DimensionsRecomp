@@ -1,0 +1,18 @@
+﻿23:15:15 [off] START S2 off (tag snap2, -j 10)
+23:15:15 [off] BEGIN build : <workspace>\build\agent2\build-snap.ps1 -Phase all -Tag snap2 -Jobs 10 -KeepGoing -SkipConfigure
+23:18:27 [off] END   build exit=0 wall=190.6s freeC=262.34GB
+23:18:29 [off] rexruntime.dll in snap1-off == install/bin (1C45C86977EC594C)
+23:18:29 [off] BEGIN stage : <workspace>\build\agent2\stage-snap-bin.ps1 -Variant off -SnapTag S2 -BuildTag snap2 -RuntimeStrings audio_shutdown_detach_worker,leave it running and leak what it can still reach
+23:18:53 [off] END   stage exit=0 wall=24.7s freeC=262.12GB
+23:18:53 [off]   PASS staged copy identical: FiraSans-Regular.ttf
+23:18:53 [off]   staged 7 files into <workspace>\build\agent2\devoff2-bin (214.3 MB)
+23:18:53 [off] DONE S2 off, total wall 218.9s
+23:19:08 [native] START S2 native (tag snap2, -j 10)
+23:19:08 [native] BEGIN build : <workspace>\build\agent2\build-snap.ps1 -Phase game -Native -Tag snap2 -Jobs 10 -PrelinkJobs 10 -KeepGoing
+23:21:35 [native] END   build exit=0 wall=145.4s freeC=262.06GB
+23:21:41 [native] rexruntime.dll in snap1-on == install/bin (1C45C86977EC594C)
+23:21:42 [native] BEGIN stage : <workspace>\build\agent2\stage-snap-bin.ps1 -Variant native -SnapTag S2 -BuildTag snap2 -RuntimeStrings audio_shutdown_detach_worker,leave it running and leak what it can still reach -ExeStrings LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD,LEGO_NATIVE_FPS_CELL_RECTS,LEGO_NATIVE_TEXTURE_STAGING_POOL
+23:22:38 [native] END   stage exit=0 wall=55.6s freeC=261.65GB
+23:22:38 [native]   PASS staged copy identical: amd_fidelityfx_dx12.dll
+23:22:38 [native]   staged 8 files into <workspace>\build\agent2\native2-bin (363.7 MB)
+23:22:38 [native] DONE S2 native, total wall 209.9s

@@ -1,0 +1,500 @@
+{
+ "run": "20261123-060847-f10b-p2fc-level",
+ "row": "f10b",
+ "kind": "off",
+ "scenario": "level-l.txt",
+ "runjson": {
+  "exit_code": 0,
+  "exit_code_hex": "0x00000000",
+  "dumps": [],
+  "crash_events": [],
+  "wer_seen": false,
+  "close_method": "wm_close",
+  "close_seconds": 1.5,
+  "elapsed_s": 441.79,
+  "seconds_requested": 600,
+  "cvars": {
+   "framerate_limit": "0",
+   "shared_memory_single_hold_rearm": "true",
+   "physical_protect_hold_global_lock": "true",
+   "physical_protect_keep_watch": "true",
+   "physical_protect_keep_watch_verify": "false",
+   "slow_frame_log_ms": "1"
+  },
+  "exited_early": false,
+  "env_extra": {},
+  "steps": "119/119"
+ },
+ "summary": {
+  "verdict": "RUNNING",
+  "first_frame_s": 9.0,
+  "levels": {
+   "info": 39004,
+   "warning": 144
+  },
+  "unknown_cvars": [],
+  "errors": []
+ },
+ "log_files": [
+  "game.2.log",
+  "game.1.log",
+  "game.log"
+ ],
+ "families": {
+  "c1_any": 44,
+  "c1_init_on": 1,
+  "c1_init_blocked": 0,
+  "c1_init_nohold": 0,
+  "c1_first": 1,
+  "c1_kept": 42,
+  "c1_blocked": 0,
+  "c1_verify_on": 0,
+  "c1_verify_f": 0,
+  "recovered_stale": 0,
+  "unhandled_phys": 0,
+  "protect_failed": 0,
+  "split_init": 0,
+  "split": 0,
+  "deferred_counters": 0,
+  "gpu_wait": 0,
+  "gpu_wait_stats": 0,
+  "gpu_wait_backoff": 0,
+  "gpu_wait_on": 0,
+  "memexport": 38492,
+  "slow_frame": 38492,
+  "s4_upload_hash": 0,
+  "precise_wait": 0,
+  "miss_cache": 0,
+  "stuck_lock": 0,
+  "minidump": 0,
+  "fatal": 0,
+  "clean_exit": 1,
+  "debug_layer": 0,
+  "dred": 0,
+  "d3d12_msg": 0,
+  "k": 0,
+  "c1_other": 0
+ },
+ "levels": {
+  "info": 39004,
+  "warning": 144
+ },
+ "lines": {
+  "c1_any": {
+   "first": [
+    "[2026-11-23 06:08:51.299] [info] [sys] [t34980] C1 keep-watch: on (with physical_protect_hold_global_lock)",
+    "[2026-11-23 06:08:53.940] [info] [sys] [t2272] C1 keep-watch: first kept protect at ED19F000, 299892736 bytes",
+    "[2026-11-23 06:08:53.942] [info] [sys] [t2272] C1 keep-watch: 2 protects kept so far"
+   ],
+   "last": [
+    "[2026-11-23 06:15:01.970] [info] [sys] [t17368] C1 keep-watch: 118784 protects kept so far",
+    "[2026-11-23 06:15:03.776] [info] [sys] [t13360] C1 keep-watch: 122880 protects kept so far",
+    "[2026-11-23 06:15:45.402] [info] [sys] [t2272] C1 keep-watch: 126976 protects kept so far"
+   ]
+  },
+  "memexport": {
+   "first": [
+    "[2026-11-23 06:08:57.995] [info] [gpu] [t32752] slow frame #2: 55.7 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.1 (2x), new 3 | texture load 2.1 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)",
+    "[2026-11-23 06:08:58.004] [info] [gpu] [t32752] slow frame #3: 8.7 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 1x 4 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)",
+    "[2026-11-23 06:08:58.008] [info] [gpu] [t32752] slow frame #4: 4.0 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 1x 4 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)"
+   ],
+   "last": [
+    "[2026-11-23 06:16:09.273] [info] [gpu] [t32752] slow frame #38491: 23.4 ms | gpu-thread idle 10.9 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.3 (34x) | readback 23x 2300 KB, 0 stalled | cpu-write invalidations 2x 8 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)",
+    "[2026-11-23 06:16:09.298] [info] [gpu] [t32752] slow frame #38492: 25.1 ms | gpu-thread idle 9.6 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.3 (34x) | readback 23x 2300 KB, 0 stalled | cpu-write invalidations 4x 16 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)",
+    "[2026-11-23 06:16:09.322] [info] [gpu] [t32752] slow frame #38493: 24.1 ms | gpu-thread idle 10.1 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.5 (34x) | readback 23x 2300 KB, 0 stalled | cpu-write invalidations 2x 8 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)"
+   ]
+  },
+  "slow_frame": {
+   "first": [
+    "[2026-11-23 06:08:57.995] [info] [gpu] [t32752] slow frame #2: 55.7 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.1 (2x), new 3 | texture load 2.1 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)",
+    "[2026-11-23 06:08:58.004] [info] [gpu] [t32752] slow frame #3: 8.7 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 1x 4 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)",
+    "[2026-11-23 06:08:58.008] [info] [gpu] [t32752] slow frame #4: 4.0 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 1x 4 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)"
+   ],
+   "last": [
+    "[2026-11-23 06:16:09.273] [info] [gpu] [t32752] slow frame #38491: 23.4 ms | gpu-thread idle 10.9 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.3 (34x) | readback 23x 2300 KB, 0 stalled | cpu-write invalidations 2x 8 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)",
+    "[2026-11-23 06:16:09.298] [info] [gpu] [t32752] slow frame #38492: 25.1 ms | gpu-thread idle 9.6 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.3 (34x) | readback 23x 2300 KB, 0 stalled | cpu-write invalidations 4x 16 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)",
+    "[2026-11-23 06:16:09.322] [info] [gpu] [t32752] slow frame #38493: 24.1 ms | gpu-thread idle 10.1 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.5 (34x) | readback 23x 2300 KB, 0 stalled | cpu-write invalidations 2x 8 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)"
+   ]
+  }
+ },
+ "c1_kept_last": 126976,
+ "memexport": {
+  "lines": 38492,
+  "last_total": 0,
+  "max_total": 0,
+  "sum_x": 0,
+  "lines_x_gt0": 0
+ },
+ "slow_last": "[2026-11-23 06:16:09.322] [info] [gpu] [t32752] slow frame #38493: 24.1 ms | gpu-thread idle 10.1 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.5 (34x) | readback 23x 2300 KB, 0 stalled | cpu-write invalidations 2x 8 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)",
+ "frame_rows": 38493,
+ "logdiff": {
+  "bases": [
+   "20261122-210059-s4b-L0-off-level"
+  ],
+  "base_scenario": "level-l.txt",
+  "NEW": 0,
+  "NEW_allowed": 0,
+  "MORE": 0,
+  "MORE_allowed": 0,
+  "GONE": 52,
+  "GONE_unexpected": 0,
+  "FLAG": 0,
+  "NEW_info_other": 4,
+  "NEW_info_allowed": 1,
+  "rc": 0,
+  "new": [],
+  "new_allowed": [],
+  "more": [],
+  "gone_unexpected": [],
+  "flag": [],
+  "new_info_other": [
+   "NEW build\\agent3\\s4b\\checks\\joined\\20261123-060847-f10b-p2fc-level\\game.log x3 [info] [core] Toypad: pad # mode # lit FE #C # (on # off # count # speed #)",
+   "NEW build\\agent3\\s4b\\checks\\joined\\20261123-060847-f10b-p2fc-level\\game.log x42 [info] [sys] C# keep-watch: # protects kept so far",
+   "NEW build\\agent3\\s4b\\checks\\joined\\20261123-060847-f10b-p2fc-level\\game.log x1 [info] [sys] C# keep-watch: first kept protect at #h, #h bytes",
+   "NEW build\\agent3\\s4b\\checks\\joined\\20261123-060847-f10b-p2fc-level\\game.log x1 [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)"
+  ],
+  "new_info_allowed": [
+   "NEW build\\agent3\\s4b\\checks\\joined\\20261123-060847-f10b-p2fc-level\\game.log x38492 [info] [gpu] slow frame ##: # ms | gpu-thread idle # | host-gpu wait # (#x) | shader translate # (#x) | pipeline create # (#x), new # | texture load # (#x) | readback #x # KB, # stalled | cpu-write invalidations #"
+  ]
+ },
+ "scenes": {
+  "base": "20261122-210059-s4b-L0-off-level",
+  "missing_in_cand": [
+   "788/31613",
+   "790/31625",
+   "841/31696"
+  ],
+  "extra_in_cand": [
+   "785/123950"
+  ],
+  "cand_major": {
+   "220/534": 68.2,
+   "785/123950": 64.3,
+   "218/222": 27.9,
+   "226/1022": 21.4,
+   "219/226": 14.8,
+   "220/528": 13.9,
+   "594/2813": 3.7,
+   "839/31674": 2.3
+  },
+  "base_major": {
+   "220/534": 81.5,
+   "218/222": 25.7,
+   "226/1022": 23.8,
+   "220/528": 17.3,
+   "219/226": 14.9,
+   "594/2813": 3.6,
+   "788/31613": 2.6,
+   "841/31696": 2.6,
+   "790/31625": 2.2
+  }
+ },
+ "marks": {
+  "prefix": 4,
+  "prefix_diff": [],
+  "all_diff": 6,
+  "cand": {
+   "first-frame": "218/222",
+   "title": "226/1022",
+   "pads-white": "220/528",
+   "tags-placed": "220/528",
+   "m01": "220/528",
+   "m02": "220/534",
+   "m03": "220/534",
+   "m04": "220/534",
+   "m05": "220/534",
+   "m06": "220/534",
+   "m07": "220/534",
+   "m08": "220/534",
+   "m09": "220/534",
+   "m10": "220/534",
+   "story-load": "218/222",
+   "vortex": "4134/682007",
+   "v-idle": "774/114220",
+   "v-start": "798/117532",
+   "v-start-a": "785/123950",
+   "settled": "785/123950",
+   "end": "785/123950"
+  }
+ },
+ "threads": {
+  "window_s": 401.7,
+  "window": [
+   20.0,
+   421.7
+  ],
+  "by_name": {
+   "(unnamed)": {
+    "pct": 18.67,
+    "threads": 35
+   },
+   "rex::thread::TimerQueue": {
+    "pct": 36.69,
+    "threads": 1
+   },
+   "DeviceHotplugThread": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "D3D Background Thread 0": {
+    "pct": 0.24,
+    "threads": 1
+   },
+   "D3D Background Thread 1": {
+    "pct": 0.31,
+    "threads": 1
+   },
+   "D3D Background Thread 2": {
+    "pct": 0.26,
+    "threads": 1
+   },
+   "D3D Background Thread 3": {
+    "pct": 0.27,
+    "threads": 1
+   },
+   "0x16c00001": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "0xc0550001": {
+    "pct": 6.69,
+    "threads": 1
+   },
+   "XMA Decoder (F8000010)": {
+    "pct": 1.0,
+    "threads": 1
+   },
+   "Audio Worker (F8000014)": {
+    "pct": 2.38,
+    "threads": 1
+   },
+   "GPU Commands (F8000018)": {
+    "pct": 54.87,
+    "threads": 1
+   },
+   "GPU VSync (F800001C)": {
+    "pct": 3.93,
+    "threads": 1
+   },
+   "D3D12 Pipelines": {
+    "pct": 2.94,
+    "threads": 9
+   },
+   "Kernel Dispatch (F8000028)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "Main XThread (F800002C)": {
+    "pct": 54.82,
+    "threads": 1
+   },
+   "D3D12 Storage writer": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread1108 (F8000070)": {
+    "pct": 1.27,
+    "threads": 1
+   },
+   "XThread3430 (F80000F4)": {
+    "pct": 24.73,
+    "threads": 1
+   },
+   "XThread1BA0 (F80000FC)": {
+    "pct": 0.25,
+    "threads": 1
+   },
+   "XThread26C0 (F8000104)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread8478 (F800010C)": {
+    "pct": 4.2,
+    "threads": 1
+   },
+   "XThread89E0 (F8000114)": {
+    "pct": 8.58,
+    "threads": 1
+   },
+   "XThread94AC (F8000120)": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "XThread0A40 (F8000128)": {
+    "pct": 0.37,
+    "threads": 1
+   },
+   "XThread23BC (F800012C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread565C (F8000140)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread8AF4 (F8000144)": {
+    "pct": 12.66,
+    "threads": 1
+   },
+   "SDLWASAPIMgmt": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "SDLAudioP19": {
+    "pct": 0.69,
+    "threads": 1
+   },
+   "XThread15B8 (F8000168)": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "XThread7C28 (F8000170)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread4FC4 (F800018C)": {
+    "pct": 0.19,
+    "threads": 1
+   },
+   "XThread7720 (F8000194)": {
+    "pct": 1.18,
+    "threads": 1
+   },
+   "XThread0BE8 (F800019C)": {
+    "pct": 1.24,
+    "threads": 1
+   },
+   "XThread3150 (F80001AC)": {
+    "pct": 55.64,
+    "threads": 1
+   },
+   "XThread43D8 (F80001C0)": {
+    "pct": 0.47,
+    "threads": 1
+   },
+   "XThread978C (F8000270)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread910C (F80002AC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread9280 (F80002B4)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread4228 (F80002BC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread71C4 (F80002CC)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread65F8 (F8000320)": {
+    "pct": 0.02,
+    "threads": 1
+   }
+  },
+  "ticks": {
+   "32812": {
+    "name": "rex::thread::TimerQueue",
+    "samples": 220,
+    "steps": 219,
+    "non_rising": 0,
+    "non_rising_at_s": [],
+    "step_s_median": 2.0,
+    "span_s": [
+     -8.3,
+     429.7
+    ]
+   }
+  }
+ },
+ "slow_state": {
+  "rows": 433,
+  "onset_s": null,
+  "slow_pct": 0.0,
+  "e_eff_mhz_median": 1433,
+  "cpu_util_pct_median": 79.5,
+  "slow": false
+ },
+ "hang_cpu": [],
+ "host_quiet": {
+  "rows": 13,
+  "busy_rows": 0
+ },
+ "toypad": {
+  "confirms": 3,
+  "result": "listener=True trigger=True placed=True load-confirms=3/3 then=off remove-confirms=0"
+ },
+ "proofs": [
+  {
+   "ok": true,
+   "text": "init \"C1 keep-watch: on (with physical_protect_hold_global_lock)\" x1"
+  },
+  {
+   "ok": true,
+   "text": "\"first kept protect\" x1 (gate D / positive control)"
+  },
+  {
+   "ok": true,
+   "text": "kept count: last \"kept so far\" = 126976 (42 such lines)"
+  },
+  {
+   "ok": true,
+   "text": "verify off (keep_watch_verify=false): \"C1 verify: on\" x0, K lines 0"
+  },
+  {
+   "ok": true,
+   "text": "kept count rises through the level load (last mark end): first 2 -> last 126976 (42 \"kept so far\" lines)"
+  },
+  {
+   "ok": true,
+   "text": "gate D zero lines: \"Recovered stale physical page protection\" 0, \"Unhandled guest physical write fault\" 0"
+  },
+  {
+   "ok": true,
+   "text": "no blocked/no-hold C1 line (0/0/0)"
+  },
+  {
+   "ok": true,
+   "text": "slow-frame lines 38492"
+  },
+  {
+   "ok": true,
+   "text": "the last slow-frame line ends with the memexport suffix: ...n memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)"
+  },
+  {
+   "ok": true,
+   "text": "P2 COUNTER: memexport full-buffer total (last line) = 0; max 0; sum Nx 0; lines with Nx > 0: 0 -> closes P2 memexport gate"
+  },
+  {
+   "ok": true,
+   "text": "f10 f10b cvars in run.json (6 expected, w6gB's set): all as planned"
+  },
+  {
+   "ok": true,
+   "text": "tags placed: 3 game.log LOAD lines (3 needed); sidecar: listener=True trigger=True placed=True load-confirms=3/3 then=off remove-confirms=0"
+  },
+  {
+   "ok": true,
+   "text": "L route reached the level: through the level load (last mark end)"
+  },
+  {
+   "ok": null,
+   "text": "FINDING 10 (Agent 6 direct test): STUCK-LOCK events 0"
+  },
+  {
+   "ok": true,
+   "text": "quiet host: hostload.csv rows with clang/cl/ninja/link during the run: 0 of 13"
+  },
+  {
+   "ok": true,
+   "text": "G8 bad lines: Protect failed 0, Recovered stale 0, Unhandled guest physical write fault 0"
+  }
+ ],
+ "base_misses": [],
+ "hint": "PASS?"
+}

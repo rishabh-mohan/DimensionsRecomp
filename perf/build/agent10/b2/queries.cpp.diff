@@ -1,0 +1,87 @@
+﻿diff --git a/baseline/DimensionsRecomp/rexlego/src/gpu_native/queries.cpp b/DimensionsRecomp/rexlego/src/gpu_native/queries.cpp
+index 11e9ed6..8b169c4 100644
+--- a/baseline/DimensionsRecomp/rexlego/src/gpu_native/queries.cpp
++++ b/DimensionsRecomp/rexlego/src/gpu_native/queries.cpp
+@@ -32,10 +32,14 @@ struct Query {
+   ComPtr<ID3D12Fence> completion;
+   u64 completion_value = 0;
+ };
+ std::mutex mutex;
+ std::unordered_map<u32, std::shared_ptr<Query>> queries;
++// Number of entries in `queries` whose `active` is set. Changed only under `mutex`, at most once per
++// critical section. QueryDrawScope reads it before locking: draws are ordered after BEGIN/END by the
++// recording lock or, with full preparation, by the recorder barrier IssueQueryQueued submits.
++std::atomic<size_t> active_queries{0};
+ std::unordered_map<u32, unsigned> pending_issues;
+ // Query generations retain samples through every submission that uses them.
+ // The pool's sole reference is therefore proof that both GPU work and readers
+ // have released a pair. Never reuse by frame number or an assumed latency.
+ std::vector<std::shared_ptr<Samples>> sample_pool;
+@@ -104,19 +108,23 @@ u32 IssueQuery(u32 address, u32 flags) {
+     // generation alive at every pending submission, without draining the GPU.
+     next->active = true;
+     HostDevice::RetireResource(query);
+     {
+       std::lock_guard lock(mutex);
+-      queries[address] = std::move(next);
++      auto& slot = queries[address];
++      if (!slot || !slot->active) ++active_queries;
++      slot = std::move(next);
+     }
+     return 0;
+   }
+   if (flags != 1) return Unsupported("issue flags", flags);
+   {
+     std::lock_guard lock(mutex);
+     if (!query->active) return kInvalid;
+     query->active = false;
++    // Not counted any more if ResetQueryResources has dropped it from the map.
++    if (const auto it = queries.find(address); it != queries.end() && it->second == query) --active_queries;
+   }
+   // Each draw has already ended/resolved its query. Submit before signaling.
+   const bool submitted = HostDevice::SubmitRecordedWork();
+   auto* queue = static_cast<plume::D3D12CommandQueue*>(HostDevice::Queue());
+   // All query ends are ordered on the same direct queue. One monotonic fence
+@@ -198,10 +206,11 @@ u32 ReleaseQuery(u32 address) {
+     std::lock_guard lock(mutex);
+     if (!queries.contains(address)) return 0;
+     const u32 refs = Header(address)[3];
+     if (refs > 1) { Header(address)[3] = refs - 1; return refs - 1; }
+     released = std::move(queries[address]);
++    if (released->active) --active_queries;
+     released->active = false;
+     queries.erase(address);
+   }
+   // GPU commands refer to host heaps/readbacks, never the guest header.
+   // Retain the generation even for release-before-END; return the header now.
+@@ -215,15 +224,16 @@ struct QueryDrawScope::Impl {
+   double sample_scale = 1.0;
+   std::shared_ptr<Samples> samples;
+   std::vector<std::shared_ptr<Query>> consumers;
+ };
+ QueryDrawScope::QueryDrawScope(plume::RenderCommandList* commands, double sample_scale) {
++  // Most draws are outside every BEGIN/END: skip the lock and the walk over all created queries.
++  if (active_queries.load(std::memory_order_acquire) == 0) return;
+   std::unique_ptr<Impl> scope;
+   {
+     std::lock_guard lock(mutex);
+-    if (std::none_of(queries.begin(),queries.end(),
+-        [](const auto& entry) { return entry.second->active; })) return;
++    if (active_queries.load(std::memory_order_relaxed) == 0) return;
+     scope = std::make_unique<Impl>();
+     for (const auto& [address, query] : queries)
+       if (query->active) scope->consumers.push_back(query);
+   }
+   if (scope->consumers.empty()) return;
+@@ -296,10 +306,11 @@ void FailActiveQueries() {
+ }
+ void ResetQueryResources() {
+   std::lock_guard lock(mutex);
+   for (const auto& [address, query] : queries) REX_KERNEL_MEMORY()->SystemHeapFree(address);
+   queries.clear();
++  active_queries.store(0);
+   pending_issues.clear();
+   sample_pool.clear();
+   query_completion.Reset();
+   query_completion_value = 0;
+ }

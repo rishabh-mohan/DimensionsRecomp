@@ -1,0 +1,56 @@
+@@ run18.py
+<<<
+8 consecutive runs over all four arms had 33-58 frames over 6 ms
+===
+8 consecutive runs had 33-58 frames over 6 ms
+>>>
+<<<
+§4b (a 05:58-06:31 entry and Possible changes)
+===
+§4b (a 05:58-06:40 entry and Possible changes)
+>>>
+<<<
+    'has exited at 07:30')
+===
+    'has exited at 07:30')
+SRC('build/agent10/t27/scrnsave-delta.md', '**Verdict: SAFE.** Install it with `install-scrnsave.ps1`', '**Verdict: SAFE.** Both scripts copy nothing unless every check passes')
+SRC('build/agent5/scrnsave-fix/install-log.txt', 'install-scrnsave.ps1 -Check starts', 'REFUSED: a launcher process is running: pid 19960', 'nothing was copied')
+>>>
+<<<
+'build/agent11/resume/facts-perfopt.md'):
+===
+'build/agent11/resume/facts-perfopt.md',
+          'build/agent5/scrnsave-fix/new/day/run-day.ps1', 'build/agent5/scrnsave-fix/day-update.ps1', 'build/agent5/scrnsave-fix/install-scrnsave.ps1'):
+>>>
+<<<
+"regenerated from the fixed launcher, with make-run-day.ps1 pinning 565D30D4… instead of 16B90FA8… (Agent 10's condition 1) and N1-N3 fixed. "
+===
+"regenerated from the fixed launcher into `build/agent5/scrnsave-fix/new/day/`, with make-run-day.ps1 pinning 565D30D4… instead of 16B90FA8… (Agent 10's condition 1, met in staged form) and N1-N3 fixed; `day-update.ps1` copies it into `build/agent5/day-draft/` after the install. "
+>>>
+<<<
+"It is installed after the launcher exits at 07:30, once Agents 8 (run-matrix.ps1's owner) and 10 have read the delta, and before RUN-DAY or "
+===
+"Agent 10 rated the delta and its install tooling SAFE (`build/agent10/t27/scrnsave-delta.md`), and `install-scrnsave.ps1 -Check` refused at 06:36 while the night launcher ran, copying nothing, as designed (`build/agent5/scrnsave-fix/install-log.txt`). It is installed after the launcher exits at 07:30, once Agent 8 (run-matrix.ps1's owner) has read the delta too, and before RUN-DAY or "
+>>>
+<<<
+SCRNSAVE fix: staged, 45/45 tests.
+===
+SCRNSAVE fix: staged, 45/45 tests, rated SAFE by Agent 10.
+>>>
+<<<
+staged, 45/45 tests PASS at 06:14:40 (next bullet).
+===
+staged, 45/45 tests PASS at 06:14:40, rated SAFE by Agent 10 (next bullet).
+>>>
+@@ fnd5.py
+<<<
+"Agent 5 has staged the proper fix, and all 45 of its tests pass. It goes in after the launcher exits at 07:30, once Agents 8 and 10 have read "
+===
+"Agent 5 has staged the proper fix; all 45 of its tests pass, and Agent 10 rated it safe. It goes in after the launcher exits at 07:30, once Agent 8 has read "
+>>>
+<<<
+SRC('build/agent5/scrnsave-fix/README.md', 'Result, 23 Nov 06:14:40: **45/45 PASS**', 'after Agent 8 (owner of run-matrix.ps1) and Agent 10 have read this delta')
+===
+SRC('build/agent5/scrnsave-fix/README.md', 'Result, 23 Nov 06:14:40: **45/45 PASS**', 'after Agent 8 (owner of run-matrix.ps1) and Agent 10 have read this delta')
+SRC('build/agent10/t27/scrnsave-delta.md', '**Verdict: SAFE.** Install it with `install-scrnsave.ps1`')
+>>>

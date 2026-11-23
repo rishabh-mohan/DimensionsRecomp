@@ -1,0 +1,19 @@
+{
+  "reference": "s0",
+  "forbid_all": ["Recovered stale physical page protection", "Unhandled guest physical write fault", "PhysicalHeap::Protect failed", "BaseHeap::Protect failed", "C1 keep-watch:", "C1 verify", "S4 upload hash:", "slow frame #"],
+  "note_all": ["STUCK-LOCK", "Minidump written to"],
+  "levels": {"warning": 40, "error": 0, "critical": 0},
+  "arms": {
+    "base": {"require": ["Reserving the guest memory arena"], "forbid": ["Host timer resolution set to 1 ms", "TimerQueue: precise wait (timer_queue_precise_wait)"]},
+    "s0":   {"require": ["Reserving the guest memory arena"], "forbid": ["Host timer resolution set to 1 ms", "TimerQueue: precise wait (timer_queue_precise_wait)"]},
+    "d11":  {"require": ["Reserving the guest memory arena", "Host timer resolution set to 1 ms (background opt-out on)"], "forbid": ["TimerQueue: precise wait (timer_queue_precise_wait)"]},
+    "d11t": {"require": ["Reserving the guest memory arena", "Host timer resolution set to 1 ms (background opt-out on)"], "forbid": ["TimerQueue: precise wait (timer_queue_precise_wait)"]},
+    "d11p": {"require": ["Reserving the guest memory arena", "Host timer resolution set to 1 ms (background opt-out on)", "TimerQueue: precise wait (timer_queue_precise_wait)"], "forbid": [], "exact": {"TimerQueue: precise wait (timer_queue_precise_wait)": 1}}
+  },
+  "count": ["STUCK-LOCK", "still not acquired after", "Minidump written to", "Recovered stale physical page protection", "Unhandled guest physical write fault", "PhysicalHeap::Protect failed", "BaseHeap::Protect failed", "Host timer resolution set to 1 ms", "TimerQueue: precise wait (timer_queue_precise_wait)", "[NtCreateFile] FAILED", "Reserving the guest memory arena", "Title terminated"],
+  "notes": [
+    "Test expectations for build/agent6/w6/w6_kit.py on window 5 (build/agent8/matrix/20261122-1756), written by Agent 6 for task #16 part 2. W5's proof rules come from its matrix.json notes (S4-DRAFT 2c; Agent 11, 14:14): d11, d11t and d11p log 'Host timer resolution set to 1 ms (background opt-out on)'; base and s0 have none; every d11p game.log has exactly one 'TimerQueue: precise wait (timer_queue_precise_wait)' and no other arm has it; d11t's proof is REX_TIMER_WAIT_BLOCKING in run.json env_set, which the kit checks against matrix.json's env for every arm.",
+    "Expected result (task #13's W5 logdiff, build/agent6/w4b/out-20261122-1756-vs-s0): all 16 runs pass; 40/0/0 levels; no STUCK-LOCK, dump, WER or Recovered line; exit 0 after WM_CLOSE; gate_logdiff NEW/MORE/GONE/FAIL 0 for every arm vs s0. The reference is s0 (as in W6); base and cold-base use base's rules (cold-<arm> -> <arm>).",
+    "Slow state must equal Agent 8's build/agent8/readout/w5/timerq3.csv (Agent 11's timerq_slowstate_3mode.ps1): onset_s/slow_pct per run cold-base -/0, base-r1 87/13, s0-r1 40/50, d11-r1 6/68, d11t-r1 13/66, d11p-r1 3/71, s0-r2 21/69, d11-r2 35/58, d11t-r2 1/62, d11p-r2 2/70, base-r2 4/78, d11-r3 2/70, d11t-r3 4/96, d11p-r3 2/80, base-r3 22/60, s0-r3 2/62."
+  ]
+}

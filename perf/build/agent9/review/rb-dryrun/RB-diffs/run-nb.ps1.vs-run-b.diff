@@ -1,0 +1,151 @@
+--- build/agent2/run-b.ps1
++++ build/agent2/run-nb.ps1
+@@ -1,30 +1,40 @@
+-# Agent 2 - codegen build B (Agent 9's codegen option, perf-notes/agent9-codegen.md "Session 2: regen+build recipe")
+-# from build/agent2/snapB (prepared by prep-b.py), run only when Agent 1 schedules it, as a run_command background
+-# task. It stops at the first failure; build/agent2/stop-snap.ps1 kills it.
+-#   powershell -NoProfile -ExecutionPolicy Bypass -File build\agent2\run-b.ps1 [-Jobs 10] [-SkipConfigure] [-NoBuild]
+-# 0. Refuses (exit 3) unless the install tree is build\agent9\install\batch-nolr (Agent 1, 02:05: never install\batch,
+-#    whose skip_lr is unsafe for LEGO), its SHA256SUMS.txt is the pinned 24CE1493... and snapB's
+-#    legodimensions_config.toml is the pinned E60EAF1C... (= configs\batch-nolr.toml). -Install exists only for the
+-#    negative test.
+-# 1. build-snap.ps1 -Phase game -Tag snapB -SnapDir build\agent2\snapB\DimensionsRecomp -GameDir build\agent2\snapB-off
+-#    -CodegenExe build\agent2\codegen-frozen\codegen-frozen2.exe -GenBase build\agent9\install\batch-nolr\generated
+-#    -KeepGoing: OFF configure (fresh tree; skipped with -SkipConfigure) -> gen-check (batch-nolr reference) -> gate (432
+-#    = 430 TUs + init + register) -> full build (PCH + 430 TUs + init + register). -k 0, so one run lists every failing
+-#    TU (a musttail failure is Agent 9's rollback 2). -NoBuild stops after the gate.
+-# 2. rexruntime.dll in snapB-off must equal snap1-sdk/install/bin (the exe's POST_BUILD copy; a fresh tree always links).
+-# 3. stage-snap-bin.ps1 -Variant off -SnapTag S2 -BuildTag snapB -GameTree snapB-off -OutDir build\agent2\devoffB-bin
+-#    -GameSnap snapB\DimensionsRecomp -CompareBin build\agent2\devoff2-bin (A) -ManifestNotesFile snapB-manifest-notes.txt
+-# Log: build/agent2/snapB-run.txt (+ build-snap's snapB-steps.txt and snapB-*.log, and snapB-stage.log).
+-param([int]$Jobs = 10, [switch]$SkipConfigure, [switch]$NoBuild, [string]$Out = 'devoffB-bin', [string]$SnapTag = 'S2',
+-    [string]$Compare = 'devoff2-bin', [string]$Install = 'build\agent9\install\batch-nolr')
++# Agent 2 - nativeB (task #14): a NATIVE_GPU=ON build of Agent 9's batch-nolr codegen on an S3 base, for the
++# native-hook checks Agent 10 left open. At Agent 1's GO only (decided ~04:15). Written by hand from run-b.ps1 (diff for
++# reference: build/agent2/RB-diffs/run-nb.ps1.vs-run-b.diff) and the native parts of run-s3d.ps1. Agent 1, 03:11: the
++# base is snap1's current tree (S3, or S3d once applied) in the new copy build\agent2\snapB3 (prep-nb.py; rexlego/out
++# is copied because the native flags read it); snapB and snapB-off stay untouched; A = native3d-bin when snapB3 was
++# copied at S3d, native3-bin at S3. Run as a run_command background task (or via rb-chain.ps1 -Variant nb); it stops
++# at the first failure; build/agent2/stop-snap.ps1 kills it.
++#   powershell -NoProfile -ExecutionPolicy Bypass -File build\agent2\run-nb.ps1 [-Jobs 10] [-SkipConfigure] [-NoBuild]
++#       [-ExtraExeStrings 'a,b']
++# 0. Guards, before anything builds: no start 08:30-12:00, -Jobs capped at 10, no other snapshot build driver; the
++#    install tree must be build\agent9\install\batch-nolr (never install\batch) with the pinned SHA256SUMS.txt
++#    24CE1493...; snapB3-manifest-notes.txt must be prep-nb.py's (its tag line names the snapshot tag, S3 or S3d; another
++#    -SnapTag is refused); snapB3's legodimensions_config.toml is the pinned E60EAF1C...; snapB3\rexlego\out\native-gpu
++#    exists; A is staged and -Out is not.
++# 1. build-snap.ps1 -Phase game -Native -Tag snapB3n -SnapDir build\agent2\snapB3\DimensionsRecomp
++#    -GameDir build\agent2\snapB3-on -CodegenExe build\agent2\codegen-frozen\codegen-frozen2.exe
++#    -GenBase build\agent9\install\batch-nolr\generated -PrelinkJobs <Jobs> -KeepGoing: native configure (fresh tree,
++#    Agent 6's flags re-rooted on snapB3) -> gen-check (batch-nolr reference) -> gate -> full build. -NoBuild stops
++#    after the gate.
++# 2. rexruntime.dll in snapB3-on must equal snap1-sdk/install/bin (a fresh tree always links).
++# 3. stage-snap-bin.ps1 -Variant native -SnapTag <prep tag> -BuildTag snapB3n -GameTree snapB3-on -OutDir nativeB-bin
++#    -GameSnap snapB3\DimensionsRecomp -CompareBin <A> -ManifestNotesFile snapB3-manifest-notes.txt: every staged file
++#    but the exe and map must equal A's, and the exe must differ.
++# Log: build/agent2/snapB3n-run.txt (+ build-snap's snapB3n-steps.txt and snapB3n-*.log, and snapB3n-stage.log).
++param([int]$Jobs = 10, [switch]$SkipConfigure, [switch]$NoBuild, [string]$Out = 'nativeB-bin', [string]$SnapTag = '',
++    [string]$Compare = '', [string]$Install = 'build\agent9\install\batch-nolr', [string]$ExtraExeStrings = '')
+ $ErrorActionPreference = 'Continue'
+ $R = '<workspace>'
+ $A = "$R\build\agent2"
+-$runLog = "$A\snapB-run.txt"
+-$snapB = "$A\snapB\DimensionsRecomp"; $gameB = "$A\snapB-off"; $notes = "$A\snapB-manifest-notes.txt"
+-# the same SDK as devoff2 (S2): Agent 12's #22 cvar name and description are in rexruntime.dll
++$tag = 'snapB3n'
++$runLog = "$A\$tag-run.txt"
++$snapB3 = "$A\snapB3\DimensionsRecomp"; $gameB = "$A\snapB3-on"; $notes = "$A\snapB3-manifest-notes.txt"
++# the S3 SDK and the native toggles, as native3 / native3d (run-s3.ps1, run-s3d.ps1)
+ $rtStrings = 'audio_shutdown_detach_worker,leave it running and leak what it can still reach'
++$exeStrings = 'which can hang when the guest pauses,LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD,LEGO_NATIVE_FPS_CELL_RECTS,LEGO_NATIVE_TEXTURE_STAGING_POOL'
++if ($ExtraExeStrings.Trim()) { $exeStrings += ',' + $ExtraExeStrings.Trim() }
+ function Log([string]$m) {
+-    $line = "$(Get-Date -Format HH:mm:ss) [B] $m"
++    $line = "$(Get-Date -Format HH:mm:ss) [nB] $m"
+     $line | Out-File -Append -Encoding utf8 $runLog
+     Write-Host $line
+@@ -40,39 +50,65 @@
+     return $code
+ }
++# guards (\bb-chain: not the rb-chain.ps1 parent; run-nb itself is not listed because the calling shell names it)
++$tod = (Get-Date).TimeOfDay
++if ($tod -ge [TimeSpan]'08:30:00' -and $tod -lt [TimeSpan]'12:00:00') { Log 'STOP: no builds from 08:30 (session-3 rule)'; exit 3 }
++if ($Jobs -gt 10) { Log "-Jobs $Jobs capped at 10"; $Jobs = 10 }
++$drv = @(Get-CimInstance Win32_Process | Where-Object { $_.ProcessId -ne $PID -and $_.CommandLine -match 'run-b\.ps1|\bb-chain\.ps1|run-s2\.ps1|run-s3\.ps1|run-s3d\.ps1|run-rb\d\.ps1|build-snap\.ps1|stage-snap-bin\.ps1' })
++if ($drv.Count) { Log "STOP: another snapshot build driver is running (pid $($drv[0].ProcessId): $($drv[0].CommandLine))"; exit 4 }
+ $t0 = [Diagnostics.Stopwatch]::StartNew()
+-Log "START codegen build B from $SnapTag (snapshot copy $snapB, game tree $gameB, -j $Jobs, install tree $Install)"
+-# 0. only install\batch-nolr, with the pinned hashes; checked before anything is built or written
++Log "START nativeB (snapshot copy $snapB3, game tree $gameB, -j $Jobs, install tree $Install)"
++# only install\batch-nolr, with the pinned hashes; checked before anything is built or written
+ $nolr = "$R\build\agent9\install\batch-nolr"
+ $inst = $(if ([IO.Path]::IsPathRooted($Install)) { $Install } else { Join-Path $R $Install })
+ $inst = [IO.Path]::GetFullPath($inst).TrimEnd('\')
+-if ($inst -ne $nolr) { Log "STOP: refusing install tree $inst : build B uses only $nolr (install\batch has skip_lr, unsafe for LEGO); nothing built"; exit 3 }
++if ($inst -ne $nolr) { Log "STOP: refusing install tree $inst : nativeB uses only $nolr (install\batch has skip_lr, unsafe for LEGO); nothing built"; exit 3 }
+ $it = Get-Item -LiteralPath $nolr -Force -ErrorAction SilentlyContinue
+ if (-not $it -or $it.LinkType) { Log "STOP: $nolr is missing or a link"; exit 3 }
+ $sumsSha = (Get-FileHash -LiteralPath "$nolr\SHA256SUMS.txt").Hash
+ if ($sumsSha -ne '24CE1493FB8DAE37E00B556EB8871D633921E44378D960DE4359B104B16CDB8E') { Log "STOP: $nolr\SHA256SUMS.txt is $sumsSha, not the pinned 24CE1493..."; exit 3 }
+-if (-not (Test-Path $notes)) { Log 'STOP: run prep-b.py first (no snapB-manifest-notes.txt)'; exit 2 }
+-$cfgSha = (Get-FileHash -LiteralPath "$snapB\rexlego\legodimensions_config.toml").Hash
+-if ($cfgSha -ne 'E60EAF1CEB575572BA0274AA5F52E97F25A35C01690B41E6A637739408E6A090') { Log "STOP: snapB legodimensions_config.toml is $cfgSha, not the pinned batch-nolr config E60EAF1C..."; exit 3 }
+-Log "pins match: install tree $nolr (SHA256SUMS.txt $($sumsSha.Substring(0, 16))), snapB config $($cfgSha.Substring(0, 16))"
+-$bsArgs = @("$A\build-snap.ps1", '-Phase', 'game', '-Tag', 'snapB', '-Jobs', "$Jobs", '-KeepGoing', '-SnapDir', $snapB,
+-    '-GameDir', $gameB, '-CodegenExe', "$A\codegen-frozen\codegen-frozen2.exe", '-GenBase', "$nolr\generated")
++if (-not (Test-Path $notes)) { Log 'STOP: run prep-nb.py first (no snapB3-manifest-notes.txt)'; exit 2 }
++$tl = @(Select-String -LiteralPath $notes -Pattern '^snapB3 = build/agent2/snap1/DimensionsRecomp at (S\d+[a-z]*), copied by prep-nb\.py ')
++if ($tl.Count -ne 1) { Log 'STOP: snapB3-manifest-notes.txt was not written by prep-nb.py (no snapshot tag line)'; exit 2 }
++$prepTag = $tl[0].Matches[0].Groups[1].Value
++if (-not $SnapTag) { $SnapTag = $prepTag } elseif ($SnapTag -ne $prepTag) { Log "STOP: -SnapTag $SnapTag, but prep-nb.py copied snap1 at $prepTag"; exit 3 }
++if (-not $Compare) { $Compare = $(if ($SnapTag -eq 'S3d') { 'native3d-bin' } else { 'native3-bin' }) }
++if (-not (Test-Path -LiteralPath "$A\$Compare\MANIFEST.txt")) { Log "STOP: $Compare is not staged (no MANIFEST.txt; it is the -CompareBin reference)"; exit 4 }
++if (Test-Path -LiteralPath "$A\$Out\MANIFEST.txt") { Log "STOP: $Out is already staged (MANIFEST.txt exists); pass another -Out"; exit 4 }
++$cfgSha = (Get-FileHash -LiteralPath "$snapB3\rexlego\legodimensions_config.toml").Hash
++if ($cfgSha -ne 'E60EAF1CEB575572BA0274AA5F52E97F25A35C01690B41E6A637739408E6A090') { Log "STOP: snapB3 legodimensions_config.toml is $cfgSha, not the pinned batch-nolr config E60EAF1C..."; exit 3 }
++if (-not (Test-Path -LiteralPath "$snapB3\rexlego\out\native-gpu")) { Log "STOP: $snapB3\rexlego\out\native-gpu is missing (prep-nb.py copies rexlego/out)"; exit 3 }
++Log "snapshot tag $SnapTag (the prep-nb.py copy); A = $Compare; out $Out"
++Log "pins match: install tree $nolr (SHA256SUMS.txt $($sumsSha.Substring(0, 16))), snapB3 config $($cfgSha.Substring(0, 16))"
++$bsArgs = @("$A\build-snap.ps1", '-Phase', 'game', '-Native', '-Tag', $tag, '-Jobs', "$Jobs", '-PrelinkJobs', "$Jobs", '-KeepGoing',
++    '-SnapDir', $snapB3, '-GameDir', $gameB, '-CodegenExe', "$A\codegen-frozen\codegen-frozen2.exe", '-GenBase', "$nolr\generated")
+ if ($SkipConfigure) { $bsArgs += '-SkipConfigure' }
+ if ($NoBuild) { $bsArgs += '-NoBuild' }
+ $c = Run 'build' $bsArgs ''
+-if ($c -ne 0) { Log "STOP: build-snap.ps1 exit $c (see snapB-steps.txt)"; exit 10 }
++if ($c -ne 0) { Log "STOP: build-snap.ps1 exit $c (see $tag-steps.txt)"; exit 10 }
+ if ($NoBuild) { Log ("DONE -NoBuild (configure, gen-check, gate), total wall {0:N1}s" -f $t0.Elapsed.TotalSeconds); exit 0 }
+ $h2 = (Get-FileHash -LiteralPath "$A\snap1-sdk\install\bin\rexruntime.dll").Hash
+ $h1 = (Get-FileHash -LiteralPath "$gameB\rexruntime.dll").Hash
+-if ($h1 -ne $h2) { Log "STOP: rexruntime.dll in snapB-off ($($h1.Substring(0, 16))) != snap1-sdk/install/bin ($($h2.Substring(0, 16)))"; exit 11 }
+-Log "rexruntime.dll in snapB-off == install/bin ($($h2.Substring(0, 16)))"
+-$what = "codegen build B: dev OFF build from $SnapTag with Agent 9's batch-nolr codegen options, NATIVE_GPU=OFF"
+-$cgNote = "codegen: Agent 9's batch-nolr options (build/agent9/install/batch-nolr, 430 TUs, no skip_lr; the snapB generated output hash-checked against that install tree by gen-check.py --base; the codegen-frozen2.exe stand-in writes nothing)"
+-$stageArgs = @("$A\stage-snap-bin.ps1", '-Variant', 'off', '-SnapTag', $SnapTag, '-BuildTag', 'snapB', '-GameTree', $gameB,
+-    '-OutDir', "$A\$Out", '-GameSnap', $snapB, '-CompareBin', "$A\$Compare", '-RuntimeStrings', $rtStrings,
+-    '-WhatText', $what, '-CodegenNote', $cgNote, '-ManifestNotesFile', $notes)
+-$stLog = "$A\snapB-stage.log"
++if ($h1 -ne $h2) { Log "STOP: rexruntime.dll in snapB3-on ($($h1.Substring(0, 16))) != snap1-sdk/install/bin ($($h2.Substring(0, 16)))"; exit 11 }
++Log "rexruntime.dll in snapB3-on == install/bin ($($h2.Substring(0, 16)))"
++$what = "nativeB: native build from $SnapTag with Agent 9's batch-nolr codegen options, NATIVE_GPU=ON with Agent 6 AOT inputs"
++$cgNote = "codegen: Agent 9's batch-nolr options (build/agent9/install/batch-nolr, 430 TUs, no skip_lr; the snapB3 generated output hash-checked against that install tree by gen-check.py --base; the codegen-frozen2.exe stand-in writes nothing)"
++$stageArgs = @("$A\stage-snap-bin.ps1", '-Variant', 'native', '-SnapTag', $SnapTag, '-BuildTag', $tag, '-GameTree', $gameB,
++    '-OutDir', "$A\$Out", '-GameSnap', $snapB3, '-CompareBin', "$A\$Compare", '-RuntimeStrings', $rtStrings,
++    '-ExeStrings', $exeStrings, '-WhatText', $what, '-CodegenNote', $cgNote, '-ManifestNotesFile', $notes)
++$stLog = "$A\$tag-stage.log"
+ $c = Run 'stage' $stageArgs $stLog
++foreach ($l in @(Get-Content $stLog | Where-Object { $_ -match [regex]::Escape($Compare) })) { Log "  $l" }
+ foreach ($l in @(Get-Content $stLog | Select-Object -Last 2)) { Log "  $l" }
+ if ($c -ne 0) { Log "STOP: stage-snap-bin.ps1 exit $c (see $(Split-Path -Leaf $stLog))"; exit 13 }
+-Log ("DONE codegen build B -> $Out, total wall {0:N1}s" -f $t0.Elapsed.TotalSeconds)
++foreach ($f in 'legodimensions.exe', 'legodimensions.map', 'rexruntime.dll', 'rexgpu-xenos.dll', 'MANIFEST.txt') {
++    $p = "$A\$Out\$f"
++    if (Test-Path -LiteralPath $p) { Log ("  staged {0}: {1} B, sha256 {2}" -f $f, (Get-Item -LiteralPath $p).Length, (Get-FileHash -LiteralPath $p).Hash) }
++}
++$man = @(Get-Content -Encoding UTF8 -LiteralPath "$A\$Out\MANIFEST.txt")
++$cnt = @(foreach ($t in 'S1', 'S2', 'S3', 'S3d') { "$t $(@($man | Where-Object { $_.StartsWith("#   $t ") }).Count)" })
++$np = @($man | Where-Object { $_.StartsWith('#   PASS ') }).Count; $nf = @($man | Where-Object { $_.StartsWith('#   FAIL ') }).Count
++$nn = @($man | Where-Object { $_.StartsWith('#   NOTE ') }).Count
++Log "  MANIFEST patch rows: $($cnt -join ' / '); checks: $np PASS / $nf FAIL / $nn NOTE"
++Log "  native GPU fingerprint: $((Get-Content "$gameB\native-gpu-build.txt" -Raw).Trim()) (A: $(@(Get-Content -Encoding UTF8 -LiteralPath "$A\$Compare\MANIFEST.txt" | Where-Object { $_ -match 'Native GPU fingerprint' } | ForEach-Object { ($_ -split ': ')[-1].TrimEnd('.') })[0]))"
++Log ("DONE nativeB -> $Out, total wall {0:N1}s" -f $t0.Elapsed.TotalSeconds)
+ exit 0

@@ -1,0 +1,67 @@
+profile : <workspace>\build\agent8\profiler\profile-694345718.bin
+map     : <workspace>\build\agent8\profiler\profiler_selftest.map
+samples : 76  threads: 7  modules: 15  duration: 3.435 s (trailer)  rounds: 11
+counting: all samples (76)
+
+busy 19 (25.0%)  waiting 57 (75.0%)  io 0 (0.0%)
+busy samples by category (leaf): guest 10 (52.6%)  rexlego 9 (47.4%)
+
+== threads ==
+  tid  name              samples   run%  busy  wait  io  top busy functions / role
+-----  ----------------  -------  -----  ----  ----  --  --------------------------------------------------------------------------------
+12592  selftest-main          11   81.8     9     2   0  lsp_selftest_hot 82%; ntdll.dll!NtDelayExecution 18%
+94648                         11    0.0     0    11   0  (waiting)
+48452                         11    0.0     0    11   0  (waiting)
+58604                         11    0.0     0    11   0  (waiting)
+94704  selftest-waiter        11    0.0     0    11   0  (waiting) std::thread::_Invoke<class std::tuple<class `extern "C" main'::`1':...
+73484  selftest-sleeper       11    0.0     0    11   0  (waiting) selftest::Sleeper
+86780  selftest-guest         10  100.0    10     0   0  sub_8200BEEF [guest 0x8200BEEF] 100%
+
+== top 5 by self (all samples) ==
+samples      %   /s  category  function
+-------  -----  ---  --------  ---------------------------------------
+     33  43.42  9.6  system    ntdll.dll!NtWaitForWorkViaWorkerFactory
+     13  17.11  3.8  system    ntdll.dll!NtDelayExecution
+     11  14.47  3.2  system    ntdll.dll!NtWaitForSingleObject
+     10  13.16  2.9  guest     sub_8200BEEF [guest 0x8200BEEF]
+      9  11.84  2.6  rexlego   lsp_selftest_hot
+
+== top 20 by inclusive (all samples) ==
+samples       %    /s  category  function
+-------  ------  ----  --------  -----------------------------------------------------------------------------------
+     76  100.00  22.1  system    KERNEL32.DLL!BaseThreadInitThunk
+     76  100.00  22.1  system    ntdll.dll!RtlUserThreadStart
+     33   43.42   9.6  system    ntdll.dll!NtWaitForWorkViaWorkerFactory
+     33   43.42   9.6  system    ntdll.dll!fn_24990 (near TpCallbackMayRunLong+0x1690)
+     32   42.11   9.3  rexlego   thread_start<unsigned int (__cdecl *)(void *), 1>
+     13   17.11   3.8  system    ntdll.dll!NtDelayExecution
+     13   17.11   3.8  system    ntdll.dll!RtlDelayExecution
+     13   17.11   3.8  system    KERNELBASE.dll!SleepEx
+     11   14.47   3.2  rexlego   main
+     11   14.47   3.2  rexlego   __scrt_common_main_seh
+     11   14.47   3.2  system    ntdll.dll!NtWaitForSingleObject
+     11   14.47   3.2  system    KERNELBASE.dll!WaitForSingleObjectEx
+     11   14.47   3.2  rexlego   std::thread::_Invoke<class std::tuple<class `extern "C" main'::`1'::<lambda_1>>, 0>
+     11   14.47   3.2  rexlego   selftest::Sleeper
+     11   14.47   3.2  rexlego   std::thread::_Invoke<class std::tuple<class `extern "C" main'::`1'::<lambda_2>>, 0>
+     10   13.16   2.9  guest     sub_8200BEEF [guest 0x8200BEEF]
+     10   13.16   2.9  rexlego   selftest::GuestLoop
+     10   13.16   2.9  rexlego   std::thread::_Invoke<class std::tuple<class `extern "C" main'::`1'::<lambda_0>>, 0>
+      9   11.84   2.6  rexlego   lsp_selftest_hot
+      9   11.84   2.6  rexlego   lsp_selftest_outer
+
+== modules by self ==
+samples      %  module
+-------  -----  ---------------------
+     57  75.00  ntdll.dll
+     19  25.00  profiler_selftest.exe
+
+== modules by inclusive ==
+samples       %  module
+-------  ------  ---------------------
+     76  100.00  ntdll.dll
+     76  100.00  KERNEL32.DLL
+     43   56.58  profiler_selftest.exe
+     24   31.58  KERNELBASE.dll
+
+(read 0.001 s, map 0.041 s, symbolize 0.288 s; 21 unique stacks, 39 addresses, 22 functions)

@@ -1,0 +1,34 @@
+runs: native3d=build\agent3\runs\20261122-055439-bgate-rev-native3d; nativeB=build\agent3\runs\20261122-055041-bgate-rev-nativeB
+
+named signatures:
+  signature                               native3d       nativeB
+  hash0                                          0             0
+  placement-missing VS 0xAC449538                4             4
+  placement-missing PS 0xAC448F28                4             4
+  unrecognized PS 0xAC448F28                     8             8
+  unrecognized VS 0xAC449538                     8             8
+
+warning/error types (20 distinct), counts per run:
+   native3d  nativeB  type
+         72       72  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_1#.DAT' -> #x#
+         16       16  [warning] [core] [t] Native GPU: query #x# invalidated by failed draw
+          8        8  [warning] [core] [t] Native GPU: unrecognized vertex shader resource #x#
+          8        8  [warning] [core] [t] Native GPU: unrecognized pixel shader resource #x#
+          8        8  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_2.DAT' -> #x#
+          8        8  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_3.DAT' -> #x#
+          8        8  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_4.DAT' -> #x#
+          8        8  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_5.DAT' -> #x#
+          8        8  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_6.DAT' -> #x#
+          8        8  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_7.DAT' -> #x#
+          8        8  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_8.DAT' -> #x#
+          8        8  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_9.DAT' -> #x#
+          4        4  [warning] [core] [t] Native GPU: placement vertex shader #x# backing #x# prefix=#x# words=F2# #A1# # # missing from AOT index
+          4        4  [warning] [core] [t] Native GPU: placement pixel shader #x# backing #x# prefix=#x# words=# # # # missing from AOT index
+          2        2  [warning] [core] [t] Native GPU: shader not present in AOT cache, hash=#x#
+          2        2  [warning] [krnl] [t] Stub XFileFsDeviceInformation!
+          2        2  [warning] [krnl] [t] IoDismountVolumeByFileHandle(#x#) - stub
+          1        1  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_2.HDR' -> #x#
+          1        1  [warning] [krnl] [t] __imp__XamBackgroundDownloadSetMode STUB
+          2        0  [warning] [core] [t] Native GPU: completion callback GPU wait took # ms
+
+totals: native3d 186 lines / 20 types, nativeB 184 lines / 19 types

@@ -1,0 +1,108 @@
+# fixes-rev1.txt - the 11 fixes from check/CHECK-W5b.md, the matching W9.md L20 cite, and the one slip
+# found by Agent 8's recompute (build/agent8/readout/w-followup/a7check/W9-W5b-check.md), applied by apply_fixes_rev1.py.
+# Format: FILE <name> / OLD <exact one-line substring> / NEW <replacement> / APPEND <name> ... ENDAPPEND.
+# Every OLD must occur exactly once. In-place edits must not change the line count.
+
+FILE W5b.md
+# rev note (L3)
+OLD All inputs were read-only, and nothing was re-run.
+NEW All inputs were read-only, and nothing was re-run. Rev 1 (Nov 23, ~07:45) applies the 11 fixes from the independent check (`check/CHECK-W5b.md`) and one slip found by Agent 8's recompute (section 10).
+# check #10 (L21)
+OLD   - The Defender exclusion for `build/` was in place (it was added ~23:16 on Nov 22).
+NEW   - The Defender exclusion for `build/` was in place (it was added ~23:16 on Nov 22; `perf-notes/SESSION2.md` L3171-3173).
+# check #2 (L42 last column)
+OLD The pick then rests on the loaded runs themselves (d11t lost -3.0 % fps vs d11p -1.1 % at similar load, n = 4 each) and on 0221, which isn't flagged. |
+NEW The pick then rests on the loaded runs themselves (d11t lost -3.0 % fps vs d11p -1.1 % at similar load, n = 4 each; post hoc and n.s.: gap -1.9 points, Welch 95 % CI [-4.1, +0.3], p 0.083) and on 0221, which isn't flagged. |
+# check #1 and #11 (L44)
+OLD 1 % low -2.8 [-6.5, +1.0] (W5: -7.7 %), all of it from one run: -0.8 [-2.5, +1.0] without 0221. The CPU saving is reproduced, smaller (-8.6 % vs -13.7 %). |
+NEW 1 % low -2.8 [-6.5, +1.0] (W5: -7.7 %), most of it from one run: -0.8 [-2.5, +1.0] without 0221. The CPU saving is reproduced, smaller (-8.6 % vs d11; W5: -13.7 % vs base, about -14.5 % vs d11). |
+# check #9 (L45)
+OLD Load came back ~6 min after the holdback, during the first scored run, and hit the first 4 scored runs (ng_t 2.84-3.76). |
+NEW Load rose again ~6 min after the holdback (source unknown), during the first scored run, and hit the first 4 scored runs (ng_t 2.84-3.76). |
+# Agent 8's slip (L70): 2.31 is the game column of audit.md L257; the ng_t mean is 2.56
+OLD   - 0221-d11t-r5, the run with the stutter cluster, isn't flagged: its window ng_t was 2.31 (audit.md L257).
+NEW   - 0221-d11t-r5, the run with the stutter cluster, isn't flagged: its window ng_t was 2.56, a typical value (z -0.0; audit.md L257).
+# check #8 (L85)
+OLD (light share 0.979-0.988 vs 0.962-0.978), so the cause is game-state warm-up.
+NEW (light share 0.979-0.988 vs 0.962-0.978), which points to game-state warm-up.
+# check note, optional (L146)
+OLD - d11t's count comes from one run: 0221-d11t-r5 has 38 / 27 / 6 of those frames.
+NEW - d11t's count comes mostly from one run: 0221-d11t-r5 has 38 / 27 / 6 of those frames.
+# check #4 (L152)
+OLD The runner's summary for pass 2: d11p -0.21 core with fps unchanged; d11t -0.21 core but fps -0.8 %, with slow r1-r2.
+NEW The runner's summary for pass 2, as relayed in `perf-notes/SESSION2.md` L3292-3295: d11p -0.21 core with fps unchanged; d11t -0.21 core but fps -0.8 %, with slow r1-r2.
+# check #3 (L156)
+OLD | cores (mean) | 2.5585 | 2.347 (-0.2115) | 2.354 (-0.2045) | pool-W5b.md section 8 |
+NEW | cores (mean) | 2.5585 | 2.347 (-0.2115) | 2.354 (-0.2045) | 3-decimal per-run cores (0451 summary.md run rows; mine/W5b.md L68-70; pool-W5b.json) |
+# check #5 (L165)
+OLD   - So "slow r1-r2" is host load (section 7).
+NEW   - So "slow r1-r2" coincides with host load and is most likely caused by it (section 7). This rests on correlation only: pass 2's within-arm Spearman is -0.32 (p 0.19; load-check.md L75).
+# check #6 (L166)
+OLD Its spreads of 10.1 / 10.3 / 4.4 % come from the fast round 1.
+NEW Its median-ms spreads of 10.1 / 10.3 / 4.4 % come mostly from the fast round 1 (all of d11's, most of d11t's, about half of d11p's); the rest is loaded 0213 (d11t) and 0209 (d11p). Without round 1 they are 2.0 / 4.4 / 2.2 %.
+# check #2 (L212, the caveat gets the test result)
+OLD    - n = 4 loaded runs per arm, picked after the fact: this is a pattern, not a test.
+NEW    - n = 4 loaded runs per arm, picked after the fact: this is a pattern, not a test. For scale, the gap of -1.9 points is n.s.: Welch 95 % CI [-4.1, +0.3], p 0.083; exact permutation p 6/70 = 0.086 (`check/check_w5b.py`).
+# Agent 8's slip (L215)
+OLD (pass 1, round 5; window 02:22:47-02:23:37; ng_t 2.31, not flagged)
+NEW (pass 1, round 5; window 02:22:47-02:23:37; ng_t 2.56, not flagged)
+# check #7 (L224)
+OLD vs 5.95 in 0221 (audit.md L257). Those runs had 0, 7 and 1 frames over 8 ms.
+NEW vs 5.95 in 0221 (audit.md L253, L359, L351, L257). Those runs had 0, 7 and 1 frames over 8 ms.
+# check #1 (L227)
+OLD In W5, d11t's p99 was +8.2 % [+0.5, +16.6] and its 1 % low -7.7 %, and it used 13.7 % less game CPU. The W4b/W5 noise read-out
+NEW In W5, d11t's p99 was +8.2 % [+0.5, +16.6] (T-std; B-block [+1.6, +15.3]) and its 1 % low -7.7 % (B-block [-13.8, -1.2]), both vs d11 (`build/agent8/readout/w5/READOUT.md` L167). It used 13.7 % less game CPU than base, about 14.5 % less than d11 (medians at n = 3; READOUT L28, L116, L119). The W4b/W5 noise read-out
+# check #1 (L230)
+OLD    - **CPU:** the saving is reproduced at a smaller size (-8.6 % vs -13.7 %).
+NEW    - **CPU:** the saving is reproduced at a smaller size (-8.6 % vs d11 here; W5: about -14.5 % vs d11, -13.7 % vs base).
+# check #9 (L286)
+OLD - **Then the load came back**, ~6 min after the holdback and during the first scored run (audit.md L32-37):
+NEW - **Then the load rose again**, ~6 min after the holdback and during the first scored run (audit.md L32-37):
+# check #2 (L308)
+OLD     - a larger fps loss under load (-3.0 % vs -1.1 % at similar ng_t; n = 4 each);
+NEW     - a larger fps loss under load (-3.0 % vs -1.1 % at similar ng_t; n = 4 each; post hoc and n.s., p 0.083, section 5 item 4);
+# check #2 (L311)
+OLD The pick then rests on the flagged (loaded) runs themselves and on 0221. Hence "narrowly".
+NEW The pick then rests on the flagged (loaded) runs themselves (a post hoc, n.s. gap) and on 0221 (a single event). Hence "narrowly".
+# check #2 (L318)
+OLD - **The loaded-run comparison is small:** 4 runs per arm, picked by ng_t after the fact.
+NEW - **The loaded-run comparison is small:** 4 runs per arm, picked by ng_t after the fact; the gap is n.s. (p 0.083).
+# check #10 (L322)
+OLD ran after the Defender exclusion for `build/` (~23:16 on Nov 22); W4b and W5 ran before it.
+NEW ran after the Defender exclusion for `build/` (~23:16 on Nov 22; SESSION2.md L3171-3173); W4b and W5 ran before it.
+
+FILE W9.md
+# check #10 (W9.md L20)
+OLD   - The Defender exclusion for `build/` was in place (it was added ~23:16 on Nov 22).
+NEW   - The Defender exclusion for `build/` was in place (it was added ~23:16 on Nov 22; `perf-notes/SESSION2.md` L3171-3173).
+
+APPEND W5b.md
+
+## 10. Changes after the checks (rev 1)
+
+- **Independent check:** `check/CHECK-W5b.md` (read-only checker, ~07:35; helper `check/check_w5b.py`). It checked ~830 claims and found 11 mismatches: 0 high, 2 medium, 6 low, 3 very low. No copied number or CI was wrong.
+- **Agent 8's recompute** from results.csv, with code that shares nothing with `pool_readout.py` (`build/agent8/readout/w-followup/a7check/W9-W5b-check.md`): 912 claims over W9 and W5b, 880 agree, 0 sign flips, no `*` changes.
+  - 21 are rounding ties of at most 1 in the last digit (unrounded per-run inputs here, 3 dp in results.csv), e.g. L239-240 and L256-257.
+  - 9 come from the light-share definition (±0.001 in 5 runs). Guard (a)'s F is 1.18 here vs 1.21 there (L81), n.s. either way.
+  - 1 is a slip, at L70 and L215: 0221's window ng_t is 2.56. The 2.31 was the game-cores column of audit.md L257 (the CHECK-W5b.md checker had passed it too).
+- **All fixes are in place, on the same lines**, so lines 1-326 keep the line numbers both checks cite. The pre-fix copy is `check/W5b-rev0.md`. The edits are listed in `check/fixes-rev1.txt` and were applied by `check/apply_fixes_rev1.py` (each old text found exactly once; line count unchanged).
+  - #1 (L44, L227, L230): W5's -13.7 % game CPU is vs base. Vs d11 it is about -14.5 %, so "smaller" still holds.
+  - #2 (L42, L212, L308, L311, L318): the loaded-run gap (-1.9 points) is now marked post hoc and n.s. (Welch p 0.083; exact permutation 6/70 = 0.086, also re-derived by hand).
+  - #3, #4, #7 (L156, L152, L224): sources added or corrected.
+  - #5, #8, #9 (L165, L85, L45, L286): wording ("coincides with", "points to", "rose again").
+  - #6 (L166): pass 1's spreads come mostly from round 1. Without it they are 2.0 / 4.4 / 2.2 %.
+  - #10 (L21, L322; also W9.md L20): the ~23:16 Defender citation. #11 (L44; also L146): "most of it from one run".
+  - Agent 8's slip (L70, L215): 2.31 is now 2.56. It stays below 2.8 and unflagged, so no run set or number moves.
+- **No verdict changed.**
+ENDAPPEND
+
+APPEND W9.md
+
+## 10. Independent recompute and rev 1 (Nov 23)
+
+- **Agent 8's recompute** of W9 and W5b from results.csv, with code that shares nothing with `pool_readout.py` (`build/agent8/readout/w-followup/a7check/W9-W5b-check.md`): 912 claims, 880 agree, 0 sign flips, no `*` changes.
+  - 21 are rounding ties of at most 1 in the last digit (unrounded per-run inputs here, 3 dp in results.csv), e.g. L285 (q125 low CI -0.78 vs -0.775).
+  - 9 come from the light-share definition (±0.001 in 5 runs, 3 of them in W9). Guard (a)'s F is 9.38 here vs 9.68 there (L78); the warning stands either way.
+  - 1 is a slip in W5b.md (0221's ng_t), fixed in its rev 1.
+- **Rev 1** only adds the ~23:16 Defender citation at L20 (`perf-notes/SESSION2.md` L3171-3173). The pre-fix copy is `check/W9-rev0.md`.
+ENDAPPEND

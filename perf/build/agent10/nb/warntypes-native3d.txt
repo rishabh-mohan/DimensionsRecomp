@@ -1,0 +1,33 @@
+runs: n0-3d=build\agent8\matrix\20261122-0452\runs\0452-n0-r1; n2-3d=build\agent8\matrix\20261122-0452\runs\0454-n2-r1; n3-3d=build\agent8\matrix\20261122-0452\runs\0456-n3-r1; n0-2=build\agent8\matrix\20261122-0013\runs\0030-n0-r1; n2-2=build\agent8\matrix\s3-n2-0210\runs\0210-n2-r1; n3-2=build\agent8\matrix\s3-n123-0205\runs\0208-n3-r1
+
+named signatures:
+  signature                                  n0-3d         n2-3d         n3-3d          n0-2          n2-2          n3-2
+  hash0                                          0             0             0             0         67220         44968
+  placement-missing VS 0xAC449538                4             4             8             4             4             8
+  placement-missing PS 0xAC448F28                4             4             8             4             4             8
+  unrecognized PS 0xAC448F28                     8             8             0             8             8             0
+  unrecognized VS 0xAC449538                     8             8             0             8             8             0
+
+warning/error types (19 distinct), counts per run:
+      n0-3d    n2-3d    n3-3d     n0-2     n2-2     n3-2  type
+          0        0        0        0    67220    44968  [warning] [core] [t] Native GPU shader cache miss: hash=#x#
+         18       18       18       18       18       18  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_1#.DAT' -> #x#
+          4        4        8        4        4        8  [warning] [core] [t] Native GPU: placement vertex shader #x# backing #x# prefix=#x# words=F2# #A1# # # missing from AOT index
+          8        8        0        8        8        0  [warning] [core] [t] Native GPU: unrecognized vertex shader resource #x#
+          4        4        8        4        4        8  [warning] [core] [t] Native GPU: placement pixel shader #x# backing #x# prefix=#x# words=# # # # missing from AOT index
+          8        8        0        8        8        0  [warning] [core] [t] Native GPU: unrecognized pixel shader resource #x#
+          2        2        2        2        2        2  [warning] [core] [t] Native GPU: shader not present in AOT cache, hash=#x#
+          2        2        2        2        2        2  [warning] [krnl] [t] Stub XFileFsDeviceInformation!
+          2        2        2        2        2        2  [warning] [krnl] [t] IoDismountVolumeByFileHandle(#x#) - stub
+          2        2        2        2        2        2  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_2.DAT' -> #x#
+          2        2        2        2        2        2  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_3.DAT' -> #x#
+          2        2        2        2        2        2  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_4.DAT' -> #x#
+          2        2        2        2        2        2  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_5.DAT' -> #x#
+          2        2        2        2        2        2  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_6.DAT' -> #x#
+          2        2        2        2        2        2  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_7.DAT' -> #x#
+          2        2        2        2        2        2  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_8.DAT' -> #x#
+          2        2        2        2        2        2  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_9.DAT' -> #x#
+          1        1        1        1        1        1  [warning] [krnl] [t] [NtCreateFile] FAILED: path='d:\INSTALL0_2.HDR' -> #x#
+          1        1        1        1        1        1  [warning] [krnl] [t] __imp__XamBackgroundDownloadSetMode STUB
+
+totals: n0-3d 66 lines / 18 types, n2-3d 66 lines / 18 types, n3-3d 58 lines / 16 types, n0-2 66 lines / 18 types, n2-2 67286 lines / 19 types, n3-2 45026 lines / 17 types

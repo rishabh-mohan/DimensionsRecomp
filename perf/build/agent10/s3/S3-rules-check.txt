@@ -1,0 +1,64 @@
+# snap-patch.py rules generated 2026-11-22 02:28:14 by build/agent2/make-rules-from-tsv.py
+# source: build\agent10\s3\S3-include.tsv (sha256 a1e7c83f7cfa13728559deffeb0b4f43adec23a52a3d9679f0712f75f2e3463d)
+#   # Agent 10 S3 include list, 2026-11-22 02:27:09. Paths relative to DimensionsRecomp/. Base: build/agent2/snap1/STATE-S2-2315.tsv (S2 = snap1 after the S2 apply); column 4 is the S2 (snap1) sha256, '-' = not in snap1 (new file). INCLUDE = take the live file (it must still match live_sha256); EXCLUDE = keep the snap1 version.
+#   # S3 build inputs (Agent 1, 02:22): game 001336f (2026-11-22 02:21:21, "S3 inputs: native settings fix (a), SDK with the S3 default flips") + SDK c5fe668 (2026-11-22 02:21:16, "S3 inputs: pause_safe_order and audio_shutdown_detach_worker default ON"; the game commit pins it), on top of the 01:50 checkpoint (game a0bdaa7, SDK 90e7ccd), plus the pre-sprint edits that stay uncommitted, as in S1/S2: thirdparty/plume checked out at e0c8871 (the game commit pins ceaeeee) with plume_d3d12.cpp, plume_d3d12.h, plume_vulkan.cpp modified; rexglue-sdk/thirdparty/simde at 71fd833 (the SDK commit pins 71fd833) with simde/x86/sse.h modified. No file under plume or simde differs from snap1.
+#   # Every row below equals its blob in those commits (git hash-object = ls-tree HEAD), so after the S3 apply every walked snap1 file equals the two commits plus the plume/simde edits. Codegen for B and S3: install/batch-nolr only, never install/batch (skip_lr).
+#   # Source: scan-vs-s2-0215-fast.txt (sha256 a73848147752f263), read-only, snap.py walk rules: 28 changed, 0 new, 0 deleted. The 48 outside-walk STATE-S2 rows (research/dxc-1.9.2609, rexlego/out/native-gpu) were hashed separately at 02:16 and are unchanged.
+# INCLUDE (28): the live file must still have the reviewed sha256
+# S3 fix (a): fix-a.patch hunk 1 + fix-a-commit.patch hunk 3 (applied 02:05:27); S1 a37337001ebdc277; live mtime 2026-11-22 02:05:27; SAFE (batch2-review sec 12)
+A6 | rexlego/src/settings_registry.cpp | 4ec71328043fa6ba8c198d5aafbfb7d0265cd1939ece13d1ce11b6a7a48db77d
+# S3 fix (a): fix-a.patch hunk 2 (applied 02:05:27); ships with the registry row; S1 c78112aa6e50f79d; live mtime 2026-11-22 02:05:27; SAFE (batch2-review sec 12)
+A6 | rexlego/src/settings_preferences.cpp | 9cbe6dbf9ceda62d61469235a828b84017340d356c166335bf53e9ab18565730
+# #22 (in S2) + S3 flip: audio_shutdown_detach_worker default ON, line 48 (applied 02:04); S1 c281fa8625435efe; live mtime 2026-11-22 02:04:39; SAFE ON (batch2-review sec 8)
+A12 | rexglue-sdk/src/audio/audio_system.cpp | 4331a312a9fe8f15e87a8cedecd553a878b8e9f5dc576a47a453a3fb0dfac638
+# S3: pause_safe_order default ON (applied 02:04); S1 e1569868e15761d9; live mtime 2026-11-22 02:04:38; SAFE (batch2-review sec 11)
+A11 (landed by A12) | rexglue-sdk/src/ui/rex_app.cpp | 11de333fa4c0541fdba0b2909bfa7c6c44a8ae90aae8834321bbe33edaecda8d
+# #27 batch 3: SDK CRT exit() becomes FlushLogging + std::_Exit (live = staged exitfix files); S1 03e89d1119cb059d; live mtime 2026-11-22 00:06:15; SAFE (batch2-review sec 10)
+A11 | rexglue-sdk/src/kernel/xam/xam_ui.cpp | 0a314946fdb9fe1ed875483592a22f70e24e62c420a1141e135a8569a6f65311
+# #27 batch 3: SDK CRT exit() becomes FlushLogging + std::_Exit (live = staged exitfix files); S1 4a0f84ae84bc61b5; live mtime 2026-11-22 00:06:15; SAFE (batch2-review sec 10)
+A11 | rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_hal.cpp | ab359e1d6c4da1b9f2fbe6e3b67094b8d4044e01b21a8b953f8f9f4e2c58d05b
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 929eeda15600105b; live mtime 2026-11-21 21:45:15; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/include/rex/codegen/config.h | d07c575ff2904b8753fa4b4306847375ec2eb69156355947e874afffc19f46c2
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 7331cde11b9bface; live mtime 2026-11-21 22:12:35; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/include/rex/codegen/function_types.h | 3cbd9f6dc3850cd196029324fc7f3d3b174309c0cbd4a2de4173d108ef51acbb
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 2168678c8a40ca4b; live mtime 2026-11-21 22:12:36; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/src/codegen/builders/builder_context.h | 873a69bbc0134bba24c098aead25b1828ea7a417864ae73410d7edb5b46ae3b5
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 aa887012da1f7f1d; live mtime 2026-11-21 22:12:37; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/src/codegen/builders/context.cpp | 7710107ce9c577ca1a74081278298a1a67951a3097eea8f5b53da7269736414d
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 046462fcb7b46677; live mtime 2026-11-21 22:12:39; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/src/codegen/builders/control_flow.cpp | 61538970604512db633ee57b5b008b8129639c7fe41afc77c7251b92fbc1ca93
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 b34b8684a0695f2b; live mtime 2026-11-21 21:29:51; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/src/codegen/builders/floating_point.cpp | 348840d2ac86988f65981afea9b072c2ab0d086e5363e453a7fde75ee0070006
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 -; live mtime 2026-11-21 21:25:19; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/src/codegen/builders/flush_mode.h | b1a8f81bbc062850ecbf50f57be54b9f097b0f08cffa752fa8116810bbc8ae5b
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 6b4bb2b7f778b6ba; live mtime 2026-11-21 20:55:26; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/src/codegen/builders/helpers.h | 1abf25fe5a16491021a7ff75692f811d5e1c6600ea66ea3c6b4dbffd1e339f7c
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 530cf95932f271ca; live mtime 2026-11-21 20:54:44; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/src/codegen/builders/logical.cpp | 6e95aaf361f945361c30786e58a8408971ed71f6abd34106fecdd75450d8e2fb
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 ada82f71017f43de; live mtime 2026-11-21 21:30:17; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/src/codegen/builders/memory.cpp | b1b9869852359947e7ebffe38b12e265ed62d4a28587023ddc7492d728916e10
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 4f8fae95ce008a58; live mtime 2026-11-21 22:12:40; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/src/codegen/builders/system.cpp | d1269273636b5a1a57be6e467ce19326eaea38f7e0e5a0c157d4b23998d10506
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 527a195f53400ea6; live mtime 2026-11-21 21:30:07; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/src/codegen/builders/vector.cpp | d32bb5a253bd1bc1e744901dc9ccdc75569327effa9e7d9b84c032ee0fb92846
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 19094a7bbb07960c; live mtime 2026-11-21 22:12:35; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/src/codegen/codegen_writer.cpp | 8235c8c77cf06b6614e9082e84b610b2c1d705f5df7839d31071a9fcdfebfa28
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 75ceaab72fc4495c; live mtime 2026-11-21 21:45:17; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/src/codegen/config.cpp | 0ed529b7e5f0f4e7cc0a4551a1c5c3a3191f03d28d491d517850898d5062fcfd
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 13bf36159c6115a1; live mtime 2026-11-21 22:12:38; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/src/codegen/function_graph.cpp | 3e4b0e982cc14eb3bc0d77f38a10a6b45fcb81735655794eda5992eb744d90b4
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 6db0ab3ef551132f; live mtime 2026-11-21 22:12:41; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/src/codegen/test_support.cpp | 688f450cc185ea21d2e9fa3a13765472d2b60d83a37400a34a6962b769fb3334
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 36578dbe6f5df222; live mtime 2026-11-21 22:12:42; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/src/rexglue/commands/test_recompiler.cpp | 30bb9be432c2fc8ceda757e79cfc454bf93a219cab60e7af0e663ff80a8b593c
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 -; live mtime 2026-11-21 22:04:58; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/tests/ppc/asm/instr_cr_so_fold.s | f2413015ba36cfb26c16688c45354a09aa6288412e706221b05449ec6e3443e2
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 -; live mtime 2026-11-21 21:59:09; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/tests/ppc/opt_config.toml | c74cd990c3299aff825c35553ff0683858c9645456b08bcaca1b918fc95eb436
+# #15 codegen options (the B inputs): off unless a codegen toml sets them; output identical at the default; S1 9be38388d871b31c; live mtime 2026-11-21 22:13:03; SAFE at the default (codegen-review)
+A9 | rexglue-sdk/tests/regression/emit_interior_entries.cpp | 893eeacb7c555bf0783be7cae6b45ec79acf88ffcaa92a914e364cb5938437d0
+# committed in a0bdaa7 (01:50); not a build input; S1 09246e1bce8b929f; live mtime 2026-11-22 01:50:25; n/a (not a build input)
+A1 | .gitignore | 600e2436ded4671d7567aea96098cae3d411187164fa6ae5faecba31c6c543cb
+# committed in a0bdaa7 (01:50); not a build input; S1 e7d25a2108620ffc; live mtime 2026-11-22 01:30:24; n/a (not a build input)
+A1 (user fork url) | .gitmodules | c6e629165c283832c6f099abd3e4b1eef03ebd8914798b42284be639632ebd37
+# EXCLUDE (0): keep the snap1 (S1) version

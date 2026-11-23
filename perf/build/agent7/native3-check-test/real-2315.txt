@@ -1,0 +1,29 @@
+== native3 boot check: <workspace>\build\agent8\runs\2315-native
+   bin_dir in run.json: <workspace>\build\agent2\native-bin; tag None; start 2026-11-21 23:15:52.239
+A. frontend on (NativeSettingsRuntime is built)
+  PASS effective native_settings_frontend=true from run-dir legodimensions.toml:72 'native_settings_frontend = true', with no command-line override
+  INFO also on the command line: --native_settings_load=false (the saved-settings load is skipped)
+B. no throw (it boots past NativeSettingsRuntime and presents)
+  FAIL game.log: 4 throw/fatal line(s), the first at L45: [2026-11-21 23:16:08.262] [critical] [core] [t86424] [FATAL] Unhandled exception 0xE06D7363 at host 0x00007FFD9C1F569A
+  INFO   L46: [2026-11-21 23:16:08.262] [critical] [core] [t86424] [FATAL] That is KERNELBASE.dll+0xC569A (module base 0x00007FFD9C130000)
+  INFO   L47: [2026-11-21 23:16:08.262] [error] [core] [t86424] [FATAL] Crashed on a host thread with no guest context
+  INFO   L48: [2026-11-21 23:16:08.268] [critical] [core] [t86424] [FATAL] Minidump failed (error 0x800703E6, fallback 0x800703E6)
+  FAIL 'Native write tracking' at L44, but no present line after it: the run stopped where the S2 build threw
+  FAIL run.json: exited early at 74.2s (phase None); werfault_seen; exit_code=-1073740940 (0xC0000374)
+  FAIL crash artifacts: legodimensions.exe(1).93080.dmp, legodimensions.exe.93080.dmp, wer-AppCrash_legodimensions.e_458148d4e77179ed106d7b584cadb8beb965_e8bb1684_71be5a4f-e98c-4f9b-b39e-4853f078add1, wer-AppCrash_legodimensions.e_8475fc4d70273fb9be2d5045b8e9891193c674fc_e8bb1684_3e41373b-e127-47a9-9794-8f11d12d779e
+  FAIL native-frames.csv missing: no frame was presented
+C. bilinear present (no FSR 1, no native FSR 3)
+  FAIL no native rows: the present mode is unknown
+  PASS no 'Native FSR 1:' warnings (FSR 1 was not requested)
+  INFO run-dir toml has present_effect = 'fsr' (accepted only by an SDK with the FidelityFX headers)
+  INFO build\agent8\runs\2315-native\rexruntime.dll (sha256 FDB315DCF477318A): a non-FFX SDK (present_effect is there, the FSR 1 cvars aren't), so present_effect is bilinear-only and the toml's 'fsr' is rejected
+D. build identity, frame accounting, present path (info)
+  INFO build\agent8\runs\2315-native\MANIFEST.txt: # build/agent2/native-bin - Agent 2 (task #1 follow-on, Agent 1's schedule). native build: NATIVE_GPU=ON with Agent 6...
+  WARN MANIFEST lists no settings_registry.cpp patch, so fix (a) isn't in this build (pre-S3?)
+  WARN MANIFEST lists no settings_preferences.cpp patch, so fix (a) isn't in this build (pre-S3?)
+  PASS native GPU fingerprint: MANIFEST befeb1184e6c7abc, game.log befeb1184e6c7abc
+  INFO game.log native GPU fingerprint befeb1184e6c7abc
+  INFO L42: D3D12 ready on 'NVIDIA GeForce MX570' (2240x1294, 3 images)
+  INFO L43: threaded recording off
+  INFO L26: swap chain ready (vsync off)
+VERDICT A=PASS B=FAIL C=FAIL D=PASS(2 WARN) -> FAIL (exit 1)

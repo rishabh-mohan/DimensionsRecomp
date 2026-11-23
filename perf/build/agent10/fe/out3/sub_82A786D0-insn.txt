@@ -1,0 +1,12 @@
+sub_82A786D0: classes cr=1 decl=1; SO writers: none
+== prologue differs (decl)
+  A| REX_FUNC_PROLOGUE();
+  A| PPCRegister temp{};
+  A| uint32_t ea{};
+  B| REX_FUNC_PROLOGUE();
+  B| PPCCRRegister cr6{};
+  B| PPCRegister temp{};
+  B| uint32_t ea{};
+[7] cmplwi cr6,r11,0   (cr)
+  A| ctx.cr6.compare<uint32_t>(ctx.r11.u32, 0, ctx.xer);
+  B| cr6.compare<uint32_t>(ctx.r11.u32, 0, {});

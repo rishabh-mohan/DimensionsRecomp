@@ -1,0 +1,167 @@
+
+=== time / OS ===
+now        2026-11-22 12:37:49
+os         Microsoft Windows 11 Pro 10.0.26300 build 26300.10075 (26H2); last boot 2026-11-22 08:34:48; logical CPUs 12
+ps         5.1.26100.10068 (Desktop); PSHOME powershell.exe exists=True
+execpolicy Process = Bypass
+execpolicy LocalMachine = RemoteSigned
+hotfix     KB5132057 Update 2026-11-22
+hotfix     KB5137006 Update 2026-11-22
+hotfix     KB5132056 Update 2026-11-20
+hotfix     KB5121794 Update 2026-10-15
+hotfix     KB5054156 Update 2026-02-25
+
+=== LdSys sampler cache (sys-csv.ps1 L76-84: key = SHA256(LdSys.cs)[0:4]) ===
+LdSys.cs   52029 B, mtime 2026-11-22 03:32:56, key b452d258
+LdSys dll  OK LdSys-b452d258.dll 32768 B 2026-11-22 03:19:49 assembly=LdSys-b452d258.35968.tmp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+cache tmp  0 leftover *.tmp.dll
+
+=== LdNvml cache (thread-cpu.ps1 L72-79: key = nvml.cs mtime ticks) + nvml.dll ===
+LdNvml dll OK LdNvml-639309222622660618.dll (LdNvml-639309222622660618, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null)
+nvml.dll   OK 8.17.16.1088 2026-07-23 08:09
+
+=== Add-Type toolchain (winhelper.cs via Import-LdHelper, LdDesk, LdPower, LdThr: in-memory csc, %TEMP%) ===
+csc.exe    OK C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe 14.8.10001.0 built by: bd501acdc000004
+System.Drawing.dll in runtime dir: True
+file       OK      bench\agent8\RUN-WINDOW4B.cmd
+file       OK      bench\agent8\run\run-matrix.ps1
+file       OK      bench\agent8\run\matrix-window4.json
+file       OK      bench\agent8\run\winhelper.cs
+file       OK      bench\agent8\run\common.ps1
+file       OK      bench\agent8\run\timing-env.ps1
+file       OK      bench\agent8\run\run-timing.ps1
+file       OK      bench\agent8\run\drivers\sys-csv.ps1
+file       OK      bench\agent8\run\drivers\LdSys.cs
+file       OK      bench\agent8\run\drivers\thread-cpu.ps1
+file       OK      harness\nvml.cs
+file       OK      harness\legodimensions.toml
+temp       this shell C:\Users\<user>\AppData\Local\Temp\ exists=True; HKCU TEMP C:\Users\<user>\AppData\Local\Temp exists=True (928 entries)
+
+=== python (run-timing.ps1 L561 "& python" for frame_summary.py / sys_summary.py) ===
+agent PATH C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\python.exe 0.0.0.0
+dbl-click  first python.exe on Machine+User PATH: C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\python.exe (file ) !!! WindowsApps stub
+
+=== bins (matrix-window4.json) and game data roots (harness\legodimensions.toml) ===
+arm        d0       bin build/agent2/devoff2-bin env [] seed_cache []
+  bin dir  exists=True MANIFEST.txt=True files=8 exe=legodimensions.exe 170334720 B 11-21 23:18
+arm        B        bin build/agent2/devoffB-bin env [] seed_cache []
+  bin dir  exists=True MANIFEST.txt=True files=8 exe=legodimensions.exe 153588736 B 11-22 02:40
+arm        d3       bin build/agent2/devoff3-bin env [] seed_cache []
+  bin dir  exists=True MANIFEST.txt=True files=8 exe=legodimensions.exe 170335232 B 11-22 02:43
+arm        d0t      bin build/agent2/devoff2-bin env [REX_TIMER_WAIT_BLOCKING=1] seed_cache []
+arm        d11t     bin build/agent2/devoff2-bin env [REX_TIMER_WAIT_BLOCKING=1] seed_cache []
+
+=== disk ===
+C:         free 270.8 GB of 911.3 GB
+window 3   20261122-0013: 19 runs, 456 files, 0.06 GB excluding hardlinked exe/dll/map/pdb (100 such files, 4.69 GB apparent)
+
+=== memory ===
+free RAM   14.18 GB available (common.ps1 Get-FreeRamGB method; run-timing exits 3 under 6 GB) of 31.7 GB
+  agy                            x12  private   3,163 MB  ws   3,164 MB
+  ChatGPT                        x14  private   1,603 MB  ws   1,805 MB
+  electron                       x4   private     553 MB  ws     568 MB
+  MsMpEng                        x1   private     544 MB  ws     596 MB
+  copilotapp                     x9   private     494 MB  ws     174 MB
+  svchost                        x44  private     470 MB  ws   1,263 MB
+  msedgewebview2                 x12  private     421 MB  ws     428 MB
+  NVIDIA Overlay                 x5   private     390 MB  ws     539 MB
+  explorer                       x1   private     290 MB  ws     519 MB
+  firefox                        x3   private     261 MB  ws     238 MB
+  powershell                     x3   private     246 MB  ws     296 MB
+  Dell.TechHub.Instrumentation.SubAgent x1   private     214 MB  ws     368 MB
+
+=== processes of interest ===
+  ipf_helper                     pid   9100 cpu       2.2 s private       2 MB start 12:06:38
+  ipf_uf                         pid   4816 cpu           s private       2 MB start ?
+  ipfsvc                         pid   4440 cpu           s private       2 MB start ?
+  MoUsoCoreWorker                pid  21172 cpu           s private      19 MB start ?
+  MpDefenderCoreService          pid   4840 cpu           s private      13 MB start ?
+  MsMpEng                        pid   5616 cpu           s private     544 MB start ?
+  nvcontainer                    pid  11600 cpu           s private      12 MB start ?
+  nvcontainer                    pid  11676 cpu      43.7 s private      41 MB start 12:06:38
+  nvcontainer                    pid   4860 cpu           s private      14 MB start ?
+  nvcontainer                    pid  11416 cpu       3.0 s private      14 MB start 12:06:38
+  NVDisplay.Container            pid  11672 cpu           s private     146 MB start ?
+  NVDisplay.Container            pid   3104 cpu           s private      21 MB start ?
+  NVIDIA Overlay                 pid  15824 cpu       0.3 s private      10 MB start 12:06:43
+  NVIDIA Overlay                 pid  17280 cpu      31.3 s private     165 MB start 12:06:41
+  NVIDIA Overlay                 pid   4620 cpu      21.8 s private      57 MB start 12:06:43
+  NVIDIA Overlay                 pid    724 cpu       1.5 s private      12 MB start 12:06:43
+  NVIDIA Overlay                 pid   4016 cpu      21.2 s private     146 MB start 12:06:43
+  PresentMon_x64                 pid  21964 cpu           s private      10 MB start ?
+  PresentMonService              pid   8808 cpu           s private       8 MB start ?
+  SearchIndexer                  pid   9608 cpu           s private      47 MB start ?
+  SearchProtocolHost             pid   8428 cpu           s private       7 MB start ?
+  TiWorker                       pid  29004 cpu           s private       7 MB start ?
+  TrustedInstaller               pid  12544 cpu           s private       2 MB start ?
+runner/sampler shells running: 1
+  pid 21204: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Command "try { $OutputEncoding = [System.Text.UTF8Encoding]::new($false); [Console]::OutputEncoding = $OutputEncoding } catch {}; $root='<workspace>'; $busy = @(Get-Process legodimensions* -ErrorAction SilentlyContinue).Count + @(Get-CimInstance Win32_Process -Filter \"Name='powershell.exe' OR Name='pwsh.exe' OR Name='cmd.exe'\" | Where-Object { $_.ProcessId -ne $PID -and $_.CommandLine -match 'run-matrix|RUN-WINDOW|run-timing' }).Count; if ($busy) { \"BUSY: game or runner running -> doing nothing\"; exit 9 }; $ts = Get-Date -Format HHmm; $rd = \"$root\build\agent8\readout\"; $chk = \"$rd\w4b-readiness-$ts.txt\"; & powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\Users\<user>\.gemini\antigravity-cli\brain\e4c37312-ab58-4dae-93c1-c8061fcc73c3\scratch\w4b-readiness.ps1' -Out $chk | Out-Null; \"check exit $LASTEXITCODE -> $chk\"; function Snap { $f = @(Get-ChildItem -LiteralPath \"$root\bench\agent8\" -Recurse -File -Force); $m = @(Get-ChildItem -LiteralPath \"$root\build\agent8\matrix\" -Directory); $c = @(Get-ChildItem -LiteralPath \"$root\build\agent8\cache\" -File); 'bench\agent8 {0} files {1} B newest-write {2:yyyy-MM-dd HH:mm:ss.fff} | matrix {3} dirs, newest-created {4} | cache {5} files' -f $f.Count, ($f | Measure-Object Length -Sum).Sum, ($f | Sort-Object LastWriteTime | Select-Object -Last 1).LastWriteTime, $m.Count, ($m | Sort-Object CreationTime | Select-Object -Last 1).Name, $c.Count }; $b0 = Snap; Push-Location \"$root\bench\agent8\"; $t0 = Get-Date; $o = & powershell -NoProfile -ExecutionPolicy Bypass -File \"$root\bench\agent8\run\run-matrix.ps1\" -Matrix \"$root\bench\agent8\run\matrix-window4.json\" -Only 'd0,B,d3,d11t' -Repeats 4 -ColdShared -NoPrompt -PlanOnly 2>&1 | Out-String; $code = $LASTEXITCODE; $t1 = Get-Date; Pop-Location; $b1 = Snap; $plan = \"$rd\w4b-planonly-$ts.txt\"; $hdr = @(\"PlanOnly of the W4b command (RUN-WINDOW4B.cmd arguments + -PlanOnly), Agent 8 task #3, board run 2\", \"cwd bench\agent8; started $($t0.ToString('yyyy-MM-dd HH:mm:ss')), took $([math]::Round(($t1-$t0).TotalSeconds,1)) s, exit $code\", \"before: $b0\", \"after:  $b1\", \"----\"); [IO.File]::WriteAllText($plan, (($hdr -join \"`r`n\") + \"`r`n\" + $o), (New-Object Text.UTF8Encoding($false))); \"planonly exit $code -> $plan\"; \"before: $b0\"; \"after:  $b1\""
+
+=== background CPU (5 x 1 s) ===
+cpu util   35.0 50.3 61.8 72.1 66.4 (avg 57.1 %)
+  electron                       pid   8556   1.27 cpu-s in ~5 s
+  Taskmgr                        pid  25784   0.70 cpu-s in ~5 s
+  electron                       pid  23716   0.59 cpu-s in ~5 s
+  powershell                     pid  31460   0.48 cpu-s in ~5 s
+  agy                            pid  27224   0.47 cpu-s in ~5 s
+  agy                            pid  20356   0.47 cpu-s in ~5 s
+  agy                            pid  27004   0.45 cpu-s in ~5 s
+  SmartByteTelemetry             pid  31720   0.42 cpu-s in ~5 s
+
+=== power / screensaver / battery ===
+powercfg   Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+schemes    Active=381b4222-f694-41f0-9685-ff5bb260df2e OverlayAc=ded574b5-45a0-4f42-8737-46345c09c238 OverlayDc=961cc777-2547-4f9d-8174-7d86181b8a7a
+battery    DELL 81PF36A BatteryStatus=2 (2 = AC) charge=100%
+screensaver ScreenSaveActive=1 IsSecure=0 TimeOut=120 exe=WPXSCR~1.SCR
+
+=== Windows Update state ===
+reboot     WU RebootRequired=False CBS RebootPending=False PendingFileRenameOperations=1 lines UpdateExeVolatile=False
+wu ux      ActiveHoursEnd=8; ActiveHoursStart=14; AllowAutoWindowsUpdateDownloadOverMeteredNetwork=0; AllowMUUpdateService=0; IsContinuousInnovationOptedIn=1; IsExpedited=1; RestartNotificationsAllowed2=1; CIOptinModified=1771726514381
+wu policy  none (no AU policy key)
+service    BITS               Running  Automatic
+service    DoSvc              Running  Manual
+service    msiserver          Stopped  Manual
+service    TrustedInstaller   Running  Manual
+service    UsoSvc             Running  Automatic
+service    WaaSMedicSvc       Stopped  Manual
+service    wuauserv           Stopped  Manual
+
+=== Intel DTT / IPF / NVIDIA services + drivers ===
+service    dptftcs                            Running  Automatic (Intel(R) Dynamic Tuning Technology Telemetry Service)
+service    FvSvc                              Running  Manual (NVIDIA FrameView SDK service)
+service    ipfsvc                             Running  Automatic (Intel(R) Innovation Platform Framework Service)
+service    NvContainerLocalSystem             Running  Automatic (NVIDIA LocalSystem Container)
+service    NVDisplay.ContainerLocalSystem     Running  Automatic (NVIDIA Display Container LS)
+driver     Intel(R) Innovation Platform Framework Manager 2.3.20306.4 2026-07-07
+driver     Intel(R) Innovation Platform Framework Generic Participant 2.3.20306.4 2026-07-07
+driver     Intel(R) Innovation Platform Framework Generic Participant 2.3.20306.4 2026-07-07
+driver     Intel(R) Innovation Platform Framework Generic Participant 2.3.20306.4 2026-07-07
+driver     NVIDIA GeForce MX570 32.0.16.1088 2026-07-21
+driver     Intel(R) Dynamic Tuning Technology 9.1.10010.2297 2026-04-30
+driver     Intel(R) Innovation Platform Framework Extensible Framework 2.3.20306.4 2026-07-07
+driver     Intel(R) Innovation Platform Framework Processor Participant 2.3.20306.4 2026-07-07
+gpu        NVIDIA GeForce MX570 driver 32.0.16.1088 (2026-07-21)
+gpu        Intel(R) Iris(R) Xe Graphics driver 32.0.101.7085 (2026-03-02)
+
+=== PDH sets read by LdSys ===
+thermal    1 instances: *
+procinfo   14 instances; Utility=True Performance=True Frequency=True
+
+=== pre-restart reference runs (window 3 = 20261122-0013; last before restart = 20261122-0657) ===
+20261122-0013 last run 0113-d11-r4: achievement_unlocked.wav driver.err.txt driver.out.txt FiraSans-Regular.ttf frames.json game.log gpu.csv headroom.json legodimensions.exe legodimensions.map legodimensions.toml legodimensions.toml.orig MANIFEST.txt perf.csv proc.csv rexgpu-xenos.dll rexruntime.dll run.json summary.txt threads.csv TracyClient.dll
+  driver.out.txt:2: 01:14:09.147 +1.38s NVML open: NVIDIA GeForce MX570 -> gpu.csv (t_s,pstate,gr_mhz,mem_mhz,temp_c,power_w,util_gpu,util_mem,throttle)
+  game.log:1: [2026-11-22 01:13:16.035] [info] [gpu] [t54036] DXGI adapter: NVIDIA GeForce MX570 (vendor 0x10DE, device 0x25A6, 1934 MB dedicated)
+20261122-0657 last run 0657-n2s-r1: achievement_unlocked.wav amd_fidelityfx_dx12.dll driver.err.txt driver.out.txt FiraSans-Regular.ttf frames.json game.log gpu.csv headroom.json legodimensions.exe legodimensions.map legodimensions.toml legodimensions.toml.orig MANIFEST.txt native-frames.csv perf.csv proc.csv rexgpu-xenos.dll rexruntime.dll run.json summary.txt sys.csv sys.err.txt sys.json sys.out.txt threads.csv TracyClient.dll
+  driver.out.txt:2: 06:58:53.615 +1.01s NVML open: NVIDIA GeForce MX570 -> gpu.csv (t_s,pstate,gr_mhz,mem_mhz,temp_c,power_w,util_gpu,util_mem,throttle)
+  sys.out.txt:1: 06:57:43.402 +0.85s sys-csv: start pid=16084 interval_ms=1000 max_s=3600 dll=LdSys-b452d258.dll(cached) init_ms=618 init_parts_ms=[proc:5,poll_start:4,cpusets:5,pdh_open:2,pdh_add:593,pdh_collect:3,reads:3,desk:3] P=[0,1,2,3] E=[4,5,6,7,8,9...
+  game.log:42: [2026-11-22 06:57:46.457] [info] [core] [t46016] Native GPU [335ff2d47268f3a1]: D3D12 ready on 'NVIDIA GeForce MX570' (2240x1294, 3 images)
+  sys.csv[0] t_s,epoch_s,wall,idle_s,fg_pid,fg_game,game_alive,input_desktop,screensaver,cpu_util_pct,cpu_perf_pct,base_mhz,eff_mhz,p_eff_mhz,e_eff_mhz,p_util_pct,e_util_pct,tz_passive_min_pct,tz_temp_max_c,ac,batt_saver,batt_pct,scheme,overlay
+  sys.csv[1] 1.049,1795352263.608,06:57:43.608,18037.297,0,0,1,Default,0,126.98,163.98,1700,2788,2669,2847,122.28,129.33,,,1,0,100,Balanced,best_efficiency
+
+=== persistent env (a double-click inherits Machine + User) ===
+env Machine  none matching REX_/LEGO_/PYTHON/VK_/DXVK/D3D/NV_/__COMPAT
+env User     none matching REX_/LEGO_/PYTHON/VK_/DXVK/D3D/NV_/__COMPAT
+env shell  no REX_/LEGO_ in this agent shell
+
+=== build\agent8\matrix (the W4b folder must end up newest) ===
+entries 19; newest by CreationTime 20261122-0657 (2026-11-22 06:57:37); newest yyyyMMdd-HHmm name 20261122-0657

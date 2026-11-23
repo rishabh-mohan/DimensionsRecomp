@@ -1,0 +1,120 @@
+{
+ "run": "s4b04",
+ "row": "s4b04",
+ "kind": "off",
+ "scenario": "I420",
+ "runjson": {
+  "exit_code": 0,
+  "exit_code_hex": "0x00000000",
+  "dumps": [],
+  "crash_events": [],
+  "wer_seen": false,
+  "close_method": "wm_close",
+  "close_seconds": 1.0,
+  "elapsed_s": 40.0,
+  "seconds_requested": 420,
+  "cvars": {
+   "physical_protect_hold_global_lock": "true",
+   "physical_protect_keep_watch": "true",
+   "physical_protect_keep_watch_verify": "true"
+  },
+  "exited_early": null,
+  "env_extra": {},
+  "steps": null
+ },
+ "summary": {
+  "verdict": null,
+  "first_frame_s": null,
+  "levels": null,
+  "unknown_cvars": null,
+  "errors": []
+ },
+ "log_files": [
+  "game.log"
+ ],
+ "families": {
+  "c1_any": 4,
+  "c1_init_on": 1,
+  "c1_init_blocked": 0,
+  "c1_init_nohold": 0,
+  "c1_first": 1,
+  "c1_kept": 2,
+  "c1_blocked": 0,
+  "recovered_stale": 0,
+  "unhandled_phys": 0,
+  "protect_failed": 0,
+  "split_init": 0,
+  "split": 0,
+  "deferred_counters": 0,
+  "gpu_wait": 0,
+  "gpu_wait_stats": 0,
+  "gpu_wait_backoff": 0,
+  "memexport": 0,
+  "slow_frame": 0,
+  "s4_upload_hash": 0,
+  "precise_wait": 0,
+  "miss_cache": 0,
+  "stuck_lock": 0,
+  "minidump": 0,
+  "fatal": 0,
+  "clean_exit": 1,
+  "debug_layer": 0,
+  "d3d12_msg": 0,
+  "k": 2,
+  "c1_other": 0
+ },
+ "levels": {
+  "info": 6,
+  "warning": 2
+ },
+ "lines": {
+  "c1_any": {
+   "first": [
+    "[2026-11-22 20:10:05.000] [info] [sys] [t4242] C1 keep-watch: on (with physical_protect_hold_global_lock)",
+    "[2026-11-22 20:10:15.002] [info] [sys] [t4242] C1 keep-watch: first kept protect at 0A1B2000, 4096 bytes",
+    "[2026-11-22 20:10:20.003] [info] [sys] [t4242] C1 keep-watch: 2 protects kept so far"
+   ],
+   "last": [
+    "[2026-11-22 20:10:25.004] [info] [sys] [t4242] C1 keep-watch: 4 protects kept so far"
+   ]
+  },
+  "k": {
+   "first": [
+    "[2026-11-22 20:10:30.005] [warning] [gpu] [t4242] C1 verify F: page 0A1B3000 changed since its upload (1 so far)",
+    "[2026-11-22 20:10:35.006] [warning] [gpu] [t4242] C1 verify F: page 0A1B4000 changed since its upload (2 so far)"
+   ],
+   "last": []
+  }
+ },
+ "c1_kept_last": 4,
+ "frame_rows": null,
+ "slow_state": null,
+ "proofs": [
+  {
+   "ok": true,
+   "text": "init \"C1 keep-watch: on (with physical_protect_hold_global_lock)\" x1"
+  },
+  {
+   "ok": true,
+   "text": "\"first kept protect\" x1 (gate D / positive control)"
+  },
+  {
+   "ok": true,
+   "text": "kept count: last \"kept so far\" = 4 (2 such lines)"
+  },
+  {
+   "ok": false,
+   "text": "verify-mismatch (K) lines 2 (gate A, menus part)"
+  },
+  {
+   "ok": true,
+   "text": "gate D zero lines: \"Recovered stale physical page protection\" 0, \"Unhandled guest physical write fault\" 0"
+  },
+  {
+   "ok": true,
+   "text": "no blocked/no-hold C1 line (0/0/0)"
+  }
+ ],
+ "base_misses": [],
+ "hint": "LOOK"
+}

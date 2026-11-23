@@ -1,0 +1,306 @@
+# pthrottle_test (S4 task #19)  2026-11-22 04:36:49
+stage copy pristine/threading_timing.h  sha256 043FFE289935  matches HASHES.txt
+stage copy pristine/threading_win.cpp   sha256 C0EBD864B9D2  matches HASHES.txt
+stage copy staged/threading_timing.h    sha256 72EAB2800912  matches HASHES.txt
+stage copy staged/threading_win.cpp     sha256 8A7F7E24289A  matches HASHES.txt
+extract pristine/b1  lines 113-157
+extract pristine/b2  lines 226-264
+extract pristine/h   lines 18-28
+extract staged/b1    lines 113-161
+extract staged/b2    lines 230-287
+extract staged/h     lines 18-32
+extract check ok: staged block 1 has OptOutOfPowerThrottling(control_mask), not the old function
+extract check ok: pristine block 1 has KeepTimerResolutionInBackground(), not the new function
+extract check ok: both blocks 1 hold timer_period_ms_ and GetTimePeriodFn
+extract check ok: both blocks 2 hold ConfigureHostTiming and RestoreHostTiming
+extract check ok: the new field is in the staged header only
+extract check ok: the new field is used in the staged block 2 only
+extract check ok: no extract contains a namespace line ()
+extract check ok: every extract is ASCII ()
+generated build/agent11/pthrottle/gen/pthrottle_impl.inc (243 lines, sha256 B5A0CA2EA6D1)
+compiler: Microsoft (R) C/C++ Optimizing Compiler Version 19.40.33811 for x64
+compile: cl /nologo /O2 /std:c++20 /EHsc /W4 /DNDEBUG /I<workspace>\build\agent11\pthrottle\gen <workspace>\bench\agent11\pthrottle_test.cpp /Fe:<workspace>\build\agent11\pthrottle\pthrottle_test.exe /Fo:<workspace>\build\agent11\pthrottle\obj\pthrottle_test.obj
+  | pthrottle_test.cpp
+compile exit 0: 0 warning(s), 0 error(s)
+run: <workspace>\build\agent11\pthrottle\pthrottle_test.exe <workspace>\build\agent11\pthrottle\run
+pthrottle_test (S4 task #19): Windows 10.0 build 26300; this process C=0x0 S=0x0
+C = ControlMask, S = StateMask (0x1 EXECUTION_SPEED, 0x4 IGNORE_TIMER_RESOLUTION)
+
+[a] both opt-outs off (the defaults), period 0: no call
+  config: timer opt-out 0, execution speed opt-out 0, period 0 ms, sim none
+  staged   launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x0 S=0x0 | parent after C=0x0 S=0x0 | held 0, restored 0
+             (no SetProcessInformation call, no log line)
+  pristine launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x0 S=0x0 | parent after C=0x0 S=0x0 | held 0, restored 0
+             (no SetProcessInformation call, no log line)
+  PASS  staged child ran
+  PASS  the child started with nothing controlled (C=0x0 S=0x0)
+  PASS  staged calls and log lines as expected (0 expected)
+  PASS  state after ConfigureHostTiming C=0x0 S=0x0 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 0 (expected 0), 0 after RestoreHostTiming
+  PASS  pristine child ran
+  PASS  identical to pristine: same SetProcessInformation calls, log lines and final state
+
+[a1] both off, period 1 ms
+  config: timer opt-out 0, execution speed opt-out 0, period 1 ms, sim none
+  staged   launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x0 S=0x0 | parent after C=0x0 S=0x0 | held 1, restored 0
+             LOG info Host timer resolution set to 1 ms (background opt-out off)
+  pristine launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x0 S=0x0 | parent after C=0x0 S=0x0 | held 1, restored 0
+             LOG info Host timer resolution set to 1 ms (background opt-out off)
+  PASS  staged child ran
+  PASS  the child started with nothing controlled (C=0x0 S=0x0)
+  PASS  staged calls and log lines as expected (1 expected)
+  PASS  state after ConfigureHostTiming C=0x0 S=0x0 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 1 (expected 1), 0 after RestoreHostTiming
+  PASS  pristine child ran
+  PASS  identical to pristine: same SetProcessInformation calls, log lines and final state
+
+[a2] both off; a state someone else set (EcoQoS on) stays untouched
+  config: timer opt-out 0, execution speed opt-out 0, period 0 ms, sim none, preset at launch C=0x1 S=0x1
+  staged   launch C=0x0 S=0x0 -> preset C=0x1 S=0x1 | child before C=0x1 S=0x1, after C=0x1 S=0x1 | parent after C=0x1 S=0x1 | held 0, restored 0
+             (no SetProcessInformation call, no log line)
+  pristine launch C=0x0 S=0x0 -> preset C=0x1 S=0x1 | child before C=0x1 S=0x1, after C=0x1 S=0x1 | parent after C=0x1 S=0x1 | held 0, restored 0
+             (no SetProcessInformation call, no log line)
+  PASS  staged child ran
+  PASS  the child started with the preset state C=0x1 S=0x1
+  PASS  staged calls and log lines as expected (0 expected)
+  PASS  state after ConfigureHostTiming C=0x1 S=0x1 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 0 (expected 0), 0 after RestoreHostTiming
+  PASS  pristine child ran
+  PASS  identical to pristine: same SetProcessInformation calls, log lines and final state
+
+[b] timer opt-out only (the new cvar off), period 0
+  config: timer opt-out 1, execution speed opt-out 0, period 0 ms, sim none
+  staged   launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x4 S=0x0 | parent after C=0x4 S=0x0 | held 0, restored 0
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x4 S=0x0 -> ok
+  pristine launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x4 S=0x0 | parent after C=0x4 S=0x0 | held 0, restored 0
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x4 S=0x0 -> ok
+  PASS  staged child ran
+  PASS  the child started with nothing controlled (C=0x0 S=0x0)
+  PASS  staged calls and log lines as expected (1 expected)
+  PASS  state after ConfigureHostTiming C=0x4 S=0x0 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 0 (expected 0), 0 after RestoreHostTiming
+  PASS  pristine child ran
+  PASS  identical to pristine: same SetProcessInformation calls, log lines and final state
+
+[b1] timer opt-out only, period 1 ms
+  config: timer opt-out 1, execution speed opt-out 0, period 1 ms, sim none
+  staged   launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x4 S=0x0 | parent after C=0x4 S=0x0 | held 1, restored 0
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x4 S=0x0 -> ok
+             LOG info Host timer resolution set to 1 ms (background opt-out on)
+  pristine launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x4 S=0x0 | parent after C=0x4 S=0x0 | held 1, restored 0
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x4 S=0x0 -> ok
+             LOG info Host timer resolution set to 1 ms (background opt-out on)
+  PASS  staged child ran
+  PASS  the child started with nothing controlled (C=0x0 S=0x0)
+  PASS  staged calls and log lines as expected (2 expected)
+  PASS  state after ConfigureHostTiming C=0x4 S=0x0 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 1 (expected 1), 0 after RestoreHostTiming
+  PASS  pristine child ran
+  PASS  identical to pristine: same SetProcessInformation calls, log lines and final state
+
+[c] execution speed opt-out only, period 0
+  config: timer opt-out 0, execution speed opt-out 1, period 0 ms, sim none
+  staged   launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x1 S=0x0 | parent after C=0x1 S=0x0 | held 0, restored 0
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x1 S=0x0 -> ok
+             LOG info Execution speed power throttling opt-out on
+  pristine launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x0 S=0x0 | parent after C=0x0 S=0x0 | held 0, restored 0
+             (no SetProcessInformation call, no log line)
+  PASS  staged child ran
+  PASS  the child started with nothing controlled (C=0x0 S=0x0)
+  PASS  staged calls and log lines as expected (2 expected)
+  PASS  state after ConfigureHostTiming C=0x1 S=0x0 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 0 (expected 0), 0 after RestoreHostTiming
+  PASS  pristine child ran
+  PASS  every log line pristine writes is written unchanged and in order (the new lines aside)
+
+[c1] execution speed opt-out only, period 1 ms
+  config: timer opt-out 0, execution speed opt-out 1, period 1 ms, sim none
+  staged   launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x1 S=0x0 | parent after C=0x1 S=0x0 | held 1, restored 0
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x1 S=0x0 -> ok
+             LOG info Execution speed power throttling opt-out on
+             LOG info Host timer resolution set to 1 ms (background opt-out off)
+  pristine launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x0 S=0x0 | parent after C=0x0 S=0x0 | held 1, restored 0
+             LOG info Host timer resolution set to 1 ms (background opt-out off)
+  PASS  staged child ran
+  PASS  the child started with nothing controlled (C=0x0 S=0x0)
+  PASS  staged calls and log lines as expected (3 expected)
+  PASS  state after ConfigureHostTiming C=0x1 S=0x0 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 1 (expected 1), 0 after RestoreHostTiming
+  PASS  pristine child ran
+  PASS  every log line pristine writes is written unchanged and in order (the new lines aside)
+
+[d] both opt-outs, period 0: ONE call with the combined mask
+  config: timer opt-out 1, execution speed opt-out 1, period 0 ms, sim none
+  staged   launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x5 S=0x0 | parent after C=0x5 S=0x0 | held 0, restored 0
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x5 S=0x0 -> ok
+             LOG info Execution speed power throttling opt-out on
+  pristine launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x4 S=0x0 | parent after C=0x4 S=0x0 | held 0, restored 0
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x4 S=0x0 -> ok
+  PASS  staged child ran
+  PASS  the child started with nothing controlled (C=0x0 S=0x0)
+  PASS  staged calls and log lines as expected (2 expected)
+  PASS  state after ConfigureHostTiming C=0x5 S=0x0 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 0 (expected 0), 0 after RestoreHostTiming
+  PASS  pristine child ran
+  PASS  every log line pristine writes is written unchanged and in order (the new lines aside)
+
+[e] both opt-outs, period 1 ms
+  config: timer opt-out 1, execution speed opt-out 1, period 1 ms, sim none
+  staged   launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x5 S=0x0 | parent after C=0x5 S=0x0 | held 1, restored 0
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x5 S=0x0 -> ok
+             LOG info Execution speed power throttling opt-out on
+             LOG info Host timer resolution set to 1 ms (background opt-out on)
+  pristine launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x4 S=0x0 | parent after C=0x4 S=0x0 | held 1, restored 0
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x4 S=0x0 -> ok
+             LOG info Host timer resolution set to 1 ms (background opt-out on)
+  PASS  staged child ran
+  PASS  the child started with nothing controlled (C=0x0 S=0x0)
+  PASS  staged calls and log lines as expected (3 expected)
+  PASS  state after ConfigureHostTiming C=0x5 S=0x0 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 1 (expected 1), 0 after RestoreHostTiming
+  PASS  pristine child ran
+  PASS  every log line pristine writes is written unchanged and in order (the new lines aside)
+
+[i0] timer opt-out only on simulated Windows 10 (flag rejected)
+  config: timer opt-out 1, execution speed opt-out 0, period 1 ms, sim win10
+  staged   launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x0 S=0x0 | parent after C=0x0 S=0x0 | held 1, restored 0
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x4 S=0x0 -> fail 87 (simulated: Windows 10 knows only EXECUTION_SPEED)
+             LOG debug Timer resolution power throttling opt-out failed (0x00000057)
+             LOG info Host timer resolution set to 1 ms (background opt-out off)
+  pristine launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x0 S=0x0 | parent after C=0x0 S=0x0 | held 1, restored 0
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x4 S=0x0 -> fail 87 (simulated: Windows 10 knows only EXECUTION_SPEED)
+             LOG debug Timer resolution power throttling opt-out failed (0x00000057)
+             LOG info Host timer resolution set to 1 ms (background opt-out off)
+  PASS  staged child ran
+  PASS  the child started with nothing controlled (C=0x0 S=0x0)
+  PASS  staged calls and log lines as expected (3 expected)
+  PASS  state after ConfigureHostTiming C=0x0 S=0x0 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 1 (expected 1), 0 after RestoreHostTiming
+  PASS  pristine child ran
+  PASS  identical to pristine: same SetProcessInformation calls, log lines and final state
+
+[i] both on simulated Windows 10: combined call rejected, 0x1 retried alone
+  config: timer opt-out 1, execution speed opt-out 1, period 1 ms, sim win10
+  staged   launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x1 S=0x0 | parent after C=0x1 S=0x0 | held 1, restored 0
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x5 S=0x0 -> fail 87 (simulated: Windows 10 knows only EXECUTION_SPEED)
+             LOG debug Timer resolution power throttling opt-out failed (0x00000057)
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x1 S=0x0 -> ok
+             LOG info Execution speed power throttling opt-out on
+             LOG info Host timer resolution set to 1 ms (background opt-out off)
+  pristine launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x0 S=0x0 | parent after C=0x0 S=0x0 | held 1, restored 0
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x4 S=0x0 -> fail 87 (simulated: Windows 10 knows only EXECUTION_SPEED)
+             LOG debug Timer resolution power throttling opt-out failed (0x00000057)
+             LOG info Host timer resolution set to 1 ms (background opt-out off)
+  PASS  staged child ran
+  PASS  the child started with nothing controlled (C=0x0 S=0x0)
+  PASS  staged calls and log lines as expected (5 expected)
+  PASS  state after ConfigureHostTiming C=0x1 S=0x0 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 1 (expected 1), 0 after RestoreHostTiming
+  PASS  pristine child ran
+  PASS  every log line pristine writes is written unchanged and in order (the new lines aside)
+
+[j] execution speed only, SetProcessInformation export missing (simulated)
+  config: timer opt-out 0, execution speed opt-out 1, period 0 ms, sim noapi
+  staged   launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x0 S=0x0 | parent after C=0x0 S=0x0 | held 0, restored 0
+             RESOLVE SetProcessInformation -> null (simulated: no export)
+             LOG warn Execution speed power throttling opt-out failed (0x0000007F)
+  pristine launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x0 S=0x0 | parent after C=0x0 S=0x0 | held 0, restored 0
+             (no SetProcessInformation call, no log line)
+  PASS  staged child ran
+  PASS  the child started with nothing controlled (C=0x0 S=0x0)
+  PASS  staged calls and log lines as expected (2 expected)
+  PASS  state after ConfigureHostTiming C=0x0 S=0x0 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 0 (expected 0), 0 after RestoreHostTiming
+  PASS  pristine child ran
+  PASS  every log line pristine writes is written unchanged and in order (the new lines aside)
+
+[j1] both, SetProcessInformation export missing (simulated)
+  config: timer opt-out 1, execution speed opt-out 1, period 0 ms, sim noapi
+  staged   launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x0 S=0x0 | parent after C=0x0 S=0x0 | held 0, restored 0
+             RESOLVE SetProcessInformation -> null (simulated: no export)
+             LOG debug Timer resolution power throttling opt-out failed (0x0000007F)
+             RESOLVE SetProcessInformation -> null (simulated: no export)
+             LOG warn Execution speed power throttling opt-out failed (0x0000007F)
+  pristine launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x0 S=0x0 | parent after C=0x0 S=0x0 | held 0, restored 0
+             RESOLVE SetProcessInformation -> null (simulated: no export)
+             LOG debug Timer resolution power throttling opt-out failed (0x0000007F)
+  PASS  staged child ran
+  PASS  the child started with nothing controlled (C=0x0 S=0x0)
+  PASS  staged calls and log lines as expected (4 expected)
+  PASS  state after ConfigureHostTiming C=0x0 S=0x0 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 0 (expected 0), 0 after RestoreHostTiming
+  PASS  pristine child ran
+  PASS  every log line pristine writes is written unchanged and in order (the new lines aside)
+
+[h] an opt-out set at launch (C=0x1, before the game's own call) is replaced
+  config: timer opt-out 1, execution speed opt-out 0, period 0 ms, sim none, preset at launch C=0x1 S=0x0
+  staged   launch C=0x0 S=0x0 -> preset C=0x1 S=0x0 | child before C=0x1 S=0x0, after C=0x4 S=0x0 | parent after C=0x4 S=0x0 | held 0, restored 0
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x4 S=0x0 -> ok
+  pristine launch C=0x0 S=0x0 -> preset C=0x1 S=0x0 | child before C=0x1 S=0x0, after C=0x4 S=0x0 | parent after C=0x4 S=0x0 | held 0, restored 0
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x4 S=0x0 -> ok
+  PASS  staged child ran
+  PASS  the child started with the preset state C=0x1 S=0x0
+  PASS  staged calls and log lines as expected (1 expected)
+  PASS  state after ConfigureHostTiming C=0x4 S=0x0 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 0 (expected 0), 0 after RestoreHostTiming
+  PASS  pristine child ran
+  PASS  identical to pristine: same SetProcessInformation calls, log lines and final state
+
+[f] replace semantics: a plain Set of C=0x1 after the game's C=0x4
+  config: timer opt-out 1, execution speed opt-out 0, period 0 ms, sim none
+  staged   launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x4 S=0x0 | parent after C=0x4 S=0x0 | held 0, restored 0
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x4 S=0x0 -> ok
+  PASS  staged child ran
+  PASS  the child started with nothing controlled (C=0x0 S=0x0)
+  PASS  staged calls and log lines as expected (1 expected)
+  PASS  state after ConfigureHostTiming C=0x4 S=0x0 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 0 (expected 0), 0 after RestoreHostTiming
+  PASS  plain Set C=0x1 S=0x0 on C=0x4 S=0x0 reads back C=0x1 S=0x0 (replaced, not merged)
+
+[g] runner read-modify-write on the game's C=0x4: keeps the timer opt-out
+  config: timer opt-out 1, execution speed opt-out 0, period 0 ms, sim none
+  staged   launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x4 S=0x0 | parent after C=0x4 S=0x0 | held 0, restored 0
+             CALL SetProcessInformation self=1 cls=4 size=12 V=1 C=0x4 S=0x0 -> ok
+  PASS  staged child ran
+  PASS  the child started with nothing controlled (C=0x0 S=0x0)
+  PASS  staged calls and log lines as expected (1 expected)
+  PASS  state after ConfigureHostTiming C=0x4 S=0x0 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 0 (expected 0), 0 after RestoreHostTiming
+  PASS  read-modify-write via SET_INFORMATION|QUERY_LIMITED handle: C=0x4 S=0x0 -> C=0x5 S=0x0 (expected C=0x5 S=0x0)
+
+[g2] runner read-modify-write on a game that set nothing
+  config: timer opt-out 0, execution speed opt-out 0, period 0 ms, sim none
+  staged   launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x0 S=0x0 | parent after C=0x0 S=0x0 | held 0, restored 0
+             (no SetProcessInformation call, no log line)
+  PASS  staged child ran
+  PASS  the child started with nothing controlled (C=0x0 S=0x0)
+  PASS  staged calls and log lines as expected (0 expected)
+  PASS  state after ConfigureHostTiming C=0x0 S=0x0 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 0 (expected 0), 0 after RestoreHostTiming
+  PASS  read-modify-write via SET_INFORMATION|QUERY_LIMITED handle: C=0x0 S=0x0 -> C=0x1 S=0x0 (expected C=0x1 S=0x0)
+
+[g3] runner read-modify-write clears an EcoQoS opt-in (C=0x1 S=0x1)
+  config: timer opt-out 0, execution speed opt-out 0, period 0 ms, sim none, preset at launch C=0x1 S=0x1
+  staged   launch C=0x0 S=0x0 -> preset C=0x1 S=0x1 | child before C=0x1 S=0x1, after C=0x1 S=0x1 | parent after C=0x1 S=0x1 | held 0, restored 0
+             (no SetProcessInformation call, no log line)
+  PASS  staged child ran
+  PASS  the child started with the preset state C=0x1 S=0x1
+  PASS  staged calls and log lines as expected (0 expected)
+  PASS  state after ConfigureHostTiming C=0x1 S=0x1 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 0 (expected 0), 0 after RestoreHostTiming
+  PASS  read-modify-write via SET_INFORMATION|QUERY_LIMITED handle: C=0x1 S=0x1 -> C=0x1 S=0x0 (expected C=0x1 S=0x0)
+
+[k] access rights a runner's handle needs
+  config: timer opt-out 0, execution speed opt-out 0, period 0 ms, sim none
+  staged   launch C=0x0 S=0x0 | child before C=0x0 S=0x0, after C=0x0 S=0x0 | parent after C=0x0 S=0x0 | held 0, restored 0
+             (no SetProcessInformation call, no log line)
+  PASS  staged child ran
+  PASS  the child started with nothing controlled (C=0x0 S=0x0)
+  PASS  staged calls and log lines as expected (0 expected)
+  PASS  state after ConfigureHostTiming C=0x0 S=0x0 (GetProcessInformation in the child and via the parent's handle)
+  PASS  timer period held 0 (expected 0), 0 after RestoreHostTiming
+  PASS  QUERY_LIMITED-only handle: Get ok true, Set ok false (error 5)
+  PASS  SET_INFORMATION-only handle: Set ok true, Get ok false (error 5); state now C=0x1 S=0x0
+
+RESULT: PASS (129 checks, 0 failed; 33 child processes)
+test exit code 0

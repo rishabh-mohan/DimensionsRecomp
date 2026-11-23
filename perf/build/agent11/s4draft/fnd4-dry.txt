@@ -1,0 +1,55 @@
+=== replace old L1-1 -> new L1-1
+--- 1: # Perf sprint: findings and changes (as of 12:50, session 3 resumed after a Windows Update restart)
++++ 1: # Perf sprint: findings and changes (as of Nov 23, 06:00: the night's windows are done, and the project pauses for a break)
+=== replace old L3-3 -> new L3-32
+--- 3: ## Next: timing window 4 (still ready after the restart)
++++ 3: ## Before the break (Nov 23)
++++ 4: 
++++ 5: > [!IMPORTANT]
++++ 6: > **The project pauses from ~13:00 today for a few days to a week.** Start again from [RESUME.md](<workspace>/perf-notes/RESUME.md): what's committed, the results, the decisions still open and the next steps. The full plan and its history are in [S4-DRAFT.md](<workspace>/perf-notes/S4-DRAFT.md). The numbers below are Agent 1's runner summaries from the night; the formal read-outs (Agents 7 and 8) land this morning and may change them.
++++ 7: 
++++ 8: **What's committed.** `perf/opt` now holds S4a and the S4b + S4c build, with every new switch off by default: rexglue-sdk `5350b1d` and DimensionsRecomp `b0bd3b4`, pushed to your forks without force. The plume and simde edits stay uncommitted; `DimensionsRecomp/tools/gpu-aot/prepare_plume.py` and `DimensionsRecomp/rexglue-sdk/scripts/prepare_simde.py` rebuild them from tracked patches. The notes, scripts and results aren't pushed yet; Agent 1 will ask you where they should go.
++++ 9: 
++++ 10: **Last night's windows.** You double-clicked RUN-NIGHT at 23:47. Agent 5's launcher ran four windows from 00:09 to 03:06, then a second pass of W6, W9 and W5b from 03:13 to 05:31. Every run in every window was OK, on the uncapped title screen, with the quiet gate strict and the builds unchanged. Second-pass figures are in brackets:
++++ 11: 
++++ 12: | Window | What it compared | Result | Lean |
++++ 13: |---|---|---|---|
++++ 14: | W6 | The upload path on the S4b build: P2, fix (i) and the re-upload fix C1 | **P2 + fix (i) + C1 (verification off): frame time −11.8% [−14%], fps +21% [+22%], 0.22 [0.27] core less**, faster in all 10 rounds. P2 alone and fix (i) alone: no change. The slowest 0.1% of frames was a bit slower (6.49 vs 5.74 ms in the second pass), which the read-out checks | keep it |
++++ 15: | W9 | The render thread's busy-wait back-off (#24) at four sleep sizes | **500 µs: 0.70-0.79 core less (−28 to −31%)**, fps +1%, and the slowest 1% of frames a bit faster. 125 and 250 µs save a little less and were unsteady in the second pass | 500 µs |
++++ 16: | W5b | The timer thread's wait modes | **Precise wait: 0.20 [0.21] core less, fps unchanged in both passes.** The blocking wait saves about the same but lost 0.8% fps in the second pass | precise |
++++ 17: | W4c | Codegen B against batch 2, again | B: frame time +1.3%, fps −0.4%, slower in 5 of 6 rounds. W4b's +6% fps hint didn't come back. No second pass (skipped for the wrap-up) | drop B |
++++ 18: 
++++ 19: So the night's only frame-time win is C1 (with P2 and fix (i)). The back-off and the precise timer wait save CPU without changing the frame rate.
++++ 20: 
++++ 21: **One hiccup.** The first GO was refused at 00:03: the launcher had deleted the screensaver's empty `SCRNSAVE.EXE` registry value instead of leaving it empty, and the runner's strict check failed on the missing value. The tests couldn't catch this, because dry runs never touch the screensaver. Agent 1 put the empty value back at 00:05 (the screensaver stayed off), and the night ran as planned. Agents 5 and 8 stage the proper fix this morning, reviewed by Agents 8 and 10, before the launcher is used again.
++++ 22: 
++++ 23: **Since session 3** (Nov 22; details in S4-DRAFT):
++++ 24: - Window 4 (W4b, 15:41-16:17) and W5 (17:56-18:29): no frame-time change cleared the noise band (±19.6% and ±20.4%), but the timer settings cut the game's CPU by ~0.4-0.5 core.
++++ 25: - S4a went live and was committed at 14:56. The S4b + S4c build (C1 v3, the back-off #24 and more, all off) was built that evening, checked by Agent 3's functional runs, and is now committed too.
++++ 26: - Agents 10 and 11 rated Agent 5's night launcher SAFE (22:31-22:33). It froze at 23:24 and ran last night's windows.
++++ 27: 
++++ 28: **Your answers on file:** the Toy Pad tags, yes (17:27); the Defender exclusion, added (23:16; comparisons with W4b, W5 and older windows carry a caveat); the native screenshot check, yes (it was planned for an hour today, so it moves to after the break; Agent 4 stages the kit); the pop-in opt-in, yes, off by default. Still open: the simde patch (question 2 below) and where the notes go.
++++ 29: 
++++ 30: **After the break** (details in RESUME.md): the formal read-outs settle the four leans; then W7 (#19), the native windows W8a and W8b (#21), the codegen window (CG26), the pop-in opt-in (#33), your screenshot check (#1), a confirmation window, the keep/drop calls, a final build with the kept switches on by default, and the write-up. On a new, faster PC, the baselines have to be measured again first.
++++ 31: 
++++ 32: ## Window 4 as planned (it ran on Nov 22, 15:41-16:17; kept for the record)
+=== replace old L126-126 -> new L155-155
+--- 126: ### Questions for you (window 4 doesn't wait on them)
++++ 155: ### Questions for you (1, 3, 4 and 5 are answered; 2 is open)
+=== replace old L133-133 -> new L162-162
+--- 133: ## Where things stand
++++ 162: ## Where things stood at 12:50 on Nov 22 (session 3; for today, see the top section)
+=== replace old L148-148 -> new L177-177
+--- 148: ## Leads for the next round (S4, forming overnight)
++++ 177: ## Leads for the next round (S4, as of the morning of Nov 22; their current state is in S4-DRAFT and RESUME.md)
+=== insert old L176-175 -> new L205-206
++++ 205: 
++++ 206: **Newer windows:** W4b and W5 (Nov 22) and last night's W6, W9, W5b and W4c are summarized in the top section, with the full numbers in S4-DRAFT ("Changed since 23:29" and "Changed since 15:54"). Window 3 and matrix 1 below ran before the Windows Update of Nov 22, so compare them with later windows only with that caveat.
+=== insert old L351-350 -> new L382-386
++++ 382: ### S4a, S4b and S4c: committed on `perf/opt` (Nov 22-23)
++++ 383: - **S4a** (live and committed at 14:56 on Nov 22): the upload-hash diagnostic (#7), P2 (#8), fix (i) (#5) and the precise timer wait (#38), all off; the warm-boot pipeline fix (#32), always on, because Agent 10 rated it output-identical; and on native builds the miss-cache stopgap (#2), off.
++++ 384: - **S4b + S4c** (built on the evening of Nov 22, committed on Nov 23 as rexglue-sdk `5350b1d` and DimensionsRecomp `b0bd3b4`): the re-upload fix C1 v3 with its counter and log line, P2's fallback counter, the non-temporal upload copy M1 (#11), the submit split (#18) and the command-filter counters (#20 step 1), the codegen pause option (#26; the CG26 build turns it on), the render-thread busy-wait back-off (#24) and the scene-walk probe (#30). Every new switch is off, and Agent 10 rated the combined change SAFE to build, landing off. 16 files: 13 in the SDK and 3 in the game.
++++ 385: - The switch names, their defaults and the lean for each are in RESUME.md.
++++ 386: 
+=== insert old L360-359 -> new L396-396
++++ 396: - Restart doc: [RESUME.md](<workspace>/perf-notes/RESUME.md). Last night's results: [20261123-0009](<workspace>/build/agent8/matrix/20261123-0009) (W6), [-0108](<workspace>/build/agent8/matrix/20261123-0108) (W9), [-0155](<workspace>/build/agent8/matrix/20261123-0155) (W5b), [-0239](<workspace>/build/agent8/matrix/20261123-0239) (W4c), [-0313](<workspace>/build/agent8/matrix/20261123-0313) (W6, second pass), [-0401](<workspace>/build/agent8/matrix/20261123-0401) (W9, second pass) and [-0451](<workspace>/build/agent8/matrix/20261123-0451) (W5b, second pass)

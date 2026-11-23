@@ -1,0 +1,24 @@
+﻿diff --git a/baseline/DimensionsRecomp/rexlego/src/name_trace.cpp b/DimensionsRecomp/rexlego/src/name_trace.cpp
+index b7c8dd5..0e0bbb5 100644
+--- a/baseline/DimensionsRecomp/rexlego/src/name_trace.cpp
++++ b/DimensionsRecomp/rexlego/src/name_trace.cpp
+@@ -27,14 +27,18 @@ extern "C" void __imp__sub_82A3D980(PPCContext& __restrict ctx, uint8_t* base);
+ REXCVAR_DEFINE_STRING(trace_file_names, "", "Runtime",
+                       "Log every archive name lookup containing one of these comma-separated "
+                       "substrings (case-insensitive, e.g. fern,finn), with its hash. Chatty.");
+ 
+ REX_HOOK_RAW(sub_82A3D980) {
+   const std::string& filter = REXCVAR_GET(trace_file_names);
++  if (filter.empty()) {  // off (the default): no name to build or match
++    __imp__sub_82A3D980(ctx, base);
++    return;
++  }
+   std::string name;
+-  if (!filter.empty()) {
++  {
+     uint32_t record = ctx.r3.u32;
+     uint32_t ptr;
+     uint16_t len;
+     std::memcpy(&ptr, base + record, 4);
+     std::memcpy(&len, base + record + 6, 2);
+     ptr = __builtin_bswap32(ptr);

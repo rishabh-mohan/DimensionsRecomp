@@ -1,0 +1,12 @@
+S4 P2 shared_memory_single_hold_rearm (Agent 12, task #27). Staged 2026-11-22 06:49:50. Not applied, not built.
+SDK: DimensionsRecomp/rexglue-sdk, perf/opt HEAD c5fe668. File: src/graphics/shared_memory.cpp (git clean, last commit 33470b5).
+pristine  15C89EDB4B197C17487A9D45208D5CE624DE98ABE416F86942C5D14ED43EB282  orig/shared_memory.cpp = live, 24698 B, LF
+staged    0BE4BADCAC666BEE80F656669D072EDA8B55C2D25D25C448BC4C29E12BD503F4  new/shared_memory.cpp, 26439 B, LF
+diff      77BEB64E1325B85451941EA87E33D4371F6EAFB98F7C5E7A37DAE95D29A2F745  single-hold-rearm.diff, 60 lines, 3 hunks, +30/-0
+git apply --check (live SDK): exit 0
+Apply order (agreed with Agent 1; C1 = Agent 5):
+  1. s4-diag  src/graphics/d3d12/shared_memory.cpp  B120D07C6709D0D2 -> BB0838CE3909E18A
+  2. s4-p2    src/graphics/shared_memory.cpp  15C89EDB4B197C17 -> 0BE4BADCAC666BEE
+  3. C1 (build/agent5/s4-c1/): its src/graphics/shared_memory.cpp must be based on s4-p2 new (0BE4BADCAC666BEE); other files on live.
+Sequential apply on scratch copies (diag then P2): diag exit 0, p2 exit 0; d3d12 result BB0838CE3909E18A (= diag new: True); shared_memory result 0BE4BADCAC666BEE (= P2 new: True)
+Syntax (bench/agent12/s4p2_syntax.ps1, 2026-11-22 07:02): PASS. Pristine and staged both exit 0 with the same 3 pre-existing warnings, none new (syntax-20261122-070217.txt).

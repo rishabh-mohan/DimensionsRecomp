@@ -1,0 +1,20 @@
+--- stage-snap-bin.ps1.pre-S3
++++ stage-snap-bin.ps1
+@@ -5,5 +5,5 @@
+ #                     native<N>-bin for S<N> (N >= 2)
+ #   -SnapTag S<N>   : the snapshot state of the build. S1 = MANIFEST-S1-*.tsv (+ PATCHES-S1.tsv); S2 and later = the
+-#                     newest STATE-S<N>-*.tsv written by snap-patch.py apply (+ PATCHES-S1.tsv and PATCHES-S<N>.tsv)
++#                     newest STATE-S<N>-*.tsv written by snap-patch.py apply (+ PATCHES-S1.tsv ... PATCHES-S<N>.tsv)
+ #   -BuildTag       : the build-snap.ps1 -Tag of the build, for its gate log; default snap<N>
+ # Checks:
+@@ -154,6 +154,8 @@
+ if ($fails.Count) { $report; "NOT staged: $($fails.Count) check(s) failed"; exit 1 }
+ Check ([bool](Select-String -Path $gateLog -Pattern '^RESULT: PASS' -Quiet)) "$(Split-Path -Leaf $gateLog) says RESULT: PASS"
+-# patches applied to snap1 since S1 (S1's rows, then this tag's)
+-$patchFiles = @(@('S1', $SnapTag) | Select-Object -Unique | ForEach-Object { "$A\snap1\PATCHES-$_.tsv" } | Where-Object { Test-Path $_ })
++# patches applied to snap1 since S1: S<N> (N >= 2) lists the rows of every tag S1..S<N> (S3 = S1 + S2 + S3, so S2's
++# rows stay in S3's MANIFEST and freshness checks); any other tag lists S1's rows, then its own
++$patchTags = $(if ($SnapN -ge 2) { @(1..$SnapN | ForEach-Object { "S$_" }) } else { @('S1', $SnapTag) })
++$patchFiles = @($patchTags | Select-Object -Unique | ForEach-Object { "$A\snap1\PATCHES-$_.tsv" } | Where-Object { Test-Path $_ })
+ $patchRows = @(foreach ($pf in $patchFiles) {
+         foreach ($line in @(Get-Content $pf | Where-Object { $_ -and -not $_.StartsWith('#') })) {

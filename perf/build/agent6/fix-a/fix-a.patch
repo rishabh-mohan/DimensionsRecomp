@@ -1,0 +1,30 @@
+diff --git a/rexlego/src/settings_preferences.cpp b/rexlego/src/settings_preferences.cpp
+--- a/rexlego/src/settings_preferences.cpp
++++ b/rexlego/src/settings_preferences.cpp
+@@ -67,8 +67,10 @@ PreferencesResult LoadNativePreferences(const std::filesystem::path& path, Backe
+     baseline = backend.read();  // Also enforces the backend's owning thread.
+     for (const auto& [key, value] : proposal) {
+       const auto source = rex::cvar::GetFlagSource(key);
++      // A cvar this build does not register cannot take a saved value; it keeps
++      // its catalog default (see ReadRegistryValues), so skip it like an override.
+       if (source == rex::cvar::Source::kEnvironment || source == rex::cvar::Source::kCommandLine ||
+-          !NativeSettingOverrideReason(key).empty()) {
++          !NativeSettingOverrideReason(key).empty() || !rex::cvar::GetFlagInfo(key)) {
+         result.overridden.push_back(key);
+         continue;
+       }
+diff --git a/rexlego/src/settings_registry.cpp b/rexlego/src/settings_registry.cpp
+--- a/rexlego/src/settings_registry.cpp
++++ b/rexlego/src/settings_registry.cpp
+@@ -100,7 +100,10 @@ void AssertOwner(std::thread::id owner) {
+ Values ReadRegistryValues() {
+   Values result;
+   for (const auto& spec : catalog) {
+-    const auto raw = rex::cvar::GetFlagByName(spec.key);
++    auto raw = rex::cvar::GetFlagByName(spec.key);
++    // A cvar this build does not register (the FSR 1 presenter settings exist
++    // only in REX_HAS_FIDELITYFX_SDK builds) reads as its catalog default.
++    if (raw.empty() && !rex::cvar::GetFlagInfo(spec.key)) raw = spec.default_value;
+     if (raw.empty()) throw std::runtime_error("Native setting is not registered: " + std::string(spec.key));
+     auto normalized = Canonical(spec, raw, false);
+     if (!normalized.valid) throw std::runtime_error(normalized.error);

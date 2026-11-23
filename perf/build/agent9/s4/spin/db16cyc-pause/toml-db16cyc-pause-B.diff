@@ -1,0 +1,11 @@
+diff --git a/rexlego/legodimensions_config.toml b/rexlego/legodimensions_config.toml
+--- a/rexlego/legodimensions_config.toml
++++ b/rexlego/legodimensions_config.toml
+@@ -34,6 +34,7 @@
+ vmx_vector_fallbacks = true
+ # Never in a Tracy build (REXGLUE_PROFILE_GUEST_FUNCTIONS + REXGLUE_ENABLE_PROFILING): musttail fails to compile there.
+ musttail_calls = true
++db16cyc_pause = true
+ # Not for LEGO: skip_lr (host hooks and XexGetProcedureAddress read ctx.lr as the caller), skip_msr (STATUS decision 4).
+ # Later: non_argument_as_local + non_volatile_as_local (Stage B/C: together, after the gate).
+ 

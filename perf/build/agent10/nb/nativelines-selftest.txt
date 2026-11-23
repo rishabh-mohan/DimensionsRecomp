@@ -1,0 +1,29 @@
+base build\agent8\matrix\20261122-0013\runs\0030-n0-r1: game.log 57,939 B; 484 lines
+cand build\agent8\runs\0256-native3: game.log 57,909 B; 482 lines
+
+item                                       verdict      base | cand
+slot heap registered                       NOT COVERED  0 bytes=[] | 0 bytes=[]   [addresses: base  cand ]
+slot heap extended (Grow, lr 82A33FC4)     NOT COVERED  0 | 0   [owned_regions max base - cand -]
+placement relocation (lr 83F9B660)         NOT COVERED  0 {} | 0 {}
+pool copy (lr, caller, VS)                 MATCH        5 lr=82BD2B44 caller=82B5819C VS=A58EBA12..x5 | 5 lr=82BD2B44 caller=82B5819C VS=A58EBA12..x5
+pool copy bytes (in order)                 MATCH        [716800, 131072, 4096, 4096, 380928] | [716800, 131072, 4096, 4096, 380928]
+cel/bloom diagnostics                      NOT COVERED  {} | {}   [logged only with native effects diagnostics on (off by default)]
+memexport begin warnings                   NOT COVERED  0 | 0
+
+hash=0x0 cache-miss lines: base 0, cand 0 (same)
+info lines: base Native GPU: threaded recording off x1 | cand Native GPU: threaded recording off x1
+
+Fail lines (cand must be 0):
+  not in any registered module                            base 0, cand 0  ok
+  Native GPU: pool copy unsupported                       base 0, cand 0  ok
+  pool copy POINTLIST contract mismatch                   base 0, cand 0  ok
+  Native slot heap: external detach verification failed   base 0, cand 0  ok
+  pool copy byte verification failed                      base 0, cand 0  ok
+  ordered pool copy skipped                               base 0, cand 0  ok
+  ordered pool copy unsupported GPU dependency            base 0, cand 0  ok
+  Native slot heap: retained                              base 0, cand 0  ok
+  unimplemented-instruction lines                         base 0, cand 0  ok
+
+covered: pool copy (lr, caller, VS), pool copy bytes (in order)
+not covered: slot heap registered, slot heap extended (Grow, lr 82A33FC4), placement relocation (lr 83F9B660), cel/bloom diagnostics, memexport begin warnings
+RESULT PASS

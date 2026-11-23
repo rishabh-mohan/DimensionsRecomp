@@ -1,0 +1,10 @@
+﻿17:58:02 BEGIN rexglue-target
+17:59:45 END-T rexglue-target exit=0 wall=103.3s freeC=263.04GB
+18:02:01 BEGIN build : cmake --build "<workspace>\build\sdk" --config Release -j 10 -- -k 0 > "<workspace>\build\agent2\sdk-build.log" 2>&1
+18:03:32 END   build exit=1 wall=90.2s freeC=262.38GB
+18:03:32 BEGIN install : cmake --install "<workspace>\build\sdk" --config Release > "<workspace>\build\agent2\sdk-install.log" 2>&1
+18:04:02 END   install exit=0 wall=30s freeC=262.37GB
+18:04:02 BEGIN ctest-list : ctest --test-dir "<workspace>\build\sdk" -C Release -N > "<workspace>\build\agent2\sdk-ctest-list.log" 2>&1
+18:04:03 END   ctest-list exit=0 wall=0.5s freeC=262.37GB
+18:04:03 BEGIN ctest : ctest --test-dir "<workspace>\build\sdk" -C Release --output-on-failure -j 6 --timeout 900 -E "ppc_tests_NOT_BUILT|^ppc\." > "<workspace>\build\agent2\sdk-ctest.log" 2>&1
+18:04:10 END   ctest exit=0 wall=6.7s freeC=262.37GB

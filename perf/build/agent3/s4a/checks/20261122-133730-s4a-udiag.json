@@ -1,0 +1,385 @@
+{
+ "run": "20261122-133730-s4a-udiag",
+ "kind": "off",
+ "runjson": {
+  "exit_code": 0,
+  "exit_code_hex": "0x00000000",
+  "dumps": [],
+  "crash_events": [],
+  "wer_seen": false,
+  "close_method": "wm_close",
+  "close_seconds": 1.5,
+  "elapsed_s": 333.45,
+  "seconds_requested": 330,
+  "cvars": {
+   "shared_memory_upload_hash_log": "true",
+   "slow_frame_log_ms": "1",
+   "framerate_limit": "0"
+  },
+  "exited_early": false,
+  "env_extra": {},
+  "script": null,
+  "steps": null,
+  "peak_threads": 84,
+  "extra_args": []
+ },
+ "summary": {
+  "verdict": "RUNNING",
+  "first_frame_s": 9.0,
+  "levels": {
+   "info": 149789,
+   "warning": 40
+  },
+  "errors": [],
+  "unknown_cvars": []
+ },
+ "greps": {
+  "s4_upload_hash": 75013,
+  "slow_frame": 74714,
+  "precise_wait": 0,
+  "miss_cache": 0,
+  "protect_failed": 0,
+  "stuck_lock": 0,
+  "minidump": 0,
+  "fatal": 0,
+  "storage": 0,
+  "storage_init": 1,
+  "clean_exit": 1
+ },
+ "grep_first": {
+  "s4_upload_hash": [
+   "[2026-11-22 13:37:39.466] [info] [gpu] [t34316] S4 upload hash: frame 1 calls 2 ranges 2 pages 921 (3684 KB) first 921 unchanged 0 changed 0 blocks 16 changed_blocks 0 pages_in_changed_blocks 0 u_page -1.0000 u_block -1.0000",
+   "[2026-11-22 13:37:39.478] [info] [gpu] [t34316] S4 upload hash: frame 2 calls 2 ranges 2 pages 921 (3684 KB) first 921 unchanged 0 changed 0 blocks 17 changed_blocks 0 pages_in_changed_blocks 0 u_page -1.0000 u_block -1.0000"
+  ],
+  "slow_frame": [
+   "[2026-11-22 13:37:39.475] [info] [gpu] [t34316] slow frame #2: 23.1 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.1 (2x), new 3 | texture load 1.4 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | m",
+   "[2026-11-22 13:37:39.478] [info] [gpu] [t34316] slow frame #3: 3.2 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | me"
+  ],
+  "precise_wait": [],
+  "miss_cache": [],
+  "protect_failed": [],
+  "stuck_lock": [],
+  "minidump": [],
+  "fatal": [],
+  "storage": [],
+  "storage_init": [
+   "[2026-11-22 13:37:35.921] [info] [core] [t21588] Initializing shader storage for title 5752084B..."
+  ],
+  "clean_exit": [
+   "[2026-11-22 13:43:03.455] [info] [core] [t21588] Title terminated; hard-exiting process."
+  ]
+ },
+ "storage_init_gap_s": 0.077,
+ "log_files": [
+  "game.8.log",
+  "game.7.log",
+  "game.6.log",
+  "game.5.log",
+  "game.4.log",
+  "game.3.log",
+  "game.2.log",
+  "game.1.log",
+  "game.log"
+ ],
+ "s4_lines_off": 149727,
+ "frame_rows": 75014,
+ "logdiff": {
+  "bases": [
+   "20261122-133333-s4a-r1-off-devoff4"
+  ],
+  "NEW": 0,
+  "NEW_allowed": 0,
+  "MORE": 0,
+  "MORE_allowed": 0,
+  "GONE": 46,
+  "GONE_non_toypad": 32,
+  "FLAG": 0,
+  "NEW_info": 2,
+  "NEW_info_non_toypad": 2,
+  "rc": 0,
+  "new": [],
+  "more": [],
+  "gone": [
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [apu] audio endpoint 'Speakers (Realtek(R) Audio)': # ch, # Hz, format #x#; submitting # ch",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Build: no install.json beside the game, so this is a development build",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Depth of field off (DoF pass skipped)",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Function table initialized for module: code=#h-#h, image=#h-#h",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Initializing shader storage for title #h...",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Portal: using the emulated ToyPad.",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Skip cutscenes: on (N#CUT# flag set at #h)",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Startup: constructing the runtime",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Startup: dialogs registered",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Startup: launching the module",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Startup: overlays ready",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Startup: presenter attached to the window",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Startup: resolving paths",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Toypad listener active on #.#:#",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Toypad: detected frame offset # (prefix #B)",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Toypad: emulated LEGO Dimensions ToyPad active",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Toypad: pad # mode # lit # # # (on # off # count # speed #)",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Toypad: pad # mode # lit # # #E (on # off # count # speed #)",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Toypad: pad # mode # lit FF FF FF (on # off # count # speed #)",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Toypad[Read ] #B # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Toypad[Read ] #B # # # # #B # # # # # # # # # # # # # # # # # # # # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Toypad[Read ] #B # # # # #C # # # # # # # # # # # # # # # # # # # # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Toypad[Read ] #B # # # # #D # # # # # # # # # # # # # # # # # # # # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Toypad[Read ] #B # # #E # # # # # #C # # #F # # # # # # # # # # # # # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Toypad[Read ] #B #C # # # # D# # D# #B # #E F# D# # # # # # # # # # # # # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Toypad[Read ] #B #C # # # #D #C #C #A AE #D #C # A# # # # # # # # # # # # # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Toypad[Write] #B # # # C# # # # # # # BE BE BE BE BE BE BE BE BE BE BE BE BE BE BE BE BE BE BE BE BE ",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Toypad[Write] #B # # # C# # # #F # # # #E # #F # # # #E # #F # # # #E # # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Toypad[Write] #B # # # C# # # FF FF FF #A # # # # # # # # # # # # # # # # # # # # # ",
+   "GONE build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log [info] [core] Toypad[Write] #B # # #A B# # # AA # A# D# #D #E # #E # # # # # # # # # # # # # # # # # "
+  ],
+  "flag": [],
+  "new_info": [
+   "NEW build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log x2366 [info] [gpu] S# upload hash: frame # calls # ranges # pages # (# KB) first # unchanged # changed # blocks # changed_blocks # pages_in_changed_blocks # u_page # u_block #",
+   "NEW build\\agent3\\runs\\20261122-133730-s4a-udiag\\game.log x2367 [info] [gpu] slow frame ##: # ms | gpu-thread idle # | host-gpu wait # (#x) | shader translate # (#x) | pipeline create # (#x), new # | texture load # (#x) | readback #x # KB, # stalled | cpu-write invalidations #"
+  ]
+ },
+ "levels_cand_vs_base0": {
+  "cand": {
+   "info": 149789,
+   "warning": 40
+  },
+  "base": {
+   "info": 61,
+   "warning": 142
+  }
+ },
+ "scenes": {
+  "base": "20261122-133333-s4a-r1-off-devoff4",
+  "base_major": {
+   "220/534": 38.0,
+   "226/1022": 30.4,
+   "218/222": 20.4,
+   "219/226": 14.9,
+   "220/528": 7.3,
+   "790/31625": 4.1,
+   "788/31613": 4.0,
+   "594/2813": 3.2,
+   "8019/1043795": 2.4
+  },
+  "cand_major": {
+   "226/1022": 294.0,
+   "219/226": 14.9,
+   "218/222": 14.6
+  },
+  "missing_in_cand": [
+   "220/528",
+   "220/534",
+   "594/2813",
+   "788/31613",
+   "790/31625",
+   "8019/1043795"
+  ],
+  "extra_in_cand": []
+ },
+ "threads": {
+  "window_s": 294.3,
+  "window": [
+   20.0,
+   314.3
+  ],
+  "by_name": {
+   "(unnamed)": {
+    "pct": 14.79,
+    "threads": 35
+   },
+   "rex::thread::TimerQueue": {
+    "pct": 39.33,
+    "threads": 1
+   },
+   "DeviceHotplugThread": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "D3D Background Thread 0": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "D3D Background Thread 1": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "D3D Background Thread 2": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "D3D Background Thread 3": {
+    "pct": 0.03,
+    "threads": 1
+   },
+   "0x16c00001": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "0xc0550001": {
+    "pct": 5.98,
+    "threads": 1
+   },
+   "XMA Decoder (F8000010)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "Audio Worker (F8000014)": {
+    "pct": 2.24,
+    "threads": 1
+   },
+   "GPU Commands (F8000018)": {
+    "pct": 62.53,
+    "threads": 1
+   },
+   "GPU VSync (F800001C)": {
+    "pct": 2.31,
+    "threads": 1
+   },
+   "SDL_joystick": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "D3D12 Pipelines": {
+    "pct": 0.01,
+    "threads": 9
+   },
+   "Kernel Dispatch (F8000028)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "Main XThread (F800002C)": {
+    "pct": 63.51,
+    "threads": 1
+   },
+   "D3D12 Storage writer": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread8364 (F8000070)": {
+    "pct": 1.21,
+    "threads": 1
+   },
+   "XThread8324 (F80000F4)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread870C (F80000FC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread02E8 (F8000104)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread8B40 (F800010C)": {
+    "pct": 3.23,
+    "threads": 1
+   },
+   "XThread472C (F8000114)": {
+    "pct": 4.51,
+    "threads": 1
+   },
+   "XThread81CC (F8000120)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread3428 (F8000128)": {
+    "pct": 0.07,
+    "threads": 1
+   },
+   "XThread3B0C (F800012C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread7E0C (F8000140)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread8A54 (F8000144)": {
+    "pct": 12.42,
+    "threads": 1
+   },
+   "SDLWASAPIMgmt": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "SDLAudioP19": {
+    "pct": 0.74,
+    "threads": 1
+   },
+   "XThread4BDC (F8000164)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread77D0 (F800016C)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread161C (F8000188)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread4C8C (F8000190)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread8998 (F8000198)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread23B8 (F80001A8)": {
+    "pct": 66.61,
+    "threads": 1
+   },
+   "XThread4354 (F80001BC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread1F70 (F800026C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread0D48 (F80002A0)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread73C4 (F80002A8)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread7EE4 (F80002B0)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread3558 (F80002C0)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread80F4 (F8000318)": {
+    "pct": 0.0,
+    "threads": 1
+   }
+  },
+  "ticks": {
+   "17456": {
+    "name": "rex::thread::TimerQueue",
+    "samples": 128,
+    "steps": 127,
+    "non_rising": 0,
+    "non_rising_at_s": [],
+    "step_s_median": 2.26,
+    "span_s": [
+     -5.3,
+     322.6
+    ]
+   }
+  }
+ },
+ "slow_state": {
+  "rows": 322,
+  "onset_s": 107.4,
+  "slow_pct": 16.5,
+  "e_eff_mhz_median": 1008,
+  "cpu_util_pct_median": 70.7,
+  "slow": true
+ }
+}

@@ -1,0 +1,37 @@
+orig 19AE1606C6DB7273 in HASHES  game/rexlego/src/gpu_native/memory_watch.cpp (7613 B)
+new  70829846C4F321A9 in HASHES  game/rexlego/src/gpu_native/memory_watch.cpp (8054 B)
+orig 4D861738A94B556B in HASHES  sdk/include/rex/graphics/shared_memory.h (12169 B)
+new  82A66445ED98B091 in HASHES  sdk/include/rex/graphics/shared_memory.h (13051 B)
+orig 80100865A654AF04 in HASHES  sdk/include/rex/system/xmemory.h (29396 B)
+new  5A70782EF00F0FB6 in HASHES  sdk/include/rex/system/xmemory.h (31430 B)
+orig E07F690223B564AE in HASHES  sdk/src/graphics/primitive_processor.cpp (79508 B)
+new  470BA4BED73B2ABF in HASHES  sdk/src/graphics/primitive_processor.cpp (79790 B)
+orig 0BE4BADCAC666BEE in HASHES  sdk/src/graphics/shared_memory.cpp (26439 B)
+new  A4A31038ABDFF94A in HASHES  sdk/src/graphics/shared_memory.cpp (32711 B)
+orig 141FB1A947D59156 in HASHES  sdk/src/system/xmemory.cpp (108907 B)
+new  6C801EB2BA7D0D07 in HASHES  sdk/src/system/xmemory.cpp (117939 B)
+diff 1B2BA4E30BC05A1E in HASHES  keep-watch.diff
+diff 4D0C10794188CF45 in HASHES  keep-watch-rexlego.diff
+body EQUAL (13 vs 13 lines): game/rexlego/src/gpu_native/memory_watch.cpp <-> rexlego/src/gpu_native/memory_watch.cpp
+body EQUAL (20 vs 20 lines): sdk/include/rex/graphics/shared_memory.h <-> include/rex/graphics/shared_memory.h
+body EQUAL (57 vs 57 lines): sdk/include/rex/system/xmemory.h <-> include/rex/system/xmemory.h
+body EQUAL (20 vs 20 lines): sdk/src/graphics/primitive_processor.cpp <-> src/graphics/primitive_processor.cpp
+body EQUAL (180 vs 180 lines): sdk/src/graphics/shared_memory.cpp <-> src/graphics/shared_memory.cpp
+body EQUAL (225 vs 225 lines): sdk/src/system/xmemory.cpp <-> src/system/xmemory.cpp
+chain part D290530197427138 in HASHES  build\agent12\s4-diag\upload-hash-log.diff
+chain part 77BEB64E1325B854 in HASHES  build\agent12\s4-p2\single-hold-rearm.diff
+chain part 80CAD795EEEF7AD4 in HASHES  build\agent12\s4-fixi\protect-hold-g.diff
+chain part 1B2BA4E30BC05A1E in HASHES  build\agent12\s4-c1\keep-watch.diff
+wrote build\agent10\s4\c1-chain-4.diff 39296 B sha FDA3319B47F7DC36
+git apply --check (live SDK, one input, 4 parts): exit 0
+    | Checking patch src/graphics/d3d12/shared_memory.cpp...
+    | Checking patch src/graphics/shared_memory.cpp...
+    | Checking patch src/system/xmemory.cpp...
+    | Checking patch include/rex/graphics/shared_memory.h...
+    | Checking patch include/rex/system/xmemory.h...
+    | Checking patch src/graphics/primitive_processor.cpp...
+    | Checking patch src/graphics/shared_memory.cpp...
+    | Checking patch src/system/xmemory.cpp...
+git apply --check (live game repo, keep-watch-rexlego.diff): exit 0
+    | Checking patch rexlego/src/gpu_native/memory_watch.cpp...
+RESULT bodies OK

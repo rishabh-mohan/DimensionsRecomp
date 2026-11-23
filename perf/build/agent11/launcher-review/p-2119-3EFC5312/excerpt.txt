@@ -1,0 +1,172 @@
+﻿L606: }
+L607: function Get-Deadline {
+L608:     if ($StopAt) { return (Read-When $StopAt '-StopAt') }
+L609:     $n = Now; $d = $n.Date.AddHours(7.5); if ($d -le $n) { $d = $d.AddDays(1) }; return $d
+L610: }
+L611: # The latest window start: 06:45 on the morning of the end time. Dry-run tests: -StartBy, else the -StopAt time.
+L612: function Get-LatestStart {
+L613:     $l = if ($StartBy) { Read-When $StartBy '-StartBy' } elseif ($StopAt) { $script:Deadline } else { $script:Deadline.Date.AddHours($LatestStartTime) }
+L614:     if ($l -gt $script:Deadline) { $l = $script:Deadline }
+L615:     return $l
+L616: }
+L617: 
+L618: # ---------- one GO ----------
+L619: $script:GoCount = 0; $script:StopNow = $false; $script:Stuck = ''
+L620: $script:GoReadAt = $null
+----
+L690:     $desk = Get-DesktopName; if ($desk -ine 'WinSta0\Default') { $soft.Add("this is desktop '$desk', not the user's own desktop WinSta0\Default") }
+L691:     if (Test-LogonUI) { $soft.Add('the PC is locked (LogonUI is running)') }
+L692:     $pw = Get-Power; if (-not $pw.ac) { $soft.Add("not on AC power: $($pw.text)") }
+L693:     if ($soft.Count -and $DryRun -and $SkipStartChecks) { Log "last checks would refuse: $($soft -join '; ') (ignored: -DryRun -SkipStartChecks)" 'Yellow' }
+L694:     else { foreach ($w in $soft) { $why.Add($w) } }
+L695:     $hw = ''; try { $hw = Sync-Hold $Go.id } catch { $hw = "the HOLD file could not be written ($($_.Exception.Message))" }
+L696:     if ($hw) { $why.Add($hw) }
+L697:     if ($why.Count) { Refuse $Go.raw ($why -join '; ') 'START'; return }
+L698:     Log "bins unchanged since the GO ($($Go.bins.Count) files)"
+L699:     foreach ($k in $AllowedEnv) { if ($null -ne [Environment]::GetEnvironmentVariable($k, 'Process')) { [Environment]::SetEnvironmentVariable($k, $null, 'Process'); Log "removed $k from the environment" } }
+L700:     $pc = 'n/a'; try { $pc = ((@(& powercfg.exe /getactivescheme) | ForEach-Object { "$_".Trim() } | Where-Object { $_ }) -join ' ') } catch { }
+L701:     Log "power scheme at the start: $pc"
+L702:     $rArgs = Get-RunnerArgs $MPath $Go
+L703:     $cmd = "`"$PsExe`" " + (Join-Args $rArgs)
+L704:     if ($DryRun) {
+L705:         Log "DRY RUN, would start window $($Go.id) now, without $($AllowedEnv -join ' / ') in its environment:" 'Cyan'
+L706:         Log "  $cmd" 'Cyan'
+L707:         if (-not $FakeRunner) {
+L708:             Write-LastResult "GO       $($Go.raw)`r`nresult   DRY RUN: would have started (estimate $($Plan.min) min)`r`ngate     $($script:GateLine)`r`ncommand  $cmd"
+L709:             return
+L710:         }
+L711:         $rArgs = @('-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', (Resolve-Path -LiteralPath $FakeRunner).Path, '-Dir', $StatusDir)
+L712:         $cmd = "`"$PsExe`" " + (Join-Args $rArgs)
+----
+L722:     $code = $run.code
+L723:     $mins = [math]::Round(((Now) - $t0).TotalMinutes, 1)
+L724:     $od = @(Get-Content -LiteralPath $rlog -ErrorAction SilentlyContinue | Where-Object { $_ -match '^out dir: ' } | Select-Object -Last 1)
+L725:     $outDir = if ($od.Count) { $od[0].Substring(9) } else { '(none: the runner started no run)' }
+L726:     # Each check on its own: a failure here must not lose the END line or last-result.txt.
+L727:     $susp = @()
+L728:     try { $after = Compare-Pins $script:Pins (Get-Pins); if ($after.Count) { $susp += "pinned files changed during the run: $($after -join '; ')" } } catch { $susp += "the pins could not be checked after the run ($($_.Exception.Message))" }
+L729:     try { $jsonNow = (Get-FileHash -LiteralPath $MPath -Algorithm SHA256).Hash; if ($jsonNow -ne $Go.sha) { $susp += "matrix json changed during the run ($jsonNow)" } } catch { $susp += "the matrix json could not be hashed after the run ($($_.Exception.Message))" }
+L730:     try { $bd = Compare-Pins $Go.bins (Get-BinHashes $Go $MPath); if ($bd.Count) { $susp += "bin files changed during the run: $($bd -join '; ')" } } catch { $susp += "the bin files could not be hashed after the run ($($_.Exception.Message))" }
+L731:     $meaning = if ($run.killed) { "stopped early: $($run.killed); the runner and everything it started were killed" } else { switch ($code) { 0 { 'all runs OK' } 1 { 'some run not OK' } 2 { 'matrix/preflight error, nothing or not all started' } default { 'unknown' } } }
+L732:     Log "window $($Go.id) END: runner exit $code ($meaning) after $mins min; out dir $outDir$(if ($susp.Count) { '; SUSPECT: ' + ($susp -join '; ') })" $(if ($code -eq 0 -and -not $susp.Count -and -not $run.killed) { 'Green' } else { 'Yellow' })
+L733:     Write-LastResult "GO       $($Go.raw)`r`nresult   runner exit $code ($meaning)`r`nstarted  $(Ts $t0)`r`nminutes  $mins`r`nout dir  $outDir`r`nrunner   $rlog`r`nkilled   $(if ($run.killed) { $run.killed } else { 'no' })`r`nsuspect  $(if ($susp.Count) { $susp -join '; ' } else { 'no (pins, matrix and bins unchanged)' })"
+L734:     if ($run.killed -eq 'STOP file') { Use-Stop "while window $($Go.id) was running"; $script:StopNow = $true }
+L735: }
+L736: 
+L737: # ---------- the runner process ----------
+L738: function Join-Args([string[]]$A) { return ((@($A) | ForEach-Object { if ($_ -match '[\s"]') { '"' + ($_ -replace '"', '\"') + '"' } else { $_ } }) -join ' ') }
+L739: # New complete lines of a file that a child process is writing: they go to the console and to the runner log.
+L740: function Read-Tail($T, [string]$RLog, [bool]$Final) {
+----
+L755:     $lines = @(if ($parts.Count -gt 1) { $parts[0..($parts.Count - 2)] })
+L756:     if ($Final -and $T.rest) { $lines += $T.rest; $T.rest = '' }
+L757:     foreach ($l in $lines) { Add-Text $RLog $l; Write-Host $l }
+L758: }
+L759: # Kills the runner's whole process tree (run-timing, the game, the drivers) and logs it. Real mode also kills a
+L760: # legodimensions from build\agent2 that started during the window in this session but is no longer in the tree.
+L761: function Stop-Tree($P, [string]$Why, [datetime]$Since) {
+L762:     $ErrorActionPreference = 'Continue'
+L763:     Log "!!! $($Why): the runner (pid $($P.Id)) and every process it started are killed now (taskkill /T /F)" 'Yellow'
+L764:     try { $o = @(& (Join-Path $env:SystemRoot 'System32\taskkill.exe') /PID $P.Id /T /F 2>&1 | ForEach-Object { "$_".Trim() } | Where-Object { $_ }); Log "taskkill: $($o -join ' / ')" } catch { Log "!!! taskkill failed: $($_.Exception.Message)" 'Red' }
+L765:     try { if (-not $P.WaitForExit(15000)) { $P.Kill(); [void]$P.WaitForExit(5000) } } catch { }
+L766:     if (-not $DryRun) {
+L767:         $mySess = [Diagnostics.Process]::GetCurrentProcess().SessionId; $binRoot = (Join-Path $Repo 'build\agent2') + '\'
+L768:         foreach ($g in @(Get-Process -Name legodimensions -ErrorAction SilentlyContinue)) {
+L769:             try {
+L770:                 $path = ''; try { $path = [string]$g.MainModule.FileName } catch { }
+L771:                 if ($g.SessionId -eq $mySess -and $g.StartTime -ge $Since -and $path.StartsWith($binRoot, [StringComparison]::OrdinalIgnoreCase)) {
+L772:                     $g.Kill(); [void]$g.WaitForExit(10000); Log "killed legodimensions pid $($g.Id) ($path), left over from the window" 'Yellow'
+L773:                 }
+L774:             } catch { Log "!!! could not kill legodimensions pid $($g.Id): $($_.Exception.Message)" 'Red' }
+L775:         }
+L776:     }
+L777:     $gone = $false; try { $gone = $P.HasExited } catch { }
+L778:     Log "runner stopped: $(if ($gone) { 'yes' } else { "NO, pid $($P.Id) is still running" })" $(if ($gone) { 'Gray' } else { 'Red' })
+L779: }
+L780: # Starts the runner with Start-Process (its output goes to runner-<tag>.out.txt / .err.txt and, as it comes, to this
+L781: # console and runner-<tag>.txt) and waits for it. Every second: a STOP file, or the end time + GraceMinutes passing,
+L782: # stops the window at once (Stop-Tree). If the launcher itself fails while the runner runs, the runner is stopped too:
+L783: # it never runs unwatched. Returns @{ code; killed }.
+L784: function Invoke-Runner([string]$ArgLine, [string]$RLog, [string]$Tag, [datetime]$T0) {
+L785:     $outF = Join-Path $StatusDir "runner-$Tag.out.txt"; $errF = Join-Path $StatusDir "runner-$Tag.err.txt"
+L786:     $p = Start-Process -FilePath $PsExe -ArgumentList $ArgLine -WorkingDirectory ((Get-Location -PSProvider FileSystem).ProviderPath) -NoNewWindow -PassThru -RedirectStandardOutput $outF -RedirectStandardError $errF
+L787:     [void]$p.Handle     # keeps ExitCode readable (Windows PowerShell 5.1)
+L788:     $r = @{ code = $null; killed = '' }
+L789:     $hardEnd = $script:Deadline.AddMinutes($GraceMinutes)
+L790:     Log "runner pid $($p.Id); a STOP file, or $(Ts $hardEnd) (end time + $GraceMinutes min), stops it and everything it started"
+L791:     $tails = @(@{ path = $outF; pos = [long]0; rest = ''; enc = [Console]::OutputEncoding }, @{ path = $errF; pos = [long]0; rest = ''; enc = [Console]::OutputEncoding })
+L792:     $tailErr = $false
+L793:     try {
+L794:         while ($true) {
+L795:             $done = $p.WaitForExit(1000)
+L796:             foreach ($t in $tails) { try { Read-Tail $t $RLog $done } catch { if (-not $tailErr) { $tailErr = $true; Log "!!! runner output could not be read ($($_.Exception.Message)); it is still in $outF and $errF" 'Yellow' } } }
+L797:             if ($done) { break }
+L798:             $why = ''
+L799:             if (Test-Stop) { $why = 'STOP file' } elseif ((Now) -ge $hardEnd) { $why = "end time $(Ts $script:Deadline) + $GraceMinutes min passed" }
+L800:             if ($why) {
+L801:                 $r.killed = $why; Stop-Tree $p $why $T0
+L802:                 foreach ($t in $tails) { try { Read-Tail $t $RLog $true } catch { } }
+L803:                 break
+L804:             }
+L805:         }
+L806:     } finally {
+L807:         $alive = $false; try { $alive = -not $p.HasExited } catch { }
+L808:         if ($alive) { if (-not $r.killed) { $r.killed = 'launcher error while the runner was running' }; Stop-Tree $p $r.killed $T0 }
+L809:     }
+L810:     try { if ($p.WaitForExit(5000)) { $r.code = $p.ExitCode } } catch { }
+L811:     return $r
+L812: }
+L813: function Invoke-Go {
+L814:     $fi = Get-Item -LiteralPath $GoFile -ErrorAction SilentlyContinue
+L815:     if (-not $fi -or $fi -isnot [IO.FileInfo]) { return }
+L816:     $sig = "$($fi.LastWriteTimeUtc.Ticks)|$($fi.Length)"
+L817:     if ($script:Stuck -eq $sig) { return }    # a GO we already read but could not delete
+L818:     $t1 = $null; $t2 = $null
+L819:     try { $t1 = Read-Text $GoFile; Start-Sleep -Seconds 1; $t2 = Read-Text $GoFile } catch { Log "GO file not readable yet: $($_.Exception.Message)"; return }
+L820:     if ($t1 -cne $t2) { Log 'GO file is still being written: read again at the next poll'; return }
+L821:     $script:GoReadAt = Now
+L822:     $delErr = ''
+L823:     try { Remove-Item -LiteralPath $GoFile -Force -ErrorAction Stop; $script:Stuck = '' } catch { $script:Stuck = $sig; $delErr = $_.Exception.Message }
+L824:     $script:GoCount++
+L825:     $go = Parse-Go $t2
+L826:     # Every GO it uses is deleted: one that cannot be deleted is refused, and ignored until the file changes.
+L827:     if ($delErr) { Log "GO read: '$($go.raw)'"; Refuse $go.raw "the GO file could not be deleted ($delErr): it is not used, and it is ignored until it changes (delete it by hand)"; return }
+L828:     Log "GO read and deleted: '$($go.raw)'"
+L829:     if (-not $go.ok) { Refuse $go.raw ($go.why -join '; '); return }
+L830:     $diff = Compare-Pins $script:Pins (Get-Pins)
+----
+L915:         while ($true) {
+L916:             if (Test-Stop) { Use-Stop 'waiting for a GO'; $endHow = 'STOP file'; break }
+L917:             if ((Now) -ge $script:Deadline) { Log "it is $(Ts $script:Deadline): the launcher ends" 'Cyan'; $endHow = 'deadline'; break }
+L918:             if (Test-Path -LiteralPath $GoFile -PathType Leaf) {
+L919:                 try { Invoke-Go }
+L920:                 catch {
+L921:                     # One bad GO must not end the night: log it, drop it, keep waiting. (Invoke-Go's finally clears the HOLD.)
+L922:                     Log "!!! error while handling a GO (line $($_.InvocationInfo.ScriptLineNumber)): $($_.Exception.Message); this GO is dropped" 'Red'
+L923:                     Write-LastResult "result   LAUNCHER ERROR while handling a GO: $($_.Exception.Message)"
+L924:                 }
+L925:                 if ($script:StopNow) { $endHow = 'STOP file'; break }
+L926:                 if (Test-Stop) { Use-Stop 'after a GO'; $endHow = 'STOP file'; break }
+L927:                 if ($MaxGo -gt 0 -and $script:GoCount -ge $MaxGo) { Log "-MaxGo $MaxGo reached: the launcher ends"; $endHow = '-MaxGo'; break }
+L928:             }
+L929:             Set-State 'waiting-for-go' @{ go_file = $GoFile; gos_read = $script:GoCount }
+L930:             $until = (Now).AddSeconds($PollSeconds)
+L931:             while ((Now) -lt $until -and -not (Test-Stop)) { Start-Sleep -Milliseconds 500 }
+L932:         }
+L933:     }
+L934: } catch {
+L935:     $exitCode = 3; $endHow = 'launcher error'
+L936:     Log "!!! launcher error at line $($_.InvocationInfo.ScriptLineNumber): $($_.Exception.Message)" 'Red'
+L937: } finally {
+L938:     # Each step on its own, so that one failure doesn't skip the others; the screensaver first.
+L939:     Try-Step 'screensaver restore' { Restore-Screensaver }
+L940:     Try-Step 'HOLD clear' { Clear-Hold }
+L941:     Try-Step 'keep-awake release' { Set-Awake $false }
+L942:     $script:WinLog = $null
+L943:     Try-Step 'state' { if ($begun -or $exitCode -eq 3) { Set-State 'ended' @{ exit = $exitCode; how = $endHow } } }
+L944:     if ($haveMutex) { try { $mutex.ReleaseMutex() } catch { } }
+L945:     $mutex.Dispose()
+L946: }
+L947: Log "launcher end: $endHow, exit $exitCode"
+L948: exit $exitCode
+----

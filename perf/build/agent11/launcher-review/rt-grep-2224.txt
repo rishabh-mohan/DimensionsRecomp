@@ -1,0 +1,80 @@
+﻿4: # and after every test), never written. No build, no game. Group 'gate' runs a dummy "build process" (a copy of PING.EXE
+5: # named ninja.exe, about 25-70 s). Group 'pin' edits RUN-NIGHT.cmd and a test matrix for a few seconds and puts them
+7: # Group 'hold' puts a "foreign" HOLD file into the test's own status-dryrun folder (never into perf-notes).
+8: # Group 'run' uses -FakeRunner (fake-runner.ps1: prints ticks, can start one sleeping child powershell) instead of the
+11: # each checks that the fake runner and its child are gone. Group 'gate' test t-close runs
+14: # Usage: powershell -NoProfile -ExecutionPolicy Bypass -File run-tests.ps1 -Group go|gate|hold|pin|run [-Only t-good,t-badhash]
+15: param([ValidateSet('go', 'gate', 'hold', 'pin', 'run')][string]$Group = 'go', [string[]]$Only = @())
+21: $NightCmd = Join-Path $Repo 'bench\agent5\launch\RUN-NIGHT.cmd'
+58: $m.arms[2].bin = 'build/agent2/doesnotexist-bin'
+147: Write-Host "group $Group; t-good.json sha256 $shaGood; real perf-notes files: $(Snap-Real)"
+149: if ($Group -eq 'go') {
+150: if (Want 't-good') {
+153: try { $p = Start-L 't-good' ($Fast + @('-MaxGo', '1', '-GateFixture', (& $Fx 'gate-quiet.json'))) -Go $GoGood } finally { Remove-Item Env:\REX_TIMER_WAIT_BLOCKING, Env:\R
+155: Check 'good GO' 't-good' $c '0' -Before $b -Has @("removed REX_TIMER_WAIT_BLOCKING='1'", [regex]::Escape('passed on to the runner as they are): ') + ".*REX_TEST_LEFTOVER=
+157: if (Want 't-badhash') {
+159: $p = Start-L 't-badhash' ($Fast + @('-MaxGo', '1', '-GateFixture', (& $Fx 'gate-quiet.json'))) -Go "GO T2 t-good.json $('0' * 64) only=base,s0 repeats=1"
+161: Check 'bad hash' 't-badhash' $c '0' -Before $b -Has @('GO REFUSED: sha256 mismatch') -HasNot @('GO ACCEPTED', 'HOLD written', 'would start') -Absent @('WINDOW-GO.txt', 'W
+163: if (Want 't-badbin') {
+165: $p = Start-L 't-badbin' ($Fast + @('-MaxGo', '1', '-GateFixture', (& $Fx 'gate-quiet.json'))) -Go "GO T3 t-badbin.json $(Sha (& $Fx 't-badbin.json')) only=d11t repeats=1"
+167: Check 'bin outside agent2' 't-badbin' $c '0' -Before $b -Has @("arm 'base': bin 'build/agent5/launch-test/fake-bin' is not build/agent2/<name>-bin", [regex]::Escape("arm 
+169: if (Want 't-badenv') {
+171: $p = Start-L 't-badenv' ($Fast + @('-MaxGo', '1', '-GateFixture', (& $Fx 'gate-quiet.json'))) -Go "GO T4 t-badenv.json $(Sha (& $Fx 't-badenv.json')) only=d11t repeats=1"
+173: Check 'disallowed env key' 't-badenv' $c '0' -Before $b -Has @("(?-i)arm 'base': env key 'REX_OTHER_KEY' is not allowed", "(?-i)arm 's0': env key 'rex_timer_wait_blocking
+175: if (Want 't-driver') {
+177: $p = Start-L 't-driver' ($Fast + @('-MaxGo', '1', '-GateFixture', (& $Fx 'gate-quiet.json'))) -Go "GO T8 t-baddrv.json $(Sha (& $Fx 't-baddrv.json')) only=base repeats=1"
+180: Check 'driver rule x5' 't-driver' $c '0' -Before $b -Has @("arm 'base'$dm'run-timing\.ps1'\)", ("arm 's0'$dm'" + [regex]::Escape('{"script":"drivers/thread-cpu.ps1","args
+182: if (Want 't-unknownarg') {
+184: $p = Start-L 't-unknownarg' @('-Bogus')
+186: Check 'unknown argument' 't-unknownarg' $c '2' -Before $b -Has @("refused: unknown argument\(s\) '-Bogus'") -Absent @('log.txt', 'state.txt')
+188: if (Want 't-14h') {
+190: $p = Start-L 't-14h' ($Fast + @('-StopAt', (Get-Date).AddHours(15).ToString('yyyy-MM-dd HH:mm')))
+192: Check 'refuse: end > 14 h away' 't-14h' $c '2' -Before $b -Has @('START REFUSED: .*more than 14 h from now \(it is past 07:30\): start it in the evening') -HasNot @('scre
+194: if (Want 't-latest-go') {
+196: $p = Start-L 't-latest-go' ($Fast + @('-MaxGo', '1', '-StartBy', (Get-Date).AddMinutes(-1).ToString('yyyy-MM-dd HH:mm'), '-GateFixture', (& $Fx 'gate-quiet.json'))) -Go $
+198: Check 'latest start at GO' 't-latest-go' $c '0' -Before $b -Has @('!!! the latest window start .* has passed: every GO is refused', 'GO REFUSED: latest start: the GO was 
+200: if (Want 't-badgo') {
+202: $p = Start-L 't-badgo' ($Fast + @('-MaxGo', '7', '-GateFixture', (& $Fx 'gate-quiet.json')))
+206: $gf = Join-Path (Join-Path $DryBase 't-badgo') 'WINDOW-GO.txt'; $notGone = 0
+207: foreach ($l in $lines) { Put-File 't-badgo' 'WINDOW-GO.txt' $l; if (-not (Wait-Gone $gf 120)) { $notGone++ } }
+209: $n = ([regex]::Matches((Log-Text 't-badgo'), 'GO REFUSED')).Count
+210: Check 'malformed GO x7' 't-badgo' $c '0' -Before $b -Has @("first token must be GO, not 'go'", 'GO line must have 6 tokens, it has 5', "must be repeats=<1-20>", "must be 
+212: if (Want 't-startref') {
+214: $p = Start-L 't-startref' @('-MaxGo', '1')
+216: Check 'refuse: not WinSta0\Default' 't-startref' $c '2' -Before $b -Has @('START REFUSED: this is desktop ', 'not the user''s own desktop WinSta0\\Default') -HasNot @('sc
+218: if (Want 't-hooks') {
+221: $p = Start-L 't-hooks' @('-MaxGo', '1', '-PollSeconds', '1') -NoDry
+224: Check 'hooks need -DryRun' 't-hooks' $c '2' -Before $b -Has @('-MaxGo -PollSeconds only work together with -DryRun') -Extra @($(if ($sa -ne $sb) { 'the real status\log.tx
+226: if (Want 't-mutex') {
+228: $p1 = Start-L 't-mutex' ($Fast + @('-GateFixture', (& $Fx 'gate-quiet.json')))
+229: $w = Wait-Log 't-mutex' 'waiting for ' 180
+230: $p2 = Start-L 't-mutex' ($Fast + @('-GateFixture', (& $Fx 'gate-quiet.json'))) -Keep -Suffix '-second'
+232: $st = [IO.File]::ReadAllText((Join-Path (Join-Path $DryBase 't-mutex') 'state.txt'))
+233: Put-File 't-mutex' 'WINDOW-STOP.txt' 'test stop'
+235: Check 'second launcher refused' 't-mutex' $c2 '2' -Before $b -Has @('START REFUSED \(pid \d+\): another launcher is already running') -Suffix '-second' -Extra @($(if (-no
+238: if ((Want 't-deadline-go') -or (Want 't-deadline-gate') -or (Want 't-deadline-wait')) {
+245: if (Want 't-deadline-go') {
+248: $p = Start-L 't-deadline-go' ($Fast + @('-MaxGo', '1', '-StopAt', $at, '-GateFixture', (& $Fx 'gate-quiet.json'))) -Go $GoGood
+250: Check 'deadline at GO' 't-deadline-go' $c '0' -Before $b -Has @("GO REFUSED: deadline: estimate $est min \+ 10 min would end after") -HasNot @('GO ACCEPTED', 'HOLD writte
+253: if (Want 't-latest-gate') {
+256: $plg = Start-L 't-latest-gate' ($Fast + @('-MaxGo', '1', '-StartBy', $sbl.ToString('yyyy-MM-dd HH:mm'), '-GateFixture', (& $Fx 'gate-busy.json'))) -Go $GoGood
+258: if (Want 't-deadline-gate') {
+261: $pg = Start-L 't-deadline-gate' ($Fast + @('-MaxGo', '1', '-StopAt', $dl.ToString('yyyy-MM-dd HH:mm'), '-GateFixture', (& $Fx 'gate-busy.json'))) -Go $GoGood
+263: if (Want 't-deadline-wait') {
+266: $pw = Start-L 't-deadline-wait' ($Fast + @('-StopAt', $dw.ToString('yyyy-MM-dd HH:mm')))
+270: Check 'deadline in gate' 't-deadline-gate' $c '0' -Before $bg -Has @('GO ACCEPTED', 'quiet gate: DEADLINE \(', 'window not started', 'GATE REFUSED: deadline:', 'HOLD remo
+274: $st = [IO.File]::ReadAllText((Join-Path (Join-Path $DryBase 't-deadline-wait') 'state.txt'))
+275: Check 'deadline, no GO' 't-deadline-wait' $c '0' -Before $bw -Has @(': the launcher ends', 'launcher end: deadline, exit 0') -Extra @($(if ($st -notmatch 'how\s+deadline'
+279: $tl = Line-Time 't-latest-gate' 'quiet gate: DEADLINE'
+280: Check 'latest start in gate' 't-latest-gate' $c '0' -Before $bl -Has @('GO ACCEPTED', 'quiet gate: DEADLINE \(', 'window not started', 'GATE REFUSED: latest start: no win
+284: if ($Group -eq 'gate') {
+285: if (Want 't-build') {
+289: $p = Start-L 't-build' ($Fast0 + @('-SampleSeconds', '2', '-GiveUpMinutes', '3', '-MaxGo', '1', '-GateFixture', (& $Fx 'gate-build-real.json'))) -Go $GoGood
+292: $tStrict = Line-Time 't-build' 'quiet gate: STRICT'; $tEnd = $nj.ExitTime
+294: Check 'build running' 't-build' $c '0' -Before $b -Has @("wait: build/game processes: ninja:$($nj.Id)", 'quiet gate: STRICT', 'would start window T1') -Extra @($order)
+296: if (Want 't-build-giveup') {
+300: $p = Start-L 't-build-giveup' ($Fast0 + @('-SampleSeconds', '2', '-GiveUpMinutes', '0.5', '-MaxGo', '1', '-GateFixture', (& $Fx 'gate-build-real.json'))) -Go $GoGood
+303: Check 'build all along' 't-build-giveup' $c '0' -Before $b -Has @("wait: build/game processes: ninja:$($nj.Id)", 'quiet gate: GAVE UP \(', 'GATE REFUSED: gave up: the qui
+305: if (Want 't-build-start') {
+309: $p = Start-L 't-build-start' ($Fast + @('-MaxGo', '1', '-GateFixture', (& $Fx 'gate-build-start.json'))) -Go $GoGood
+311: Check 'build at window start' 't-build-start' $c '0' -Before $b -Has @('GO ACCEPTED', 'quiet gate: STRICT', 'START REFUSED: .*build or game processes are running: ninja:4

@@ -1,0 +1,84 @@
+D1 [51]: # S4 draft plan, for the user and Agent 1 to decide
+D7 [575]: **Changed since 15:54** (task #10, run 2 after the 17:27 agy-grid relaunch, = the old board-run-2 task #35; 19:37, 20:07, 21:47, 22:55-23:02 and 23:29; the 15:54 version is kept in `build/agent11/s4draft/S4-DRAFT.1937-14C2A482.md`, the 19:37 one in `build/agen
+D27 [55]: - **Since 20:07** (SESSION2 L2779-2919, read at 21:47):
+D35 [72]: - **Since 21:47** (SESSION2 L2921-3199, read at 22:55, 23:02 and 23:29):
+D50 [134]: **Changed since 14:42** (board-run-2 task #24, 15:54; the 14:42 version is kept in `build/agent11/s4draft/S4-DRAFT.1554-C8B4CBCA.md`):
+D69 [193]: **Changed since 13:15** (board-run-2 task #14, 14:27-14:42; the 13:15 version is kept in `build/agent11/s4draft/S4-DRAFT.1315-BC98C02E.md`, and each later session's starting version beside it):
+D101 [120]: **Changed since 07:58** (board-run-2 task #2, 13:02; Agent 1's 13:04 decisions added at 13:11; Agent 10's §28 at 13:15):
+D115 [153]: **Changed 07:44-07:58** (task #35: the 07:58 version's list, kept as it was apart from "(its #34)" in the #32 line, which correction 9 above made wrong):
+D133 [47]: **Still open (20:07; updated as inputs land):**
+D167 [32]: ## Decisions this draft asks for
+D183 [11]: ## 1. Items
+D185 [52]: ### 1a. GPU memory / upload path, and native shaders
+D207 [45]: ### 1b. D3D12 submission and native threading
+D211 [1162]: | 18 | **R1 stage 1: split the end-of-frame submit** in `RefreshGuestOutput` (A7) | SDK `graphics/d3d12/command_processor.cpp/.h`, `d3d12/deferred_command_list.h` | cvar `d3d12_submit_split_kb`, 0 = OFF; kInitOnly (b2r §17 cond 4) | **SAFE** as a default-off t
+D212 [327]: | 19 | R1 stage 2: hand the submit to a worker (A7) | as #18, plus the worker (not itemized in my sources) | cvar `d3d12_async_submit`, OFF | **not rated** | no (by design) | C++ (SDK) | E: most of #18's estimate | functional + a 10-min soak, then a timing A/B
+D213 [789]: | 20 | R2: filter redundant commands (A7) | SDK `d3d12/deferred_command_list.h/.cpp` | cvar `d3d12_filter_redundant_commands`, OFF (§17 rates R2 as a default-off candidate; b2r §25 addendum 2) | step 1 **SAFE**; step 2 **SAFE-IF** (a)-(e) (b2r §17). (a): pure 
+D214 [913]: | 21 | **S4-T1: raise the priority of the native worker chain** (A7, task #26) | rexlego `native_worker.cpp:346`, `native_recording.cpp:138`, `native_preparation.h:21-26` | env `LEGO_NATIVE_CHAIN_PRIORITY=1`; unset = OFF | **not rated.** F's "Agent 10 wants on
+D218 [55]: ### 1c. Render-thread busy-wait, stuck lock and codegen
+D226 [1131]: | 26 | (b) codegen: `db16cyc` → `_mm_pause` (A9) | SDK `src/codegen/builders/system.cpp:51-73` | none at run time (a codegen change); codegen option `db16cyc_pause`, default OFF, set in the codegen config `rexlego/legodimensions_config.toml` (not the harness t
+D233 [36]: ### 1d. Pipelines and shader storage
+D238 [537]: | 33 | **Don't wait for pipelines** (opt-in no-wait mode) (A6's (c)) | SDK `d3d12/pipeline_cache.cpp/.h`, optionally `d3d12/command_processor.cpp` | cvar, false (placeholder name `d3d12_async_pipeline_no_wait`) | **not rated** | **YES, visible:** objects whose
+D244 [34]: ### 1e. Timer and power (Agent 11)
+D252 [27]: ### 1f. Dropped (not in S4)
+D266 [79]: ### 1g. Shared files and apply order (from the notes; check again when staging)
+D278 [629]: 10. **rexlego `CMakeLists.txt`:** #30's option (after :154) and #24's new hook file (before :168, inside `if(NOT LEGODIMENSIONS_NATIVE_GPU)`, so Xenos builds only). The CMake edit makes both trees re-run CMake (7-25 s each, A2). CMakeLists.txt is also the nati
+D285 [63]: ### 1h. Root-cause investigations (functional only; from 07:47)
+D291 [28]: ## 2. Proposed order (draft)
+D293 [43]: ### 2a. Build batches, every new switch OFF
+D331 [83]: ### 2b. Functional checks for S4a (hidden desktop, never timed, one game at a time)
+D357 [44]: ### 2c. Timing windows (45 min or less each)
+D406 [79]: ## 3. Build time and disk (Agent 2, 07:08; estimates only, ±30%, nothing built)
+D420 [20]: ## 4. Open questions
+D422 [20]: ### 4a. For the user
+D441 [323]:    - **Answer (the user, 23:24; L3198-3199): yes, on Monday,** in a one-hour slot when the user messages that they're free. The kit is staged in the morning; no timed window may be running when the hour starts (let it finish, or stop it cleanly); if #33 is bui
+D442 [170]: 5. **No-wait mode pop-in (#33).** Would an opt-in mode be acceptable in which objects can be missing for a few frames, instead of the game freezing while shaders compile?
+D443 [37]:    - If not, #33 and #34 are dropped.
+D444 [232]:    - **Answer (the user, 23:24; L3196): yes,** as an opt-in that's off by default, so #33 and #34 stay in scope. They need Agent 6's implementation, Agent 10's rating, a build, and the user's look at the pop-in on a visible desktop.
+D445 [0]: 
+D446 [50]: ### 4b. For Agents 1, 10 and 12 (not for the user)
+D447 [0]: 
+D448 [70]: **Answered by Agent 1 (07:47-07:48, 08:12, 08:25, 13:04 and ~15:35):**
+D449 [128]: - **#37 watchdog dump delay:** staged only, not an S4 item; the 06:28 call stands. F's Leads were stale and were fixed at 07:48.
+D450 [168]: - **#7's cost when ON:** record both numbers (A10: +1-3 ms/f on GPU Cmds; A12: 0.25-0.4, at most 0.75 ms/f). It is functional-only either way, so no decision is needed.
+D451 [244]: - **#32:** it ships with a switch (OFF) unless Agent 10 rates it output-identical. Agent 10 rated it output-identical at 12:40 (b2r §27), so it needs no switch. (Its old #34 brief's "#32" was Agent 9's task, this draft's #24; §25 correction 9.)
+D452 [333]: - **#8's memexport caveat:** an S4 gate, not a change tonight. Count the full-buffer `RangeWrittenByGpu` calls in S4a's functional run (§2b step 3). A length cap is decided in S4, and only if that path runs. The staged P2 diff stays as it is. (13:04: the count
+D453 [307]: - **P2's fallback counter (08:25):** no existing log can show that the fallback never runs (A12, 08:20), so P2 ON needs a counter. A12 stages it after window 4 in the S4a set, before C1 v2; A10 rates it then. (13:04: it goes into the next build, not S4a.) A ho
+D454 [245]: - **C1 v2 (08:12):** no v2 tonight. It is staged after window 4 and before any S4b build, in a new `build/agent12/s4-c1v2/`, with the kept-protect counter and the first-kept line that ON needs. native3d and nativeB are re-pinned after the apply.
+D455 [162]: - **GO to stage #18 and #20:** deferred to the S4 kickoff with the user after window 4 (07:47). **13:04:** GO to stage #18 and #20 step 1, staging only (Agent 7).
+D456 [505]: - **13:04, the rest:** S4a is devoff4 and native4 (#7, #8, #5 and #38 OFF, #32 always on, #2 OFF on native4), built now by Agent 2 in snap trees; Agent 3's functional checks run until 14:20. P2's counter goes into the next build, not S4a. #24: Agent 9 fixes N1
+D457 [185]: - **~15:35 (task #24):** S4a is live and committed (14:56); S4b takes C1 v3 and leaves #24 + #30 for an incremental S4c (§2a); timed windows start only on the user's double-click (§2c).
+D458 [428]: - **16:35-16:48 (SESSION2 L2605-2635; Agent 1's order, re-issued in task #10):** W4b is done, with every arm within the noise band (d11t: ~15% less CPU). W5 next, on the S3d line (B4 deferred); then the S4b + S4c build (S3d line, C1 v3, S4c folded in); then th
+D459 [254]: - **17:27 (the user; L2654):** decision 1 = yes: generated virtual Toy Pad tags in Agent 3's hidden-desktop runs, under the 02:11 harness-only rules; S4b queue rows 7, 20 and 23 are in, and C1 ON's verify-mode level load (b2r §21 A) can run (§4a item 1).
+D460 [277]: - **17:52-18:34 (L2662-2692):** W5 started although the quiet gate failed on Defender (~0.9 core) and ran at 17:56-18:29; in Agent 1's quick look every arm is within the noise band, and d11t and d11p use ~0.4 core less game CPU (Changed since 15:54). The read-
+D461 [428]: - **19:31-19:35 (L2694-2717):** tonight's targets (the user sleeps at 00:00): the S4b + S4c bins, at -j8 Below Normal (devoff4b ~20:25-20:30, native4b ~21:00); Agent 3's S4b queue to ~22:50-23:00; Agent 5's launcher reviewed by ~22:30 and double-clicked by the
+D462 [473]: - **19:42-19:49 (L2719-2761):** Agent 4 does the native re-pin, once, on native4b (run-2 task #12; no `-Go` without Agent 1's word); Agent 10 rates the folded S4b + S4c compose check PASS, SAFE to build, landing OFF, with five gates for the build (b2r row 39, 
+D463 [435]: - **20:30-21:33 (L2779-2919):** T-std is the read-out method; Agent 8's interim read-outs (strict FAIL on W4b and W5; W5's S4a arms equal S3d within about ±4 %; the timer bundle cuts game CPU by 12-14 %); W6 on devoff4b without the timer bundle, GO by Agent 1;
+D464 [1064]: - **21:55-23:25 (L2921-3199):** W6 promoted, its GO 4 arms × 5 (`only=s0,p2,p2f,p2fc`; C1 without P2 isn't cleared, so f and fc stay out); the W6 functional set complete (G4, G5 partial, w6s3, gate B without tags); s4b17 and s4b18 PASS, so W9 runs; the night W
+D465 [0]: 
+D466 [15]: **Still open:**
+D467 [664]: - **Ratings still missing:** #6 (no code yet), #19, #21 (F's "one more code proof" has no source in Agent 10's notes, b2r §25), #25, #33. Rated since 07:30: #8 P2 (07:34, b2r row 23, §22), #5 fix (i) (~07:56, b2r row 24, §23), #4 C1 v1 (~08:09, b2r row 25, §24
+D468 [384]: - **P2's counter, as staged (A12, 13:19) and rated (A10, ~13:42, b2r §30):** the one-TU route (1 file rebuilds) and no overlap with #7, #8 or #5 (Agent 1's 08:25 questions); it commutes with #18's diff (either order gives 027204B5…). Output-identical and SAFE,
+D469 [454]: - **Switch names missing:** #6. M1's is `shared_memory_upload_nontemporal_copy` (Agent 5, 13:28); #18's is `d3d12_submit_split_kb` (kInitOnly, 0 = off), and #20 step 1's counters are a one-TU compile macro, `REX_D3D12_DEFERRED_COUNTERS` (default 0; Agent 7). #
+D470 [280]: - **S4c's re-pin: answered** (asked ~15:35; SESSION2 L2625; Agent 1's order, re-issued in task #10): S4c is folded into the S4b build, so native3d and nativeB are re-pinned once, on native4b, as 13:04 planned (b2r §26). Agent 4 does it (run-2 task #12, since 1
+D471 [1555]: - **Possible changes after this draft:** Agent 10's notes as of 13:38 are folded in (§25 with its addenda, §26, §27 with its 13:20 correction, §28's C1 re-check, §29's S4a apply record and §30's P2 counter). Its R1/R2 summary (addendum 2) leaves rows 18-20 unc
+D472 [0]: 
+D473 [28]: ## 5. Open, but not S4 items
+D474 [0]: 
+D475 [216]: - **nativeB's menu exit: closed for tonight as (a), a recorded difference** (Agent 1, 07:47). nativeB leaves the front-end menu ~12 s earlier than native3d, in both orders (F 06:15); the exit follows guest CPU speed.
+D476 [136]:   - Not codegen: Agent 10's "(b) result" (07:35, codegen-review L717-769). The whole tree, 164,786 functions, has 0 sequence mismatches.
+D477 [125]:   - Not a host clock: Agent 3 (07:38-07:40, a3 §7.5). Every clock the guest can read is wall time and the same in all builds.
+D478 [41]:   - The root cause is S4 work: #41 (§1h).
+D479 [1301]: - **The stuck game lock (finding 10):** v0.2.0 hits it too (F 06:48), so our changes didn't cause it. The S4 answer is #24, whose H2 hook covers the GetData loop that base1's lock owner spun in (a9 S5.2.1). #37, the watchdog dump delay, is staged only, not S4 
+D480 [14]: - **Harness:**
+D481 [250]:   - **done:** "STUCK-LOCK + dump + exit 0" is now RECOVERED HANG. Agent 3 applied the patch to `harness/runstats.py` at 07:02, and its test (07:05) had 0 failures in 37 checks over 5 real runs and 14 mock cases. Exit codes don't change (a3 L650-658);
+D482 [110]:   - an optional lock-trace repro, only on A1's GO (`LEGO_TT_LOCK_TRACE`, `critical_section_stuck_seconds=30`).
+D483 [57]: - **The slow state** (E-cores at ~550 MHz in agent runs):
+D484 [76]:   - Ruled out: process-level EcoQoS / EXECUTION_SPEED (task #24, finding 7).
+D485 [117]:   - Still open: the package power limit (PL1, which #40 tests), per-thread or window-visibility QoS, and overlay/EPP.
+D486 [191]:   - The Intel DTT/IPF update before window 4 may change the slow state itself (DTT manages the power limits), so a change from window 3 to W4b may come from the update, not from an arm (§2c).
+D487 [374]:   - A8 runs `timerq_slowstate.ps1` over W4b's fg=1 runs (that script stays frozen), and its 3-mode copy `timerq_slowstate_3mode.ps1` over W5's (spin, blocking or precise, from env_set and the precise line; task #10). In W5 every scored run reaches the slow sta
+D488 [0]: 
+D489 [27]: ## 6. Sources (line ranges)
+D490 [0]: 
+D491 [218]: - **F** (`FINDINGS-AND-CHANGES.md`): 344 lines at 06:55, 345 at 07:04. From L96 on, everything moved down 1 line between those reads. Rows that cite F line numbers use the 06:55 read; most rows cite F sections instead.

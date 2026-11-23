@@ -1,0 +1,555 @@
+{
+ "run": "20261122-220947-s4b-18-gw-q250",
+ "row": "s4b18",
+ "kind": "off",
+ "scenario": "M",
+ "runjson": {
+  "exit_code": 0,
+  "exit_code_hex": "0x00000000",
+  "dumps": [],
+  "crash_events": [],
+  "wer_seen": false,
+  "close_method": "wm_close",
+  "close_seconds": 40.14,
+  "elapsed_s": 259.34,
+  "seconds_requested": 420,
+  "cvars": {},
+  "exited_early": false,
+  "env_extra": {
+   "LEGO_GPU_WAIT_BACKOFF_US": "250",
+   "LEGO_GPU_WAIT_STATS": "1"
+  },
+  "steps": "54/54"
+ },
+ "summary": {
+  "verdict": "RUNNING",
+  "first_frame_s": 10.0,
+  "levels": {
+   "info": 103,
+   "warning": 142
+  },
+  "unknown_cvars": [],
+  "errors": []
+ },
+ "log_files": [
+  "game.log"
+ ],
+ "families": {
+  "c1_any": 0,
+  "c1_init_on": 0,
+  "c1_init_blocked": 0,
+  "c1_init_nohold": 0,
+  "c1_first": 0,
+  "c1_kept": 0,
+  "c1_blocked": 0,
+  "c1_verify_on": 0,
+  "c1_verify_f": 0,
+  "recovered_stale": 0,
+  "unhandled_phys": 0,
+  "protect_failed": 0,
+  "split_init": 0,
+  "split": 0,
+  "deferred_counters": 0,
+  "gpu_wait": 42,
+  "gpu_wait_stats": 41,
+  "gpu_wait_backoff": 1,
+  "gpu_wait_on": 1,
+  "memexport": 0,
+  "slow_frame": 0,
+  "s4_upload_hash": 0,
+  "precise_wait": 0,
+  "miss_cache": 0,
+  "stuck_lock": 0,
+  "minidump": 0,
+  "fatal": 0,
+  "clean_exit": 1,
+  "debug_layer": 0,
+  "dred": 0,
+  "d3d12_msg": 0,
+  "k": 0,
+  "c1_other": 0
+ },
+ "levels": {
+  "info": 103,
+  "warning": 142
+ },
+ "lines": {
+  "gpu_wait": {
+   "first": [
+    "[2026-11-22 22:09:53.415] [info] [core] [t30772] GPU wait back-off: ON (quantum 250 us, spin 30 us); stats ON; GetData hook built.",
+    "[2026-11-22 22:10:02.372] [info] [core] [t23116] GPU wait stats (5 s): L1 waits 297 polls 9821 moved 0 gpu_off 0 sleep>moved 0 sleep>done 287 | L2 tries 0 waits 0 polls 0 delayed 0 sleep>ready 0 | kicks 582 | pause 3494 yield 287 sleep 6040 sleep_sum 4436.88 ms sleep_fail 0 | L1 sum 4589.46 ms max 51.124 ms hist <50us 10 <200us 0 <1ms 2 <4ms 0 >=4ms 285 | L2 sum 0.00 ms max 0.000 ms",
+    "[2026-11-22 22:10:07.389] [info] [core] [t23116] GPU wait stats (5 s): L1 waits 301 polls 10559 moved 1 gpu_off 0 sleep>moved 0 sleep>done 301 | L2 tries 0 waits 0 polls 0 delayed 0 sleep>ready 0 | kicks 602 | pause 3879 yield 301 sleep 6378 sleep_sum 4526.34 ms sleep_fail 0 | L1 sum 4719.41 ms max 29.509 ms hist <50us 0 <200us 0 <1ms 0 <4ms 1 >=4ms 300 | L2 sum 0.00 ms max 0.000 ms"
+   ],
+   "last": [
+    "[2026-11-22 22:13:12.945] [info] [core] [t23116] GPU wait stats (5 s): L1 waits 275 polls 5958 moved 0 gpu_off 0 sleep>moved 0 sleep>done 236 | L2 tries 960 waits 0 polls 0 delayed 0 sleep>ready 0 | kicks 1909 | pause 2328 yield 253 sleep 3377 sleep_sum 3115.00 ms sleep_fail 0 | L1 sum 3663.87 ms max 63.892 ms hist <50us 22 <200us 0 <1ms 0 <4ms 8 >=4ms 245 | L2 sum 0.00 ms max 0.000 ms",
+    "[2026-11-22 22:13:17.977] [info] [core] [t23116] GPU wait stats (5 s): L1 waits 236 polls 5728 moved 2 gpu_off 0 sleep>moved 1 sleep>done 213 | L2 tries 808 waits 0 polls 0 delayed 0 sleep>ready 0 | kicks 1468 | pause 1904 yield 229 sleep 3593 sleep_sum 3322.76 ms sleep_fail 0 | L1 sum 3735.80 ms max 123.973 ms hist <50us 9 <200us 0 <1ms 0 <4ms 10 >=4ms 217 | L2 sum 0.00 ms max 0.000 ms",
+    "[2026-11-22 22:13:23.011] [info] [core] [t23116] GPU wait stats (5 s): L1 waits 94 polls 5121 moved 0 gpu_off 0 sleep>moved 0 sleep>done 90 | L2 tries 334 waits 0 polls 0 delayed 0 sleep>ready 0 | kicks 1259 | pause 668 yield 92 sleep 4361 sleep_sum 3863.43 ms sleep_fail 0 | L1 sum 4120.18 ms max 172.475 ms hist <50us 2 <200us 0 <1ms 0 <4ms 0 >=4ms 92 | L2 sum 0.00 ms max 0.000 ms"
+   ]
+  }
+ },
+ "gpu_wait_stats": {
+  "lines": 41,
+  "first_ts": "22:10:02.372",
+  "last_ts": "22:13:23.011",
+  "first": {
+   "interval_s": 5,
+   "l1_waits": 297,
+   "l1_polls": 9821,
+   "l1_moved": 0,
+   "l1_gpu_off": 0,
+   "l1_sleep_moved": 0,
+   "l1_sleep_done": 287,
+   "l2_tries": 0,
+   "l2_waits": 0,
+   "l2_polls": 0,
+   "l2_delayed": 0,
+   "l2_sleep_ready": 0,
+   "kicks": 582,
+   "pause": 3494,
+   "yield": 287,
+   "sleep": 6040,
+   "sleep_sum_ms": 4436.88,
+   "sleep_fail": 0,
+   "l1_sum_ms": 4589.46,
+   "l1_max_ms": 51.124,
+   "h_lt50us": 10,
+   "h_lt200us": 0,
+   "h_lt1ms": 2,
+   "h_lt4ms": 0,
+   "h_ge4ms": 285,
+   "l2_sum_ms": 0,
+   "l2_max_ms": 0
+  },
+  "last": {
+   "interval_s": 5,
+   "l1_waits": 94,
+   "l1_polls": 5121,
+   "l1_moved": 0,
+   "l1_gpu_off": 0,
+   "l1_sleep_moved": 0,
+   "l1_sleep_done": 90,
+   "l2_tries": 334,
+   "l2_waits": 0,
+   "l2_polls": 0,
+   "l2_delayed": 0,
+   "l2_sleep_ready": 0,
+   "kicks": 1259,
+   "pause": 668,
+   "yield": 92,
+   "sleep": 4361,
+   "sleep_sum_ms": 3863.43,
+   "sleep_fail": 0,
+   "l1_sum_ms": 4120.18,
+   "l1_max_ms": 172.475,
+   "h_lt50us": 2,
+   "h_lt200us": 0,
+   "h_lt1ms": 0,
+   "h_lt4ms": 0,
+   "h_ge4ms": 92,
+   "l2_sum_ms": 0,
+   "l2_max_ms": 0
+  },
+  "max": {
+   "interval_s": 5,
+   "l1_waits": 444,
+   "l1_polls": 10951,
+   "l1_moved": 2,
+   "l1_gpu_off": 0,
+   "l1_sleep_moved": 1,
+   "l1_sleep_done": 301,
+   "l2_tries": 960,
+   "l2_waits": 1,
+   "l2_polls": 224,
+   "l2_delayed": 223,
+   "l2_sleep_ready": 1,
+   "kicks": 1909,
+   "pause": 4046,
+   "yield": 301,
+   "sleep": 6751,
+   "sleep_sum_ms": 4575.14,
+   "sleep_fail": 0,
+   "l1_sum_ms": 4719.41,
+   "l1_max_ms": 862.13,
+   "h_lt50us": 284,
+   "h_lt200us": 1,
+   "h_lt1ms": 12,
+   "h_lt4ms": 60,
+   "h_ge4ms": 300,
+   "l2_sum_ms": 159.97,
+   "l2_max_ms": 159.965
+  },
+  "sum": {
+   "interval_s": 205,
+   "l1_waits": 11494,
+   "l1_polls": 255170,
+   "l1_moved": 20,
+   "l1_gpu_off": 0,
+   "l1_sleep_moved": 9,
+   "l1_sleep_done": 9302,
+   "l2_tries": 4092,
+   "l2_waits": 1,
+   "l2_polls": 224,
+   "l2_delayed": 223,
+   "l2_sleep_ready": 1,
+   "kicks": 28663,
+   "pause": 89436,
+   "yield": 10391,
+   "sleep": 155546,
+   "sleep_sum_ms": 147096.72,
+   "sleep_fail": 0,
+   "l1_sum_ms": 177112.08,
+   "l1_max_ms": 4402.626,
+   "h_lt50us": 1112,
+   "h_lt200us": 1,
+   "h_lt1ms": 38,
+   "h_lt4ms": 763,
+   "h_ge4ms": 9580,
+   "l2_sum_ms": 159.97,
+   "l2_max_ms": 159.965
+  },
+  "monotonic": {
+   "interval_s": true,
+   "l1_waits": false,
+   "l1_polls": false,
+   "l1_moved": false,
+   "l1_gpu_off": true,
+   "l1_sleep_moved": false,
+   "l1_sleep_done": false,
+   "l2_tries": false,
+   "l2_waits": false,
+   "l2_polls": false,
+   "l2_delayed": false,
+   "l2_sleep_ready": false,
+   "kicks": false,
+   "pause": false,
+   "yield": false,
+   "sleep": false,
+   "sleep_sum_ms": false,
+   "sleep_fail": true,
+   "l1_sum_ms": false,
+   "l1_max_ms": false,
+   "h_lt50us": false,
+   "h_lt200us": false,
+   "h_lt1ms": false,
+   "h_lt4ms": false,
+   "h_ge4ms": false,
+   "l2_sum_ms": false,
+   "l2_max_ms": false
+  }
+ },
+ "frame_rows": 11117,
+ "logdiff": {
+  "bases": [
+   "20261122-205356-s4b-01-off"
+  ],
+  "base_scenario": "M",
+  "NEW": 0,
+  "NEW_allowed": 0,
+  "MORE": 0,
+  "MORE_allowed": 0,
+  "GONE": 6,
+  "GONE_unexpected": 0,
+  "FLAG": 0,
+  "NEW_info_other": 0,
+  "NEW_info_allowed": 2,
+  "rc": 0,
+  "new": [],
+  "new_allowed": [],
+  "more": [],
+  "gone_unexpected": [],
+  "flag": [],
+  "new_info_other": [],
+  "new_info_allowed": [
+   "NEW build\\agent3\\runs\\20261122-220947-s4b-18-gw-q250\\game.log x1 [info] [core] GPU wait back-off: ON (quantum # us, spin # us); stats ON; GetData hook built.",
+   "NEW build\\agent3\\runs\\20261122-220947-s4b-18-gw-q250\\game.log x41 [info] [core] GPU wait stats (# s): L# waits # polls # moved # gpu_off # sleep>moved # sleep>done # | L# tries # waits # polls # delayed # sleep>ready # | kicks # | pause # yield # sleep # sleep_sum # ms sleep_fail"
+  ]
+ },
+ "scenes": {
+  "base": "20261122-205356-s4b-01-off",
+  "missing_in_cand": [],
+  "extra_in_cand": [
+   "788/31613",
+   "790/31625"
+  ],
+  "cand_major": {
+   "220/534": 82.3,
+   "226/1022": 29.6,
+   "218/222": 26.5,
+   "219/226": 14.9,
+   "220/528": 14.8,
+   "790/31625": 7.3,
+   "788/31613": 4.0,
+   "594/2813": 3.2,
+   "8019/1043795": 2.4
+  },
+  "base_major": {
+   "220/534": 71.4,
+   "226/1022": 30.3,
+   "218/222": 22.6,
+   "220/528": 16.6,
+   "219/226": 14.9,
+   "594/2813": 3.1,
+   "8019/1043795": 2.4,
+   "839/31674": 2.2
+  }
+ },
+ "front_end_scenes": {
+  "218/222": 26.5,
+  "226/1022": 29.6,
+  "220/528": 14.8,
+  "220/534": 82.3,
+  "219/226": 14.9
+ },
+ "marks": {
+  "prefix": 9,
+  "prefix_diff": [],
+  "all_diff": 8,
+  "cand": {
+   "first-frame": "218/222",
+   "title": "226/1022",
+   "after-start": "226/1022",
+   "after-a1": "220/528",
+   "after-a2": "220/534",
+   "after-a3": "220/534",
+   "down-1": "220/534",
+   "down-2": "220/534",
+   "up-2": "220/534",
+   "back-1": "220/534",
+   "back-2": "220/534",
+   "back-3": "220/534",
+   "idle-10": "220/534",
+   "idle-20": "220/534",
+   "idle-30": "220/534",
+   "idle-40": "220/540",
+   "idle-50": "218/222",
+   "idle-60": "838/31668",
+   "idle-70": "790/31625",
+   "idle-80": "788/31613",
+   "idle-90": "8019/1043795",
+   "end": "8019/1043795"
+  }
+ },
+ "threads": {
+  "window_s": 218.0,
+  "window": [
+   20.0,
+   238.0
+  ],
+  "by_name": {
+   "(unnamed)": {
+    "pct": 13.4,
+    "threads": 30
+   },
+   "rex::thread::TimerQueue": {
+    "pct": 21.75,
+    "threads": 1
+   },
+   "DeviceHotplugThread": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "D3D Background Thread 0": {
+    "pct": 0.21,
+    "threads": 1
+   },
+   "D3D Background Thread 1": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "D3D Background Thread 2": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "D3D Background Thread 3": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "0x16c00001": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "0xc0550001": {
+    "pct": 4.64,
+    "threads": 1
+   },
+   "XMA Decoder (F8000010)": {
+    "pct": 0.09,
+    "threads": 1
+   },
+   "Audio Worker (F8000014)": {
+    "pct": 2.1,
+    "threads": 1
+   },
+   "GPU Commands (F8000018)": {
+    "pct": 22.72,
+    "threads": 1
+   },
+   "GPU VSync (F800001C)": {
+    "pct": 2.19,
+    "threads": 1
+   },
+   "D3D12 Pipelines": {
+    "pct": 0.49,
+    "threads": 9
+   },
+   "Kernel Dispatch (F8000028)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "Main XThread (F800002C)": {
+    "pct": 21.48,
+    "threads": 1
+   },
+   "D3D12 Storage writer": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread9158 (F8000070)": {
+    "pct": 0.65,
+    "threads": 1
+   },
+   "XThread4F90 (F80000F4)": {
+    "pct": 35.64,
+    "threads": 1
+   },
+   "XThread6A20 (F80000FC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread7314 (F8000104)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread9018 (F800010C)": {
+    "pct": 3.1,
+    "threads": 1
+   },
+   "XThread47C8 (F8000114)": {
+    "pct": 4.02,
+    "threads": 1
+   },
+   "XThread5C54 (F8000120)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread7454 (F8000124)": {
+    "pct": 0.09,
+    "threads": 1
+   },
+   "XThread6278 (F8000128)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread5CEC (F800013C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread90FC (F8000144)": {
+    "pct": 10.73,
+    "threads": 1
+   },
+   "SDLWASAPIMgmt": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "SDLAudioP19": {
+    "pct": 1.25,
+    "threads": 1
+   },
+   "XThread61F0 (F8000164)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread8780 (F800016C)": {
+    "pct": 0.03,
+    "threads": 1
+   },
+   "XThread9704 (F8000188)": {
+    "pct": 0.15,
+    "threads": 1
+   },
+   "XThread95F4 (F8000190)": {
+    "pct": 0.81,
+    "threads": 1
+   },
+   "XThread3468 (F8000198)": {
+    "pct": 0.82,
+    "threads": 1
+   },
+   "XThread5A4C (F80001A8)": {
+    "pct": 6.17,
+    "threads": 1
+   },
+   "XThread5C38 (F80001BC)": {
+    "pct": 0.39,
+    "threads": 1
+   },
+   "XThread26F4 (F800026C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread18F0 (F80002AC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread85E8 (F80002B4)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread3F5C (F80002C0)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread77FC (F80002C8)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread5A24 (F8000308)": {
+    "pct": 0.01,
+    "threads": 1
+   }
+  },
+  "ticks": {
+   "25112": {
+    "name": "rex::thread::TimerQueue",
+    "samples": 109,
+    "steps": 108,
+    "non_rising": 0,
+    "non_rising_at_s": [],
+    "step_s_median": 2.0,
+    "span_s": [
+     -8.0,
+     208.0
+    ]
+   }
+  }
+ },
+ "slow_state": {
+  "rows": 251,
+  "onset_s": null,
+  "slow_pct": 0.0,
+  "e_eff_mhz_median": 1526,
+  "cpu_util_pct_median": 89.1,
+  "slow": false
+ },
+ "proofs": [
+  {
+   "ok": true,
+   "text": "GPU wait stats lines 41, 41 parsed"
+  },
+  {
+   "ok": true,
+   "text": "one \"GPU wait back-off: ON (quantum 250 us, ...); ...; GetData hook built.\" line (ON x1, back-off lines x1): .415] [info] [core] [t30772] GPU wait back-off: ON (quantum 250 us, spin 30 us); stats ON; GetData hook built."
+  },
+  {
+   "ok": true,
+   "text": "sleep_fail = 0 (max 0 over 41 stats lines)"
+  },
+  {
+   "ok": true,
+   "text": "no STUCK-LOCK (0)"
+  }
+ ],
+ "base_misses": [],
+ "hint": "PASS?"
+}

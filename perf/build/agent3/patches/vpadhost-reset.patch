@@ -1,0 +1,54 @@
+--- a/harness/vpad/vpadhost.cs
++++ b/harness/vpad/vpadhost.cs
+@@ -21,6 +21,9 @@
+ //   stop                                   end the run now (the harness closes the game as usual)
+ // A timed-out wait is logged as TIMEOUT and the script goes on. Buttons: A B X Y START BACK UP DOWN LEFT RIGHT LB RB
+ // LS RS GUIDE, joined with '+'. Only slot 0 is driven. C# 5 (Windows PowerShell 5.1 Add-Type).
++// Start() begins with ResetRun(), so one PowerShell process can run several scripts in turn (Agent 8's run-matrix.ps1
++// calls run-timing.ps1 in-process). Before it, a second Start() in the same process ran no steps (abort stayed set)
++// and reported the first run's counters.
+ using System;
+ using System.Collections.Generic;
+ using System.Collections.Specialized;
+@@ -263,7 +266,9 @@
+     // ---- run ----
+     public static string Start(string scriptPath, string statePath, string inputCsv, string gameLog, string perfCsv)
+     {
+-        string e = Load(scriptPath);
++        string e = ResetRun();
++        if (e != null) return e;
++        e = Load(scriptPath);
+         if (e != null) return e;
+         e = OpenState(statePath);
+         if (e != null) return e;
+@@ -273,6 +278,30 @@
+         csv = new StreamWriter(new FileStream(inputCsv, FileMode.Create, FileAccess.Write, FileShare.Read));
+         csv.AutoFlush = true;
+         csv.WriteLine("t_s,line,cmd,args,result,pad_reads,pad_active_reads,key_calls,key_events,perf_rows,perf_bytes,scene_draws,scene_vertices,log_lines,log_bytes");
++        return null;
++    }
++
++    // Per-run state back to that of a fresh process: stops a step thread that is still alive, releases the files of a
++    // run that never got to Finish() and clears every per-run field. Start() calls it first (a no-op in a fresh process).
++    public static string ResetRun()
++    {
++        abort = true;
++        if (worker != null && worker.IsAlive && !worker.Join(5000)) return "the previous script thread is still running 5 s after the stop";
++        worker = null;
++        if (csv != null) { try { csv.Close(); } catch (Exception) { } csv = null; }
++        if (view != IntPtr.Zero) { UnmapViewOfFile(view); view = IntPtr.Zero; }
++        if (map != IntPtr.Zero) { CloseHandle(map); map = IntPtr.Zero; }
++        if (file != IntPtr.Zero) { CloseHandle(file); file = IntPtr.Zero; }
++        lock (padLock) { padButtons = padLt = padRt = padLx = padLy = padRx = padRy = 0; }
++        clock = null; t0 = 0;
++        logTail = new Tail(null); perfTail = new Tail(null); perfPath = null;
++        logLines.Clear(); logCursor = 0;
++        perfHeaderSeen = false; perfRows = 0; lastPollMs = -1000; perfLockedSeen = false;
++        Array.Clear(ringDraws, 0, ringDraws.Length); Array.Clear(ringVerts, 0, ringVerts.Length); ringN = 0;
++        curLine = 0; markDraws = markVerts = -1;
++        StopRequested = false; StepsDone = 0; Timeouts = 0; TimeoutLines = ""; Error = null;
++        current = "not started";
++        abort = false;
+         return null;
+     }
+ 

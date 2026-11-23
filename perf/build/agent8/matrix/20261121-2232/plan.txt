@@ -1,0 +1,31 @@
+﻿=== timing matrix: Quiet window 1: baseline-bin vs devoff1-bin, both at defaults. Title/attract loop, no input needed ===
+matrix   <workspace>\bench\agent8\run\matrix-base-vs-devoff1.json
+note     Do not touch the PC while it runs. Both arms sit on the title/attract loop, which the game reaches with no input.
+note     Per Agent 3: the window starts a fixed 60 s after the first guest frame and is 60 s long, with 5 runs per arm alternating. Round-robin with a rotating start gives A B B A A B B A A B. Compare medians and p99, not means (the attract loop alternates between ~25 and ~52 fps phases).
+note     One unscored cold run per bin comes first, because the first boot of a bin pays one-off costs.
+note     The runner always passes --audio_mute=true --pause_when_unfocused=false --native_settings_load=false --discord_rpc=false. The toml keeps framerate_limit = 60, so a CPU-side win can show as lower cpu_cores and fewer >33/>100 ms frames rather than as a lower median.
+settings warm-up from firstframe (boot timeout 240 s, settle 20 s); order roundrobin; close timeout 60 s; cooldown 10 s
+arms:
+       base: bin build/baseline-bin; frames perf; x5; warm-up 60 s; window 60 s; group ab (ref)
+         upstream baseline (batch 0), defaults; the reference
+       r0: bin build/agent2/devoff1-bin; frames perf; x5; warm-up 60 s; window 60 s; group ab
+         dev OFF build 1 (S1, batch 1), defaults
+cold     base (build/baseline-bin), r0 (build/agent2/devoff1-bin): unscored, before round 1
+round 1  base r0
+round 2  r0 base
+round 3  base r0
+round 4  r0 base
+round 5  base r0
+order    base r0 | r0 base | base r0 | r0 base | base r0
+estimate 12 runs (2 cold), about 41 min (warm boot 20 s, cold boot 61 s, close 35 s per run)
+
+--- preflight ---
+desktop    WinSta0\Default -> interactive desktop: timing can be valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   10.85 GB
+game       no legodimensions.exe running
+builds     none (clang-cl, clang, lld-link, ninja, dxc, cl)
+bin        build/agent2/devoff1-bin : ok (MANIFEST.txt)
+bin        build/baseline-bin : ok (MANIFEST.txt)
+estimate   12 runs, about 41 min: done around 23:12

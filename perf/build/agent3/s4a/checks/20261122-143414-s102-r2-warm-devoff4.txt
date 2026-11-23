@@ -1,0 +1,21 @@
+# s4a_check 20261122-143414-s102-r2-warm-devoff4 (off)
+run.json: exit 0 (0x00000000) dumps 0 crash_events 0 wer False; close wm_close 1.69 s; elapsed 361.87 of 360 s; cvars {}; args -; env -; script attract-long.txt steps 67/91
+  seed storage: [2026-11-22 14:34:20.531] [info] [core] [t30796] Initializing shader storage for title 5752084B...
+  seed storage: [2026-11-22 14:34:20.546] [info] [gpu] [t25016] Translated 229 shaders from the storage in 12 milliseconds
+  seed storage: [2026-11-22 14:34:21.121] [info] [gpu] [t25016] Created 214 graphics pipelines (not including reading the descriptions) from the storage in 575 milliseconds
+summary: verdict RUNNING; first frame 10.0 s; levels {"info": 317, "warning": 142}; unknown cvars []; errors 0
+log files game.log; greps s4_upload_hash=0 slow_frame=0 precise_wait=0 miss_cache=0 protect_failed=0 stuck_lock=0 minidump=0 fatal=0 storage=2 storage_init=1 clean_exit=1; gap after "Initializing shader storage" 0.015 s
+  storage: [2026-11-22 14:34:20.546] [info] [gpu] [t25016] Translated 229 shaders from the storage in 12 milliseconds
+  storage: [2026-11-22 14:34:21.121] [info] [gpu] [t25016] Created 214 graphics pipelines (not including reading the descriptions) from the storage in 575 milliseconds
+frames (perf.csv rows) 12595; per frame: s4_upload_hash 0.000 slow_frame 0.000
+logdiff vs 20261122-131746-s102-r2-warm-devoff3: NEW 0 (+0 allowed) MORE 0 (+0 allowed) GONE 33 (0 non-Toypad) FLAG 0; NEW at info 30 (0 non-Toypad)
+levels (game*.log) cand {"info": 317, "warning": 142} vs 20261122-131746-s102-r2-warm-devoff3 {"info": 322, "warning": 142}; [error] 0 vs 0
+scenes (>= 2 s) base 20261122-131746-s102-r2-warm-devoff3: 220/534:35s 226/1022:30s 218/222:20s 766/110956:20s 219/226:15s 790/31625:10s 220/528:8s 788/31613:4s 8127/762167:4s 594/2813:3s
+scenes (>= 2 s) cand: 220/534:36s 226/1022:29s 766/110956:23s 218/222:21s 219/226:15s 220/528:6s 594/2813:4s 8019/1043795:2s
+  missing in cand: ['790/31625', '8127/762167']; extra in cand: -
+route marks: 10 same scene, 17 differ: idle-50 790/31625->870/55055 idle-70 8019/1043795->1392/564530 idle-80 5194/879213->6376/1002225 idle-90 2266/414212->2270/424176 idle-100 5120/1264126->5107/1085733 idle-110 1825/652435->1514/334509 idle-120 1140/330362->6019/1116185 idle-130 8440/1055786->1151/327366 idle-140 1818/1081961->8117/768305 idle-150 1946/1147158->2396/1196054 idle-160 2427/1117371->1941/1130141 idle-170 1634/996155->2934/1177330 idle-180 1308/707799->1744/927903 idle-190 683/46281->1427/992959 idle-200 770/114604->1308/913276 idle-210 767/111436->8997/957657 idle-220 766/110956->4111/633446
+  cand marks: first-frame=218/222 title=226/1022 after-start=226/1022 after-a1=220/534 after-a2=220/534 idle-10=220/534 idle-20=220/534 idle-30=218/222 idle-40=839/31674 idle-50=870/55055 idle-60=788/31613 idle-70=1392/564530 idle-80=6376/1002225 idle-90=2270/424176 idle-100=5107/1085733 idle-110=1514/334509 idle-120=6019/1116185 idle-130=1151/327366 idle-140=8117/768305 idle-150=2396/1196054 idle-160=1941/1130141 idle-170=2934/1177330 idle-180=1744/927903 idle-190=1427/992959 idle-200=1308/913276 idle-210=8997/957657 idle-220=4111/633446 idle-230=765/125608 idle-240=770/113900 idle-250=769/112428 idle-260=766/110956 idle-270=766/110956
+threads (% of one core, window [20.0, 340.2] s from the first frame, 320.2 s): XThread5AC4 (F80001AC) x1 87.5 | GPU Commands (F8000018) x1 44.2 | rex::thread::TimerQueue x1 34.1 | Main XThread (F800002C) x1 28.4 | XThread42B0 (F80000F4) x1 17.1 | (unnamed) x32 12.2 | XThread8F38 (F8000144) x1 8.2 | 0xc0550001 x1 5.9 | XThread471C (F8000114) x1 5.8 | XThread7E9C (F800010C) x1 3.8 | GPU VSync (F800001C) x1 3.2 | Audio Worker (F8000014) x1 2.8
+  TimerQueue: {"rex::thread::TimerQueue": {"pct": 34.14, "threads": 1}}
+  TimerQueue ticks (tid 31828): 180 samples over [-7.8, 350.2] s (step median 2.0 s), cycles non-rising in 0 of 179 steps 
+sys.csv slow state: {"rows": 351, "onset_s": 209.8, "slow_pct": 40.5, "e_eff_mhz_median": 1488, "cpu_util_pct_median": 73.6, "slow": true}

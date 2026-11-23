@@ -1,0 +1,41 @@
+diff --git a/include/rex/codegen/config.h b/include/rex/codegen/config.h
+--- a/include/rex/codegen/config.h
++++ b/include/rex/codegen/config.h
+@@ -107,6 +107,7 @@
+   bool crCompareSoZero = false;   ///< Compares store SO=0 when no image instruction sets XER.SO
+   bool musttailCalls = false;     ///< Tail calls as [[clang::musttail]] return f(ctx, base)
+   bool vmxVectorFallbacks = false;  ///< SSE forms for VMX ops emitted as scalar lane loops
++  bool db16cycPause = false;        ///< db16cyc emits simde_mm_pause() (a spin-wait hint)
+ 
+   // === Analysis tuning (optional) ===
+   uint32_t maxJumpExtension = 65536;  ///< Max bytes to extend function for jump table targets
+diff --git a/src/codegen/config.cpp b/src/codegen/config.cpp
+--- a/src/codegen/config.cpp
++++ b/src/codegen/config.cpp
+@@ -126,6 +126,8 @@
+             hasBool("musttail_calls"), "musttail_calls");
+   MergeBool(cfg.vmxVectorFallbacks, toml["vmx_vector_fallbacks"].value_or(false),
+             hasBool("vmx_vector_fallbacks"), "vmx_vector_fallbacks");
++  MergeBool(cfg.db16cycPause, toml["db16cyc_pause"].value_or(false), hasBool("db16cyc_pause"),
++            "db16cyc_pause");
+   if (hasBool("is_dll")) {
+     cfg.isDll = toml["is_dll"].value_or(false);
+   }
+diff --git a/src/codegen/builders/system.cpp b/src/codegen/builders/system.cpp
+--- a/src/codegen/builders/system.cpp
++++ b/src/codegen/builders/system.cpp
+@@ -49,8 +49,12 @@
+ }
+ 
+ bool build_db16cyc(BuilderContext& ctx) {
+-  // Xenon-specific 16-cycle delay hint, no effect in recompiled code
+-  (void)ctx;
++  // Xenon-specific 16-cycle delay hint. By default it emits nothing (no effect in
++  // recompiled code). With db16cyc_pause each one emits a spin-wait hint, so a
++  // guest delay loop yields to the sibling hyperthread instead of running empty.
++  // simde_mm_pause() is x86 PAUSE here and is already in the generated pch.
++  if (ctx.config().db16cycPause)
++    ctx.println("\tsimde_mm_pause();");
+   return true;
+ }
+ 

@@ -1,0 +1,13 @@
+diff --git a/bench/agent8/run/sys_summary.py b/bench/agent8/run/sys_summary.py
+index f2f12d6..de771ad 100644
+--- a/bench/agent8/run/sys_summary.py
++++ b/bench/agent8/run/sys_summary.py
+@@ -67,7 +67,7 @@ def load(path):
+     if not lines or not lines[0].strip():
+         raise CsvError("no complete header line in %s" % path)
+     header = [h.strip() for h in next(csv.reader([lines[0]]))]
+-    info["header_ok"] = header == COLUMNS
++    info["header_ok"] = header[:len(COLUMNS)] == COLUMNS  # extra columns after the known ones (pkg_w ...) are allowed
+     info["missing_columns"] = [c for c in COLUMNS if c not in header]
+     if "t_s" not in header or "epoch_s" not in header:
+         raise CsvError("not a sys.csv (no t_s / epoch_s column): %s" % path)

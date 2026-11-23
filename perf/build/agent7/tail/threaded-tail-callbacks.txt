@@ -1,0 +1,130 @@
+threaded_tail.py: slow frames = interval_ms > 33 ms; runner window from frames.json
+
+====================================================================================================
+n0  (build\agent8\matrix\20261122-0452\runs\0452-n0-r1)
+window: frames.json source=native first_row=8879 rows=6063 -> native rows [8879, 14942) 0-based (first_row-0); mean 9.8975 vs frames.json 9.8975, n 6063 vs 6063: MATCH; perf window shifted +1 row
+frames 6063 over 60.009 s = 101.04 fps; mean 9.898, p50 9.265, p95 15.853, p99 23.736, p99.9 34.853, max 53.888 ms; 1% low (mean of the slowest 1%) 35.19 fps; > 33 ms: 8
+histogram (ms: frames, %% of frames, %% of window time):
+  <=5: 52 0.9% 0.4%  5-8: 1173 19.3% 13.2%  8-12: 3941 65.0% 62.6%  12-16.7: 652 10.8% 14.9%  16.7-20: 124 2.0% 3.8%  20-25: 77 1.3% 2.9%  25-33: 36 0.6% 1.6%  33-40: 3 0.0% 0.2%  40-50: 4 0.1% 0.3%  50-70: 1 0.0% 0.1%
+  time above the median spent in slow frames: 0.26 s of 60.01 s (0.4%)
+per 10 s bin (window s; proc s = window start 69.01 s after launch; gpu/proc columns are means of their 1 s samples):
+  window s  frames     fps     p50     p99  >thr   gpu %  gr MHz  cores
+     0-10     1130   113.0    8.80   17.33     0       -       -   1.97
+    10-20     1210   121.1    8.31   12.64     0       -       -   2.08
+    20-30      951    95.0    9.55   25.43     0       -       -   1.85
+    30-40      962    96.2    9.57   22.75     1       -       -   1.86
+    40-50      930    93.0    9.75   27.22     4       -       -   1.86
+    50-60      879    87.9   10.60   27.49     3       -       -   1.86
+    60-70        1   105.6    9.47    9.47     0       -       -   1.97
+slow frames: 8 in 7 cluster(s) (<= 3 frames apart); cluster sizes: 6x1, 1x2
+  gaps between slow frames: frames median 18 (min 2, max 1217); seconds median 0.26, p10 0.05, p90 12.78, max 12.78; CV 1.64
+  per-second slow counts: seconds with >= 1: 4 of 61; max 4; Fano 2.62
+  first slow frames at window s: 36.23, 49.01, 49.06, 49.24, 49.86, 50.12, 50.33, 55.03
+  median interval around a slow frame (window median 9.26): -3: 12.65  -2: 11.67  -1: 14.45  +0: 41.47  +1: 12.93  +2: 14.66  +3: 16.39
+  next frame < 0.5 x median (catch-up): 0 of 8
+perf.csv aligned with shift +1 (mean |perf frame_time - interval| 0.025 ms)
+columns vs slow frames (constant columns left out; rho = Spearman with interval_ms over the window; pms = per-ms share in slow / other frames):
+  column                                all       slow      other   nz_s   nz_o    rho  rho-1  rho+1    pms
+  swap_present_cpu_ms                 1.598       8.12       1.59   1.00   1.00   0.63   0.17   0.17   1.22
+  callbacks_executed                      8      8.625      7.999   1.00   1.00   0.08  -0.02  -0.06   0.26
+  callbacks_pending                   4.955      4.375      4.956   0.88   0.99  -0.08   0.02   0.00   0.21
+  perf.buffer_queue_depth             7.279      7.625      7.278   1.00   0.92   0.26   0.06   0.07   0.25
+  perf.functions_dispatched           1.856          7      1.849   1.00   0.93   0.52   0.13   0.13   0.91
+  -- other columns by |rho| --
+  perf.frame_time_us                   9898  4.142e+04       9856   1.00   1.00   1.00   0.24   0.24   1.01
+  perf.fps                            103.3      72.25      103.4   1.00   1.00  -0.45  -0.44  -0.45   0.17
+  constant or missing focus columns: sync_calls, sync_ms, sync_other_ms, sync_idle_ms, sync_fence_ms, sync_resource_ms, sync_callback_ms, sync_query_begin_ms, sync_query_release_ms, cpu_resource_wait_skips, frame_slot_wait_calls, frame_slot_wait_ms, pipeline_creations, pipeline_creation_ms, temporal_pipeline_creations, present_cpu_ms, acquire_cpu_ms, present_submit_cpu_ms, callbacks_enqueued, bindings_ms, begin_ms, pipeline_ms, issue_ms, tail_ms, texture_ms, constants_ms, vertices_ms, buffer_hash_ms, draw_calls, buffer_converted_bytes
+  cond callbacks_executed >= 16: 0 frames (0.0/min); P(> 33 ms | >=) - (0), P(> 33 ms | <) 0.0013 (8); 0.00 of the slow frames have it; median interval >= - vs < 9.26 ms
+  cond callbacks_executed >= 50: 0 frames (0.0/min); P(> 33 ms | >=) - (0), P(> 33 ms | <) 0.0013 (8); 0.00 of the slow frames have it; median interval >= - vs < 9.26 ms
+  cond callbacks_pending >= 64: 0 frames (0.0/min); P(> 33 ms | >=) - (0), P(> 33 ms | <) 0.0013 (8); 0.00 of the slow frames have it; median interval >= - vs < 9.26 ms
+  split swap_present_cpu_ms, frames >33 ms (8): mean interval 41.20 (median 9.26), mean swap_present_cpu_ms 8.12 (median 1.39); share of the excess 21%, per-frame median 1% (p25 1%, p75 38%)
+  split swap_present_cpu_ms, frames 20-33 ms (113): mean interval 23.89 (median 9.26), mean swap_present_cpu_ms 3.40 (median 1.39); share of the excess 14%, per-frame median 5% (p25 0%, p75 12%)
+
+====================================================================================================
+n2  (build\agent8\matrix\20261122-0452\runs\0454-n2-r1)
+window: frames.json source=native first_row=9166 rows=6578 -> native rows [9166, 15744) 0-based (first_row-0); mean 9.1219 vs frames.json 9.1219, n 6578 vs 6578: MATCH; perf window shifted +1 row
+frames 6578 over 60.004 s = 109.63 fps; mean 9.122, p50 7.212, p95 21.640, p99 33.693, p99.9 54.463, max 70.818 ms; 1% low (mean of the slowest 1%) 23.22 fps; > 33 ms: 74
+histogram (ms: frames, %% of frames, %% of window time):
+  <=5: 154 2.3% 1.2%  5-8: 3983 60.6% 43.0%  8-12: 1513 23.0% 23.7%  12-16.7: 373 5.7% 8.7%  16.7-20: 159 2.4% 4.8%  20-25: 192 2.9% 7.2%  25-33: 130 2.0% 6.1%  33-40: 40 0.6% 2.4%  40-50: 20 0.3% 1.5%  50-70: 13 0.2% 1.2%  >70: 1 0.0% 0.1%
+  time above the median spent in slow frames: 2.57 s of 60.00 s (4.3%)
+per 10 s bin (window s; proc s = window start 69.02 s after launch; gpu/proc columns are means of their 1 s samples):
+  window s  frames     fps     p50     p99  >thr   gpu %  gr MHz  cores
+     0-10     1327   132.8    6.67   23.23     2       -       -   1.87
+    10-20     1310   130.9    6.55   26.04     5       -       -   1.81
+    20-30      932    93.4    8.52   34.62    15       -       -   1.89
+    30-40      865    86.4    8.08   38.79    16       -       -   1.68
+    40-50      899    89.9    7.72   46.54    32       -       -   1.76
+    50-60     1244   124.4    7.17   21.58     4       -       -   1.99
+    60-70        1   114.5    8.74    8.74     0       -       -      -
+slow frames: 74 in 72 cluster(s) (<= 3 frames apart); cluster sizes: 70x1, 2x2
+  gaps between slow frames: frames median 35 (min 1, max 948); seconds median 0.44, p10 0.07, p90 1.51, max 7.25; CV 1.45
+  per-second slow counts: seconds with >= 1: 39 of 61; max 6; Fano 1.68
+  first slow frames at window s: 2.95, 4.48, 11.73, 12.55, 13.37, 14.88, 16.04, 20.67, 21.46, 22.29, 23.69, 24.38
+  median interval around a slow frame (window median 7.21): -3: 8.38  -2: 7.74  -1: 7.31  +0: 39.58  +1: 7.04  +2: 8.04  +3: 7.17
+  next frame < 0.5 x median (catch-up): 0 of 74
+perf.csv aligned with shift +1 (mean |perf frame_time - interval| 0.008 ms)
+columns vs slow frames (constant columns left out; rho = Spearman with interval_ms over the window; pms = per-ms share in slow / other frames):
+  column                                all       slow      other   nz_s   nz_o    rho  rho-1  rho+1    pms
+  swap_present_cpu_ms                 1.399      15.03      1.244   1.00   1.00   0.45  -0.05  -0.03   2.52
+  callbacks_executed                  7.999      6.608      8.015   0.45   0.46   0.29  -0.21  -0.38   0.17
+  callbacks_pending                   14.09      14.65      14.08   1.00   1.00  -0.26   0.18   0.32   0.22
+  perf.buffer_queue_depth              5.88      7.149      5.865   0.96   0.76   0.13  -0.06  -0.05   0.25
+  perf.functions_dispatched           1.692      7.622      1.625   0.96   0.78   0.42  -0.05  -0.06   0.98
+  -- other columns by |rho| --
+  perf.frame_time_us                   9122  4.188e+04       8749   1.00   1.00   1.00  -0.14  -0.14   1.00
+  perf.fps                            113.5      92.07      113.7   1.00   1.00  -0.28  -0.28  -0.28   0.17
+  constant or missing focus columns: sync_calls, sync_ms, sync_other_ms, sync_idle_ms, sync_fence_ms, sync_resource_ms, sync_callback_ms, sync_query_begin_ms, sync_query_release_ms, cpu_resource_wait_skips, frame_slot_wait_calls, frame_slot_wait_ms, pipeline_creations, pipeline_creation_ms, temporal_pipeline_creations, present_cpu_ms, acquire_cpu_ms, present_submit_cpu_ms, callbacks_enqueued, bindings_ms, begin_ms, pipeline_ms, issue_ms, tail_ms, texture_ms, constants_ms, vertices_ms, buffer_hash_ms, draw_calls, buffer_converted_bytes
+  cond callbacks_executed >= 16: 2680 frames (2679.8/min); P(> 33 ms | >=) 0.007 (20), P(> 33 ms | <) 0.0139 (54); 0.27 of the slow frames have it; median interval >= 7.64 vs < 6.69 ms
+  cond callbacks_executed >= 50: 1 frames (1.0/min); P(> 33 ms | >=) 0.000 (0), P(> 33 ms | <) 0.0113 (74); 0.00 of the slow frames have it; median interval >= 10.95 vs < 7.21 ms
+  cond callbacks_pending >= 64: 1 frames (1.0/min); P(> 33 ms | >=) 0.000 (0), P(> 33 ms | <) 0.0113 (74); 0.00 of the slow frames have it; median interval >= 7.06 vs < 7.21 ms
+  split swap_present_cpu_ms, frames >33 ms (74): mean interval 41.88 (median 7.21), mean swap_present_cpu_ms 15.03 (median 0.95); share of the excess 41%, per-frame median 2% (p25 0%, p75 99%)
+  split swap_present_cpu_ms, frames 20-33 ms (322): mean interval 24.81 (median 7.21), mean swap_present_cpu_ms 3.66 (median 0.95); share of the excess 15%, per-frame median 2% (p25 0%, p75 4%)
+
+====================================================================================================
+n3  (build\agent8\matrix\20261122-0452\runs\0456-n3-r1)
+window: frames.json source=native first_row=9239 rows=7003 -> native rows [9239, 16242) 0-based (first_row-0); mean 8.5686 vs frames.json 8.5686, n 7003 vs 7003: MATCH; perf window shifted +1 row
+frames 7003 over 60.006 s = 116.71 fps; mean 8.569, p50 6.679, p95 19.553, p99 32.260, p99.9 51.439, max 65.533 ms; 1% low (mean of the slowest 1%) 24.13 fps; > 33 ms: 68
+histogram (ms: frames, %% of frames, %% of window time):
+  <=5: 300 4.3% 2.3%  5-8: 4553 65.0% 47.8%  8-12: 1246 17.8% 19.7%  12-16.7: 416 5.9% 9.7%  16.7-20: 147 2.1% 4.4%  20-25: 147 2.1% 5.5%  25-33: 126 1.8% 5.9%  33-40: 37 0.5% 2.2%  40-50: 21 0.3% 1.5%  50-70: 10 0.1% 0.9%
+  time above the median spent in slow frames: 2.38 s of 60.01 s (4.0%)
+per 10 s bin (window s; proc s = window start 68.03 s after launch; gpu/proc columns are means of their 1 s samples):
+  window s  frames     fps     p50     p99  >thr   gpu %  gr MHz  cores
+     0-10      888    88.9    9.47   31.80     7       -       -   1.86
+    10-20     1115   111.4    6.99   31.34    10       -       -   1.98
+    20-30     1414   141.4    6.26   22.35     2       -       -   2.35
+    30-40      959    95.9    6.85   46.73    44       -       -   1.79
+    40-50     1180   118.1    6.46   28.80     4       -       -   2.10
+    50-60     1446   144.4    6.24   16.65     1       -       -   2.40
+    60-70        1   173.9    5.75    5.75     0       -       -      -
+slow frames: 68 in 65 cluster(s) (<= 3 frames apart); cluster sizes: 62x1, 3x2
+  gaps between slow frames: frames median 18 (min 1, max 1521); seconds median 0.19, p10 0.07, p90 1.72, max 10.52; CV 2.08
+  per-second slow counts: seconds with >= 1: 26 of 61; max 11; Fano 3.68
+  first slow frames at window s: 1.63, 3.70, 3.77, 7.32, 7.37, 8.37, 9.06, 10.71, 13.07, 13.14, 13.26, 13.40
+  median interval around a slow frame (window median 6.68): -3: 7.29  -2: 7.20  -1: 6.83  +0: 39.02  +1: 7.18  +2: 7.42  +3: 7.06
+  next frame < 0.5 x median (catch-up): 0 of 68
+perf.csv aligned with shift +1 (mean |perf frame_time - interval| 0.036 ms)
+columns vs slow frames (constant columns left out; rho = Spearman with interval_ms over the window; pms = per-ms share in slow / other frames):
+  column                                all       slow      other   nz_s   nz_o    rho  rho-1  rho+1    pms
+  swap_present_cpu_ms                   2.5       15.8      2.369   1.00   1.00   0.66   0.18   0.21   1.32
+  callbacks_executed                  8.019       8.75      8.012   0.71   0.81  -0.09  -0.10  -0.09   0.22
+  callbacks_pending                    28.6      37.79      28.51   1.00   1.00   0.10   0.14   0.10   0.26
+  perf.buffer_queue_depth             5.965      7.735      5.948   1.00   0.76   0.26   0.04   0.00   0.26
+  perf.functions_dispatched           1.605      7.824      1.544   1.00   0.78   0.50   0.08   0.05   1.00
+  -- other columns by |rho| --
+  perf.frame_time_us                   8569  4.113e+04       8249   1.00   1.00   1.00   0.13   0.14   0.99
+  perf.fps                            121.1      94.28      121.3   1.00   1.00  -0.39  -0.39  -0.39   0.15
+  constant or missing focus columns: sync_calls, sync_ms, sync_other_ms, sync_idle_ms, sync_fence_ms, sync_resource_ms, sync_callback_ms, sync_query_begin_ms, sync_query_release_ms, cpu_resource_wait_skips, frame_slot_wait_calls, frame_slot_wait_ms, pipeline_creations, pipeline_creation_ms, temporal_pipeline_creations, present_cpu_ms, acquire_cpu_ms, present_submit_cpu_ms, callbacks_enqueued, bindings_ms, begin_ms, pipeline_ms, issue_ms, tail_ms, texture_ms, constants_ms, vertices_ms, buffer_hash_ms, draw_calls, buffer_converted_bytes
+  cond callbacks_executed >= 16: 910 frames (909.9/min); P(> 33 ms | >=) 0.010 (9), P(> 33 ms | <) 0.0097 (59); 0.13 of the slow frames have it; median interval >= 7.18 vs < 6.62 ms
+  cond callbacks_executed >= 50: 84 frames (84.0/min); P(> 33 ms | >=) 0.012 (1), P(> 33 ms | <) 0.0097 (67); 0.01 of the slow frames have it; median interval >= 11.53 vs < 6.66 ms
+  cond callbacks_pending >= 64: 682 frames (681.9/min); P(> 33 ms | >=) 0.015 (10), P(> 33 ms | <) 0.0092 (58); 0.15 of the slow frames have it; median interval >= 7.21 vs < 6.64 ms
+  split swap_present_cpu_ms, frames >33 ms (68): mean interval 41.69 (median 6.68), mean swap_present_cpu_ms 15.80 (median 1.73); share of the excess 40%, per-frame median 7% (p25 1%, p75 99%)
+  split swap_present_cpu_ms, frames 20-33 ms (273): mean interval 25.03 (median 6.68), mean swap_present_cpu_ms 8.23 (median 1.73); share of the excess 35%, per-frame median 10% (p25 2%, p75 90%)
+
+====================================================================================================
+side by side: mean over the window / mean in slow frames / rho
+  column                                        n0 (8 slow)               n2 (74 slow)               n3 (68 slow)
+  swap_present_cpu_ms                     1.6 / 8.12 / 0.63            1.4 / 15 / 0.45          2.5 / 15.8 / 0.66
+  callbacks_executed                        8 / 8.62 / 0.08            8 / 6.61 / 0.29        8.02 / 8.75 / -0.09
+  callbacks_pending                     4.95 / 4.38 / -0.08        14.1 / 14.6 / -0.26         28.6 / 37.8 / 0.10
+  perf.buffer_queue_depth                7.28 / 7.62 / 0.26         5.88 / 7.15 / 0.13         5.97 / 7.74 / 0.26
+  perf.functions_dispatched                 1.86 / 7 / 0.52         1.69 / 7.62 / 0.42         1.61 / 7.82 / 0.50

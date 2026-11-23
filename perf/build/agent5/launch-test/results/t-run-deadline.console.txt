@@ -1,0 +1,280 @@
+2026-11-22 22:13:52 [dry] launcher start: DRY RUN, files in <workspace>\bench\agent5\launch\status-dryrun\t-run-deadline; pid 32480; PowerShell 5.1.26100.10068; repo <workspace>
+2026-11-22 22:13:52 [dry] dry-run hooks: -DryRunTag t-run-deadline -SkipStartChecks True -MatrixDir build\agent5\launch-test -PollSeconds 1 -SampleSeconds 1 -MaxGo 1 -GateFixture <workspace>\build\agent5\launch-test\gate-quiet.json -FakeRunner <workspace>\build\agent5\launch-test\fake-runner.ps1 -StopAt 2026-11-22 22:36 -GraceMinutes -17.69
+2026-11-22 22:13:52 [dry] start checks: desktop 'WinSta0\exebox-AWCLA7JRX7DBFNVTEKQ7VU4PRX'; LogonUI not running; power AC (ACLineStatus 1, BatteryFlag 1, battery 100 %); ends at 2026-11-22 22:36:00; latest window start 2026-11-22 22:36:00; a window still running at 2026-11-22 22:18:18 is stopped
+2026-11-22 22:13:52 [dry] start checks would refuse: this is desktop 'WinSta0\exebox-AWCLA7JRX7DBFNVTEKQ7VU4PRX', not the user's own desktop WinSta0\Default (ignored: -DryRun -SkipStartChecks)
+2026-11-22 22:13:54 [dry] pinned 19 files (status: pins.txt)
+2026-11-22 22:13:54 [dry] environment: no other REX_*/LEGO_* variables
+2026-11-22 22:13:54 [dry] console Quick Edit: not changed in a dry run
+2026-11-22 22:13:54 [dry] screensaver: would set (None) (now ScreenSaveActive=0, SCRNSAVE.EXE '') and restore it at the end
+2026-11-22 22:13:54 [dry] keep-awake: would request SetThreadExecutionState(continuous+system+display) until the end
+2026-11-22 22:13:54 [dry] waiting for <workspace>\bench\agent5\launch\status-dryrun\t-run-deadline\WINDOW-GO.txt (checked every 1 s) until 2026-11-22 22:36:00, or until <workspace>\bench\agent5\launch\status-dryrun\t-run-deadline\WINDOW-STOP.txt appears
+2026-11-22 22:13:56 [dry] GO read and deleted: 'GO T1 t-good.json 4D7D689B799F6102E6325B4CED12688E60F1D2FCE82397C06956574B2B025DFD only=base,s0 repeats=1'
+2026-11-22 22:14:03 [dry] HOLD written: <workspace>\bench\agent5\launch\status-dryrun\t-run-deadline\WINDOW-HOLD.txt
+2026-11-22 22:14:05 [dry] GO ACCEPTED: window T1: t-good.json (sha256 ok), only=base,s0, repeats=1; runner estimate 3 runs, about 7 min
+2026-11-22 22:14:05 [dry] bin build/agent2/devoff3-bin/legodimensions.exe sha256 2522D43605D8A9BF2A5EEE31490E6C349274D3258C8E0E1474DBB561CDE86F57
+2026-11-22 22:14:05 [dry] bin build/agent2/devoff3-bin/MANIFEST.txt sha256 B9C5175DA19042353A084E355CBA22D09C50A6B8CE95A1E0A8B17BF64E40FEFE
+2026-11-22 22:14:05 [dry] bin build/agent2/devoff4-bin/legodimensions.exe sha256 6BE3C713229232B29C183D27B397A3560B46E2279C6AF47C64CF8A2EFA287376
+2026-11-22 22:14:05 [dry] bin build/agent2/devoff4-bin/MANIFEST.txt sha256 16DCC9399239E5774BF571869B5248DF36DB0D374BF6A159BF1A9839784CAD6D
+2026-11-22 22:14:05 [dry] WARN: run-matrix.ps1 -PlanOnly says: note     Timing comes only from this double-click run on the unlocked desktop (screensaver None, AC power, hands off). Agent runs of this matrix (-Quick, hidden desktop) are functional only.
+2026-11-22 22:14:05 [dry] WARN: run-matrix.ps1 -PlanOnly says: desktop    WinSta0\exebox-AWCLA7JRX7DBFNVTEKQ7VU4PRX -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+2026-11-22 22:14:05 [dry] programs (GO accepted): none running (ChatGPT, Copilot app, Roblox player or Store app, Task Manager, Wallpaper Engine)
+2026-11-22 22:14:05 [dry] gate: simulated samples from <workspace>\build\agent5\launch-test\gate-quiet.json (fields set to 'real' use this PC)
+2026-11-22 22:14:06 [dry] gate 1 (+0 min): cpu n/a; builds none; RAM 12 GB; C: 50 GB; LogonUI False; AC True -> wait: 0 of 3 consecutive one-minute CPU averages so far
+2026-11-22 22:14:07 [dry] gate 2 (+0.1 min): cpu MsMpEng 0.02, OfficeClickToRun 0.00, CrossDeviceService 0.01; builds none; RAM 12 GB; C: 50 GB; LogonUI False; AC True -> wait: 1 of 3 consecutive one-minute CPU averages so far
+2026-11-22 22:14:08 [dry] gate 3 (+0.1 min): cpu MsMpEng 0.02, OfficeClickToRun 0.00, CrossDeviceService 0.01; builds none; RAM 12 GB; C: 50 GB; LogonUI False; AC True -> wait: 2 of 3 consecutive one-minute CPU averages so far
+2026-11-22 22:14:08 [dry] gate 4 (+0.1 min): cpu MsMpEng 0.02, OfficeClickToRun 0.00, CrossDeviceService 0.01; builds none; RAM 12 GB; C: 50 GB; LogonUI False; AC True -> PASS
+22:14:08 quiet gate: STRICT (MsMpEng 0.02/0.02/0.02, OfficeClickToRun 0.00/0.00/0.00, CrossDeviceService 0.01/0.01/0.01)
+2026-11-22 22:14:09 [dry] programs (window start): none running (ChatGPT, Copilot app, Roblox player or Store app, Task Manager, Wallpaper Engine)
+2026-11-22 22:14:11 [dry] last checks would refuse: this is desktop 'WinSta0\exebox-AWCLA7JRX7DBFNVTEKQ7VU4PRX', not the user's own desktop WinSta0\Default (ignored: -DryRun -SkipStartChecks)
+2026-11-22 22:14:11 [dry] bins unchanged since the GO (4 files)
+2026-11-22 22:14:11 [dry] power scheme at the start: Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+2026-11-22 22:14:11 [dry] DRY RUN, would start window T1 now, without REX_TIMER_WAIT_BLOCKING / LEGO_GPU_WAIT_STATS / LEGO_GPU_WAIT_BACKOFF_US / LEGO_GPU_WAIT_SPIN_US / LEGO_NATIVE_FRAME_METRICS / LEGO_NATIVE_SHADER_MISS_CACHE / LEGO_NATIVE_THREADED / LEGO_NATIVE_PREPARE_THREADS / LEGO_NATIVE_SNAPSHOT_STATE / LEGO_NATIVE_FULL_DRAW_PREPARATION / LEGO_NATIVE_CHAIN_PRIORITY in its environment:
+2026-11-22 22:14:11 [dry]   "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File <workspace>\bench\agent8\run\run-matrix.ps1 -Matrix <workspace>\build\agent5\launch-test\t-good.json -Only base,s0 -Repeats 1 -ColdShared -NoPrompt
+2026-11-22 22:14:11 [dry] DRY RUN with -FakeRunner: the fake runner below runs instead (tests the run, STOP and end-time handling)
+2026-11-22 22:14:11 [dry] window T1 START (estimate 7 min, about 22:21): "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File <workspace>\build\agent5\launch-test\fake-runner.ps1 -Dir <workspace>\bench\agent5\launch\status-dryrun\t-run-deadline
+2026-11-22 22:14:11 [dry] runner pid 30816; a STOP file, or the end time 2026-11-22 22:18:18, stops it and everything it started
+fake runner pid 30816 starting (seconds 600, exit 0, child 600 s)
+fake runner stderr line
+fake child pid 38252
+out dir: <workspace>\bench\agent5\launch\status-dryrun\t-run-deadline\fake-out
+fake run tick 1
+fake run tick 2
+fake run tick 3
+fake run tick 4
+fake run tick 5
+fake run tick 6
+fake run tick 7
+fake run tick 8
+fake run tick 9
+fake run tick 10
+fake run tick 11
+fake run tick 12
+fake run tick 13
+fake run tick 14
+fake run tick 15
+fake run tick 16
+fake run tick 17
+fake run tick 18
+fake run tick 19
+fake run tick 20
+fake run tick 21
+fake run tick 22
+fake run tick 23
+fake run tick 24
+fake run tick 25
+fake run tick 26
+fake run tick 27
+fake run tick 28
+fake run tick 29
+fake run tick 30
+fake run tick 31
+fake run tick 32
+fake run tick 33
+fake run tick 34
+fake run tick 35
+fake run tick 36
+fake run tick 37
+fake run tick 38
+fake run tick 39
+fake run tick 40
+fake run tick 41
+fake run tick 42
+fake run tick 43
+fake run tick 44
+fake run tick 45
+fake run tick 46
+fake run tick 47
+fake run tick 48
+fake run tick 49
+fake run tick 50
+fake run tick 51
+fake run tick 52
+fake run tick 53
+fake run tick 54
+fake run tick 55
+fake run tick 56
+fake run tick 57
+fake run tick 58
+fake run tick 59
+fake run tick 60
+fake run tick 61
+fake run tick 62
+fake run tick 63
+fake run tick 64
+fake run tick 65
+fake run tick 66
+fake run tick 67
+fake run tick 68
+fake run tick 69
+fake run tick 70
+fake run tick 71
+fake run tick 72
+fake run tick 73
+fake run tick 74
+fake run tick 75
+fake run tick 76
+fake run tick 77
+fake run tick 78
+fake run tick 79
+fake run tick 80
+fake run tick 81
+fake run tick 82
+fake run tick 83
+fake run tick 84
+fake run tick 85
+fake run tick 86
+fake run tick 87
+fake run tick 88
+fake run tick 89
+fake run tick 90
+fake run tick 91
+fake run tick 92
+fake run tick 93
+fake run tick 94
+fake run tick 95
+fake run tick 96
+fake run tick 97
+fake run tick 98
+fake run tick 99
+fake run tick 100
+fake run tick 101
+fake run tick 102
+fake run tick 103
+fake run tick 104
+fake run tick 105
+fake run tick 106
+fake run tick 107
+fake run tick 108
+fake run tick 109
+fake run tick 110
+fake run tick 111
+fake run tick 112
+fake run tick 113
+fake run tick 114
+fake run tick 115
+fake run tick 116
+fake run tick 117
+fake run tick 118
+fake run tick 119
+fake run tick 120
+fake run tick 121
+fake run tick 122
+fake run tick 123
+fake run tick 124
+fake run tick 125
+fake run tick 126
+fake run tick 127
+fake run tick 128
+fake run tick 129
+fake run tick 130
+fake run tick 131
+fake run tick 132
+fake run tick 133
+fake run tick 134
+fake run tick 135
+fake run tick 136
+fake run tick 137
+fake run tick 138
+fake run tick 139
+fake run tick 140
+fake run tick 141
+fake run tick 142
+fake run tick 143
+fake run tick 144
+fake run tick 145
+fake run tick 146
+fake run tick 147
+fake run tick 148
+fake run tick 149
+fake run tick 150
+fake run tick 151
+fake run tick 152
+fake run tick 153
+fake run tick 154
+fake run tick 155
+fake run tick 156
+fake run tick 157
+fake run tick 158
+fake run tick 159
+fake run tick 160
+fake run tick 161
+fake run tick 162
+fake run tick 163
+fake run tick 164
+fake run tick 165
+fake run tick 166
+fake run tick 167
+fake run tick 168
+fake run tick 169
+fake run tick 170
+fake run tick 171
+fake run tick 172
+fake run tick 173
+fake run tick 174
+fake run tick 175
+fake run tick 176
+fake run tick 177
+fake run tick 178
+fake run tick 179
+fake run tick 180
+fake run tick 181
+fake run tick 182
+fake run tick 183
+fake run tick 184
+fake run tick 185
+fake run tick 186
+fake run tick 187
+fake run tick 188
+fake run tick 189
+fake run tick 190
+fake run tick 191
+fake run tick 192
+fake run tick 193
+fake run tick 194
+fake run tick 195
+fake run tick 196
+fake run tick 197
+fake run tick 198
+fake run tick 199
+fake run tick 200
+fake run tick 201
+fake run tick 202
+fake run tick 203
+fake run tick 204
+fake run tick 205
+fake run tick 206
+fake run tick 207
+fake run tick 208
+fake run tick 209
+fake run tick 210
+fake run tick 211
+fake run tick 212
+fake run tick 213
+fake run tick 214
+fake run tick 215
+fake run tick 216
+fake run tick 217
+fake run tick 218
+fake run tick 219
+fake run tick 220
+fake run tick 221
+fake run tick 222
+fake run tick 223
+fake run tick 224
+fake run tick 225
+fake run tick 226
+fake run tick 227
+fake run tick 228
+fake run tick 229
+fake run tick 230
+fake run tick 231
+fake run tick 232
+fake run tick 233
+2026-11-22 22:18:19 [dry] !!! end time 2026-11-22 22:36:00 + -17.69 min (2026-11-22 22:18:18) reached: the runner (pid 30816) and every process it started are killed now
+2026-11-22 22:18:19 [dry] runner pid 30816 killed
+2026-11-22 22:18:25 [dry] killed (walk 1): powershell.exe:38252, conhost.exe:14256 (ended on its own)
+2026-11-22 22:18:28 [dry] runner stopped: yes
+2026-11-22 22:18:38 [dry] window T1 END: runner exit -1 (stopped early: end time 2026-11-22 22:36:00 + -17.69 min (2026-11-22 22:18:18) reached; the runner and everything it started were killed) after 4.3 min; out dir <workspace>\bench\agent5\launch\status-dryrun\t-run-deadline\fake-out
+2026-11-22 22:18:38 [dry] HOLD removed
+2026-11-22 22:18:38 [dry] -MaxGo 1 reached: the launcher ends
+2026-11-22 22:18:39 [dry] launcher end: -MaxGo, exit 0

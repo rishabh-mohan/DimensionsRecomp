@@ -1,0 +1,432 @@
+{
+  "run": "<workspace>\\build\\agent4\\s35\\run-071627",
+  "checks": [
+    {
+      "name": "inputs: exactly the 4 pinned placement containers, structure OK",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "runtime cache: declared entry count equals the parsed rows",
+      "ok": true,
+      "detail": "declared 4, parsed 4"
+    },
+    {
+      "name": "ps-75A4D1ABA62F7594.bin: every index row has stage 1",
+      "ok": true,
+      "detail": [
+        1,
+        1
+      ]
+    },
+    {
+      "name": "ps-75A4D1ABA62F7594.bin: whole-physical-section signature, size 208 (literal block included)",
+      "ok": true,
+      "detail": [
+        144,
+        208
+      ]
+    },
+    {
+      "name": "ps-75A4D1ABA62F7594.bin: instruction-stream signature, offset 64 size 144",
+      "ok": true,
+      "detail": [
+        144,
+        208
+      ]
+    },
+    {
+      "name": "ps-75A4D1ABA62F7594.bin: compiled into runtime-cache.cpp (DXIL present)",
+      "ok": true,
+      "detail": "dxilSize 4644"
+    },
+    {
+      "name": "ps-E81FD692C3AB35E1.bin: every index row has stage 1",
+      "ok": true,
+      "detail": [
+        1,
+        1
+      ]
+    },
+    {
+      "name": "ps-E81FD692C3AB35E1.bin: whole-physical-section signature, size 184 (literal block included)",
+      "ok": true,
+      "detail": [
+        120,
+        184
+      ]
+    },
+    {
+      "name": "ps-E81FD692C3AB35E1.bin: instruction-stream signature, offset 64 size 120",
+      "ok": true,
+      "detail": [
+        120,
+        184
+      ]
+    },
+    {
+      "name": "ps-E81FD692C3AB35E1.bin: compiled into runtime-cache.cpp (DXIL present)",
+      "ok": true,
+      "detail": "dxilSize 3772"
+    },
+    {
+      "name": "vs-ACAF01F01E1C03D2.bin: every index row has stage 0",
+      "ok": true,
+      "detail": [
+        0
+      ]
+    },
+    {
+      "name": "vs-ACAF01F01E1C03D2.bin: whole-physical-section signature, size 324 (literal block included)",
+      "ok": true,
+      "detail": [
+        324
+      ]
+    },
+    {
+      "name": "vs-ACAF01F01E1C03D2.bin: instruction-stream signature, offset 0 size 324",
+      "ok": true,
+      "detail": [
+        324
+      ]
+    },
+    {
+      "name": "vs-ACAF01F01E1C03D2.bin: compiled into runtime-cache.cpp (DXIL present)",
+      "ok": true,
+      "detail": "dxilSize 5420"
+    },
+    {
+      "name": "vs-CCD7655302B54D80.bin: every index row has stage 0",
+      "ok": true,
+      "detail": [
+        0
+      ]
+    },
+    {
+      "name": "vs-CCD7655302B54D80.bin: whole-physical-section signature, size 288 (literal block included)",
+      "ok": true,
+      "detail": [
+        288
+      ]
+    },
+    {
+      "name": "vs-CCD7655302B54D80.bin: instruction-stream signature, offset 0 size 288",
+      "ok": true,
+      "detail": [
+        288
+      ]
+    },
+    {
+      "name": "vs-CCD7655302B54D80.bin: compiled into runtime-cache.cpp (DXIL present)",
+      "ok": true,
+      "detail": "dxilSize 5100"
+    },
+    {
+      "name": "runtime cache: exactly one entry per container, nothing else",
+      "ok": true,
+      "detail": [
+        "75A4D1ABA62F7594",
+        "ACAF01F01E1C03D2",
+        "CCD7655302B54D80",
+        "E81FD692C3AB35E1"
+      ]
+    },
+    {
+      "name": "merge: every old record preserved (19116)",
+      "ok": true,
+      "detail": 0
+    },
+    {
+      "name": "merge: new index = old + addition, no duplicates",
+      "ok": true,
+      "detail": "19122 rows, 19122 unique"
+    },
+    {
+      "name": "merge: added records are exactly the addition",
+      "ok": true,
+      "detail": 6
+    },
+    {
+      "name": "merge-report.json agrees",
+      "ok": true,
+      "detail": {
+        "before": 19116,
+        "addition": 6,
+        "after": 19122,
+        "added": 6,
+        "preserved_all_old_records": true,
+        "included_all_addition_records": true
+      }
+    },
+    {
+      "name": "negative control: none of the 4 container hashes is in the old index (why they missed)",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "negative control: none of the new signatures is in the old index",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "main cache (9601 entries) does not already contain the 4 containers",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "lookup: production FindShaderByMicrocode resolves all 4 (physical and instruction sections)",
+      "ok": true,
+      "detail": "PASS: 4 captured containers, physical and instruction sections resolve to their exact compiled shader through production lookup"
+    },
+    {
+      "name": "lookup-main: production FindShaderByMicrocode resolves all 4 (physical and instruction sections)",
+      "ok": true,
+      "detail": "PASS: 4 captured containers, physical and instruction sections resolve to their exact compiled shader through production lookup"
+    }
+  ],
+  "containers": [
+    {
+      "file": "ps-75A4D1ABA62F7594.bin",
+      "label": "placement PS 0xAC448F28 (backing 0xED23D540, zero-prefix bucket)",
+      "bytes": 1716,
+      "sha256": "09D05274AFBC26A2605D0B91E5C2A0E0C95303C4C0C84F4D463105EB678D66EE",
+      "problems": [],
+      "flags": "102A1100",
+      "virtual_size": 1504,
+      "physical_size": 208,
+      "marker": true,
+      "physical_base": 1508,
+      "stage": 1,
+      "microcode_offset": 64,
+      "microcode_size": 144,
+      "physical_first_words": "00000000 00000000 00000000 00000000",
+      "container_hash": "75A4D1ABA62F7594",
+      "container_hash_source": "file name = container hash",
+      "index_rows": [
+        {
+          "prefix": "C77B3ABB6F87ACD9",
+          "microcode_hash": "0DD13E570A16128B",
+          "size": 208,
+          "stage": 1,
+          "texture_mask": "00000001"
+        },
+        {
+          "prefix": "D86762B2726966CC",
+          "microcode_hash": "D7F9D5BAED92E535",
+          "size": 144,
+          "stage": 1,
+          "texture_mask": "00000001"
+        }
+      ],
+      "spec_constants_mask": 2
+    },
+    {
+      "file": "ps-E81FD692C3AB35E1.bin",
+      "label": "second placement PS (pairs with vs-CCD76553)",
+      "bytes": 1640,
+      "sha256": "58B4FA21E35500529895AA400F4B307F0DD09BBBBDB71F5C7C8E8748B31170F1",
+      "problems": [],
+      "flags": "102A1100",
+      "virtual_size": 1452,
+      "physical_size": 184,
+      "marker": true,
+      "physical_base": 1456,
+      "stage": 1,
+      "microcode_offset": 64,
+      "microcode_size": 120,
+      "physical_first_words": "00000000 00000000 00000000 00000000",
+      "container_hash": "E81FD692C3AB35E1",
+      "container_hash_source": "file name = container hash",
+      "index_rows": [
+        {
+          "prefix": "C77B3ABB6F87ACD9",
+          "microcode_hash": "7143F73A2A70F633",
+          "size": 184,
+          "stage": 1,
+          "texture_mask": "00000000"
+        },
+        {
+          "prefix": "F96898C29CD2C2A3",
+          "microcode_hash": "1ACEA61058153A20",
+          "size": 120,
+          "stage": 1,
+          "texture_mask": "00000000"
+        }
+      ],
+      "spec_constants_mask": 2
+    },
+    {
+      "file": "vs-ACAF01F01E1C03D2.bin",
+      "label": "placement VS 0xAC449538 (backing 0xED23D3E0)",
+      "bytes": 1304,
+      "sha256": "6C4F65C3161DF6BEE23F9C551F34971D60275BB49C3DB6327CFF9084F4317A66",
+      "problems": [],
+      "flags": "102A1101",
+      "virtual_size": 976,
+      "physical_size": 324,
+      "marker": true,
+      "physical_base": 980,
+      "stage": 0,
+      "microcode_offset": 0,
+      "microcode_size": 324,
+      "physical_first_words": "F2556004 600A1200 12000000 00006010",
+      "container_hash": "ACAF01F01E1C03D2",
+      "container_hash_source": "file name = container hash",
+      "index_rows": [
+        {
+          "prefix": "DCD4AD8441398283",
+          "microcode_hash": "033935513ABF2DCB",
+          "size": 324,
+          "stage": 0,
+          "texture_mask": "00000000"
+        }
+      ],
+      "spec_constants_mask": 1
+    },
+    {
+      "file": "vs-CCD7655302B54D80.bin",
+      "label": "second placement VS (pairs with ps-E81FD692)",
+      "bytes": 944,
+      "sha256": "F4EE30B28DEE9E4AB5AE2E9204D54195A0AC9D8D5497B7F2C8FAC11D90EEC65E",
+      "problems": [],
+      "flags": "102A1101",
+      "virtual_size": 652,
+      "physical_size": 288,
+      "marker": true,
+      "physical_base": 656,
+      "stage": 0,
+      "microcode_offset": 0,
+      "microcode_size": 288,
+      "physical_first_words": "70956004 600A1200 12000000 00005010",
+      "container_hash": "CCD7655302B54D80",
+      "container_hash_source": "file name = container hash",
+      "index_rows": [
+        {
+          "prefix": "98D43959C65B882A",
+          "microcode_hash": "3720347783993E3D",
+          "size": 288,
+          "stage": 0,
+          "texture_mask": "00000000"
+        }
+      ],
+      "spec_constants_mask": 1
+    }
+  ],
+  "runtime_cache": {
+    "sha256": "AEA36683202B97535C52DFA7D7548EEBA1D3512E70717C2DE381FB59CC29A734",
+    "bytes": 33765,
+    "sizes": {
+      "g_shaderCacheEntryCount": 4,
+      "g_dxilCacheCompressedSize": 9340,
+      "g_dxilCacheDecompressedSize": 18936,
+      "g_spirvCacheCompressedSize": 9,
+      "g_spirvCacheDecompressedSize": 0
+    },
+    "entries": [
+      {
+        "hash": "75A4D1ABA62F7594",
+        "dxilOffset": 0,
+        "dxilSize": 4644,
+        "spirvOffset": 0,
+        "spirvSize": 0,
+        "specConstantsMask": 2
+      },
+      {
+        "hash": "ACAF01F01E1C03D2",
+        "dxilOffset": 4644,
+        "dxilSize": 5420,
+        "spirvOffset": 0,
+        "spirvSize": 0,
+        "specConstantsMask": 1
+      },
+      {
+        "hash": "CCD7655302B54D80",
+        "dxilOffset": 10064,
+        "dxilSize": 5100,
+        "spirvOffset": 0,
+        "spirvSize": 0,
+        "specConstantsMask": 1
+      },
+      {
+        "hash": "E81FD692C3AB35E1",
+        "dxilOffset": 15164,
+        "dxilSize": 3772,
+        "spirvOffset": 0,
+        "spirvSize": 0,
+        "specConstantsMask": 2
+      }
+    ]
+  },
+  "index": {
+    "old_rows": 19116,
+    "addition_rows": 6,
+    "new_rows": 19122,
+    "added_rows": 6,
+    "new_sha256": "E4C05782462452C3104A165AF588F21F42910FBD07A75A0071A34F89E3060617",
+    "addition_sha256": "154242FB07BEDC92075585D96C714CFA5273824EEE4B5FA9690F46CFBD3398F6"
+  },
+  "merge_report": {
+    "before": 19116,
+    "addition": 6,
+    "after": 19122,
+    "added": 6,
+    "preserved_all_old_records": true,
+    "included_all_addition_records": true
+  },
+  "main_cache": {
+    "entries": 9601,
+    "declared": 9601
+  },
+  "prefix_buckets": [
+    {
+      "prefix": "D86762B2726966CC",
+      "stage": 1,
+      "size": 144,
+      "container": "75A4D1ABA62F7594",
+      "old_rows_same_prefix_and_stage": 180
+    },
+    {
+      "prefix": "C77B3ABB6F87ACD9",
+      "stage": 1,
+      "size": 208,
+      "container": "75A4D1ABA62F7594",
+      "old_rows_same_prefix_and_stage": 6636
+    },
+    {
+      "prefix": "DCD4AD8441398283",
+      "stage": 0,
+      "size": 324,
+      "container": "ACAF01F01E1C03D2",
+      "old_rows_same_prefix_and_stage": 21
+    },
+    {
+      "prefix": "98D43959C65B882A",
+      "stage": 0,
+      "size": 288,
+      "container": "CCD7655302B54D80",
+      "old_rows_same_prefix_and_stage": 22
+    },
+    {
+      "prefix": "F96898C29CD2C2A3",
+      "stage": 1,
+      "size": 120,
+      "container": "E81FD692C3AB35E1",
+      "old_rows_same_prefix_and_stage": 0
+    },
+    {
+      "prefix": "C77B3ABB6F87ACD9",
+      "stage": 1,
+      "size": 184,
+      "container": "E81FD692C3AB35E1",
+      "old_rows_same_prefix_and_stage": 6636
+    }
+  ],
+  "hlsl_dump": [
+    "ps-75A4D1ABA62F7594.hlsl",
+    "ps-E81FD692C3AB35E1.hlsl",
+    "vs-ACAF01F01E1C03D2.hlsl",
+    "vs-CCD7655302B54D80.hlsl"
+  ],
+  "fails": [],
+  "verdict": "PASS"
+}

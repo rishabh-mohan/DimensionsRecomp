@@ -1,0 +1,49 @@
+profile : <workspace>\build\agent8\profiler\synth\c_mode1.bin
+map     : <workspace>\build\agent8\profiler\synth\synthgame.map
+samples : 2170  threads: 5  modules: 3  duration: 2.000 s (trailer)  rounds: 1000
+counting: busy samples (1170)
+
+busy 1170 (53.9%)  waiting 1000 (46.1%)  io 0 (0.0%)
+busy samples by category (leaf): guest 625 (53.4%)  native-gpu 300 (25.6%)  rexlego 45 (3.8%)  d3d12+driver 100 (8.5%)  unknown 100 (8.5%)
+
+== threads ==
+tid  name          samples   run%  busy  wait  io  top busy functions / role
+---  ------------  -------  -----  ----  ----  --  --------------------------------------------------------------------------------------------------------------------
+300  synth-waiter     1000    0.0     0  1000   0  (waiting) synth::Pump
+100  synth-main        650  100.0   650     0   0  sub_82000280 [guest 0x82000280] 62%; sub_820002C0 [guest 0x820002C0] 31%; sub_8201C740 [hook of guest 0x8201C740] 4%
+200  synth-render      300  100.0   300     0   0  legodimensions::gpu_native::Renderer::Draw 100%
+500                    120  100.0   120     0   0  synthgame.exe!? 42%; [unknown] 42%; synth::Same0 {+2 aliases} 17%
+400  synth-driver      100  100.0   100     0   0  nvsynthumd64.dll!? 100%
+
+== top 9 by self (busy samples) ==
+samples      %     /s  category      function
+-------  -----  -----  ------------  -------------------------------------------------------
+    400  34.19  200.0  guest         sub_82000280 [guest 0x82000280]
+    300  25.64  150.0  native-gpu    legodimensions::gpu_native::Renderer::Draw
+    200  17.09  100.0  guest         sub_820002C0 [guest 0x820002C0]
+    100   8.55   50.0  d3d12+driver  nvsynthumd64.dll!?
+     50   4.27   25.0  unknown       synthgame.exe!?
+     50   4.27   25.0  unknown       [unknown]
+     25   2.14   12.5  rexlego       sub_8201C740 [hook of guest 0x8201C740]
+     25   2.14   12.5  guest         __imp__sub_8201C740 [guest 0x8201C740, hooked original]
+     20   1.71   10.0  rexlego       synth::Same0 {+2 aliases}
+
+== top 14 by inclusive (busy samples) ==
+samples      %     /s  category      function
+-------  -----  -----  ------------  -------------------------------------------------------
+    950  81.20  475.0  rexlego       mainCRTStartup
+    650  55.56  325.0  rexlego       synth::RunGuest
+    600  51.28  300.0  guest         sub_82000300 [guest 0x82000300]
+    600  51.28  300.0  rexlego       synth::Dispatch
+    520  44.44  260.0  rexlego       synth::Pump
+    400  34.19  200.0  guest         sub_82000280 [guest 0x82000280]
+    400  34.19  200.0  native-gpu    legodimensions::gpu_native::Renderer::Draw
+    200  17.09  100.0  guest         sub_820002C0 [guest 0x820002C0]
+    100   8.55   50.0  d3d12+driver  nvsynthumd64.dll!?
+     50   4.27   25.0  rexlego       sub_8201C740 [hook of guest 0x8201C740]
+     50   4.27   25.0  unknown       synthgame.exe!?
+     50   4.27   25.0  unknown       [unknown]
+     25   2.14   12.5  guest         __imp__sub_8201C740 [guest 0x8201C740, hooked original]
+     20   1.71   10.0  rexlego       synth::Same0 {+2 aliases}
+
+(read 0.005 s, map 1.37 s, symbolize 0.053 s; 2135 unique stacks, 2131 addresses, 16 functions)

@@ -1,0 +1,96 @@
+﻿diff --git a/baseline/DimensionsRecomp/rexlego/src/gpu_native/textures.cpp b/DimensionsRecomp/rexlego/src/gpu_native/textures.cpp
+index a1dbcb3..22b861a 100644
+--- a/baseline/DimensionsRecomp/rexlego/src/gpu_native/textures.cpp
++++ b/DimensionsRecomp/rexlego/src/gpu_native/textures.cpp
+@@ -44,10 +44,11 @@
+ #include "gpu_native/texture_upload_cache.h"
+ #include "gpu_native/texture_upload_source.h"
+ #include "gpu_native/texture_upload_publication.h"
+ #include "gpu_native/texture_volume_upload.h"
+ #include "gpu_native/texture_alpha4_upload.h"
++#include "gpu_native/texture_scratch.h"
+ #include "gpu_native/long_probe.h"
+ #include "gpu_native/memory_watch.h"
+ #include "gpu_native/depth_alias.h"
+ #include "gpu_native/texture_depth_upload.h"
+ #include "gpu_native/texture_readback.h"
+@@ -2186,17 +2187,22 @@ bool UploadTextureResourceStorage(u32 guest_address,
+     }
+     if (!upload_size_wide || upload_size_wide > UINT32_MAX) return false;
+     const u32 upload_size = static_cast<u32>(upload_size_wide);
+     // Untiling, diagnostics and the decoded-content hash need CPU reads.
+     // Keep those in normal RAM; UPLOAD memory must be a write-only destination.
+-    std::vector<u8> decoded(upload_size);
++    // The per-thread scratch is not zero-filled: the loop zeroes each 512-byte
++    // alignment gap, and each level's row padding and tail before its copier
++    // runs, since every byte is hashed and staged.
++    TextureDecodeScratch decoded(upload_size);
+     auto* mapped = decoded.data();
+     u32 destination_offset = 0;
+     for (u32 subresource = 0; subresource < faces * resource->levels; ++subresource) {
+       const u32 face = subresource / resource->levels;
+       const u32 level = subresource % resource->levels;
+-      destination_offset = AlignUp(destination_offset, 512);
++      const u32 aligned_offset = AlignUp(destination_offset, 512);
++      std::memset(mapped + destination_offset, 0, aligned_offset - destination_offset);
++      destination_offset = aligned_offset;
+       const u32 packed_level = std::min(level, layout.packed_level);
+       const auto& guest_level = level == 0 ? layout.base : layout.mips[packed_level];
+       const u64 base_wide = (level == 0 ? u64(u32(fetch.base_address) << 12)
+           : u64(u32(fetch.mip_address) << 12) + layout.mip_offsets_bytes[packed_level]) +
+           u64(face) * guest_level.array_slice_stride_bytes;
+@@ -2218,10 +2224,12 @@ bool UploadTextureResourceStorage(u32 guest_address,
+                                level, offset_x, offset_y, offset_z);
+       const u32 width = MipDimension(resource->width, level);
+       const u32 height = MipDimension(resource->height, level);
+       const u32 pitch = RowPitch(resource->format, width);
+       if (alpha4) {
++        ZeroTextureRowPadding({mapped + destination_offset, LevelSize(*resource, level)}, pitch,
++            width, u64(height) * (volume ? MipDimension(resource->depth, level) : 1));
+         const bool copied = CopyTextureAlpha4Blocks(
+             {source, TextureEndianExtent(guest_level.array_slice_data_extent_bytes,endian_xor)},
+             {mapped + destination_offset, LevelSize(*resource, level)},
+             width, height, volume ? MipDimension(resource->depth, level) : 1,
+             pitch, endian_xor, [&](u32 x, u32 y, u32 z) -> int64_t {
+@@ -2238,10 +2246,13 @@ bool UploadTextureResourceStorage(u32 guest_address,
+         destination_offset += LevelSize(*resource, level);
+         continue;
+       }
+       if (volume) {
+         const u32 block_height = format_info->block_height;
++        ZeroTextureRowPadding({mapped + destination_offset, LevelSize(*resource, level)}, pitch,
++            u64((width + block_width - 1) / block_width) * block_bytes,
++            u64((height + block_height - 1) / block_height) * MipDimension(resource->depth, level));
+         const bool copied = CopyTextureVolumeBlocks(
+             {source, TextureEndianExtent(guest_level.array_slice_data_extent_bytes,endian_xor)},
+             {mapped + destination_offset, LevelSize(*resource, level)},
+             (width + block_width - 1) / block_width,
+             (height + block_height - 1) / block_height,
+@@ -2257,19 +2268,24 @@ bool UploadTextureResourceStorage(u32 guest_address,
+             });
+         if (!copied) return false;
+         destination_offset += LevelSize(*resource, level);
+         continue;
+       }
++      ZeroTextureRowPadding({mapped + destination_offset, LevelSize(*resource, level)}, pitch,
++          u64((width + block_width - 1) / block_width) * block_bytes,
++          (height + format_info->block_height - 1) / format_info->block_height);
+       // The checked block copier also handles one 2D/cube slice. Validate each
+       // computed address, including endian XOR and packed-mip offsets, against
+-      // the same guest extent whose residency was checked above.
+-      const bool copied = CopyTextureVolumeBlocks(
++      // the same guest extent whose residency was checked above. The layout
++      // lets it copy whole tile runs/rows; the callback is the reference path.
++      const bool copied = CopyTexture2DBlocks(
+           {source, TextureEndianExtent(guest_level.array_slice_data_extent_bytes,endian_xor)},
+           {mapped + destination_offset, LevelSize(*resource, level)},
+           (width + block_width - 1) / block_width,
+           (height + format_info->block_height - 1) / format_info->block_height,
+-          1, block_bytes, pitch, endian_xor,
++          block_bytes, pitch, endian_xor,
++          {fetch.tiled != 0, offset_x, offset_y, guest_level.row_pitch_bytes},
+           [&](u32 x, u32 y, u32) -> int64_t {
+             if (fetch.tiled)
+               return tu::GetTiledOffset2D(x + offset_x, y + offset_y,
+                   guest_level.row_pitch_bytes / block_bytes, rex::log2_floor(block_bytes));
+             return u64(y + offset_y) * guest_level.row_pitch_bytes +

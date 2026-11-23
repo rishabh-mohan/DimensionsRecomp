@@ -1,0 +1,64 @@
+# cg26_check.py (Agent 9, run-2 task #18)  2026-11-22 22:28:50  kit sha256 E246936B51EB7C6A
+# arm A; R2.17 sites sub_83FAF180 TU107 x8, sub_83F99F80 TU116 x2, sub_83F9A5B0 TU321 x2, sub_83FCB608 TU205 x2, sub_83E66CD8 TU169 x1, sub_83EA90D0 TU153 x1, sub_83E63F38 TU432 x1, sub_83E96348 TU304 x1, sub_83E70320 TU284 x1, sub_83E64900 TU125 x1
+# gen    build\agent9\cg26-check\mock\rexlego\generated  (codegen dir default)
+# ref    build\agent2\snap1\DimensionsRecomp\rexlego\generated
+# config build\agent9\cg26-check\mock\rexlego\legodimensions_config.toml
+# tool   build\agent2\cg26\tool\rexglue.exe
+# bin    build\agent9\cg26-check\mock\bin
+# scanned 887 + 887 files, 980.0 MB, 139.4 s
+== (a) the toml line and the new codegen tool are in the same build
+PASS config toml has exactly one root-level 'db16cyc_pause = true' (before the first [table]): line 24
+PASS config toml minus that line == the arm-A base toml 7F775847DB9CC2DA: 7F775847DB9CC2DA
+NOTE config toml sha256 11707872E82D8B52 == Agent 9 staged new-A toml (HASHES.txt)
+PASS codegen.d names a config toml with this content: <workspace>/build/agent9/cg26-check/mock/rexlego/legodimensions_config.toml 11707872E82D8B52
+PASS codegen.stamp is a version-1 stamp with a fingerprint: b3bccb3c76fc31afbec121ecee459527
+PASS codegen.build.stamp == the codegen.stamp fingerprint (one regen wrote both): b3bccb3c76fc31afbec121ecee459527 vs b3bccb3c76fc31afbec121ecee459527
+PASS the fingerprint differs from the reference (the inputs changed since the reference): gen b3bccb3c76fc31afbec121ecee459527, ref 58c23c7e7cdb95afd17a35c5148cb3e9
+PASS the stamp lists the same outputs as the reference (883)
+PASS every stamp output exists
+PASS the regen ran after the toml landed: codegen.stamp 2026-11-22 22:28:33, toml 2026-11-22 22:18:18
+PASS the tool has the db16cyc_pause option (sha256 9145166CDBEF5500): 'db16cyc_pause' yes, '\tsimde_mm_pause();' yes
+PASS the regen emitted the pauses (both the toml line and the new tool were in effect): 20 of 20
+NOTE the bin MANIFEST names: the tool sha256 yes, the config toml sha256 yes, ON TU sha256s 10/10
+PASS the staged exe is newer than the regen: exe 2026-11-22 22:28:34, newest of the 10 TUs 2026-11-22 22:28:33
+== (b) the 20 pause sites
+PASS the reference has the 20 db16cyc sites in the arm-A TUs: 20 sites in 10 TUs
+PASS the reference has no _mm_pause text
+PASS gen has the same db16cyc comment lines per TU as the reference: 20 sites in 10 TUs
+PASS exactly 20 pause lines (\tsimde_mm_pause();): 20
+PASS no other '_mm_pause' text anywhere in gen (887 files scanned): 20 occurrence(s) in 10 file(s)
+PASS no pause outside the arm-A 10 TUs
+PASS every pause is in its expected function and TU
+PASS every pause line directly follows a '\t// db16cyc ' line
+PASS per-function pause counts == R2.17 (8, 2, 2, 2 and six 1s): 10 functions
+PASS TU107 sub_83FAF180: 8 pause line(s), one after each db16cyc site; minus them == the reference: inserted 8, db16cyc sites without a pause 0, rest identical yes
+PASS TU116 sub_83F99F80: 2 pause line(s), one after each db16cyc site; minus them == the reference: inserted 2, db16cyc sites without a pause 0, rest identical yes
+PASS TU125 sub_83E64900: 1 pause line(s), one after each db16cyc site; minus them == the reference: inserted 1, db16cyc sites without a pause 0, rest identical yes
+PASS TU153 sub_83EA90D0: 1 pause line(s), one after each db16cyc site; minus them == the reference: inserted 1, db16cyc sites without a pause 0, rest identical yes
+PASS TU169 sub_83E66CD8: 1 pause line(s), one after each db16cyc site; minus them == the reference: inserted 1, db16cyc sites without a pause 0, rest identical yes
+PASS TU205 sub_83FCB608: 2 pause line(s), one after each db16cyc site; minus them == the reference: inserted 2, db16cyc sites without a pause 0, rest identical yes
+PASS TU284 sub_83E70320: 1 pause line(s), one after each db16cyc site; minus them == the reference: inserted 1, db16cyc sites without a pause 0, rest identical yes
+PASS TU304 sub_83E96348: 1 pause line(s), one after each db16cyc site; minus them == the reference: inserted 1, db16cyc sites without a pause 0, rest identical yes
+PASS TU321 sub_83F9A5B0: 2 pause line(s), one after each db16cyc site; minus them == the reference: inserted 2, db16cyc sites without a pause 0, rest identical yes
+PASS TU432 sub_83E63F38: 1 pause line(s), one after each db16cyc site; minus them == the reference: inserted 1, db16cyc sites without a pause 0, rest identical yes
+== (c) codegen.partition.json and the rest of the tree unchanged
+PASS same file list as the reference: 887 files
+PASS no file differs except the 10 TUs and the 3 stamp files: 13 differ: codegen.build.stamp codegen.d codegen.stamp legodimensions_recomp.107.cpp legodimensions_recomp.116.cpp legodimensions_recomp.125.cpp legodimensions_recomp.153.cpp legodimensions_recomp.169.cpp legodimensions_recomp.205.cpp legodimensions_recomp.284.cpp legodimensions_recomp.304.cpp legodimensions_recomp.321.cpp legodimensions_recomp.432.cpp
+PASS codegen.partition.json unchanged: gen 22C9D89BEA8E8C6E, ref 22C9D89BEA8E8C6E
+PASS codegen.partition.json is the arm-A sidecar 22C9D89BEA8E8C6E: 22C9D89BEA8E8C6E
+PASS sources.cmake unchanged: 941C165E7B669CE4
+PASS legodimensions_funcs.h unchanged: 76EFB251276CB23D
+PASS legodimensions_init.cpp unchanged: C2B065A262CCABDB
+PASS legodimensions_init.h unchanged: D4FB8E763E0E22BA
+PASS legodimensions_register.cpp unchanged: 747F2EDADBF61A24
+PASS legodimensions_pch.h unchanged: 61BFA4CCB81A9D46
+PASS every header unchanged (441 .h files)
+NOTE codegen.stamp differs from the reference (expected after a regen)
+NOTE codegen.build.stamp differs from the reference (expected after a regen)
+NOTE codegen.d differs from the reference (expected after a regen)
+== (d) the staged bin MANIFEST
+PASS MANIFEST build\agent9\cg26-check\mock\bin\MANIFEST.txt has hash rows: 3 rows
+PASS legodimensions.exe sha256 and size == MANIFEST: DE067EDDED1155CC 2880 B
+PASS legodimensions.map sha256 and size == MANIFEST: 165737B8F4B57C7C 640 B
+PASS rexruntime.dll sha256 and size == MANIFEST: B25ECC6165974850 1024 B
+RESULT: PASS  (144.6 s)

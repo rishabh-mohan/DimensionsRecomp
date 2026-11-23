@@ -1,0 +1,77 @@
+﻿{
+    "harness":  "harness/run-game.ps1",
+    "mode":  "FUNCTIONAL ONLY (hidden desktop exebox-JGWR2SVEU4PVVYD7BE2KMKVWMX), NOT FOR TIMING",
+    "desktop":  "exebox-JGWR2SVEU4PVVYD7BE2KMKVWMX",
+    "tag":  "crash",
+    "run_dir":  "<workspace>\\build\\agent3\\selftest-runs\\20261122-041258-crash",
+    "bin_dir":  "<workspace>\\build\\agent3\\selftest-bin",
+    "exe":  "<workspace>\\build\\agent3\\selftest-runs\\20261122-041258-crash\\fakedimensions.exe",
+    "exe_sha256":  "4CC21280DFD7E5151824B113AEE02B32F47CD06ABE0A3888D7966D4EE742DDEF",
+    "map":  "<workspace>\\build\\agent3\\selftest-runs\\20261122-041258-crash\\fakedimensions.map",
+    "files_linked":  5,
+    "files_copied":  0,
+    "cwd":  "<workspace>\\build\\agent3\\selftest-runs\\20261122-041258-crash",
+    "command_line":  "fakedimensions.exe --log_file=<workspace>\\build\\agent3\\selftest-runs\\20261122-041258-crash\\game.log --log_flush_interval=1 --perf_log_csv=<workspace>\\build\\agent3\\selftest-runs\\20261122-041258-crash\\perf.csv --native_settings_load=false --discord_rpc=false --audio_mute=true --pause_when_unfocused=false --fake_crash_after=4",
+    "env":  {
+                "LEGO_NATIVE_FRAME_METRICS":  "<workspace>\\build\\agent3\\selftest-runs\\20261122-041258-crash\\frames.csv"
+            },
+    "cvars":  {
+
+              },
+    "user_data_root":  "<workspace>\\build\\agent3\\selftest-runs\\20261122-041258-crash\\user",
+    "toml_sha256_before":  "AF38F264A41AD6D0258B6F9E6C93BD3DDDB066AEAF4DD6457FA213A8B334299C",
+    "toml_sha256_after":  "AF38F264A41AD6D0258B6F9E6C93BD3DDDB066AEAF4DD6457FA213A8B334299C",
+    "toml_rewritten":  false,
+    "started":  "2026-11-22T04:13:01.4040416-06:00",
+    "started_epoch_s":  1795342381.404,
+    "pid":  21772,
+    "seconds_requested":  25,
+    "warmup_s":  2,
+    "elapsed_s":  17.39,
+    "exited_early":  false,
+    "exit_code":  -1,
+    "exit_code_hex":  "0xFFFFFFFF",
+    "close_method":  "killed",
+    "close_seconds":  10.17,
+    "close_sent_s":  7.22,
+    "close_timeout":  10,
+    "windows_at_close":  [
+                             "UAC_InputIndicatorOverlayWnd||0x0|bg|",
+                             "UAC Input Indicator||0x0|bg|",
+                             "WindowsForms10.Window.8.app.0.34f5582_r6_ad1|Fake Dimensions (harness self-test)|960x540|bg|"
+                         ],
+    "wer_seen":  true,
+    "crash_events":  [
+                         {
+                             "id":  1000,
+                             "provider":  "Application Error",
+                             "time":  "2026-11-22T04:13:06.8377404-06:00",
+                             "summary":  "Faulting application name: fakedimensions.exe, version: 0.0.0.0, time stamp: 0x6b02bff4 Faulting module name: KERNELBASE.dll, version: 10.0.26100.9974, time stamp: 0xa3ff6954 Exception code: 0xe0434352 Fault offset: 0x00000000000c569a Faulting process id: 0x550C Faulting application start time: 0x1D"
+                         },
+                         {
+                             "id":  1026,
+                             "provider":  ".NET Runtime",
+                             "time":  "2026-11-22T04:13:05.7492867-06:00",
+                             "summary":  "Application: fakedimensions.exe Framework Version: v4.0.30319 Description: The process was terminated due to an unhandled exception. Exception Info: System.InvalidOperationException at FakeGame.Present() at System.Windows.Forms.Timer.OnTick(System.EventArgs) at System.Windows.Forms.Timer+TimerNative"
+                         }
+                     ],
+    "dumps":  [
+
+              ],
+    "process":  {
+                    "cpu_s":  0.4,
+                    "avg_cores":  0.02,
+                    "peak_ws_mb":  39,
+                    "peak_private_mb":  25,
+                    "peak_threads":  15,
+                    "samples":  7
+                },
+    "log_bytes":  1280,
+    "perf_csv_bytes":  10395,
+    "frames_csv_bytes":  5991,
+    "profile":  null,
+    "input_script":  null,
+    "gpu_log":  {
+
+                }
+}

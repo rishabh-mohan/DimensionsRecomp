@@ -1,0 +1,18 @@
+--- A/snap1/sub_82A333B8
++++ B/snapB3/sub_82A333B8
+@@ -1,5 +1,6 @@
+ DEFINE_REX_FUNC(sub_82A333B8) {
+ 	REX_FUNC_PROLOGUE();
++	PPCXERRegister xer{};
+ 	uint32_t ea{};
+ 	// mflr r12
+ 	ctx.r12.u64 = ctx.lr;
+@@ -32,7 +33,7 @@
+ 	// subf r9,r11,r10
+ 	ctx.r9.u64 = ctx.r10.u64 - ctx.r11.u64;
+ 	// sradi r8,r9,32
+-	ctx.xer.ca = (ctx.r9.s64 < 0) & ((ctx.r9.u64 & 0xFFFFFFFF) != 0);
++	xer.ca = (ctx.r9.s64 < 0) & ((ctx.r9.u64 & 0xFFFFFFFF) != 0);
+ 	ctx.r8.s64 = ctx.r9.s64 >> 32;
+ 	// stw r9,0(r31)
+ 	REX_STORE_U32(ctx.r31.u32 + 0, ctx.r9.u32);

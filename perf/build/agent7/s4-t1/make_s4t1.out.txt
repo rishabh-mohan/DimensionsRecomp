@@ -1,0 +1,59 @@
+make_s4t1.py: S4-T1 (#21) staging against build/agent2/snap1/DimensionsRecomp/rexlego
+  native_worker.cpp: + 1 lines after before-L5 (after-L6-L6): include
+  native_worker.cpp: + 1 lines after before-L154 (after-L156-L156): RecorderMain (th3)
+  native_worker.cpp: + 1 lines after before-L199 (after-L202-L202): CoordinatorMain (th3 worker thread)
+  native_worker.cpp: + 1 lines after before-L261 (after-L265-L265): WorkerMain (th2 worker thread)
+  native_worker.cpp: +37 lines after before-L328 (after-L333-L369): helper definition (named namespace, after NativeWorkerEnabled)
+  native_recording.cpp: + 1 lines after before-L112 (after-L113-L113): RecordingQueue thread "Native GPU recording" (th2-type)
+  native_preparation.h: + 8 lines after before-L13 (after-L14-L21): declaration
+  native_preparation.h: + 1 lines after before-L26 (after-L35-L35): prep pool thread "Native GPU prepare N"
+
+PROOF 1 (additive only): difflib opcodes are equal/insert only; 0 deleted or changed lines
+  native_worker.cpp: +41 -0
+  native_recording.cpp: +1 -0
+  native_preparation.h: +9 -0
+  s4-t1.diff: +51 -0
+PROOF 2 (reversible): removing the inserted lines from after/ gives the before bytes (sha256 equal)
+  native_worker.cpp: 7157E8F2EDC3D5C438E3F2F21B50051693A3046B36A4BD8EE096901DF8FE0E2F == before
+  native_recording.cpp: 48F0C429DDB89E452794365788C8B34EA9510A4B10B86F93771F418F3E53AA9B == before
+  native_preparation.h: 889F3FA6F207011B03D044E745C2952C68200A44C99BE6E13EB810357D3D41A5 == before
+PROOF 3 (call sites): inside pre-existing code the only inserted statements are
+  ApplyNativeChainPriority("<literal>"); each directly after the thread's SetThreadDescription line
+  native_worker.cpp after-L333-L369: new block (37 lines, all inserted)
+  native_preparation.h after-L14-L21: new block (8 lines, all inserted)
+  native_worker.cpp after-L156: ApplyNativeChainPriority("recorder");   <- after-L155: SetThreadDescription(GetCurrentThread(), L"Native GPU recording");
+  native_worker.cpp after-L202: ApplyNativeChainPriority("coordinator");   <- after-L201: SetThreadDescription(GetCurrentThread(), L"Native GPU preparation");
+  native_worker.cpp after-L265: ApplyNativeChainPriority("worker");   <- after-L264: SetThreadDescription(GetCurrentThread(), NativePrepareEnabled() ? L"Na
+  native_recording.cpp after-L113: ApplyNativeChainPriority("recording queue");   <- after-L112: SetThreadDescription(GetCurrentThread(), L"Native GPU recording");
+  native_preparation.h after-L35: ApplyNativeChainPriority("prepare");   <- after-L34: SetThreadDescription(GetCurrentThread(), name.c_str());
+  call sites: 5 (prepare, recording queue, recorder, coordinator, worker)
+PROOF 4 (unset path): in the helper, the unset return precedes the first log, and
+  "if (mode == 0) return;" precedes every Win32 call and the per-thread log
+  unset return at helper L8 < first log L11 < "mode == 0" return L14 < Win32 calls L15-L28 and per-thread log L27
+  header wrapper ApplyNativeChainPriority: one statement, calls the hook only when it is set; the hook
+  starts null (constant init); native_worker.cpp's installer only stores &ApplyNativeChainPriorityImpl
+  (no Win32 call, no log, before main). So with the variable unset, legodimensions reaches only the
+  getenv-then-return above, and builds without native_worker.cpp make no call at all
+PROOF 5 (untouched): existing lines still present exactly once
+  native_worker.cpp after-L390: SetThreadPriority(g_thread.native_handle(), THREAD_PRIORITY_ABOVE_NORMAL);
+  native_worker.cpp after-L387: if (NativeFullDrawPreparationEnabled()) g_recorder_thread = std::thread(RecorderMain);
+  native_worker.cpp after-L388: g_thread = std::thread(WorkerMain);
+  native_worker.cpp after-L637: if (g_thread.joinable()) g_thread.join();
+  native_worker.cpp after-L638: if (g_recorder_thread.joinable()) g_recorder_thread.join();
+  native_worker.cpp: SetThreadPriority( occurrences added = 1 (only inside the helper)
+  native_recording.cpp: SetThreadPriority( occurrences added = 0 (only inside the helper)
+  native_preparation.h: SetThreadPriority( occurrences added = 0 (only inside the helper)
+  inserted text has no process-wide/system calls (SetPriorityClass, SetProcessInformation, timeBeginPeriod,
+  affinity/CPU-set calls, power requests, registry)
+PROOF 6 (link closure, review S1): the header and native_recording.cpp add only inline entities and calls,
+  so a build that compiles them without native_worker.cpp (the gpu-aot fixtures) needs no new symbol
+  native_preparation.h adds: inline hook pointer (= nullptr), inline wrapper, 1 call (prepare)
+  native_recording.cpp adds: 1 call (recording queue); no new include, no extern declaration anywhere
+  ApplyNativeChainPriorityImpl (static) appears only in native_worker.cpp at after-L337 (definition) and after-L366 (installer); no name existed before
+
+SHA256 (before -> after):
+  native_worker.cpp: 7157E8F2EDC3D5C438E3F2F21B50051693A3046B36A4BD8EE096901DF8FE0E2F (22262 B, 609 lines) -> 071E2F4B784D40DEF4A58870F438EFDB194B96E2D2FCF0A8349E8DDD7141BFDA (24595 B, 650 lines)
+  native_recording.cpp: 48F0C429DDB89E452794365788C8B34EA9510A4B10B86F93771F418F3E53AA9B (27848 B, 551 lines) -> 00F03D84A0C594FA6DC4850CE36AB77847453A913AA077286F6D0D11B900EC6C (27898 B, 552 lines)
+  native_preparation.h: 889F3FA6F207011B03D044E745C2952C68200A44C99BE6E13EB810357D3D41A5 (2651 B, 84 lines) -> 88C57831AF2B200A36E966C000F4D783004D26EB984A54BDEEADE245709CCFE0 (3198 B, 93 lines)
+  s4-t1.diff: 46FFD2E9044094DCE17C364C382F7BF2563E071E0DF81750C1DE1BC38BE38050 (5165 B)
+ALL PROOFS PASS

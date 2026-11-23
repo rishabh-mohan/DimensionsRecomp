@@ -1,0 +1,130 @@
+checker B perfcheck.py: 2026-11-22T21:11:21
+
+== B6. perf.csv window recomputation (all 16 runs; * = the 3 spot-check runs)
+run                rows  first frames   bad | mean_me   mean_rj   ok   ok-1 ok+1 | med_me  med_rj  ok   | p95 p99 p999 min max | sum_ft_s  window_s  | fps_me    fps_rj    | offset -1/+1 mean,median match
+ 1756-cold-base   37875  25920  11875     0 | 2.5264    2.5264    Y    N    N    | 2.437   2.437   Y    | Y Y Y Y Y | 30.0007   30.0007   | 395.824   395.824   | -1: N,Y +1: N,Y
+ 1757-base-r1     46885  26880  19230     0 | 2.6001    2.6001    Y    Y    Y    | 2.411   2.411   Y    | Y Y Y Y Y | 50.0006   50.0006   | 384.596   384.596   | -1: Y,Y +1: Y,Y
+ 1800-s0-r1       41394  24240  16669     0 | 2.9996    2.9996    Y    Y    N    | 2.687   2.687   Y    | Y Y Y Y Y | 50.0011   50.0011   | 333.373   333.373   | -1: Y,N +1: N,Y
+ 1802-d11-r1      41956  23940  17519     0 | 2.8543    2.8543    Y    N    N    | 2.620   2.620   Y    | Y Y Y Y Y | 50.0052   50.0052   | 350.343   350.343   | -1: N,Y +1: N,N
+ 1804-d11t-r1     42712  25080  16925     0 | 2.9542    2.9542    Y    N    N    | 2.647   2.647   Y    | Y Y Y Y Y | 50.0004   50.0004   | 338.498   338.498   | -1: N,Y +1: N,Y
+ 1806-d11p-r1     41558  23760  17168     0 | 2.9125    2.9125    Y    Y    N    | 2.624   2.624   Y    | Y Y Y Y Y | 50.0023   50.0023   | 343.344   343.344   | -1: Y,Y +1: N,Y
+ 1808-s0-r2       40519  24540  15496     0 | 3.2268    3.2268    Y    Y    Y    | 2.764   2.764   Y    | Y Y Y Y Y | 50.0030   50.0030   | 309.902   309.902   | -1: Y,Y +1: Y,Y
+ 1810-d11-r2      42681  24540  17567     0 | 2.8463    2.8463    Y    N    N    | 2.612   2.612   Y    | Y Y Y Y Y | 50.0005   50.0005   | 351.337   351.337   | -1: N,Y +1: N,Y
+ 1813-d11t-r2     42815  24240  17938     0 | 2.7875    2.7875    Y    Y    N    | 2.547   2.547   Y    | Y Y Y Y Y | 50.0014   50.0014   | 358.750   358.750   | -1: Y,Y +1: N,Y
+ 1815-d11p-r2     42697  24240  17847     0 | 2.8017    2.8017    Y    Y    N    | 2.580   2.580   Y    | Y Y Y Y Y | 50.0019   50.0019   | 356.926   356.926   | -1: Y,Y +1: N,Y
+*1817-base-r2     38704  23700  14462     0 | 3.4574    3.4574    Y    N    N    | 2.931   2.931   Y    | Y Y Y Y Y | 50.0013   50.0013   | 289.232   289.232   | -1: N,Y +1: N,N
+ 1819-d11-r3      40770  22500  17624     0 | 2.8371    2.8371    Y    N    Y    | 2.560   2.560   Y    | Y Y Y Y Y | 50.0016   50.0016   | 352.469   352.469   | -1: N,N +1: Y,Y
+*1821-d11t-r3     33770  19380  13858     0 | 3.6086    3.6086    Y    N    N    | 3.028   3.028   Y    | Y Y Y Y Y | 50.0079   50.0079   | 277.116   277.116   | -1: N,Y +1: N,Y
+ 1823-d11p-r3     42054  24780  16769     0 | 2.9820    2.9820    Y    N    N    | 2.645   2.645   Y    | Y Y Y Y Y | 50.0050   50.0050   | 335.346   335.346   | -1: N,Y +1: N,Y
+*1825-base-r3     42188  23760  17778     0 | 2.8125    2.8125    Y    Y    Y    | 2.546   2.546   Y    | Y Y Y Y Y | 50.0001   50.0001   | 355.559   355.559   | -1: Y,Y +1: Y,Y
+ 1827-s0-r3       41954  23280  18000     0 | 2.7779    2.7779    Y    Y    N    | 2.520   2.520   Y    | Y Y Y Y Y | 50.0017   50.0017   | 359.988   359.988   | -1: Y,Y +1: N,Y
+rows_total in run.json vs parsed: cold-base 37875/37875, base-r1 46885/46885, s0-r1 41394/41394, d11-r1 41956/41956, d11t-r1 42712/42712, d11p-r1 41558/41558, s0-r2 40519/40519, d11-r2 42681/42681, d11t-r2 42815/42815, d11p-r2 42697/42697, base-r2 38704/38704, d11-r3 40770/40770, d11t-r3 33770/33770, d11p-r3 42054/42054, base-r3 42188/42188, s0-r3 41954/41954
+perf.csv header (first run): frame_time_us,fps,draw_calls,command_buffer_stalls,vertices_processed,xma_frames_decoded,audio_frame_latency_us,buffer_queue_depth,functions_dispatched,interrupt_dispatches,active_threads,apc_queue_depth,critical_region_contentions,texture_cache_hits,texture_cache_misses,pipeline_cache_hits,pipeline_cache_misses
+
+per-frame means over the window, constancy checks, threads.csv busy_pct, sys window, gpu.csv:
+run                   fps     bufQ  funcs/f   intr/f | viol draw/vert/actthr    | GPUcmd   Main   X1A8 TimerQ   X144  thr_n |  Putil  E_MHz rows |  Pu_me   E_me rws | gpu.csv throttle counts (0x20 n, t_s range)
+ 1756-cold-base   395.824   2.3588  12.0011  11.5272 | 0/0/0                    |    n/a    n/a    n/a    n/a    n/a    n/a |  77.44   1683   30 |  77.44   1683  30 | n/a
+ 1757-base-r1     384.596   2.4909  12.0887  11.6010 | 0/0/0                    |   70.3   87.8   37.6   39.5   12.3     72 |  73.32   1174   50 |  73.32   1174  50 | {'0x0': 50} (0x20 0, None)
+ 1800-s0-r1       333.373   2.9139  12.5635  12.0010 | 0/0/0                    |   77.0   85.2   41.9   50.6   15.6 72(AC) |  86.44    725   50 |  86.44    725  50 | {'0x0': 50} (0x20 0, None)
+ 1802-d11-r1      350.343   2.8035  12.3900  11.8548 | 0/0/0                    |   74.9   84.8   44.6   49.0   15.0     72 |  84.27    719   50 |  84.27    719  50 | {'0x0': 50} (0x20 0, None)
+ 1804-d11t-r1     338.498   2.9137  12.5086  11.9547 | 0/0/0                    |   73.3   83.6   43.2    4.5   16.0     74 |  82.61    676   50 |  82.61    676  50 | {'0x0': 50} (0x20 0, None)
+ 1806-d11p-r1     343.344   2.8554  12.4591  11.9130 | 0/0/0                    |   74.6   82.5   44.7    5.2   15.3     72 |  82.41    659   51 |  82.41    659  51 | {'0x0': 50} (0x20 0, None)
+ 1808-s0-r2       309.902   3.1689  12.8334  12.2283 | 0/0/0                    |   80.4   77.1   56.2   55.4   19.0     72 |  91.49    597   50 |  91.49    597  50 | {'0x0': 50} (0x20 0, None)
+ 1810-d11-r2      351.337   2.8247  12.3804  11.8467 | 0/0/0                    |   72.8   84.2   43.8   51.1   14.8     72 |  80.91    699   50 |  80.91    699  50 | {'0x0': 50} (0x20 0, None)
+ 1813-d11t-r2     358.750   2.7388  12.3107  11.7879 | 0/0/0                    |   70.8   85.1   40.8    4.0   14.2     72 |  76.37    729   50 |  76.37    729  50 | {'0x0': 32, '0x20': 18} (0x20 18, (28.96, 49.35))
+ 1815-d11p-r2     356.926   2.7796  12.3275  11.8022 | 0/0/0                    |   72.1   83.7   39.9    4.2   14.3     72 |  76.78    684   50 |  76.78    684  50 | {'0x0': 32, '0x20': 18} (0x20 18, (28.62, 49.44))
+*1817-base-r2     289.232   3.4046  13.1076  12.4593 | 0/0/0                    |   84.3   72.5   61.9   60.5   19.3     73 |  98.50    554   50 |  98.50    554  50 | {'0x0': 50} (0x20 0, None)
+ 1819-d11-r3      352.469   2.8116  12.3697  11.8376 | 0/0/0                    |   73.0   85.3   42.3   47.5   15.5     72 |  79.96    725   50 |  79.96    725  50 | {'0x0': 42, '0x20': 8} (0x20 8, (41.74, 49.5))
+*1821-d11t-r3     277.116   3.5224  13.2857  12.6090 | 0/0/0                    |   76.4   76.0   53.3    4.5   18.5     72 |  91.38    551   50 |  91.38    551  50 | {'0x0': 50} (0x20 0, None)
+ 1823-d11p-r3     335.346   2.9559  12.5418  11.9825 | 0/0/0                    |   74.2   84.0   46.7    5.9   16.3     72 |  83.85    609   50 |  83.85    609  50 | {'0x0': 37, '0x20': 13} (0x20 13, (35.65, 49.38))
+*1825-base-r3     355.559   2.7917  12.3412  11.8138 | 0/0/0                    |   71.7   86.6   41.8   49.0   14.9     72 |  79.36    740   50 |  79.36    740  50 | {'0x0': 30, '0x20': 20} (0x20 20, (19.57, 49.36))
+ 1827-s0-r3       359.988   2.7311  12.3000  11.7791 | 0/0/0                    |   70.6   87.2   40.5   46.5   12.5     72 |  77.88    749   50 |  77.88    749  50 | {'0x0': 28, '0x20': 22} (0x20 22, (15.6, 49.43))
+constancy value sets: base-r2 {'draw_calls': [226], 'vertices_processed': [1022], 'active_threads': [30]}; base-r3 {'draw_calls': [226], 'vertices_processed': [1022], 'active_threads': [30]}; d11t-r3 {'draw_calls': [226], 'vertices_processed': [1022], 'active_threads': [30]}
+top threads 1817-base-r2  : GPU Commands (F8000018) 84.3, Main XThread (F800002C) 72.5, XThread3B00 (F80001A8) 61.9, rex::thread::TimerQueue 60.5, XThread80B0 (F8000144) 19.3,  14.5, GPU VSync (F800001C) 6.8
+   matches: {'gpucmd': [('GPU Commands (F8000018)', 84.3)], 'main': [('Main XThread (F800002C)', 72.5)], 'x1a8': [('XThread3B00 (F80001A8)', 61.9)], 'x1ac': [], 'timerq': [('rex::thread::TimerQueue', 60.5)], 'x144': [('XThread80B0 (F8000144)', 19.3)]}
+top threads 1825-base-r3  : Main XThread (F800002C) 86.6, GPU Commands (F8000018) 71.7, rex::thread::TimerQueue 49.0, XThread66DC (F80001A8) 41.8,  16.9, XThread760C (F8000144) 14.9, XThread4998 (F8000114) 10.0
+   matches: {'gpucmd': [('GPU Commands (F8000018)', 71.7)], 'main': [('Main XThread (F800002C)', 86.6)], 'x1a8': [('XThread66DC (F80001A8)', 41.8)], 'x1ac': [], 'timerq': [('rex::thread::TimerQueue', 49.0)], 'x144': [('XThread760C (F8000144)', 14.9)]}
+top threads 1821-d11t-r3  : GPU Commands (F8000018) 76.4, Main XThread (F800002C) 76.0, XThread7294 (F80001A8) 53.3, XThread73D0 (F8000144) 18.5,  17.6, XThread8078 (F8000114) 8.3, XThread683C (F800010C) 7.0
+   matches: {'gpucmd': [('GPU Commands (F8000018)', 76.4)], 'main': [('Main XThread (F800002C)', 76.0)], 'x1a8': [('XThread7294 (F80001A8)', 53.3)], 'x1ac': [], 'timerq': [('rex::thread::TimerQueue', 4.5)], 'x144': [('XThread73D0 (F8000144)', 18.5)]}
+top threads 1800-s0-r1    : Main XThread (F800002C) 85.2, GPU Commands (F8000018) 77.0, rex::thread::TimerQueue 50.6, XThread2F84 (F80001AC) 41.9, XThread3EE8 (F8000144) 15.6,  15.5, XThread36B8 (F8000114) 8.6
+   matches: {'gpucmd': [('GPU Commands (F8000018)', 77.0)], 'main': [('Main XThread (F800002C)', 85.2)], 'x1a8': [], 'x1ac': [('XThread2F84 (F80001AC)', 41.9)], 'timerq': [('rex::thread::TimerQueue', 50.6)], 'x144': [('XThread3EE8 (F8000144)', 15.6)]}
+
+== B7. fixed-rate fit over all 16 runs: per second = window total / run.json frames.window_s
+interrupt_dispatches/s = k * fps + r: k 8.9997 r 1000.364 R2 0.9999997 max|res| 0.2446
+functions_dispatched/s = k * fps + r: k 9.0000 r 1187.805 R2 0.9999997 max|res| 0.2463
+  1756-cold-base  fps  395.824 intr/s  4562.764 funcs/s  4750.326 res_i  +0.082 res_f  +0.104 funcs-intr /s  187.562
+  1757-base-r1    fps  384.596 intr/s  4461.710 funcs/s  4649.248 res_i  +0.084 res_f  +0.085 funcs-intr /s  187.538
+  1800-s0-r1      fps  333.373 intr/s  4000.791 funcs/s  4188.326 res_i  +0.160 res_f  +0.171 funcs-intr /s  187.536
+  1802-d11-r1     fps  350.343 intr/s  4153.247 funcs/s  4340.767 res_i  -0.118 res_f  -0.126 funcs-intr /s  187.520
+  1804-d11t-r1    fps  338.498 intr/s  4046.631 funcs/s  4234.129 res_i  -0.124 res_f  -0.151 funcs-intr /s  187.499
+  1806-d11p-r1    fps  343.344 intr/s  4090.251 funcs/s  4277.762 res_i  -0.122 res_f  -0.137 funcs-intr /s  187.511
+  1808-s0-r2      fps  309.902 intr/s  3789.555 funcs/s  3977.084 res_i  +0.157 res_f  +0.167 funcs-intr /s  187.529
+  1810-d11-r2     fps  351.337 intr/s  4162.182 funcs/s  4349.700 res_i  -0.122 res_f  -0.133 funcs-intr /s  187.518
+  1813-d11t-r2    fps  358.750 intr/s  4228.919 funcs/s  4416.453 res_i  -0.100 res_f  -0.096 funcs-intr /s  187.535
+  1815-d11p-r2    fps  356.926 intr/s  4212.499 funcs/s  4400.012 res_i  -0.110 res_f  -0.128 funcs-intr /s  187.513
+  1817-base-r2    fps  289.232 intr/s  3603.626 funcs/s  3791.141 res_i  +0.245 res_f  +0.246 funcs-intr /s  187.515
+  1819-d11-r3     fps  352.469 intr/s  4172.387 funcs/s  4359.921 res_i  -0.105 res_f  -0.100 funcs-intr /s  187.534
+  1821-d11t-r3    fps  277.116 intr/s  3494.166 funcs/s  3681.676 res_i  -0.171 res_f  -0.171 funcs-intr /s  187.510
+  1823-d11p-r3    fps  335.346 intr/s  4018.277 funcs/s  4205.839 res_i  -0.118 res_f  -0.082 funcs-intr /s  187.561
+  1825-base-r3    fps  355.559 intr/s  4200.494 funcs/s  4388.034 res_i  +0.186 res_f  +0.196 funcs-intr /s  187.540
+  1827-s0-r3      fps  359.988 intr/s  4240.334 funcs/s  4427.847 res_i  +0.175 res_f  +0.157 funcs-intr /s  187.514
+funcs/s - intr/s: min 187.499 max 187.562 (rounded to 0.1: ['187.5', '187.6'])
+
+== B8. separation: 3 slow runs vs the non-slow runs (cold-base has no threads.csv / gpu.csv)
+P util (run.json sys.window p_util_mean): slow s0-r2 91.49, base-r2 98.5, d11t-r3 91.38 | slow min 91.38 (d11t-r3) vs non-slow max 86.44 (s0-r1), 13 non-slow runs -> strictly separating: True
+    all: cold-base 77.44, base-r1 73.32, s0-r1 86.44, d11-r1 84.27, d11t-r1 82.61, d11p-r1 82.41, s0-r2 91.49, d11-r2 80.91, d11t-r2 76.37, d11p-r2 76.78, base-r2 98.5, d11-r3 79.96, d11t-r3 91.38, d11p-r3 83.85, base-r3 79.36, s0-r3 77.88
+E eff MHz (run.json sys.window e_eff_mhz_mean): slow s0-r2 597, base-r2 554, d11t-r3 551 | slow max 597 (s0-r2) vs non-slow min 609 (d11p-r3), 13 non-slow runs -> strictly separating: True
+    all: cold-base 1683, base-r1 1174, s0-r1 725, d11-r1 719, d11t-r1 676, d11p-r1 659, s0-r2 597, d11-r2 699, d11t-r2 729, d11p-r2 684, base-r2 554, d11-r3 725, d11t-r3 551, d11p-r3 609, base-r3 740, s0-r3 749
+buffer_queue_depth per frame: slow s0-r2 3.169, base-r2 3.405, d11t-r3 3.522 | slow min 3.169 (s0-r2) vs non-slow max 2.956 (d11p-r3), 13 non-slow runs -> strictly separating: True
+    all: cold-base 2.359, base-r1 2.491, s0-r1 2.914, d11-r1 2.804, d11t-r1 2.914, d11p-r1 2.855, s0-r2 3.169, d11-r2 2.825, d11t-r2 2.739, d11p-r2 2.78, base-r2 3.405, d11-r3 2.812, d11t-r3 3.522, d11p-r3 2.956, base-r3 2.792, s0-r3 2.731
+Main XThread busy: slow s0-r2 77.1, base-r2 72.5, d11t-r3 76 | slow max 77.1 (s0-r2) vs non-slow min 82.5 (d11p-r1), 12 non-slow runs -> strictly separating: True
+    all: cold-base -, base-r1 87.8, s0-r1 85.2, d11-r1 84.8, d11t-r1 83.6, d11p-r1 82.5, s0-r2 77.1, d11-r2 84.2, d11t-r2 85.1, d11p-r2 83.7, base-r2 72.5, d11-r3 85.3, d11t-r3 76, d11p-r3 84, base-r3 86.6, s0-r3 87.2
+X1A8 busy (alias F80001AC where F80001A8 is missing): slow s0-r2 56.2, base-r2 61.9, d11t-r3 53.3 | slow min 53.3 (d11t-r3) vs non-slow max 46.7 (d11p-r3), 12 non-slow runs -> strictly separating: True
+    all: cold-base -, base-r1 37.6, s0-r1 41.9, d11-r1 44.6, d11t-r1 43.2, d11p-r1 44.7, s0-r2 56.2, d11-r2 43.8, d11t-r2 40.8, d11p-r2 39.9, base-r2 61.9, d11-r3 42.3, d11t-r3 53.3, d11p-r3 46.7, base-r3 41.8, s0-r3 40.5
+X144 busy: slow s0-r2 19, base-r2 19.3, d11t-r3 18.5 | slow min 18.5 (d11t-r3) vs non-slow max 16.3 (d11p-r3), 12 non-slow runs -> strictly separating: True
+    all: cold-base -, base-r1 12.3, s0-r1 15.6, d11-r1 15, d11t-r1 16, d11p-r1 15.3, s0-r2 19, d11-r2 14.8, d11t-r2 14.2, d11p-r2 14.3, base-r2 19.3, d11-r3 15.5, d11t-r3 18.5, d11p-r3 16.3, base-r3 14.9, s0-r3 12.5
+GPU Commands busy: slow s0-r2 80.4, base-r2 84.3, d11t-r3 76.4 | slow min 76.4 (d11t-r3) vs non-slow max 77 (s0-r1), 12 non-slow runs -> strictly separating: False
+    all: cold-base -, base-r1 70.3, s0-r1 77, d11-r1 74.9, d11t-r1 73.3, d11p-r1 74.6, s0-r2 80.4, d11-r2 72.8, d11t-r2 70.8, d11p-r2 72.1, base-r2 84.3, d11-r3 73, d11t-r3 76.4, d11p-r3 74.2, base-r3 71.7, s0-r3 70.6
+runs using the F80001AC alias for X1A8: ['1800-s0-r1']
+TimerQueue busy by arm:
+  base  39.5, 60.5, 49.0  range 39.5..60.5
+  s0    50.6, 55.4, 46.5  range 46.5..55.4
+  d11   49.0, 51.1, 47.5  range 47.5..51.1
+  d11t  4.5, 4.0, 4.5  range 4.0..4.5
+  d11p  5.2, 4.2, 5.9  range 4.2..5.9
+gpu.csv throttle 0x20 samples per run (run.json start):
+  1756-cold-base  start 2026-11-22 17:56:02.409  no gpu.csv
+  1757-base-r1    start 2026-11-22 17:57:53.683  0x20 0 of 50 rows, t_s None, values {'0x0': 50}
+  1800-s0-r1      start 2026-11-22 18:00:10.780  0x20 0 of 50 rows, t_s None, values {'0x0': 50}
+  1802-d11-r1     start 2026-11-22 18:02:21.986  0x20 0 of 50 rows, t_s None, values {'0x0': 50}
+  1804-d11t-r1    start 2026-11-22 18:04:30.135  0x20 0 of 50 rows, t_s None, values {'0x0': 50}
+  1806-d11p-r1    start 2026-11-22 18:06:38.276  0x20 0 of 50 rows, t_s None, values {'0x0': 50}
+  1808-s0-r2      start 2026-11-22 18:08:46.712  0x20 0 of 50 rows, t_s None, values {'0x0': 50}
+  1810-d11-r2     start 2026-11-22 18:10:54.878  0x20 0 of 50 rows, t_s None, values {'0x0': 50}
+  1813-d11t-r2    start 2026-11-22 18:13:01.596  0x20 18 of 50 rows, t_s (28.96, 49.35), values {'0x0': 32, '0x20': 18}
+  1815-d11p-r2    start 2026-11-22 18:15:09.942  0x20 18 of 50 rows, t_s (28.62, 49.44), values {'0x0': 32, '0x20': 18}
+  1817-base-r2    start 2026-11-22 18:17:16.673  0x20 0 of 50 rows, t_s None, values {'0x0': 50}
+  1819-d11-r3     start 2026-11-22 18:19:23.918  0x20 8 of 50 rows, t_s (41.74, 49.5), values {'0x0': 42, '0x20': 8}
+  1821-d11t-r3    start 2026-11-22 18:21:31.749  0x20 0 of 50 rows, t_s None, values {'0x0': 50}
+  1823-d11p-r3    start 2026-11-22 18:23:39.565  0x20 13 of 50 rows, t_s (35.65, 49.38), values {'0x0': 37, '0x20': 13}
+  1825-base-r3    start 2026-11-22 18:25:47.728  0x20 20 of 50 rows, t_s (19.57, 49.36), values {'0x0': 30, '0x20': 20}
+  1827-s0-r3      start 2026-11-22 18:27:55.005  0x20 22 of 50 rows, t_s (15.6, 49.43), values {'0x0': 28, '0x20': 22}
+runs started before 18:13 with any 0x20 sample: none
+
+== B4x. frames between Toypad B1 challenges (perf.csv rows mapped to wall time from measure_start: row first_row ~ measure_start.epoch_s, then cumulative frame_time_us)
+  1756-cold-base       window fps   395.8 | B1 at s after measure_start [-60.2, -33.9, -4.8, 25.4] | intervals s [26.3, 29.1, 30.2] | frames between [11786, 12010, 12004] | fps in interval [448.4, 413.1, 397.4]
+  1757-base-r1         window fps   384.6 | B1 at s after measure_start [-60.4, -34.8, -7.0, 22.1] | intervals s [25.7, 27.8, 29.0] | frames between [11750, 12011, 12004] | fps in interval [458.1, 432.3, 413.3]
+  1800-s0-r1           window fps   333.4 | B1 at s after measure_start [-60.4, -34.5, -0.9, 35.3] | intervals s [25.9, 33.6, 36.1] | frames between [11804, 12008, 12002] | fps in interval [455.7, 357.1, 332.0]
+  1802-d11-r1          window fps   350.3 | B1 at s after measure_start [-60.4, -32.9, 0.1, 34.7] | intervals s [27.5, 33.0, 34.7] | frames between [11775, 12016, 12002] | fps in interval [428.4, 364.3, 346.0]
+  1804-d11t-r1         window fps   338.5 | B1 at s after measure_start [-58.8, -33.9, -3.0, 31.7] | intervals s [24.9, 30.8, 34.8] | frames between [11181, 12026, 12009] | fps in interval [448.6, 390.0, 345.4]
+  1806-d11p-r1         window fps   343.3 | B1 at s after measure_start [-60.4, -32.8, 0.9, 36.3] | intervals s [27.6, 33.7, 35.4] | frames between [11944, 12021, 12000] | fps in interval [433.4, 356.2, 339.0]
+  1808-s0-r2      SLOW window fps   309.9 | B1 at s after measure_start [-60.4, -34.3, -1.7, 35.1] | intervals s [26.0, 32.6, 36.8] | frames between [11750, 12007, 12002] | fps in interval [451.4, 368.1, 326.1]
+  1810-d11-r2          window fps   351.3 | B1 at s after measure_start [-60.4, -34.0, -1.5, 32.9] | intervals s [26.5, 32.5, 34.4] | frames between [11959, 12011, 12004] | fps in interval [451.8, 370.1, 349.3]
+  1813-d11t-r2         window fps   358.7 | B1 at s after measure_start [-58.7, -32.5, -0.7, 33.4] | intervals s [26.2, 31.8, 34.1] | frames between [11178, 12008, 12002] | fps in interval [426.1, 377.9, 351.9]
+  1815-d11p-r2         window fps   356.9 | B1 at s after measure_start [-59.5, -32.4, -0.6, 33.5] | intervals s [27.1, 31.8, 34.1] | frames between [11626, 12005, 12004] | fps in interval [429.4, 377.9, 351.6]
+  1817-base-r2    SLOW window fps   289.2 | B1 at s after measure_start [-60.5, -32.7, 1.3, 43.3] | intervals s [27.8, 34.0, 42.1] | frames between [11876, 12031, 11987] | fps in interval [427.7, 353.9, 285.0]
+  1819-d11-r3          window fps   352.5 | B1 at s after measure_start [-60.5, -33.0, 4.6, 38.8] | intervals s [27.4, 37.6, 34.2] | frames between [11889, 12011, 12008] | fps in interval [433.5, 319.2, 350.8]
+  1821-d11t-r3    SLOW window fps   277.1 | B1 at s after measure_start [-60.4, -25.5, 17.1] | intervals s [34.9, 42.5] | frames between [11940, 12012] | fps in interval [341.8, 282.4]
+  1823-d11p-r3         window fps   335.3 | B1 at s after measure_start [-60.5, -33.4, -2.3, 34.6] | intervals s [27.1, 31.1, 36.9] | frames between [11753, 12005, 12003] | fps in interval [433.7, 385.8, 325.2]
+  1825-base-r3         window fps   355.6 | B1 at s after measure_start [-57.8, -32.0, 0.9, 35.0] | intervals s [25.9, 32.9, 34.1] | frames between [11014, 12032, 11981] | fps in interval [425.5, 366.0, 351.2]
+  1827-s0-r3           window fps   360.0 | B1 at s after measure_start [-60.4, -32.5, 2.5, 35.6] | intervals s [28.0, 35.0, 33.1] | frames between [11771, 12027, 12003] | fps in interval [421.0, 343.6, 363.1]

@@ -1,0 +1,29 @@
+# S2 rules - DRAFT by Agent 2 (22:25). The final owner include list comes from Agent 1 at the end of the quiet window;
+# build/agent2/S2-rules.txt is written from it. Format (build/agent2/snap-patch.py docstring):
+#   <owner> | <path or glob under DimensionsRecomp/> | <expected live sha256 prefix, 8-64 hex>
+#   !<glob> excludes, ~<glob> accepts snap1 drift, @owner N = Agent N's board claims (cross-check only).
+# Source: perf-notes/agent10-batch2-review.md (status table + file hashes, 22:15). One line per reviewed file; the
+# hash pins the reviewed version, so a later live edit stops the plan.
+# items 1-4: Agent 7 task #20 (SAFE; native only)
+Agent 7 | rexlego/src/gpu_native/device.h | 703939aa91efea81
+Agent 7 | rexlego/src/gpu_native/device.cpp | 3d01e63142dbfb50
+Agent 7 | rexlego/src/gpu_native/fps_counter.h | e05d6a554042b302
+# item 5: Agent 6's async-PSO patch, applied to draw.cpp by Agent 4 (SAFE at the default and ON; native only)
+Agent 4 | rexlego/src/gpu_native/draw.cpp | 50aa3b1dee615678
+# item 6: Agent 6, comment only (SAFE)
+Agent 6 | rexlego/src/gpu_native/pipeline_snapshot.h | 42318b849fae030b
+# item 8: Agent 12 #22 audio-shutdown fix, SDK, cvar audio_shutdown_detach_worker default false (SAFE at the default)
+#   -> SDK build + install (6 includer TUs, rexruntime.dll relinks); nothing in rexlego or generated/ includes the header
+Agent 12 | rexglue-sdk/src/audio/audio_system.cpp | c281fa8625435efe
+Agent 12 | rexglue-sdk/include/rex/audio/audio_system.h | 4836b139802d3438
+# item 9: Agent 5 batch 2 (+ Agent 4's (a) in textures.cpp ResolveFramebuffer), toggles unset (SAFE at the default)
+Agent 5 | rexlego/src/gpu_native/upload_legacy_paths.h | 5c823f13
+Agent 5 | rexlego/src/gpu_native/texture_volume_upload.h | d0601ecf
+Agent 5 | rexlego/src/gpu_native/texture_scratch.h | 8f6a12ae
+Agent 5 | rexlego/src/gpu_native/texture_upload_source.h | ff9e1141
+Agent 5 | rexlego/src/gpu_native/vertex_upload.h | ffd2b023
+Agent 5 | rexlego/src/gpu_native/buffers.cpp | 75025044
+Agent 5 | rexlego/src/gpu_native/upload_buffer_pool.h | 853e6c16
+Agent 5 | rexlego/src/gpu_native/textures.cpp | 3011add4
+# NOT in this draft (pending at 22:15): item 7 Agent 6 #26 tools/gpu-aot/prepare_plume.py + patches/plume-winsdk-compat.patch;
+# item 10 Agent 11 SDK exit() fix (batch 3).

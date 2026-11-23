@@ -1,0 +1,97 @@
+== 1. per-run overview: non-empty lines, log files, levels, distinct keys ==
+  1542-d0-r1    d0       98 lines, files game.log, cont=8 info=50 warning=40, 66 keys
+  1558-d0-r2    d0       98 lines, files game.log, cont=8 info=50 warning=40, 66 keys
+  1604-d0-r3    d0       98 lines, files game.log, cont=8 info=50 warning=40, 66 keys
+  1611-d0-r4    d0       94 lines, files game.log, cont=8 info=46 warning=40, 66 keys
+  1545-B-r1     B        98 lines, files game.log, cont=8 info=50 warning=40, 66 keys
+  1551-B-r2     B        94 lines, files game.log, cont=8 info=46 warning=40, 66 keys
+  1606-B-r3     B        94 lines, files game.log, cont=8 info=46 warning=40, 66 keys
+  1613-B-r4     B        94 lines, files game.log, cont=8 info=46 warning=40, 66 keys
+  1547-d3-r1    d3       94 lines, files game.log, cont=8 info=46 warning=40, 66 keys
+  1553-d3-r2    d3       98 lines, files game.log, cont=8 info=50 warning=40, 66 keys
+  1600-d3-r3    d3       98 lines, files game.log, cont=8 info=50 warning=40, 66 keys
+  1615-d3-r4    d3       98 lines, files game.log, cont=8 info=50 warning=40, 66 keys
+  1549-d11t-r1  d11t     95 lines, files game.log, cont=8 info=47 warning=40, 67 keys
+  1556-d11t-r2  d11t     99 lines, files game.log, cont=8 info=51 warning=40, 67 keys
+  1602-d11t-r3  d11t     95 lines, files game.log, cont=8 info=47 warning=40, 67 keys
+  1608-d11t-r4  d11t     95 lines, files game.log, cont=8 info=47 warning=40, 67 keys
+  1541-cold-d0  cold-d0  94 lines, files game.log, cont=8 info=46 warning=40, 66 keys
+
+== 2. d0-internal: keys present in some but not all 4 warm d0 runs (d0 counts r1..r4) ==
+
+== 3. arm B (1545-B-r1, 1551-B-r2, 1606-B-r3, 1613-B-r4) vs warm d0 ==
+(a) messages in some B run and in no warm d0 run (any level): 0
+(b) messages in all 4 d0 runs but missing from some B run: 0
+(c) warning/error/critical messages with a per-run count outside d0 min..max: 0
+(d) [extra] info/cont messages with a per-run count outside d0 min..max: 0
+
+== 3. arm d3 (1547-d3-r1, 1553-d3-r2, 1600-d3-r3, 1615-d3-r4) vs warm d0 ==
+(a) messages in some d3 run and in no warm d0 run (any level): 1
+    [warning] [krnl] IoDismountVolumeByFileHandle(0xf8000164) - stub  per-run [0, 0, 2, 0]  groups having it: d3 1/4
+(b) messages in all 4 d0 runs but missing from some d3 run: 1
+    [warning] [krnl] IoDismountVolumeByFileHandle(0xf8000160) - stub  missing in ['1600-d3-r3']  d0 [2, 2, 2, 2]  groups missing it: d3 1/4
+(c) warning/error/critical messages with a per-run count outside d0 min..max: 2
+    [warning] [krnl] IoDismountVolumeByFileHandle(0xf8000160) - stub  d0 [2, 2, 2, 2]  outside {'1600-d3-r3': 0}
+    [warning] [krnl] IoDismountVolumeByFileHandle(0xf8000164) - stub  d0 [0, 0, 0, 0]  outside {'1600-d3-r3': 2}
+(d) [extra] info/cont messages with a per-run count outside d0 min..max: 0
+
+== 4. crash evidence (run.json fields, dumps, last 3 log lines, grep STUCK/REX_FATAL/unimplemented(i)/[critical]/[error]) ==
+  1542-d0-r1    status=OK problems=[] exit=0x00000000 close.exit=0x00000000 early=False killed=False exit_wait_s=1.13 repost_s=None wer=False foreign_dumps=[] dialogs=[] notresp=0 perf_stalled=False | valid_timing=True why=[] build_procs_window=[] excluded=False | dumps=[] tail_clean=True lines run.json/mine=98/98 | grep STUCK=0 REX_FATAL=0 unimplemented=0 [critical]=0 [error]=0
+  1558-d0-r2    status=OK problems=[] exit=0x00000000 close.exit=0x00000000 early=False killed=False exit_wait_s=0.94 repost_s=None wer=False foreign_dumps=[] dialogs=[] notresp=0 perf_stalled=False | valid_timing=True why=[] build_procs_window=[] excluded=False | dumps=[] tail_clean=True lines run.json/mine=98/98 | grep STUCK=0 REX_FATAL=0 unimplemented=0 [critical]=0 [error]=0
+  1604-d0-r3    status=OK problems=[] exit=0x00000000 close.exit=0x00000000 early=False killed=False exit_wait_s=0.87 repost_s=None wer=False foreign_dumps=[] dialogs=[] notresp=0 perf_stalled=False | valid_timing=True why=[] build_procs_window=[] excluded=False | dumps=[] tail_clean=True lines run.json/mine=98/98 | grep STUCK=0 REX_FATAL=0 unimplemented=0 [critical]=0 [error]=0
+  1611-d0-r4    status=OK problems=[] exit=0x00000000 close.exit=0x00000000 early=False killed=False exit_wait_s=0.8 repost_s=None wer=False foreign_dumps=[] dialogs=[] notresp=0 perf_stalled=False | valid_timing=True why=[] build_procs_window=[] excluded=False | dumps=[] tail_clean=True lines run.json/mine=94/94 | grep STUCK=0 REX_FATAL=0 unimplemented=0 [critical]=0 [error]=0
+  1545-B-r1     status=OK problems=[] exit=0x00000000 close.exit=0x00000000 early=False killed=False exit_wait_s=0.9 repost_s=None wer=False foreign_dumps=[] dialogs=[] notresp=0 perf_stalled=False | valid_timing=True why=[] build_procs_window=[] excluded=False | dumps=[] tail_clean=True lines run.json/mine=98/98 | grep STUCK=0 REX_FATAL=0 unimplemented=0 [critical]=0 [error]=0
+  1551-B-r2     status=OK problems=[] exit=0x00000000 close.exit=0x00000000 early=False killed=False exit_wait_s=0.77 repost_s=None wer=False foreign_dumps=[] dialogs=[] notresp=0 perf_stalled=False | valid_timing=False why=['build processes: clang++:34584 clang++:36068 clang++:6544'] build_procs_window=['clang++:34584', 'clang++:36068', 'clang++:6544'] excluded=False | dumps=[] tail_clean=True lines run.json/mine=94/94 | grep STUCK=0 REX_FATAL=0 unimplemented=0 [critical]=0 [error]=0
+  1606-B-r3     status=OK problems=[] exit=0x00000000 close.exit=0x00000000 early=False killed=False exit_wait_s=0.9 repost_s=None wer=False foreign_dumps=[] dialogs=[] notresp=0 perf_stalled=False | valid_timing=True why=[] build_procs_window=[] excluded=False | dumps=[] tail_clean=True lines run.json/mine=94/94 | grep STUCK=0 REX_FATAL=0 unimplemented=0 [critical]=0 [error]=0
+  1613-B-r4     status=OK problems=[] exit=0x00000000 close.exit=0x00000000 early=False killed=False exit_wait_s=0.95 repost_s=None wer=False foreign_dumps=[] dialogs=[] notresp=0 perf_stalled=False | valid_timing=True why=[] build_procs_window=[] excluded=False | dumps=[] tail_clean=True lines run.json/mine=94/94 | grep STUCK=0 REX_FATAL=0 unimplemented=0 [critical]=0 [error]=0
+  1547-d3-r1    status=OK problems=[] exit=0x00000000 close.exit=0x00000000 early=False killed=False exit_wait_s=0.82 repost_s=None wer=False foreign_dumps=[] dialogs=[] notresp=0 perf_stalled=False | valid_timing=True why=[] build_procs_window=[] excluded=False | dumps=[] tail_clean=True lines run.json/mine=94/94 | grep STUCK=0 REX_FATAL=0 unimplemented=0 [critical]=0 [error]=0
+  1553-d3-r2    status=OK problems=[] exit=0x00000000 close.exit=0x00000000 early=False killed=False exit_wait_s=0.87 repost_s=None wer=False foreign_dumps=[] dialogs=[] notresp=0 perf_stalled=False | valid_timing=True why=[] build_procs_window=[] excluded=False | dumps=[] tail_clean=True lines run.json/mine=98/98 | grep STUCK=0 REX_FATAL=0 unimplemented=0 [critical]=0 [error]=0
+  1600-d3-r3    status=OK problems=[] exit=0x00000000 close.exit=0x00000000 early=False killed=False exit_wait_s=0.91 repost_s=None wer=False foreign_dumps=[] dialogs=[] notresp=0 perf_stalled=False | valid_timing=True why=[] build_procs_window=[] excluded=False | dumps=[] tail_clean=True lines run.json/mine=98/98 | grep STUCK=0 REX_FATAL=0 unimplemented=0 [critical]=0 [error]=0
+  1615-d3-r4    status=OK problems=[] exit=0x00000000 close.exit=0x00000000 early=False killed=False exit_wait_s=0.89 repost_s=None wer=False foreign_dumps=[] dialogs=[] notresp=0 perf_stalled=False | valid_timing=True why=[] build_procs_window=[] excluded=False | dumps=[] tail_clean=True lines run.json/mine=98/98 | grep STUCK=0 REX_FATAL=0 unimplemented=0 [critical]=0 [error]=0
+  1541-cold-d0  status=OK problems=[] exit=0x00000000 close.exit=0x00000000 early=False killed=False exit_wait_s=0.79 repost_s=None wer=False foreign_dumps=[] dialogs=[] notresp=0 perf_stalled=False | valid_timing=True why=[] build_procs_window=[] excluded=False | dumps=[] tail_clean=True lines run.json/mine=94/94 | grep STUCK=0 REX_FATAL=0 unimplemented=0 [critical]=0 [error]=0
+
+== 5. 'Host timer resolution set to' lines per run ==
+  d0      1542-d0-r1:0  1558-d0-r2:0  1604-d0-r3:0  1611-d0-r4:0
+  B       1545-B-r1:0  1551-B-r2:0  1606-B-r3:0  1613-B-r4:0
+  d3      1547-d3-r1:0  1553-d3-r2:0  1600-d3-r3:0  1615-d3-r4:0
+  d11t    1549-d11t-r1:1  1556-d11t-r2:1  1602-d11t-r3:1  1608-d11t-r4:1
+  cold-d0 1541-cold-d0:0
+    e.g. 1549-d11t-r1: [2026-11-22 15:49:37.973] [info] [core] [t30780] Host timer resolution set to 1 ms (background opt-out on)
+    e.g. 1556-d11t-r2: [2026-11-22 15:56:05.052] [info] [core] [t6284] Host timer resolution set to 1 ms (background opt-out on)
+    e.g. 1602-d11t-r3: [2026-11-22 16:02:35.565] [info] [core] [t34264] Host timer resolution set to 1 ms (background opt-out on)
+    e.g. 1608-d11t-r4: [2026-11-22 16:09:01.160] [info] [core] [t28504] Host timer resolution set to 1 ms (background opt-out on)
+
+== 6. Toypad (cmd = 5th byte of each Toypad[Write]; B1 times in s after the first Toypad write) ==
+  1542-d0-r1    W/R 10/10 seq B0 C0 B1 B3 B1 B3 B1 B3 B1 B3    B1 at [0.008, 27.813, 60.171, 105.334]   gaps [27.805, 32.358, 45.163] first write @3.312  close @116.779 last B1->close 11.445  ctr_ok True B1->B3 True other 0
+  1558-d0-r2    W/R 10/10 seq B0 C0 B1 B3 B1 B3 B1 B3 B1 B3    B1 at [0.069, 27.846, 63.04, 107.701]    gaps [27.777, 35.194, 44.661] first write @3.305  close @113.204 last B1->close 5.503   ctr_ok True B1->B3 True other 0
+  1604-d0-r3    W/R 10/10 seq C0 B0 B0 C0 B1 B3 B1 B3 B1 B3    B1 at [1.922, 34.354, 81.949]            gaps [32.432, 47.595]         first write @3.366  close @113.54  last B1->close 31.591  ctr_ok False B1->B3 True other 0
+  1611-d0-r4    W/R  8/8  seq B0 C0 B1 B3 B1 B3 B1 B3          B1 at [0.01, 34.484, 82.027]             gaps [34.474, 47.543]         first write @4.254  close @112.482 last B1->close 30.455  ctr_ok True B1->B3 True other 0
+  1545-B-r1     W/R 10/10 seq B0 C0 B1 B3 B1 B3 B1 B3 B1 B3    B1 at [0.008, 27.544, 59.195, 91.475]    gaps [27.536, 31.651, 32.28]  first write @4.473  close @114.491 last B1->close 23.016  ctr_ok True B1->B3 True other 0
+  1551-B-r2     W/R  8/8  seq B0 C0 B1 B3 B1 B3 B1 B3          B1 at [0.011, 28.564, 61.597]            gaps [28.553, 33.033]         first write @5.878  close @112.109 last B1->close 50.512  ctr_ok True B1->B3 True other 0
+  1606-B-r3     W/R  8/8  seq B0 C0 B1 B3 B1 B3 B1 B3          B1 at [0.008, 41.295, 93.042]            gaps [41.287, 51.747]         first write @4.261  close @112.386 last B1->close 19.344  ctr_ok True B1->B3 True other 0
+  1613-B-r4     W/R  8/8  seq B0 C0 B1 B3 B1 B3 B1 B3          B1 at [0.007, 36.172, 78.585]            gaps [36.165, 42.413]         first write @3.236  close @113.964 last B1->close 35.379  ctr_ok True B1->B3 True other 0
+  1547-d3-r1    W/R  8/8  seq B0 C0 B1 B3 B1 B3 B1 B3          B1 at [0.015, 28.436, 63.624]            gaps [28.421, 35.188]         first write @4.45   close @114.058 last B1->close 50.434  ctr_ok True B1->B3 True other 0
+  1553-d3-r2    W/R 10/10 seq B0 C0 B1 B3 B1 B3 B1 B3 B1 B3    B1 at [0.009, 27.526, 59.856, 96.36]     gaps [27.517, 32.33, 36.504]  first write @5.336  close @112.367 last B1->close 16.007  ctr_ok True B1->B3 True other 0
+  1600-d3-r3    W/R 10/10 seq C0 B0 B0 C0 B1 B3 B1 B3 B1 B3    B1 at [1.73, 30.167, 81.342]             gaps [28.437, 51.175]         first write @5.667  close @112.95  last B1->close 31.608  ctr_ok False B1->B3 True other 0
+  1615-d3-r4    W/R 10/10 seq C0 B0 B0 C0 B1 B3 B1 B3 B1 B3    B1 at [2.077, 38.662, 81.781]            gaps [36.585, 43.119]         first write @2.797  close @113.429 last B1->close 31.648  ctr_ok False B1->B3 True other 0
+  1541-cold-d0  W/R  8/8  seq B0 C0 B1 B3 B1 B3 B1 B3          B1 at [0.012, 28.048, 65.244]            gaps [28.036, 37.196]         first write @5.625  close @90.196  last B1->close 24.952  ctr_ok True B1->B3 True other 0
+  1549-d11t-r1  W/R  8/8  seq B0 C0 B1 B3 B1 B3 B1 B3          B1 at [0.008, 27.038, 64.502]            gaps [27.03, 37.464]          first write @3.26   close @112.495 last B1->close 47.993  ctr_ok True B1->B3 True other 0
+  1556-d11t-r2  W/R 10/10 seq B0 C0 B1 B3 B1 B3 B1 B3 B1 B3    B1 at [0.008, 25.828, 55.553, 106.761]   gaps [25.82, 29.725, 51.208]  first write @4.274  close @113.566 last B1->close 6.805   ctr_ok True B1->B3 True other 0
+  1602-d11t-r3  W/R  8/8  seq B0 C0 B1 B3 B1 B3 B1 B3          B1 at [0.011, 30.552, 73.181]            gaps [30.541, 42.629]         first write @4.359  close @112.52  last B1->close 39.339  ctr_ok True B1->B3 True other 0
+  1608-d11t-r4  W/R  8/8  seq B0 C0 B1 B3 B1 B3 B1 B3          B1 at [0.009, 36.034, 86.739]            gaps [36.025, 50.705]         first write @4.296  close @111.674 last B1->close 24.935  ctr_ok True B1->B3 True other 0
+  (first write @ = s after the first log line; close @ = s after the first Toypad write)
+  deterministic payloads (B0/C0 writes + their 2 reads, all bytes): 2 distinct set(s) over 17 runs
+  non-payload Toypad line count patterns (excluding payload lines): [{'Portal: using emulated': 1, 'detected frame offset': 1, 'emulated ToyPad active': 1, 'listener active': 1, 'pad 0 mode': 1}]
+  distinct header sets over all runs: 1 -> [['0B 04 55 01', '0B 0C 55 09', '0B 11 55 0E', '0B 16 55 06 C0', '0B 16 55 0A B1', '0B 16 55 0A B3', '0B 16 55 0F B0']]
+  d0    W/R ['10/10', '10/10', '10/10', '8/8'] | B1 #1 0.008..1.922 (n=4); #2 27.813..34.484 (n=4); #3 60.171..82.027 (n=4); #4 105.334..107.701 (n=2) | B1 gaps 27.777..47.595 | last B1->close [11.445, 5.503, 31.591, 30.455] | close@ [116.779, 113.204, 113.54, 112.482]
+  B     W/R ['10/10', '8/8', '8/8', '8/8'] | B1 #1 0.007..0.011 (n=4); #2 27.544..41.295 (n=4); #3 59.195..93.042 (n=4); #4 91.475..91.475 (n=1) | B1 gaps 27.536..51.747 | last B1->close [23.016, 50.512, 19.344, 35.379] | close@ [114.491, 112.109, 112.386, 113.964]
+  d3    W/R ['8/8', '10/10', '10/10', '10/10'] | B1 #1 0.009..2.077 (n=4); #2 27.526..38.662 (n=4); #3 59.856..81.781 (n=4); #4 96.36..96.36 (n=1) | B1 gaps 27.517..51.175 | last B1->close [50.434, 16.007, 31.608, 31.648] | close@ [114.058, 112.367, 112.95, 113.429]
+  d11t  W/R ['8/8', '10/10', '8/8', '8/8'] | B1 #1 0.008..0.011 (n=4); #2 25.828..36.034 (n=4); #3 55.553..86.739 (n=4); #4 106.761..106.761 (n=1) | B1 gaps 25.82..51.208 | last B1->close [47.993, 6.805, 39.339, 24.935] | close@ [112.495, 113.566, 112.52, 111.674]
+
+== 7. cross-check items per arm ==
+  B: NEW warn/err/crit keys 0 | MORE (warn count > d0 max) 0 | LESS (< d0 min) 0 | GONE warn 0 | GONE any level 0 | ONLY-in-arm any level 0 | info/cont count outside d0 range 0
+     Toypad W/R ['10/10', '8/8', '8/8', '8/8'] (d0 ['10/10', '10/10', '10/10', '8/8'])
+     exit ['0x00000000', '0x00000000', '0x00000000', '0x00000000'] | tail clean [True, True, True, True] | dumps [0, 0, 0, 0] | WER [False, False, False, False] | killed [False, False, False, False] | early [False, False, False, False] | status ['OK', 'OK', 'OK', 'OK'] | host-timer lines [0, 0, 0, 0]
+  d3: NEW warn/err/crit keys 1 | MORE (warn count > d0 max) 1 | LESS (< d0 min) 1 | GONE warn 1 | GONE any level 1 | ONLY-in-arm any level 1 | info/cont count outside d0 range 0
+     Toypad W/R ['8/8', '10/10', '10/10', '10/10'] (d0 ['10/10', '10/10', '10/10', '8/8'])
+     exit ['0x00000000', '0x00000000', '0x00000000', '0x00000000'] | tail clean [True, True, True, True] | dumps [0, 0, 0, 0] | WER [False, False, False, False] | killed [False, False, False, False] | early [False, False, False, False] | status ['OK', 'OK', 'OK', 'OK'] | host-timer lines [0, 0, 0, 0]

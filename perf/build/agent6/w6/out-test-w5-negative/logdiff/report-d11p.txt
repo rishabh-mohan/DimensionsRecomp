@@ -1,0 +1,17 @@
+== arm d11p (3 runs) vs s0 (3 runs)
+  runs\1806-d11p-r1: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 100 lines game.log 11265, 2026-11-22 18:06:40.421..2026-11-22 18:08:37.346 (117 s) | levels info=52 raw=8 warning=40 | Toypad R/W 10/10 (5.1/5.1 per min)
+  runs\1815-d11p-r2: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 100 lines game.log 11276, 2026-11-22 18:15:11.914..2026-11-22 18:17:08.086 (116 s) | levels info=52 raw=8 warning=40 | Toypad R/W 10/10 (5.2/5.2 per min)
+  runs\1823-d11p-r3: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 100 lines game.log 11275, 2026-11-22 18:23:41.685..2026-11-22 18:25:38.604 (117 s) | levels info=52 raw=8 warning=40 | Toypad R/W 10/10 (5.1/5.1 per min)
+gate_logdiff FAIL findings (B = arm run, A = each base run): none
+NEW warning/error/critical keys (in an arm run, in no base run): 0
+MORE (arm run count > base max + max(5, base max)): 0
+GONE (in every base run, missing from an arm run; any level): 0
+Toypad (base: runs\1800-s0-r1 {'info Write': 10, 'info Read': 10}; runs\1808-s0-r2 {'info Write': 10, 'info Read': 10}; runs\1827-s0-r3 {'info Write': 10, 'info Read': 10})
+  runs\1806-d11p-r1: {'info Write': 10, 'info Read': 10}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\1815-d11p-r2: {'info Write': 10, 'info Read': 10}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\1823-d11p-r3: {'info Write': 10, 'info Read': 10}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+ONLY in d11p (any level, not Toypad; in no base run): 2 keys
+  3/3 runs, counts [1, 1, 1], also in ['d11', 'd11t']  [info] [core] Host timer resolution set to # ms (background opt-out on)
+      e.g. [2026-11-22 18:06:40.935] [info] [core] [t28880] Host timer resolution set to 1 ms (background opt-out on)
+  3/3 runs, counts [1, 1, 1], also in -  [info] [core] TimerQueue: precise wait (timer_queue_precise_wait)
+      e.g. [2026-11-22 18:06:40.944] [info] [core] [t28880] TimerQueue: precise wait (timer_queue_precise_wait)

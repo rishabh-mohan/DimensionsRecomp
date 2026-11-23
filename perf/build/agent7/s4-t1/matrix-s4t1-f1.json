@@ -1,0 +1,153 @@
+{
+  "title": "S4-T1 (#21 LEGO_NATIVE_CHAIN_PRIORITY) functional row F1 on native4b+#21 (Agent 7, task #17): unset equivalence, ON identity, MP1/MP2/MP5a. FUNCTIONAL ONLY. Title/attract loop, no input needed",
+  "reference": "n0",
+  "warmup_s": 55,
+  "warmup_from": "firstframe",
+  "measure_s": 60,
+  "repeats": 2,
+  "settle_s": 5,
+  "cooldown_s": 5,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "menu_s": 60,
+  "cold_run": false,
+  "order": "roundrobin",
+  "sys_csv": true,
+  "quick": {
+    "warmup_s": 10,
+    "measure_s": 20,
+    "settle_s": 5,
+    "menu_s": 20,
+    "cooldown_s": 5
+  },
+  "notes": [
+    "PURPOSE: row F1 of build/agent7/s4-t1/FUNCTIONAL-ROWS.md, for Agent 10's rating of #21 (build/agent7/s4-t1/RATE-REQUEST.md). FUNCTIONAL ONLY: an agent-queue run never gives a timing result.",
+    "BINS: <NATIVE4B-S4T1> = native4b + build/agent7/s4-t1/s4-t1.diff (Agent 2 builds and stages it Monday, e.g. build/agent2/native4b-s4t1-bin). <NATIVE4B> = build/agent2/native4b-bin, the same S4b sources without #21. Agent 3 replaces both in a copy (as for g3q). A bin dir without MANIFEST.txt skips its arms, so this file cannot run by mistake.",
+    "ARMS: n0 x2 (ref), th3old x2 (old bin: the unset-equivalence reference), th3 x2, th3cp3 x2, th2 x1, th2cp3 x1 = 10 runs, about 26 min (planner about 142 s/run, observed about 158 s/run). Run with -NoCold. Same cvars, frames=perf, 55 s warm-up from the first frame, 60 s window, sys_csv and thread-cpu driver as bench/agent4/matrix-native-threaded.json.",
+    "WHY th3 FIRST: th3 is W8b's mode. In th3 the present runs on RecorderMain, which is NORMAL today and is n3's busiest thread (55 %); #21 raises it to ABOVE_NORMAL. Full draw preparation is also where MP4's risk is. The th2 arms (x1) cover the worker and recording-queue call sites; in th2 the worker is already ABOVE_NORMAL (native_worker.cpp:390).",
+    "CHECKS (FUNCTIONAL-ROWS.md F1): check_n_rows n3=th3,th3cp3,th3old and n2=th2,th2cp3 against n0; th3 vs th3old: no new line type and no 'chain priority' line; th3cp3 vs th3: the only new line type is 'Native GPU: chain priority'; the mode line once per cp run; every thread line 'priority=1 ecoqos=opt-out', no 'failed'; clean close; busy < 0.97 and the sys.csv slow-state check before any timing remark.",
+    "No LEGO_NATIVE_TIMING, LEGO_NATIVE_STATE_CALLS, trace toggles or debug layer in any arm."
+  ],
+  "arms": [
+    {
+      "id": "n0",
+      "group": "s4t1",
+      "ref": true,
+      "frames": "perf",
+      "repeats": 2,
+      "bin": "<NATIVE4B-S4T1>",
+      "cvars": [
+        "native_settings_frontend=false",
+        "native_fps_limit=0",
+        "framerate_limit=0"
+      ],
+      "env": {
+        "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv"
+      },
+      "note": "Reference: native defaults on the #21 bin, threaded recording off, LEGO_NATIVE_CHAIN_PRIORITY unset. Must log no 'chain priority' line",
+      "driver": "drivers/thread-cpu.ps1"
+    },
+    {
+      "id": "th3old",
+      "group": "s4t1",
+      "frames": "perf",
+      "repeats": 2,
+      "bin": "<NATIVE4B>",
+      "cvars": [
+        "native_settings_frontend=false",
+        "native_fps_limit=0",
+        "framerate_limit=0"
+      ],
+      "env": {
+        "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv",
+        "LEGO_NATIVE_THREADED": "1",
+        "LEGO_NATIVE_PREPARE_THREADS": "2",
+        "LEGO_NATIVE_FULL_DRAW_PREPARATION": "1"
+      },
+      "note": "Unset-equivalence reference: th3 env on native4b WITHOUT #21",
+      "driver": "drivers/thread-cpu.ps1"
+    },
+    {
+      "id": "th3",
+      "group": "s4t1",
+      "frames": "perf",
+      "repeats": 2,
+      "bin": "<NATIVE4B-S4T1>",
+      "cvars": [
+        "native_settings_frontend=false",
+        "native_fps_limit=0",
+        "framerate_limit=0"
+      ],
+      "env": {
+        "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv",
+        "LEGO_NATIVE_THREADED": "1",
+        "LEGO_NATIVE_PREPARE_THREADS": "2",
+        "LEGO_NATIVE_FULL_DRAW_PREPARATION": "1"
+      },
+      "note": "#21 bin, variable unset, th3: must match th3old (no 'chain priority' line, the same line types, counts within th3old's spread)",
+      "driver": "drivers/thread-cpu.ps1"
+    },
+    {
+      "id": "th3cp3",
+      "group": "s4t1",
+      "frames": "perf",
+      "repeats": 2,
+      "bin": "<NATIVE4B-S4T1>",
+      "cvars": [
+        "native_settings_frontend=false",
+        "native_fps_limit=0",
+        "framerate_limit=0"
+      ],
+      "env": {
+        "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv",
+        "LEGO_NATIVE_THREADED": "1",
+        "LEGO_NATIVE_PREPARE_THREADS": "2",
+        "LEGO_NATIVE_FULL_DRAW_PREPARATION": "1",
+        "LEGO_NATIVE_CHAIN_PRIORITY": "3"
+      },
+      "note": "#21 ON, mode 3, th3: 1 mode line; thread lines exactly coordinator, recorder, prepare x2 (no worker line: WorkerMain hands off at :263; no recording queue in th3), all priority=1 ecoqos=opt-out",
+      "driver": "drivers/thread-cpu.ps1"
+    },
+    {
+      "id": "th2",
+      "group": "s4t1",
+      "frames": "perf",
+      "repeats": 1,
+      "bin": "<NATIVE4B-S4T1>",
+      "cvars": [
+        "native_settings_frontend=false",
+        "native_fps_limit=0",
+        "framerate_limit=0"
+      ],
+      "env": {
+        "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv",
+        "LEGO_NATIVE_THREADED": "1",
+        "LEGO_NATIVE_PREPARE_THREADS": "2",
+        "LEGO_NATIVE_SNAPSHOT_STATE": "1"
+      },
+      "note": "#21 bin, variable unset, th2: check 'Native draw batches: parallel workers=2'; no 'chain priority' line",
+      "driver": "drivers/thread-cpu.ps1"
+    },
+    {
+      "id": "th2cp3",
+      "group": "s4t1",
+      "frames": "perf",
+      "repeats": 1,
+      "bin": "<NATIVE4B-S4T1>",
+      "cvars": [
+        "native_settings_frontend=false",
+        "native_fps_limit=0",
+        "framerate_limit=0"
+      ],
+      "env": {
+        "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv",
+        "LEGO_NATIVE_THREADED": "1",
+        "LEGO_NATIVE_PREPARE_THREADS": "2",
+        "LEGO_NATIVE_SNAPSHOT_STATE": "1",
+        "LEGO_NATIVE_CHAIN_PRIORITY": "3"
+      },
+      "note": "#21 ON, mode 3, th2: 1 mode line; thread lines worker, recording queue (one per RecordingQueue instance), prepare x2, all priority=1 ecoqos=opt-out",
+      "driver": "drivers/thread-cpu.ps1"
+    }
+  ]
+}

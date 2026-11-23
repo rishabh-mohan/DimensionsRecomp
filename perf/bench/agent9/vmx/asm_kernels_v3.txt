@@ -1,0 +1,217 @@
+---- k_vsubsws_distinct_old (v3)
+ vmovdqa xmm0, xmmword ptr [rcx + 608]
+ vmovdqa xmm1, xmmword ptr [rcx + 624]
+ vpsubd xmm2, xmm0, xmm1
+ vpcmpgtd xmm0, xmm1, xmm0
+ vpxor xmm0, xmm0, xmm2
+ vpsrad xmm1, xmm2, 31
+ vpbroadcastd xmm3, dword ptr [rip + __real@80000000]
+ vpxor xmm1, xmm1, xmm3
+ vblendvps xmm0, xmm2, xmm1, xmm0
+ vmovaps xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vsubsws_distinct_new (v3)
+ vmovdqa xmm0, xmmword ptr [rcx + 608]
+ vmovdqa xmm1, xmmword ptr [rcx + 624]
+ vpsubd xmm2, xmm0, xmm1
+ vpxor xmm3, xmm0, xmm2
+ vpxor xmm1, xmm1, xmm0
+ vpand xmm1, xmm3, xmm1
+ vbroadcastss xmm3, dword ptr [rip + __real@80000000]
+ vbroadcastss xmm4, dword ptr [rip + __real@7fffffff]
+ vblendvps xmm0, xmm4, xmm3, xmm0
+ vblendvps xmm0, xmm2, xmm0, xmm1
+ vmovaps xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vsrb_distinct_old (v3)
+ vmovdqa xmm0, xmmword ptr [rcx + 608]
+ vmovdqa xmm1, xmmword ptr [rcx + 624]
+ vpsrlw xmm2, xmm0, 4
+ vpand xmm2, xmm2, xmmword ptr [rip + __xmm@0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f]
+ vpsllw xmm1, xmm1, 5
+ vpblendvb xmm0, xmm0, xmm2, xmm1
+ vpsrlw xmm2, xmm0, 2
+ vpand xmm2, xmm2, xmmword ptr [rip + __xmm@3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f]
+ vpand xmm1, xmm1, xmmword ptr [rip + __xmm@e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0]
+ vpaddb xmm1, xmm1, xmm1
+ vpblendvb xmm0, xmm0, xmm2, xmm1
+ vpsrlw xmm2, xmm0, 1
+ vpand xmm2, xmm2, xmmword ptr [rip + __xmm@7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f]
+ vpaddb xmm1, xmm1, xmm1
+ vpblendvb xmm0, xmm0, xmm2, xmm1
+ vmovdqa xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vsrb_distinct_new (v3)
+ vmovdqa xmm0, xmmword ptr [rcx + 608]
+ vmovdqa xmm1, xmmword ptr [rcx + 624]
+ vpsllw xmm2, xmm1, 5
+ vpsrlw xmm3, xmm0, 4
+ vpand xmm3, xmm3, xmmword ptr [rip + __xmm@0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f]
+ vpblendvb xmm0, xmm0, xmm3, xmm2
+ vpsllw xmm2, xmm1, 6
+ vpsrlw xmm3, xmm0, 2
+ vpand xmm3, xmm3, xmmword ptr [rip + __xmm@3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f]
+ vpblendvb xmm0, xmm0, xmm3, xmm2
+ vpsllw xmm1, xmm1, 7
+ vpsrlw xmm2, xmm0, 1
+ vpand xmm2, xmm2, xmmword ptr [rip + __xmm@7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f]
+ vpblendvb xmm0, xmm0, xmm2, xmm1
+ vmovdqa xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vsrab_distinct_old (v3)
+ vmovdqa xmm0, xmmword ptr [rcx + 624]
+ vpsllw xmm0, xmm0, 5
+ vpand xmm0, xmm0, xmmword ptr [rip + __xmm@e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0]
+ vmovdqa xmm1, xmmword ptr [rcx + 608]
+ vpunpckhbw xmm2, xmm0, xmm0
+ vpunpckhbw xmm3, xmm1, xmm1
+ vpsraw xmm4, xmm3, 4
+ vpblendvb xmm3, xmm3, xmm4, xmm2
+ vpsraw xmm4, xmm3, 2
+ vpaddw xmm5, xmm2, xmm2
+ vpblendvb xmm3, xmm3, xmm4, xmm5
+ vpsraw xmm4, xmm3, 1
+ vpsllw xmm2, xmm2, 2
+ vpblendvb xmm2, xmm3, xmm4, xmm2
+ vpsrlw xmm2, xmm2, 8
+ vpunpcklbw xmm0, xmm0, xmm0
+ vpunpcklbw xmm1, xmm1, xmm1
+ vpsraw xmm3, xmm1, 4
+ vpblendvb xmm1, xmm1, xmm3, xmm0
+ vpsraw xmm3, xmm1, 2
+ vpaddw xmm4, xmm0, xmm0
+ vpblendvb xmm1, xmm1, xmm3, xmm4
+ vpsraw xmm3, xmm1, 1
+ vpsllw xmm0, xmm0, 2
+ vpblendvb xmm0, xmm1, xmm3, xmm0
+ vpsrlw xmm0, xmm0, 8
+ vpackuswb xmm0, xmm0, xmm2
+ vmovdqa xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vsrab_distinct_new (v3)
+ vmovdqa xmm0, xmmword ptr [rcx + 608]
+ vmovdqa xmm1, xmmword ptr [rcx + 624]
+ vpxor xmm0, xmm0, xmmword ptr [rip + __xmm@80808080808080808080808080808080]
+ vpsllw xmm2, xmm1, 5
+ vpsrlw xmm3, xmm0, 4
+ vpand xmm3, xmm3, xmmword ptr [rip + __xmm@0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f]
+ vpblendvb xmm0, xmm0, xmm3, xmm2
+ vpsllw xmm2, xmm1, 6
+ vpsrlw xmm3, xmm0, 2
+ vpand xmm3, xmm3, xmmword ptr [rip + __xmm@3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f]
+ vpblendvb xmm0, xmm0, xmm3, xmm2
+ vpsllw xmm2, xmm1, 7
+ vpsrlw xmm3, xmm0, 1
+ vpand xmm3, xmm3, xmmword ptr [rip + __xmm@7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f]
+ vpblendvb xmm0, xmm0, xmm3, xmm2
+ vpand xmm1, xmm1, xmmword ptr [rip + __xmm@07070707070707070707070707070707]
+ vmovq xmm2, qword ptr [rip + __xmm@00000000000000000102040810204080]
+ vpshufb xmm1, xmm2, xmm1
+ vpsubb xmm0, xmm0, xmm1
+ vmovdqa xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vrlw_distinct_old (v3)
+ mov rax, rcx
+ mov r9d, dword ptr [rcx + 608]
+ mov r8d, dword ptr [rcx + 612]
+ movzx edx, byte ptr [rcx + 632]
+ movzx ecx, byte ptr [rcx + 628]
+ rol r8d, cl
+ movzx ecx, byte ptr [rax + 624]
+ rol r9d, cl
+ mov r10d, dword ptr [rax + 616]
+ mov ecx, edx
+ rol r10d, cl
+ vpbroadcastd xmm0, dword ptr [rip + __real@0000001f]
+ vpand xmm0, xmm0, xmmword ptr [rax + 624]
+ mov ecx, dword ptr [rax + 620]
+ vpxor xmm1, xmm1, xmm1
+ vpextrb edx, xmm0, 12
+ shlx r11d, ecx, edx
+ neg dl
+ vpblendd xmm2, xmm1, xmmword ptr [rax + 608], 7
+ shrx ecx, ecx, edx
+ vmovd xmm3, r9d
+ vpinsrd xmm3, xmm3, r8d, 1
+ vpinsrd xmm3, xmm3, r10d, 2
+ vpinsrd xmm3, xmm3, ecx, 3
+ vpcmpeqd xmm0, xmm0, xmm1
+ vblendvps xmm0, xmm3, xmm2, xmm0
+ vmovd xmm1, r11d
+ vpslldq xmm1, xmm1, 12
+ vorps xmm0, xmm0, xmm1
+ vmovaps xmmword ptr [rax + 640], xmm0
+ ret
+---- k_vrlw_distinct_new (v3)
+ vmovdqa xmm0, xmmword ptr [rcx + 608]
+ vpbroadcastd xmm1, dword ptr [rip + __real@0000001f]
+ vpand xmm1, xmm1, xmmword ptr [rcx + 624]
+ vpsllvd xmm2, xmm0, xmm1
+ vpbroadcastd xmm3, dword ptr [rip + __real@00000020]
+ vpsubd xmm1, xmm3, xmm1
+ vpsrlvd xmm0, xmm0, xmm1
+ vpor xmm0, xmm2, xmm0
+ vmovdqa xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vsraw_distinct_old (v3)
+ vmovdqa xmm0, xmmword ptr [rcx + 608]
+ vmovdqa xmm1, xmmword ptr [rcx + 624]
+ vpshufb xmm1, xmm1, xmmword ptr [rip + __xmm@0000000000000000000000000c080400]
+ vpand xmm1, xmm1, xmmword ptr [rip + __xmm@0000000000000000000000001f1f1f1f]
+ vpmovzxbd xmm1, xmm1
+ vpsravd xmm0, xmm0, xmm1
+ vmovdqa xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vsraw_distinct_new (v3)
+ vpbroadcastd xmm0, dword ptr [rip + __real@0000001f]
+ vpand xmm0, xmm0, xmmword ptr [rcx + 624]
+ vmovdqa xmm1, xmmword ptr [rcx + 608]
+ vpsravd xmm0, xmm1, xmm0
+ vmovdqa xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vsrw_distinct_old (v3)
+ vmovdqa xmm0, xmmword ptr [rcx + 608]
+ vmovdqa xmm1, xmmword ptr [rcx + 624]
+ vpshufb xmm1, xmm1, xmmword ptr [rip + __xmm@0000000000000000000000000c080400]
+ vpand xmm1, xmm1, xmmword ptr [rip + __xmm@0000000000000000000000001f1f1f1f]
+ vpmovzxbd xmm1, xmm1
+ vpsrlvd xmm0, xmm0, xmm1
+ vmovdqa xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vsrw_distinct_new (v3)
+ vpbroadcastd xmm0, dword ptr [rip + __real@0000001f]
+ vpand xmm0, xmm0, xmmword ptr [rcx + 624]
+ vmovdqa xmm1, xmmword ptr [rcx + 608]
+ vpsrlvd xmm0, xmm1, xmm0
+ vmovdqa xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vpkuhus_distinct_old (v3)
+ vmovdqa ymm0, ymmword ptr [rcx + 608]
+ vpminuw ymm0, ymm0, ymmword ptr [rip + __ymm@00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff]
+ vextracti128 xmm1, ymm0, 1
+ vpackuswb xmm0, xmm1, xmm0
+ vmovdqa xmmword ptr [rcx + 640], xmm0
+ vzeroupper
+ ret
+---- k_vpkuhus_distinct_new (v3)
+ vpbroadcastd xmm0, dword ptr [rip + __real@00ff00ff]
+ vpminuw xmm1, xmm0, xmmword ptr [rcx + 608]
+ vpminuw xmm0, xmm0, xmmword ptr [rcx + 624]
+ vpackuswb xmm0, xmm0, xmm1
+ vmovdqa xmmword ptr [rcx + 640], xmm0
+ ret
+---- k_vpkuwus_distinct_old (v3)
+ vpbroadcastd ymm0, dword ptr [rip + __real@0000ffff]
+ vpminud ymm0, ymm0, ymmword ptr [rcx + 608]
+ vextracti128 xmm1, ymm0, 1
+ vpackusdw xmm0, xmm1, xmm0
+ vmovdqa xmmword ptr [rcx + 640], xmm0
+ vzeroupper
+ ret
+---- k_vpkuwus_distinct_new (v3)
+ vpbroadcastd xmm0, dword ptr [rip + __real@0000ffff]
+ vpminud xmm1, xmm0, xmmword ptr [rcx + 608]
+ vpminud xmm0, xmm0, xmmword ptr [rcx + 624]
+ vpackusdw xmm0, xmm0, xmm1
+ vmovdqa xmmword ptr [rcx + 640], xmm0
+ ret

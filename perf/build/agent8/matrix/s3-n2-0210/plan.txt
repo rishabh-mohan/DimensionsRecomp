@@ -1,0 +1,27 @@
+﻿=== timing matrix: NATIVE ON build, FUNCTIONAL rows (hidden desktop OK, not timing): Agent 4 N1-N3 threaded paths and F1/F2 state-call counts, Agent 6 P1/P2 PSO counters ===
+matrix   <workspace>\bench\agent8\run\matrix-native-functional.json
+note     Functional checks: counts and log lines, not frame times. Agent-launched runs are fine (hidden desktop): run-matrix.ps1 -Matrix bench\agent8\run\matrix-native-functional.json -NoPrompt [-Only n1,n2,n3]. BIN DIR: build/agent2/native2-bin (S2, staged by Agent 2 at 23:22; it booted cleanly at 23:46 as window 3's n0).
+note     Every arm passes native_settings_frontend=false: with the frontend on, native builds throw at start ('Native setting is not registered: present_fsr_sharpness_reduction', FidelityFX-OFF SDK; perf-notes/agent8-first-boot.md). n1-n3 also run uncapped (native_fps_limit=0, framerate_limit=0) with drivers/thread-cpu.ps1, the same cvars and driver as th1-th3 in bench/agent4/matrix-native-threaded.json.
+note     Timing matches Agent 4's base command: warm-up 30 s from the first frame, 60 s window, frames=native (LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv), no settle.
+note     Agent 4 S2.12 (n1-n3): game.log must show 'Native GPU: threaded recording ON (LEGO_NATIVE_THREADED=1)'; 'Native draw batches: serial workers=0' (n1), 'parallel workers=2' (n2), 'serial workers=2' (n3); 'Native worker: last 600 frames tasks=...' every 600 presents; no new errors or warnings against the native first boot. Report peak threads and mean cores.
+note     Agent 4 S2.10 (f1/f2): the runner creates <run>\state_calls.trigger at the measure start; the game writes 120 rows to <run>\state_calls.csv. F1: sum(index_equal)/sum(index_calls) and the blend ratio (the elision ceiling; T1 is worth timing only if >= ~30%). F2: index_skipped <= index_equal and blend_skipped <= blend_equal on every row; nothing new in game.log against F1.
+note     Agent 6 (agent6-runspecs.md): p1 cold, p2 seeded from p1's cache (its last idle autosave). drivers/pso-stats-at-end.ps1 gets the PSO summary logged before the close. Compile counts are valid on the hidden desktop; frame times are not.
+settings warm-up from firstframe (boot timeout 240 s, settle 0 s); order fixed; close timeout 60 s; cooldown 5 s
+arms:
+       n2: bin build/agent2/native2-bin; frames native; x1; warm-up 30 s; window 60 s; group threaded; cvars native_settings_frontend=false native_fps_limit=0 framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv LEGO_NATIVE_THREADED=1 LEGO_NATIVE_PREPARE_THREADS=2 LEGO_NATIVE_SNAPSHOT_STATE=1; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         Agent 4 N2: parallel draws. 'Native draw batches: parallel workers=2'
+round 1  n2
+order    n2
+estimate 1 runs (0 cold), about 3 min (warm boot 20 s, cold boot 61 s, close 35 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-57EZY2EV33A7IIWBEM7GSO27QD -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   8.71 GB
+game       no legodimensions.exe running
+builds     none (clang-cl, clang, lld-link, ninja, dxc, cl)
+bin        build/agent2/native2-bin : ok (MANIFEST.txt)
+screensaver WPXSCR~1.SCR after 120 s: the keep-awake request should hold it off; if it starts during timing runs, set it to (None)
+estimate   1 runs, about 3 min: done around 02:13
+keep-awake ON (SetThreadExecutionState continuous+system+display until the matrix ends)

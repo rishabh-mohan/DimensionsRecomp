@@ -1,0 +1,19 @@
+﻿13:25:33 BEGIN sdk-build : cmake --build "<workspace>\build\agent2\snap1-sdk" --config Release -j 10 -- -k 0 > "<workspace>\build\agent2\snap4a-sdk-build.log" 2>&1
+13:27:01 END   sdk-build exit=0 wall=84.8s freeC=269.17GB
+13:27:01 BEGIN sdk-install : cmake --install "<workspace>\build\agent2\snap1-sdk" --config Release > "<workspace>\build\agent2\snap4a-sdk-install.log" 2>&1
+13:28:43 END   sdk-install exit=0 wall=102.6s freeC=269.15GB
+13:28:43 BEGIN gen-check : python "<workspace>\build\agent2\gen-check.py" > "<workspace>\build\agent2\snap4a-game-gen-check.log" 2>&1
+13:30:15 END   gen-check exit=0 wall=91.2s freeC=269.17GB
+13:30:15 BEGIN gate : python "<workspace>\build\agent2\snap-gate.py" "<workspace>\build\agent2\snap1-off" > "<workspace>\build\agent2\snap4a-gate.log" 2>&1
+13:30:18 END   gate exit=0 wall=3.4s freeC=269.17GB
+13:30:18 BEGIN game-build : cmake --build "<workspace>\build\agent2\snap1-off" --target legodimensions -j 10 -- -k 0 > "<workspace>\build\agent2\snap4a-game-build.log" 2>&1
+13:30:29 END   game-build exit=0 wall=10.2s freeC=269.16GB
+13:33:03 NOTE  native: LEGO_GPU_PRELINK_JOBS=10
+13:33:03 BEGIN native-configure : cmake -S "<workspace>\build\agent2\snap1\DimensionsRecomp\rexlego" -B "<workspace>\build\agent2\snap1-on" -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLEGODIMENSIONS_NATIVE_GPU=ON -DLEGO_NATIVE_SHADER_CACHE=<workspace>/build/agent2/snap1/DimensionsRecomp/rexlego/out/native-gpu/aot/lego-dxil-cache.cpp -DLEGO_NATIVE_RUNTIME_SHADER_CACHE=<workspace>/build/agent2/snap1/DimensionsRecomp/rexlego/out/native-gpu/stubs/runtime-cache.cpp -DLEGO_TEMPORAL_SHADER_BANK=<workspace>/build/agent2/snap1/DimensionsRecomp/rexlego/out/native-gpu/stubs/temporal-bank -DLEGO_FLOAT_BLEND_INDICES_BANK=<workspace>/build/agent2/snap1/DimensionsRecomp/rexlego/out/native-gpu/aot/float-blend-indices-bank -DLEGO_INSTANCED_CONSTANTS_BANK=<workspace>/build/agent2/snap1/DimensionsRecomp/rexlego/out/native-gpu/aot/instanced-constants-bank -DLEGO_DXC_ROOT=<workspace>/build/agent2/snap1/DimensionsRecomp/research/dxc-1.9.2609 -DLEGO_HOST_DXC_EXECUTABLE= -DLEGO_NATIVE_BINARY_CACHE=ON -DLEGO_NATIVE_FIDELITYFX_RUNTIME=<workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/thirdparty/FidelityFX-SDK/PrebuiltSignedDLL/amd_fidelityfx_dx12.dll -DLEGO_HOST_LLVM_MC=<workspace>/toolchain/llvm-23.1.6/bin/llvm-mc.exe -DLEGODIMENSIONS_X86_BASELINE=x86-64-v3 -DCMAKE_PREFIX_PATH=<workspace>/build/agent2/snap1-sdk/install -DREXGLUE_HOST_CODEGEN_EXECUTABLE=<workspace>/build/agent2/codegen-frozen/codegen-frozen.exe -DCMAKE_EXPORT_COMPILE_COMMANDS=ON > "<workspace>\build\agent2\snap4a-native-configure.log" 2>&1
+13:33:11 END   native-configure exit=0 wall=7.7s freeC=268.95GB
+13:33:11 BEGIN gen-check : python "<workspace>\build\agent2\gen-check.py" > "<workspace>\build\agent2\snap4a-native-gen-check.log" 2>&1
+13:33:16 END   gen-check exit=0 wall=5.5s freeC=268.94GB
+13:33:16 BEGIN gate : python "<workspace>\build\agent2\snap-gate.py" "<workspace>\build\agent2\snap1-on" > "<workspace>\build\agent2\snap4a-native-gate.log" 2>&1
+13:33:17 END   gate exit=0 wall=1s freeC=268.94GB
+13:33:17 BEGIN native-build : cmake --build "<workspace>\build\agent2\snap1-on" --target legodimensions -j 10 -- -k 0 > "<workspace>\build\agent2\snap4a-native-build.log" 2>&1
+13:34:49 END   native-build exit=0 wall=91.2s freeC=268.93GB

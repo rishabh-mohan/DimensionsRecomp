@@ -1,0 +1,18 @@
+run      <workspace>\build\agent3\selftest-runs\20261121-233247-normal
+mode     FUNCTIONAL ONLY (hidden desktop exebox-73EKOPXWXUIC6WQ5MMEB2DOAK3), NOT FOR TIMING
+result   RUNNING; closed by WM_CLOSE in 0.08 s; exit code 0x00000000
+process  cpu 0.4 s over 12.12 s (avg 0.03 cores); peak working set 38 MB, peak private 25 MB
+boot     TU patch 0.0.0.3 -> 0.0.23.3 at 0.0 s; DXGI adapter 'Harness Fake Adapter' (0 MB) at 0.0 s; shader storage init at 0.0 s; frames first written 2.0 s after launch
+log      7 lines over 11.41 s: 1 warnings, 0 errors, 0 critical; 0 MISSING-FUNCTION addresses; unknown cvars: fake_selftest_cvar
+frames   603 presented over 11.36 s; 494 measured after a 2.0 s warm-up:
+         mean 18.929 ms (52.83 fps)  median 16.864  p95 30.336  p99 31.327  max 41.068 ms  >50 ms: 0  1% low 31.92 fps
+         draws/frame median 825.0; PSO creations 28 (70.0 ms), 0 after warm-up; scene 640x360 -> output 640x360; cap 60; vsync 0; focused 0.0
+timeline fps per 10 s: 53.2
+perf     603 guest frames over 11.36 s (perf.csv); 494 measured from 2.0 s after the first frame:
+         mean 18.928 ms (52.83 fps)  median 16.863  p95 30.336  p99 31.327  p99.9 36.613  max 41.067 ms  >50 ms: 0  >100 ms: 0  1% low 31.92 fps
+         draws/frame p10/p50/p90 903.0/920.0/936.0; pipeline cache misses 84 (0 after warm-up); texture cache misses 140
+perf     per 10 s from the first frame (warm-up included), fps: 53.2
+         median draws per 10 s: 919
+         median vertices per 10 s: 120267
+gpu      NVIDIA GeForce MX570 (NVML, 1 Hz): 9 samples from 4.0 to 12.0 s: util median 14.0 % (p90 42.2, max 43); graphics clock median 817 MHz (p10 580, max 1155); memory clock 5501 MHz
+         power median 6.57 W (max 7.83); temperature median 68.0 C (max 69, 70 over the whole run); P3 in 0.444 of samples; clock limit reasons (share of samples): idle 1.0, power_cap 0.0, hw_slowdown 0.0, thermal 0.0

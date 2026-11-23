@@ -1,0 +1,71 @@
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-22 22:09:00
+mode: RECHECK (already in bench\agent8\run; no copy)
+result: OK
+run: only=s0,p2,p2f,p2fc repeats=5 -ColdShared; -PlanOnly: 21 runs, about 48 min (runner); expected 21 runs; Agent 7's formula 1.70 + 2.14 x 4 x 5 = 44.5 min
+latest start: the launcher accepts this GO until 06:32 (07:30 - runner estimate 48 min - slack 10 min); started then, it ends about 07:16 by Agent 7's formula
+GO line: GO W6 matrix-window6.json E50D791B6C38638F718A1AF65EB15EAF543A78AC8EA50B69DD1CC96AB7C9A0D2 only=s0,p2,p2f,p2fc repeats=5
+draft: bench\agent8\run\matrix-window6.json  sha256 E50D791B6C38638F718A1AF65EB15EAF543A78AC8EA50B69DD1CC96AB7C9A0D2  9211 bytes
+matrix for the GO: bench\agent8\run\matrix-window6.json  sha256 E50D791B6C38638F718A1AF65EB15EAF543A78AC8EA50B69DD1CC96AB7C9A0D2
+launcher: bench\agent5\launch\run-night.ps1 sha256 B0902106C4D935810C5747951095053E117165BE36CF8FE1F32B0C0337E8DB33 (2026-11-22 21:42:43); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/devoff4b-bin (arms s0,p2,p2f,p2fc,f,fc): MANIFEST.txt sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA (expected DE11A914079D7DF7); legodimensions.exe DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 102, FAIL 0
+arm: s0 (devoff4b; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+arm: p2 (devoff4b; frames perf; cvars framerate_limit=0;shared_memory_single_hold_rearm=true; env {}; drivers/thread-cpu.ps1)
+arm: p2f (devoff4b; frames perf; cvars framerate_limit=0;shared_memory_single_hold_rearm=true;physical_protect_hold_global_lock=true; env {}; drivers/thread-cpu.ps1)
+arm: p2fc (devoff4b; frames perf; cvars framerate_limit=0;shared_memory_single_hold_rearm=true;physical_protect_hold_global_lock=true;physical_protect_keep_watch=true;physical_protect_keep_watch_verify=false; env {}; drivers/thread-cpu.ps1)
+arm: f (devoff4b; frames perf; cvars framerate_limit=0;physical_protect_hold_global_lock=true; env {}; drivers/thread-cpu.ps1)
+arm: fc (devoff4b; frames perf; cvars framerate_limit=0;physical_protect_hold_global_lock=true;physical_protect_keep_watch=true;physical_protect_keep_watch_verify=false; env {}; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: 21 / 21
+NOTE: matrix-window6.json has 2 non-ASCII bytes
+NOTE: queue gap: a queue game runs (LAUNCH 22:09:03, 21 s ago); -PlanOnly at 22:09:24 after 6 s of waiting
+
+--- launcher Get-BinHashes (only= arms)
+DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83  build/agent2/devoff4b-bin/legodimensions.exe
+DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA  build/agent2/devoff4b-bin/MANIFEST.txt
+
+--- run-matrix.ps1 -Matrix bench\agent8\run\matrix-window6.json -Only s0,p2,p2f,p2fc -Repeats 5 -ColdShared -NoPrompt -PlanOnly (launcher Get-Plan)
+=== timing matrix: Window 6 (Agent 5's draft v2, finalized 2026-11-22 21:16 for build/agent2/devoff4b-bin): upload path on the S4b bin. s0 (every switch OFF) vs p2 = #8 P2, p2f = #8 + #5 fix (i), p2fc = #8 + #5 + #4 C1 v3 keep-watch (verify off); f and fc = the decision table's arms without P2 ===
+matrix   <workspace>\bench\agent8\run\matrix-window6.json
+note     W6 finalized 2026-11-22 21:16 for build/agent2/devoff4b-bin by build/agent5/w6-draft/finalize-w6.ps1 from Agent 5's draft v2 (matrix-w6.json): bin build/agent2/devoff4b-bin in every arm (legodimensions.exe sha256 DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83). The gates before any timed run are G1-G12 in build/agent12/w6-gates/W6-GATES.md (v2, 20:20); build/agent5/w6-draft/README.md has the summary.
+note     W6 (S4-DRAFT L346): run\run-matrix.ps1 -Matrix <this file> -Only s0,p2,p2f,p2fc -Repeats 3 -ColdShared -NoPrompt. One unscored cold run shared by all arms (they all use one bin), then 3 round-robin rounds rotated each round (3 rows of a 4x4 Latin square), with s0, p2, p2f and p2fc x3 each: 13 runs, about 33 min (S4-DRAFT L328). Overnight it starts from Agent 5's launcher (bench/agent5/launch/RUN-NIGHT.cmd) with the GO line 'GO W6 matrix-window6.json <sha256> only=s0,p2,p2f,p2fc repeats=3'; RUN-WINDOW6.cmd is the double-click fallback. Check with -PlanOnly first.
+note     The arms differ only in these switches. p2 adds shared_memory_single_hold_rearm (#8 P2). p2f also adds physical_protect_hold_global_lock (#5 fix (i)). p2fc also adds physical_protect_keep_watch (#4 C1 v3) with physical_protect_keep_watch_verify=false. f = fix (i) alone and fc = f + C1 v3 (no P2), for the decision table's 'G4 FAIL, no cap' row only. Every other S4b switch stays at its default OFF (#7's hash log, M1, #18/#20 and the rest). Switches are set at launch only, hands off (G9): C1 v3 latches physical_protect_keep_watch and physical_protect_hold_global_lock at init (kInitOnly), so a console set never reaches Protect; physical_protect_keep_watch_verify and every other cvar are still read live.
+note     Pairs (R3), all on the same bin: P2 = p2 - s0; fix (i) = p2f - p2; C1 = p2fc - p2f, with fix (i) ON in both arms (a12 S4.12 step 7; b2r §25 correction 3); stack = p2fc - s0. Read GPU Commands ms/f (threads.csv, the main metric), Main ms/f (C1 swaps Main's lock-time protects for write faults), fps and the slowest frames (perf.csv, summary.md). Per arm: median of 3 and min-max. Per pair: the difference of medians plus the 3 per-round differences. Noise rule: if the two arms' min-max ranges overlap, write 'no detectable change' with the median difference in brackets. A12 asks for 5 or more repeats (S4-DRAFT L322).
+note     Never in a timing arm: #7's upload hash log (shared_memory_upload_hash_log, +1-3 ms/f on GPU Commands) or slow_frame_log_ms. Upload KB/f, kept protects per frame and P2's full-buffer counter come from untimed agent runs on the same bin: side 1 = p2f's set and side 2 = p2fc's set, both + shared_memory_upload_hash_log=true and slow_frame_log_ms=1; gate A = p2fc's set with physical_protect_keep_watch_verify=true and slow_frame_log_ms=1 over the title, the menu walk and one level load; side 3 (suggested) = p2fc's set + slow_frame_log_ms=1 on harness/routes/attract-long.txt. See W6-GATES.md, 'Untimed runs'.
+note     Per-run validity (G10, S4-DRAFT L323-327): each run's slow state, >= 6 GB free, Defender below ~5 % (or the launcher's RELAXED gate, G12), and the log lines. Every p2fc and fc game.log needs 'C1 keep-watch: on (with physical_protect_hold_global_lock)' and 'C1 keep-watch: first kept protect at', and must have no 'C1 verify: on'. No arm may log 'Recovered stale physical page protection', 'Unhandled guest physical write fault' or 'PhysicalHeap::Protect failed' (b2r L1178). P2 and fix (i) print no line of their own: their ON proof is the cvar list the runner records per run; p2fc's init line also shows that fix (i) is ON.
+note     Environment (G11, G12): keep sys_csv true. After the window: python build\agent12\w6-gates\w6_env_record.py <matrix out dir> --gate-log bench\agent5\launch\status\window-<id>-<HHmm>.log --json <out>. G11: one power overlay, scheme and AC in all 13 runs; if the overlay is not W5's best_efficiency, compare W6 only within itself. G12: the launcher's gate line says STRICT or RELAXED; RELAXED means a steady ~1 core of Defender through the window, which the round-robin spreads over all arms alike (quote the MsMpEng triple in R7).
+note     Window as in windows 4 and 5: a 5 s settle and a 55 s warm-up from the first frame, then 50 s measured, so every window starts >= 60 s after the first frame (Agent 1's floor). The cold run has a 55 s warm-up and a 30 s window. Runner flags, frame source (perf.csv, uncapped) and driver (drivers/thread-cpu.ps1) as in window 5. Agent 5's launcher refuses arms with menu, profile, triggers, toml or seed_cache fields, bins other than build/agent2/<name>-bin with MANIFEST.txt and legodimensions.exe, and env keys outside the 11 in build/agent8/w8w9/ENV-KEYS-F1.txt, and it refuses drivers that are not a plain string drivers/<name>.ps1; this matrix has none of them (env {} and drivers/thread-cpu.ps1 in every arm).
+note     Decision table (W6-GATES.md; Agent 1 decides). G4 PASS and C1 go: -Only s0,p2,p2f,p2fc -Repeats 3 (13 runs). G4 PASS and C1 no-go: -Only s0,p2 -Repeats 6 (1 + 12 = 13 runs; the runner rotates AB, BA, ...). G4 FAIL with a cap: rebuild with the cap, redo G2-G4, then row 1. G4 FAIL, no cap, C1 go: -Only s0,f,fc -Repeats 3 (10 runs, ~25 min); C1 = fc - f, fix (i) = f - s0. G4 FAIL, no cap, C1 no-go: Agent 1's call; not 's0 vs f only' (b2r L1181: fix (i) is timed only inside the C1 A/B).
+note     Timing comes only from the user's unlocked desktop (screensaver None, AC power, hands off): the overnight launcher or a double-click. Agent runs of this matrix (-Quick, hidden desktop) are functional only (G3).
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order roundrobin; close timeout 60 s; cooldown 5 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+       s0: bin build/agent2/devoff4b-bin; frames perf; x5; warm-up 55 s; window 50 s; group w6 (ref); cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         s0 = the S4b bin with every switch OFF (S4-DRAFT L338 defines s0 the same way on S4a)
+       p2: bin build/agent2/devoff4b-bin; frames perf; x5; warm-up 55 s; window 50 s; group w6; cvars framerate_limit=0 shared_memory_single_hold_rearm=true; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         #8 P2 ON (Agent 12, build/agent12/s4-p2): one G hold across a range's valid-bit update and its watch re-arm. Timed only if P2's full-buffer counter totals 0 in the untimed runs (G4); otherwise Agent 1 decides a cap. No log line of its own.
+       p2f: bin build/agent2/devoff4b-bin; frames perf; x5; warm-up 55 s; window 50 s; group w6; cvars framerate_limit=0 shared_memory_single_hold_rearm=true physical_protect_hold_global_lock=true; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         #8 + #5 fix (i) ON (latched at init in C1 v3): C1's control arm. No log line of its own.
+       p2fc: bin build/agent2/devoff4b-bin; frames perf; x5; warm-up 55 s; window 50 s; group w6; cvars framerate_limit=0 shared_memory_single_hold_rearm=true physical_protect_hold_global_lock=true physical_protect_keep_watch=true physical_protect_keep_watch_verify=false; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         #8 + #5 + #4: C1 v3 keep-watch ON, verify off (keep_watch and hold_global_lock latched at init). Every game.log needs 'C1 keep-watch: on (with physical_protect_hold_global_lock)' and 'C1 keep-watch: first kept protect at', no 'C1 verify: on', and no stale-protection, unhandled-fault or 'PhysicalHeap::Protect failed' lines. Kept protects per frame: R4 (side 2 is the main source; timed p2fc runs are a cross-check).
+cold     s0 (build/agent2/devoff4b-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+         -ColdShared: one cold run for all 1 bin(s); the other bins first launch as scored round-1 runs
+round 1  s0 p2 p2f p2fc
+round 2  p2 p2f p2fc s0
+round 3  p2f p2fc s0 p2
+round 4  p2fc s0 p2 p2f
+round 5  s0 p2 p2f p2fc
+order    s0 p2 p2f p2fc | p2 p2f p2fc s0 | p2f p2fc s0 p2 | p2fc s0 p2 p2f | s0 p2 p2f p2fc
+estimate 21 runs (1 cold), about 48 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-BYLJR6KOERZY27HTEBZI23GI2B -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   11.82 GB
+game       no legodimensions.exe running
+builds     RUNNING: clang++:2936 clang++:16012 clang++:18156 clang++:22944 clang++:26464 clang++:26828 clang++:31572 clang++:31656 cmake:38524 ninja:35152 -> timing not valid while they run
+bin        build/agent2/devoff4b-bin : ok (MANIFEST.txt)
+screensaver none
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   21 runs, about 48 min: done around 22:57
+!!! These runs will be FUNCTIONAL ONLY (see above): their numbers are not timing results.
+PlanOnly: nothing started.

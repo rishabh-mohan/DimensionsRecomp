@@ -1,0 +1,210 @@
+﻿diff --git a/baseline/DimensionsRecomp/rexlego/src/cheat_engine.cpp b/DimensionsRecomp/rexlego/src/cheat_engine.cpp
+index 3fc3564..913f3ee 100644
+--- a/baseline/DimensionsRecomp/rexlego/src/cheat_engine.cpp
++++ b/DimensionsRecomp/rexlego/src/cheat_engine.cpp
+@@ -31,12 +31,16 @@ constexpr double kFloatEpsilon = 1e-3;
+ 
+ // Scan kinds handed to the scan thread.
+ constexpr int kScanNew = 0;
+ constexpr int kScanExact = 1;
+ constexpr int kScanCompare = 2;
+ 
++// Leading results cached when a filtering scan finishes. The menu lists 200;
++// TakeResults walks the bitmap only for a longer list than this.
++constexpr size_t kCachedResults = 1024;
++
+ double LoadValue(const uint8_t* p, CheatEngine::ValueType type) {
+   switch (type) {
+     case CheatEngine::ValueType::kUInt8:
+       return double(p[0]);
+     case CheatEngine::ValueType::kUInt16:
+       return double((uint32_t(p[0]) << 8) | p[1]);
+@@ -125,13 +129,18 @@ CheatEngine::CheatEngine(rex::memory::Memory* memory, std::filesystem::path save
+   freeze_thread_ = std::thread(&CheatEngine::FreezeMain, this);
+ }
+ 
+ CheatEngine::~CheatEngine() {
+   // Stop the freeze thread first: it runs continuously and touches memory_,
+   // snapshot_ and the mutex, all of which must not be live when Join() runs.
+-  freeze_running_ = false;
++  // The flag changes under the mutex so the thread cannot miss the notify.
++  {
++    std::lock_guard<std::mutex> lock(apply_mutex_);
++    freeze_running_ = false;
++  }
++  freeze_cv_.notify_all();
+   if (freeze_thread_.joinable()) {
+     freeze_thread_.join();
+   }
+   // Only once the freeze thread is gone: wait for any in-progress scan.
+   Join();
+   Save();
+@@ -286,12 +295,13 @@ void CheatEngine::RunScan(int kind, double value, CompareOp op) {
+   const uint8_t* base = memory_->physical_membase();
+ 
+   if (kind == kScanNew) {
+     ResetMask();
+     unfiltered_ = true;
+     result_count_ = 0;
++    cached_results_.clear();
+     TakeSnapshot();
+     scanning_ = false;
+     return;
+   }
+ 
+   // A value scan run without a snapshot behaves like a first scan.
+@@ -352,32 +362,47 @@ void CheatEngine::RunScan(int kind, double value, CompareOp op) {
+         }
+       }
+     }
+   }
+ 
+   result_count_ = kept;
++  // Published with the results by the scanning_ store below.
++  cached_results_.clear();
++  CollectResults(kCachedResults, cached_results_);
+   TakeSnapshot();
+   scanning_ = false;
+ }
+ 
+ std::vector<uint32_t> CheatEngine::TakeResults(size_t limit) const {
+   std::vector<uint32_t> out;
+   if (scanning_ || unfiltered_ || mask_.empty()) {
+     return out;
+   }
++  // The cache holds the first min(kCachedResults, result_count_) addresses, so
++  // it answers any request no longer than itself, and every request once it
++  // holds them all.
++  if (limit <= cached_results_.size() || cached_results_.size() == result_count_.load()) {
++    out.assign(cached_results_.begin(),
++               cached_results_.begin() + std::min(limit, cached_results_.size()));
++    return out;
++  }
++  CollectResults(limit, out);
++  return out;
++}
++
++void CheatEngine::CollectResults(size_t limit, std::vector<uint32_t>& out) const {
+   const uint32_t value_size = uint32_t(ValueTypeSize(scan_type_));
+   out.reserve(std::min<size_t>(limit, size_t(result_count_.load())));
+   for (size_t word_index = 0; word_index < mask_.size() && out.size() < limit; ++word_index) {
+     uint64_t word = mask_[word_index];
+     while (word && out.size() < limit) {
+       const int bit = std::countr_zero(word);
+       word &= word - 1;
+       out.push_back(uint32_t(((uint64_t(word_index) << 6) + uint64_t(bit)) * value_size));
+     }
+   }
+-  return out;
+ }
+ 
+ // ---------------------------------------------------------------------------
+ // Direct access.
+ 
+ double CheatEngine::ReadValue(uint32_t phys_addr, ValueType type) const {
+@@ -405,12 +430,13 @@ void CheatEngine::SetFrozen(uint32_t phys_addr, ValueType type, double value, bo
+     if (it != frozen_.end()) {
+       it->type = type;
+       it->value = value;
+     } else {
+       frozen_.push_back({phys_addr, type, value});
+     }
++    freeze_cv_.notify_one();
+   } else if (it != frozen_.end()) {
+     frozen_.erase(it);
+   }
+ }
+ 
+ bool CheatEngine::IsFrozen(uint32_t phys_addr) const {
+@@ -439,12 +465,13 @@ void CheatEngine::AddCheat(const std::string& name, uint32_t phys_addr, ValueTyp
+   std::lock_guard<std::mutex> lock(apply_mutex_);
+   Cheat cheat;
+   cheat.name = name.empty() ? "Unnamed cheat" : name;
+   cheat.enabled = true;
+   cheat.writes.push_back({phys_addr, type, value});
+   cheats_.push_back(std::move(cheat));
++  freeze_cv_.notify_one();
+ }
+ 
+ void CheatEngine::RemoveCheat(size_t index) {
+   std::lock_guard<std::mutex> lock(apply_mutex_);
+   if (index < cheats_.size()) {
+     cheats_.erase(cheats_.begin() + index);
+@@ -452,37 +479,49 @@ void CheatEngine::RemoveCheat(size_t index) {
+ }
+ 
+ void CheatEngine::SetCheatEnabled(size_t index, bool enabled) {
+   std::lock_guard<std::mutex> lock(apply_mutex_);
+   if (index < cheats_.size()) {
+     cheats_[index].enabled = enabled;
++    if (enabled) {
++      freeze_cv_.notify_one();
++    }
+   }
+ }
+ 
+ void CheatEngine::FreezeMain() {
++  // Same 50 ms cadence as a sleep loop while there is anything to apply. With
++  // nothing to apply it waits for a notify (new work or shutdown) instead of
++  // waking 20 times a second; the mutex is released while it waits.
++  std::unique_lock<std::mutex> lock(apply_mutex_);
+   while (freeze_running_) {
+-    {
+-      std::lock_guard<std::mutex> lock(apply_mutex_);
+-      auto apply = [&](const CheatWrite& write) {
+-        if (IsWritableAddress(write.phys_addr, ValueTypeSize(write.type))) {
+-          StoreValue(memory_->physical_membase() + write.phys_addr, write.type, write.value);
+-        }
+-      };
+-      for (const CheatWrite& write : frozen_) {
+-        apply(write);
++    bool has_work = false;
++    auto apply = [&](const CheatWrite& write) {
++      // Unwritable addresses still count: they are retried every tick, as before.
++      has_work = true;
++      if (IsWritableAddress(write.phys_addr, ValueTypeSize(write.type))) {
++        StoreValue(memory_->physical_membase() + write.phys_addr, write.type, write.value);
+       }
+-      for (const Cheat& cheat : cheats_) {
+-        if (!cheat.enabled) {
+-          continue;
+-        }
+-        for (const CheatWrite& write : cheat.writes) {
+-          apply(write);
+-        }
++    };
++    for (const CheatWrite& write : frozen_) {
++      apply(write);
++    }
++    for (const Cheat& cheat : cheats_) {
++      if (!cheat.enabled) {
++        continue;
+       }
++      for (const CheatWrite& write : cheat.writes) {
++        apply(write);
++      }
++    }
++    if (has_work) {
++      // Only shutdown ends this wait early; new work waits for the next tick.
++      freeze_cv_.wait_for(lock, std::chrono::milliseconds(50), [this] { return !freeze_running_; });
++    } else {
++      freeze_cv_.wait(lock);
+     }
+-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+   }
+ }
+ 
+ // Persistence, one cheat per line:
+ //   name|enabled|addr:type:value[;addr:type:value...]
+ // addr is a hex guest physical address, type the ValueType integer, e.g.
+@@ -542,9 +581,10 @@ void CheatEngine::Load() {
+       }
+     }
+     if (!cheat.writes.empty()) {
+       cheats_.push_back(std::move(cheat));
+     }
+   }
++  freeze_cv_.notify_one();
+ }
+ 
+ }  // namespace legodimensions::cheats

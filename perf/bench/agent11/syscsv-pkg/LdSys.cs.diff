@@ -1,0 +1,81 @@
+diff --git a/bench/agent8/run/drivers/LdSys.cs b/bench/agent8/run/drivers/LdSys.cs
+index b919729..c083237 100644
+--- a/bench/agent8/run/drivers/LdSys.cs
++++ b/bench/agent8/run/drivers/LdSys.cs
+@@ -9,6 +9,11 @@
+ // once); the stop file is checked after a notification and once per tick (fallback without the notification: waits of
+ // <= 250 ms, check at every wake). The power scheme / overlay RPCs (slow: up to ~1 s per call) run on one background
+ // thread; rows carry its latest completed values.
++// pkg_w,pp0_w,pp1_w,dram_w (last 4 columns, added 2026-11-22 by Agent 11): RAPL power in W of the package / cores (PP0) /
++// graphics (PP1) / DRAM, the mean over the last interval, from PDH \Energy Meter(*)\Power (mW; instances
++// RAPL_Package<n>_PKG/_PP0/_PP1/_DRAM, summed over packages; _Total and other channels ignored). Blank cells when the
++// counterset is missing (e.g. non-Intel or a VM: counters=5/6, failed=[power:0x...]) or a channel has no valid value.
++// Purpose: tell a PL1 (package power limit) clamp apart from other causes of the E-core ~550 MHz slow state.
+ using System;
+ using System.Collections.Generic;
+ using System.Diagnostics;
+@@ -22,7 +27,7 @@ public static class LdSys
+ {
+     public const string Header = "t_s,epoch_s,wall,idle_s,fg_pid,fg_game,game_alive,input_desktop,screensaver," +
+         "cpu_util_pct,cpu_perf_pct,base_mhz,eff_mhz,p_eff_mhz,e_eff_mhz,p_util_pct,e_util_pct," +
+-        "tz_passive_min_pct,tz_temp_max_c,ac,batt_saver,batt_pct,scheme,overlay";
++        "tz_passive_min_pct,tz_temp_max_c,ac,batt_saver,batt_pct,scheme,overlay,pkg_w,pp0_w,pp1_w,dram_w";
+ 
+     // ---- results, read by sys-csv.ps1 after Init / Run ----
+     public static bool GameGone;          // the game pid was not running at Init (-> header only, reason game_exit)
+@@ -66,15 +71,16 @@ public static class LdSys
+     // test machine, ~40 % of the whole collect). Same counter instance, same values.
+     const uint PDH_FMT = 0x00000200u | 0x00008000u;          // PDH_FMT_DOUBLE | PDH_FMT_NOCAP100 (perf/utility go > 100)
+     const uint PDH_MORE_DATA = 0x800007D2u;
+-    const int C_UTIL_ALL = 0, C_PERF_ALL = 1, C_FREQ_ALL = 2, C_TZ_PASSIVE = 3, C_TZ_TEMP = 4, NC = 5;
++    const int C_UTIL_ALL = 0, C_PERF_ALL = 1, C_FREQ_ALL = 2, C_TZ_PASSIVE = 3, C_TZ_TEMP = 4, C_POWER = 5, NC = 6;
+     const string TOTAL = "_Total";
+-    static readonly string[] CNames = { "util", "perf", "freq", "tz_passive", "tz_temp" };
++    static readonly string[] CNames = { "util", "perf", "freq", "tz_passive", "tz_temp", "power" };
+     static readonly string[] CPaths = {
+         @"\Processor Information(*)\% Processor Utility",
+         @"\Processor Information(*)\% Processor Performance",
+         @"\Processor Information(*)\Processor Frequency",
+         @"\Thermal Zone Information(*)\% Passive Limit",
+-        @"\Thermal Zone Information(*)\Temperature" };
++        @"\Thermal Zone Information(*)\Temperature",
++        @"\Energy Meter(*)\Power" };
+     static IntPtr query = IntPtr.Zero;
+     static readonly IntPtr[] counters = new IntPtr[NC];
+     static IntPtr arrBuf = IntPtr.Zero;
+@@ -679,6 +685,7 @@ public static class LdSys
+         double util = double.NaN, perf = double.NaN, bas = double.NaN;
+         double pEff = 0, eEff = 0, pUtil = 0, eUtil = 0; int npEff = 0, neEff = 0, npUtil = 0, neUtil = 0;
+         double tzPassive = double.NaN, tzTemp = double.NaN;
++        double pkgW = double.NaN, pp0W = double.NaN, pp1W = double.NaN, dramW = double.NaN;
+         try
+         {
+             freqBy.Clear();
+@@ -707,6 +714,16 @@ public static class LdSys
+             for (int i = 0; i < n; i++) if (double.IsNaN(tzPassive) || vals[i] < tzPassive) tzPassive = vals[i];
+             n = ReadArray(counters[C_TZ_TEMP]);
+             for (int i = 0; i < n; i++) if (vals[i] > 0 && (double.IsNaN(tzTemp) || vals[i] > tzTemp)) tzTemp = vals[i];
++            // RAPL power (mW, mean over the last interval) by channel suffix, summed over packages; _Total / others ignored
++            n = ReadArray(counters[C_POWER]);
++            for (int i = 0; i < n; i++)
++            {
++                string nm = names[i]; double wv = vals[i] / 1000.0;
++                if (nm.EndsWith("_PKG", StringComparison.OrdinalIgnoreCase)) pkgW = (double.IsNaN(pkgW) ? 0 : pkgW) + wv;
++                else if (nm.EndsWith("_PP0", StringComparison.OrdinalIgnoreCase)) pp0W = (double.IsNaN(pp0W) ? 0 : pp0W) + wv;
++                else if (nm.EndsWith("_PP1", StringComparison.OrdinalIgnoreCase)) pp1W = (double.IsNaN(pp1W) ? 0 : pp1W) + wv;
++                else if (nm.EndsWith("_DRAM", StringComparison.OrdinalIgnoreCase)) dramW = (double.IsNaN(dramW) ? 0 : dramW) + wv;
++            }
+         }
+         catch (Exception ex) { NoteOnce("pdh-x", "PDH read: " + ex.Message); }
+         Num(util, "0.00"); sb.Append(',');
+@@ -744,6 +761,10 @@ public static class LdSys
+             schemeV = null; overlayV = null;
+         }
+         sb.Append(schemeV ?? "").Append(',').Append(overlayV ?? "");
++        sb.Append(','); Num(pkgW, "0.000");
++        sb.Append(','); Num(pp0W, "0.000");
++        sb.Append(','); Num(pp1W, "0.000");
++        sb.Append(','); Num(dramW, "0.000");
+ 
+         sb.Append("\r\n");
+         w.Write(sb.ToString());

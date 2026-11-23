@@ -1,0 +1,69 @@
+﻿=== journal_bench  2026-11-21 18:31:46  runs=3 quick=True
+load before: total CPU 100% of 12 logical CPUs; busiest (per-CPU %): PresentMon_x64=101%, dllhost=101%, powershell#8=97%, clang++#6=66%, agy#6=62%, clang++#9=62%, clang++=59%, WerFault=59%
+journal_bench: sizeof old=3276808 new=2129984 bytes, runs=3 seed=0x5eed2026, logical CPUs=12
+  phase colliding: 32 buckets x 12 keys    pool=486     ops=30000    mismatches=0
+  phase random: 20000 pointers + aliases   pool=20000   ops=100000   mismatches=0
+  phase tiny: 16 pointers (self-eviction)  pool=16      ops=10000    mismatches=0
+  phase colliding: 8 buckets x 40 keys     pool=400     ops=20000    mismatches=0
+  records=160000 (null=2505) reads=183404 nonempty=178206 full(8)=13999 alias-view reads=46332
+EQUIVALENCE PASS (mismatches=0)
+TWO-THREAD old PASS: pointers=5037 ops/thread=200000 events=25640 newest-checked=4262 next-seq=400001 errors=0
+TWO-THREAD new PASS: pointers=5037 ops/thread=200000 events=25640 newest-checked=4347 next-seq=400001 errors=0
+
+measurement (ns/op)                             median       min       max  runs
+Record 1T hot (1024 ptrs) old                    39.25     35.42     48.25     3
+Record 1T hot (1024 ptrs) new                    45.14     36.73     49.47     3
+Record 1T spread old                             60.99     43.58     74.60     3
+Record 1T spread new                             35.49     31.66     37.10     3
+Record 2T shared journal old                    182.73    170.68    217.61     3
+Record 2T shared journal new                    161.60     31.91    195.89     3
+hook alloc 1T OFF                                12.05     11.24     12.95     3
+hook alloc 1T ON old                             78.04     72.05     86.47     3
+hook alloc 1T ON new                             49.45     47.40     52.51     3
+hook alloc+free 1T OFF                           34.60     21.13     44.16     3
+hook alloc+free 1T ON old                       498.79    423.70    684.98     3
+hook alloc+free 1T ON new                       135.29    132.06    306.71     3
+hook alloc+free 2T OFF                           23.35     20.32    152.37     3
+hook alloc+free 2T ON old                       413.50    189.97    741.42     3
+hook alloc+free 2T ON new                       577.43    139.88    621.19     3
+
+(sink 6827105205584)
+RESULT PASS
+load after: total CPU 100% of 12 logical CPUs; busiest (per-CPU %): PresentMon_x64=100%, clang++#9=97%, MsMpEng=80%, clang++#6=80%, clang++#8=67%, WmiPrvSE#2=50%, clang++#4=47%, dllhost=47%
+exit code: 0
+
+=== journal_bench  2026-11-21 18:48:00  runs=7 quick=False
+load before: total CPU 100% of 12 logical CPUs; busiest (per-CPU %): MsMpEng=359%, PresentMon_x64=93%, clang++#2=78%, agy#10=74%, clang++#1=70%, CrossDeviceService=58%, svchost#12=46%, dllhost=43%
+journal_bench: sizeof old=3276808 new=2129984 bytes, runs=7 seed=0x5eed2026, logical CPUs=12, priority=above-normal
+calibration: TSC 2.611 GHz; 50 ms spin: wall 50.00 ms, thread CPU 47.34 ms
+  phase colliding: 32 buckets x 12 keys    pool=486     ops=300000   mismatches=0
+  phase random: 20000 pointers + aliases   pool=20000   ops=1000000  mismatches=0
+  phase tiny: 16 pointers (self-eviction)  pool=18      ops=100000   mismatches=0
+  phase colliding: 8 buckets x 40 keys     pool=404     ops=200000   mismatches=0
+  records=1600000 (null=24982) reads=1645909 nonempty=1613318 full(8)=228229 alias-view reads=404767
+EQUIVALENCE PASS (mismatches=0)
+TWO-THREAD old PASS: pointers=5037 ops/thread=2000000 events=25640 newest-checked=3837 next-seq=4000001 errors=0
+TWO-THREAD new PASS: pointers=5037 ops/thread=2000000 events=25640 newest-checked=3868 next-seq=4000001 errors=0
+
+measurement (ns/op)                cpu-median  cpu-min  cpu-max wall-median  runs
+Record 1T hot (1024 ptrs) old           33.33    23.57    52.08       34.72     7
+Record 1T hot (1024 ptrs) new           31.16    21.32    48.59       33.61     7
+Record 1T spread old                    38.45    26.41    59.12       39.50     7
+Record 1T spread new                    30.23    23.52    49.47       30.39     7
+Record 2T shared journal old           108.45    84.54   237.83      112.89     7
+Record 2T shared journal new           128.07    77.96   189.63      128.63     7
+hook alloc 1T OFF                        8.82     6.17    14.08        9.61     7
+hook alloc 1T ON old                    59.70    52.15    97.72       61.24     7
+hook alloc 1T ON new                    39.01    33.42    62.78       39.87     7
+hook alloc+free 1T OFF                  15.94    14.44    30.34       16.21     7
+hook alloc+free 1T ON old              170.73   142.80   293.71      171.62     7
+hook alloc+free 1T ON new              110.63    91.52   206.01      116.08     7
+hook alloc+free 2T OFF                  16.97    13.73    30.20       17.60     7
+hook alloc+free 2T ON old              416.39   351.34   692.56      420.97     7
+hook alloc+free 2T ON new              418.19   243.03   631.70      421.60     7
+
+(sink 43594570879435344)
+RESULT PASS
+load after: total CPU 100% of 12 logical CPUs; busiest (per-CPU %): powershell#15=111%, PresentMon_x64=91%, powershell#19=87%, clang++#1=75%, powershell#17=75%, powershell#16=71%, MsMpEng=71%, powershell#18=71%
+exit code: 0
+

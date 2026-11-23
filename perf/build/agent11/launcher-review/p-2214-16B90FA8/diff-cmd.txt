@@ -1,0 +1,12 @@
+﻿diff --git a/build/agent11/launcher-review/p-2147-B0902106/RUN-NIGHT.cmd b/build/agent11/launcher-review/p-2214-16B90FA8/RUN-NIGHT.cmd
+index 46ed5e0..62751d4 100644
+--- a/build/agent11/launcher-review/p-2147-B0902106/RUN-NIGHT.cmd
++++ b/build/agent11/launcher-review/p-2214-16B90FA8/RUN-NIGHT.cmd
+@@ -12,6 +12,7 @@ echo.
+ if "%RC%"=="0" echo The launcher ended normally (07:30, STOP file).
+ if "%RC%"=="2" echo The launcher did not start: the reason is in red above. Nothing was changed.
+ if "%RC%"=="3" echo The launcher stopped on an error: see the red line above.
++if not "%RC%"=="0" if not "%RC%"=="2" if not "%RC%"=="3" echo The launcher was interrupted (exit code %RC%, e.g. Ctrl+C). If a window was running, it was stopped. See the lines above.
+ echo Status and logs: %~dp0status\
+ echo You can close this window.
+ pause

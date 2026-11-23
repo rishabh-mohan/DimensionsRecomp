@@ -1,0 +1,64 @@
+route-report: <workspace>\build\agent3\selftest-runs\20261122-024812-input
+  tag input; bin <workspace>\build\agent3\selftest-bin; started 2026-11-22T02:48:15.1733454-06:00; pid 58128
+  script <workspace>\harness\routes\selftest-input.txt (15 steps, sha256 6BC237C5745C292EA42AB49B8A4BB17CD63FBF5BD49B675DFCDF9B2A7DCEA207)
+
+Steps (t = s since launch; perf = s of frame time since the first frame; scene = median draw calls/vertices of the
+30 frames on disk at that point; pad/keys = XInputGetState calls / keystroke events since the previous row):
+   0.46 L0   start                           -> slot 0 connected; 15 ste... | pad +0    keys +0  | perf      - scene -          | log +0
+   2.26 L3   wait_first_frame 30             -> ok after 1.8 s           | pad +64   keys +0  | perf    1.4 scene 900/120000 | log +8
+          | [2026-11-22 02:48:15.941] [info] [gpu] [t1] DXGI adapter: Harness Fake Adapter (vendor 0x0000, device 0x0000, 0 MB dedicated)
+          | [2026-11-22 02:48:15.950] [info] [core] [t1] XEX patch applied successfully: base version: 0.0.0.3, new version: 0.0.23.3
+          | ... 6 more
+   2.26 L4   wait_scene       900 120000 10  -> ok after 0.0 s           | pad +0    keys +0  | perf    1.4 scene 900/120000 | log +0
+   2.27 L5   mark             first-frame    -> mark                     | pad +0    keys +0  | perf    1.4 scene 900/120000 | log +0
+   3.08 L6   press            A              -> ok x1                    | pad +37   keys +2  | perf    1.4 scene 900/120000 | log +4
+          | [2026-11-22 02:48:17.480] [info] [input] [t1] fake xinput: result 0 buttons 0x1000 lx 0 ly 0 packet 1 scene 1
+          | [2026-11-22 02:48:17.480] [info] [input] [t1] fake xinput: key 0x5800 flags 1
+          | ... 2 more
+   3.59 L7   wait_change      5              -> ok after 0.5 s: 900/1200... | pad +24   keys +0  | perf    2.7 scene 910/120001 | log +0
+   3.61 L8   wait_scene       910 120001 5   -> ok after 0.0 s           | pad +1    keys +0  | perf    2.7 scene 910/120001 | log +0
+   4.04 L9   press            START 1 100 30... -> ok x1                    | pad +19   keys +2  | perf    2.7 scene 910/120001 | log +4
+          | [2026-11-22 02:48:18.837] [info] [input] [t1] fake xinput: result 0 buttons 0x0010 lx 0 ly 0 packet 3 scene 1
+          | [2026-11-22 02:48:18.837] [info] [input] [t1] fake xinput: key 0x5814 flags 1
+          | ... 2 more
+   4.83 L10  press            DOWN 2 120 250 -> ok x2                    | pad +33   keys +4  | perf    2.7 scene 910/120001 | log +8
+          | [2026-11-22 02:48:19.268] [info] [input] [t1] fake xinput: result 0 buttons 0x0002 lx 0 ly 0 packet 5 scene 1
+          | [2026-11-22 02:48:19.268] [info] [input] [t1] fake xinput: key 0x5811 flags 1
+          | ... 6 more
+   4.84 L11  wait_log         fake xinput: k... -> ok after 0.0 s: [2026-11... | pad +1    keys +0  | perf    2.7 scene 910/120001 | log +0
+   5.15 L12  hold             B 300          -> ok                       | pad +14   keys +1  | perf    4.1 scene 910/120001 | log +2
+          | [2026-11-22 02:48:20.071] [info] [input] [t1] fake xinput: result 0 buttons 0x2000 lx 0 ly 0 packet 9 scene 1
+          | [2026-11-22 02:48:20.071] [info] [input] [t1] fake xinput: key 0x5801 flags 1
+   5.36 L13  stick            L 0 -32767 200 -> ok                       | pad +10   keys +1  | perf    4.1 scene 910/120001 | log +2
+          | [2026-11-22 02:48:20.365] [info] [input] [t1] fake xinput: result 0 buttons 0x0000 lx 0 ly -32767 packet 11 scene 1
+          | [2026-11-22 02:48:20.365] [info] [input] [t1] fake xinput: key 0x5801 flags 2
+   5.37 L14  wait_log         ly -32767 5    -> ok after 0.0 s: [2026-11... | pad +0    keys +0  | perf    4.1 scene 910/120001 | log +0
+   6.42 L15  wait_log         never written ... -> TIMEOUT after 1.1 s      | pad +45   keys +0  | perf    5.5 scene 910/120001 | log +1
+          | [2026-11-22 02:48:20.582] [info] [input] [t1] fake xinput: result 0 buttons 0x0000 lx 0 ly 0 packet 12 scene 1
+   6.42 L16  mark             done           -> mark                     | pad +0    keys +0  | perf    5.5 scene 910/120001 | log +0
+   6.43 L17  stop                            -> stop requested           | pad +0    keys +0  | perf    5.5 scene 910/120001 | log +0
+   7.08 L0   end                             -> steps 15/15; timeouts 1  | pad +26   keys +0  | perf    6.2 scene 910/120001 | log +1
+          | [2026-11-22 02:48:22.242] [info] [core] [t1] window close requested; shutting down
+
+Marks (compare devoff2 and devoffB mark by mark):
+  first-frame    t    2.27  perf    1.4  scene 900/120000
+  done           t    6.42  perf    5.5  scene 910/120001
+
+Scene timeline (perf.csv, 5-s buckets of frame time, most common draws/vertices; runs of equal buckets merged):
+      0-10    s  910/120001
+  273 frame rows, 6.2 s of frame time
+
+Checks:
+  ok   exit: exit 0 (0x00000000); close wm_close in 0.04 s; elapsed 7.1 s; exited_early False
+  ok   no crash: wer_seen False; crash_events 0; dumps 0
+  ok   script ran to the end: 15/15 done; last "done"; stopped by script True; timeouts 1 15; error 
+  ok   pad DLL loaded by the game from the run dir: pid 58128 (game 58128); <workspace>\build\agent3\selftest-runs\20261122-024812-input\xinput1_4.dll; maps 1
+  ok   game polled the pad: XInputGetState 274 (with input 50); XInputGetKeystroke 284 (events 10); caps 0; set_state 0
+  info perf.csv: held unshared by the game while it ran: ;  bytes at the end; 273 frame rows
+  ok   no "not in any registered module" lines: 0 lines
+  ok   no watchdog/hang lines: 0 lines
+  info crash guard lines (the gate compares kinds with devoff2): 0 lines; kinds: none
+  info unimplemented-instruction lines (the gate compares the count with devoff2): 0 lines
+  FAIL exit sequence in game.log: line numbers missing, missing, missing (Window closing / Execution complete / Title terminated)
+
+PROBLEMS: exit sequence in game.log

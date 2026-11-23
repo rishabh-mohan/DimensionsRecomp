@@ -1,0 +1,41 @@
+﻿=== timing matrix: Window 3: devoff2 (ref) vs baseline, devoff2 + Agent 11 ON bundle, native2 N0 (and devoff2 + Agent 12 ON bundle if it fits). Uncapped, title loop, no input ===
+matrix   <workspace>\bench\agent8\run\matrix-window3.json
+note     Do not touch the PC while it runs (about 40 min). Every arm sits on the title/attract loop, which the game reaches with no input. The runner keeps the display on (SetThreadExecutionState) until the matrix ends.
+note     RUN-WINDOW3.cmd runs -Only d0,base,d11,n0 (Agent 1 priority; d12 is dropped to fit 45 min with 4 reps). Order: one unscored cold run per bin (devoff2, baseline, native2), then 4 rounds, rotated each round.
+note     Window: 5 s settle + 35 s warm-up from the first frame (past the ~33 s intro-to-title step), then 50 s measured.
+note     Primary metric: uncapped frame rate. OFF arms pass framerate_limit=0 (Agent 3 section 3.1: the only cap on OFF builds); n0 also passes native_fps_limit=0 (gpu_native/device.cpp: 0 is uncapped; default 240). Secondary: drivers/thread-cpu.ps1 per run writes threads.csv and headroom.json (busiest thread busy %, headroom = 100 - that, total cores) and gpu.csv (NVML each second: GPU util, clocks, power/thermal throttle).
+note     The runner always passes --audio_mute=true --pause_when_unfocused=false --native_settings_load=false --discord_rpc=false.
+note     n0 passes native_settings_frontend=false: native builds crash at start with the frontend on ('Native setting is not registered: present_fsr_sharpness_reduction', FidelityFX-OFF SDK; Agents 6/7). Its frames come from LEGO_NATIVE_FRAME_METRICS (native-frames.csv).
+note     d11 check: every d11 game.log must show 'Host timer resolution set to 1 ms (background opt-out on)'. No profiler on these arms.
+note     Post-hoc: python bench/agent8/run/matrix_recheck.py <out dir> --write (paired deltas per round, headroom, foreign dumps).
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order roundrobin; close timeout 60 s; cooldown 5 s
+arms:
+       d0: bin build/agent2/devoff2-bin; frames perf; x4; warm-up 35 s; window 50 s; group w3 (ref); cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         devoff2 (S2, batch 2) at defaults, uncapped: the reference
+       base: bin build/baseline-bin; frames perf; x4; warm-up 35 s; window 50 s; group w3; cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         upstream baseline (batch 0) at defaults, uncapped
+       d11: bin build/agent2/devoff2-bin; frames perf; x4; warm-up 35 s; window 50 s; group w3; cvars framerate_limit=0 host_timer_resolution_ms=1 host_timer_throttling_optout=true precise_guest_sleep=true wait_timeout_round_up=true cs_spin=true spinlock_pause_spin=true clock_lockfree=true tls_bounds_fix=true; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         devoff2 + Agent 11 ON bundle (R3: timer 1 ms + opt-out, precise sleep, wait round-up, cs_spin, pause spin, lock-free clock, TLS bounds fix), uncapped
+       n0: bin build/agent2/native2-bin; frames native; x4; warm-up 35 s; window 50 s; group w3; cvars native_settings_frontend=false native_fps_limit=0 framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         native2 N0 at defaults, uncapped (native_fps_limit=0), settings frontend off (crash workaround)
+cold     d0 (build/agent2/devoff2-bin), base (build/baseline-bin), n0 (build/agent2/native2-bin): unscored, before round 1
+round 1  d0 base d11 n0
+round 2  base d11 n0 d0
+round 3  d11 n0 d0 base
+round 4  n0 d0 base d11
+order    d0 base d11 n0 | base d11 n0 d0 | d11 n0 d0 base | n0 d0 base d11
+estimate 19 runs (3 cold), about 49 min (warm boot 20 s, cold boot 61 s, close 35 s per run)
+
+--- preflight ---
+desktop    WinSta0\Default -> interactive desktop: timing can be valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   8.98 GB
+game       no legodimensions.exe running
+builds     none (clang-cl, clang, lld-link, ninja, dxc, cl)
+bin        build/agent2/devoff2-bin : ok (MANIFEST.txt)
+bin        build/agent2/native2-bin : ok (MANIFEST.txt)
+bin        build/baseline-bin : ok (MANIFEST.txt)
+screensaver WPXSCR~1.SCR after 120 s: the keep-awake request should hold it off; if it starts during timing runs, set it to (None)
+estimate   19 runs, about 49 min: done around 01:02
+keep-awake ON (SetThreadExecutionState continuous+system+display until the matrix ends)

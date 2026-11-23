@@ -1,0 +1,29 @@
+{
+  "title": "Codegen options (Agent 9): A = devoff2-bin (S2 sources, S1 codegen) vs B = devoffB-bin (the same S2 sources + the batch codegen config). Title/attract loop, no input needed. Superseded for the user timing window by matrix-window4.json (B vs devoff2)",
+  "reference": "a",
+  "warmup_s": 60,
+  "warmup_from": "firstframe",
+  "measure_s": 60,
+  "repeats": 4,
+  "order": "roundrobin",
+  "settle_s": 20,
+  "cooldown_s": 10,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "menu_s": 60,
+  "cold_run": true,
+  "quick": { "warmup_s": 10, "measure_s": 20, "settle_s": 5, "menu_s": 20, "cooldown_s": 5 },
+  "notes": [
+    "Spec: perf-notes/agent9-codegen.md, 'Run spec for the codegen-options timing run'. B = build/agent2/devoffB-bin (Agent 2 stages it after the B build; a missing bin skips the arm). A = build/agent2/devoff2-bin, so the codegen options are the only difference.",
+    "Run matrix-codegen-check.json first: the functional gate (B boots and plays Agent 10's route with no REX_FATAL, __builtin_trap, 'Switch case out of range', hang or crash, and no new ERROR/WARN lines against A) and one profile run of each build. Do not time B if the gate failed.",
+    "Order: roundrobin gives a b | b a | a b | b a (Agent 9 asks for alternating A/B, at least 3 each). One unscored cold run per bin comes first, because B is a new exe on its first launch (driver and file caches).",
+    "Metrics (Agent 9): frame time p50/p99 per run (p95: compute from perf.csv), cpu_cores (process CPU; under the 60 fps cap a codegen win shows here rather than in the median) and the first-frame time (boot). Main-thread CPU per frame is not measured by the runner; the check matrix's profile runs give per-thread samples and the top guest functions.",
+    "Same scene, settings and window state as the other OFF matrices: the title/attract loop, the harness toml (framerate_limit = 60), audio muted, profiler off."
+  ],
+  "arms": [
+    { "id": "a", "group": "codegen", "ref": true, "bin": "build/agent2/devoff2-bin", "cvars": [], "env": {},
+      "note": "Agent 9 A: dev OFF build 2 (S2), S1 codegen" },
+    { "id": "b", "group": "codegen", "bin": "build/agent2/devoffB-bin", "cvars": [], "env": {},
+      "note": "Agent 9 B: S2 + the batch codegen config" }
+  ]
+}

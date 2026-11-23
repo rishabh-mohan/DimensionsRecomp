@@ -1,0 +1,76 @@
+﻿diff --git a/baseline/DimensionsRecomp/rexlego/src/gpu_native/buffers.cpp b/DimensionsRecomp/rexlego/src/gpu_native/buffers.cpp
+index 81410a6..84431aa 100644
+--- a/baseline/DimensionsRecomp/rexlego/src/gpu_native/buffers.cpp
++++ b/DimensionsRecomp/rexlego/src/gpu_native/buffers.cpp
+@@ -148,29 +148,15 @@ void TraceBufferAllocation(const BufferResource& resource, const VertexByteOrder
+       "previous_variants=", previous_variants, "evicted=", evicted);
+ }
+ 
+ void ByteSwapElements(void* destination, const void* source, size_t size,
+                       u32 element_size) {
+-  auto* dst = static_cast<u8*>(destination);
+-  const auto* src = static_cast<const u8*>(source);
+-  size_t offset = 0;
+-  if (element_size == 2) {
+-    for (; offset + 2 <= size; offset += 2) {
+-      dst[offset + 0] = src[offset + 1];
+-      dst[offset + 1] = src[offset + 0];
+-    }
+-  } else {
+-    for (; offset + 4 <= size; offset += 4) {
+-      dst[offset + 0] = src[offset + 3];
+-      dst[offset + 1] = src[offset + 2];
+-      dst[offset + 2] = src[offset + 1];
+-      dst[offset + 3] = src[offset + 0];
+-    }
+-  }
+-  if (offset != size) {
+-    std::memcpy(dst + offset, src + offset, size - offset);
+-  }
++  // SSSE3/AVX2 shuffles in vertex_upload.h, byte-identical to the old scalar
++  // loop: 16-bit swaps for element_size 2, 32-bit swaps otherwise, and a
++  // trailing partial element copied unchanged. The buffers never overlap.
++  SwapUploadElementBytes(static_cast<u8*>(destination), static_cast<const u8*>(source), size,
++                         element_size);
+ }
+ 
+ }  // namespace
+ 
+ BufferUploadTiming ConsumeBufferUploadTiming() {
+@@ -491,18 +477,20 @@ plume::RenderBuffer* ResolveBufferContents(const std::shared_ptr<BufferResource>
+         kind == BufferKind::kIndex && resource->format == 1 ? 2 : 4;
+     const u8* conversion_source=reusable?reuse_bytes.data():source;
+     // UPLOAD heaps can be write-combined. Read/modify/write there (the packed
+     // vertex swizzle below) is extremely slow. Transform in cacheable CPU RAM,
+     // then perform a sequential write-only copy into the new GPU version.
+-    std::vector<u8> converted;
++    // Not zero-filled: ByteSwapElements writes every byte (whole elements plus
++    // the copied tail) before ApplyVertexByteOrder permutes within the range.
++    std::unique_ptr<u8[]> converted;
+     void* conversion_target = mapped;
+     const bool fused_upload = kind == BufferKind::kVertex &&
+         WriteAlignedVertexUpload(static_cast<u8*>(mapped), conversion_source, resource->length, conversion_order);
+     if (!fused_upload) {
+       if (kind == BufferKind::kVertex && !byte_order.reversed_elements.empty()) {
+-        converted.resize(resource->length);
+-        conversion_target = converted.data();
++        converted.reset(new u8[resource->length]);
++        conversion_target = converted.get();
+       }
+       ByteSwapElements(conversion_target, conversion_source, resource->length, element_size);
+     }
+     if (timing) g_buffer_timing.converted_bytes += resource->length;
+     if (!fused_upload && kind == BufferKind::kVertex &&
+@@ -510,11 +498,11 @@ plume::RenderBuffer* ResolveBufferContents(const std::shared_ptr<BufferResource>
+       next_buffer->unmap();
+       REXLOG_WARN("Native GPU: rejected invalid packed vertex layout stride={}",
+                   byte_order.stride);
+       return nullptr;
+     }
+-    if (!converted.empty()) std::memcpy(mapped, converted.data(), converted.size());
++    if (converted && resource->length) std::memcpy(mapped, converted.get(), resource->length);
+     next_buffer->unmap();
+     // UPLOAD memory can be write-combined. Flush stores before another CPU
+     // preparation job may consume this immutable allocation through the cache.
+     _mm_sfence();
+     // A buffer rewritten within the last frames is read once; the device copy would only add work.

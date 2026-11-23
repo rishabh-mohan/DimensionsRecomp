@@ -1,0 +1,38 @@
+# mapdiff_sub2: full public-name diff by NAME and OBJECT (Agent 2 / sub2)  2026-11-22 22:45:25  native4b-vs-native4
+# parser: mapcheck_sub2.parse_map (own parser); symbol lines are re-printed in lld format (identical to the raw lines when "re-format mismatches" is 0); addresses are not compared across maps
+NEW: build\agent2\native4b-bin\legodimensions.map  43741734 B  sha256 03CBC65FEA77674C  lines 385475  publics 358797  statics 26618  unparsed 0  other 0  re-format mismatches 0
+REF: build\agent2\native4-bin\legodimensions.map  43741350 B  sha256 136CF59158249EED  lines 385472  publics 358795  statics 26617  unparsed 0  other 0  re-format mismatches 0
+
+summary: publics REF 358795 -> NEW 358797 (+2 lines); distinct names REF 358740 -> NEW 358742; only in NEW 3; only in REF 1; in both with changed object(s) 0 (of them with a changed repeat count 0)
+publics line-count accounting (every name whose number of lines changed; sum = +2):
+  +1  ?BlockPhysicalProtectKeepWatch@Memory@memory@rex@@SAXXZ   [rexruntime:rexruntime.dll]
+  +1  __imp_?BlockPhysicalProtectKeepWatch@Memory@memory@rex@@SAXXZ   [rexruntime:rexruntime.dll]
+  +1  __xmm@33623735633466656262636130346239   [pipeline_library.cpp.obj]
+  -1  __xmm@34366634663031656435356666336535   [pipeline_library.cpp.obj]
+
+names only in NEW: 3
+  rexruntime:rexruntime.dll  [import:rexruntime]: 2
+    ?BlockPhysicalProtectKeepWatch@Memory@memory@rex@@SAXXZ   (C++ name (inline/COMDAT))
+         0001:09a05800       ?BlockPhysicalProtectKeepWatch@Memory@memory@rex@@SAXXZ 0000000149a06800     rexruntime:rexruntime.dll
+    __imp_?BlockPhysicalProtectKeepWatch@Memory@memory@rex@@SAXXZ
+         0002:07f3e430       __imp_?BlockPhysicalProtectKeepWatch@Memory@memory@rex@@SAXXZ 0000000151947430     rexruntime:rexruntime.dll
+  pipeline_library.cpp.obj  [project-obj]: 1
+    __xmm@33623735633466656262636130346239   (__xmm@ constant; value bytes in memory order as ASCII: "9b40acbbef4c57b3")
+         0002:07336960       __xmm@33623735633466656262636130346239 0000000150d3f960     pipeline_library.cpp.obj
+
+names only in REF: 1
+  pipeline_library.cpp.obj  [project-obj]: 1
+    __xmm@34366634663031656435356666336535   (__xmm@ constant; value bytes in memory order as ASCII: "5e3ff55de10f4f64")
+         0002:07336960       __xmm@34366634663031656435356666336535 0000000150d3f960     pipeline_library.cpp.obj
+
+names in both maps whose defining object(s) changed: 0
+
+objects (publics): REF 621, NEW 621; only in NEW: none; only in REF: none
+per-object public counts that changed: rexruntime:rexruntime.dll 904->906
+section-table names only in NEW: none; only in REF: none
+
+statics (name, object) multisets: REF 26617 -> NEW 26618; added 1, removed 0
+  memory_watch.cpp.obj  [project-obj]: +1 -0
+    + ?g_keep_watch_blocked@?A0xF002FE51@gpu_native@legodimensions@@3_NB
+
+RESULT: DONE  publics 358795 -> 358797 (+2): +1 ?BlockPhysicalProtectKeepWatch@Memory@memory@rex@@SAXXZ [rexruntime:rexruntime.dll], +1 __imp_?BlockPhysicalProtectKeepWatch@Memory@memory@rex@@SAXXZ [rexruntime:rexruntime.dll], +1 __xmm@33623735633466656262636130346239 [pipeline_library.cpp.obj], -1 __xmm@34366634663031656435356666336535 [pipeline_library.cpp.obj]  (9.7s)

@@ -1,0 +1,64 @@
+W6 logdiff kit (Agent 6, task #16): <workspace>\build\agent6\wnight\test-s4b17-neg
+expect build\agent6\wnight\expect-w9.json (reference off); matrix.json build\agent6\wnight\test-s4b17-neg\matrix.json
+runs 3 in 3 arms: off=1; q0=1; q250=1
+arms in the expect file with no run here: p1, q125, q250s, q500
+
+Per arm. stuck = STUCK-LOCK episodes (sites; IN = in the measured window); recov/unh/pfail = Recovered stale protection / Unhandled write fault / Protect failed lines per run; W/E/C = warning/error/critical lines per run; slow = slow runs/runs, mean slow_pct, mean onset s; logdiff vs off = gate FAIL findings/NEW/MORE/GONE/ONLY keys
+  arm        runs verdict stuck                  dumps recov      unh        pfail      W/E/C                      slow                   logdiff F/N/M/G/O
+  off        1    FAIL    0                      0     [0]        [0]        [0]        142/0/0                    0/0 -% -s              (reference)
+  q0         1    FAIL    0                      0     [0]        [0]        [0]        143/0/0                    0/0 -% -s              0/1/0/0/4
+  q250       1    FAIL    0                      0     [0]        [0]        [0]        142/0/0                    0/0 -% -s              0/0/0/0/2
+
+Per run. exit = run.json exit code; close = WM_CLOSE posted/clean; seq = log ends with the clean-exit lines; stuck = episodes; slow = onset s / slow_pct / span s (sys.csv rows); nogrowth = perf.csv max no-growth s in the window; free = GB at start
+  run                arm      verdict status exit  close     seq  W/E/C     stuck dmp  slow                 nogrowth free  lines
+  2053-off-r1        off      FAIL    None   0     None/None ok   142/0/0   0     0    -                    -        -     215
+  2209-q250-r1       q250     FAIL    None   0     None/None ok   142/0/0   0     0    -                    -        -     253
+  2231-q0-r1         q0       FAIL    None   0     None/None ok   143/0/0   0     0    -                    -        -     655
+
+STUCK-LOCK episodes: 0 (H1 = owner parked in sub_83FAF180, the L1 fence-wait poll; finding 10)
+
+Reasons, FAIL first (per arm: its runs, then its logdiff findings)
+  FAIL off      2053-off-r1: status None, problems []
+  FAIL q0       2231-q0-r1: missing required "GPU wait back-off: ON (quantum 0 us, spin 30 us); stats OFF; GetData hook built."
+  FAIL q0       2231-q0-r1: forbidden "GPU wait stats" x81
+  FAIL q0       2231-q0-r1: "GPU wait back-off: ON (quantum 0 us, spin 30 us); stats OFF; GetData hook built." x0, expected exactly 1
+  FAIL q0       2231-q0-r1: status None, problems []
+  FAIL q250     2209-q250-r1: missing required "GPU wait back-off: ON (quantum 250 us, spin 30 us); stats OFF; GetData hook built."
+  FAIL q250     2209-q250-r1: forbidden "GPU wait stats" x41
+  FAIL q250     2209-q250-r1: "GPU wait back-off: ON (quantum 250 us, spin 30 us); stats OFF; GetData hook built." x0, expected exactly 1
+  FAIL q250     2209-q250-r1: status None, problems []
+  NOTE off      2053-off-r1: levels W/E/C 142/0/0, expected 40/0/0
+  NOTE q0       logdiff NEW warning key: [warning] [krnl] __imp__XNetLogonGetTitleID STUB
+  NOTE q0       logdiff ONLY key that no rule names: [warning] [krnl] __imp__XNetLogonGetTitleID STUB
+  NOTE q0       2231-q0-r1: levels W/E/C 143/0/0, expected 40/0/0
+  NOTE q250     2209-q250-r1: levels W/E/C 142/0/0, expected 40/0/0
+
+Counts per arm (lines containing each expect count text; one number per run, run-dir order)
+  STUCK-LOCK                                                   off=[0]; q0=[0]; q250=[0]
+  still not acquired after                                     off=[0]; q0=[0]; q250=[0]
+  Minidump written to                                          off=[0]; q0=[0]; q250=[0]
+  Recovered stale physical page protection                     off=[0]; q0=[0]; q250=[0]
+  Unhandled guest physical write fault                         off=[0]; q0=[0]; q250=[0]
+  PhysicalHeap::Protect failed                                 off=[0]; q0=[0]; q250=[0]
+  BaseHeap::Protect failed                                     off=[0]; q0=[0]; q250=[0]
+  GPU wait back-off:                                           off=[0]; q0=[1]; q250=[1]
+  GPU wait stats (5 s):                                        off=[0]; q0=[81]; q250=[41]
+  is not a plain number                                        off=[0]; q0=[0]; q250=[0]
+  [NtCreateFile] FAILED                                        off=[137]; q0=[137]; q250=[137]
+  Reserving the guest memory arena                             off=[1]; q0=[1]; q250=[1]
+  Title terminated                                             off=[1]; q0=[1]; q250=[1]
+
+ONLY keys per arm vs off (any level, not Toypad; in no off run), from w4b_logdiff
+  q0: 4 (not named by a rule: 1)
+    [info] [core] GPU wait back-off: OFF (quantum # us, spin # us); stats ON; GetData hook built.
+    [info] [core] GPU wait stats (# s): L# waits # polls #h moved # gpu_off # sleep>moved # sleep>done # | L# tries # waits # polls # delayed # sleep>ready # | kicks # | pause # yield # sleep # sleep_sum # ms sleep_fail # | 
+    [warning] [krnl] __imp__XNetLogonGetTitleID STUB
+    [info] [core] GPU wait stats (# s): L# waits # polls # moved # gpu_off # sleep>moved # sleep>done # | L# tries # waits # polls # delayed # sleep>ready # | kicks # | pause # yield # sleep # sleep_sum # ms sleep_fail # | L
+  q250: 2
+    [info] [core] GPU wait back-off: ON (quantum # us, spin # us); stats ON; GetData hook built.
+    [info] [core] GPU wait stats (# s): L# waits # polls # moved # gpu_off # sleep>moved # sleep>done # | L# tries # waits # polls # delayed # sleep>ready # | kicks # | pause # yield # sleep # sleep_sum # ms sleep_fail # | L
+
+w4b_logdiff: exit 0 in 0.2 s -> build\agent6\wnight\out-W9-test-s4b17-neg\logdiff (log build\agent6\wnight\out-W9-test-s4b17-neg\logdiff.log)
+w4b_extra: exit 0 in 0.2 s -> build\agent6\wnight\out-W9-test-s4b17-neg\extra.txt (log build\agent6\wnight\out-W9-test-s4b17-neg\extra.log)
+verdict: FAIL; runtime 0.3 s; output build\agent6\wnight\out-W9-test-s4b17-neg
+w6_kit exit 1 (0 = no FAIL, 1 = at least one FAIL, 2 = usage error)

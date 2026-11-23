@@ -1,0 +1,18 @@
+t_s,line,cmd,args,result,pad_reads,pad_active_reads,key_calls,key_events,perf_rows,scene_draws,scene_vertices,log_lines,log_bytes
+0.46,0,start,,slot 0 connected; 15 steps,0,0,0,0,0,-1,-1,0,0
+2.26,3,wait_first_frame,30,ok after 1.8 s,64,0,64,0,60,900,120000,8,1530
+2.26,4,wait_scene,900 120000 10,ok after 0.0 s,64,0,64,0,60,900,120000,8,1530
+2.27,5,mark,first-frame,mark,64,0,64,0,60,900,120000,8,1530
+3.08,6,press,A,ok x1,101,11,103,2,60,900,120000,12,1910
+3.59,7,wait_change,5,ok after 0.5 s: 900/120000 -> 910/120001,125,11,127,2,120,910,120001,12,1910
+3.61,8,wait_scene,910 120001 5,ok after 0.0 s,126,11,128,2,120,910,120001,12,1910
+4.04,9,press,START 1 100 300,ok x1,145,15,149,4,120,910,120001,16,2290
+4.83,10,press,DOWN 2 120 250,ok x2,178,26,186,8,120,910,120001,24,3050
+4.84,11,wait_log,fake xinput: key 0x5811 flags 2 5,ok after 0.0 s: [2026-11-22 02:48:19.376] [info] [input] [t1] fake xinput: key 0x5811 flags 2,179,26,187,8,120,910,120001,24,3050
+5.15,12,hold,B 300,ok,193,40,202,9,180,910,120001,26,3240
+5.36,13,stick,L 0 -32767 200,ok,203,50,213,10,180,910,120001,28,3436
+5.37,14,wait_log,ly -32767 5,ok after 0.0 s: [2026-11-22 02:48:20.365] [info] [input] [t1] fake xinput: result 0 buttons 0x0000 lx 0 ly -32767 packet 11 scene 1,203,50,213,10,180,910,120001,28,3436
+6.42,15,wait_log,never written by the fake game 1,TIMEOUT after 1.1 s,248,50,258,10,240,910,120001,29,3548
+6.42,16,mark,done,mark,248,50,258,10,240,910,120001,29,3548
+6.43,17,stop,,stop requested,248,50,258,10,240,910,120001,29,3548
+7.08,0,end,,steps 15/15; timeouts 1,274,50,284,10,273,910,120001,30,3632

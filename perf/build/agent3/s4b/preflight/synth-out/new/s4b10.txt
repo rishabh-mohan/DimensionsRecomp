@@ -1,0 +1,17 @@
+# s4b_check s4b10 s4b10 (off, scenario I420)
+run.json: exit 0 (0x00000000) dumps 0 crash_events 0 wer False; close wm_close 1.00 s; elapsed 40.0 of 420 s; cvars {"d3d12_submit_split_kb": "40"}; env -; steps None
+summary: verdict None; first frame None s; levels null; unknown cvars None; errors 0
+log files game.log; levels {"info": 4}
+families: c1_any=0 k=0 c1_verify_on=0 c1_verify_f=0 c1_other=0 recovered_stale=0 unhandled_phys=0 protect_failed=0 split_init=1 split=2 deferred_counters=0 gpu_wait=0 memexport=0 slow_frame=0 s4_upload_hash=0 precise_wait=0 miss_cache=0 stuck_lock=0 minidump=0 fatal=0 debug_layer=0 dred=0 d3d12_msg=0 clean_exit=1
+  split_init: [2026-11-22 20:10:05.000] [info] [gpu] [t4242] d3d12_submit_split_kb: splitting submissions at 40 KB of deferred commands
+  split: [2026-11-22 20:10:10.001] [info] [gpu] [t4242] d3d12_submit_split: frame=600 submission=1900 splits=1200 failed=0 held_query=3 held_scratch=0 held_pipelines=12
+  split: [2026-11-22 20:10:15.002] [info] [gpu] [t4242] d3d12_submit_split: frame=1200 submission=3800 splits=2400 failed=0 held_query=5 held_scratch=0 held_pipelines=20
+split fields: lines 2 (20:10:10.001..20:10:15.002); last {"frame": 1200, "submission": 3800, "splits": 2400, "failed": 0, "held_query": 5, "held_scratch": 0, "held_pipelines": 20}; max {"frame": 1200, "submission": 3800, "splits": 2400, "failed": 0, "held_query": 5, "held_scratch": 0, "held_pipelines": 20}; per frame {"submission": 3.1667, "splits": 2.0, "failed": 0.0, "held_query": 0.0033, "held_scratch": 0.0, "held_pipelines": 0.0133}; monotonic {"frame": true, "submission": true, "splits": true, "failed": true, "held_query": true, "held_scratch": true, "held_pipelines": true}
+threads: no threads-s4a.csv
+sys.csv slow state: no sys.csv
+PROOF ok   init "d3d12_submit_split_kb: splitting submissions at N KB" x1: 2026-11-22 20:10:05.000] [info] [gpu] [t4242] d3d12_submit_split_kb: splitting submissions at 40 KB of deferred commands
+PROOF ok   failed=0 in every d3d12_submit_split line (max 0 over 2 lines)
+PROOF ok   splits > 0 (max 2400)
+PROOF note per frame: submission 3.1667, splits 2.0 (frames 600; fields monotonic {'frame': True, 'submission': True, 'splits': True, 'failed': True, 'held_query': True, 'held_scratch': True, 'held_pipelines': True})
+BASE items missed: none
+VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b10)

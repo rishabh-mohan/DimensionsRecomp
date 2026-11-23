@@ -1,0 +1,336 @@
+{
+ "tree": "<workspace>\\DimensionsRecomp",
+ "checks": [
+  {
+   "build": "real",
+   "case": "unit",
+   "args": [
+    "--unit",
+    "<workspace>\\build\\agent4\\state_shadow-b2\\real\\unit"
+   ],
+   "variable": "on",
+   "expected": 0,
+   "exit": 0,
+   "last_line": "PASS unit: shadow keys/compares, lookup gates and tripwires, ledger columns, CSV, env parse",
+   "ok": true
+  },
+  {
+   "build": "real",
+   "case": "oracle elision",
+   "args": [
+    "--oracle",
+    "--expect-elision"
+   ],
+   "variable": "on",
+   "expected": 0,
+   "exit": 0,
+   "last_line": "ORACLE pass draws=180650 ib_calls=88676 blend_calls=88171 ib_skipped=91974 blend_skipped=92479",
+   "ok": true
+  },
+  {
+   "build": "real",
+   "case": "oracle variable unset",
+   "args": [
+    "--oracle",
+    "--expect-none"
+   ],
+   "variable": "off",
+   "expected": 0,
+   "exit": 0,
+   "last_line": "ORACLE pass draws=180650 ib_calls=180650 blend_calls=180650 ib_skipped=0 blend_skipped=0",
+   "ok": true
+  },
+  {
+   "build": "real",
+   "case": "oracle full preparation",
+   "args": [
+    "--oracle",
+    "--full-prep"
+   ],
+   "variable": "on",
+   "expected": 0,
+   "exit": 0,
+   "last_line": "ORACLE pass full_preparation ib_calls=74900 blend_calls=74900",
+   "ok": true
+  },
+  {
+   "build": "real",
+   "case": "negative: lookup after the layout bind",
+   "args": [
+    "--oracle",
+    "--check-after-binds"
+   ],
+   "variable": "on",
+   "expected": 3,
+   "exit": 3,
+   "last_line": "ORACLE_MISMATCH step=3 draw=1",
+   "ok": true
+  },
+  {
+   "build": "real",
+   "case": "negative: external write without notify",
+   "args": [
+    "--oracle",
+    "--silent-external"
+   ],
+   "variable": "on",
+   "expected": 3,
+   "exit": 3,
+   "last_line": "ORACLE_MISMATCH step=145 draw=99",
+   "ok": true
+  },
+  {
+   "build": "real",
+   "case": "negative: draw-layout rebind after external write",
+   "args": [
+    "--oracle",
+    "--rebind-after-external"
+   ],
+   "variable": "on",
+   "expected": 3,
+   "exit": 3,
+   "last_line": "ORACLE_MISMATCH step=247 draw=158",
+   "ok": true
+  },
+  {
+   "build": "mutant no_tripwire",
+   "case": "--oracle",
+   "args": [
+    "--oracle"
+   ],
+   "variable": "on",
+   "expected": 3,
+   "exit": 3,
+   "last_line": "ORACLE_MISMATCH step=3 draw=1",
+   "ok": true
+  },
+  {
+   "build": "mutant ignore_serial",
+   "case": "--oracle",
+   "args": [
+    "--oracle"
+   ],
+   "variable": "on",
+   "expected": 3,
+   "exit": 3,
+   "last_line": "ORACLE_MISMATCH step=698 draw=424",
+   "ok": true
+  },
+  {
+   "build": "mutant no_tripwire_ignore_serial",
+   "case": "--oracle",
+   "args": [
+    "--oracle"
+   ],
+   "variable": "on",
+   "expected": 3,
+   "exit": 3,
+   "last_line": "ORACLE_MISMATCH step=3 draw=1",
+   "ok": true
+  },
+  {
+   "build": "mutant no_heaps_check",
+   "case": "--oracle",
+   "args": [
+    "--oracle"
+   ],
+   "variable": "on",
+   "expected": 3,
+   "exit": 3,
+   "last_line": "ORACLE_MISMATCH step=19 draw=13",
+   "ok": true
+  },
+  {
+   "build": "mutant no_root_signature_check",
+   "case": "--oracle",
+   "args": [
+    "--oracle"
+   ],
+   "variable": "on",
+   "expected": 3,
+   "exit": 3,
+   "last_line": "ORACLE_MISMATCH step=28 draw=19",
+   "ok": true
+  },
+  {
+   "build": "mutant full_prep_gate_removed",
+   "case": "--oracle",
+   "args": [
+    "--oracle",
+    "--full-prep"
+   ],
+   "variable": "on",
+   "expected": 3,
+   "exit": 3,
+   "last_line": "ORACLE_MISMATCH full_preparation step=2",
+   "ok": true
+  },
+  {
+   "build": "mutant preparation_gate_removed",
+   "case": "--unit",
+   "args": [
+    "--unit",
+    "<workspace>\\build\\agent4\\state_shadow-b2\\mutant-preparation_gate_removed\\unit"
+   ],
+   "variable": "on",
+   "expected": 1,
+   "exit": 1,
+   "last_line": "CHECK failed <workspace>\\build\\agent4\\state_shadow-b2\\mutant-preparation_gate_removed\\state_shadow_test.cpp:269: sim.Draw(index, blend, nullptr, &preparation) && sim.list.ib_calls == 2",
+   "ok": true
+  },
+  {
+   "build": "mutant env_parse_loose",
+   "case": "--unit",
+   "args": [
+    "--unit",
+    "<workspace>\\build\\agent4\\state_shadow-b2\\mutant-env_parse_loose\\unit"
+   ],
+   "variable": "on",
+   "expected": 1,
+   "exit": 1,
+   "last_line": "CHECK failed <workspace>\\build\\agent4\\state_shadow-b2\\mutant-env_parse_loose\\state_shadow_test.cpp:301: ReadElideStateCalls() == c.on",
+   "ok": true
+  },
+  {
+   "build": "mutant shadow_ignores_size",
+   "case": "--oracle",
+   "args": [
+    "--oracle"
+   ],
+   "variable": "on",
+   "expected": 3,
+   "exit": 3,
+   "last_line": "ORACLE_MISMATCH step=85 draw=61",
+   "ok": true
+  },
+  {
+   "build": "mutant shadow_ignores_format",
+   "case": "--oracle",
+   "args": [
+    "--oracle"
+   ],
+   "variable": "on",
+   "expected": 3,
+   "exit": 3,
+   "last_line": "ORACLE_MISMATCH step=21 draw=15",
+   "ok": true
+  },
+  {
+   "build": "mutant blend_float_compare",
+   "case": "--oracle",
+   "args": [
+    "--oracle"
+   ],
+   "variable": "on",
+   "expected": 3,
+   "exit": 3,
+   "last_line": "ORACLE_MISMATCH step=72 draw=50",
+   "ok": true
+  },
+  {
+   "build": "mutant invalidate_keeps_blend",
+   "case": "--oracle",
+   "args": [
+    "--oracle"
+   ],
+   "variable": "on",
+   "expected": 3,
+   "exit": 3,
+   "last_line": "ORACLE_MISMATCH step=3 draw=1",
+   "ok": true
+  },
+  {
+   "build": "mutant begin_ignores_layout",
+   "case": "--unit",
+   "args": [
+    "--unit",
+    "<workspace>\\build\\agent4\\state_shadow-b2\\mutant-begin_ignores_layout\\unit"
+   ],
+   "variable": "on",
+   "expected": 1,
+   "exit": 1,
+   "last_line": "CHECK failed <workspace>\\build\\agent4\\state_shadow-b2\\mutant-begin_ignores_layout\\state_shadow_test.cpp:232: s.Begin(&list_b, 2, &layout_b)",
+   "ok": true
+  }
+ ],
+ "audit": [
+  {
+   "check": "draw.cpp: one shadow lookup, inside DispatchDraw",
+   "ok": true
+  },
+  {
+   "check": "DispatchDraw: the lookup precedes its first BindNativeDrawLayout (plume flags still unrevalidated)",
+   "ok": true
+  },
+  {
+   "check": "draw.cpp: the only SetNativeBlendFactor call is guarded by SameDrawBlendFactor",
+   "ok": true
+  },
+  {
+   "check": "draw.cpp: both setIndexBuffer calls are guarded by SameDrawIndexBuffer",
+   "ok": true
+  },
+  {
+   "check": "rexlego/src setIndexBuffer( = draw.cpp x2 + native_recording.cpp tape: {'draw.cpp': [3582, 3609], 'native_recording.cpp': [393, 399]}",
+   "ok": true
+  },
+  {
+   "check": "rexlego/src raw IASetIndexBuffer = native overlay only: {'native_overlay_gpu.cpp': [176]}",
+   "ok": true
+  },
+  {
+   "check": "rexlego/src OMSetBlendFactor = native_recording.cpp (tape replay, SetNativeBlendFactor): {'native_recording.cpp': [322, 542]}",
+   "ok": true
+  },
+  {
+   "check": "rexlego/src SetNativeBlendFactor( = draw.cpp call + native_recording declaration/definition: {'draw.cpp': [2980], 'native_recording.cpp': [534], 'native_recording.h': [44]}",
+   "ok": true
+  },
+  {
+   "check": "rexlego/src has no ClearState / ExecuteBundle / ExecuteIndirect: {}",
+   "ok": true
+  },
+  {
+   "check": "rexlego/src ->begin() = device.cpp frame list + native_recording.cpp tape: {'device.cpp': [744], 'native_recording.cpp': [334]}",
+   "ok": true
+  },
+  {
+   "check": "device.cpp: ++g_recording_serial follows the frame list begin() before it is returned",
+   "ok": true
+  },
+  {
+   "check": "device.cpp: the native overlay is followed by both notify calls, then end(), with no draw between",
+   "ok": true
+  },
+  {
+   "check": "plume begin() calls notifyCommandStateWasChangedExternally",
+   "ok": true
+  },
+  {
+   "check": "plume end() clears descriptorHeapsSet and calls notifyCommandStateWasChangedExternally",
+   "ok": true
+  },
+  {
+   "check": "plume notifyDescriptorHeapWasChangedExternally clears descriptorHeapsSet",
+   "ok": true
+  },
+  {
+   "check": "plume notifyCommandStateWasChangedExternally nulls the graphics root signature and validity",
+   "ok": true
+  },
+  {
+   "check": "plume setGraphicsPipelineLayout records the root signature and sets validity",
+   "ok": true
+  },
+  {
+   "check": "plume sets cachedGraphicsRootValid / descriptorHeapsSet true in one place each",
+   "ok": true
+  },
+  {
+   "check": "plume setIndexBuffer binds (gpuVA + offset or 0, toDXGI(format), size): the shadow key",
+   "ok": true
+  }
+ ],
+ "bench": {},
+ "failures": []
+}

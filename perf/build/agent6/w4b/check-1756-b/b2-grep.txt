@@ -1,0 +1,63 @@
+﻿=== ROOT build/agent2/snap1/DimensionsRecomp/rexglue-sdk/src
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\core\threading_win.cpp:242: spdlog::warn("Could not set the host timer resolution to {} ms", period);
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\core\threading_win.cpp:252: spdlog::info("Host timer resolution set to {} ms (background opt-out {})", period,
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\core\timer_queue.cpp:31: REXCVAR_DEFINE_BOOL(timer_queue_precise_wait, false, "Runtime",
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\core\timer_queue.cpp:52: // kSpin: the default phased spin. kBlocking (REX_TIMER_WAIT_BLOCKING): the
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\core\timer_queue.cpp:54: // (timer_queue_precise_wait): the condition variable, then high-resolution
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\core\timer_queue.cpp:59: : mode_(std::getenv("REX_TIMER_WAIT_BLOCKING") != nullptr ? Mode::kBlocking : Mode::kSpin) {}
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\core\timer_queue.cpp:69: if (REXCVAR_GET(timer_queue_precise_wait)) {
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\core\timer_queue.cpp:71: REXLOG_INFO("TimerQueue: precise wait (timer_queue_precise_wait)");
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\d3d12\shared_memory.cpp:40: REXCVAR_DEFINE_BOOL(shared_memory_upload_hash_log, false, "GPU/D3D12",
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\d3d12\shared_memory.cpp:58: // State of the shared_memory_upload_hash_log diagnostic. Only touched while the
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\d3d12\shared_memory.cpp:106: "S4 upload hash: frame {} calls {} ranges {} pages {} ({} KB) first {} unchanged {} "
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\d3d12\shared_memory.cpp:539: if (REXCVAR_GET(shared_memory_upload_hash_log)) {
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\shared_memory.cpp:34: REXCVAR_DEFINE_BOOL(shared_memory_single_hold_rearm, false, "GPU",
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\shared_memory.cpp:311: // S4 P2 (shared_memory_single_hold_rearm): one G hold for the watch firing and
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\shared_memory.cpp:314: if (REXCVAR_GET(shared_memory_single_hold_rearm)) {
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\shared_memory.cpp:346: // S4 P2 (shared_memory_single_hold_rearm): hold G from the valid-bit update
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\shared_memory.cpp:352: if (REXCVAR_GET(shared_memory_single_hold_rearm)) {
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\runtime.cpp:39: REXCVAR_DEFINE_UINT32(host_timer_resolution_ms, 0, "Runtime",
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\runtime.cpp:40: "Host timer resolution to request at startup, in ms (0 = OS default; "
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\runtime.cpp:42: REXCVAR_DEFINE_BOOL(host_timer_throttling_optout, false, "Runtime",
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\runtime.cpp:43: "Keep the host timer resolution while the window is minimized or occluded");
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\runtime.cpp:139: // Host timer resolution, for the game but not tools.
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\runtime.cpp:142: timing.timer_resolution_ms = REXCVAR_GET(host_timer_resolution_ms);
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\runtime.cpp:143: timing.keep_timer_resolution_in_background = REXCVAR_GET(host_timer_throttling_optout);
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\xmemory.cpp:46: REXCVAR_DEFINE_BOOL(physical_protect_hold_global_lock, false, "Memory",
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\xmemory.cpp:51: // no page's access. Engages only with physical_protect_hold_global_lock on; see
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\xmemory.cpp:57: "page's access unchanged (needs physical_protect_hold_global_lock)")
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\xmemory.cpp:66: static constinit std::atomic<bool> physical_protect_hold_global_lock_latched{false};
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\xmemory.cpp:161: const bool hold_on = REXCVAR_GET(physical_protect_hold_global_lock);
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\xmemory.cpp:163: physical_protect_hold_global_lock_latched.store(hold_on, std::memory_order_relaxed);
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\xmemory.cpp:171: REXSYS_WARN("C1 keep-watch: on, but physical_protect_hold_global_lock is off, so no "
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\xmemory.cpp:174: REXSYS_INFO("C1 keep-watch: on (with physical_protect_hold_global_lock)");
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\xmemory.cpp:2266: // S4.7 fix (i), physical_protect_hold_global_lock (default off). TriggerCallbacks
+build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\xmemory.cpp:2278: physical_protect_hold_global_lock_latched.load(std::memory_order_relaxed)) {
+=== ROOT DimensionsRecomp/rexglue-sdk/src
+DimensionsRecomp\rexglue-sdk\src\core\threading_win.cpp:242: spdlog::warn("Could not set the host timer resolution to {} ms", period);
+DimensionsRecomp\rexglue-sdk\src\core\threading_win.cpp:252: spdlog::info("Host timer resolution set to {} ms (background opt-out {})", period,
+DimensionsRecomp\rexglue-sdk\src\core\timer_queue.cpp:31: REXCVAR_DEFINE_BOOL(timer_queue_precise_wait, false, "Runtime",
+DimensionsRecomp\rexglue-sdk\src\core\timer_queue.cpp:52: // kSpin: the default phased spin. kBlocking (REX_TIMER_WAIT_BLOCKING): the
+DimensionsRecomp\rexglue-sdk\src\core\timer_queue.cpp:54: // (timer_queue_precise_wait): the condition variable, then high-resolution
+DimensionsRecomp\rexglue-sdk\src\core\timer_queue.cpp:59: : mode_(std::getenv("REX_TIMER_WAIT_BLOCKING") != nullptr ? Mode::kBlocking : Mode::kSpin) {}
+DimensionsRecomp\rexglue-sdk\src\core\timer_queue.cpp:69: if (REXCVAR_GET(timer_queue_precise_wait)) {
+DimensionsRecomp\rexglue-sdk\src\core\timer_queue.cpp:71: REXLOG_INFO("TimerQueue: precise wait (timer_queue_precise_wait)");
+DimensionsRecomp\rexglue-sdk\src\graphics\d3d12\shared_memory.cpp:35: REXCVAR_DEFINE_BOOL(shared_memory_upload_hash_log, false, "GPU/D3D12",
+DimensionsRecomp\rexglue-sdk\src\graphics\d3d12\shared_memory.cpp:44: // State of the shared_memory_upload_hash_log diagnostic. Only touched while the
+DimensionsRecomp\rexglue-sdk\src\graphics\d3d12\shared_memory.cpp:92: "S4 upload hash: frame {} calls {} ranges {} pages {} ({} KB) first {} unchanged {} "
+DimensionsRecomp\rexglue-sdk\src\graphics\d3d12\shared_memory.cpp:470: if (REXCVAR_GET(shared_memory_upload_hash_log)) {
+DimensionsRecomp\rexglue-sdk\src\graphics\shared_memory.cpp:32: REXCVAR_DEFINE_BOOL(shared_memory_single_hold_rearm, false, "GPU",
+DimensionsRecomp\rexglue-sdk\src\graphics\shared_memory.cpp:299: // S4 P2 (shared_memory_single_hold_rearm): one G hold for the watch firing and
+DimensionsRecomp\rexglue-sdk\src\graphics\shared_memory.cpp:302: if (REXCVAR_GET(shared_memory_single_hold_rearm)) {
+DimensionsRecomp\rexglue-sdk\src\graphics\shared_memory.cpp:334: // S4 P2 (shared_memory_single_hold_rearm): hold G from the valid-bit update
+DimensionsRecomp\rexglue-sdk\src\graphics\shared_memory.cpp:340: if (REXCVAR_GET(shared_memory_single_hold_rearm)) {
+DimensionsRecomp\rexglue-sdk\src\system\runtime.cpp:39: REXCVAR_DEFINE_UINT32(host_timer_resolution_ms, 0, "Runtime",
+DimensionsRecomp\rexglue-sdk\src\system\runtime.cpp:40: "Host timer resolution to request at startup, in ms (0 = OS default; "
+DimensionsRecomp\rexglue-sdk\src\system\runtime.cpp:42: REXCVAR_DEFINE_BOOL(host_timer_throttling_optout, false, "Runtime",
+DimensionsRecomp\rexglue-sdk\src\system\runtime.cpp:43: "Keep the host timer resolution while the window is minimized or occluded");
+DimensionsRecomp\rexglue-sdk\src\system\runtime.cpp:139: // Host timer resolution, for the game but not tools.
+DimensionsRecomp\rexglue-sdk\src\system\runtime.cpp:142: timing.timer_resolution_ms = REXCVAR_GET(host_timer_resolution_ms);
+DimensionsRecomp\rexglue-sdk\src\system\runtime.cpp:143: timing.keep_timer_resolution_in_background = REXCVAR_GET(host_timer_throttling_optout);
+DimensionsRecomp\rexglue-sdk\src\system\xmemory.cpp:46: REXCVAR_DEFINE_BOOL(physical_protect_hold_global_lock, false, "Memory",
+DimensionsRecomp\rexglue-sdk\src\system\xmemory.cpp:2136: // S4.7 fix (i), physical_protect_hold_global_lock (default off). TriggerCallbacks
+DimensionsRecomp\rexglue-sdk\src\system\xmemory.cpp:2147: if ((protect & memory::kMemoryProtectWrite) && REXCVAR_GET(physical_protect_hold_global_lock)) {

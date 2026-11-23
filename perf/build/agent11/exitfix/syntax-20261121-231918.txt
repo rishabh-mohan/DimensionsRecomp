@@ -1,0 +1,58 @@
+# exitfix_syntax (task #27)  2026-11-21 23:19:19  config Release  candidate: live tree
+xboxkrnl_hal.cpp   pristine  exit=0  10.1s diagnostics=0  <workspace>\build\agent11\exitfix\pristine\xboxkrnl_hal.cpp
+xboxkrnl_hal.cpp   candidate exit=0  11.3s diagnostics=0  <workspace>\DimensionsRecomp\rexglue-sdk\src\kernel\xboxkrnl\xboxkrnl_hal.cpp
+    no new diagnostics in the candidate
+xam_ui.cpp         pristine  exit=0  15.0s diagnostics=8  <workspace>\build\agent11\exitfix\pristine\xam_ui.cpp
+    | <workspace>\build\agent11\exitfix\pristine\xam_ui.cpp:228:24: warning: unused parameter 'io' [-Wunused-parameter]
+    |   228 |   void OnDraw(ImGuiIO& io) override {
+    |       |                        ^
+    | <workspace>\build\agent11\exitfix\pristine\xam_ui.cpp:368:24: warning: unused parameter 'io' [-Wunused-parameter]
+    |   368 |   void OnDraw(ImGuiIO& io) override {
+    |       |                        ^
+    | <workspace>\build\agent11\exitfix\pristine\xam_ui.cpp:545:30: warning: unused parameter 'r3' [-Wunused-parameter]
+    |   545 | u32 XamShowPartyUI_entry(u32 r3, u32 r4) {
+    |       |                              ^
+    | <workspace>\build\agent11\exitfix\pristine\xam_ui.cpp:545:38: warning: unused parameter 'r4' [-Wunused-parameter]
+    |   545 | u32 XamShowPartyUI_entry(u32 r3, u32 r4) {
+    |       |                                      ^
+    | <workspace>\build\agent11\exitfix\pristine\xam_ui.cpp:549:42: warning: unused parameter 'r3' [-Wunused-parameter]
+    |   549 | u32 XamShowCommunitySessionsUI_entry(u32 r3, u32 r4) {
+    |       |                                          ^
+    | <workspace>\build\agent11\exitfix\pristine\xam_ui.cpp:549:50: warning: unused parameter 'r4' [-Wunused-parameter]
+    |   549 | u32 XamShowCommunitySessionsUI_entry(u32 r3, u32 r4) {
+    |       |                                                  ^
+    | <workspace>\build\agent11\exitfix\pristine\xam_ui.cpp:263:12: warning: private field 'default_button_' is not used [-Wunused-private-field]
+    |   263 |   uint32_t default_button_ = 0;
+    |       |            ^
+    | <workspace>\build\agent11\exitfix\pristine\xam_ui.cpp:414:10: warning: private field 'max_length_' is not used [-Wunused-private-field]
+    |   414 |   size_t max_length_ = 0;
+    |       |          ^
+    | 8 warnings generated.
+xam_ui.cpp         candidate exit=0  19.3s diagnostics=8  <workspace>\DimensionsRecomp\rexglue-sdk\src\kernel\xam\xam_ui.cpp
+    | <workspace>\DimensionsRecomp\rexglue-sdk\src\kernel\xam\xam_ui.cpp:230:24: warning: unused parameter 'io' [-Wunused-parameter]
+    |   230 |   void OnDraw(ImGuiIO& io) override {
+    |       |                        ^
+    | <workspace>\DimensionsRecomp\rexglue-sdk\src\kernel\xam\xam_ui.cpp:370:24: warning: unused parameter 'io' [-Wunused-parameter]
+    |   370 |   void OnDraw(ImGuiIO& io) override {
+    |       |                        ^
+    | <workspace>\DimensionsRecomp\rexglue-sdk\src\kernel\xam\xam_ui.cpp:551:30: warning: unused parameter 'r3' [-Wunused-parameter]
+    |   551 | u32 XamShowPartyUI_entry(u32 r3, u32 r4) {
+    |       |                              ^
+    | <workspace>\DimensionsRecomp\rexglue-sdk\src\kernel\xam\xam_ui.cpp:551:38: warning: unused parameter 'r4' [-Wunused-parameter]
+    |   551 | u32 XamShowPartyUI_entry(u32 r3, u32 r4) {
+    |       |                                      ^
+    | <workspace>\DimensionsRecomp\rexglue-sdk\src\kernel\xam\xam_ui.cpp:555:42: warning: unused parameter 'r3' [-Wunused-parameter]
+    |   555 | u32 XamShowCommunitySessionsUI_entry(u32 r3, u32 r4) {
+    |       |                                          ^
+    | <workspace>\DimensionsRecomp\rexglue-sdk\src\kernel\xam\xam_ui.cpp:555:50: warning: unused parameter 'r4' [-Wunused-parameter]
+    |   555 | u32 XamShowCommunitySessionsUI_entry(u32 r3, u32 r4) {
+    |       |                                                  ^
+    | <workspace>\DimensionsRecomp\rexglue-sdk\src\kernel\xam\xam_ui.cpp:265:12: warning: private field 'default_button_' is not used [-Wunused-private-field]
+    |   265 |   uint32_t default_button_ = 0;
+    |       |            ^
+    | <workspace>\DimensionsRecomp\rexglue-sdk\src\kernel\xam\xam_ui.cpp:416:10: warning: private field 'max_length_' is not used [-Wunused-private-field]
+    |   416 |   size_t max_length_ = 0;
+    |       |          ^
+    | 8 warnings generated.
+    no new diagnostics in the candidate
+RESULT: PASS

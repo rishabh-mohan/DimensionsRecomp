@@ -1,0 +1,39 @@
+S4 C1 physical_protect_keep_watch (Agent 12, task #31, from Agent 5's #28). Staged 2026-11-22 07:51:35. Not applied, not built.
+SDK: DimensionsRecomp/rexglue-sdk HEAD c5fe668; game: DimensionsRecomp HEAD 08933a7.
+live      B120D07C6709D0D2A7836B532ED06B2032A418CBD4A71808CD318C7E6EB6CFBC  src/graphics/d3d12/shared_memory.cpp
+live      15C89EDB4B197C17487A9D45208D5CE624DE98ABE416F86942C5D14ED43EB282  src/graphics/shared_memory.cpp
+live      6E8FA1BA80EF9271D4433DD1BB2CAD0403360E222B22CED78AA4C7951D811DB4  src/system/xmemory.cpp
+live      80100865A654AF047D25EDA70CF1C746B182C81BCBDFC5B027EE56E0AE7132F9  include/rex/system/xmemory.h
+live      4D861738A94B556B08A4604D2CAB07AD7AFE1B3AD56B295F7F1E31C57BAED847  include/rex/graphics/shared_memory.h
+live      E07F690223B564AE0D41D1192ACD9225BD35226A43A7ACA8F2798B1851291B35  src/graphics/primitive_processor.cpp
+live      19AE1606C6DB727369A5F119EF3371A8D307F4B42088D5C064F0D2DF8D62D47A  game rexlego/src/gpu_native/memory_watch.cpp (CRLF work tree)
+orig      4D861738A94B556B08A4604D2CAB07AD7AFE1B3AD56B295F7F1E31C57BAED847  include/rex/graphics/shared_memory.h (C1 base)
+new       82A66445ED98B091B5CF8FAA75D0EF3E11DFA0344ABBC2184F3A23C46F0FF98C  include/rex/graphics/shared_memory.h (13051 B)
+orig      80100865A654AF047D25EDA70CF1C746B182C81BCBDFC5B027EE56E0AE7132F9  include/rex/system/xmemory.h (C1 base)
+new       5A70782EF00F0FB6094A0F538690557E81B5EE21C7781E190A38ABD859541CB2  include/rex/system/xmemory.h (31430 B)
+orig      E07F690223B564AE0D41D1192ACD9225BD35226A43A7ACA8F2798B1851291B35  src/graphics/primitive_processor.cpp (C1 base)
+new       470BA4BED73B2ABFD32048F901C426BA24048C26A07694F9768F7AD35EC137F2  src/graphics/primitive_processor.cpp (79790 B)
+orig      0BE4BADCAC666BEE80F656669D072EDA8B55C2D25D25C448BC4C29E12BD503F4  src/graphics/shared_memory.cpp (C1 base)
+new       A4A31038ABDFF94A1B97D28A13EE2ACBB67F44DC596F7A964C8C7493050390C6  src/graphics/shared_memory.cpp (32711 B)
+orig      141FB1A947D59156EB40A835B27E64F94EE22A3F5BE0E0F70F17BC85C676C87A  src/system/xmemory.cpp (C1 base)
+new       6C801EB2BA7D0D07A476C0B0E0B659F14D574CEB33D86530768AC0FA097B080D  src/system/xmemory.cpp (117939 B)
+orig      19AE1606C6DB727369A5F119EF3371A8D307F4B42088D5C064F0D2DF8D62D47A  game rexlego/src/gpu_native/memory_watch.cpp (CRLF)
+new       70829846C4F321A9B701B471634AC0806A9B0E6EF8730ADCBC84E937DE27105A  game rexlego/src/gpu_native/memory_watch.cpp (CRLF, 8054 B)
+diff      1B2BA4E30BC05A1E7157B50DBC90BC819C93E4B16B419BAFE7E62CCF11A4AB70  keep-watch.diff, 522 lines, 19 hunks, +362/-3, LF
+diff      4D0C10794188CF450046D42B249C9C46D009EE9F4F1B82116954857FA70838BD  keep-watch-rexlego.diff, 17 lines, 1 hunks, +6/-0, LF
+chain     D290530197427138029FF34EE8B1BBBEDE26340AA85D0AE4EABB00DC0CEE9CEF  build/agent12/s4-diag/upload-hash-log.diff
+chain     77BEB64E1325B85451941EA87E33D4371F6EAFB98F7C5E7A37DAE95D29A2F745  build/agent12/s4-p2/single-hold-rearm.diff
+chain     80CAD795EEEF7AD45DBD9DB52ECFFF38C7C7BAF73969FB5DE6FE275EE2F656D9  build/agent12/s4-fixi/protect-hold-g.diff
+diff      1D2CC1F3A3845A3F8FA22BC9ABB5F2B77203E89A734D06884278BB75B0C07616  chain-live-to-c1.diff (diag + P2 + fix (i) + C1 as one diff on live; reference)
+git apply --check (live SDK, diag): exit 0
+git apply --check (live SDK, P2): exit 0
+git apply --check (live SDK, fix (i)): exit 0
+git apply --check (live SDK, chain-live-to-c1): exit 0
+git apply --check (live game repo, keep-watch-rexlego.diff): exit 0
+4-step chain on scratch copies of the live files (git -c core.autocrlf=false apply, outside any work tree):
+  1. diag exit 0; src/graphics/d3d12/shared_memory.cpp BB0838CE3909E18A (= staged: True)
+  2. p2   exit 0; src/graphics/shared_memory.cpp 0BE4BADCAC666BEE (= staged: True)
+  3. fixi exit 0; src/system/xmemory.cpp 141FB1A947D59156 (= staged: True)
+  4. c1   exit 0; include/rex/graphics/shared_memory.h 82A66445ED98B091 (= staged: True); include/rex/system/xmemory.h 5A70782EF00F0FB6 (= staged: True); src/graphics/primitive_processor.cpp 470BA4BED73B2ABF (= staged: True); src/graphics/shared_memory.cpp A4A31038ABDFF94A (= staged: True); src/system/xmemory.cpp 6C801EB2BA7D0D07 (= staged: True)
+  game: LF copy of the live memory_watch.cpp + keep-watch-rexlego.diff: exit 0; 18DE0334BA318CE5 (= LF staged: True)
+RESULT PASS

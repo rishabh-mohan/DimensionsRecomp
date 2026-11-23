@@ -1,0 +1,152 @@
+diff --git "a/build\\agent9\\s4\\fence-wait\\gpu_wait_backoff.cpp.draft.rated-D176CA8D" "b/build\\agent9\\s4\\fence-wait\\gpu_wait_backoff.cpp.draft"
+index 4dff065..92262b9 100644
+--- "a/build\\agent9\\s4\\fence-wait\\gpu_wait_backoff.cpp.draft.rated-D176CA8D"
++++ "b/build\\agent9\\s4\\fence-wait\\gpu_wait_backoff.cpp.draft"
+@@ -1,4 +1,6 @@
+-// gpu_wait_backoff.cpp -- DRAFT by Agent 9 (task #32, 2026-11-22). NOT COMPILED, NOT REVIEWED, NOT BUILT.
++// gpu_wait_backoff.cpp -- DRAFT by Agent 9 (task #32, 2026-11-22; N1-N4 of Agent 10's b2r S26 added in run-2
++// task #11). Syntax-checked only (clang -fsyntax-only with devoffB's flags: syntax-*.txt beside the draft).
++// NOT BUILT, NOT LINKED, NOT RUN.
+ // S4 item "GPU-wait spin back-off": perf-notes/agent9-codegen.md S5.2 (S4-DRAFT rows #24 stage 1, #25 stage 2).
+ // Target: DimensionsRecomp/rexlego/src/gpu_wait_backoff.cpp. That needs an S4 grant (Agent 1 / the user).
+ //
+@@ -17,6 +19,8 @@
+ //                                 Q = 0: pause phase, then SwitchToThread on every later poll (Agent 6's (e)).
+ //                                 Q > 0: pause phase, one SwitchToThread, then a Q us sleep per poll. Max 2000.
+ //   LEGO_GPU_WAIT_SPIN_US=<S>     pause phase of a stalled wait before the first yield. Default 30, max 200.
++//                                 Q and S take decimal digits only; a larger value clamps to the max. Anything
++//                                 else ("-5", "+5", " 5", "5us") logs a warning and is ignored: Q stays OFF, S 30.
+ //   LEGO_GPU_WAIT_STATS=1         probe P1 counters (S4.1.4), one log line per 5 s. Works with the back-off OFF.
+ //                                 Profiling runs only; a STATS run never counts as a timing run.
+ //
+@@ -27,6 +31,8 @@
+ //            set_property(SOURCE src/gpu_wait_backoff.cpp APPEND PROPERTY
+ //                COMPILE_DEFINITIONS LEGO_GPU_WAIT_HOOK_GETDATA=1)
+ //        endif()
++//   Map check after the build (b2r S26 item 3): sub_83FBF7D0, sub_83FAF180, sub_83FB09E8 and sub_83FC0C10 (H0-H3)
++//   all resolve to gpu_wait_backoff.cpp.obj, so devoffB's 27 hooked aliases become 31.
+ //   Native builds have nothing to save: the native device is never ring-initialised (dev+11024 stays 0), the hot
+ //   callers of sub_83FBF7D0 are hooked, and GetData is replaced (Agent 3, 07:34; build/agent3/logs/fe-11024.txt).
+ //   Native already defines sub_83FB09E8 (gpu_native/queries.cpp:320) and sub_83FC0C10 (hooks_device.cpp:340), so
+@@ -34,12 +40,13 @@
+ //   No SDK change in stage 1. Stage 2 (WaitOnAddress on a CP sequence counter) is S5.2.3 and is not drafted here.
+ //
+ // Style checked against rexlego (07:45): the pch include and extern "C" __imp__ declarations as in
+-// native_lock_elide.cpp:3-37; guest loads use the pch's REX_LOAD_U32 / REX_LOAD_U8
+-// (generated/default/legodimensions_pch.h:120-129, the macros the generated bodies use); the env switch is a magic
+-// static like native_lock_elide.cpp:40-46; <windows.h> without WIN32_LEAN_AND_MEAN (the SDK defines it,
+-// discord_presence.cpp:37-39); the high-resolution timer as in sample_profiler.cpp:70-71.
++// native_lock_elide.cpp:3-37; guest loads use the pch's REX_LOAD_U32 / REX_LOAD_U8 (legodimensions_pch.h:120-129
++// in generated/default, :124-133 in B's batch-nolr pch; same text, the macros the generated bodies use); the env
++// switch is a magic static like native_lock_elide.cpp:40-46; <windows.h> without WIN32_LEAN_AND_MEAN (the SDK
++// defines it, discord_presence.cpp:37-39); the high-resolution timer as in sample_profiler.cpp:70-71.
+ //
+-// Review TODOs (Agent 10)
++// Review: Agent 10 rated D176CA8D in b2r S26 (landing OFF SAFE once S5.2.4 step 0 is done; ON SAFE to test after
++// steps 1-4). These were the review TODOs; b2r S26 answers all three as PASS:
+ //   - H2 reads ctx.lr at entry (crash_guards.cpp:69 reads it too): skip_lr must stay off (it is off in every build).
+ //   - Every L1 waiter gets the back-off, not only the render thread (BlockOnFence callers, S4.1.1). The same
+ //     output-identical argument holds for each; the stall state is per thread.
+@@ -98,11 +105,12 @@ struct Config {
+   int64_t spin_ticks = 0;
+ };
+ 
+-// Parses a decimal value; false if absent or invalid. Clamps to max.
++// Parses a decimal value; false if absent or invalid. Digits only (N1: strtoul alone takes "-5", wraps it and
++// clamps it to max, so a stray sign would turn the back-off ON at Q = 2000). Clamps to max.
+ bool ParseUs(const char* s, uint32_t max, uint32_t* out) {
+-  if (!s || !*s) return false;
++  if (!s || *s < '0' || *s > '9') return false;  // also rejects "", "+5" and " 5"
+   char* end = nullptr;
+-  const unsigned long v = std::strtoul(s, &end, 10);
++  const unsigned long v = std::strtoul(s, &end, 10);  // saturates at ULONG_MAX, which then clamps to max
+   if (end == s || *end != '\0') return false;
+   *out = v > max ? max : static_cast<uint32_t>(v);
+   return true;
+@@ -114,15 +122,21 @@ const Config& Cfg() {
+     Config c;
+     const char* q = std::getenv("LEGO_GPU_WAIT_BACKOFF_US");
+     c.on = ParseUs(q, 2000, &c.quantum_us);
++    const char* sp = std::getenv("LEGO_GPU_WAIT_SPIN_US");
+     uint32_t s = 0;
+-    if (ParseUs(std::getenv("LEGO_GPU_WAIT_SPIN_US"), 200, &s)) c.spin_us = s;
++    const bool spin_ok = ParseUs(sp, 200, &s);
++    if (spin_ok) c.spin_us = s;
+     const char* st = std::getenv("LEGO_GPU_WAIT_STATS");
+     c.stats = st && st[0] == '1';
+     LARGE_INTEGER f;
+     if (QueryPerformanceFrequency(&f) && f.QuadPart > 0) c.qpf = f.QuadPart;
+     c.spin_ticks = c.qpf * c.spin_us / 1000000;
+     if (q && *q && !c.on) {
+-      REXLOG_WARN("GPU wait back-off: LEGO_GPU_WAIT_BACKOFF_US=\"{}\" is not a number; back-off stays OFF.", q);
++      REXLOG_WARN("GPU wait back-off: LEGO_GPU_WAIT_BACKOFF_US=\"{}\" is not a plain number; back-off stays OFF.", q);
++    }
++    if (sp && *sp && !spin_ok) {
++      REXLOG_WARN("GPU wait back-off: LEGO_GPU_WAIT_SPIN_US=\"{}\" is not a plain number; spin stays {} us.", sp,
++                  c.spin_us);
+     }
+     if (c.on || c.stats) {
+       REXLOG_INFO("GPU wait back-off: {} (quantum {} us, spin {} us); stats {}; GetData hook {}.",
+@@ -182,6 +196,7 @@ struct Stats {
+   std::atomic<uint64_t> l2_tries{0}, l2_polls{0}, l2_delayed{0}, l2_waits{0}, l2_sleep_then_ready{0};
+   std::atomic<uint64_t> kicks{0};
+   std::atomic<uint64_t> pauses{0}, yields{0}, sleeps{0}, sleep_fails{0};
++  std::atomic<uint64_t> sleep_ticks{0};  // N4: QPC ticks inside SleepUs, failed tries included
+   std::atomic<uint64_t> l1_ticks{0}, l1_max_ticks{0}, l2_ticks{0}, l2_max_ticks{0};
+   std::atomic<uint64_t> hist[5] = {};  // L1 wait time: <50 us, <200 us, <1 ms, <4 ms, >= 4 ms
+   std::atomic<int64_t> next_log{0};
+@@ -211,7 +226,7 @@ void AddL1Wait(const Config& c, int64_t ticks) {
+ double TicksToMs(const Config& c, uint64_t t) { return static_cast<double>(t) * 1000.0 / static_cast<double>(c.qpf); }
+ 
+ // One line per 5 s; each line covers one interval (counters are taken and cleared). Per-frame numbers: divide by
+-// the frames in the same interval from the runner's perf.csv.
++// the frames in the same interval from the runner's perf.csv. sleep_sum = time spent in sleeps (N4).
+ void MaybeLog(const Config& c) {
+   const int64_t now = Qpc();
+   int64_t next = g_stats.next_log.load(std::memory_order_relaxed);
+@@ -222,15 +237,15 @@ void MaybeLog(const Config& c) {
+   REXLOG_INFO(
+       "GPU wait stats (5 s): L1 waits {} polls {} moved {} gpu_off {} sleep>moved {} sleep>done {} | "
+       "L2 tries {} waits {} polls {} delayed {} sleep>ready {} | kicks {} | pause {} yield {} sleep {} "
+-      "sleep_fail {} | L1 sum {:.2f} ms max {:.3f} ms hist <50us {} <200us {} <1ms {} <4ms {} >=4ms {} | "
+-      "L2 sum {:.2f} ms max {:.3f} ms",
++      "sleep_sum {:.2f} ms sleep_fail {} | L1 sum {:.2f} ms max {:.3f} ms hist <50us {} <200us {} <1ms {} "
++      "<4ms {} >=4ms {} | L2 sum {:.2f} ms max {:.3f} ms",
+       w1, Take(g_stats.l1_polls), Take(g_stats.l1_moved), Take(g_stats.l1_gpu_off),
+       Take(g_stats.l1_sleep_then_moved), Take(g_stats.l1_sleep_then_done), Take(g_stats.l2_tries), w2,
+       Take(g_stats.l2_polls), Take(g_stats.l2_delayed), Take(g_stats.l2_sleep_then_ready), Take(g_stats.kicks),
+-      Take(g_stats.pauses), Take(g_stats.yields), Take(g_stats.sleeps), Take(g_stats.sleep_fails),
+-      TicksToMs(c, Take(g_stats.l1_ticks)), TicksToMs(c, Take(g_stats.l1_max_ticks)), Take(g_stats.hist[0]),
+-      Take(g_stats.hist[1]), Take(g_stats.hist[2]), Take(g_stats.hist[3]), Take(g_stats.hist[4]),
+-      TicksToMs(c, Take(g_stats.l2_ticks)), TicksToMs(c, Take(g_stats.l2_max_ticks)));
++      Take(g_stats.pauses), Take(g_stats.yields), Take(g_stats.sleeps), TicksToMs(c, Take(g_stats.sleep_ticks)),
++      Take(g_stats.sleep_fails), TicksToMs(c, Take(g_stats.l1_ticks)), TicksToMs(c, Take(g_stats.l1_max_ticks)),
++      Take(g_stats.hist[0]), Take(g_stats.hist[1]), Take(g_stats.hist[2]), Take(g_stats.hist[3]),
++      Take(g_stats.hist[4]), TicksToMs(c, Take(g_stats.l2_ticks)), TicksToMs(c, Take(g_stats.l2_max_ticks)));
+ }
+ 
+ enum class Action : uint8_t { kPause, kYield, kSleep, kSleepFailed };
+@@ -249,11 +264,19 @@ Action BackOff(Stall& st, const Config& c) {
+     st.yielded = true;
+     SwitchToThread();
+     a = Action::kYield;
+-  } else if (SleepUs(c.quantum_us)) {
+-    a = Action::kSleep;
+   } else {
+-    SwitchToThread();
+-    a = Action::kSleepFailed;
++    const int64_t s0 = c.stats ? Qpc() : 0;
++    const bool ok = SleepUs(c.quantum_us);
++    if (c.stats) {
++      const int64_t d = Qpc() - s0;
++      Inc(g_stats.sleep_ticks, d > 0 ? static_cast<uint64_t>(d) : 0);
++    }
++    if (ok) {
++      a = Action::kSleep;
++    } else {
++      SwitchToThread();
++      a = Action::kSleepFailed;
++    }
+   }
+   st.slept = (a == Action::kSleep);
+   if (c.stats) {

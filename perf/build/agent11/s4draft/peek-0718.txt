@@ -1,0 +1,181 @@
+======== build/agent7/readout/pool-W5b.md
+size 27129 lines 275 sha 53C6388B32FA63EC
+M35: | **B-block T-std** | fps | 2.9 | 1.2 | 1.8 | 22 | -1.1 [-2.1, -0.0] * | -0.7 [-1.8, +0.3] |
+M41: | T-std | p99 ms | 4.0 | 1.0 | 1.4 | 33 | +0.3 [-0.5, +1.2] | +0.0 [-0.8, +0.8] |
+M42: | **B-block T-std** | p99 ms | 1.7 | 0.7 | 1.1 | 22 | +0.3 [-0.3, +1.0] | +0.0 [-0.6, +0.6] |
+M43: | T-std | 1 % low fps | 8.2 | 4.6 | 6.9 | 33 | -2.8 [-6.5, +1.0] | -0.2 [-4.0, +3.7] |
+M44: | **B-block T-std** | 1 % low fps | 11.6 | 4.5 | 6.9 | 22 | -2.8 [-6.5, +1.0] | -0.2 [-4.0, +3.7] |
+M48: ## 3. CPU (process cores and thread busy)
+M54: | cpu cores | 2.55 | 2.33; -0.22 [-0.25, -0.19]; -8.6 [-9.8, -7.4] *; -8.6 [-9.6, -7.6] * | 2.34; -0.20 [-0.23, -0.17]; -8.0 [-9.2, -6.8] *; -8.0 [-9.0, -7.0] * |
+M71: | cpu cores | -8.62 +- 1.05 (med -8.90; higher 0/12) | -7.98 +- 1.16 (med -8.54; higher 0/12) |
+M75: Cells: the primary's GM delta [95 % CI] for median ms; fps; p99; 1 % low; then the cores change [95 % CI].
+M77: | pass | kept | primary (round test) | d11t: median ms; fps; p99; 1 % low; cores (change) | d11p: median ms; fps; p99; 1 % low; cores (change) |
+M84: **no-slow-d11t** (left out: 0455-d11t-r1, 0459-d11t-r2): primary B-block T-std; Round terms of B-block T-std vs round 1: median ms: round 2 +6.0 %, round 3 +7.9 %, round 4 +6.3 %, round 5 +5.1 %, round 6 +5.8 %, round 7 +4.1 %, round 8 +5.8 %, round 9 +6.3 %, round 10 +6.1 %, round 11 +7.0 %, round 12 +6.3 %; F = 7.77 on (11, 20), p = < 0.001. fps: round 2 -4.4 %, round 3 -5.6 %, round 4 -4.4 %, round 5 -4.1 %, round 6 -4.2 %, round 7 -3.0 %, round 8 -4.3 %, round 9 -4.6 %, round 10 -4.4 %, round 11 -5.0 %, round 12 -4.5 %; F = 9.58 on (11, 20), p = < 0.001.
+M96: | cpu cores change | -0.22 [-0.26, -0.19] | -0.20 [-0.24, -0.17] |
+M110: | cpu cores change | -0.22 [-0.25, -0.19] | -0.20 [-0.24, -0.17] |
+M124: | cpu cores change | -0.22 [-0.26, -0.19] | -0.20 [-0.24, -0.17] |
+M138: | cpu cores change | -0.23 [-0.26, -0.19] | -0.20 [-0.24, -0.17] |
+M152: | cpu cores change | -0.23 [-0.26, -0.19] | -0.21 [-0.25, -0.18] |
+M166: | cpu cores change | -0.22 [-0.25, -0.19] | -0.20 [-0.23, -0.17] |
+M180: | cpu cores change | -0.22 [-0.25, -0.19] | -0.19 [-0.23, -0.16] |
+M194: | cpu cores change | -0.22 [-0.25, -0.19] | -0.21 [-0.24, -0.18] |
+M208: | cpu cores change | -0.23 [-0.28, -0.18] | -0.20 [-0.25, -0.15] |
+M222: | cpu cores change | -0.21 [-0.25, -0.17] | -0.20 [-0.25, -0.16] |
+M234: | seq | pass | round | arm | run | window start | kept | frames | raw median ms | T-std median ms | raw fps | raw p99 ms | cores | Main % | GPU % | TQ % | eff MHz | P MHz | E MHz | P util % | E util % | low E rows in window (onset s) | STUCK | light share | flag |
+======== build/agent10/t27/r21-s4t1.md
+size 12358 lines 113 sha C2DB5124DA84A7EA
+M7: | (a) default-off test bed | **SAFE** |
+M8: | (b) value 3 in F1, F3, W1 and W8b | **SAFE-IF** the 5 conditions in (b) hold |
+M9: | (c) MP4 restatement and the §9 code reads | **ACCEPTED**, with one wording fix (§9.2) and one addition (F-CA under MP4 gap 2) |
+M32: ## (a) Default-off test bed: SAFE
+M48: ## (b) Value 3 in F1, F3, W1 and W8b: SAFE-IF
+M55: 5. **A th2 hang is checked against F-CA first.** My helper found a th2-only deadlock path that exists without #21 (sub-r21-coderead.md §6). My spot-check of the cited lines agrees.
+M69: - **F-CA's main case does not depend on priority.** If the handoff is in the tape that Immediate() flushes, it deadlocks at any priority. Only a tape posted earlier races the worker's re-lock (native_worker.cpp:270) against the queue thread's try_lock (:535), so #21 could change how often that case hangs, in either direction. Whether a handoff happens follows the guest's draw order and surface layouts, not scheduling.
+M76: - N-b. The EcoQoS half of value 3 depends on the power plan. The launcher logs the power scheme at start (bench/agent5/launch/README.md L165), so quote it in the W8b readout. Running values 1 and 2 only if 3 helps (RATE-REQUEST L277) is the right split.
+M80: ## (c) MP4 restatement and the §9 code reads: ACCEPTED
+M102:    - The tape side is not lock-free. Record F-CA (condition 5) there as a known th2 issue that predates #21.
+M105: - **SHOULD (Agent 7).** Record F-CA under MP4 gap 2, and say whether any earlier th2 run hung. My helper could not tell whether color-alias handoffs happen in the F1/F3/W1/W8b scenes. A handoff needs a single-sample RGBA8 surface taking over another surface's identical eDRAM layout (textures.cpp:1655-1662).
+======== ls build/agent7/s4-r1s2/*
+  build/agent7/s4-r1s2/CHECKS.txt                                             1627 23:13:32
+  build/agent7/s4-r1s2/FUNCTIONAL-ROWS.md                                     5512 23:31:36
+  build/agent7/s4-r1s2/NOTE.md                                               19768 23:20:29
+  build/agent7/s4-r1s2/PROOFS.txt                                             7131 23:10:25
+  build/agent7/s4-r1s2/README.md                                              2154 23:32:46
+  build/agent7/s4-r1s2/SHA256SUMS.txt                                         1382 23:10:25
+  build/agent7/s4-r1s2/SOAK.md                                                2503 23:32:20
+  build/agent7/s4-r1s2/make_s4r1s2.py                                        29958 23:10:18
+  build/agent7/s4-r1s2/matrix-w7-draft.json                                   6239 23:28:57
+  build/agent7/s4-r1s2/new                                                       0 23:10:25
+  build/agent7/s4-r1s2/orig                                                      0 22:58:21
+  build/agent7/s4-r1s2/queue-s4r1s2.jsonl                                     5357 23:31:36
+  build/agent7/s4-r1s2/s4-r1s2.diff                                          20060 23:10:25
+======== ls build/agent6/s33-popin/*
+  build/agent6/s33-popin/CHECK.txt                                            7296 06:47:42
+  build/agent6/s33-popin/DESIGN.md                                           25405 06:42:09
+  build/agent6/s33-popin/s33-popin.patch                                     11003 06:28:39
+======== ls build/agent8/readout/w-followup/*
+  build/agent8/readout/w-followup/W4c.md                                     12279 06:40:58
+  build/agent8/readout/w-followup/W6.md                                      28746 06:39:29
+  build/agent8/readout/w-followup/a7                                         16384 06:45:45
+  build/agent8/readout/w-followup/a7check                                     4096 07:16:29
+  build/agent8/readout/w-followup/audit                                       8192 06:37:15
+  build/agent8/readout/w-followup/inputs-W4c-222347.txt                       3453 22:30:59
+  build/agent8/readout/w-followup/inputs-W4c-224057.txt                       5178 22:41:01
+  build/agent8/readout/w-followup/inputs-W4cR-223130.txt                      3455 22:31:42
+  build/agent8/readout/w-followup/inputs-W5b-221447.txt                       3169 22:23:08
+  build/agent8/readout/w-followup/inputs-W5b-224054.txt                       4025 22:40:57
+  build/agent8/readout/w-followup/inputs-W5b2-222310.txt                      3171 22:23:46
+  build/agent8/readout/w-followup/inputs-W6-220900.txt                        3156 22:09:46
+  build/agent8/readout/w-followup/inputs-W6-224132.txt                        4031 22:41:35
+  build/agent8/readout/w-followup/inputs-W8a4-223101.txt                      3172 22:31:29
+  build/agent8/readout/w-followup/inputs-W8a4-223501.txt                      4177 22:40:54
+  build/agent8/readout/w-followup/inputs-W9-221141.txt                        3168 22:14:45
+  build/agent8/readout/w-followup/inputs-W9-224128.txt                        4031 22:41:31
+  build/agent8/readout/w-followup/inputs-W9-224622.txt                        4031 22:46:25
+  build/agent8/readout/w-followup/mine                                       20480 06:41:48
+  build/agent8/readout/w-followup/pool                                           0 05:50:55
+  build/agent8/readout/w-followup/promote-batch-223447.txt                    8065 22:41:01
+  build/agent8/readout/w-followup/promote-batch-224127.txt                    5868 22:41:35
+  build/agent8/readout/w-followup/promote-batch-224622.txt                    2867 22:46:25
+  build/agent8/readout/w-followup/s4b17-check-2240.txt                        1169 22:40:19
+  build/agent8/readout/w-followup/scripts                                     4096 06:40:49
+  build/agent8/readout/w-followup/stage-W4c-222347.txt                        8488 22:30:59
+  build/agent8/readout/w-followup/stage-W4c-224057.txt                        8390 22:41:01
+  build/agent8/readout/w-followup/stage-W4cE-223204-NOTOK.txt                 2299 22:32:22
+  build/agent8/readout/w-followup/stage-W4cR-223130.txt                       7999 22:31:42
+  build/agent8/readout/w-followup/stage-W4cn-223154-NOTOK.txt                 2229 22:32:02
+  build/agent8/readout/w-followup/stage-W5b-221447.txt                       11271 22:23:08
+  build/agent8/readout/w-followup/stage-W5b-224054.txt                       11199 22:40:57
+  build/agent8/readout/w-followup/stage-W5b2-222310.txt                      10513 22:23:46
+  build/agent8/readout/w-followup/stage-W6-220900.txt                        12995 22:09:46
+  build/agent8/readout/w-followup/stage-W6-224132.txt                        13087 22:41:35
+  build/agent8/readout/w-followup/stage-W8a-223143-NOTOK.txt                  1873 22:31:45
+  build/agent8/readout/w-followup/stage-W8a4-223101.txt                       8324 22:31:29
+  build/agent8/readout/w-followup/stage-W8a4-223501.txt                      10449 22:42:32
+  build/agent8/readout/w-followup/stage-W9-221141.txt                        10688 22:14:45
+  build/agent8/readout/w-followup/stage-W9-224128.txt                        10608 22:41:31
+  build/agent8/readout/w-followup/stage-W9-224622.txt                        10682 22:46:25
+  build/agent8/readout/w-followup/stage-W9n-223146-NOTOK.txt                  2492 22:31:52
+  build/agent8/readout/w-followup/tests-221054.txt                           26624 22:33:06
+  build/agent8/readout/w-followup/xcheck                                         0 06:06:03
+======== ls build/agent8/readout/w-followup/a7check/*
+  build/agent8/readout/w-followup/a7check/W9-W5b-check.md                   127497 07:16:31
+  build/agent8/readout/w-followup/a7check/__pycache__                            0 07:16:29
+  build/agent8/readout/w-followup/a7check/check-run.log                      14212 07:16:31
+  build/agent8/readout/w-followup/a7check/check_a7_w9w5b.py                  52579 07:16:20
+======== ls build/agent*/HANDOFF.md
+  build/agent10/HANDOFF.md                                                   14366 07:10:29
+  build/agent12/HANDOFF.md                                                   12738 06:24:32
+  build/agent1/HANDOFF.md                                                     7658 07:05:48
+  build/agent2/HANDOFF.md                                                    21180 06:34:31
+  build/agent3/HANDOFF.md                                                     9003 07:01:32
+  build/agent4/HANDOFF.md                                                     9782 06:51:29
+  build/agent5/HANDOFF.md                                                     8862 06:57:33
+  build/agent6/HANDOFF.md                                                    10478 07:03:23
+  build/agent9/HANDOFF.md                                                    17488 06:06:20
+======== build/agent8/w-followup/PROPOSAL.md
+size 9352 lines 120 sha 09A94D65E82AA7E5
+M4: - W8a and W8a4 move to a Monday daytime session (Section 5).
+M77: - **W8a** goes to a Monday daytime session, with W8b and W10. So does its fallback **W8a4**.
+M78:   - W8a: `GO W8a matrix-window8a.json A06E5E3AAEE25B079532DE8BFC9134D7462B5F842ECB9FADA19B6FD8DD8A475E only=n0,mc repeats=6`. 13 runs, 27.4 min, runner 30.
+M79:   - W8a4: `GO W8a4 matrix-window8a4.json 56BE00D8131981A735CC40142980316F9E834D0B51F103A143BA6105AA5DA1D1 only=n4,n4mc repeats=6`. Same size.
+M80:   - W8a still needs: native4b-bin with Agent 2's MANIFEST sha, Agent 4's re-pin, and PASS on rpb0/rpm4 and s4b02/s4b05.
+M81:   - W8a4 needs an OK to use native4's r6 PASS as its functional cover.
+M112: - 12/12 PASS: T1 W9 r4, T2 W5b r6 three arms, T3 W5b r6 two arms, T4 W4c, T5 W8a4, T6 W4cR (exit 0); the negative tests N1-N4 exit 1 and N5-N6 exit 2, as expected.
+M119: - W8a4 r6, Monday fallback only: promoted OK at 22:35:01 (`stage-W8a4-223501.txt`, with native4's r5/r6 functional cover). W8a itself goes to Monday's day session on native4b, after the re-pin and s4b02/05.
+======== ls build/agent8/w-followup/matrix-window8a*.json
+  build/agent8/w-followup/matrix-window8a.json                                4406 21:41:25
+  build/agent8/w-followup/matrix-window8a4.json                               4263 21:41:28
+======== ls build/agent5/scrnsave-fix/install-log.txt
+  build/agent5/scrnsave-fix/install-log.txt                                   1326 06:36:22
+======== ls perf-notes/*.md
+  perf-notes/ANDROID-FEASIBILITY.md                                          63006 21:01:57
+  perf-notes/BRIEF.md                                                         5590 11:01:57
+  perf-notes/FINDINGS-AND-CHANGES.md                                        102491 06:55:26
+  perf-notes/RESTART-PROMPT-S3.md                                            25362 01:54:49
+  perf-notes/RESUME.md                                                       40818 07:10:07
+  perf-notes/S4-DRAFT.md                                                    197277 06:55:26
+  perf-notes/SESSION2-jobs.md                                                10835 16:46:45
+  perf-notes/SESSION2.md                                                    398075 07:06:02
+  perf-notes/STATUS.md                                                       11359 11:43:46
+  perf-notes/agent1-pause-state-lines.md                                     14398 01:37:25
+  perf-notes/agent1-tracker-s2.md                                            36454 01:54:49
+  perf-notes/agent10-batch1-review.md                                        20143 19:58:50
+  perf-notes/agent10-batch2-review.md                                       350379 22:58:41
+  perf-notes/agent10-codegen-review-draft.md                                 27796 18:18:45
+  perf-notes/agent10-codegen-review.md                                       88083 07:35:07
+  perf-notes/agent10-helpers.md                                              71216 14:36:57
+  perf-notes/agent10-native-review.md                                        20413 20:25:28
+  perf-notes/agent11-global-mutex-design.md                                  17172 18:41:20
+  perf-notes/agent11-kernel.md                                              193186 13:56:40
+  perf-notes/agent11-s2-benches.md                                             824 18:39:47
+  perf-notes/agent11-s2-cs-spinlock.md                                       19387 19:02:48
+  perf-notes/agent11-s2-plan.md                                              12293 17:00:21
+  perf-notes/agent12-gcr-map.md                                              80945 19:42:39
+  perf-notes/agent12-gcr-review.md                                           19739 19:46:01
+  perf-notes/agent12-io-memory.md                                           184719 06:10:31
+  perf-notes/agent12-session2-plan.md                                         8948 16:52:43
+  perf-notes/agent2-baseline.md                                             135995 22:56:39
+  perf-notes/agent3-build.md                                                 30230 11:40:57
+  perf-notes/agent3-run-harness.md                                          144829 07:00:40
+  perf-notes/agent4-draw-path.md                                            138352 22:44:02
+  perf-notes/agent5-uploads.md                                              123815 23:14:39
+  perf-notes/agent6-async-pso-design.md                                      18265 20:55:29
+  perf-notes/agent6-attract-stalls.md                                        93288 07:03:23
+  perf-notes/agent6-crash-triage.md                                          25691 03:01:33
+  perf-notes/agent6-hang-triage.md                                           35853 07:15:26
+  perf-notes/agent6-native-aot.md                                            39228 22:28:00
+  perf-notes/agent6-pipelines.md                                             40600 01:39:16
+  perf-notes/agent6-runspecs.md                                               7381 21:54:09
+  perf-notes/agent6-session2-design.md                                        9549 16:58:56
+  perf-notes/agent7-odr-ffx.md                                               15381 00:20:22
+  perf-notes/agent7-present.md                                              190343 23:33:03
+  perf-notes/agent7-s3-proposal.md                                           17915 01:29:02
+  perf-notes/agent7-session2-plan.md                                          6636 16:52:13
+  perf-notes/agent8-first-boot.md                                            38872 03:03:01
+  perf-notes/agent8-runtime-diag.md                                           9094 11:36:01
+  perf-notes/agent8-runtime-features.md                                      12385 11:35:44
+  perf-notes/agent8-runtime.md                                               17370 11:36:53
+  perf-notes/agent8-session2.md                                              19610 19:13:45
+  perf-notes/agent8-window3.md                                              113766 22:49:22
+  perf-notes/agent9-codegen.md                                              203765 23:11:31

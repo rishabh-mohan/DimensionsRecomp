@@ -1,0 +1,72 @@
+selftest_toypad 2026-11-22 19:51:32
+PASS id batman - id=1 uid=049D1786995D7E
+PASS bcc batman
+PASS size batman
+PASS deterministic batman
+PASS pages 36-37 batman - 0100000001000000
+PASS id gandalf - id=2 uid=04B0D868F41F1F
+PASS bcc gandalf
+PASS size gandalf
+PASS deterministic gandalf
+PASS pages 36-37 gandalf - 0200000002000000
+PASS id wyldstyle - id=3 uid=0449E864639307
+PASS bcc wyldstyle
+PASS size wyldstyle
+PASS deterministic wyldstyle
+PASS pages 36-37 wyldstyle - 0300000003000000
+PASS distinct uids
+PASS tea inverse x300
+PASS vehicle branch id 1000
+fake listener on 127.0.0.1:57045
+  LOAD batman id=1 pad=2 index=0 path_len=0 -> hangup-ok (0.02 s)
+  LOAD gandalf id=2 pad=1 index=1 path_len=0 -> hangup-ok (0.00 s)
+  LOAD wyldstyle id=3 pad=3 index=2 path_len=0 -> hangup-ok (0.01 s)
+PASS starter: 3 loads, server hung up
+PASS listener saw pad/index/id/path_len - [(2, 0, 1, 0), (1, 1, 2, 0), (3, 2, 3, 0)]
+PASS GET_LED 40 bytes - p1:m1:FFFFFF p2:m0:000000 p3:m0:000000
+PASS GET_LED keeps the connection open
+PASS reject pad 0: hang-up, no reply
+PASS REMOVE 2/0
+PASS MOVE 1/1 -> 2/0
+PASS slots after REMOVE/MOVE - {2: (3, 3), 0: (2, 2)}
+C++ source lines: L89-113 and L550-642 of DimensionsRecomp\rexglue-sdk\src\input\portal\emulated_toypad.cpp
+clang-cl output:
+<workspace>\build\agent3\toypad\selftest\xcheck.cpp(148,25): warning: 'fopen' is deprecated: This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  148 |     std::FILE* f = std::fopen(argv[a], "rb");
+      |                         ^
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\ucrt\stdio.h(212,20): note: 'fopen' has been explicitly marked deprecated here
+  212 |     _Check_return_ _CRT_INSECURE_DEPRECATE(fopen_s)
+      |                    ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h(356,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  356 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807\include\vcruntime.h(346,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  346 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+1 warning generated.
+PASS C++ cross-check compiles (clang-cl, lld-link /threads:1) - exit 0
+xcheck.exe:
+TAG <workspace>\build\agent3\toypad\tags\batman.bin id=1 key=8704D48716B1C7719A132134F9EAFDC8 enc=750375C6DD9FB722
+TAG <workspace>\build\agent3\toypad\tags\gandalf.bin id=2 key=0C46B1DF0D29A1697D8DC126AE0A579F enc=6F57641A98B4B7FF
+TAG <workspace>\build\agent3\toypad\tags\wyldstyle.bin id=3 key=F6F9CEFA9D31E4D7665DDEFD65F6D750 enc=6A22BD6AE385A7F9
+TAG <workspace>\build\agent3\toypad\selftest\batmobile-1000.bin id=1000 key=3325D14F96E54CD318800EB518F966DE enc=7B606A3E51EF685E
+CMD enc=E8F66C96A642D580 dec=0123456789ABCDEF
+PASS xcheck.exe runs - exit 0
+PASS C++ == Python id batman.bin - c++ 1 py 1
+PASS C++ == Python figure key batman.bin
+PASS C++ == Python Encrypt(id,id) batman.bin
+PASS C++ Encrypt(id,id) == tag pages 36-37 batman.bin
+PASS C++ == Python id gandalf.bin - c++ 2 py 2
+PASS C++ == Python figure key gandalf.bin
+PASS C++ == Python Encrypt(id,id) gandalf.bin
+PASS C++ Encrypt(id,id) == tag pages 36-37 gandalf.bin
+PASS C++ == Python id wyldstyle.bin - c++ 3 py 3
+PASS C++ == Python figure key wyldstyle.bin
+PASS C++ == Python Encrypt(id,id) wyldstyle.bin
+PASS C++ Encrypt(id,id) == tag pages 36-37 wyldstyle.bin
+PASS C++ == Python id batmobile-1000.bin - c++ 1000 py 1000
+PASS C++ == Python figure key batmobile-1000.bin
+PASS C++ == Python Encrypt(id,id) batmobile-1000.bin
+PASS C++ == Python command-key Encrypt
+PASS C++ command-key Decrypt round trip
+RESULT: PASS (45/45 checks passed)

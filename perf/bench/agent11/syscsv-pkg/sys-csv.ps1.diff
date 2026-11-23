@@ -1,0 +1,30 @@
+diff --git a/bench/agent8/run/drivers/sys-csv.ps1 b/bench/agent11/syscsv-pkg/sys-csv.ps1
+index e981dcc..acc8b83 100644
+--- a/bench/agent8/run/drivers/sys-csv.ps1
++++ b/bench/agent11/syscsv-pkg/sys-csv.ps1
+@@ -24,6 +24,9 @@
+ # Exit: 0 any normal stop (also: game pid not running at start -> header only, reason game_exit); 1 init failure
+ # (compile/load failed, no PDH counter at all, sys.csv not creatable, unexpected error in the loop); 2 bad arguments.
+ # Uses .NET calls instead of cmdlets of the auto-loaded Utility / Management modules (shorter launch -> first row).
++# STAGED COPY (Agent 11, 2026-11-22): differs from bench\agent8\run\drivers\sys-csv.ps1 only in the repo depth and the
++# DLL cache dir (build\agent11\cache), so it runs from bench\agent11\syscsv-pkg with the staged LdSys.cs next to it.
++# Not part of the adoption: after window 4 only LdSys.cs.diff is applied to bench\agent8\run\drivers\LdSys.cs.
+ param(
+     [string]$GamePid = '',
+     [string]$RunDir = '',
+@@ -70,12 +73,12 @@ foreach ($f in @($outPath, $stopPath)) {
+     if (-not $d -or -not [IO.Directory]::Exists($d)) { Bad "no directory for '$f'" }
+ }
+ 
+-# ---- LdSys: compile once into build\agent8\cache (content key), afterwards only load ----
++# ---- LdSys: compile once into build\agent11\cache (content key), afterwards only load ----
+ $dllHow = ''; $dllName = ''
+ try {
+     $cs = [IO.Path]::Combine($PSScriptRoot, 'LdSys.cs')
+-    $repo = [IO.Path]::GetFullPath([IO.Path]::Combine($PSScriptRoot, '..\..\..\..'))
+-    $cacheDir = [IO.Path]::Combine($repo, 'build\agent8\cache')
++    $repo = [IO.Path]::GetFullPath([IO.Path]::Combine($PSScriptRoot, '..\..\..'))
++    $cacheDir = [IO.Path]::Combine($repo, 'build\agent11\cache')
+     $sha = [Security.Cryptography.SHA256]::Create()
+     try { $hash = $sha.ComputeHash([IO.File]::ReadAllBytes($cs)) } finally { $sha.Dispose() }
+     $key = [BitConverter]::ToString($hash, 0, 4).Replace('-', '').ToLowerInvariant()

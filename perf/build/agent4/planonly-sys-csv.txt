@@ -1,0 +1,44 @@
+=== timing matrix: NATIVE ON build: threaded recording n0/th1/th2/th3 on native3d (Agent 4, S3 task #12, <= 45 min planned for a later window). Title/attract loop, no input needed ===
+matrix   <workspace>\bench\agent4\matrix-native-threaded.json
+note     BIN DIR: build/agent2/native3d-bin = native3 (S3 with fix-a) plus the draw.cpp hash=0 fix (perf-notes/agent4-draw-path.md S3.2; draw.cpp 5EA1F357...). All four arms run the same exe and cvars; only the environment differs. If a later native bin (an AOT pack for placement VS 0xAC449538 / PS 0xAC448F28, or a shader miss-cache bin) is staged before this matrix runs, move every arm to it together, after its own functional n-rows pass.
+note     Every arm passes native_settings_frontend=false (native builds throw at start with the frontend on: 'Native setting is not registered: present_fsr_sharpness_reduction') and runs uncapped (native_fps_limit=0, framerate_limit=0). drivers/thread-cpu.ps1 gives the busiest-thread busy %.
+note     ONE FRAME SOURCE: frames=perf on every arm (perf.csv frame_time_us, the per-present interval written next to native-frames.csv in the same present call: device.cpp:2266-2276, fps_counter.h:37). Same source as the OFF-build arms (d0/devoff/B), so results can be set beside window 4. Checked on 7 native runs (window-3 n0 x4, S3 N1-N3): window mean fps identical (delta <= 0.001%), median within 0.002 ms, p99 within 0.015 ms (bench/agent4/s3/perf-vs-native.json). LEGO_NATIVE_FRAME_METRICS stays on in every arm as a cross-check only (same cost in every arm).
+note     WINDOW: starts 60 s after the first frame (settle 5 + warm-up 55, firstframe mode), past the light-to-heavy title switch at 30-40 s; satisfies a runner min_window_after_ff_s of 60 without raising the warm-up. Flag any run whose window still shows the light phase. 60 s window, 3 repeats, round-robin order, no cold run.
+note     No cold run: it is unscored, and its warm-up is capped at 10 s (ColdWarmupMax), which breaks the 60 s rule. n0-r1 then boots with the coldest file cache, which can only widen n0's spread (conservative).
+note     TIME: 4 arms x 3 repeats = 12 runs, the same count as the n0/th1/th2 x4 version: -PlanOnly (05:05) says about 30 min (12 runs of about 142 s). Window 3 ran native runs about 16 s/run longer than the planner assumes (tick-loop lag, boot), so expect about 33-34 min; the worst window-3 overheads on every run would give about 41 min, inside the 45 min cap.
+note     th3 (LEGO_NATIVE_FULL_DRAW_PREPARATION=1) is back, and th2 is no longer provisional: native2's N2/N3 logged 'Native GPU shader cache miss: hash=0x0' (67,220 / 44,968 lines) because the preparation paths planned draws whose captured vertex shader failed to bind. native3d's PrepareDrawGeometry skips those draws with the recorder's own failed-bind test; the recorder drops them at draw.cpp:2718-2725 as before, so the image does not change. native3d functional n0/n2/n3 (Agent 8, build/agent8/matrix/20261122-0452, 04:52-04:59, idle machine) PASS check_n_rows.py for n2 and n3 with 0 hash=0 lines in all three (native2: 0 / 67,220 / 44,968) and no new warning type (checked separately by Agent 4, bench/agent4/s3/check-native3d.json, and Agent 10, build/agent10/nb/).
+note     SYS_CSV on (Agent 8's suggestion, as in bench/agent8/run/matrix-window4.json): drivers/sys-csv.ps1 logs idle time, foreground window, input desktop, screensaver, CPU util/MHz, thermal and power every 1 s (sys.csv; sys.json for the window), so the runner flags runs with input during the window, foreground loss, a screensaver or a power change. Agent 8 saw heavy background load in tonight's runs (MsMpEng 2.5-2.9 cores, PresentMon about 1 core). Timing comes only from a run on the unlocked, idle desktop; agent runs of this matrix are functional only.
+note     game.log rotates at 5 MB and keeps 2 files. bench/agent4/check_n_rows.py reads game.1.log too and uses threads.csv names when the boot lines are gone.
+note     No LEGO_NATIVE_TIMING, LEGO_NATIVE_STATE_CALLS, trace toggles or debug layer in any arm. The trace toggles also switch parallel draws off.
+note     Check (bench/agent4/check_n_rows.py --baseline <this matrix's n0 runs> --rows n1=<th1> n2=<th2> n3=<th3>): th1-th3 log 'Native GPU: threaded recording ON (LEGO_NATIVE_THREADED=1)' once; 'Native draw batches:' is 'serial workers=0' (th1), 'parallel workers=2' (th2) and absent (th3: full preparation never calls NativeParallelDrawsEnabled); 'Native worker: last 600 frames ...' about once per 600 presents; worker threads 'Native GPU recording' (th1), 'Native GPU preparation' + 'Native GPU prepare 1/2' (th2), and those plus reclaim and recording (th3); no new warning type against n0, hash=0 included.
+note     Decision (perf-notes/agent4-draw-path.md S2.12, adjusted for 3 repeats): a threaded arm counts only if its mean fps beats n0 in every one of the 3 round-robin rounds AND its median frame time is below n0's lowest median (beats n0's whole min..max spread), with mean fps reported next to the median (frame times can be bimodal). Compare only within this matrix: window 3's n0 used a 50 s window from 35 s, frames=native and the native2 bin.
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order roundrobin; close timeout 60 s; cooldown 5 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+       n0: bin build/agent2/native3d-bin; frames perf; x3; warm-up 55 s; window 60 s; group threaded (ref); cvars native_settings_frontend=false native_fps_limit=0 framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         Agent 4 N0: native defaults, threaded recording off
+       th1: bin build/agent2/native3d-bin; frames perf; x3; warm-up 55 s; window 60 s; group threaded; cvars native_settings_frontend=false native_fps_limit=0 framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv LEGO_NATIVE_THREADED=1; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         Agent 4 N1: threaded recording only. Check 'Native draw batches: serial workers=0'
+       th2: bin build/agent2/native3d-bin; frames perf; x3; warm-up 55 s; window 60 s; group threaded; cvars native_settings_frontend=false native_fps_limit=0 framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv LEGO_NATIVE_THREADED=1 LEGO_NATIVE_PREPARE_THREADS=2 LEGO_NATIVE_SNAPSHOT_STATE=1; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         Agent 4 N2: threaded recording, 2 preparation workers, snapshot state = parallel draws. Check 'Native draw batches: parallel workers=2' and no hash=0 warnings
+       th3: bin build/agent2/native3d-bin; frames perf; x3; warm-up 55 s; window 60 s; group threaded; cvars native_settings_frontend=false native_fps_limit=0 framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv LEGO_NATIVE_THREADED=1 LEGO_NATIVE_PREPARE_THREADS=2 LEGO_NATIVE_FULL_DRAW_PREPARATION=1; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         Agent 4 N3: threaded recording, 2 preparation workers, full draw preparation. No 'Native draw batches' line (expected); check the thread names and no hash=0 warnings
+round 1  n0 th1 th2 th3
+round 2  th1 th2 th3 n0
+round 3  th2 th3 n0 th1
+order    n0 th1 th2 th3 | th1 th2 th3 n0 | th2 th3 n0 th1
+estimate 12 runs (0 cold), about 30 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-THWEOOQDCDFZTU6Y5GPMNCASKL -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   6.58 GB
+game       legodimensions.exe RUNNING (pid 91340) -> close it first
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/native3d-bin : ok (MANIFEST.txt)
+screensaver WPXSCR~1.SCR after 120 s: the keep-awake request should hold it off; if it starts during timing runs, set it to (None)
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   12 runs, about 30 min: done around 06:34
+!!! FATAL: legodimensions.exe is running (pid 91340)
+PlanOnly: nothing started.

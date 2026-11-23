@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "tree": "<workspace>\\build\\agent4\\s32tree\\DimensionsRecomp",
+  "counts_active": true,
+  "actual_native_functions": [
+    "IssueQuery",
+    "IssueQueryQueued",
+    "GetQueryData",
+    "ReleaseQuery",
+    "ResetQueryResources",
+    "HostDevice::RetireResource"
+  ],
+  "checks": [
+    "no query drain",
+    "fresh generations",
+    "retain at every submitted/open slot",
+    "release before END",
+    "guest header reuse",
+    "nonfinal refcount",
+    "fence readiness",
+    "no fabricated result",
+    "removal failure",
+    "readback failure",
+    "cached sum",
+    "saturating sum",
+    "shared monotonic fence generations",
+    "signal failures",
+    "queued BEGIN/END recorder barriers",
+    "END racing final release",
+    "END racing reset",
+    "active entry count after every BEGIN/END/release/reset"
+  ],
+  "real_GPU_gameplay_not_proven": true
+}

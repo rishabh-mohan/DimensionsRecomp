@@ -1,0 +1,51 @@
+02:04:55 PASS parse - 0 errors
+    | 02:04:58 bin <workspace>\build\agent2\devoff2-bin: exe 2026-11-21 23:18, rexruntime.dll 2026-11-21 23:18
+    | 02:04:59 the build defines pause_safe_order, guest_suspend_guard, debug_pause_cycle_ms and debug_pause_cycle_count
+    | 02:04:59 NOT STARTED: the 'default' run needs a pause_safe_order default-ON build, and this one lacks its help text ('which can hang when the guest pauses')
+02:04:59 PASS devoff2 -Only default -CheckOnly refuses - exit 2
+02:04:59 PASS devoff2 carries the old description - rexruntime.dll False, exe True
+02:05:00 PASS devoff2 lacks the marker - rexruntime.dll False, exe False
+    | 02:05:02 bin <workspace>\build\agent2\devoff2-bin: exe 2026-11-21 23:18, rexruntime.dll 2026-11-21 23:18
+    | 02:05:03 the build defines pause_safe_order, guest_suspend_guard, debug_pause_cycle_ms and debug_pause_cycle_count
+    | 02:05:03 check only: nothing started
+02:05:03 PASS devoff2 -CheckOnly (no -Only) exits 0 - exit 0
+    | 02:05:06 bin <workspace>\build\agent11\selftest\default-20261122-020455\fake-marker: exe 2026-11-22 02:05, rexruntime.dll -
+    | 02:05:07 the build defines pause_safe_order, guest_suspend_guard, debug_pause_cycle_ms and debug_pause_cycle_count
+    | 02:05:07 the build carries the pause_safe_order default-ON help text ('which can hang when the guest pauses')
+    | 02:05:07 check only: nothing started
+02:05:07 PASS fake with marker, -Only default - exit 0
+    | 02:05:08 bin <workspace>\build\agent11\selftest\default-20261122-020455\fake-nomarker: exe 2026-11-22 02:05, rexruntime.dll -
+    | 02:05:09 the build defines pause_safe_order, guest_suspend_guard, debug_pause_cycle_ms and debug_pause_cycle_count
+    | 02:05:09 NOT STARTED: the 'default' run needs a pause_safe_order default-ON build, and this one lacks its help text ('which can hang when the guest pauses')
+02:05:09 PASS fake without marker, -Only default - exit 2
+    | 02:05:12 bin <workspace>\build\agent11\selftest\default-20261122-020455\fake-nomarker: exe 2026-11-22 02:05, rexruntime.dll -
+    | 02:05:12 the build defines pause_safe_order, guest_suspend_guard, debug_pause_cycle_ms and debug_pause_cycle_count
+    | 02:05:12 NOT STARTED: the 'default' run needs a pause_safe_order default-ON build, and this one lacks its help text ('which can hang when the guest pauses')
+02:05:12 PASS fake without marker, -Only testg-default - exit 2
+    | 02:05:14 bin <workspace>\build\agent11\selftest\default-20261122-020455\fake-nomarker: exe 2026-11-22 02:05, rexruntime.dll -
+    | 02:05:15 the build defines pause_safe_order, guest_suspend_guard, debug_pause_cycle_ms and debug_pause_cycle_count
+    | 02:05:15 NOT STARTED: the 'default' run needs a pause_safe_order default-ON build, and this one lacks its help text ('which can hang when the guest pauses')
+02:05:15 PASS fake without marker, -Only b-off,default - exit 2
+    | 02:05:16 bin <workspace>\build\agent11\selftest\default-20261122-020455\fake-nomarker: exe 2026-11-22 02:05, rexruntime.dll -
+    | 02:05:17 the build defines pause_safe_order, guest_suspend_guard, debug_pause_cycle_ms and debug_pause_cycle_count
+    | 02:05:17 check only: nothing started
+02:05:17 PASS fake without marker, -Only default -NoMarkerCheck - exit 0
+    | 02:05:18 bin <workspace>\build\agent11\selftest\default-20261122-020455\fake-nomarker: exe 2026-11-22 02:05, rexruntime.dll -
+    | 02:05:19 the build defines pause_safe_order, guest_suspend_guard, debug_pause_cycle_ms and debug_pause_cycle_count
+    | 02:05:19 check only: nothing started
+02:05:19 PASS fake without marker, no -Only - exit 0
+02:05:19 PASS the loop starts with $short, the -Only filter, the OptIn filter
+02:05:19 PASS filter -Only '' -> b-off,b-on,control - got 'b-off,b-on,control'
+02:05:19 PASS filter -Only 'default' -> default - got 'default'
+02:05:19 PASS filter -Only 'testg-default' -> default - got 'default'
+02:05:19 PASS filter -Only 'b-off,default' -> b-off,default - got 'b-off,default'
+02:05:19 PASS filter -Only 'control' -> control - got 'control'
+02:05:19 PASS filter -Only 'b-on' -> b-on - got 'b-on'
+02:05:19 PASS the post-run OptIn check exists
+02:05:19 PASS post-run: clean run dir - default: cmdline.txt and legodimensions.toml do not set pause_safe_order, so the build default picked the order
+02:05:19 PASS post-run: cmdline sets it - default: WARNING, the build default may not have picked the order: cmdline.txt sets pause_safe_order
+02:05:19 PASS post-run: toml sets it - default: WARNING, the build default may not have picked the order: legodimensions.toml sets pause_safe_order
+02:05:19 PASS post-run: toml missing - default: WARNING, the build default may not have picked the order: legodimensions.toml missing
+02:05:20 PASS harness\legodimensions.toml does not set pause_safe_order
+02:05:20 RESULT: PASS (0 failed)
+02:05:20 report: <workspace>\build\agent11\selftest\default-20261122-020455.txt

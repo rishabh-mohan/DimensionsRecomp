@@ -1,0 +1,17 @@
+S2L2874: ## 21:01 Agent 1: launcher fix list, W6 finalize, build cutoff
+S2L2875: 
+S2L2876: - Launcher v2 (run-night.ps1 924321AE, RUN-NIGHT.cmd F7190AB2, README 39ECF5C2): Agent 10's addendum (20:56) and Agent 11's pre-read (build/agent11/launcher-review/REVIEW.md, 20:58) both say SAFE once (5) is in. Sent to Agent 5, aim 22:45, hard 23:00:
+S2L2877:   - MUST: (5) driver = plain string `^drivers/[A-Za-z0-9_-]+\.ps1$` resolving inside `$RunDir\drivers`; objects and args refused. (6) refuse to start when the deadline is > 14 h away. (7) re-check LogonUI, AC and desktop after Close-Programs, right before the runner. F1: explicit env names for the W8a/W8b/W9 arms (Agent 8 lists them; pre-approved if every key is an exact name used by those arms; exact case, no patterns; DRY RUN line generic; README). F3: latest start 06:45 (refuse a GO read at/after it, give up in Wait-Quiet, refuse in Start-Window, log, README). README L151 (Sync-Hold text). The STOP-file smoke test of RUN-NIGHT.cmd.
+S2L2878:   - SHOULD: (8) runner via Start-Process -PassThru, poll STOP and deadline + grace, kill the whole tree (runner, legodimensions, drivers) and log it; else the documented behaviour stays. F5: add copilotapphost/copilotapp_proxy (only under `\WindowsApps\Microsoft.MicrosoftOfficeHub_`) and Windows10Universal (only under `\WindowsApps\ROBLOXCORPORATION.ROBLOX_`). Separate try for Set-Awake and Restore-Screensaver.
+S2L2879:   - OPTIONAL: F4 -NotBefore 00:00 (GO left unread until then). F6 CPU + top-3 processes per gate sample. No WINDOW-CANCEL.
+S2L2880: - W6: Agent 5 finalizes matrix-w6 now with build/agent2/devoff4b-bin (MANIFEST DE11A914079D7DF7, re-hashed by Agent 1). Agent 8 promotes after Agent 3's W6 rows pass.
+S2L2881: - Agent 3's queue already passes `-OutDir build\agent3\runs\<id>-<stamp>` for matrix rows (s4b-queue.ps1 L131). Nothing to change.
+S2L2882: - Agent 4 step 1b PASS on the real native4b configure: fingerprint 9b40acbbef4c57b3 (build/agent4/repin/dryrun-native4b-1b-2055.txt, 2EB43DEF…, 0 FAIL, 0 WARN). Pin record after native4b-bin is staged (~21:20).
+S2L2883: - Builds: all finished by 23:40. Don't start one that can't finish by then; stop at 23:40 and resume tomorrow.
+S2L2884: - Hold manager exits at 07:30 without clearing (Agent 11 F6): in the morning Agent 1 clears a stale HOLD only if no runner or game is running.
+S2L2885: - Agent 8 (after W6 promotion): propose up to 2 follow-up windows for 01:00-06:45 by 22:45, using only arms already checked functionally and allowed by the launcher (e.g. a codegen B vs d0 repeat for the W4b hint; d11 vs d11t for the W5 p99 lead). Agent 1 picks one or two.
+S2L2886: 
+S2L2887: ## 21:04 Agent 1: Android report done
+S2L2888: 
+S2L2889: - Agent 9 #8 done: perf-notes/ANDROID-FEASIBILITY.md v1.1 (752 lines, 21:01). About 349 citations were re-checked by 3 subagents. Verdict: feasible, but as a port project of ≈17-42 person-weeks. Top blockers: arm64 memory ordering in the generated code; the Vulkan backend ("not ready"); Android build and surface glue. Cheapest first step, P0a: the Windows build with REXGLUE_USE_VULKAN=ON and gpu_backend = vulkan, on the PC, no phone needed. Not tonight (builds stop at 23:40); it's the user's decision. Agent 9 stays idle, with no new task, to keep the load down.
+S2L2890: 

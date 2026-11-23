@@ -1,0 +1,474 @@
+{
+ "run": "20261122-220520-s4b-24-w6-c1",
+ "row": "s4b24",
+ "kind": "off",
+ "scenario": "M",
+ "runjson": {
+  "exit_code": 0,
+  "exit_code_hex": "0x00000000",
+  "dumps": [
+   "<workspace>\\build\\agent3\\runs\\20261122-220520-s4b-24-w6-c1\\hang-31952.dmp"
+  ],
+  "crash_events": [],
+  "wer_seen": false,
+  "close_method": "wm_close",
+  "close_seconds": 1.64,
+  "elapsed_s": 217.83,
+  "seconds_requested": 420,
+  "cvars": {
+   "shared_memory_single_hold_rearm": "true",
+   "physical_protect_hold_global_lock": "true",
+   "physical_protect_keep_watch": "true"
+  },
+  "exited_early": false,
+  "env_extra": {},
+  "steps": "54/54"
+ },
+ "summary": {
+  "verdict": "RECOVERED HANG (STUCK-LOCK + dump)",
+  "first_frame_s": 8.1,
+  "levels": {
+   "info": 84,
+   "warning": 142,
+   "error": 5,
+   "critical": 1
+  },
+  "unknown_cvars": [],
+  "errors": [
+   "156.99s [error] STUCK-LOCK: critical section 0x84959edc still not acquired after 5s. owner=guest thread object 0x30111018, lock_count=1, recursion=1; waiting thread is 0x6. An owner of 0, or one naming a thread that has exited, means the lock was leaked.",
+   "156.99s [error] STUCK-LOCK: the owner is tid 0x0017 (unnamed), parked at lr=83FAF200 with r3=00000017. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.",
+   "156.99s [error] STUCK-LOCK: owner's callers: 83FBF7B4 <- 83FBFA98 <- 83FBF868 <- 83FBFBDC <- 83FC0CA8 <- 83FB3AC8 <- 83FBF698 <- 83FBFA98 <- 82BD6BA4",
+   "156.99s [error] STUCK-LOCK: waiter's callers: lr=82A2A270 <- 82AED6BC <- 82B7132C <- 82FB01A0 <- 82B7995C <- 82AB2108 <- 82FEBDE0",
+   "156.99s [error] STUCK-LOCK: GPU thread: executing PM4 opcode 0x22 | read ptr 0x70e, write ptr 0x8dd"
+  ]
+ },
+ "log_files": [
+  "game.log"
+ ],
+ "families": {
+  "c1_any": 23,
+  "c1_init_on": 1,
+  "c1_init_blocked": 0,
+  "c1_init_nohold": 0,
+  "c1_first": 1,
+  "c1_kept": 21,
+  "c1_blocked": 0,
+  "c1_verify_on": 0,
+  "c1_verify_f": 0,
+  "recovered_stale": 0,
+  "unhandled_phys": 0,
+  "protect_failed": 0,
+  "split_init": 0,
+  "split": 0,
+  "deferred_counters": 0,
+  "gpu_wait": 0,
+  "gpu_wait_stats": 0,
+  "gpu_wait_backoff": 0,
+  "gpu_wait_on": 0,
+  "memexport": 0,
+  "slow_frame": 0,
+  "s4_upload_hash": 0,
+  "precise_wait": 0,
+  "miss_cache": 0,
+  "stuck_lock": 5,
+  "minidump": 1,
+  "fatal": 1,
+  "clean_exit": 1,
+  "debug_layer": 0,
+  "dred": 0,
+  "d3d12_msg": 0,
+  "k": 0,
+  "c1_other": 0
+ },
+ "levels": {
+  "info": 84,
+  "warning": 142,
+  "error": 5,
+  "critical": 1
+ },
+ "lines": {
+  "c1_any": {
+   "first": [
+    "[2026-11-22 22:05:23.480] [info] [sys] [t34224] C1 keep-watch: on (with physical_protect_hold_global_lock)",
+    "[2026-11-22 22:05:24.707] [info] [sys] [t11028] C1 keep-watch: first kept protect at ED19F000, 299892736 bytes",
+    "[2026-11-22 22:05:24.708] [info] [sys] [t11028] C1 keep-watch: 2 protects kept so far"
+   ],
+   "last": [
+    "[2026-11-22 22:07:42.779] [info] [sys] [t37356] C1 keep-watch: 32768 protects kept so far",
+    "[2026-11-22 22:08:27.639] [info] [sys] [t11028] C1 keep-watch: 36864 protects kept so far",
+    "[2026-11-22 22:08:46.581] [info] [sys] [t11028] C1 keep-watch: 40960 protects kept so far"
+   ]
+  },
+  "stuck_lock": {
+   "first": [
+    "[2026-11-22 22:07:59.791] [error] [krnl] [t11028] STUCK-LOCK: critical section 0x84959edc still not acquired after 5s. owner=guest thread object 0x30111018, lock_count=1, recursion=1; waiting thread is 0x6. An owner of 0, or one naming a thread that has exited, means the lock was leaked.",
+    "[2026-11-22 22:07:59.792] [error] [krnl] [t11028] STUCK-LOCK: the owner is tid 0x0017 (unnamed), parked at lr=83FAF200 with r3=00000017. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.",
+    "[2026-11-22 22:07:59.792] [error] [krnl] [t11028] STUCK-LOCK: owner's callers: 83FBF7B4 <- 83FBFA98 <- 83FBF868 <- 83FBFBDC <- 83FC0CA8 <- 83FB3AC8 <- 83FBF698 <- 83FBFA98 <- 82BD6BA4"
+   ],
+   "last": [
+    "[2026-11-22 22:07:59.792] [error] [krnl] [t11028] STUCK-LOCK: waiter's callers: lr=82A2A270 <- 82AED6BC <- 82B7132C <- 82FB01A0 <- 82B7995C <- 82AB2108 <- 82FEBDE0",
+    "[2026-11-22 22:07:59.792] [error] [krnl] [t11028] STUCK-LOCK: GPU thread: executing PM4 opcode 0x22 | read ptr 0x70e, write ptr 0x8dd"
+   ]
+  },
+  "minidump": {
+   "first": [
+    "[2026-11-22 22:08:02.549] [critical] [core] [t11028] [FATAL] Minidump written to hang-31952.dmp"
+   ],
+   "last": []
+  },
+  "fatal": {
+   "first": [
+    "[2026-11-22 22:08:02.549] [critical] [core] [t11028] [FATAL] Minidump written to hang-31952.dmp"
+   ],
+   "last": []
+  }
+ },
+ "c1_kept_last": 40960,
+ "frame_rows": 8077,
+ "logdiff": {
+  "bases": [
+   "20261122-205356-s4b-01-off"
+  ],
+  "base_scenario": "M",
+  "NEW": 6,
+  "NEW_allowed": 0,
+  "MORE": 0,
+  "MORE_allowed": 0,
+  "GONE": 5,
+  "GONE_unexpected": 0,
+  "FLAG": 1,
+  "NEW_info_other": 9,
+  "NEW_info_allowed": 0,
+  "rc": 0,
+  "new": [
+   "NEW build\\agent3\\runs\\20261122-220520-s4b-24-w6-c1\\game.log x1 [critical] [core] [FATAL] Minidump written to hang-#.dmp",
+   "NEW build\\agent3\\runs\\20261122-220520-s4b-24-w6-c1\\game.log x1 [error] [krnl] STUCK-LOCK: GPU thread: executing PM# opcode #x# | read ptr #x#, write ptr #x#",
+   "NEW build\\agent3\\runs\\20261122-220520-s4b-24-w6-c1\\game.log x1 [error] [krnl] STUCK-LOCK: critical section #x# still not acquired after #s. owner=guest thread object #x#, lock_count=#, recursion=#; waiting thread is #x#. An owner of #, or one naming a thread that has exited, me",
+   "NEW build\\agent3\\runs\\20261122-220520-s4b-24-w6-c1\\game.log x1 [error] [krnl] STUCK-LOCK: owner's callers: #h <- #h <- #h <- #h <- #h <- #h <- #h <- #h <- #h",
+   "NEW build\\agent3\\runs\\20261122-220520-s4b-24-w6-c1\\game.log x1 [error] [krnl] STUCK-LOCK: the owner is tid #x# (unnamed), parked at lr=#h with r#=#h. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.",
+   "NEW build\\agent3\\runs\\20261122-220520-s4b-24-w6-c1\\game.log x1 [error] [krnl] STUCK-LOCK: waiter's callers: lr=#h <- #h <- #h <- #h <- #h <- #h <- #h"
+  ],
+  "new_allowed": [],
+  "more": [],
+  "gone_unexpected": [],
+  "flag": [
+   "FLAG build\\agent3\\runs\\20261122-220520-s4b-24-w6-c1\\game.log fatal=1 (baseline max 0)"
+  ],
+  "new_info_other": [
+   "NEW build\\agent3\\runs\\20261122-220520-s4b-24-w6-c1\\game.log x1 [critical] [core] [FATAL] Minidump written to hang-#.dmp",
+   "NEW build\\agent3\\runs\\20261122-220520-s4b-24-w6-c1\\game.log x1 [error] [krnl] STUCK-LOCK: GPU thread: executing PM# opcode #x# | read ptr #x#, write ptr #x#",
+   "NEW build\\agent3\\runs\\20261122-220520-s4b-24-w6-c1\\game.log x1 [error] [krnl] STUCK-LOCK: critical section #x# still not acquired after #s. owner=guest thread object #x#, lock_count=#, recursion=#; waiting thread is #x#. An owner of #, or one naming a thread that has exited, me",
+   "NEW build\\agent3\\runs\\20261122-220520-s4b-24-w6-c1\\game.log x1 [error] [krnl] STUCK-LOCK: owner's callers: #h <- #h <- #h <- #h <- #h <- #h <- #h <- #h <- #h",
+   "NEW build\\agent3\\runs\\20261122-220520-s4b-24-w6-c1\\game.log x1 [error] [krnl] STUCK-LOCK: the owner is tid #x# (unnamed), parked at lr=#h with r#=#h. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.",
+   "NEW build\\agent3\\runs\\20261122-220520-s4b-24-w6-c1\\game.log x1 [error] [krnl] STUCK-LOCK: waiter's callers: lr=#h <- #h <- #h <- #h <- #h <- #h <- #h",
+   "NEW build\\agent3\\runs\\20261122-220520-s4b-24-w6-c1\\game.log x21 [info] [sys] C# keep-watch: # protects kept so far",
+   "NEW build\\agent3\\runs\\20261122-220520-s4b-24-w6-c1\\game.log x1 [info] [sys] C# keep-watch: first kept protect at #h, #h bytes",
+   "NEW build\\agent3\\runs\\20261122-220520-s4b-24-w6-c1\\game.log x1 [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)"
+  ],
+  "new_info_allowed": []
+ },
+ "scenes": {
+  "base": "20261122-205356-s4b-01-off",
+  "missing_in_cand": [
+   "8019/1043795",
+   "839/31674"
+  ],
+  "extra_in_cand": [],
+  "cand_major": {
+   "220/534": 38.2,
+   "226/1022": 30.1,
+   "218/222": 22.2,
+   "219/226": 14.9,
+   "220/528": 9.9,
+   "594/2813": 3.4
+  },
+  "base_major": {
+   "220/534": 71.4,
+   "226/1022": 30.3,
+   "218/222": 22.6,
+   "220/528": 16.6,
+   "219/226": 14.9,
+   "594/2813": 3.1,
+   "8019/1043795": 2.4,
+   "839/31674": 2.2
+  }
+ },
+ "front_end_scenes": {
+  "218/222": 22.2,
+  "226/1022": 30.1,
+  "220/528": 9.9,
+  "220/534": 38.2,
+  "219/226": 14.9
+ },
+ "marks": {
+  "prefix": 9,
+  "prefix_diff": [],
+  "all_diff": 12,
+  "cand": {
+   "first-frame": "218/222",
+   "title": "226/1022",
+   "after-start": "226/1022",
+   "after-a1": "220/528",
+   "after-a2": "220/534",
+   "after-a3": "220/534",
+   "down-1": "220/534",
+   "down-2": "220/534",
+   "up-2": "220/534",
+   "back-1": "220/534",
+   "back-2": "218/222",
+   "back-3": "594/1796",
+   "idle-10": "652/5396",
+   "idle-20": "791/31916",
+   "idle-30": "811/37673",
+   "idle-40": "811/37673",
+   "idle-50": "811/37673",
+   "idle-60": "5281/860373",
+   "idle-70": "4688/950782",
+   "idle-80": "1518/336333",
+   "idle-90": "2783/754432",
+   "end": "2783/754432"
+  }
+ },
+ "threads": {
+  "window_s": 179.3,
+  "window": [
+   20.0,
+   199.3
+  ],
+  "by_name": {
+   "(unnamed)": {
+    "pct": 12.24,
+    "threads": 32
+   },
+   "rex::thread::TimerQueue": {
+    "pct": 22.55,
+    "threads": 1
+   },
+   "DeviceHotplugThread": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "D3D Background Thread 0": {
+    "pct": 0.1,
+    "threads": 1
+   },
+   "D3D Background Thread 1": {
+    "pct": 0.03,
+    "threads": 1
+   },
+   "D3D Background Thread 2": {
+    "pct": 0.07,
+    "threads": 1
+   },
+   "D3D Background Thread 3": {
+    "pct": 0.09,
+    "threads": 1
+   },
+   "0x16c00001": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "0xc0550001": {
+    "pct": 4.02,
+    "threads": 1
+   },
+   "XMA Decoder (F8000010)": {
+    "pct": 0.54,
+    "threads": 1
+   },
+   "Audio Worker (F8000014)": {
+    "pct": 1.59,
+    "threads": 1
+   },
+   "GPU Commands (F8000018)": {
+    "pct": 20.65,
+    "threads": 1
+   },
+   "GPU VSync (F800001C)": {
+    "pct": 2.55,
+    "threads": 1
+   },
+   "D3D12 Pipelines": {
+    "pct": 3.78,
+    "threads": 9
+   },
+   "Kernel Dispatch (F8000028)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "Main XThread (F800002C)": {
+    "pct": 17.98,
+    "threads": 1
+   },
+   "D3D12 Storage writer": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread2EF4 (F8000070)": {
+    "pct": 0.55,
+    "threads": 1
+   },
+   "XThread91EC (F80000F4)": {
+    "pct": 32.99,
+    "threads": 1
+   },
+   "XThread3844 (F80000FC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread4A0C (F8000104)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread811C (F800010C)": {
+    "pct": 2.64,
+    "threads": 1
+   },
+   "XThread0894 (F8000114)": {
+    "pct": 3.78,
+    "threads": 1
+   },
+   "XThread8C44 (F8000120)": {
+    "pct": 0.03,
+    "threads": 1
+   },
+   "XThread3950 (F8000128)": {
+    "pct": 0.17,
+    "threads": 1
+   },
+   "XThread2534 (F800012C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread3A30 (F8000140)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread5E18 (F8000144)": {
+    "pct": 9.93,
+    "threads": 1
+   },
+   "SDLWASAPIMgmt": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "SDLAudioP19": {
+    "pct": 0.61,
+    "threads": 1
+   },
+   "XThread63EC (F8000164)": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "XThread52A8 (F800016C)": {
+    "pct": 0.03,
+    "threads": 1
+   },
+   "XThread6990 (F8000188)": {
+    "pct": 0.22,
+    "threads": 1
+   },
+   "XThread8EA8 (F8000190)": {
+    "pct": 1.37,
+    "threads": 1
+   },
+   "XThread9054 (F8000198)": {
+    "pct": 1.32,
+    "threads": 1
+   },
+   "XThread8EB8 (F80001A8)": {
+    "pct": 76.16,
+    "threads": 1
+   },
+   "XThread8E84 (F80001BC)": {
+    "pct": 0.57,
+    "threads": 1
+   },
+   "XThread6B08 (F8000274)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread81B4 (F80002A8)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread4FEC (F80002B0)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread8F6C (F80002BC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread4824 (F80002C4)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread1D64 (F80002FC)": {
+    "pct": 0.02,
+    "threads": 1
+   }
+  },
+  "ticks": {
+   "32904": {
+    "name": "rex::thread::TimerQueue",
+    "samples": 108,
+    "steps": 107,
+    "non_rising": 1,
+    "non_rising_at_s": [
+     151.3
+    ],
+    "step_s_median": 2.0,
+    "span_s": [
+     -6.7,
+     207.3
+    ]
+   }
+  }
+ },
+ "slow_state": {
+  "rows": 211,
+  "onset_s": null,
+  "slow_pct": 0.0,
+  "e_eff_mhz_median": 1820,
+  "cpu_util_pct_median": 107.2,
+  "slow": false
+ },
+ "proofs": [
+  {
+   "ok": true,
+   "text": "init \"C1 keep-watch: on (with physical_protect_hold_global_lock)\" x1"
+  },
+  {
+   "ok": true,
+   "text": "\"first kept protect\" x1 (gate D / positive control)"
+  },
+  {
+   "ok": true,
+   "text": "kept count: last \"kept so far\" = 40960 (21 such lines)"
+  },
+  {
+   "ok": true,
+   "text": "gate D zero lines: \"Recovered stale physical page protection\" 0, \"Unhandled guest physical write fault\" 0"
+  },
+  {
+   "ok": true,
+   "text": "no blocked/no-hold C1 line (0/0/0)"
+  },
+  {
+   "ok": true,
+   "text": "W6 cvars in run.json: single_hold_rearm=true hold_global_lock=true"
+  }
+ ],
+ "base_misses": [
+  "logdiff NEW 6",
+  "logdiff FLAG 1",
+  "dumps 1",
+  "[error] 5 [critical] 1",
+  "stuck_lock 5",
+  "minidump 1",
+  "fatal 1",
+  "TimerQueue ticks non-rising 1/107"
+ ],
+ "hint": "LOOK"
+}

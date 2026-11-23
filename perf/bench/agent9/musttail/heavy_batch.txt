@@ -1,0 +1,45 @@
+heavy-TU comparison on identical function sets (2026-11-21 23:25)
+baseline: <workspace>\build\agent2\gen-noflag\default (TU N as-is)
+batch:    <workspace>\build\agent9\generated\batch\default (412 recomp TUs, written 23:18, rexglue.exe 37B32713B7516402 per build/agent9/logs/gen-steps.txt); gen_out/batch_tuN.cpp = TU N's functions copied from it
+flags: build/dev/compile_commands.json Release entry of legodimensions_recomp.61.cpp (the one env/compile-one.ps1 picks), -I<generated> -> variant dir, CMake PCH -> per-variant PCH of its own legodimensions_pch.h:
+  -DNOMINMAX -DREXGLUE_ENABLE_PERF_COUNTERS -DREX_HAS_D3D12=1 -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DWIN32_LEAN_AND_MEAN -I<workspace>/DimensionsRecomp/rexlego -I<workspace>/DimensionsRecomp/rexlego/src -I<variant> -I<workspace>/DimensionsRecomp/rexglue-sdk/include -I<workspace>/build/dev/rexglue-sdk/include -I<workspace>/DimensionsRecomp/rexglue-sdk/thirdparty/imgui -I<workspace>/DimensionsRecomp/rexglue-sdk/thirdparty/simde -I<workspace>/DimensionsRecomp/rexglue-sdk/thirdparty/simde/simde -I<workspace>/DimensionsRecomp/rexglue-sdk/thirdparty/fmt/include -I<workspace>/DimensionsRecomp/rexglue-sdk/thirdparty/spdlog/include -I<workspace>/build/dev/rexglue-sdk/thirdparty/sdl3/include-revision -I<workspace>/DimensionsRecomp/rexglue-sdk/thirdparty/sdl3/include -I<workspace>/DimensionsRecomp/rexglue-sdk/thirdparty/dxc/include -isystem <workspace>/DimensionsRecomp/rexglue-sdk/thirdparty/tomlplusplus/include -O3 -DNDEBUG -std=gnu++23 -D_DLL -D_MT -Xclang --dependent-lib=msvcrt -msse4.1 -fasync-exceptions -gline-tables-only -O3 -march=x86-64-v3 -fasync-exceptions -gline-tables-only
+workers: 2 (each clang run holds one Agent 9 slot)
+baseline legodimensions_pch.h identical to off3: True
+baseline TU 304: 334 functions, 1866261 B; split/join self-test byte-identical: True; TU and funcs header identical to off3: True
+baseline TU 233: 379 functions, 1487935 B; split/join self-test byte-identical: True; TU and funcs header identical to off3: True
+baseline TU 52: 333 functions, 1394996 B; split/join self-test byte-identical: True; TU and funcs header identical to off3: True
+baseline TU 61: 336 functions, 1033674 B; split/join self-test byte-identical: True; TU and funcs header identical to off3: True
+412 batch recomp TUs (165023 functions) scanned in 5.2s
+TU 304: 334 functions; baseline 1,866,261 B, 0 musttail sites; batch_tu304.cpp 1,721,920 B (92.3% of baseline), 124 musttail sites; its functions come from 235 batch TUs (235 funcs-header #includes): 304,403,139,102,404,187,265,153,13,150,294,147,394,217,238,255,233,339,202,239,331,60,9,156,234,26,366,113,310,103,299,409,231,352,333,69,354,169,30,411,53,201,296,12,209,160,270,130,179,254,280,198,97,263,344,276,203,378,49,123,402,66,273,392,137,380,357,90,327,145,87,289,372,195,25,180,43,8,21,284,91,291,295,406,309,322,288,194,177,57,140,290,285,58,361,164,347,400,128,365,77,15,81,183,163,212,38,221,240,171,35,343,292,181,68,142,80,144,74,129,14,211,100,126,297,218,260,306,0,17,161,84,262,41,242,345,375,226,364,244,110,241,232,24,269,251,225,7,268,62,132,3,191,367,76,319,51,308,220,376,275,305,303,19,133,316,173,320,148,224,395,348,167,215,250,321,259,28,134,326,252,71,371,197,158,106,341,55,50,188,151,405,115,205,75,317,157,258,67,277,219,248,141,124,186,237,243,384,346,120,272,146,114,155,34,391,152,172,230,393,52,397,20,389,332,261,185,40,330,88,94,267,302,1,2
+TU 233: 379 functions; baseline 1,487,935 B, 0 musttail sites; batch_tu233.cpp 1,403,880 B (94.4% of baseline), 137 musttail sites; its functions come from 246 batch TUs (246 funcs-header #includes): 233,114,196,400,304,62,81,169,256,259,159,247,160,8,285,390,357,299,73,5,277,145,322,79,319,144,411,310,186,296,293,372,282,288,211,122,334,161,250,402,274,354,44,109,217,407,54,348,128,337,10,258,352,71,164,96,198,42,251,125,401,150,180,202,393,361,326,300,147,399,321,377,200,305,213,69,63,75,23,373,31,149,102,143,47,329,381,104,347,154,185,330,306,234,0,350,121,157,362,126,32,192,21,67,55,89,356,38,28,237,325,183,77,240,120,313,137,206,382,242,379,151,48,17,115,41,193,406,146,223,172,135,249,40,365,153,111,178,134,289,49,270,386,33,61,83,375,80,130,333,368,190,29,51,140,84,110,9,88,236,127,34,220,229,189,404,18,239,103,301,19,116,316,174,163,50,72,25,101,215,91,173,374,45,335,184,139,315,201,341,263,170,168,182,367,53,291,166,30,226,26,117,138,391,278,11,410,312,94,241,24,394,273,97,266,380,405,388,156,267,338,283,269,92,351,257,222,370,64,353,68,230,398,216,141,58,4,396,46,331,284,245,320,93,346,179
+TU 52: 333 functions; baseline 1,394,996 B, 0 musttail sites; batch_tu52.cpp 1,315,170 B (94.3% of baseline), 116 musttail sites; its functions come from 219 batch TUs (219 funcs-header #includes): 52,401,393,44,351,198,98,291,191,228,83,76,306,304,185,298,136,251,82,206,127,267,123,129,350,284,170,219,262,87,367,261,197,117,388,372,10,381,176,218,336,301,160,323,23,29,377,147,64,215,385,59,214,410,17,71,99,274,347,217,4,266,305,159,292,285,34,265,120,158,31,272,329,331,221,107,46,167,84,303,108,0,317,253,247,42,110,300,338,193,74,281,130,63,319,177,382,405,408,242,240,342,224,373,314,113,220,20,241,137,352,81,14,293,180,363,94,183,189,126,45,356,315,287,290,135,257,65,343,411,53,13,178,237,190,188,392,24,151,394,330,233,68,48,61,142,339,9,88,279,211,252,223,232,207,115,397,340,168,332,400,213,25,353,236,155,6,143,250,181,1,131,312,28,344,195,341,297,69,203,362,33,32,173,307,286,164,227,255,238,276,387,202,379,231,320,139,30,294,152,40,77,328,296,337,133,112,361,8,166,398,368,365,360,172,50,370,186,248
+TU 61: 336 functions; baseline 1,033,674 B, 0 musttail sites; batch_tu61.cpp 981,367 B (94.9% of baseline), 139 musttail sites; its functions come from 219 batch TUs (219 funcs-header #includes): 61,156,302,93,104,199,97,191,374,222,395,87,63,2,263,224,188,262,240,396,192,114,313,351,52,223,254,73,170,201,3,38,358,69,408,219,95,166,350,21,399,75,257,231,327,110,59,293,378,133,118,261,258,46,357,367,211,295,172,323,200,67,397,22,307,142,320,271,359,321,342,190,229,108,197,9,58,305,380,154,345,256,17,329,285,134,347,368,109,94,352,278,85,141,198,209,335,140,310,177,37,70,383,91,44,77,393,387,39,259,252,158,348,36,35,76,86,60,322,298,279,253,268,195,394,155,241,57,297,146,74,174,33,24,203,276,8,218,115,372,356,338,344,160,292,125,171,403,410,390,187,294,106,185,369,71,102,48,159,10,402,5,45,204,99,90,34,377,226,275,251,151,215,270,100,137,11,280,354,228,136,362,82,78,245,217,400,381,31,317,64,150,349,328,361,103,83,308,186,339,80,330,28,373,300,346,214,384,49,316,333,23,189,163,220,129,6,62,135
+PCH baseline: wall 6.8s, CPU 5.8s, 40,853,564 B
+PCH batch: wall 10.1s, CPU 7.6s, 40,854,032 B
+compiling 8 TUs on 2 worker(s)
+
+| TU | variant | source bytes | functions | musttail sites | exit | wall s | CPU s | .obj bytes | .text bytes |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 304 | baseline | 1,866,261 | 334 | 0 | 0 | 25.9 | 20.1 | 1,200,332 | 562,692 |
+| 304 | batch | 1,721,920 | 334 | 124 | 0 | 88.8 | 60.8 | 1,066,306 | 475,968 |
+| 233 | baseline | 1,487,935 | 379 | 0 | 0 | 18.4 | 15.4 | 1,048,448 | 484,225 |
+| 233 | batch | 1,403,880 | 379 | 137 | 0 | 82.4 | 57.7 | 919,487 | 403,041 |
+| 52 | baseline | 1,394,996 | 333 | 0 | 0 | 18.9 | 15.6 | 1,007,834 | 451,274 |
+| 52 | batch | 1,315,170 | 333 | 116 | 0 | 62.4 | 51.2 | 891,068 | 377,333 |
+| 61 | baseline | 1,033,674 | 336 | 0 | 0 | 11.1 | 6.2 | 844,600 | 371,716 |
+| 61 | batch | 981,367 | 336 | 139 | 1 | 43.6 | 37.6 | 0 | 0 |
+  ^ clang failed: gen_out/hb_batch_tu61.err
+
+TU 304: batch/baseline  CPU 302%  wall 343%  .obj 89%  .text 85%
+TU 233: batch/baseline  CPU 376%  wall 448%  .obj 88%  .text 83%
+TU 52: batch/baseline  CPU 327%  wall 330%  .obj 88%  .text 84%
+all 3 TUs: batch/baseline  CPU 169.7s/51.1s = 332%  wall 370%  .obj 88%  .text 84%
+compiling 4 whole batch TUs on 2 worker(s)
+
+For reference: the real batch TU that holds the largest share of each baseline TU's functions, compiled as-is (batch PCH, same flags). Its function set differs from TU N, so compare per function set with the table above.
+| baseline TU | batch TU (as-is) | bytes | functions | of them from TU N | share of TU N's functions (batch bytes) | musttail sites | exit | wall s | CPU s | .obj bytes | .text bytes |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 304 | 2 | 1,772,652 | 402 | 1 | 45.3% | 131 | 0 | 30.3 | 19.3 | 1,111,632 | 499,728 |
+| 233 | 179 | 1,454,318 | 368 | 1 | 33.0% | 143 | 0 | 21.7 | 15.5 | 957,174 | 422,305 |
+| 52 | 248 | 1,366,645 | 240 | 1 | 28.3% | 81 | 0 | 19.6 | 13.0 | 895,971 | 413,397 |
+| 61 | 215 | 1,033,117 | 362 | 2 | 8.0% | 171 | 0 | 16.5 | 9.8 | 791,706 | 313,956 |

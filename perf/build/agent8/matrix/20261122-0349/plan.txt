@@ -1,0 +1,30 @@
+﻿=== timing matrix: Session 3 functional checks (agent slot, hidden desktop, NOT timing): d0t = devoff2 + REX_TIMER_WAIT_BLOCKING=1, d11t = window 3's d11 + REX_TIMER_WAIT_BLOCKING=1 (Agent 11), d0f = devoff2 ===
+matrix   <workspace>\bench\agent8\run\matrix-s3-functional.json
+note     Agent 11's d0t check (OK'd by Agent 1): pass = TimerQueue busy <= ~3 % in threads.csv (window 3 d0: 62 %), no more > 100 ms frames than d0f, a clean close, no dump. Window: 5 s settle + 35 s warm-up asked, raised to 55 s by the 60 s first-frame floor (min_window_after_ff_s default, as in window 4), then 50 s measured; window 3's d0 had no floor (35 s warm-up). TimerQueue busy % is a per-thread share, so the longer warm-up does not change the pass rule. Functional only (hidden desktop): the frame numbers are not timing.
+note     REX_TIMER_WAIT_BLOCKING must reach the game process: run-timing.ps1 sets it in its own environment around Start-Process and restores it after; run.json env_set shows it. Any value turns it on.
+note     03:30 pair: -Only d0f,d0t when the file order was d0f, d0t. Re-check 03:53 (Agent 1): the order is fixed, so the file order d0t, d11t, d0f is the run order; run -Only d0t,d11t,d0f. d11t = window 3's d11 cvars (Agent 11's ON bundle R3) + REX_TIMER_WAIT_BLOCKING=1; its game.log must show 'Host timer resolution set to 1 ms (background opt-out on)'. Report per run: TimerQueue busy % (threads.csv), window fps, share of window frames in the 53-67 fps band (frame time 14.93-18.87 ms): python build/agent8/scratch/band.py <run dirs>. W4b runs d11t in place of d0t only if d11t holds fps within noise of d0f and cuts TimerQueue CPU (Agent 1).
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order fixed; close timeout 60 s; cooldown 5 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+       d0t: bin build/agent2/devoff2-bin; frames perf; x1; warm-up 55 s (raised from 35 s for the floor); window 50 s; group s3; cvars framerate_limit=0; env REX_TIMER_WAIT_BLOCKING=1; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         devoff2 + REX_TIMER_WAIT_BLOCKING=1: TimerQueue blocking wait, no rebuild (Agent 11)
+       d11t: bin build/agent2/devoff2-bin; frames perf; x1; warm-up 55 s (raised from 35 s for the floor); window 50 s; group s3; cvars framerate_limit=0 host_timer_resolution_ms=1 host_timer_throttling_optout=true precise_guest_sleep=true wait_timeout_round_up=true cs_spin=true spinlock_pause_spin=true clock_lockfree=true tls_bounds_fix=true; env REX_TIMER_WAIT_BLOCKING=1; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         window 3's d11 (devoff2 + Agent 11 ON bundle R3) + REX_TIMER_WAIT_BLOCKING=1 (Agent 1, 03:42)
+       d0f: bin build/agent2/devoff2-bin; frames perf; x1; warm-up 55 s (raised from 35 s for the floor); window 50 s; group s3 (ref); cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         devoff2 as window 3's d0: functional reference for d0t and d11t
+round 1  d0t d11t d0f
+order    d0t d11t d0f
+estimate 3 runs (0 cold), about 7 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-C4D4RL5LGHXYUJHMNAZUZLCAQD -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   8.73 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/devoff2-bin : ok (MANIFEST.txt)
+screensaver WPXSCR~1.SCR after 120 s: the keep-awake request should hold it off; if it starts during timing runs, set it to (None)
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   3 runs, about 7 min: done around 03:56
+keep-awake ON (SetThreadExecutionState continuous+system+display until the matrix ends)

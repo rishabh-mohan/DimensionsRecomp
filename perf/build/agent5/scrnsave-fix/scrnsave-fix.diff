@@ -1,0 +1,177 @@
+diff --git a/base/run-matrix.ps1 b/new/run-matrix.ps1
+index fe0edd3..20b28fb 100644
+--- a/base/run-matrix.ps1
++++ b/new/run-matrix.ps1
+@@ -414,9 +414,9 @@ foreach ($b in @($P.arms.Values | ForEach-Object { $_.bin } | Sort-Object -Uniqu
+     $pre.Add("bin        $b : $(if ($ok) { 'ok (MANIFEST.txt)' } else { 'MISSING -> arms skipped: ' + ($users -join ' ') })")
+ }
+ $scr = Get-ItemProperty -LiteralPath 'HKCU:\Control Panel\Desktop' -ErrorAction SilentlyContinue
+-$scrExe = if ($scr) { [string]$scr.'SCRNSAVE.EXE' } else { '' }
+-if ($scr -and [string]$scr.ScreenSaveActive -eq '1' -and $scrExe) {
+-    $pre.Add("screensaver $(Split-Path -Leaf $scrExe) after $($scr.ScreenSaveTimeOut) s$(if ([string]$scr.ScreenSaverIsSecure -eq '1') { ', LOCKS on resume' }): the keep-awake request should hold it off; if it starts during timing runs, set it to (None)")
++$scrExe = [string](Get-P $scr 'SCRNSAVE.EXE' '')   # via PSObject.Properties: a missing value is '' (a plain read throws under StrictMode: W6 GO refused 00:03:40)
++if ([string](Get-P $scr 'ScreenSaveActive' '') -eq '1' -and $scrExe) {
++    $pre.Add("screensaver $(Split-Path -Leaf $scrExe) after $(Get-P $scr 'ScreenSaveTimeOut' '?') s$(if ([string](Get-P $scr 'ScreenSaverIsSecure' '') -eq '1') { ', LOCKS on resume' }): the keep-awake request should hold it off; if it starts during timing runs, set it to (None)")
+ } else { $pre.Add('screensaver none') }
+ if ([bool](Get-P $mx 'sys_csv' $false)) {
+     $sysDrvPath = Join-Path $PSScriptRoot 'drivers\sys-csv.ps1'
+diff --git a/base/run-night.ps1 b/new/run-night.ps1
+index 5601ffc..183e9fc 100644
+--- a/base/run-night.ps1
++++ b/new/run-night.ps1
+@@ -462,15 +462,16 @@ function Set-ScreensaverNone {
+     $was = Save-Screensaver
+     if ($DryRun) { Log "screensaver: would set (None) (now $was) and restore it at the end"; return }
+     [void][LdNight]::SystemParametersInfoW(0x0011, 0, [IntPtr]::Zero, 3)     # SPI_SETSCREENSAVEACTIVE FALSE, update ini + broadcast
+-    if ($script:SsSaved.has_exe) { Remove-ItemProperty -LiteralPath $DeskKey -Name 'SCRNSAVE.EXE' -ErrorAction SilentlyContinue }
++    try { Set-ItemProperty -LiteralPath $DeskKey -Name 'SCRNSAVE.EXE' -Value '' -Type String } catch { Log "!!! could not set SCRNSAVE.EXE to '': $($_.Exception.Message)" 'Yellow' }   # '' is (None); never removed: run-matrix.ps1 L417 threw on a missing value (GO refused 00:03:40)
+     $k = Get-ItemProperty -LiteralPath $DeskKey
+-    Log "screensaver: set to (None) (was $was; now ScreenSaveActive=$([string](Get-P $k 'ScreenSaveActive')), SCRNSAVE.EXE $(if ($k.PSObject.Properties['SCRNSAVE.EXE']) { 'present' } else { 'absent' }))"
++    Log "screensaver: set to (None) (was $was; now ScreenSaveActive=$([string](Get-P $k 'ScreenSaveActive')), SCRNSAVE.EXE $(if ($k.PSObject.Properties['SCRNSAVE.EXE']) { "'$($k.'SCRNSAVE.EXE')'" } else { 'absent' }))"
+ }
+ function Restore-Screensaver {
+     if ($null -eq $script:SsSaved) { return }
+     if ($DryRun) { Add-Text $SsFile "restored $(Ts (Now)) (dry run: nothing had been changed)"; $script:SsSaved = $null; return }
+     try {
+         if ($script:SsSaved.has_exe) { Set-ItemProperty -LiteralPath $DeskKey -Name 'SCRNSAVE.EXE' -Value $script:SsSaved.exe }
++        elseif ($null -ne (Get-ItemProperty -LiteralPath $DeskKey).PSObject.Properties['SCRNSAVE.EXE']) { Remove-ItemProperty -LiteralPath $DeskKey -Name 'SCRNSAVE.EXE' }   # it was missing at the start: missing again
+         [void][LdNight]::SystemParametersInfoW(0x0011, $(if ($script:SsSaved.active -eq '1') { 1 } else { 0 }), [IntPtr]::Zero, 3)
+         $k = Get-ItemProperty -LiteralPath $DeskKey
+         Log "screensaver: restored (ScreenSaveActive=$([string](Get-P $k 'ScreenSaveActive')), SCRNSAVE.EXE $(if ($k.PSObject.Properties['SCRNSAVE.EXE']) { "'$($k.'SCRNSAVE.EXE')'" } else { 'absent' }))"
+diff --git a/base/README.md b/new/README.md
+index 071b4f3..73f7ac5 100644
+--- a/base/README.md
++++ b/new/README.md
+@@ -50,7 +50,7 @@ Timing runs only count when they run on your own desktop, with nobody touching t
+ 
+ | What | What it does | Put back at the end? |
+ |---|---|---|
+-| Screensaver | sets it to "(None)" when it starts | yes. It was already "(None)" when I checked at 19:37 |
++| Screensaver | sets it to "(None)" when it starts: screensaver off, SCRNSAVE.EXE set to empty. (Before 23 Nov it deleted SCRNSAVE.EXE, and that made the runner refuse a window.) | yes, exactly as it was, also when SCRNSAVE.EXE was missing. It was already "(None)" when I checked at 19:37 |
+ | Sleep and screen-off | keeps the PC and the screen awake | yes. Normal sleep comes back as soon as the launcher ends |
+ | ChatGPT, the Copilot app, Roblox (player and Store app), Task Manager, Wallpaper Engine | closes them when a window is accepted and again right before it starts, only in your own session. The Copilot app, the Store Roblox app and Wallpaper Engine's ui32/ui64 are closed only when the program file is in their own install folder, because other programs use the same names. Task Manager may refuse (it runs as admin); the launcher then writes that in its log and goes on. Roblox Studio is not touched | no, open them again in the morning |
+ | Its own window | turns off "Quick Edit", so a stray click in the window can't pause it | it only affects that window |
+@@ -80,7 +80,7 @@ It builds nothing, changes no code and no game files, and runs nothing except `r
+   2. Delete `perf-notes\WINDOW-HOLD.txt` if it is still there.
+   3. Screensaver: go to Settings > Personalization > Lock screen > Screen saver.
+      - Set it back to what `bench\agent5\launch\status\screensaver-saved.txt` says.
+-     - "ScreenSaveActive=0" plus an empty SCRNSAVE.EXE means "(None)". In that case there is nothing to do.
++     - "ScreenSaveActive=0" plus an empty or missing SCRNSAVE.EXE (`present=False`) means "(None)". In that case there is nothing to do.
+      - If you start the launcher again first, it moves that file to `status\screensaver-saved-unrestored-<date-time>.txt` and says so in yellow. The values to put back are then in that file.
+   4. Sleep: nothing to do. Windows goes back to normal by itself.
+ 
+diff --git a/base/make-run-day.ps1 b/new/make-run-day.ps1
+index fead522..64e76fe 100644
+--- a/base/make-run-day.ps1
++++ b/new/make-run-day.ps1
+@@ -1,5 +1,5 @@
+ # make-run-day.ps1: makes run-day.ps1 (Agent 5's day launcher) from bench\agent5\launch\run-night.ps1, which must have
+-# sha256 16B90FA8... (the reviewed night launcher). Each change replaces text that must occur in exactly one line, or
++# sha256 565D30D4... (the reviewed night launcher 16B90FA8 plus the SCRNSAVE.EXE fix, build\agent5\scrnsave-fix). Each change replaces text that must occur in exactly one line, or
+ # inserts one line after a line that must be unique; every changed line ends in '# DAY:'. Nothing else differs.
+ # It also parse-checks the result and writes run-day.diff (git diff --no-index). It writes only next to itself.
+ # Run: powershell -NoProfile -ExecutionPolicy Bypass -File make-run-day.ps1
+@@ -8,7 +8,7 @@ $ErrorActionPreference = 'Stop'
+ Set-StrictMode -Version 2
+ $Repo = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
+ if (-not $Source) { $Source = Join-Path $Repo 'bench\agent5\launch\run-night.ps1' }
+-$Want = '16B90FA8654FAC088FE5A1248DE1754918AACC7667A2126AD14723BFBF939B31'
++$Want = '565D30D40DC5025AD63FD9B9F606724BABC167BC81FCB6FBEB6362B603977112'
+ $Out = Join-Path $PSScriptRoot 'run-day.ps1'
+ $DiffFile = Join-Path $PSScriptRoot 'run-day.diff'
+ $h = (Get-FileHash -LiteralPath $Source -Algorithm SHA256).Hash
+@@ -42,7 +42,7 @@ $o = @'
+ # run-night.ps1: Agent 5's overnight launcher (task #4, old #27). Plain description: README.md next to this file.
+ '@
+ $n = @'
+-# run-day.ps1: Agent 5's day launcher, made from run-night.ps1 (sha 16B90FA8) by make-run-day.ps1; changed lines end in '# DAY:'. -StopAt is required; in the comments below, 07:30 means the -StopAt time. Plain description: README-DAY.md.
++# run-day.ps1: Agent 5's day launcher, made from run-night.ps1 (sha 565D30D4) by make-run-day.ps1; changed lines end in '# DAY:'. -StopAt is required; in the comments below, 07:30 means the -StopAt time. Plain description: README-DAY.md.
+ '@
+ Set-Sub $o $n 'header'
+ 
+@@ -109,7 +109,10 @@ $tk = $null; $pe = $null
+ [void][System.Management.Automation.Language.Parser]::ParseFile($Out, [ref]$tk, [ref]$pe)
+ if (@($pe).Count) { throw "run-day.ps1 has parse errors: $((@($pe) | ForEach-Object { "line $($_.Extent.StartLineNumber): $($_.Message)" }) -join '; ')" }
+ $ErrorActionPreference = 'Continue'
+-$d = @(& git -c core.autocrlf=false diff --no-index --no-color -- $Source $Out | ForEach-Object { [string]$_ })
++# Paths relative to $Repo, so the diff names no user folder (Agent 10's N1); a path outside $Repo stays as it is.
++$rel = @(foreach ($p in $Source, $Out) { $f = (Resolve-Path -LiteralPath $p).Path; if ($f.StartsWith($Repo + '\', [StringComparison]::OrdinalIgnoreCase)) { $f.Substring($Repo.Length + 1).Replace('\', '/') } else { $f } })
++Push-Location -LiteralPath $Repo
++try { $d = @(& git -c core.autocrlf=false diff --no-index --no-color -- $rel[0] $rel[1] | ForEach-Object { [string]$_ }) } finally { Pop-Location }
+ $ErrorActionPreference = 'Stop'
+ [IO.File]::WriteAllText($DiffFile, (($d -join "`n") + "`n"), (New-Object Text.ASCIIEncoding))
+ Write-Host "run-day.ps1: $($L.Count) lines, $marks '# DAY:' lines, parse OK, sha256 $((Get-FileHash -LiteralPath $Out -Algorithm SHA256).Hash)"
+diff --git a/base/run-day.ps1 b/new/day/run-day.ps1
+index 25b0409..cd29347 100644
+--- a/base/run-day.ps1
++++ b/new/day/run-day.ps1
+@@ -1,4 +1,4 @@
+-# run-day.ps1: Agent 5's day launcher, made from run-night.ps1 (sha 16B90FA8) by make-run-day.ps1; changed lines end in '# DAY:'. -StopAt is required; in the comments below, 07:30 means the -StopAt time. Plain description: README-DAY.md.   # DAY: header
++# run-day.ps1: Agent 5's day launcher, made from run-night.ps1 (sha 565D30D4) by make-run-day.ps1; changed lines end in '# DAY:'. -StopAt is required; in the comments below, 07:30 means the -StopAt time. Plain description: README-DAY.md.   # DAY: header
+ # The user starts it once (RUN-NIGHT.cmd) on the unlocked desktop. It waits for perf-notes\WINDOW-GO.txt:
+ #   GO <window-id> <matrix json in bench\agent8\run\> <sha256 of that json> only=<arm,arm,...> repeats=<n>
+ # checks it, waits for a quiet machine, then runs ONLY the pinned bench\agent8\run\run-matrix.ps1 with that json
+@@ -463,15 +463,16 @@ function Set-ScreensaverNone {
+     $was = Save-Screensaver
+     if ($DryRun) { Log "screensaver: would set (None) (now $was) and restore it at the end"; return }
+     [void][LdNight]::SystemParametersInfoW(0x0011, 0, [IntPtr]::Zero, 3)     # SPI_SETSCREENSAVEACTIVE FALSE, update ini + broadcast
+-    if ($script:SsSaved.has_exe) { Remove-ItemProperty -LiteralPath $DeskKey -Name 'SCRNSAVE.EXE' -ErrorAction SilentlyContinue }
++    try { Set-ItemProperty -LiteralPath $DeskKey -Name 'SCRNSAVE.EXE' -Value '' -Type String } catch { Log "!!! could not set SCRNSAVE.EXE to '': $($_.Exception.Message)" 'Yellow' }   # '' is (None); never removed: run-matrix.ps1 L417 threw on a missing value (GO refused 00:03:40)
+     $k = Get-ItemProperty -LiteralPath $DeskKey
+-    Log "screensaver: set to (None) (was $was; now ScreenSaveActive=$([string](Get-P $k 'ScreenSaveActive')), SCRNSAVE.EXE $(if ($k.PSObject.Properties['SCRNSAVE.EXE']) { 'present' } else { 'absent' }))"
++    Log "screensaver: set to (None) (was $was; now ScreenSaveActive=$([string](Get-P $k 'ScreenSaveActive')), SCRNSAVE.EXE $(if ($k.PSObject.Properties['SCRNSAVE.EXE']) { "'$($k.'SCRNSAVE.EXE')'" } else { 'absent' }))"
+ }
+ function Restore-Screensaver {
+     if ($null -eq $script:SsSaved) { return }
+     if ($DryRun) { Add-Text $SsFile "restored $(Ts (Now)) (dry run: nothing had been changed)"; $script:SsSaved = $null; return }
+     try {
+         if ($script:SsSaved.has_exe) { Set-ItemProperty -LiteralPath $DeskKey -Name 'SCRNSAVE.EXE' -Value $script:SsSaved.exe }
++        elseif ($null -ne (Get-ItemProperty -LiteralPath $DeskKey).PSObject.Properties['SCRNSAVE.EXE']) { Remove-ItemProperty -LiteralPath $DeskKey -Name 'SCRNSAVE.EXE' }   # it was missing at the start: missing again
+         [void][LdNight]::SystemParametersInfoW(0x0011, $(if ($script:SsSaved.active -eq '1') { 1 } else { 0 }), [IntPtr]::Zero, 3)
+         $k = Get-ItemProperty -LiteralPath $DeskKey
+         Log "screensaver: restored (ScreenSaveActive=$([string](Get-P $k 'ScreenSaveActive')), SCRNSAVE.EXE $(if ($k.PSObject.Properties['SCRNSAVE.EXE']) { "'$($k.'SCRNSAVE.EXE')'" } else { 'absent' }))"
+diff --git a/base/README-DAY.md b/new/README-DAY.md
+index d2be90a..b948a18 100644
+--- a/base/README-DAY.md
++++ b/new/README-DAY.md
+@@ -54,15 +54,15 @@ The reason is shown in red.
+ 
+ ## For the agents
+ 
+-All files are in `build\agent5\day-draft\` tonight. After Agents 10 and 11 rate them, and after the windows, they get copied to a new folder `bench\agent5\day\`. `bench\agent5\launch\` stays unchanged. launcher-ctl.ps1 refuses a real day session outside `bench\agent5\day\`, so the draft copy can't start one (only `-DryRunTag` tests run there). STOP-LAUNCHER works from any folder; it always asks first.
++All files are in `build\agent5\day-draft\` tonight. After Agents 10 and 11 rate them, and after the windows, they get copied to a new folder `bench\agent5\day\`. `bench\agent5\launch\` stays unchanged. launcher-ctl.ps1 refuses a real day session outside `bench\agent5\day\`, so the draft copy can't start one (only `-DryRunTag` tests run there). STOP-LAUNCHER always asks first. Use the installed copy in `bench\agent5\day\`: a copy in another folder can't read a day launcher's state (it looks in `<own folder>\status\`), so it says the state is unknown and asks.
+ 
+ | file | what |
+ |---|---|
+ | RUN-DAY.cmd | user entry: `launcher-ctl.ps1 -Mode day -OutFile <tmp>`, then `run-day.ps1 -StopAt "<return - 15 min>"` (CRLF) |
+ | STOP-LAUNCHER.cmd | `launcher-ctl.ps1 -Mode stop` (CRLF) |
+ | launcher-ctl.ps1 | the questions, the read-out of the running launcher, the STOP write and the wait |
+-| run-day.ps1 | made from run-night.ps1 16B90FA8 by make-run-day.ps1; 7 lines end in `# DAY:` (run-day.diff) |
+-| make-run-day.ps1 | the generator. It refuses unless the source sha is 16B90FA8 and each change matches exactly one line. It checks ASCII, 7 marks and +1 line, parse-checks, and writes run-day.diff |
++| run-day.ps1 | made from run-night.ps1 565D30D4 (16B90FA8 plus the SCRNSAVE.EXE fix) by make-run-day.ps1; 7 lines end in `# DAY:` (run-day.diff) |
++| make-run-day.ps1 | the generator. It refuses unless the source sha is 565D30D4 and each change matches exactly one line. It checks ASCII, 7 marks and +1 line, parse-checks, and writes run-day.diff (paths relative to the repo) |
+ | run-day.diff | `git diff --no-index` run-night.ps1 -> run-day.ps1 |
+ | test-day.ps1 | the tests below; results in `results\summary-*.txt` |
+ 
+@@ -133,6 +133,8 @@ Not covered by a test: the battery refusal, the "too late" check before a stop,
+ 
+ **Review so far:** a read-only spec read by Agent 5's subagent (23:04) found no blockers. Fixed at 23:10: the unknown state now asks (in both modes); day mode reads the state again after the answer; the time check runs before anything is stopped; AC and the files are checked first; Ctrl+C instead of the X; a STOP written at the same moment is handled; `[0-9]` in launcher-ctl's time pattern; the exit-code line in RUN-DAY.cmd; the draft folder can't start a real day session; the test guard for the user's desktop. Open, for later: (a) the day launcher doesn't see the screensaver setting saved by a night launcher that was closed with the X, because it uses its own status folder. The user section points to the night README for that case. (b) run-day.ps1 line 68 keeps `\d`, so an odd `-StopAt` typed by hand can exit 3 instead of 2. That is harmless: RUN-DAY.cmd always passes a valid time. Agents 10 and 11 review next.
+ 
++**SCRNSAVE.EXE fix (task #26, 23 Nov):** at 00:03:40 the night launcher refused the W6 GO: its Set-ScreensaverNone had deleted SCRNSAVE.EXE, and run-matrix.ps1 -PlanOnly then threw under StrictMode. run-day.ps1 is now made from run-night.ps1 565D30D4, which sets SCRNSAVE.EXE to '' instead of deleting it and, at the end, puts back the saved state, also 'missing'. run-matrix.ps1 reads the value through PSObject.Properties. This is condition 1 of Agent 10's rating (SAFE-IF, `build\agent10\t27\day-draft-rating.md`). Also from that rating: run-day.diff has repo-relative paths (N1), the STOP-LAUNCHER line above (N2) and RUN-DAY.cmd's exit-2 line (N3). Diff and tests: `build\agent5\scrnsave-fix\`.
++
+ **Install, after review and after the windows (not tonight)**
+ 
+ 1. Copy RUN-DAY.cmd, STOP-LAUNCHER.cmd, launcher-ctl.ps1, run-day.ps1 and README-DAY.md (make-run-day.ps1, run-day.diff and test-day.ps1 are optional) to `bench\agent5\day\`.
+diff --git a/base/RUN-DAY.cmd b/new/RUN-DAY.cmd
+index c68e590..c0636a7 100644
+--- a/base/RUN-DAY.cmd
++++ b/new/RUN-DAY.cmd
+@@ -22,7 +22,7 @@ echo Starting the day launcher. It ends at %STOPAT%.
+ set "RC=%ERRORLEVEL%"
+ echo.
+ if "%RC%"=="0" echo The day launcher ended normally (end time %STOPAT% or STOP file).
+-if "%RC%"=="2" echo The day launcher did not start: the reason is in red above. Nothing was changed.
++if "%RC%"=="2" echo The day launcher did not start: the reason is in red above. It changed nothing; a night launcher that RUN-DAY stopped above stays stopped.
+ if "%RC%"=="3" echo The day launcher stopped on an error: see the red line above.
+ if not "%RC%"=="0" if not "%RC%"=="2" if not "%RC%"=="3" echo The day launcher was interrupted (e.g. Ctrl+C) or PowerShell failed (exit code %RC%). If a window was running, it was stopped. See the lines above.
+ echo Status and logs: %~dp0status\

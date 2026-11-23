@@ -1,0 +1,33 @@
+{
+  "title": "Session 3 functional checks (agent slot, hidden desktop, NOT timing): d0t = devoff2 + REX_TIMER_WAIT_BLOCKING=1, d11t = window 3's d11 + REX_TIMER_WAIT_BLOCKING=1 (Agent 11), d0f = devoff2",
+  "reference": "d0f",
+  "warmup_s": 35,
+  "warmup_from": "firstframe",
+  "measure_s": 50,
+  "repeats": 1,
+  "order": "fixed",
+  "settle_s": 5,
+  "cooldown_s": 5,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "cold_run": false,
+  "sys_csv": true,
+  "quick": { "warmup_s": 10, "measure_s": 20, "settle_s": 5, "cooldown_s": 5 },
+  "notes": [
+    "Agent 11's d0t check (OK'd by Agent 1): pass = TimerQueue busy <= ~3 % in threads.csv (window 3 d0: 62 %), no more > 100 ms frames than d0f, a clean close, no dump. Window: 5 s settle + 35 s warm-up asked, raised to 55 s by the 60 s first-frame floor (min_window_after_ff_s default, as in window 4), then 50 s measured; window 3's d0 had no floor (35 s warm-up). TimerQueue busy % is a per-thread share, so the longer warm-up does not change the pass rule. Functional only (hidden desktop): the frame numbers are not timing.",
+    "REX_TIMER_WAIT_BLOCKING must reach the game process: run-timing.ps1 sets it in its own environment around Start-Process and restores it after; run.json env_set shows it. Any value turns it on.",
+    "03:30 pair: -Only d0f,d0t when the file order was d0f, d0t. Re-check 03:53 (Agent 1): the order is fixed, so the file order d0t, d11t, d0f is the run order; run -Only d0t,d11t,d0f. d11t = window 3's d11 cvars (Agent 11's ON bundle R3) + REX_TIMER_WAIT_BLOCKING=1; its game.log must show 'Host timer resolution set to 1 ms (background opt-out on)'. Report per run: TimerQueue busy % (threads.csv), window fps, share of window frames in the 53-67 fps band (frame time 14.93-18.87 ms): python build/agent8/scratch/band.py <run dirs>. W4b runs d11t in place of d0t only if d11t holds fps within noise of d0f and cuts TimerQueue CPU (Agent 1)."
+  ],
+  "arms": [
+    { "id": "d0t", "group": "s3", "bin": "build/agent2/devoff2-bin", "frames": "perf", "cvars": ["framerate_limit=0"], "env": { "REX_TIMER_WAIT_BLOCKING": "1" },
+      "driver": "drivers/thread-cpu.ps1", "note": "devoff2 + REX_TIMER_WAIT_BLOCKING=1: TimerQueue blocking wait, no rebuild (Agent 11)" },
+    { "id": "d11t", "group": "s3", "bin": "build/agent2/devoff2-bin", "frames": "perf",
+      "cvars": ["framerate_limit=0", "host_timer_resolution_ms=1", "host_timer_throttling_optout=true",
+                "precise_guest_sleep=true", "wait_timeout_round_up=true",
+                "cs_spin=true", "spinlock_pause_spin=true", "clock_lockfree=true", "tls_bounds_fix=true"],
+      "env": { "REX_TIMER_WAIT_BLOCKING": "1" },
+      "driver": "drivers/thread-cpu.ps1", "note": "window 3's d11 (devoff2 + Agent 11 ON bundle R3) + REX_TIMER_WAIT_BLOCKING=1 (Agent 1, 03:42)" },
+    { "id": "d0f", "group": "s3", "ref": true, "bin": "build/agent2/devoff2-bin", "frames": "perf", "cvars": ["framerate_limit=0"], "env": {},
+      "driver": "drivers/thread-cpu.ps1", "note": "devoff2 as window 3's d0: functional reference for d0t and d11t" }
+  ]
+}

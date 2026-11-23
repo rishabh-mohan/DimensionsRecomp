@@ -1,0 +1,389 @@
+prof_main_compare: A = a-prof, B = n-prof; ms of CPU per frame (busy samples) unless noted
+'~' = |delta| < 2se (Poisson); w = 1000/(rounds*fps) ms/frame per sample
+
+[A] a-prof: <workspace>\build\agent8\matrix\20261122-0357\runs\0357-a-prof-r1
+  profile profile-728734687.bin (1.4 MB), map <workspace>\build\agent8\matrix\20261122-0357\runs\0357-a-prof-r1\legodimensions.map
+  samples 14766, threads 78, rounds 191 (trailer), duration 150.26 s [trailer], rounds/s 1.3, timer_mode 1 (observer effect False)
+  fps 67.66 [frames.json window rows_by_end_bytes/end_bytes_window_s] -> w 0.077385
+  thread name /^Main XThread/: tids [39692] Main XThread (F800002C)
+  thread samples 191 (busy 47, wait 144, io 0): busy 3.637 ms/frame, blocked 11.143 ms/frame
+  args: --native_settings_load=false --discord_rpc=false --audio_mute=true --pause_when_unfocused=false --framerate_limit=0
+  env: LEGO_SAMPLE_PROFILE=1, LEGO_SAMPLE_PROFILE_TRIGGER=C:\Users\<user>\.vscode\projects\games...
+
+[B] n-prof: <workspace>\build\agent8\matrix\20261122-0357\runs\0405-n-prof-r1
+  profile profile-729246015.bin (1.5 MB), map <workspace>\build\agent8\matrix\20261122-0357\runs\0405-n-prof-r1\legodimensions.map
+  samples 15887, threads 63, rounds 255 (trailer), duration 150.25 s [trailer], rounds/s 1.7, timer_mode 1 (observer effect False)
+  fps 70.77 [frames.json window rows_by_end_bytes/end_bytes_window_s] -> w 0.055416
+  thread name /^Main XThread/: tids [8908] Main XThread (F8000024)
+  thread samples 255 (busy 109, wait 146, io 0): busy 6.040 ms/frame, blocked 8.091 ms/frame
+  args: --native_settings_load=false --discord_rpc=false --audio_mute=true --pause_when_unfocused=false --native_settings_frontend=false --native_fps_limit=0 --framerate_limit=0
+  env: LEGO_SAMPLE_PROFILE_TRIGGER=C:\Users\<user>\.vscode\projects\games..., LEGO_SAMPLE_PROFILE=1, LEGO_NATIVE_FRAME_METRICS=C:\Users\<user>\.vscode\projects\games...
+
+warning: a-prof: 1 rounds/s (< 250): CPU-saturated sampler, attribution usable but noisy
+warning: n-prof: 2 rounds/s (< 250): CPU-saturated sampler, attribution usable but noisy
+warning: A: profile-728734687.bin: low sampling rate (1 rounds/s, nominal ~1000): the machine was probably CPU-saturated (each SuspendThread/GetThreadContext waits until the target thread is scheduled); attribution is still usable but noisy
+warning: B: profile-729246015.bin: low sampling rate (2 rounds/s, nominal ~1000): the machine was probably CPU-saturated (each SuspendThread/GetThreadContext waits until the target thread is scheduled); attribution is still usable but noisy
+
+== buckets (busy ms/frame; first match over the host frames above the first guest frame) ==
+A ms/f  B ms/f    delta    2se   nA   nB  key
+------  ------  -------  -----  ---  ---  --------------------------
+ 2.863   5.154  +2.290   1.424   37   93  guest code
+ 0.077   0.000  -0.077~  0.155    1    0  write-tracking fault (VEH)
+ 0.464   0.166  -0.298~  0.425    6    3  write-tracking arm/protect
+ 0.000   0.000  +0.000   0.000    0    0  CPU pool copy
+ 0.155   0.055  -0.099~  0.245    2    1  sync/spin/yield (busy)
+ 0.000   0.000  +0.000   0.000    0    0  d3d12+driver
+ 0.000   0.000  +0.000   0.000    0    0  native upload/copy/hash
+ 0.000   0.000  +0.000   0.000    0    0  native-gpu other
+ 0.000   0.443  +0.443   0.313    0    8  rexlego host
+ 0.077   0.222  +0.144~  0.270    1    4  rexruntime
+ 0.000   0.000  +0.000   0.000    0    0  system/other
+ 3.637   6.040  +2.403   1.570   47  109  total busy
+11.143   8.091  -3.053   2.290  144  146  blocked (wait/io, not CPU)
+
+== ranked candidates (buckets with B > A, largest first) ==
+ 1. guest code                   +2.290 ms/frame (2se 1.424)
+ 2. rexlego host                 +0.443 ms/frame (2se 0.313)
+ 3. rexruntime                   +0.144 ms/frame (2se 0.270)  ~noise
+
+== leaf categories (busy) ==
+A ms/f  B ms/f    delta    2se  nA  nB  key
+------  ------  -------  -----  --  --  ------------
+ 2.554   4.544  +1.990   1.341  33  82  guest
+ 0.077   0.000  -0.077~  0.155   1   0  rexruntime
+ 0.000   0.000  +0.000   0.000   0   0  native-gpu
+ 0.310   0.776  +0.466~  0.517   4  14  rexlego
+ 0.000   0.000  +0.000   0.000   0   0  d3d12+driver
+ 0.619   0.720  +0.101~  0.593   8  13  system
+ 0.077   0.000  -0.077~  0.155   1   0  other
+ 0.000   0.000  +0.000   0.000   0   0  unknown
+
+== boundary: host function entered from guest code (busy, by |delta|) ==
+A ms/f  B ms/f    delta    2se  nA  nB  key                                                                                     top guest callers (B, else A)
+------  ------  -------  -----  --  --  --------------------------------------------------------------------------------------  ------------------------------------------------------------------------
+ 2.863   5.154  +2.290   1.424  37  93  (guest code)
+ 0.542   0.166  -0.375~  0.452   7   3  rexruntime.dll!rex::X::$MP6AXV?$MappedPtr::?$HostToGuestFunction                        sub_82B55588 [guest 0x82B55588] 100%
+ 0.232   0.000  -0.232~  0.268   3   0  rexruntime.dll!rex::chrono::UpdateGuestClock                                            sub_83F9EA20 [guest 0x83F9EA20] 100%
+ 0.000   0.222  +0.222   0.222   0   4  rexruntime.dll!rex::input::UX_INPUT_STATE::$MP6AIIIV?$MappedPtr::?$HostToGuestFunction  sub_82A32128 [guest 0x82A32128] 100%
+ 0.000   0.222  +0.222   0.222   0   4  sub_83E46040 [hook of guest 0x83E46040]                                                 sub_82EEFA18 [guest 0x82EEFA18] 75%; sub_82B321F0 [guest 0x82B321F0] 25%
+ 0.000   0.055  +0.055~  0.111   0   1  __chkstk                                                                                __restgprlr_29 100%
+ 0.000   0.055  +0.055~  0.111   0   1  rexruntime.dll!rex::I$00::U?$endian_store::$MP6AIIIV?$MappedPtr::?$HostToGuestFunction  sub_83F9E930 [guest 0x83F9E930] 100%
+ 0.000   0.055  +0.055~  0.111   0   1  sub_82A2A160 [hook of guest 0x82A2A160]                                                 sub_82A44B38 [guest 0x82A44B38] 100%
+ 0.000   0.055  +0.055~  0.111   0   1  sub_82A34208 [hook of guest 0x82A34208]                                                 sub_82654C98 [guest 0x82654C98] 100%
+ 0.000   0.055  +0.055~  0.111   0   1  sub_83E45090 [hook of guest 0x83E45090]                                                 sub_82B52B38 [guest 0x82B52B38] 100%
+
+== self (leaf function, busy) ==
+A ms/f  B ms/f    delta    2se  nA  nB  key
+------  ------  -------  -----  --  --  ----------------------------------------------------------------
+ 0.464   0.166  -0.298~  0.425   6   3  ntdll.dll!NtProtectVirtualMemory
+ 0.000   0.277  +0.277   0.248   0   5  sub_82B61580 [guest 0x82B61580]
+ 0.232   0.000  -0.232~  0.268   3   0  sub_83FF1F88 [guest 0x83FF1F88]
+ 0.077   0.277  +0.200~  0.292   1   5  sub_83E4E5E0 [guest 0x83E4E5E0]
+ 0.000   0.166  +0.166~  0.192   0   3  VCRUNTIME140.dll!~memmove
+ 0.000   0.166  +0.166~  0.192   0   3  sub_82A2A2B8 [guest 0x82A2A2B8]
+ 0.000   0.166  +0.166~  0.192   0   3  sub_82B62528 [guest 0x82B62528]
+ 0.000   0.166  +0.166~  0.192   0   3  sub_82B62C1C [guest 0x82B62C1C]
+ 0.000   0.111  +0.111~  0.157   0   2  __restgprlr_27
+ 0.000   0.111  +0.111~  0.157   0   2  __savegprlr_28
+ 0.000   0.111  +0.111~  0.157   0   2  ntdll.dll!~RtlSizeHeap
+ 0.000   0.111  +0.111~  0.157   0   2  sub_82B53308 [guest 0x82B53308]
+ 0.000   0.111  +0.111~  0.157   0   2  sub_82EBDB50 [guest 0x82EBDB50]
+ 0.000   0.111  +0.111~  0.157   0   2  sub_83E4BBD8 [guest 0x83E4BBD8]
+ 0.000   0.111  +0.111~  0.157   0   2  sub_83E4CED0 [guest 0x83E4CED0]
+ 0.155   0.055  -0.099~  0.245   2   1  sub_82AA4410 [guest 0x82AA4410]
+ 0.155   0.055  -0.099~  0.245   2   1  sub_82BD1EC8 [guest 0x82BD1EC8]
+ 0.077   0.000  -0.077~  0.155   1   0  KERNEL32.DLL!GetCurrentThreadId
+ 0.077   0.000  -0.077~  0.155   1   0  MSVCP140.dll!_Mtx_trylock
+ 0.077   0.000  -0.077~  0.155   1   0  __restgprlr_14
+ 0.077   0.000  -0.077~  0.155   1   0  __restgprlr_23
+ 0.077   0.000  -0.077~  0.155   1   0  __savegprlr_29
+ 0.077   0.000  -0.077~  0.155   1   0  rexgpu-xenos.dll!~rex_gpu_create
+ 0.077   0.000  -0.077~  0.155   1   0  rexruntime.dll!rex::X::$MP6AXV?$MappedPtr::?$HostToGuestFunction
+ 0.077   0.000  -0.077~  0.155   1   0  sub_82A1C668 [guest 0x82A1C668]
+
+== inclusive (busy) ==
+A ms/f  B ms/f    delta    2se  nA   nB  key
+------  ------  -------  -----  --  ---  -------------------------------------------------
+ 3.482   5.985  +2.503   1.551  45  108  sub_82FEB7B8 [guest 0x82FEB7B8]
+ 3.560   5.930  +2.370   1.554  46  107  sub_82FF6350 [guest 0x82FF6350]
+ 3.560   5.930  +2.370   1.554  46  107  sub_82FF72A0 [guest 0x82FF72A0]
+ 3.637   5.985  +2.348   1.566  47  108  sub_82984F80 [guest 0x82984F80]
+ 3.482   5.763  +2.281   1.535  45  104  sub_82A65440 [guest 0x82A65440]
+ 3.482   5.542  +2.059   1.519  45  100  xstart
+ 1.006   2.992  +1.986   0.987  13   54  sub_82AFAB68 [guest 0x82AFAB68]
+ 1.006   2.937  +1.931   0.981  13   53  sub_82AF9BC0 [guest 0x82AF9BC0]
+ 3.328   5.209  +1.882   1.478  43   94  rexruntime.dll!rex::system::XThread::Execute
+ 0.774   2.438  +1.664   0.883  10   44  sub_82FCB308 [guest 0x82FCB308]
+ 0.696   2.327  +1.631   0.855   9   42  sub_82F050B0 [guest 0x82F050B0]
+ 0.774   2.383  +1.609   0.876  10   43  sub_82FCC500 [guest 0x82FCC500]
+ 0.619   2.217  +1.598   0.826   8   40  sub_82EF8C18 [guest 0x82EF8C18]
+ 0.619   2.217  +1.598   0.826   8   40  sub_82F0CCD8 [guest 0x82F0CCD8]
+ 0.542   2.106  +1.564   0.797   7   38  sub_82EFE948 [guest 0x82EFE948]
+ 3.328   4.821  +1.494   1.449  43   87  rexruntime.dll!~rex::system::XHostThread::Execute
+ 0.542   1.995  +1.453   0.781   7   36  sub_82EF3180 [guest 0x82EF3180]
+ 0.542   1.995  +1.453   0.781   7   36  sub_82EF3B38 [guest 0x82EF3B38]
+ 3.095   4.322  +1.227~  1.384  40   78  KERNEL32.DLL!BaseThreadInitThunk
+ 3.328   4.544  +1.217~  1.427  43   82  rexruntime.dll!rex::thread::ThreadStartRoutine
+ 3.018   3.935  +0.917~  1.344  39   71  ntdll.dll!RtlUserThreadStart
+ 0.232   0.997  +0.765   0.541   3   18  sub_82EEFA18 [guest 0x82EEFA18]
+ 0.232   0.942  +0.710   0.530   3   17  sub_82EF2FE0 [guest 0x82EF2FE0]
+ 0.232   0.887  +0.655   0.518   3   16  sub_82EF2E28 [guest 0x82EF2E28]
+ 0.232   0.831  +0.599   0.506   3   15  sub_82EF2368 [guest 0x82EF2368]
+
+== guest self (guest leaf, busy) ==
+A ms/f  B ms/f    delta    2se  nA  nB  key
+------  ------  -------  -----  --  --  -------------------------------
+ 0.000   0.277  +0.277   0.248   0   5  sub_82B61580 [guest 0x82B61580]
+ 0.232   0.000  -0.232~  0.268   3   0  sub_83FF1F88 [guest 0x83FF1F88]
+ 0.077   0.277  +0.200~  0.292   1   5  sub_83E4E5E0 [guest 0x83E4E5E0]
+ 0.000   0.166  +0.166~  0.192   0   3  sub_82A2A2B8 [guest 0x82A2A2B8]
+ 0.000   0.166  +0.166~  0.192   0   3  sub_82B62528 [guest 0x82B62528]
+ 0.000   0.166  +0.166~  0.192   0   3  sub_82B62C1C [guest 0x82B62C1C]
+ 0.000   0.111  +0.111~  0.157   0   2  __restgprlr_27
+ 0.000   0.111  +0.111~  0.157   0   2  __savegprlr_28
+ 0.000   0.111  +0.111~  0.157   0   2  sub_82B53308 [guest 0x82B53308]
+ 0.000   0.111  +0.111~  0.157   0   2  sub_82EBDB50 [guest 0x82EBDB50]
+ 0.000   0.111  +0.111~  0.157   0   2  sub_83E4BBD8 [guest 0x83E4BBD8]
+ 0.000   0.111  +0.111~  0.157   0   2  sub_83E4CED0 [guest 0x83E4CED0]
+ 0.155   0.055  -0.099~  0.245   2   1  sub_82AA4410 [guest 0x82AA4410]
+ 0.155   0.055  -0.099~  0.245   2   1  sub_82BD1EC8 [guest 0x82BD1EC8]
+ 0.077   0.000  -0.077~  0.155   1   0  __restgprlr_14
+ 0.077   0.000  -0.077~  0.155   1   0  __restgprlr_23
+ 0.077   0.000  -0.077~  0.155   1   0  __savegprlr_29
+ 0.077   0.000  -0.077~  0.155   1   0  sub_82A1C668 [guest 0x82A1C668]
+ 0.077   0.000  -0.077~  0.155   1   0  sub_82A79548 [guest 0x82A79548]
+ 0.077   0.000  -0.077~  0.155   1   0  sub_82AF8EB8 [guest 0x82AF8EB8]
+ 0.077   0.000  -0.077~  0.155   1   0  sub_82B32520 [guest 0x82B32520]
+ 0.077   0.000  -0.077~  0.155   1   0  sub_82B39198 [guest 0x82B39198]
+ 0.077   0.000  -0.077~  0.155   1   0  sub_82BBCB48 [guest 0x82BBCB48]
+ 0.077   0.000  -0.077~  0.155   1   0  sub_82E58450 [guest 0x82E58450]
+ 0.077   0.000  -0.077~  0.155   1   0  sub_82E8E4E0 [guest 0x82E8E4E0]
+
+== guest inclusive (guest functions on the stack, busy) ==
+A ms/f  B ms/f    delta    2se  nA   nB  key
+------  ------  -------  -----  --  ---  -------------------------------
+ 3.482   5.985  +2.503   1.551  45  108  sub_82FEB7B8 [guest 0x82FEB7B8]
+ 3.560   5.930  +2.370   1.554  46  107  sub_82FF6350 [guest 0x82FF6350]
+ 3.560   5.930  +2.370   1.554  46  107  sub_82FF72A0 [guest 0x82FF72A0]
+ 3.637   5.985  +2.348   1.566  47  108  sub_82984F80 [guest 0x82984F80]
+ 3.482   5.763  +2.281   1.535  45  104  sub_82A65440 [guest 0x82A65440]
+ 3.482   5.542  +2.059   1.519  45  100  xstart
+ 1.006   2.992  +1.986   0.987  13   54  sub_82AFAB68 [guest 0x82AFAB68]
+ 1.006   2.937  +1.931   0.981  13   53  sub_82AF9BC0 [guest 0x82AF9BC0]
+ 0.774   2.438  +1.664   0.883  10   44  sub_82FCB308 [guest 0x82FCB308]
+ 0.696   2.327  +1.631   0.855   9   42  sub_82F050B0 [guest 0x82F050B0]
+ 0.774   2.383  +1.609   0.876  10   43  sub_82FCC500 [guest 0x82FCC500]
+ 0.619   2.217  +1.598   0.826   8   40  sub_82EF8C18 [guest 0x82EF8C18]
+ 0.619   2.217  +1.598   0.826   8   40  sub_82F0CCD8 [guest 0x82F0CCD8]
+ 0.542   2.106  +1.564   0.797   7   38  sub_82EFE948 [guest 0x82EFE948]
+ 0.542   1.995  +1.453   0.781   7   36  sub_82EF3180 [guest 0x82EF3180]
+ 0.542   1.995  +1.453   0.781   7   36  sub_82EF3B38 [guest 0x82EF3B38]
+ 0.232   0.997  +0.765   0.541   3   18  sub_82EEFA18 [guest 0x82EEFA18]
+ 0.232   0.942  +0.710   0.530   3   17  sub_82EF2FE0 [guest 0x82EF2FE0]
+ 0.232   0.887  +0.655   0.518   3   16  sub_82EF2E28 [guest 0x82EF2E28]
+ 0.232   0.831  +0.599   0.506   3   15  sub_82EF2368 [guest 0x82EF2368]
+ 0.232   0.720  +0.488   0.481   3   13  sub_83E4E748 [guest 0x83E4E748]
+ 0.310   0.720  +0.411~  0.505   4   13  sub_83E45CF8 [guest 0x83E45CF8]
+ 0.000   0.388  +0.388   0.293   0    7  sub_82B62528 [guest 0x82B62528]
+ 0.542   0.166  -0.375~  0.452   7    3  sub_82B55588 [guest 0x82B55588]
+ 0.542   0.166  -0.375~  0.452   7    3  sub_82B590E8 [guest 0x82B590E8]
+
+== blocked: wait/io samples by boundary (ms/frame blocked, not CPU) ==
+A ms/f  B ms/f    delta    2se   nA   nB  key                                                                                               top guest callers (B, else A)
+------  ------  -------  -----  ---  ---  ------------------------------------------------------------------------------------------------  ------------------------------------
+11.143   7.426  -3.718   2.257  144  134  rexruntime.dll!rex::kernel::xboxkrnl::UX_RTL_CRITICAL_SECTION::$MP6AXV?$MappedPtr::?$HostToGu...  sub_82A2A260 [guest 0x82A2A260] 100%
+ 0.000   0.665  +0.665   0.384    0   12  rexruntime.dll!rex::_K$00::U?$endian_store::$MP6AIIIIV?$MappedPtr::?$HostToGuestFunction          sub_83FA6020 [guest 0x83FA6020] 100%
+
+== write-tracking faults by faulting guest function ==
+A ms/f  B ms/f    delta    2se  nA  nB  key
+------  ------  -------  -----  --  --  -------------------------------
+ 0.077   0.000  -0.077~  0.155   1   0  sub_82B55588 [guest 0x82B55588]
+
+== write-tracking faults by handler leaf ==
+A ms/f  B ms/f    delta    2se  nA  nB  key
+------  ------  -------  -----  --  --  --------------------------------
+ 0.077   0.000  -0.077~  0.155   1   0  rexgpu-xenos.dll!~rex_gpu_create
+
+== sync/spin/yield (busy) by boundary ==
+A ms/f  B ms/f    delta    2se  nA  nB  key
+------  ------  -------  -----  --  --  --------------------------------------------------------------------------------------
+ 0.155   0.000  -0.155~  0.219   2   0  rexruntime.dll!rex::chrono::UpdateGuestClock
+ 0.000   0.055  +0.055~  0.111   0   1  rexruntime.dll!rex::I$00::U?$endian_store::$MP6AIIIV?$MappedPtr::?$HostToGuestFunction
+
+== fault-linked: guest self of the faulting guest functions (it holds the kernel fault-entry time) ==
+fault delta  A self  B self  self delta    2se  faulting guest function
+-----------  ------  ------  ----------  -----  -------------------------------
+     -0.077   0.000   0.000     +0.000   0.000  sub_82B55588 [guest 0x82B55588]
+
+== handoff: Main vs render, joint state per sampler round (ms/frame = share of rounds x frame time) ==
+busy = running or runnable; wait = wait/io leaf; absent = not sampled that round. A round samples threads one after another, so the joint state is approximate.
+  [A] a-prof: rounds 191 (trailer 191), samples 14766, frame 14.781 ms, scan 0.14 s; tracked gpu_cmd 1576 GPU Commands (F8000018), main 39692 Main XThread (F800002C), render 88804 XThread15AE4 (F80001A8)
+  [B] n-prof: rounds 255 (trailer 255), samples 15887, frame 14.131 ms, scan 0.17 s; tracked main 8908 Main XThread (F8000024), render 53568 XThreadD140 (F8000190)
+A ms/f  B ms/f    delta    2se   nA   nB  key
+------  ------  -------  -----  ---  ---  -----------------------
+ 3.482   4.987  +1.505   1.478   45   90  main busy / render busy
+ 0.155   1.053  +0.898   0.530    2   19  main busy / render wait
+10.370   7.370  -2.999   2.201  134  133  main wait / render busy
+ 0.774   0.720  -0.053~  0.632   10   13  main wait / render wait
+
+observed vs expected if Main and render were independent (ms/frame):
+state                     A obs  A indep  B obs  B indep
+-----------------------  ------  -------  -----  -------
+main busy / render busy   3.482    3.409  4.987    5.282
+main busy / render wait   0.155    0.229  1.053    0.758
+main wait / render busy  10.370   10.443  7.370    7.075
+main wait / render wait   0.774    0.700  0.720    1.015
+  [A] P(main busy) 24.6%, P(render busy) 93.7%, P(render wait | main busy) 4.3%, P(main wait | render busy) 74.9%
+  [B] P(main busy) 42.7%, P(render busy) 87.5%, P(render wait | main busy) 17.4%, P(main wait | render busy) 59.6%
+
+== handoff: Main busy while render waits, by bucket (render idles on Main: critical-path Main work) ==
+A ms/f  B ms/f    delta    2se  nA  nB  key
+------  ------  -------  -----  --  --  --------------------------
+ 0.155   0.997  +0.843   0.519   2  18  guest code
+ 0.000   0.055  +0.055~  0.111   0   1  write-tracking arm/protect
+
+== handoff: Main busy while render waits, by guest leaf or host boundary (<- guest caller) ==
+A ms/f  B ms/f    delta    2se  nA  nB  key
+------  ------  -------  -----  --  --  ------------------------------------------------------------------------------------------------
+ 0.000   0.111  +0.111~  0.157   0   2  sub_82B61580 [guest 0x82B61580]
+ 0.000   0.111  +0.111~  0.157   0   2  sub_82B62528 [guest 0x82B62528]
+ 0.077   0.000  -0.077~  0.155   1   0  sub_82EE31A8 [guest 0x82EE31A8]
+ 0.000   0.055  +0.055~  0.111   0   1  rexruntime.dll!rex::X::$MP6AXV?$MappedPtr::?$HostToGuestFunction <- sub_82B55588 [guest 0x82B...
+ 0.000   0.055  +0.055~  0.111   0   1  sub_82A29478 [guest 0x82A29478]
+ 0.000   0.055  +0.055~  0.111   0   1  sub_82A2A2B8 [guest 0x82A2A2B8]
+ 0.000   0.055  +0.055~  0.111   0   1  sub_82AE77E0 [guest 0x82AE77E0]
+ 0.000   0.055  +0.055~  0.111   0   1  sub_82AE93E0 [guest 0x82AE93E0]
+ 0.000   0.055  +0.055~  0.111   0   1  sub_82AED3C0 [guest 0x82AED3C0]
+ 0.000   0.055  +0.055~  0.111   0   1  sub_82AFDE08 [guest 0x82AFDE08]
+ 0.000   0.055  +0.055~  0.111   0   1  sub_82B06AC0 [guest 0x82B06AC0]
+ 0.000   0.055  +0.055~  0.111   0   1  sub_82B39348 [guest 0x82B39348]
+ 0.000   0.055  +0.055~  0.111   0   1  sub_82B62C1C [guest 0x82B62C1C]
+ 0.000   0.055  +0.055~  0.111   0   1  sub_82CEC928 [guest 0x82CEC928]
+ 0.000   0.055  +0.055~  0.111   0   1  sub_82F0B0D8 [guest 0x82F0B0D8]
+ 0.000   0.055  +0.055~  0.111   0   1  sub_83CBA0C8 [guest 0x83CBA0C8]
+ 0.077   0.111  +0.033~  0.220   1   2  sub_83E4E5E0 [guest 0x83E4E5E0]
+
+== handoff: render wait boundary while Main is busy ==
+A ms/f  B ms/f    delta    2se  nA  nB  key
+------  ------  -------  -----  --  --  ----------------------------------------------------------------------------------------
+ 0.155   1.053  +0.898   0.530   2  19  rexruntime.dll!rex::_K$00::U?$endian_store::$MP6AIIIIV?$MappedPtr::?$HostToGuestFunction
+
+== handoff: Main wait boundary (<- guest caller) while render is busy ==
+A ms/f  B ms/f    delta    2se   nA   nB  key
+------  ------  -------  -----  ---  ---  ------------------------------------------------------------------------------------------------
+10.370   6.761  -3.609   2.170  134  122  rexruntime.dll!rex::kernel::xboxkrnl::UX_RTL_CRITICAL_SECTION::$MP6AXV?$MappedPtr::?$HostToGu...
+ 0.000   0.610  +0.610   0.368    0   11  rexruntime.dll!rex::_K$00::U?$endian_store::$MP6AIIIIV?$MappedPtr::?$HostToGuestFunction <- s...
+
+== handoff: render busy while Main waits, by bucket ==
+A ms/f  B ms/f    delta    2se   nA  nB  key
+------  ------  -------  -----  ---  --  -----------------------
+ 9.983   0.277  -9.706   1.775  129   5  guest code
+ 0.000   3.325  +3.325   0.859    0  60  native-gpu other
+ 0.000   2.050  +2.050   0.674    0  37  d3d12+driver
+ 0.000   1.053  +1.053   0.483    0  19  native upload/copy/hash
+ 0.232   0.610  +0.377~  0.455    3  11  sync/spin/yield (busy)
+ 0.155   0.000  -0.155~  0.219    2   0  rexlego host
+ 0.000   0.055  +0.055~  0.111    0   1  rexruntime
+
+== handoff: render busy while Main waits, by guest leaf or host boundary ==
+A ms/f  B ms/f    delta    2se  nA  nB  key
+------  ------  -------  -----  --  --  ------------------------------------------------------------------------------------------------
+ 5.959   0.000  -5.959   1.358  77   0  sub_83FAF180 [guest 0x83FAF180]
+ 0.000   2.438  +2.438   0.735   0  44  rex::ppc::HostToGuestFunction<&legodimensions::gpu_native::`anonymous namespace'::SwapHookQue...
+ 0.000   1.995  +1.995   0.665   0  36  legodimensions::gpu_native::BindShader <- sub_82B79FB8 [guest 0x82B79FB8]
+ 0.000   1.607  +1.607   0.597   0  29  rex::ppc::HostToGuestFunction<&legodimensions::gpu_native::`anonymous namespace'::DrawVertice...
+ 1.470   0.000  -1.470   0.675  19   0  sub_83FBF7D0 [guest 0x83FBF7D0]
+ 1.006   0.000  -1.006   0.558  13   0  __savegprlr_29
+ 0.696   0.000  -0.696   0.464   9   0  __restgprlr_29
+ 0.464   0.000  -0.464   0.379   6   0  sub_83FA2698 [guest 0x83FA2698]
+ 0.000   0.166  +0.166~  0.192   0   3  (no guest frame) dxgi.dll!fn_8DFC
+ 0.155   0.000  -0.155~  0.219   2   0  __chkstk <- __restgprlr_29
+ 0.000   0.111  +0.111~  0.157   0   2  (no guest frame) dxgi.dll!fn_B6B0
+ 0.000   0.111  +0.111~  0.157   0   2  rex::ppc::HostToGuestFunction<&legodimensions::gpu_native::`anonymous namespace'::ClearHook(s...
+ 0.000   0.111  +0.111~  0.157   0   2  rex::ppc::HostToGuestFunction<&legodimensions::gpu_native::`anonymous namespace'::KickOffHook...
+ 0.000   0.111  +0.111~  0.157   0   2  sub_83FBF0D8 [hook of guest 0x83FBF0D8] <- sub_82B64860 [guest 0x82B64860]
+ 0.077   0.000  -0.077~  0.155   1   0  rexruntime.dll!rex::kernel::xboxkrnl::xeKeSetEvent <- sub_82B74258 [guest 0x82B74258]
+ 0.077   0.000  -0.077~  0.155   1   0  rexruntime.dll!rex::runtime::MMIOHandler::CheckStore <- sub_83FBFCA0 [guest 0x83FBFCA0]
+ 0.077   0.000  -0.077~  0.155   1   0  sub_82BCDDD8 [guest 0x82BCDDD8]
+ 0.077   0.000  -0.077~  0.155   1   0  sub_82BCE7F8 [guest 0x82BCE7F8]
+ 0.077   0.000  -0.077~  0.155   1   0  sub_83FB33E0 [guest 0x83FB33E0]
+ 0.077   0.000  -0.077~  0.155   1   0  sub_83FB6558 [guest 0x83FB6558]
+ 0.077   0.000  -0.077~  0.155   1   0  sub_83FD0F88 [guest 0x83FD0F88]
+ 0.000   0.055  +0.055~  0.111   0   1  (no guest frame) dxgi.dll!fn_3A68
+ 0.000   0.055  +0.055~  0.111   0   1  (no guest frame) dxgi.dll!~DXGIReportAdapterConfiguration
+ 0.000   0.055  +0.055~  0.111   0   1  (no guest frame) legodimensions::gpu_native::`anonymous namespace'::SwapHook
+ 0.000   0.055  +0.055~  0.111   0   1  (no guest frame) plume::D3D12SwapChain::present
+
+== handoff: Main busy while render is busy too (overlap), by bucket ==
+A ms/f  B ms/f    delta    2se  nA  nB  key
+------  ------  -------  -----  --  --  --------------------------
+ 2.708   4.156  +1.448   1.327  35  75  guest code
+ 0.000   0.443  +0.443   0.313   0   8  rexlego host
+ 0.464   0.111  -0.353~  0.410   6   2  write-tracking arm/protect
+ 0.077   0.222  +0.144~  0.270   1   4  rexruntime
+ 0.155   0.055  -0.099~  0.245   2   1  sync/spin/yield (busy)
+ 0.077   0.000  -0.077~  0.155   1   0  write-tracking fault (VEH)
+
+== handoff: both waiting: Main boundary | render boundary ==
+A ms/f  B ms/f    delta    2se  nA  nB  key
+------  ------  -------  -----  --  --  ------------------------------------------------------------------------------------------------
+ 0.774   0.610  -0.164~  0.612  10  11  rexruntime.dll!rex::kernel::xboxkrnl::UX_RTL_CRITICAL_SECTION::$MP6AXV?$MappedPtr::?$HostToGu...
+ 0.000   0.055  +0.055~  0.111   0   1  rexruntime.dll!rex::_K$00::U?$endian_store::$MP6AIIIIV?$MappedPtr::?$HostToGuestFunction | re...
+ 0.000   0.055  +0.055~  0.111   0   1  rexruntime.dll!rex::kernel::xboxkrnl::UX_RTL_CRITICAL_SECTION::$MP6AXV?$MappedPtr::?$HostToGu...
+
+== handoff: joint state of main, render, gpu_cmd, a-prof ==
+state                                   rounds   ms/f
+--------------------------------------  ------  -----
+main wait / render busy / gpu_cmd busy      76  5.881
+main wait / render busy / gpu_cmd wait      58  4.488
+main busy / render busy / gpu_cmd busy      26  2.012
+main busy / render busy / gpu_cmd wait      19  1.470
+main wait / render wait / gpu_cmd busy       5  0.387
+main wait / render wait / gpu_cmd wait       5  0.387
+main busy / render wait / gpu_cmd busy       2  0.155
+
+== threads by role (all threads, matched by role; busy ms/frame; guest = busy with a guest leaf; blocked = wait/io) ==
+role      A busy  B busy     delta    2se  A guest  B guest  g delta  A blocked  B blocked   nA   nB  A thread                 B thread
+--------  ------  ------  --------  -----  -------  -------  -------  ---------  ---------  ---  ---  -----------------------  -----------------------
+main       3.637   6.040   +2.403   1.570    2.863    5.154   +2.290     11.143      8.091   47  109  Main XThread (F800002C)  Main XThread (F8000024)
+render    13.852  12.358   -1.494~  2.651   13.388    0.610  -12.778      0.929      1.773  179  223  XThread15AE4 (F80001A8)  XThreadD140 (F8000190)
+gpu_cmd    8.435   0.000   -8.435   1.616    0.000    0.000   +0.000      6.346      0.000  109    0  GPU Commands (F8000018)
+timerq    12.691   6.373   -6.318   2.311    0.000    0.000   +0.000      2.089      7.758  164  115  rex::thread::TimerQueue  rex::thread::TimerQueue
+worker2    3.947   1.385   -2.561   1.236    3.328    1.275   -2.053     10.834     12.746   51   25  XThread9CDC (F8000144)   XThread34D8 (F8000128)
+vsync      0.387   0.000   -0.387   0.346    0.000    0.000   +0.000     14.394      0.000    5    0  GPU VSync (F800001C)
+audio      0.464   0.332   -0.132~  0.466    0.077    0.055   -0.022     43.877     42.061    6    6  3 threads                3 threads
+xt_other   1.702   1.219   -0.483~  0.893    0.774    0.443   -0.331    323.469    281.402   22   22  22 threads               20 threads
+other      2.089   0.610   -1.480   0.884    0.000    0.000   +0.000    682.381    498.245   27   11  47 threads               36 threads
+all       47.205  28.318  -18.887   4.570   20.430    7.537  -12.893   1095.462    852.076  610  511  78 threads               63 threads
+
+== busiest threads, a-prof (busy ms/frame) ==
+  tid  role      name                     samples  busy  wait  io  busy ms/f
+-----  --------  -----------------------  -------  ----  ----  --  ---------
+88804  render    XThread15AE4 (F80001A8)      191   179    12   0     13.852
+60900  timerq    rex::thread::TimerQueue      191   164    27   0     12.691
+ 1576  gpu_cmd   GPU Commands (F8000018)      191   109    82   0      8.435
+40156  worker2   XThread9CDC (F8000144)       191    51   140   0      3.947
+39692  main      Main XThread (F800002C)      191    47   144   0      3.637
+21304  xt_other  XThread5338 (F8000114)       191    16   175   0      1.238
+66024  other     0xc0550001                   191    11   180   0      0.851
+98416  other                                  191    11   180   0      0.851
+34436  audio     Audio Worker (F8000014)      191     6   185   0      0.464
+35644  xt_other  XThread8B3C (F800010C)       191     5   186   0      0.387
+78012  vsync     GPU VSync (F800001C)         191     5   186   0      0.387
+57248  other                                  191     3   188   0      0.232
+
+== busiest threads, n-prof (busy ms/frame) ==
+  tid  role      name                     samples  busy  wait  io  busy ms/f
+-----  --------  -----------------------  -------  ----  ----  --  ---------
+53568  render    XThreadD140 (F8000190)       255   223    31   1     12.358
+19564  timerq    rex::thread::TimerQueue      255   115   140   0      6.373
+ 8908  main      Main XThread (F8000024)      255   109   146   0      6.040
+13528  worker2   XThread34D8 (F8000128)       255    25   230   0      1.385
+91224  xt_other  XThread16458 (F800010C)      255    14   241   0      0.776
+37312  other     0xc0550001                   255     8   247   0      0.443
+82580  xt_other  XThread14294 (F8000104)      255     8   247   0      0.443
+82636  audio     Audio Worker (F8000014)      255     5   250   0      0.277
+65644  other                                  255     2   253   0      0.111
+49040  other                                  255     1   254   0      0.055
+98568  audio     SDLAudioP19                  255     1   254   0      0.055
+ 1700  other                                  255     0   255   0      0.000

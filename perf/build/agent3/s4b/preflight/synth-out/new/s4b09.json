@@ -1,0 +1,144 @@
+{
+ "run": "s4b09",
+ "row": "s4b09",
+ "kind": "off",
+ "scenario": "I420",
+ "runjson": {
+  "exit_code": 0,
+  "exit_code_hex": "0x00000000",
+  "dumps": [],
+  "crash_events": [],
+  "wer_seen": false,
+  "close_method": "wm_close",
+  "close_seconds": 1.0,
+  "elapsed_s": 40.0,
+  "seconds_requested": 420,
+  "cvars": {},
+  "exited_early": null,
+  "env_extra": {},
+  "steps": null
+ },
+ "summary": {
+  "verdict": null,
+  "first_frame_s": null,
+  "levels": null,
+  "unknown_cvars": null,
+  "errors": []
+ },
+ "log_files": [
+  "game.log"
+ ],
+ "families": {
+  "c1_any": 0,
+  "c1_init_on": 0,
+  "c1_init_blocked": 0,
+  "c1_init_nohold": 0,
+  "c1_first": 0,
+  "c1_kept": 0,
+  "c1_blocked": 0,
+  "c1_verify_on": 0,
+  "c1_verify_f": 0,
+  "recovered_stale": 0,
+  "unhandled_phys": 0,
+  "protect_failed": 0,
+  "split_init": 0,
+  "split": 0,
+  "deferred_counters": 12,
+  "gpu_wait": 0,
+  "gpu_wait_stats": 0,
+  "gpu_wait_backoff": 0,
+  "gpu_wait_on": 0,
+  "memexport": 0,
+  "slow_frame": 0,
+  "s4_upload_hash": 0,
+  "precise_wait": 0,
+  "miss_cache": 0,
+  "stuck_lock": 0,
+  "minidump": 0,
+  "fatal": 0,
+  "clean_exit": 1,
+  "debug_layer": 0,
+  "dred": 0,
+  "d3d12_msg": 0,
+  "k": 0,
+  "c1_other": 0
+ },
+ "levels": {
+  "info": 13
+ },
+ "lines": {
+  "deferred_counters": {
+   "first": [
+    "[2026-11-22 20:10:05.000] [info] [gpu] [t4242] deferred_counters: 10.0 s, 1200 lists, 96000 KB, 5400 barriers",
+    "[2026-11-22 20:10:10.001] [info] [gpu] [t4242] deferred_counters:   SetGraphicsRootSignature          total=1200     repeat=600      (50.0%)",
+    "[2026-11-22 20:10:15.002] [info] [gpu] [t4242] deferred_counters:   D3DDrawInstanced                  total=10800    repeat=1200     (11.1%)"
+   ],
+   "last": [
+    "[2026-11-22 20:10:50.009] [info] [gpu] [t4242] deferred_counters:   SetGraphicsRootSignature          total=1250     repeat=625      (50.0%)",
+    "[2026-11-22 20:10:55.010] [info] [gpu] [t4242] deferred_counters:   D3DDrawInstanced                  total=11250    repeat=1250     (11.1%)",
+    "[2026-11-22 20:11:00.011] [info] [gpu] [t4242] deferred_counters:   ResourceBarrier                   total=5600     repeat=1866     (33.3%)"
+   ]
+  }
+ },
+ "deferred_counters": {
+  "lines": 3,
+  "first_ts": "20:10:05.000",
+  "last_ts": "20:10:45.008",
+  "first": {
+   "seconds": 10,
+   "lists": 1200,
+   "kb": 96000,
+   "barriers": 5400,
+   "kb_per_list": 80.0
+  },
+  "last": {
+   "seconds": 10.1,
+   "lists": 1250,
+   "kb": 93750,
+   "barriers": 5600,
+   "kb_per_list": 75.0
+  },
+  "max": {
+   "seconds": 10.1,
+   "lists": 1250,
+   "kb": 99000,
+   "barriers": 5600,
+   "kb_per_list": 90.0
+  },
+  "sum": {
+   "seconds": 30.1,
+   "lists": 3550,
+   "kb": 288750,
+   "barriers": 16000,
+   "kb_per_list": 245.0
+  },
+  "monotonic": {
+   "seconds": true,
+   "lists": false,
+   "kb": false,
+   "barriers": false,
+   "kb_per_list": false
+  }
+ },
+ "deferred_counters_last_block": [
+  "[2026-11-22 20:10:45.008] [info] [gpu] [t4242] deferred_counters: 10.1 s, 1250 lists, 93750 KB, 5600 barriers",
+  "[2026-11-22 20:10:50.009] [info] [gpu] [t4242] deferred_counters:   SetGraphicsRootSignature          total=1250     repeat=625      (50.0%)",
+  "[2026-11-22 20:10:55.010] [info] [gpu] [t4242] deferred_counters:   D3DDrawInstanced                  total=11250    repeat=1250     (11.1%)",
+  "[2026-11-22 20:11:00.011] [info] [gpu] [t4242] deferred_counters:   ResourceBarrier                   total=5600     repeat=1866     (33.3%)",
+  "[2026-11-22 20:11:05.012] [info] [kernel] [t4242] Title terminated; hard-exiting process"
+ ],
+ "frame_rows": null,
+ "slow_state": null,
+ "proofs": [
+  {
+   "ok": true,
+   "text": "deferred_counters headers 3 (about every 10 s; elapsed 40 s -> ~4 expected)"
+  },
+  {
+   "ok": null,
+   "text": "KB per list per header: median 80.0 (min 75.0, max 90.0; 3 headers); half the median 40.0 (QUEUE.md: <N> ~ half; Agent 7 sets N)"
+  }
+ ],
+ "base_misses": [],
+ "hint": "PASS?"
+}

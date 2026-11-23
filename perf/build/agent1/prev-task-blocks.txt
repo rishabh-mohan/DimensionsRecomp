@@ -1,0 +1,135 @@
+===== line 545 step 544 2026-11-22T21:33:56Z =====
+**I can't start the timed windows myself, so W4b needs one double-click from you.** Every command I or any agent runs lands on its own hidden desktop (`WinSta0\exebox-â€¦`, a new one per command). That's agy's terminal sandbox: your agy-grid README notes the Purdue policy only lets commands run without asking inside it. A game started there never shows on screen, so its frame times are invalid. Starting the game on your desktop from here would mean getting around the sandbox, so I won't.
+
+**W4b is ready right now.** The machine has been quiet since 15:05, Agent 8's readiness check passed at 15:07, and nothing heavy is running. I'm holding builds until **16:00** so you can start it straight away:
+1. Set the screensaver to None and close ChatGPT, Copilot, Task Manager and Wallpaper Engine.
+2. Double-click `bench\agent8\RUN-WINDOW4B.cmd` (17 runs, ~40-43 min) and leave the PC alone.
+
+**After 16:00:** the builds will be running, so use `bench\agent8-launch\RUN-W4B-THEN-W5.cmd` instead. Agent 8 is writing it now and Agent 11 will review it. It:
+- closes only those apps;
+- turns the screensaver off for the run and restores it afterwards;
+- waits for the machine to go quiet and for the readiness checks to pass;
+- runs W4b and then W5 (~80 min), and won't start after 06:45.
+
+I'll see it start and stop the agents.
+
+**Optional, for fully unattended runs (untested):** add a narrow `unsandboxed(<launcher command>)` allow rule to agy-grid's `agy-allow.json`. That's agy's documented route for enterprise accounts, but agy may need a restart and the Purdue policy may override it. I won't change agy settings myself.
+
+**Done since your message:** #32 passed every gate, so S4a is now in the live source and committed: SDK `3bb65bb` and game `1bd322e`, both pushed to `mine`.
+
+**Next, in this order:**
+1. B4 build, then the S4b build. S4b takes C1 v3 (v2 plus the init latch, rated SAFE). The P2 counter, r1r2, M1 and #26 are all built with their switches OFF.
+2. S4b functional runs and the P2 counter read. These don't need your desktop.
+<truncated 4375 bytes>
+ and each verdict.
+```
+
+```agy-task to=11 subagents=0 files=perf-notes/S4-DRAFT.md, build/agent11/**
+(1) S4-DRAFT updates: #32 run 3 is 5 of 5 and the gate passed on every run; S4a is live and committed (SDK 3bb65bb, game 1bd322e, 14:56); S4b takes C1 v3 and leaves #24 + #30 for an incremental S4c; timed windows start only on the user's double-click, because agent commands run in agy's sandbox on hidden desktops (Agent 8's launcher waits for quiet and readiness, then runs W4b and W5). (2) When Agent 8 sends the launcher, review it read-only: -DryRun closes and changes nothing; it closes only the 5 listed apps; it restores the screensaver; the quiet, readiness and time-limit gates match the spec; it takes no instructions from agent-writable files. Send findings to Agent 8 and me.
+Report with @@done: S4-DRAFT sha256 and line count, and the review verdict.
+```
+
+```agy-task to=4 subagents=0 files=build/agent4/**, perf-notes/agent4-draw-path.md
+mc_smoke_check C3 fix, before S4b's runs (build/agent4/r2t6/mc_smoke_check.py): match heap-address shader keys by stage, rows per frame and time window, as in your r6 verdict; keep exact matching for fixed addresses; list unmatched keys. Re-check Agent 3's r6 ON/OFF pair (must PASS now) and one older pair that passed (must still PASS). No game runs, builds or git writes; <=2 threads. The native re-pin still waits for W4b.
+Report with @@done: script sha256 and both re-check results.
+```
+
+@@to 2: S4a is live and committed. Your apply script's dry run was 6/6 and -Go was clean (backups in build/agent2/live-backup-S4a-20261122-145608); SDK 3bb65bb and game 1bd322e are pushed to mine. Builds resume at 16:00 unless W4b has started, and I'll send B4 then S4b (-C1 v3) at that point. Until then, dry runs only.
+@@to 3: S4a has landed (SDK 3bb65bb, game 1bd322e). Your next runs are Agent 7's S4b queue, once Agent 2's S4b bins exist (~17:00). Nothing to run before then.
+@@to 6: Thanks. #32 landed live with S4a (SDK 3bb65bb). #36's warm-boot baselines on fixed bins go in a later quiet slot.
+===== line 552 step 551 2026-11-22T21:36:35Z =====
+Created At: 2026-11-22T15:36:35-06:00
+Completed At: 2026-11-22T15:36:36-06:00
+Created At: 2026-11-22T15:36:35-06:00
+Completed At: 2026-11-22T15:36:36-06:00
+Command exited with code 0.
+
+Command output:
+--- agy-allow.json:
+{
+  "permissions": {
+    "allow": ["command(regex:.*)", "read_file(*)"]
+  }
+}
+
+
+--- README subagent lines:
+5: This fork of agy grid adds [orchestrator mode](#orchestrator-mode): the top-left pane plans the work and hands out tasks to the other panes, with a capped subagent budget and file claims that hooks enforce. It can run beside the original ag
+86: `hooks.json` is read again right before each change and replaced in one step (a temporary file, then a rename, retried while the file is locked), so entries other tools write in the meantime survive. If the workspace is in a git repository,
+92: In orchestrator mode the top-left pane is the **orchestrator** and every other pane is a **worker**. You tell the orchestrator what to build; it splits the work into tasks and gives each task to one worker. A task can let its worker start s
+101: | A chip per open task, `#7 Â· 1/4` (subagents started/granted); its tooltip shows the task text and files | worker pane headers | `.task-chip` |
+102: | The budget meter, `Subagents 23/79` (granted so far/cap), amber from 80% and red at 100% | toolbar | `#orchBudget` |
+117: ```agy-task to=3 subagents=4 files=src/api/**, test/api/**
+122: or with a single line, `@@task <to> [subagents=N] [files=<globs>]: <text>`:
+125: @@task 4 subagents=0 files=docs/**: Write the API docs.
+128: - `to` is one worker, by number or pane name; the one-line form also takes a leading `to=`. `subagents` (alias `subagent`) defaults to 0. `files` is a list of [patterns](#file-claims), split on commas, or on whitespace if there are no comma
+130: - In the block, keys are case-insensitive and values may be quoted. The body may start with header lines such as `to: 3`, `subagents: 4` or `files: a/**, b/**`, which fill in keys the info string didn't set; the rest of the body is the task
+<truncated 2992 bytes>
+t panes never overlap: every task, `@@claim` and auto-claim checks the other panes' claims first. Patterns are relative to the workspace
+222: 4. With `strictClaims` on, a path that none of the writer's own claims covers is denied too: the agent has to `@@claim` it first (subagents are told to ask their parent).
+225: Each path is checked in its canonical form: `\\?\` and `\\.\` prefixes and trailing dots and spaces are stripped, and 8.3 short names, symbolic links and junctions are resolved, so another spelling of a claimed path is still caught. A path 
+243: - **Tasks**, open ones first: id, worker, status, subagents (started/granted), files and text. An open task's **Cancel** button tells the worker to stop and releases the task's files; the orchestrator is told too.
+262: | `maxSubagents` | `79` | The subagent budget of a run, 0â€“1000. |
+281: - Subagents have to use the shared workspace: `invoke_subagent` with `Workspace` set to `branch` or `share` is denied.
+282: - An agent can start another agy process with `run_command`, for example `agy -p ...`. That process is outside the subagent budget, though its own tool calls still go through the hooks if it runs in the workspace. In a rare race, a backgrou
+283: - The grid recognises only the default `C:\â€¦>` or `PS C:\â€¦>` shell prompt. With a customised prompt (`PROMPT`, clink, oh-my-posh or starship), or if you start agy again within a second of the prompt showing, an agy that died mid-turn and is
+284: - The orchestrator can't start subagents itself.
+285: - The budget counts grants (requests), not just the subagents actually started.
+286: - The budget counts subagent starts, not work. `send_message` can wake an idle subagent, and agy's own tool descriptions tell models to reuse subagents that way, so a subagent started under one task can keep working after that task closes, 
+360: "maxSubagents": 79,
+373: - `orchestrator`: the subagent budget, strict claims and auto-turn limit of orchestrator mode (see [Orchestrator settings](#orchestrator-settings)).
+
+===== line 632 step 631 2026-11-22T22:46:44Z =====
+S4 is on track to land around 21:30â€“22:30 tonight, and the rest of the plan should finish by about 08:00 tomorrow. W5 is ready to start now, but it needs your double-click. An Android port is possible, but it would be a separate project of several weeks.
+
+## Status (16:47)
+
+**Committed and pushed to your forks:** S3 and S4a (latest commits: SDK `3bb65bb`, game `1bd322e`). Every new switch is off by default.
+
+**W4b finished** with 17 of 17 runs ([summary.md](<workspace>/build/agent8/matrix/20261122-1541/summary.md)). On the title screen, no build changed frame time by more than the Â±19.6% noise band:
+
+| Arm | Median frame time | vs d0 | CPU (cores) |
+|---|---|---|---|
+| d0 (reference) | 3.40 ms | â€” | 3.44 |
+| B (codegen options) | 3.23 ms | âˆ’4.9% (âˆ’10.8% without run 6) | 3.35 |
+| d3 (S3) | 3.21 ms | âˆ’5.4% | 3.38 |
+| d11t (timer settings) | 3.36 ms | âˆ’1.1% | **2.91 (âˆ’15%)** |
+
+- **Run 6 doesn't count:** an agent's compile ran during it. A watcher now creates a hold file whenever a window runs, and every agent stops while it exists.
+- **So far the gains are CPU savings and bug fixes, not frame rate.** On the title screen the game mostly waits on the GPU command thread.
+
+## W5: ready now
+
+I set it up myself (Agent 8 had stopped on an error). It runs 16 runs in about 37 minutes, and its plan check passed. The machine is quiet (Defender at 0 cores, 13.4 GB RAM free), the screensaver is already None, and you're on AC.
+
+1. **Close Task Manager.** It runs as admin, so I couldn't close it.
+2. **Double-click** [RUN-WINDOW5-S3D.cmd](<workspace>/bench/agent8/RUN-WINDOW5-S3D.cmd) and don't touch the PC until it says "Press any key".
+
+Please start it by 17:10 or skip it. After 17:10 the S4b build starts, and W5 moves to the overnight launcher. Agents run no commands until W5 ends, and stop completely while it runs.
+
+## What's left and ETA
+
+| Step | When (if W5 starts now) |
+|---|---|
+| W5: S4a baselin
+<truncated 16931 bytes>
+m build/agent2. It must close only the 5 approved apps, restore the screensaver, refuse when locked, on battery or past the deadline, and write only its own folders plus the GO/HOLD files.
+
+Window rule: W5 (~37 min) may start on the user's desktop any minute. Until I send 'go': file tools only (read, search, edit your own files); no run_command and no subagents. While perf-notes/WINDOW-HOLD.txt exists: no tool calls at all; end your turn and wait for my resume. After 'go': check the HOLD file before every command; subagents only read, stage and check, never build or run games.
+
+Subagents: an independent re-apply of the compose chain, and a second read of the launcher.
+Report with @@done: both ratings.
+```
+
+```agy-task to=11 subagents=2 files=perf-notes/S4-DRAFT.md, build/agent11/**, bench/agent11/**
+1. Add W4b's result and the new order to S4-DRAFT: W5 now; the S4b + S4c build; the functional queue; W6 by the launcher; W7-W10 overnight as their gates pass; the native re-pin once, on native4b.
+2. The 3-mode copy of bench/agent11/timerq_slowstate.ps1 for W5's read-out (spin / blocking / precise, by env_set and the precise line). Leave the original frozen, and give the path to Agent 8.
+3. Review Agent 5's launcher (bench/agent5/launch/) when Agent 5 asks (not Agent 8's).
+
+Window rule: W5 (~37 min) may start on the user's desktop any minute. Until I send 'go': file tools only (read, search, edit your own files); no run_command and no subagents. While perf-notes/WINDOW-HOLD.txt exists: no tool calls at all; end your turn and wait for my resume. After 'go': check the HOLD file before every command; subagents only read, stage and check, never build or run games.
+
+Subagents: a check of the 3-mode script against W4b's runs.
+Report with @@done: the S4-DRAFT sha, the script path, and the review.
+```
+
+@@to 4: W4b is done. After my 'go' (W5 runs first), run #25's self-test and the r6/0452 re-checks; the native re-pin waits for native4b. Until 'go', file tools only; no tool calls at all while perf-notes/WINDOW-HOLD.txt exists.

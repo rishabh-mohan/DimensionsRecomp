@@ -1,0 +1,134 @@
+﻿02:18:04 START b-prep2
+02:18:04 PASS snapB does not exist yet
+02:18:04 PASS snapB-off does not exist yet
+02:18:04 PASS devoffB-bin does not exist yet
+02:18:04 PASS snapB-manifest-notes.txt does not exist yet
+02:18:05 PASS py_compile prep-b.py 
+02:18:06 PASS py_compile gen-check.py 
+02:18:08 PASS py_compile snap-gate.py 
+02:18:09 PASS py_compile patch-b-tools.py 
+02:18:11 PASS py_compile b-diffs.py 
+02:18:11 PASS PS parse run-b.ps1: 0 error(s) 
+02:18:11 PASS PS parse b-chain.ps1: 0 error(s) 
+02:18:11 PASS PS parse stop-snap.ps1: 0 error(s) 
+02:18:12 PASS build-snap.ps1 == build-snap.ps1.pre-B before patching
+02:18:12 PASS stage-snap-bin.ps1 == stage-snap-bin.ps1.pre-B before patching
+02:18:14 PASS patch-b-tools.py: exit 0 : patched build-snap.ps1: 7 edits | patched stage-snap-bin.ps1: 12 edits
+02:18:15 PASS PS parse build-snap.ps1: 0 error(s) 
+02:18:15 PASS PS parse stage-snap-bin.ps1: 0 error(s) 
+02:18:18   preB-tools.diff   build-snap.ps1       +34 -6
+02:18:18   preB-tools.diff   stage-snap-bin.ps1   +50 -14
+02:18:18   preB-tools.diff   gen-check.py         +49 -12
+02:18:18   preB-tools.diff   snap-gate.py         +44 -15
+02:18:18   preB-tools.diff   stop-snap.ps1        +12 -8
+02:18:18   prep-b.nolr.diff  prep-b.py            +44 -18
+02:18:18   run-b.nolr.diff   run-b.ps1            +27 -11
+02:18:18   nolr-comments.diff patch-b-tools.py    +5 -5
+02:18:18   nolr-comments.diff gen-check.py        +3 -3
+02:18:19   nolr-comments.diff snap-gate.py        +1 -1
+02:18:19   b-chain.new.diff  b-chain.ps1          +51 -0
+02:18:19   diff preB-tools.diff       31647 B sha256 0C97791FCC44A8585CACE50FB2446A5513A7907EF0CFB55B0D83E3ED75CFC7A6
+02:18:19   diff prep-b.nolr.diff       9005 B sha256 C06B68ADA3A5710A7DC41E1BF31AFECCC13353CC57985403DF945238935D95C6
+02:18:19   diff run-b.nolr.diff        6349 B sha256 CC6EAD365E8EF0309A5C987B4DFDD34E7A6AC1840F4537CB66176EAC10367E35
+02:18:19   diff nolr-comments.diff     4890 B sha256 FE497ED39AB0B809594F9D09F8564246E73FAA14178E6D77BAA1CD5DD5945A72
+02:18:19   diff b-chain.new.diff       3625 B sha256 7310180A74E367DCF1D57FA74D976E73D254AF53EA8C2DB4BD86196A77EBCA34
+02:18:19   file prep-b.py            sha256 02D655DDC2A5767A94B839E57AAC345EDD33C3E52C80803EF6DEA02A0F93793F
+02:18:19   file run-b.ps1            sha256 0D15965119037CBD4A6CB3BCA8F486484B1926A7FC96B55B8F973DE0031DBD17
+02:18:19   file b-chain.ps1          sha256 AD7C76D774CE46A25CEBA15BDA0BAB1BF6A33342B69D1C2E85D1DC79A82778C1
+02:18:19   file patch-b-tools.py     sha256 D164288B00E25AEC3D7BC8064998720B4F9BA1B27487D1935610DF4CAC48D55C
+02:18:19   file build-snap.ps1       sha256 166C2492DB410CD1225BB32FEC372E767108E4F7A637DCAC2C5B0A553C2C6BA3
+02:18:19   file stage-snap-bin.ps1   sha256 45F623621EEEF37687C12F59DF891F10ED2D3D47E18CA801A5D0AA1CE78EFC00
+02:18:19   file gen-check.py         sha256 0E830AED27901CCA1C4BD7A91598BC5D906AA16A006CB09CC680F002E230630B
+02:18:19   file snap-gate.py         sha256 6F8B4CD18A43D7D0CD32F4B1121ACC1AC4763338491CCC3433FBE46E0344B8C4
+02:18:19   file stop-snap.ps1        sha256 414DF411A0F658EFCA35313100DD6C56969633F2CDD11F305717C6930B666E87
+02:18:19   CHECK PASS build-snap.ps1 == build-snap.ps1.pre-B + exactly patch-b-tools.py's 7 EDITS
+02:18:20   CHECK PASS stage-snap-bin.ps1 == stage-snap-bin.ps1.pre-B + exactly patch-b-tools.py's 12 EDITS
+02:18:20   CHECK PASS gen-check.py .pre-nolr -> current: docstring/comment changes only (same AST without docstrings)
+02:18:20   CHECK PASS snap-gate.py .pre-nolr -> current: docstring/comment changes only (same AST without docstrings)
+02:18:20   CHECK PASS patch-b-tools.py .pre-nolr -> current: same code and search texts; 10 changed replacement lines, all '#' comments
+02:18:20   RESULT: PASS
+02:18:21 PASS b-diffs.py exit 0
+02:18:32 PASS gen-check default (baseline vs snap1): exit 0, 11.3s: # gen-check 02:18:32: reference 887 files, snapshot 887 files; 886/886 compared files identical (490.0 MB); codegen.d: already has snapshot paths; 9.3s | RESULT: PASS
+02:18:35 PASS snap-gate default snap1-off: exit 0, 3.1s: # snap-gate <workspace>\build\agent2\snap1-off: 477 DB entries, 440 generated TUs (sources.cmake lists 440), 5 distinct include dirs; snapshot <workspace>\build\agent2\snap1\DimensionsRecomp | rexglue_DIR: <workspace>\build\agent2\snap1-sdk\install\lib\cmake\rexglue (ok) | headers rex   : 341 installed, 340 hash-equal to the snapshot, 1 configure-generated, 0 differ/missing | headers fmt   : 14 installed, 14 hash-equal to the snapshot, 0 configure-generated, 0 differ/missing | headers spdlog: 90 installed, 90 hash-equal to the snapshot, 0 configure-generated, 0 differ/missing | headers simde : 469 installed, 469 hash-equal to the snapshot, 0 configure-generated, 0 differ/missing | RESULT: PASS
+02:18:36 PASS negative: prep-b.py --install build\agent9\install\batch -> exit 1 : 02:18:36 START prep-b: install tree <workspace>\build\agent9\install\batch, snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp | 02:18:36 FAIL refusing install tree <workspace>\build\agent9\install\batch: build B uses only <workspace>\build\agent9\install\batch-nolr (install/batch has skip_lr, unsafe for LEGO); nothing copied
+02:18:38 PASS negative: prep-b.py --install <workspace>\build\agent9\install\batch -> exit 1 : 02:18:37 START prep-b: install tree <workspace>\build\agent9\install\batch, snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp | 02:18:37 FAIL refusing install tree <workspace>\build\agent9\install\batch: build B uses only <workspace>\build\agent9\install\batch-nolr (install/batch has skip_lr, unsafe for LEGO); nothing copied
+02:18:39 PASS negative: prep-b.py --install build\agent9\install\batch-nolr\..\batch -> exit 1 : 02:18:39 START prep-b: install tree <workspace>\build\agent9\install\batch, snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp | 02:18:39 FAIL refusing install tree <workspace>\build\agent9\install\batch: build B uses only <workspace>\build\agent9\install\batch-nolr (install/batch has skip_lr, unsafe for LEGO); nothing copied
+02:18:41 PASS negative: prep-b.py --install build/agent9/install/batch -> exit 1 : 02:18:41 START prep-b: install tree <workspace>\build\agent9\install\batch, snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp | 02:18:41 FAIL refusing install tree <workspace>\build\agent9\install\batch: build B uses only <workspace>\build\agent9\install\batch-nolr (install/batch has skip_lr, unsafe for LEGO); nothing copied
+02:18:43 PASS negative: run-b.ps1 -Install build\agent9\install\batch -> exit 3 : 02:18:43 [B] START codegen build B from S2 (snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp, game tree <workspace>\build\agent2\snapB-off, -j 10, install tree build\agent9\install\batch) | 02:18:43 [B] STOP: refusing install tree <workspace>\build\agent9\install\batch : build B uses only <workspace>\build\agent9\install\batch-nolr (install\batch has skip_lr, unsafe for LEGO); nothing built
+02:18:45 PASS negative: run-b.ps1 -Install <workspace>\build\agent9\install\batch -> exit 3 : 02:18:45 [B] START codegen build B from S2 (snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp, game tree <workspace>\build\agent2\snapB-off, -j 10, install tree <workspace>\build\agent9\install\batch) | 02:18:45 [B] STOP: refusing install tree <workspace>\build\agent9\install\batch : build B uses only <workspace>\build\agent9\install\batch-nolr (install\batch has skip_lr, unsafe for LEGO); nothing built
+02:18:47 PASS negative: run-b.ps1 -Install build\agent9\install\batch-nolr\..\batch -> exit 3 : 02:18:46 [B] START codegen build B from S2 (snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp, game tree <workspace>\build\agent2\snapB-off, -j 10, install tree build\agent9\install\batch-nolr\..\batch) | 02:18:47 [B] STOP: refusing install tree <workspace>\build\agent9\install\batch : build B uses only <workspace>\build\agent9\install\batch-nolr (install\batch has skip_lr, unsafe for LEGO); nothing built
+02:18:49 PASS negative: run-b.ps1 -Install build/agent9/install/batch -> exit 3 : 02:18:48 [B] START codegen build B from S2 (snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp, game tree <workspace>\build\agent2\snapB-off, -j 10, install tree build/agent9/install/batch) | 02:18:49 [B] STOP: refusing install tree <workspace>\build\agent9\install\batch : build B uses only <workspace>\build\agent9\install\batch-nolr (install\batch has skip_lr, unsafe for LEGO); nothing built
+02:18:50 PASS control: run-b.ps1 (defaults) passes step 0, then exit 2 : 02:18:50 [B] START codegen build B from S2 (snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp, game tree <workspace>\build\agent2\snapB-off, -j 10, install tree build\agent9\install\batch-nolr) | 02:18:50 [B] STOP: run prep-b.py first (no snapB-manifest-notes.txt)
+02:18:51 FAIL control: prep-b.py --skip-copy passes step 1 (install pins), then stops at step 2 (no snapB): exit 1 : 02:18:51 START prep-b: install tree <workspace>\build\agent9\install\batch-nolr, snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp | 02:18:51 FAIL no [batch-nolr] END line in <workspace>\build\agent9\logs\install-steps.txt
+02:18:51 PASS after the tests: snapB still does not exist
+02:18:51 PASS after the tests: snapB-off still does not exist
+02:18:51 PASS after the tests: devoffB-bin still does not exist
+02:18:51 PASS after the tests: no snapB-robocopy.log
+02:18:51 PASS after the tests: no snapB-manifest-notes.txt
+02:18:51 RESULT: FAIL (1)
+02:20:13 START b-prep2
+02:20:13 PASS snapB does not exist yet
+02:20:13 PASS snapB-off does not exist yet
+02:20:13 PASS devoffB-bin does not exist yet
+02:20:13 PASS snapB-manifest-notes.txt does not exist yet
+02:20:15 PASS py_compile prep-b.py 
+02:20:16 PASS py_compile gen-check.py 
+02:20:16 PASS py_compile snap-gate.py 
+02:20:17 PASS py_compile patch-b-tools.py 
+02:20:18 PASS py_compile b-diffs.py 
+02:20:18 PASS PS parse run-b.ps1: 0 error(s) 
+02:20:18 PASS PS parse b-chain.ps1: 0 error(s) 
+02:20:18 PASS PS parse stop-snap.ps1: 0 error(s) 
+02:20:18 NOTE  build-snap.ps1 and stage-snap-bin.ps1 are already patched (re-run): b-diffs.py checks them against .pre-B + EDITS
+02:20:18 PASS PS parse build-snap.ps1: 0 error(s) 
+02:20:18 PASS PS parse stage-snap-bin.ps1: 0 error(s) 
+02:20:19   preB-tools.diff   build-snap.ps1       +34 -6
+02:20:19   preB-tools.diff   stage-snap-bin.ps1   +50 -14
+02:20:19   preB-tools.diff   gen-check.py         +49 -12
+02:20:19   preB-tools.diff   snap-gate.py         +44 -15
+02:20:19   preB-tools.diff   stop-snap.ps1        +12 -8
+02:20:19   prep-b.nolr.diff  prep-b.py            +53 -18
+02:20:19   run-b.nolr.diff   run-b.ps1            +27 -11
+02:20:19   nolr-comments.diff patch-b-tools.py    +5 -5
+02:20:19   nolr-comments.diff gen-check.py        +3 -3
+02:20:19   nolr-comments.diff snap-gate.py        +1 -1
+02:20:19   b-chain.new.diff  b-chain.ps1          +51 -0
+02:20:19   diff preB-tools.diff       31647 B sha256 0C97791FCC44A8585CACE50FB2446A5513A7907EF0CFB55B0D83E3ED75CFC7A6
+02:20:19   diff prep-b.nolr.diff       9454 B sha256 643F3B6131CDEAADA9D6825629510F83268863D11DDD52BF0736F4B936DF5F26
+02:20:19   diff run-b.nolr.diff        6349 B sha256 CC6EAD365E8EF0309A5C987B4DFDD34E7A6AC1840F4537CB66176EAC10367E35
+02:20:19   diff nolr-comments.diff     4890 B sha256 FE497ED39AB0B809594F9D09F8564246E73FAA14178E6D77BAA1CD5DD5945A72
+02:20:19   diff b-chain.new.diff       3625 B sha256 7310180A74E367DCF1D57FA74D976E73D254AF53EA8C2DB4BD86196A77EBCA34
+02:20:19   file prep-b.py            sha256 C0067F18C299D5515162A1DE5E480A09D43676A9A559856E19C91B753B800BB1
+02:20:19   file run-b.ps1            sha256 0D15965119037CBD4A6CB3BCA8F486484B1926A7FC96B55B8F973DE0031DBD17
+02:20:19   file b-chain.ps1          sha256 AD7C76D774CE46A25CEBA15BDA0BAB1BF6A33342B69D1C2E85D1DC79A82778C1
+02:20:19   file patch-b-tools.py     sha256 D164288B00E25AEC3D7BC8064998720B4F9BA1B27487D1935610DF4CAC48D55C
+02:20:19   file build-snap.ps1       sha256 166C2492DB410CD1225BB32FEC372E767108E4F7A637DCAC2C5B0A553C2C6BA3
+02:20:19   file stage-snap-bin.ps1   sha256 45F623621EEEF37687C12F59DF891F10ED2D3D47E18CA801A5D0AA1CE78EFC00
+02:20:19   file gen-check.py         sha256 0E830AED27901CCA1C4BD7A91598BC5D906AA16A006CB09CC680F002E230630B
+02:20:19   file snap-gate.py         sha256 6F8B4CD18A43D7D0CD32F4B1121ACC1AC4763338491CCC3433FBE46E0344B8C4
+02:20:19   file stop-snap.ps1        sha256 414DF411A0F658EFCA35313100DD6C56969633F2CDD11F305717C6930B666E87
+02:20:19   CHECK PASS build-snap.ps1 == build-snap.ps1.pre-B + exactly patch-b-tools.py's 7 EDITS
+02:20:19   CHECK PASS stage-snap-bin.ps1 == stage-snap-bin.ps1.pre-B + exactly patch-b-tools.py's 12 EDITS
+02:20:19   CHECK PASS gen-check.py .pre-nolr -> current: docstring/comment changes only (same AST without docstrings)
+02:20:19   CHECK PASS snap-gate.py .pre-nolr -> current: docstring/comment changes only (same AST without docstrings)
+02:20:19   CHECK PASS patch-b-tools.py .pre-nolr -> current: same code and search texts; 10 changed replacement lines, all '#' comments
+02:20:19   RESULT: PASS
+02:20:19 PASS b-diffs.py exit 0
+02:20:25 PASS gen-check default (baseline vs snap1): exit 0, 5.3s: # gen-check 02:20:25: reference 887 files, snapshot 887 files; 886/886 compared files identical (490.0 MB); codegen.d: already has snapshot paths; 4.7s | RESULT: PASS
+02:20:26 PASS snap-gate default snap1-off: exit 0, 1.2s: # snap-gate <workspace>\build\agent2\snap1-off: 477 DB entries, 440 generated TUs (sources.cmake lists 440), 5 distinct include dirs; snapshot <workspace>\build\agent2\snap1\DimensionsRecomp | rexglue_DIR: <workspace>\build\agent2\snap1-sdk\install\lib\cmake\rexglue (ok) | headers rex   : 341 installed, 340 hash-equal to the snapshot, 1 configure-generated, 0 differ/missing | headers fmt   : 14 installed, 14 hash-equal to the snapshot, 0 configure-generated, 0 differ/missing | headers spdlog: 90 installed, 90 hash-equal to the snapshot, 0 configure-generated, 0 differ/missing | headers simde : 469 installed, 469 hash-equal to the snapshot, 0 configure-generated, 0 differ/missing | RESULT: PASS
+02:20:26 PASS negative: prep-b.py --install build\agent9\install\batch -> exit 1 : 02:20:26 START prep-b: install tree <workspace>\build\agent9\install\batch, snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp | 02:20:26 FAIL refusing install tree <workspace>\build\agent9\install\batch: build B uses only <workspace>\build\agent9\install\batch-nolr (install/batch has skip_lr, unsafe for LEGO); nothing copied
+02:20:27 PASS negative: prep-b.py --install <workspace>\build\agent9\install\batch -> exit 1 : 02:20:27 START prep-b: install tree <workspace>\build\agent9\install\batch, snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp | 02:20:27 FAIL refusing install tree <workspace>\build\agent9\install\batch: build B uses only <workspace>\build\agent9\install\batch-nolr (install/batch has skip_lr, unsafe for LEGO); nothing copied
+02:20:27 PASS negative: prep-b.py --install build\agent9\install\batch-nolr\..\batch -> exit 1 : 02:20:27 START prep-b: install tree <workspace>\build\agent9\install\batch, snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp | 02:20:27 FAIL refusing install tree <workspace>\build\agent9\install\batch: build B uses only <workspace>\build\agent9\install\batch-nolr (install/batch has skip_lr, unsafe for LEGO); nothing copied
+02:20:27 PASS negative: prep-b.py --install build/agent9/install/batch -> exit 1 : 02:20:27 START prep-b: install tree <workspace>\build\agent9\install\batch, snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp | 02:20:27 FAIL refusing install tree <workspace>\build\agent9\install\batch: build B uses only <workspace>\build\agent9\install\batch-nolr (install/batch has skip_lr, unsafe for LEGO); nothing copied
+02:20:29 PASS negative: run-b.ps1 -Install build\agent9\install\batch -> exit 3 : 02:20:29 [B] START codegen build B from S2 (snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp, game tree <workspace>\build\agent2\snapB-off, -j 10, install tree build\agent9\install\batch) | 02:20:29 [B] STOP: refusing install tree <workspace>\build\agent9\install\batch : build B uses only <workspace>\build\agent9\install\batch-nolr (install\batch has skip_lr, unsafe for LEGO); nothing built
+02:20:30 PASS negative: run-b.ps1 -Install <workspace>\build\agent9\install\batch -> exit 3 : 02:20:30 [B] START codegen build B from S2 (snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp, game tree <workspace>\build\agent2\snapB-off, -j 10, install tree <workspace>\build\agent9\install\batch) | 02:20:30 [B] STOP: refusing install tree <workspace>\build\agent9\install\batch : build B uses only <workspace>\build\agent9\install\batch-nolr (install\batch has skip_lr, unsafe for LEGO); nothing built
+02:20:31 PASS negative: run-b.ps1 -Install build\agent9\install\batch-nolr\..\batch -> exit 3 : 02:20:31 [B] START codegen build B from S2 (snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp, game tree <workspace>\build\agent2\snapB-off, -j 10, install tree build\agent9\install\batch-nolr\..\batch) | 02:20:31 [B] STOP: refusing install tree <workspace>\build\agent9\install\batch : build B uses only <workspace>\build\agent9\install\batch-nolr (install\batch has skip_lr, unsafe for LEGO); nothing built
+02:20:34 PASS negative: run-b.ps1 -Install build/agent9/install/batch -> exit 3 : 02:20:33 [B] START codegen build B from S2 (snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp, game tree <workspace>\build\agent2\snapB-off, -j 10, install tree build/agent9/install/batch) | 02:20:33 [B] STOP: refusing install tree <workspace>\build\agent9\install\batch : build B uses only <workspace>\build\agent9\install\batch-nolr (install\batch has skip_lr, unsafe for LEGO); nothing built
+02:20:35 PASS control: run-b.ps1 (defaults) passes step 0, then exit 2 : 02:20:35 [B] START codegen build B from S2 (snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp, game tree <workspace>\build\agent2\snapB-off, -j 10, install tree build\agent9\install\batch-nolr) | 02:20:35 [B] STOP: run prep-b.py first (no snapB-manifest-notes.txt)
+02:20:49 PASS control: prep-b.py --skip-copy passes step 1 (install pins), then stops at step 2 (no snapB): exit 1 : 02:20:36 START prep-b: install tree <workspace>\build\agent9\install\batch-nolr, snapshot copy <workspace>\build\agent2\snapB\DimensionsRecomp | 02:20:36 install END line: 23:54:03 [batch-nolr] END files=872 bytes=481074943 TUs=430 last=legodimensions_recomp.429.cpp config_sha=E60EAF1CEB575572 | 02:20:38 install tree: 872 files, 481074943 bytes, every file matches SHA256SUMS.txt (sha256 24ce1493fb8dae37e00b556eb8871d633921e44378d960de4359b104b16cdb8e), 2.1s | 02:20:38 config e60eaf1ceb575572 == configs/batch-nolr.toml == the END line == the pin; rexglue.cmake and codegen.d == baseline's; sources.cmake: 432 sources (430 TUs, last legodimensions_recomp.429.cpp); build/agent9/bin/rexglue.exe 37b32713b7516402 (matches the recipe's 37B32713) | 02:20:48 FAIL snapB vs snap1: 24095 missing ['.git\\modules\\thirdparty\\plume\\FETCH_HEAD', '.git\\modules\\thirdparty\\plume\\HEAD', '.git\\modules\\thirdparty\\plume\\config'], 0 extra [], 0 size/mtime differ []
+02:20:49 PASS after the tests: snapB still does not exist
+02:20:49 PASS after the tests: snapB-off still does not exist
+02:20:49 PASS after the tests: devoffB-bin still does not exist
+02:20:49 PASS after the tests: no snapB-robocopy.log
+02:20:49 PASS after the tests: no snapB-manifest-notes.txt
+02:20:49 RESULT: PASS

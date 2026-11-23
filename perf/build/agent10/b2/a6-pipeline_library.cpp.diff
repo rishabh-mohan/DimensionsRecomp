@@ -1,0 +1,581 @@
+﻿diff --git a/baseline/DimensionsRecomp/rexlego/src/gpu_native/pipeline_library.cpp b/DimensionsRecomp/rexlego/src/gpu_native/pipeline_library.cpp
+index 59e0e7f..4484038 100644
+--- a/baseline/DimensionsRecomp/rexlego/src/gpu_native/pipeline_library.cpp
++++ b/DimensionsRecomp/rexlego/src/gpu_native/pipeline_library.cpp
+@@ -21,9 +21,12 @@
+ #include <plume_d3d12.h>
+ 
+ #define XXH_INLINE_ALL
+ #include <xxhash.h>
++#include "gpu_native/pipeline_parallel.h"
+ #include "gpu_native/pipeline_recipes.h"
++#include "gpu_native/pipeline_snapshot.h"
++#include "gpu_native/pipeline_stats.h"
+ 
+ namespace legodimensions::gpu_native {
+ namespace {
+ 
+@@ -100,11 +103,50 @@ std::filesystem::path CachePath() {
+                                       : std::filesystem::current_path();
+   return base / "cache" / "native-pso.bin";
+ }
+ 
++// LEGO_NATIVE_PSO_PREPARE_THREADS=<n> spreads startup preparation over n
++// threads, at most 8 and at most the core count. Unset, 0 or 1: the serial loop.
++unsigned PreparationThreads() {
++  const char* value = std::getenv("LEGO_NATIVE_PSO_PREPARE_THREADS");
++  if (!value || !*value) return 1;
++  const unsigned long requested = std::strtoul(value, nullptr, 10);
++  const unsigned limit = std::clamp(std::thread::hardware_concurrency(), 1u, 8u);
++  return unsigned(std::clamp<unsigned long>(requested, 1, limit));
++}
++
++// Preparation workers run at most this many recipes ahead of the in-order commit.
++constexpr std::size_t kPrepareWindow = 64;
++
++enum class PrepareResult : uint8_t { kLoaded, kCompiled, kFailed, kRemoved };
++
++struct PreparedPipeline {
++  PrepareResult result = PrepareResult::kFailed;
++  Microsoft::WRL::ComPtr<ID3D12PipelineState> pipeline;
++  uint64_t load_ns = 0, compile_ns = 0;  // measured only while PSO stats are on
++};
++
++struct PrepareTotals {
++  uint64_t loaded = 0, compiled = 0, failed = 0;
++  uint64_t load_ns = 0, compile_ns = 0, max_compile_ns = 0;
++};
++
++// CreateGraphicsPipelineState for an auxiliary pipeline the library does not cover.
++bool CreateUncached(ID3D12Device* device, const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc,
++                    ID3D12PipelineState** pipeline) {
++  if (!pso_stats::Enabled())
++    return SUCCEEDED(device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(pipeline)));
++  const uint64_t start = pso_stats::Nanos();
++  const bool compiled = SUCCEEDED(device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(pipeline)));
++  pso_stats::OnAuxiliary(false, compiled, pso_stats::Nanos() - start);
++  return compiled;
++}
++
+ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+  public:
+   bool Open(ID3D12Device8* device) {
++    const bool stats = pso_stats::Enabled();
++    const uint64_t read_start = stats ? pso_stats::Nanos() : 0;
+     device_ = device;
+     path_ = CachePath();
+     recipe_path_ = path_.parent_path() / "native-pso-recipes.bin";
+     seed_path_ = path_.parent_path().parent_path() / "native-pso-seed.bin";
+@@ -114,26 +156,37 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+       blob_.resize(size_t(size));
+       std::ifstream file(path_, std::ios::binary);
+       if (!file.read(reinterpret_cast<char*>(blob_.data()), std::streamsize(size))) blob_.clear();
+     }
++    const uint64_t file_bytes = blob_.size();
++    const uint64_t create_start = stats ? pso_stats::Nanos() : 0;
+     // The driver rejects a blob from another driver version or adapter;
+     // start empty then, and the next save replaces the stale file.
+     HRESULT result = E_FAIL;
+     if (!blob_.empty())
+       result = device->CreatePipelineLibrary(blob_.data(), blob_.size(), IID_PPV_ARGS(&library_));
++    const bool accepted = SUCCEEDED(result);
+     if (FAILED(result)) {
+       if (!blob_.empty())
+         REXLOG_INFO("Native GPU: pipeline cache {} rejected by the driver (0x{:08X}); rebuilding",
+                     path_.string(), static_cast<uint32_t>(result));
+       blob_.clear();
+       library_ = nullptr;
+       result = device->CreatePipelineLibrary(nullptr, 0, IID_PPV_ARGS(&library_));
+     }
++    const auto opened = [&](pso_stats::CacheState state) {
++      if (stats)
++        pso_stats::OnOpen(state, file_bytes, create_start - read_start, pso_stats::Nanos() - create_start);
++    };
+     if (FAILED(result) || !library_) {
+       REXLOG_WARN("Native GPU: pipeline cache unavailable (0x{:08X})", static_cast<uint32_t>(result));
++      opened(pso_stats::CacheState::kUnavailable);
+       return false;
+     }
+     REXLOG_INFO("Native GPU: pipeline cache {} opened ({} bytes)", path_.string(), blob_.size());
++    opened(accepted     ? pso_stats::CacheState::kLoaded
++           : file_bytes ? pso_stats::CacheState::kRejected
++                        : pso_stats::CacheState::kNoFile);
+     return true;
+   }
+ 
+   ~PipelineLibrary() override {
+@@ -148,37 +201,59 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+       return;
+     }
+     const auto start = Clock::now();
+     ReadRecipes(recipe_path_, recipes_);
+-    size_t loaded = 0, compiled = 0, failed = 0;
++    const bool stats = pso_stats::Enabled();
++    const unsigned threads = PreparationThreads();
++    if (threads > 1)
++      REXLOG_INFO("Native GPU: startup pipeline preparation uses {} threads (LEGO_NATIVE_PSO_PREPARE_THREADS)",
++                  threads);
++    PrepareTotals totals;
+     auto next_progress = Clock::now() + std::chrono::seconds(2);
+     std::vector<D3D12_INPUT_ELEMENT_DESC> inputs;
+     std::unordered_set<std::wstring> prepared;
++    const auto progress = [&] {
++      if (Clock::now() >= next_progress) {
++        REXLOG_INFO("Native GPU: startup pipeline preparation processed {} recipes",
++                    totals.loaded + totals.compiled + totals.failed);
++        next_progress = Clock::now() + std::chrono::seconds(2);
++      }
++    };
++    // Applies one recipe's result on this thread, in recipe order, exactly as
++    // the serial loop always has. Returns false once the device is removed.
++    const auto commit = [&](const std::wstring& name, PreparedPipeline&& item) {
++      totals.load_ns += item.load_ns;
++      totals.compile_ns += item.compile_ns;
++      totals.max_compile_ns = std::max(totals.max_compile_ns, item.compile_ns);
++      switch (item.result) {
++        case PrepareResult::kLoaded:
++          ++totals.loaded;
++          break;
++        case PrepareResult::kCompiled:
++          ++totals.compiled;
++          Store(name, item.pipeline.Get());
++          break;
++        case PrepareResult::kFailed:
++          ++totals.failed;
++          return true;
++        case PrepareResult::kRemoved:
++          ++totals.failed;
++          return false;
++      }
++      prepared.insert(name);
++      // Keep the first pipelines resident. Later ones use the driver library.
++      constexpr size_t kMaxResident = 512;
++      if (warmed_.size() < kMaxResident) warmed_.emplace(name, std::move(item.pipeline));
++      return true;
++    };
+     const auto prepare = [&](const PipelineRecipes& source) {
++      if (threads > 1) return PrepareParallel(source, threads, stats, prepared, progress, commit);
+       for (const auto& recipe : source.Entries()) {
+         const std::wstring name(recipe->name.begin(), recipe->name.end());
+         if (prepared.contains(name)) continue;
+-        if (Clock::now() >= next_progress) {
+-          REXLOG_INFO("Native GPU: startup pipeline preparation processed {} recipes",
+-                      loaded + compiled + failed);
+-          next_progress = Clock::now() + std::chrono::seconds(2);
+-        }
++        progress();
+         const auto desc = source.Describe(*recipe, root_, inputs);
+-        Microsoft::WRL::ComPtr<ID3D12PipelineState> pipeline;
+-        if (SUCCEEDED(library_->LoadGraphicsPipeline(name.c_str(), &desc, IID_PPV_ARGS(&pipeline)))) {
+-          ++loaded;
+-        } else if (SUCCEEDED(device_->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipeline)))) {
+-          ++compiled;
+-          Store(name, pipeline.Get());
+-        } else {
+-          ++failed;
+-          if (FAILED(device_->GetDeviceRemovedReason())) return false;
+-          continue;
+-        }
+-        prepared.insert(name);
+-        // Keep the first pipelines resident. Later ones use the driver library.
+-        constexpr size_t kMaxResident = 512;
+-        if (warmed_.size() < kMaxResident) warmed_.emplace(name, std::move(pipeline));
++        if (!commit(name, stats ? PrepareOne<true>(name, desc) : PrepareOne<false>(name, desc))) return false;
+       }
+       return true;
+     };
+     // Seed files are read one at a time. The portable seed does not use the
+@@ -214,61 +289,38 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+         REXLOG_INFO("Native GPU: removed {} seeded pipelines from local recording",
+                     old_count - recipes_.Entries().size());
+       }
+     }
+-    if (!loaded && !compiled && !failed) {
++    if (stats)
++      pso_stats::OnPrepare({totals.loaded, totals.compiled, totals.failed, warmed_.size(), threads,
++                            uint64_t(std::chrono::duration_cast<std::chrono::nanoseconds>(Clock::now() - start).count()),
++                            totals.load_ns, totals.compile_ns, totals.max_compile_ns});
++    if (!totals.loaded && !totals.compiled && !totals.failed) {
+       REXLOG_INFO("Native GPU: no startup pipeline recipes yet; recording during gameplay");
+       return;
+     }
+     REXLOG_INFO("Native GPU: startup pipelines loaded={} compiled={} failed={} resident={} elapsed_ms={}",
+-                loaded, compiled, failed, warmed_.size(),
++                totals.loaded, totals.compiled, totals.failed, warmed_.size(),
+                 std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - start).count());
+   }
+ 
+   ID3D12PipelineState* load(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc) override {
+-    const auto name = PipelineName(desc);
+-    ID3D12PipelineState* pipeline = nullptr;
+-    std::lock_guard lock(mutex_);
+-    if (root_ && desc.pRootSignature == root_) {
+-      auto entry = warmed_.find(name);
+-      if (entry != warmed_.end()) {
+-        pipeline = entry->second.Detach();
+-        warmed_.erase(entry);
+-        ++stats_.hits;
+-        return pipeline;
+-      }
+-    }
+-    if (SUCCEEDED(library_->LoadGraphicsPipeline(name.c_str(), &desc, IID_PPV_ARGS(&pipeline)))) {
+-      Record(name, desc);
+-      ++stats_.hits;
+-      return pipeline;
+-    }
+-    ++stats_.misses;
+-    return nullptr;
++    return pso_stats::Enabled() ? Load<true>(desc) : Load<false>(desc);
+   }
+ 
+   void store(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc, ID3D12PipelineState* pipeline) override {
+-    const auto name = PipelineName(desc);
+-    std::lock_guard lock(mutex_);
+-    Store(name, pipeline);
+-    Record(name, desc);
++    if (pso_stats::Enabled())
++      StoreCompiled<true>(desc, pipeline);
++    else
++      StoreCompiled<false>(desc, pipeline);
+   }
+ 
+   bool CreateAuxiliary(ID3D12Device* device, const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc,
+                        const void* root_data, std::size_t root_size,
+                        ID3D12PipelineState** pipeline) {
+-    if (device != device_ || !root_data || !root_size)
+-      return SUCCEEDED(device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(pipeline)));
+-    const auto name = L"aux-" + PipelineName(desc, root_data, root_size);
+-    std::lock_guard lock(mutex_);
+-    if (SUCCEEDED(library_->LoadGraphicsPipeline(name.c_str(), &desc, IID_PPV_ARGS(pipeline)))) {
+-      ++stats_.hits;
+-      return true;
+-    }
+-    ++stats_.misses;
+-    if (FAILED(device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(pipeline)))) return false;
+-    Store(name, *pipeline);
+-    return true;
++    if (device != device_ || !root_data || !root_size) return CreateUncached(device, desc, pipeline);
++    return pso_stats::Enabled() ? Auxiliary<true>(device, desc, root_data, root_size, pipeline)
++                                : Auxiliary<false>(device, desc, root_data, root_size, pipeline);
+   }
+ 
+   void Frame() {
+     {
+@@ -303,8 +355,132 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+     return stats_;
+   }
+ 
+  private:
++  // load(), store() and CreateAuxiliary() with the PSO stats compiled in or
++  // out. The <false> versions are the code these functions had before.
++  template <bool kStats>
++  ID3D12PipelineState* Load(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc) {
++    pso_stats::LookupTimes times;
++    if constexpr (kStats) times.start = pso_stats::Nanos();
++    const auto name = PipelineName(desc);
++    ID3D12PipelineState* pipeline = nullptr;
++    if constexpr (kStats) times.lock_begin = pso_stats::Nanos();
++    std::lock_guard lock(mutex_);
++    if constexpr (kStats) times.locked = pso_stats::Nanos();
++    if (root_ && desc.pRootSignature == root_) {
++      auto entry = warmed_.find(name);
++      if (entry != warmed_.end()) {
++        pipeline = entry->second.Detach();
++        warmed_.erase(entry);
++        ++stats_.hits;
++        if constexpr (kStats) pso_stats::OnLookup(pso_stats::Lookup::kWarm, times);
++        return pipeline;
++      }
++    }
++    if constexpr (kStats) times.load_begin = pso_stats::Nanos();
++    const HRESULT loaded = library_->LoadGraphicsPipeline(name.c_str(), &desc, IID_PPV_ARGS(&pipeline));
++    if constexpr (kStats) times.load_end = pso_stats::Nanos();
++    if (SUCCEEDED(loaded)) {
++      Record(name, desc);
++      ++stats_.hits;
++      if constexpr (kStats) pso_stats::OnLookup(pso_stats::Lookup::kLibrary, times);
++      return pipeline;
++    }
++    ++stats_.misses;
++    if constexpr (kStats) pso_stats::OnLookup(pso_stats::Lookup::kMiss, times);
++    return nullptr;
++  }
++
++  // Plume calls store() on the thread that missed, right after it compiled.
++  template <bool kStats>
++  void StoreCompiled(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc, ID3D12PipelineState* pipeline) {
++    const uint64_t begin = kStats ? pso_stats::OnStore() : 0;
++    const auto name = PipelineName(desc);
++    {
++      std::lock_guard lock(mutex_);
++      Store(name, pipeline);
++      Record(name, desc);
++    }
++    if constexpr (kStats) pso_stats::OnStored(begin);
++  }
++
++  template <bool kStats>
++  bool Auxiliary(ID3D12Device* device, const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc,
++                 const void* root_data, std::size_t root_size, ID3D12PipelineState** pipeline) {
++    const auto name = L"aux-" + PipelineName(desc, root_data, root_size);
++    std::lock_guard lock(mutex_);
++    if (SUCCEEDED(library_->LoadGraphicsPipeline(name.c_str(), &desc, IID_PPV_ARGS(pipeline)))) {
++      ++stats_.hits;
++      if constexpr (kStats) pso_stats::OnAuxiliary(true, true, 0);
++      return true;
++    }
++    ++stats_.misses;
++    const uint64_t start = kStats ? pso_stats::Nanos() : 0;
++    const bool compiled = SUCCEEDED(device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(pipeline)));
++    if constexpr (kStats) pso_stats::OnAuxiliary(false, compiled, pso_stats::Nanos() - start);
++    if (!compiled) return false;
++    Store(name, *pipeline);
++    return true;
++  }
++
++  // One startup recipe: the driver library first, then a compile. Several may
++  // run at once: the library and the device are free-threaded, and no two
++  // concurrent calls share a name (ID3D12PipelineLibrary's one restriction).
++  template <bool kStats>
++  PreparedPipeline PrepareOne(const std::wstring& name, const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc) const {
++    PreparedPipeline item;
++    const uint64_t load_start = kStats ? pso_stats::Nanos() : 0;
++    const HRESULT loaded = library_->LoadGraphicsPipeline(name.c_str(), &desc, IID_PPV_ARGS(&item.pipeline));
++    if constexpr (kStats) item.load_ns = pso_stats::Nanos() - load_start;
++    if (SUCCEEDED(loaded)) {
++      item.result = PrepareResult::kLoaded;
++      return item;
++    }
++    const uint64_t compile_start = kStats ? pso_stats::Nanos() : 0;
++    const HRESULT compiled = device_->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&item.pipeline));
++    if constexpr (kStats) item.compile_ns = pso_stats::Nanos() - compile_start;
++    if (SUCCEEDED(compiled))
++      item.result = PrepareResult::kCompiled;
++    else
++      item.result = FAILED(device_->GetDeviceRemovedReason()) ? PrepareResult::kRemoved : PrepareResult::kFailed;
++    return item;
++  }
++
++  // Prepare()'s loop over one source on `threads` threads
++  // (LEGO_NATIVE_PSO_PREPARE_THREADS). Loads and compiles run on worker
++  // threads; commit() runs on this thread in recipe order, so the library, the
++  // resident set and the counts end up as the serial loop leaves them.
++  template <class Progress, class Commit>
++  bool PrepareParallel(const PipelineRecipes& source, unsigned threads, bool stats,
++                       const std::unordered_set<std::wstring>& prepared, const Progress& progress,
++                       const Commit& commit) const {
++    const auto& entries = source.Entries();
++    std::vector<std::size_t> pending;
++    std::vector<std::wstring> names;
++    std::unordered_set<std::wstring> seen;
++    pending.reserve(entries.size());
++    names.reserve(entries.size());
++    for (std::size_t i = 0; i < entries.size(); ++i) {
++      std::wstring name(entries[i]->name.begin(), entries[i]->name.end());
++      // Names are unique within a source; never let two workers load one name.
++      if (prepared.contains(name) || !seen.insert(name).second) continue;
++      pending.push_back(i);
++      names.push_back(std::move(name));
++    }
++    return RunOrdered<PreparedPipeline>(
++        pending.size(), threads, kPrepareWindow,
++        [&](std::size_t index) {
++          std::vector<D3D12_INPUT_ELEMENT_DESC> inputs;
++          const auto desc = source.Describe(*entries[pending[index]], root_, inputs);
++          return stats ? PrepareOne<true>(names[index], desc) : PrepareOne<false>(names[index], desc);
++        },
++        [&](std::size_t index, PreparedPipeline&& item) {
++          progress();
++          return commit(names[index], std::move(item));
++        });
++  }
++
+   std::vector<std::filesystem::path> SeedPaths() const {
+     std::vector<std::filesystem::path> paths{seed_path_};
+     auto directory = seed_path_;
+     directory.replace_extension();
+@@ -378,42 +554,65 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+   }
+ 
+   void Save() {
+     SaveRecipes();
+-    std::vector<uint8_t> data;
++    const bool stats = pso_stats::Enabled();
+     uint64_t saved = 0;
+-    {
++    // The buffer is allocated outside mutex_; only the size query and Serialize
++    // run under it (see pipeline_snapshot.h). Same bytes, same file.
++    auto snapshot = SnapshotPipelineLibrary(
++        mutex_,
++        [&]() -> std::size_t {
++          if (!unsaved_) return 0;
++          const SIZE_T size = library_->GetSerializedSize();
++          // A library holding real pipelines is never this small; refuse to
++          // overwrite a good file with one that did not actually keep them.
++          if (size <= 1024 || size > kMaxLibraryBytes) {
++            unsaved_ = 0;
++            return 0;
++          }
++          return size;
++        },
++        [&](uint8_t* data, std::size_t size) {
++          if (FAILED(library_->Serialize(data, size))) return false;
++          saved = unsaved_;
++          unsaved_ = 0;
++          ++stats_.saves;
++          return true;
++        });
++    if (stats)
++      pso_stats::OnSaveSnapshot({uint64_t(snapshot.lock_us) * 1000, uint64_t(snapshot.max_lock_us) * 1000,
++                                 uint64_t(snapshot.copy_us) * 1000, uint64_t(snapshot.alloc_us) * 1000,
++                                 snapshot.retries, snapshot.allocated_under_lock});
++    if (snapshot.status == PipelineSnapshot::Status::kNoMemory) {
++      // The old resize threw std::bad_alloc on this detached thread. Retry
++      // after the next quiet period instead.
++      REXLOG_WARN("Native GPU: pipeline cache save postponed; {} bytes unavailable", snapshot.wanted);
++      if (stats) pso_stats::OnSavePostponed();
+       std::lock_guard lock(mutex_);
+-      if (!unsaved_) return;
+-      const SIZE_T size = library_->GetSerializedSize();
+-      // A library holding real pipelines is never this small; refuse to
+-      // overwrite a good file with one that did not actually keep them.
+-      if (size <= 1024 || size > kMaxLibraryBytes) {
+-        unsaved_ = 0;
+-        return;
+-      }
+-      data.resize(size);
+-      if (FAILED(library_->Serialize(data.data(), size))) return;
+-      saved = unsaved_;
+-      unsaved_ = 0;
+-      ++stats_.saves;
++      last_store_ = Clock::now();
++      return;
+     }
++    if (snapshot.status != PipelineSnapshot::Status::kCopied) return;
++    const uint64_t write_start = stats ? pso_stats::Nanos() : 0;
+     std::error_code error;
+     std::filesystem::create_directories(path_.parent_path(), error);
+     auto temporary = path_;
+     temporary += L".tmp";
+     {
+       std::ofstream file(temporary, std::ios::binary | std::ios::trunc);
+-      if (!file.write(reinterpret_cast<const char*>(data.data()), std::streamsize(data.size()))) {
++      if (!file.write(reinterpret_cast<const char*>(snapshot.data.get()), std::streamsize(snapshot.size))) {
+         REXLOG_WARN("Native GPU: could not write pipeline cache {}", temporary.string());
++        if (stats) pso_stats::OnSaveWritten(false, 0, pso_stats::Nanos() - write_start);
+         return;
+       }
+     }
+     std::filesystem::rename(temporary, path_, error);
++    if (stats) pso_stats::OnSaveWritten(!error, snapshot.size, pso_stats::Nanos() - write_start);
+     if (error)
+       REXLOG_WARN("Native GPU: could not replace pipeline cache {}: {}", path_.string(), error.message());
+     else
+-      REXLOG_INFO("Native GPU: pipeline cache saved, {} new pipelines, {} bytes", saved, data.size());
++      REXLOG_INFO("Native GPU: pipeline cache saved, {} new pipelines, {} bytes", saved, snapshot.size);
+   }
+ 
+   std::filesystem::path path_;
+   std::filesystem::path recipe_path_;
+@@ -434,36 +633,67 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+ };
+ 
+ PipelineLibrary* g_library = nullptr;
+ 
++// Stands in for the library while PSO stats are on and there is none
++// (LEGO_NATIVE_PSO_CACHE=0, a capture layer, or CreatePipelineLibrary failed),
++// so lookups and compiles are still counted for cache on/off comparisons.
++// Plume reads the registered pointer without a lock, so it is never deleted.
++class CountingPipelineCache final : public plume::D3D12GraphicsPipelineCache {
++ public:
++  ID3D12PipelineState* load(const D3D12_GRAPHICS_PIPELINE_STATE_DESC&) override {
++    pso_stats::OnUncachedLookup();
++    return nullptr;
++  }
++  void store(const D3D12_GRAPHICS_PIPELINE_STATE_DESC&, ID3D12PipelineState*) override {
++    pso_stats::OnStored(pso_stats::OnStore());
++  }
++};
++
++std::atomic<bool> g_counting_cache{false};
++
++void StartCountingCache(pso_stats::CacheState state) {
++  pso_stats::OnCacheState(state);
++  static auto* const cache = new CountingPipelineCache();
++  g_counting_cache.store(true);
++  plume::SetD3D12GraphicsPipelineCache(cache);
++}
++
+ }  // namespace
+ 
+ void StartPipelineLibrary(plume::RenderDevice* render_device) {
++  // LEGO_NATIVE_PSO_STATS; nothing else changes while it is off.
++  const bool stats = pso_stats::ReadEnvironment();
++  if (stats) pso_stats::Configure(CachePath().parent_path());
+   const char* value = std::getenv("LEGO_NATIVE_PSO_CACHE");
+   if (value && std::strcmp(value, "0") == 0) {
+     REXLOG_INFO("Native GPU: pipeline cache disabled by LEGO_NATIVE_PSO_CACHE=0");
++    if (stats) StartCountingCache(pso_stats::CacheState::kDisabled);
+     return;
+   }
+   // Capture layers (RenderDoc) wrap the device and do not persist pipeline
+   // libraries: stores "succeed" but serialize to an empty blob, which would
+   // replace the real cache on disk. Leave the cache untouched in those runs.
+   if (GetModuleHandleW(L"renderdoc.dll") || std::getenv("LEGO_NATIVE_RENDERDOC_DLL")) {
+     REXLOG_INFO("Native GPU: pipeline cache skipped while a capture layer is active");
++    if (stats) StartCountingCache(pso_stats::CacheState::kCaptureLayer);
+     return;
+   }
+   if (!render_device || g_library) return;
+   auto* device = static_cast<plume::D3D12Device*>(render_device)->d3d;
+   if (!device) return;
+   auto* library = new PipelineLibrary();
+   if (!library->Open(device)) {
+     delete library;
++    if (stats) StartCountingCache(pso_stats::CacheState::kUnavailable);
+     return;
+   }
+   g_library = library;
+   plume::SetD3D12GraphicsPipelineCache(library);
+ }
+ 
+ void PipelineLibraryFrame() {
++  if (pso_stats::Enabled()) pso_stats::OnFrame();
+   if (g_library) g_library->Frame();
+ }
+ 
+ void PreparePipelineLibrary(plume::RenderPipelineLayout* layout) {
+@@ -479,21 +709,31 @@ bool StartupPipelinePreparationEnabled() {
+ bool CreateAuxiliaryPipeline(ID3D12Device* device,
+     const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc, const void* root_data,
+     std::size_t root_size, ID3D12PipelineState** pipeline) {
+   if (g_library) return g_library->CreateAuxiliary(device, desc, root_data, root_size, pipeline);
+-  return SUCCEEDED(device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(pipeline)));
++  return CreateUncached(device, desc, pipeline);
+ }
+ 
+ void StopPipelineLibrary() {
+-  if (!g_library) return;
++  if (!g_library) {
++    // The counting stand-in is unregistered but, like the library, never deleted.
++    if (g_counting_cache.exchange(false)) plume::SetD3D12GraphicsPipelineCache(nullptr);
++    if (pso_stats::Enabled()) pso_stats::LogExitSummary();
++    return;
++  }
+   plume::SetD3D12GraphicsPipelineCache(nullptr);
+   g_library->Stop();
+   g_library = nullptr;
+   // Intentionally leaked: a detached save thread can no longer start, but
+   // keeping the object avoids any use-after-free during hard exits.
++  if (pso_stats::Enabled()) pso_stats::LogExitSummary();
+ }
+ 
+ PipelineLibraryStats GetPipelineLibraryStats() {
+   return g_library ? g_library->Stats() : PipelineLibraryStats{};
+ }
+ 
++void LogPipelineStats() {
++  if (pso_stats::Enabled()) pso_stats::LogSummary("request");
++}
++
+ }  // namespace legodimensions::gpu_native

@@ -1,0 +1,9 @@
+# snap-patch S3d plan 2026-11-22 03:42:56; rules <workspace>\build\agent2\S3d-rules.txt (sha256 714cbc5e13225733e7355f9e2883015e47d36ce2e4255df80919bd943bb7db37)
+# base: MANIFEST-S1-2041.tsv + 48 PATCHES row(s) + 48 native-input file(s) + STATE-S3-0241.tsv
+# note: S3d build inputs: S3 (STATE-S3-0241.tsv: game commit 001336f + SDK commit c5fe668 + the uncommitted pre-sprint plume and simde edits) + exactly Agent 4's live write of rexlego/src/gpu_native/draw.cpp, 50AA3B1DEE615678 -> 5EA1F3576DCC2F90 (306557 B, live mtime 2026-11-22 03:34:59); Agent 1's GO 03:35.
+# note: S3d is native only: draw.cpp is not compiled into OFF builds (snap1-off compile_commands.json: 477 entries, no gpu_native file), so devoff3-bin stays the OFF build of S3d; snap1-sdk is not rebuilt (its install/bin rexruntime.dll and rexgpu-xenos.dll == native3-bin).
+# note: Generated code: the pinned S1 output (gen-check against baseline/), as in S1-S3; only build B uses install/batch-nolr.
+files: live 23843, snap1 23843; hashed live 1, snap1 0; walk 2.3s, hash 0.1s
+same 23842; differing 1: COPY 1 (306557 bytes), DELETE 0, HELD BACK 0; errors 0, warnings 0
+## APPLIED 03:42:56: copied 1, deleted 0; PATCHES PATCHES-S3d.tsv (sha256 0250a3d000cb11c55e21af6e338c70bddd311455b9c7dc69bf730c2afc996c87); STATE STATE-S3d-0342.tsv (sha256 ac7b88d344a2c446725c9889a068097a7e0f4358e0dd51e2b3d79d58a8a4cbbb); wall 3.5s
+diff: <workspace>\build\agent2\snap1\DIFF-S3d-0342.txt

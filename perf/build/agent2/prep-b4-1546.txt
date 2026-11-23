@@ -1,0 +1,56 @@
+prep-b4.py dry run (read-only) --variant both at 2026-11-22 15:46:11; R = <workspace>
+  snap1 PATCHES S1,S2,S3,S3d,S4a: 55 rows; S4a table (apply-s4a-live.ps1): 6 rows
+
+[off] devoffB4: build/agent2/snapB/DimensionsRecomp (level S2) -> the S4a level, source build/agent2/snap1/DimensionsRecomp
+  ok   .gitignore                                                     other       09246E1BCE8B929F -> 600E2436DED4671D
+  ok   .gitmodules                                                    other       E7D25A2108620FFC -> C6E629165C283832
+  ok   rexglue-sdk/include/rex/codegen/config.h                       rexglue-sdk 929EEDA15600105B -> D07C575FF2904B87
+  ok   rexglue-sdk/include/rex/codegen/function_types.h               rexglue-sdk 7331CDE11B9BFACE -> 3CBD9F6DC3850CD1
+  ok   rexglue-sdk/src/audio/audio_system.cpp                         rexglue-sdk C281FA8625435EFE -> 4331A312A9FE8F15
+  ok   rexglue-sdk/src/codegen/builders/builder_context.h             rexglue-sdk 2168678C8A40CA4B -> 873A69BBC0134BBA
+  ok   rexglue-sdk/src/codegen/builders/context.cpp                   rexglue-sdk AA887012DA1F7F1D -> 7710107CE9C577CA
+  ok   rexglue-sdk/src/codegen/builders/control_flow.cpp              rexglue-sdk 046462FCB7B46677 -> 61538970604512DB
+  ok   rexglue-sdk/src/codegen/builders/floating_point.cpp            rexglue-sdk B34B8684A0695F2B -> 348840D2AC86988F
+  ok   rexglue-sdk/src/codegen/builders/flush_mode.h                  new         ABSENT -> B1A8F81BBC062850
+  ok   rexglue-sdk/src/codegen/builders/helpers.h                     rexglue-sdk 6B4BB2B7F778B6BA -> 1ABF25FE5A164910
+  ok   rexglue-sdk/src/codegen/builders/logical.cpp                   rexglue-sdk 530CF95932F271CA -> 6E95AAF361F94536
+  ok   rexglue-sdk/src/codegen/builders/memory.cpp                    rexglue-sdk ADA82F71017F43DE -> B1B9869852359947
+  ok   rexglue-sdk/src/codegen/builders/system.cpp                    rexglue-sdk 4F8FAE95CE008A58 -> D1269273636B5A1A
+  ok   rexglue-sdk/src/codegen/builders/vector.cpp                    rexglue-sdk 527A195F53400EA6 -> D32BB5A253BD1BC1
+  ok   rexglue-sdk/src/codegen/codegen_writer.cpp                     rexglue-sdk 19094A7BBB07960C -> 8235C8C77CF06B66
+  ok   rexglue-sdk/src/codegen/config.cpp                             rexglue-sdk 75CEAAB72FC4495C -> 0ED529B7E5F0F4E7
+  ok   rexglue-sdk/src/codegen/function_graph.cpp                     rexglue-sdk 13BF36159C6115A1 -> 3E4B0E982CC14EB3
+  ok   rexglue-sdk/src/codegen/test_support.cpp                       rexglue-sdk 6DB0AB3EF551132F -> 688F450CC185EA21
+  ok   rexglue-sdk/src/core/timer_queue.cpp                           rexglue-sdk D8724B29C43286B0 -> 015C04A22DACC592
+  ok   rexglue-sdk/src/graphics/d3d12/pipeline_cache.cpp              rexglue-sdk 5DBED81F611E25B1 -> DA77744302CFC149
+  ok   rexglue-sdk/src/graphics/d3d12/shared_memory.cpp               rexglue-sdk B120D07C6709D0D2 -> BB0838CE3909E18A
+  ok   rexglue-sdk/src/graphics/shared_memory.cpp                     rexglue-sdk 15C89EDB4B197C17 -> 0BE4BADCAC666BEE
+  ok   rexglue-sdk/src/kernel/xam/xam_ui.cpp                          rexglue-sdk 03E89D1119CB059D -> 0A314946FDB9FE1E
+  ok   rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_hal.cpp               rexglue-sdk 4A0F84AE84BC61B5 -> AB359E1D6C4DA1B9
+  ok   rexglue-sdk/src/rexglue/commands/test_recompiler.cpp           rexglue-sdk 36578DBE6F5DF222 -> 30BB9BE432C2FC8C
+  ok   rexglue-sdk/src/system/xmemory.cpp                             rexglue-sdk 6E8FA1BA80EF9271 -> 141FB1A947D59156
+  ok   rexglue-sdk/src/ui/rex_app.cpp                                 rexglue-sdk E1569868E15761D9 -> 11DE333FA4C0541F
+  ok   rexglue-sdk/tests/ppc/asm/instr_cr_so_fold.s                   new         ABSENT -> F2413015BA36CFB2
+  ok   rexglue-sdk/tests/ppc/opt_config.toml                          new         ABSENT -> C74CD990C3299AFF
+  ok   rexglue-sdk/tests/regression/emit_interior_entries.cpp         rexglue-sdk 9BE38388D871B31C -> 893EEACB7C555BF0
+  ok   rexlego/src/gpu_native/draw.cpp                                rexlego     50AA3B1DEE615678 -> 5EA1F3576DCC2F90
+  ok   rexlego/src/gpu_native/shaders.cpp                             rexlego     E87A2DEE43D38D8E -> 9567FE3F3B63637D
+  ok   rexlego/src/settings_preferences.cpp                           rexlego     C78112AA6E50F79D -> 9CBE6DBF9CEDA62D
+  ok   rexlego/src/settings_registry.cpp                              rexlego     A37337001EBDC277 -> 4EC71328043FA6BA
+  52 PATCHES files (last row each), 17 already == snap1, 35 to copy: 4 rexlego, 26 rexglue-sdk, 2 other, 3 new
+  install/bin vs devoff4-bin: rexruntime.dll 870276A6 ==, rexgpu-xenos.dll 59662F76 ==, TracyClient.dll 85044850 ==; devoff4-bin MANIFEST 16DCC9399239E577
+
+[native] nativeB4: build/agent2/snapB3/DimensionsRecomp (level S3d) -> the S4a level, source build/agent2/snap1/DimensionsRecomp
+  ok   rexglue-sdk/src/core/timer_queue.cpp                           rexglue-sdk D8724B29C43286B0 -> 015C04A22DACC592
+  ok   rexglue-sdk/src/graphics/d3d12/pipeline_cache.cpp              rexglue-sdk 5DBED81F611E25B1 -> DA77744302CFC149
+  ok   rexglue-sdk/src/graphics/d3d12/shared_memory.cpp               rexglue-sdk B120D07C6709D0D2 -> BB0838CE3909E18A
+  ok   rexglue-sdk/src/graphics/shared_memory.cpp                     rexglue-sdk 15C89EDB4B197C17 -> 0BE4BADCAC666BEE
+  ok   rexglue-sdk/src/system/xmemory.cpp                             rexglue-sdk 6E8FA1BA80EF9271 -> 141FB1A947D59156
+  ok   rexlego/src/gpu_native/shaders.cpp                             rexlego     E87A2DEE43D38D8E -> 9567FE3F3B63637D
+  52 PATCHES files (last row each), 46 already == snap1, 6 to copy: 1 rexlego, 5 rexglue-sdk, 0 other, 0 new
+  install/bin vs native4-bin: rexruntime.dll 870276A6 ==, rexgpu-xenos.dll 59662F76 ==, TracyClient.dll 85044850 ==; native4-bin MANIFEST 00D33D4FFB46776D
+
+running game/ninja/clang/cmake processes: legodimensions.exe(22840)
+
+DRY RUN: 0 FAIL; READY for --go once the processes above end
+wall 10.9 s; report build/agent2/prep-b4-1546.txt

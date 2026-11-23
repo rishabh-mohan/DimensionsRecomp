@@ -1,0 +1,273 @@
+# timerq_stage_bench 2026-11-22 03:00:20  12th Gen Intel(R) Core(TM) i7-1255U  AC=True  live timer_queue.cpp D8724B29C432  staged 015C04A22DAC  seconds 10
+# 03:00:21 a legodimensions process is running (Agent 8's slot): waiting
+# 03:01:21 game gone, continuing
+
+## live spin: bench_timerq stress 2000 50  [03:01:22  exit 0  0.63 s]
+  mode live SPIN (default)
+    stress: 2000 one-shots due over 50 ms (from +20 ms) with the 1 ms timer running; queued in 1.14 ms, longest QueueTimer call 0.086 ms
+    fired 2000, missing 0, fired twice 0, early 0; lateness ms p50 0.174 p90 3.907 p99 7.952 max 8.415
+    RESULT ok
+PASS  live spin stress 2000 50: mode 'live SPIN (default)', precise log line absent
+PASS  live spin stress 2000 50: RESULT ok, exit 0
+
+## live spin: bench_timerq stress 40 2000 0  [03:01:25  exit 0  2.27 s]
+  mode live SPIN (default)
+    stress: 40 one-shots due over 2000 ms (from +20 ms) with no other timer; queued in 0.03 ms, longest QueueTimer call 0.008 ms
+    fired 40, missing 0, fired twice 0, early 0; lateness ms p50 4.279 p90 12.011 p99 17.067 max 17.067
+    RESULT ok
+PASS  live spin stress 40 2000 0: mode 'live SPIN (default)', precise log line absent
+PASS  live spin stress 40 2000 0: RESULT ok, exit 0
+
+## live spin: bench_timerq exit  [03:01:26  exit 0  0.39 s]
+  mode live SPIN (default)
+    exit: 299 ticks in 300 ms; returning from main with both timers armed (the static TimerQueue must stop its thread)
+PASS  live spin exit: mode 'live SPIN (default)', precise log line absent
+PASS  live spin exit: exit 0 in < 3 s (took 0.39 s)
+
+## live blocking: bench_timerq stress 2000 50  [03:01:26  exit 0  0.36 s]
+  mode live BLOCKING (REX_TIMER_WAIT_BLOCKING)
+    stress: 2000 one-shots due over 50 ms (from +20 ms) with the 1 ms timer running; queued in 1.63 ms, longest QueueTimer call 0.324 ms
+    fired 2000, missing 0, fired twice 0, early 0; lateness ms p50 7.234 p90 15.024 p99 18.144 max 18.629
+    RESULT ok
+PASS  live blocking stress 2000 50: mode 'live BLOCKING (REX_TIMER_WAIT_BLOCKING)', precise log line absent
+PASS  live blocking stress 2000 50: RESULT ok, exit 0
+
+## live blocking: bench_timerq stress 40 2000 0  [03:01:29  exit 0  2.23 s]
+  mode live BLOCKING (REX_TIMER_WAIT_BLOCKING)
+    stress: 40 one-shots due over 2000 ms (from +20 ms) with no other timer; queued in 0.08 ms, longest QueueTimer call 0.029 ms
+    fired 40, missing 0, fired twice 0, early 0; lateness ms p50 12.190 p90 13.468 p99 15.164 max 15.164
+    RESULT ok
+PASS  live blocking stress 40 2000 0: mode 'live BLOCKING (REX_TIMER_WAIT_BLOCKING)', precise log line absent
+PASS  live blocking stress 40 2000 0: RESULT ok, exit 0
+
+## live blocking: bench_timerq exit  [03:01:29  exit 0  0.35 s]
+  mode live BLOCKING (REX_TIMER_WAIT_BLOCKING)
+    exit: 306 ticks in 300 ms; returning from main with both timers armed (the static TimerQueue must stop its thread)
+PASS  live blocking exit: mode 'live BLOCKING (REX_TIMER_WAIT_BLOCKING)', precise log line absent
+PASS  live blocking exit: exit 0 in < 3 s (took 0.35 s)
+
+## staged spin: bench_timerq stress 2000 50  [03:01:30  exit 0  0.29 s]
+  mode staged SPIN (default)
+    stress: 2000 one-shots due over 50 ms (from +20 ms) with the 1 ms timer running; queued in 0.78 ms, longest QueueTimer call 0.047 ms
+    fired 2000, missing 0, fired twice 0, early 0; lateness ms p50 0.080 p90 7.707 p99 12.161 max 12.640
+    RESULT ok
+PASS  staged spin stress 2000 50: mode 'staged SPIN (default)', precise log line absent
+PASS  staged spin stress 2000 50: RESULT ok, exit 0
+
+## staged spin: bench_timerq stress 40 2000 0  [03:01:32  exit 0  2.19 s]
+  mode staged SPIN (default)
+    stress: 40 one-shots due over 2000 ms (from +20 ms) with no other timer; queued in 0.08 ms, longest QueueTimer call 0.044 ms
+    fired 40, missing 0, fired twice 0, early 0; lateness ms p50 10.692 p90 13.474 p99 14.028 max 14.028
+    RESULT ok
+PASS  staged spin stress 40 2000 0: mode 'staged SPIN (default)', precise log line absent
+PASS  staged spin stress 40 2000 0: RESULT ok, exit 0
+
+## staged spin: bench_timerq exit  [03:01:33  exit 0  0.43 s]
+  mode staged SPIN (default)
+    exit: 325 ticks in 300 ms; returning from main with both timers armed (the static TimerQueue must stop its thread)
+PASS  staged spin exit: mode 'staged SPIN (default)', precise log line absent
+PASS  staged spin exit: exit 0 in < 3 s (took 0.43 s)
+
+## staged blocking: bench_timerq stress 2000 50  [03:01:33  exit 0  0.36 s]
+  mode staged BLOCKING (REX_TIMER_WAIT_BLOCKING)
+    stress: 2000 one-shots due over 50 ms (from +20 ms) with the 1 ms timer running; queued in 1.84 ms, longest QueueTimer call 0.588 ms
+    fired 2000, missing 0, fired twice 0, early 0; lateness ms p50 7.580 p90 13.394 p99 15.066 max 15.549
+    RESULT ok
+PASS  staged blocking stress 2000 50: mode 'staged BLOCKING (REX_TIMER_WAIT_BLOCKING)', precise log line absent
+PASS  staged blocking stress 2000 50: RESULT ok, exit 0
+
+## staged blocking: bench_timerq stress 40 2000 0  [03:01:36  exit 0  2.29 s]
+  mode staged BLOCKING (REX_TIMER_WAIT_BLOCKING)
+    stress: 40 one-shots due over 2000 ms (from +20 ms) with no other timer; queued in 0.10 ms, longest QueueTimer call 0.077 ms
+    fired 40, missing 0, fired twice 0, early 0; lateness ms p50 12.191 p90 14.335 p99 17.266 max 17.266
+    RESULT ok
+PASS  staged blocking stress 40 2000 0: mode 'staged BLOCKING (REX_TIMER_WAIT_BLOCKING)', precise log line absent
+PASS  staged blocking stress 40 2000 0: RESULT ok, exit 0
+
+## staged blocking: bench_timerq exit  [03:01:37  exit 0  0.45 s]
+  mode staged BLOCKING (REX_TIMER_WAIT_BLOCKING)
+    exit: 312 ticks in 300 ms; returning from main with both timers armed (the static TimerQueue must stop its thread)
+PASS  staged blocking exit: mode 'staged BLOCKING (REX_TIMER_WAIT_BLOCKING)', precise log line absent
+PASS  staged blocking exit: exit 0 in < 3 s (took 0.45 s)
+
+## staged precise: bench_timerq stress 2000 50  [03:01:38  exit 0  0.43 s]
+  [log info] TimerQueue: precise wait (timer_queue_precise_wait)
+  mode staged PRECISE (timer_queue_precise_wait)
+    stress: 2000 one-shots due over 50 ms (from +20 ms) with the 1 ms timer running; queued in 12.12 ms, longest QueueTimer call 5.725 ms
+    fired 2000, missing 0, fired twice 0, early 0; lateness ms p50 0.906 p90 4.721 p99 8.775 max 9.259
+    RESULT ok
+# a game started during this run (pid 58340, started 03:01:37): discarded
+# 03:01:38 a legodimensions process is running (Agent 8's slot): waiting
+# 03:04:15 game gone, continuing
+
+## staged precise: bench_timerq stress 2000 50  [03:04:15  exit 0  0.38 s]
+  [log info] TimerQueue: precise wait (timer_queue_precise_wait)
+  mode staged PRECISE (timer_queue_precise_wait)
+    stress: 2000 one-shots due over 50 ms (from +20 ms) with the 1 ms timer running; queued in 3.27 ms, longest QueueTimer call 0.875 ms
+    fired 2000, missing 0, fired twice 0, early 0; lateness ms p50 0.340 p90 1.321 p99 3.193 max 3.676
+    RESULT ok
+PASS  staged precise stress 2000 50: mode 'staged PRECISE (timer_queue_precise_wait)', precise log line present
+PASS  staged precise stress 2000 50: RESULT ok, exit 0
+
+## staged precise: bench_timerq stress 40 2000 0  [03:04:18  exit 0  2.25 s]
+  [log info] TimerQueue: precise wait (timer_queue_precise_wait)
+  mode staged PRECISE (timer_queue_precise_wait)
+    stress: 40 one-shots due over 2000 ms (from +20 ms) with no other timer; queued in 0.08 ms, longest QueueTimer call 0.062 ms
+    fired 40, missing 0, fired twice 0, early 0; lateness ms p50 0.681 p90 2.742 p99 7.573 max 7.573
+    RESULT ok
+PASS  staged precise stress 40 2000 0: mode 'staged PRECISE (timer_queue_precise_wait)', precise log line present
+PASS  staged precise stress 40 2000 0: RESULT ok, exit 0
+
+## staged precise: bench_timerq exit  [03:04:18  exit 0  0.38 s]
+  [log info] TimerQueue: precise wait (timer_queue_precise_wait)
+  mode staged PRECISE (timer_queue_precise_wait)
+    exit: 304 ticks in 300 ms; returning from main with both timers armed (the static TimerQueue must stop its thread)
+PASS  staged precise exit: mode 'staged PRECISE (timer_queue_precise_wait)', precise log line present
+PASS  staged precise exit: exit 0 in < 3 s (took 0.38 s)
+
+## staged precise+blocking: bench_timerq stress 2000 50  [03:04:19  exit 0  0.31 s]
+  [log info] TimerQueue: precise wait (timer_queue_precise_wait)
+  mode staged PRECISE (timer_queue_precise_wait) + REX_TIMER_WAIT_BLOCKING
+    stress: 2000 one-shots due over 50 ms (from +20 ms) with the 1 ms timer running; queued in 2.76 ms, longest QueueTimer call 1.696 ms
+    fired 2000, missing 0, fired twice 0, early 0; lateness ms p50 0.380 p90 2.065 p99 3.559 max 3.916
+    RESULT ok
+PASS  staged precise+blocking stress 2000 50: mode 'staged PRECISE (timer_queue_precise_wait) + REX_TIMER_WAIT_BLOCKING', precise log line present
+PASS  staged precise+blocking stress 2000 50: RESULT ok, exit 0
+
+## staged precise+blocking: bench_timerq stress 40 2000 0  [03:04:21  exit 0  2.22 s]
+  [log info] TimerQueue: precise wait (timer_queue_precise_wait)
+  mode staged PRECISE (timer_queue_precise_wait) + REX_TIMER_WAIT_BLOCKING
+    stress: 40 one-shots due over 2000 ms (from +20 ms) with no other timer; queued in 0.09 ms, longest QueueTimer call 0.070 ms
+    fired 40, missing 0, fired twice 0, early 0; lateness ms p50 0.413 p90 1.733 p99 2.507 max 2.507
+    RESULT ok
+PASS  staged precise+blocking stress 40 2000 0: mode 'staged PRECISE (timer_queue_precise_wait) + REX_TIMER_WAIT_BLOCKING', precise log line present
+PASS  staged precise+blocking stress 40 2000 0: RESULT ok, exit 0
+
+## staged precise+blocking: bench_timerq exit  [03:04:22  exit 0  0.38 s]
+  [log info] TimerQueue: precise wait (timer_queue_precise_wait)
+  mode staged PRECISE (timer_queue_precise_wait) + REX_TIMER_WAIT_BLOCKING
+    exit: 300 ticks in 300 ms; returning from main with both timers armed (the static TimerQueue must stop its thread)
+PASS  staged precise+blocking exit: mode 'staged PRECISE (timer_queue_precise_wait) + REX_TIMER_WAIT_BLOCKING', precise log line present
+PASS  staged precise+blocking exit: exit 0 in < 3 s (took 0.38 s)
+
+## staged precise no-hires: bench_timerq stress 2000 50  [03:04:22  exit 0  0.29 s]
+  [log info] TimerQueue: precise wait (timer_queue_precise_wait)
+  mode staged PRECISE (timer_queue_precise_wait) + TIMERQ_NO_HIRES
+    stress: 2000 one-shots due over 50 ms (from +20 ms) with the 1 ms timer running; queued in 1.05 ms, longest QueueTimer call 0.059 ms
+    fired 2000, missing 0, fired twice 0, early 0; lateness ms p50 0.000 p90 0.001 p99 0.360 max 0.850
+    RESULT ok
+PASS  staged precise no-hires stress 2000 50: mode 'staged PRECISE (timer_queue_precise_wait) + TIMERQ_NO_HIRES', precise log line present
+PASS  staged precise no-hires stress 2000 50: RESULT ok, exit 0
+
+## staged precise no-hires: bench_timerq stress 40 2000 0  [03:04:25  exit 0  2.18 s]
+  [log info] TimerQueue: precise wait (timer_queue_precise_wait)
+  mode staged PRECISE (timer_queue_precise_wait) + TIMERQ_NO_HIRES
+    stress: 40 one-shots due over 2000 ms (from +20 ms) with no other timer; queued in 0.05 ms, longest QueueTimer call 0.037 ms
+    fired 40, missing 0, fired twice 0, early 0; lateness ms p50 9.333 p90 11.575 p99 15.586 max 15.586
+    RESULT ok
+PASS  staged precise no-hires stress 40 2000 0: mode 'staged PRECISE (timer_queue_precise_wait) + TIMERQ_NO_HIRES', precise log line present
+PASS  staged precise no-hires stress 40 2000 0: RESULT ok, exit 0
+
+## staged precise no-hires: bench_timerq exit  [03:04:25  exit 0  0.42 s]
+  [log info] TimerQueue: precise wait (timer_queue_precise_wait)
+  mode staged PRECISE (timer_queue_precise_wait) + TIMERQ_NO_HIRES
+    exit: 319 ticks in 300 ms; returning from main with both timers armed (the static TimerQueue must stop its thread)
+PASS  staged precise no-hires exit: mode 'staged PRECISE (timer_queue_precise_wait) + TIMERQ_NO_HIRES', precise log line present
+PASS  staged precise no-hires exit: exit 0 in < 3 s (took 0.42 s)
+
+## live spin: bench_timerq run 10 0  [03:04:37  exit 0  11.38 s]
+  mode live SPIN (default)  timeBeginPeriod 0  affinity 0x0  window 10.01 s
+    timer thread CPU: 30.4% of a core by GetThreadTimes (user 27.2%, kernel 3.3%), 28.3% by cycles
+    callbacks: 1000/s; gap ms p10 0.159 p50 0.308 p90 1.432 p99 13.407 max 81.528; gaps <0.5 ms 8094, >2 ms 843, >5 ms 513, >10 ms 308; tick count >2 ms stale 49.7% of the time
+PASS  live spin run 10 0: mode 'live SPIN (default)', precise log line absent
+PASS  live spin run 10 0: exit 0
+
+## staged spin: bench_timerq run 10 0  [03:04:49  exit 0  11.34 s]
+  mode staged SPIN (default)  timeBeginPeriod 0  affinity 0x0  window 10.01 s
+    timer thread CPU: 28.4% of a core by GetThreadTimes (user 25.4%, kernel 3.0%), 26.6% by cycles
+    callbacks: 1000/s; gap ms p10 0.109 p50 0.259 p90 0.748 p99 14.348 max 26.844; gaps <0.5 ms 8626, >2 ms 678, >5 ms 580, >10 ms 427; tick count >2 ms stale 57.5% of the time
+    SleepPrecise calls: 0/s
+PASS  staged spin run 10 0: mode 'staged SPIN (default)', precise log line absent
+PASS  staged spin run 10 0: exit 0
+
+## staged precise: bench_timerq run 10 0  [03:05:00  exit 0  11.31 s]
+  [log info] TimerQueue: precise wait (timer_queue_precise_wait)
+  mode staged PRECISE (timer_queue_precise_wait)  timeBeginPeriod 0  affinity 0x0  window 10.02 s
+    timer thread CPU: 1.9% of a core by GetThreadTimes (user 0.0%, kernel 1.9%), 1.8% by cycles
+    callbacks: 1000/s; gap ms p10 0.005 p50 1.069 p90 1.357 p99 3.768 max 11.528; gaps <0.5 ms 1292, >2 ms 471, >5 ms 27, >10 ms 4; tick count >2 ms stale 5.4% of the time
+    SleepPrecise calls: 889/s
+PASS  staged precise run 10 0: mode 'staged PRECISE (timer_queue_precise_wait)', precise log line present
+PASS  staged precise run 10 0: exit 0
+PASS  staged precise run (timeBeginPeriod 0): timer thread CPU < 5% (got 1.9%)
+PASS  staged precise run (timeBeginPeriod 0): median gap < 1.5 ms (got 1.069)
+
+## live blocking: bench_timerq run 10 0  [03:05:12  exit 0  11.31 s]
+  mode live BLOCKING (REX_TIMER_WAIT_BLOCKING)  timeBeginPeriod 0  affinity 0x0  window 10.02 s
+    timer thread CPU: 0.3% of a core by GetThreadTimes (user 0.2%, kernel 0.2%), 0.5% by cycles
+    callbacks: 999/s; gap ms p10 0.000 p50 0.001 p90 0.004 p99 17.182 max 31.736; gaps <0.5 ms 9236, >2 ms 731, >5 ms 627, >10 ms 594; tick count >2 ms stale 84.5% of the time
+PASS  live blocking run 10 0: mode 'live BLOCKING (REX_TIMER_WAIT_BLOCKING)', precise log line absent
+PASS  live blocking run 10 0: exit 0
+
+## staged precise no-hires: bench_timerq run 10 0  [03:05:24  exit 0  11.45 s]
+  [log info] TimerQueue: precise wait (timer_queue_precise_wait)
+  mode staged PRECISE (timer_queue_precise_wait) + TIMERQ_NO_HIRES  timeBeginPeriod 0  affinity 0x0  window 10.01 s
+    timer thread CPU: 25.9% of a core by GetThreadTimes (user 15.0%, kernel 10.9%), 28.7% by cycles
+    callbacks: 1001/s; gap ms p10 0.000 p50 0.418 p90 1.617 p99 12.669 max 69.675; gaps <0.5 ms 5054, >2 ms 890, >5 ms 419, >10 ms 185; tick count >2 ms stale 40.2% of the time
+    SleepPrecise calls: 923294/s
+# a game started during this run (pid 47976, started 03:05:13): discarded
+# 03:05:25 a legodimensions process is running (Agent 8's slot): waiting
+# 03:07:46 game gone, continuing
+
+## staged precise no-hires: bench_timerq run 10 0  [03:07:57  exit 0  11.35 s]
+  [log info] TimerQueue: precise wait (timer_queue_precise_wait)
+  mode staged PRECISE (timer_queue_precise_wait) + TIMERQ_NO_HIRES  timeBeginPeriod 0  affinity 0x0  window 10.01 s
+    timer thread CPU: 39.8% of a core by GetThreadTimes (user 20.8%, kernel 19.0%), 39.3% by cycles
+    callbacks: 1000/s; gap ms p10 0.000 p50 0.984 p90 1.476 p99 11.229 max 42.292; gaps <0.5 ms 3903, >2 ms 784, >5 ms 303, >10 ms 133; tick count >2 ms stale 29.3% of the time
+    SleepPrecise calls: 1073709/s
+# a game started during this run (pid 5044, started 03:07:54): discarded
+# 03:07:58 a legodimensions process is running (Agent 8's slot): waiting
+# 03:10:29 game gone, continuing
+
+## staged precise no-hires: bench_timerq run 10 0  [03:10:40  exit 0  11.28 s]
+  [log info] TimerQueue: precise wait (timer_queue_precise_wait)
+  mode staged PRECISE (timer_queue_precise_wait) + TIMERQ_NO_HIRES  timeBeginPeriod 0  affinity 0x0  window 10.00 s
+    timer thread CPU: 32.7% of a core by GetThreadTimes (user 19.4%, kernel 13.3%), 31.1% by cycles
+    callbacks: 1001/s; gap ms p10 0.000 p50 0.004 p90 1.038 p99 13.247 max 17.048; gaps <0.5 ms 5505, >2 ms 641, >5 ms 498, >10 ms 369; tick count >2 ms stale 48.0% of the time
+    SleepPrecise calls: 986031/s
+PASS  staged precise no-hires run 10 0: mode 'staged PRECISE (timer_queue_precise_wait) + TIMERQ_NO_HIRES', precise log line present
+PASS  staged precise no-hires run 10 0: exit 0
+
+## staged precise: bench_timerq run 10 1  [03:10:52  exit 0  11.29 s]
+  [log info] TimerQueue: precise wait (timer_queue_precise_wait)
+  mode staged PRECISE (timer_queue_precise_wait)  timeBeginPeriod 1  affinity 0x0  window 10.00 s
+    timer thread CPU: 1.7% of a core by GetThreadTimes (user 0.3%, kernel 1.4%), 1.7% by cycles
+    callbacks: 1000/s; gap ms p10 0.001 p50 1.045 p90 1.588 p99 5.695 max 17.870; gaps <0.5 ms 2498, >2 ms 753, >5 ms 160, >10 ms 9; tick count >2 ms stale 14.0% of the time
+    SleepPrecise calls: 767/s
+PASS  staged precise run 10 1: mode 'staged PRECISE (timer_queue_precise_wait)', precise log line present
+PASS  staged precise run 10 1: exit 0
+PASS  staged precise run (timeBeginPeriod 1): timer thread CPU < 5% (got 1.7%)
+PASS  staged precise run (timeBeginPeriod 1): median gap < 1.5 ms (got 1.045)
+
+### correctness (lateness ms p50 / p99 / max)
+| mode | stress 2000 50 | lateness, 1 ms timer on | longest QueueTimer ms | lateness, stress 40 2000 0 (no other timer) | exit s |
+|---|---|---|---|---|---|
+| live spin | ok | 0.174 / 7.952 / 8.415 | 0.086 | 4.279 / 17.067 / 17.067 (ok) | 0.39 |
+| live blocking | ok | 7.234 / 18.144 / 18.629 | 0.324 | 12.190 / 15.164 / 15.164 (ok) | 0.35 |
+| staged spin | ok | 0.080 / 12.161 / 12.640 | 0.047 | 10.692 / 14.028 / 14.028 (ok) | 0.43 |
+| staged blocking | ok | 7.580 / 15.066 / 15.549 | 0.588 | 12.191 / 17.266 / 17.266 (ok) | 0.45 |
+| staged precise | ok | 0.340 / 3.193 / 3.676 | 0.875 | 0.681 / 7.573 / 7.573 (ok) | 0.38 |
+| staged precise+blocking | ok | 0.380 / 3.559 / 3.916 | 1.696 | 0.413 / 2.507 / 2.507 (ok) | 0.38 |
+| staged precise no-hires | ok | 0.000 / 0.360 / 0.850 | 0.059 | 9.333 / 15.586 / 15.586 (ok) | 0.42 |
+
+### 1 ms timer, 10 s
+| mode | timeBeginPeriod | timer thread CPU % | callbacks/s | gap p50 ms | gap p99 ms | gap max ms | tick count >2 ms stale % | SleepPrecise/s |
+|---|---|---|---|---|---|---|---|---|
+| live spin | 0 | 30.4 | 1,000 | 0.308 | 13.407 | 81.528 | 49.7 | - |
+| staged spin | 0 | 28.4 | 1,000 | 0.259 | 14.348 | 26.844 | 57.5 | 0 |
+| staged precise | 0 | 1.9 | 1,000 | 1.069 | 3.768 | 11.528 | 5.4 | 889 |
+| live blocking | 0 | 0.3 | 999 | 0.001 | 17.182 | 31.736 | 84.5 | - |
+| staged precise no-hires | 0 | 32.7 | 1,001 | 0.004 | 13.247 | 17.048 | 48.0 | 986,031 |
+| staged precise | 1 | 1.7 | 1,000 | 1.045 | 5.695 | 17.870 | 14.0 | 767 |
+
+RESULT: PASS
+# done 03:10:53  log <workspace>\build\agent11\timerq\stage-bench-20261122-030019.txt

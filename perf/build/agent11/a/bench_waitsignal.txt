@@ -1,0 +1,17 @@
+# bench_waitsignal  2026-11-21 19:16:33  args: 5 3
+[start] AC=online battery=100% cpu_load=100% (GetSystemTimes, 250 ms)
+TSC 2.611 GHz; runs=5; 30000 round trips per mode per run (chunks of 10000, modes interleaved)
+run 1:  NONE mean 65823 p50 26219 p99 781542 max 57725756 |  OLD  mean 63972 p50 26329 p99 797680 max 28873926 |  NEW  mean 69048 p50 25353 p99 877447 max 63072488 |
+run 2:  NONE mean 46280 p50 23241 p99 274129 max 33222768 |  OLD  mean 58103 p50 24577 p99 632969 max 60945256 |  NEW  mean 61266 p50 24673 p99 516420 max 31187416 |
+run 3:  NONE mean 44530 p50 22435 p99 158741 max 56406032 |  OLD  mean 44083 p50 23647 p99 134491 max 29403260 |  NEW  mean 49806 p50 23251 p99 142570 max 47854636 |
+run 4:  NONE mean 63235 p50 22670 p99 552408 max 77357600 |  OLD  mean 50790 p50 22567 p99 265233 max 23903632 |  NEW  mean 57991 p50 22477 p99 571145 max 50155612 |
+run 5:  NONE mean 34259 p50 20858 p99 217504 max 21140044 |  OLD  mean 32302 p50 20377 p99 165662 max 21330414 |  NEW  mean 39507 p50 21675 p99 229947 max 30195362 |
+
+SUMMARY ns per round trip (4 guarded calls per round trip), median of 5 runs [min..max of run values]
+  mode | mean ns/RT              | p50     | p90     | p99     | max(all) | mean - NONE
+  NONE |   46280 [ 34259.. 65823] |   22670 |   34892 |  274129 | 77357600 | +0
+  OLD  |   50790 [ 32302.. 63972] |   23647 |   32262 |  265233 | 60945256 | +4510
+  NEW  |   57991 [ 39507.. 69048] |   23251 |   34937 |  516420 | 63072488 | +11711
+signature mismatches: 0
+[end] AC=online battery=100% cpu_load=99% (GetSystemTimes, 250 ms)
+# exit=0 wall=24s

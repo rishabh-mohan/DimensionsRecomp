@@ -1,0 +1,116 @@
+diff --git a/src/gpu_native/native_worker.cpp b/src/gpu_native/native_worker.cpp
+--- a/src/gpu_native/native_worker.cpp
++++ b/src/gpu_native/native_worker.cpp
+@@ -3,6 +3,7 @@
+ #include "gpu_native/native_recording.h"
+ #include "gpu_native/draw_batch.h"
+ #include "gpu_native/fsr3_settings.h"
++#include "gpu_native/native_preparation.h"
+ 
+ #include <windows.h>
+ 
+@@ -152,6 +153,7 @@
+ void RecorderMain() {
+   t_on_recorder = true;
+   SetThreadDescription(GetCurrentThread(), L"Native GPU recording");
++  ApplyNativeChainPriority("recorder");
+   for (;;) {
+     std::vector<Task> pending;
+     {
+@@ -197,6 +199,7 @@
+ // or the preparation workers.
+ void CoordinatorMain() {
+   SetThreadDescription(GetCurrentThread(), L"Native GPU preparation");
++  ApplyNativeChainPriority("coordinator");
+   for (;;) {
+     {
+       std::unique_lock lock(g_queue_mutex);
+@@ -259,6 +262,7 @@
+ void WorkerMain() {
+   if (NativeFullDrawPreparationEnabled()) { CoordinatorMain(); return; }
+   SetThreadDescription(GetCurrentThread(), NativePrepareEnabled() ? L"Native GPU preparation" : L"Native GPU recording");
++  ApplyNativeChainPriority("worker");
+   for (;;) {
+     {
+       std::unique_lock lock(g_queue_mutex);
+@@ -326,6 +330,43 @@
+   return enabled;
+ }
+ 
++// S4-T1 (#21) test bed, default off. LEGO_NATIVE_CHAIN_PRIORITY: 1 = THREAD_PRIORITY_ABOVE_NORMAL,
++// 2 = EcoQoS opt-out (power throttling control on, execution-speed throttling off), 3 = both.
++// Unset: no log line and no Win32 call. Any other value: off, with one log line. Each chain thread
++// reaches this through ApplyNativeChainPriority (native_preparation.h) right after naming itself.
++static void ApplyNativeChainPriorityImpl(const char* role) {
++  static const unsigned mode = [] {
++    const char* value = std::getenv("LEGO_NATIVE_CHAIN_PRIORITY");
++    if (!value) return 0u;
++    const unsigned parsed = value[0] >= '1' && value[0] <= '3' && value[1] == '\0' ? unsigned(value[0] - '0') : 0u;
++    static const char* const kModes[] = {"off", "priority", "EcoQoS opt-out", "priority + EcoQoS opt-out"};
++    REXLOG_INFO("Native GPU: chain priority mode {}: {} (LEGO_NATIVE_CHAIN_PRIORITY={})", parsed, kModes[parsed], value);
++    return parsed;
++  }();
++  if (mode == 0) return;
++  const HANDLE self = GetCurrentThread();
++  const bool priority_ok = (mode & 1u) == 0 || SetThreadPriority(self, THREAD_PRIORITY_ABOVE_NORMAL) != 0;
++  const char* ecoqos = "unchanged";
++  if (mode & 2u) {
++    THREAD_POWER_THROTTLING_STATE state{};
++    state.Version = THREAD_POWER_THROTTLING_CURRENT_VERSION;
++    state.ControlMask = THREAD_POWER_THROTTLING_EXECUTION_SPEED;
++    state.StateMask = 0;
++    ecoqos = SetThreadInformation(self, ThreadPowerThrottling, &state, sizeof(state)) ? "opt-out" : "opt-out failed";
++  }
++  static std::atomic<unsigned> logged{0};
++  if (logged.fetch_add(1, std::memory_order_relaxed) < 16)
++    REXLOG_INFO("Native GPU: chain priority {} tid={} priority={}{} ecoqos={}", role, GetCurrentThreadId(),
++                GetThreadPriority(self), priority_ok ? "" : " (set failed)", ecoqos);
++}
++
++// Installs the native_preparation.h hook during static initialization, before main and so before any
++// chain thread exists. The settings are per thread and end with the thread.
++[[maybe_unused]] const bool g_native_chain_priority_installed = [] {
++  g_native_chain_priority = &ApplyNativeChainPriorityImpl;
++  return true;
++}();
++
+ bool NativeWorkerStarted() {
+   return g_started.load(std::memory_order_acquire);
+ }
+diff --git a/src/gpu_native/native_recording.cpp b/src/gpu_native/native_recording.cpp
+--- a/src/gpu_native/native_recording.cpp
++++ b/src/gpu_native/native_recording.cpp
+@@ -110,6 +110,7 @@
+   std::exception_ptr failure_;
+   void Run() {
+     SetThreadDescription(GetCurrentThread(), L"Native GPU recording");
++    ApplyNativeChainPriority("recording queue");
+     for (;;) {
+       Work work;
+       {
+diff --git a/src/gpu_native/native_preparation.h b/src/gpu_native/native_preparation.h
+--- a/src/gpu_native/native_preparation.h
++++ b/src/gpu_native/native_preparation.h
+@@ -12,6 +12,14 @@
+ 
+ namespace legodimensions::gpu_native {
+ 
++// S4-T1 (#21): opt-in scheduling for the native GPU chain threads. Each chain thread calls
++// ApplyNativeChainPriority on itself right after naming itself. native_worker.cpp installs the hook before
++// main; builds without native_worker.cpp (the offline gpu-aot fixtures) keep it null, so the call is a no-op.
++inline void (*g_native_chain_priority)(const char* role) = nullptr;
++inline void ApplyNativeChainPriority(const char* role) {
++  if (auto* apply = g_native_chain_priority) apply(role);
++}
++
+ // Jobs retain captured state and serialize mutable resource access.
+ class NativePreparationQueue {
+   struct Job { std::function<void()> run; size_t bytes; };
+@@ -24,6 +32,7 @@
+   void Run(unsigned index) {
+     const auto name = L"Native GPU prepare " + std::to_wstring(index + 1);
+     SetThreadDescription(GetCurrentThread(), name.c_str());
++    ApplyNativeChainPriority("prepare");
+     for (;;) {
+       Job job;
+       {

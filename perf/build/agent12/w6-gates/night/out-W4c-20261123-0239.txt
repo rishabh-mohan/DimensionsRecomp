@@ -1,0 +1,70 @@
+=== W6 gate kit (run_gates.py): <workspace>\build\agent8\matrix\20261123-0239 ===
+matrix   Window 4c (Agent 8, run-2 task #7 follow-up): codegen B repeat. B = devoffB (S2 sources + codegen B) vs d0 = devoff2 (S2 sources + S1 codegen), 6 round-robin rounds
+ref      d0; sys_csv true; plan.txt 13 runs (1 cold)
+arms run d0 x6 (+1 cold), B x6 (13 runs)
+bins     build/agent2/devoff2-bin: d0; build/agent2/devoffB-bin: B
+switches P2 (shared_memory_single_hold_rearm=true): none; keep-watch (physical_protect_keep_watch=true): none
+launcher window log: <workspace>\bench\agent5\launch\status\window-W4c-0236.log (its END line names this out dir)
+quiet-gate source: <workspace>\bench\agent5\launch\status\window-W4c-0236.log (the launcher's window log)
+
+--- G1 every switch rated: MANUAL ---
+  d0 (ref): bin build/agent2/devoff2-bin; beyond the common set: -
+  B: bin build/agent2/devoffB-bin; beyond the common set: -
+  rate every switch above against W6-GATES.md G1 (Agent 10's b2r ratings): the kit only lists them
+
+--- G2 one bin per arm, as built: PASS ---
+  bin build/agent2/devoff2-bin: arms d0; MANIFEST.txt sha256 B87DC2D2CA22379F; TracyClient.dll 233472 B, legodimensions.exe 170334720 B, rexgpu-xenos.dll 3385344 B, rexruntime.dll 10889728 B; legodimensions.exe sha256 7F0B1C1C84BC66FF
+  bin build/agent2/devoffB-bin: arms B; MANIFEST.txt sha256 8709476FF4778768; TracyClient.dll 233472 B, legodimensions.exe 153588736 B, rexgpu-xenos.dll 3385344 B, rexruntime.dll 10889728 B; legodimensions.exe sha256 C3F8686EBDD83340
+
+--- G3 every planned run completed: PASS ---
+  plan.txt: d0 x6+1 cold, B x6; results.csv: d0 x6+1 cold, B x6
+  launcher END: runner exit 0 (all runs OK) after 26.2 min (<workspace>\bench\agent5\launch\status\window-W4c-0236.log)
+
+--- G4 P2's fallback never runs: n/a ---
+
+--- G5 C1 verify on gate A: n/a ---
+
+--- G6 keep only under G: n/a ---
+
+--- G7 inert on native: n/a ---
+
+--- G8 nothing stale, no new errors: PASS ---
+  logdiff reference: d0 x7 merged (694 log lines, 5 warning/error kinds); 13/13 runs have a game*.log to compare
+  by hand: the frame hash or screenshot matches the reference arm at the same point (W6-GATES G8)
+
+--- G9 launch-only switches as planned: PASS ---
+  hands off, no dev console during the window: procedural (C1 v3 latches keep_watch and hold_global_lock at init; other cvars are read live)
+
+--- G10 per-run validity: PASS ---
+  proof lines d0: none (7 runs)
+  proof lines B: none (6 runs)
+  slow state (info; E-cores < 800 MHz for >= 3 samples overlapping the window): 0/12 scored runs; slow samples in the window: none
+
+--- G11 power overlay: PASS ---
+  power overlay: best_performance in 13/13 runs, no change inside any window (differs from W5's best_efficiency: don't compare absolute numbers with W5)
+  scheme: Balanced x13; AC: 1 x13; battery saver: 0 x13
+  launcher: plan| note     sys_csv: drivers/sys-csv.ps1 logs the system state every 1 s (sys.csv, sys.json). Input during the window, the game losing the foreground, battery, battery saver, a power-plan change, a non-default input desktop or a screensaver exclude a run from summary.md (it stays in results.csv, under 'Flagged runs'). Light phase: a game.log with < 30 'FAILED: path=d:\INSTALL*.DAT' lines (normal boot: 34) is excluded (light_phase).
+  launcher: 2026-11-23 02:39:46 power scheme at the start: Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)
+
+--- G12 quiet gate: PASS ---
+  non-game load: 3.26-3.61 cores (median 3.34) in 12 scored runs; unscored/cold 3.66
+  non-game load flag (scored runs above the median 3.34 + 1.0 cores): none
+  quiet gate: STRICT: <workspace>\bench\agent5\launch\status\window-W4c-0236.log: '02:39:45 quiet gate: STRICT (MsMpEng 0.00/0.00/0.00, OfficeClickToRun 0.00/0.00/0.00, CrossDeviceService 0.03/0.04/0.04)' at 02:39:45; the window started at 02:39, 0 min later
+
+| gate | status | key number |
+|---|---|---|
+| G1 every switch rated | MANUAL | 2 arms; switches beyond the common set (framerate_limit=0): d0 0, B 0 |
+| G2 one bin per arm, as built | PASS | 13/13 runs on their arm's bin (MANIFEST + exe/dll SHA-256); 2 bins |
+| G3 every planned run completed | PASS | 13/13 runs OK, exit 0x00000000, wm_close, runner exit 0; plan.txt 13 runs (1 cold); arms 2/2 as planned; launcher END exit 0 |
+| G4 P2's fallback never runs | n/a | no run arm sets shared_memory_single_hold_rearm=true |
+| G5 C1 verify on gate A | n/a | no run arm sets physical_protect_keep_watch=true |
+| G6 keep only under G | n/a | no run arm sets physical_protect_keep_watch=true |
+| G7 inert on native | n/a | no run arm sets physical_protect_keep_watch=true |
+| G8 nothing stale, no new errors | PASS | stale/fault/Protect-failed lines in 0/13 runs; logdiff vs d0 (x7): FAIL findings in 0, NEW messages in 0/13 runs (0 kinds) |
+| G9 launch-only switches as planned | PASS | 13/13 runs: params.cvar, args, env_set and toml_set = the arm's |
+| G10 per-run validity | PASS | 12/12 scored runs valid; proof lines ok in 13/13 runs; free RAM >= 6 GB in 13/13; slow state 0/12 scored (info) |
+| G11 power overlay | PASS | overlay best_performance in 13/13 runs, no change inside any window; scheme Balanced; AC 1; saver 0 |
+| G12 quiet gate | PASS | STRICT at 02:39:45 [window-W4c-0236.log]; MsMpEng 0.00/0.00/0.00, OfficeClickToRun 0.00/0.00/0.00, CrossDeviceService 0.03/0.04/0.04; non-game load 3.26-3.61 cores (median 3.34), 0 flagged |
+
+RECORD: overlay best_performance (13/13, no change); quiet gate STRICT; non-game load 3.26-3.61 cores
+GATES: G1 MANUAL; G2 PASS; G3 PASS; G4 n/a; G5 n/a; G6 n/a; G7 n/a; G8 PASS; G9 PASS; G10 PASS; G11 PASS; G12 PASS; exit 0

@@ -1,0 +1,28 @@
+{
+  "title": "Quiet window 1: baseline-bin vs devoff1-bin, both at defaults. Title/attract loop, no input needed",
+  "reference": "base",
+  "warmup_s": 60,
+  "warmup_from": "firstframe",
+  "measure_s": 60,
+  "repeats": 5,
+  "settle_s": 20,
+  "cooldown_s": 10,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "menu_s": 60,
+  "cold_run": true,
+  "order": "roundrobin",
+  "quick": { "warmup_s": 10, "measure_s": 20, "settle_s": 5, "menu_s": 20, "cooldown_s": 5 },
+  "notes": [
+    "Do not touch the PC while it runs. Both arms sit on the title/attract loop, which the game reaches with no input.",
+    "Per Agent 3: the window starts a fixed 60 s after the first guest frame and is 60 s long, with 5 runs per arm alternating. Round-robin with a rotating start gives A B B A A B B A A B. Compare medians and p99, not means (the attract loop alternates between ~25 and ~52 fps phases).",
+    "One unscored cold run per bin comes first, because the first boot of a bin pays one-off costs.",
+    "The runner always passes --audio_mute=true --pause_when_unfocused=false --native_settings_load=false --discord_rpc=false. The toml keeps framerate_limit = 60, so a CPU-side win can show as lower cpu_cores and fewer >33/>100 ms frames rather than as a lower median."
+  ],
+  "arms": [
+    { "id": "base", "group": "ab", "ref": true, "bin": "build/baseline-bin", "cvars": [], "env": {},
+      "note": "upstream baseline (batch 0), defaults; the reference" },
+    { "id": "r0", "group": "ab", "bin": "build/agent2/devoff1-bin", "cvars": [], "env": {},
+      "note": "dev OFF build 1 (S1, batch 1), defaults" }
+  ]
+}

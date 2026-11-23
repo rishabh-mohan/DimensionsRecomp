@@ -1,0 +1,72 @@
+W6 logdiff kit (Agent 6, task #16): <workspace>\build\agent8\matrix\20261123-0401
+expect build\agent6\wnight\expect-w9.json (reference off); matrix.json build\agent8\matrix\20261123-0401\matrix.json
+runs 21 in 6 arms: off=4; cold-off=1; q0=4; q125=4; q250=4; q500=4
+arms in the expect file with no run here: p1, q250s
+
+Per arm. stuck = STUCK-LOCK episodes (sites; IN = in the measured window); recov/unh/pfail = Recovered stale protection / Unhandled write fault / Protect failed lines per run; W/E/C = warning/error/critical lines per run; slow = slow runs/runs, mean slow_pct, mean onset s; logdiff vs off = gate FAIL findings/NEW/MORE/GONE/ONLY keys
+  arm        runs verdict stuck                  dumps recov      unh        pfail      W/E/C                      slow                   logdiff F/N/M/G/O
+  off        4    NOTE    0                      0     [0, 0, 0, 0] [0, 0, 0, 0] [0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 0/4 0.0% -s            (reference)
+  cold-off   1    PASS    0                      0     [0]        [0]        [0]        40/0/0                     0/1 0.0% -s            0/0/0/0/0
+  q0         4    PASS    0                      0     [0, 0, 0, 0] [0, 0, 0, 0] [0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 0/4 0.0% -s            0/0/0/0/1
+  q125       4    PASS    0                      0     [0, 0, 0, 0] [0, 0, 0, 0] [0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 0/4 0.0% -s            0/0/0/0/1
+  q250       4    PASS    0                      0     [0, 0, 0, 0] [0, 0, 0, 0] [0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 0/4 0.0% -s            0/0/0/0/1
+  q500       4    PASS    0                      0     [0, 0, 0, 0] [0, 0, 0, 0] [0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 0/4 0.0% -s            0/0/0/0/1
+
+Per run. exit = run.json exit code; close = WM_CLOSE posted/clean; seq = log ends with the clean-exit lines; stuck = episodes; slow = onset s / slow_pct / span s (sys.csv rows); nogrowth = perf.csv max no-growth s in the window; free = GB at start
+  run                arm      verdict status exit  close     seq  W/E/C     stuck dmp  slow                 nogrowth free  lines
+  0401-cold-off      cold-off PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/91 (91)          0        14    98
+  0403-off-r1        off      PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.96 98
+  0405-q0-r1         q0       PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.97 103
+  0407-q125-r1       q125     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (113)        0        13.94 99
+  0409-q250-r1       q250     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.7  103
+  0411-q500-r1       q500     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        14.01 99
+  0413-q0-r2         q0       PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        14.02 103
+  0415-q125-r2       q125     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/111 (112)        0        14.03 99
+  0417-q250-r2       q250     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        14.03 99
+  0419-q500-r2       q500     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.82 99
+  0421-off-r2        off      PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.81 102
+  0423-q125-r3       q125     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.98 99
+  0425-q250-r3       q250     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.93 99
+  0427-q500-r3       q500     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.98 99
+  0429-off-r3        off      NOTE    OK     0     1/True    NO   40/0/0    0     0    -/0/112 (112)        0        13.99 97
+  0431-q0-r3         q0       PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/111 (112)        0        13.96 103
+  0433-q250-r4       q250     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.98 103
+  0435-q500-r4       q500     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/111 (112)        0        13.96 99
+  0438-off-r4        off      PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        14    98
+  0440-q0-r4         q0       PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.95 99
+  0442-q125-r4       q125     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (113)        0        13.95 103
+
+STUCK-LOCK episodes: 0 (H1 = owner parked in sub_83FAF180, the L1 fence-wait poll; finding 10)
+
+Reasons, FAIL first (per arm: its runs, then its logdiff findings)
+  NOTE off      0429-off-r3: log does not end with the clean-exit lines: ['Toypad[Read ] 0B 0C 55 09 0A 07 A8 B8 1A 76 B9 F7 2C 3B 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ', 'Window closing, shutting down...', 'Title terminated; hard-exiting process.']
+
+Counts per arm (lines containing each expect count text; one number per run, run-dir order)
+  STUCK-LOCK                                                   off=[0, 0, 0, 0]; cold-off=[0]; q0=[0, 0, 0, 0]; q125=[0, 0, 0, 0]; q250=[0, 0, 0, 0]; q500=[0, 0, 0, 0]
+  still not acquired after                                     off=[0, 0, 0, 0]; cold-off=[0]; q0=[0, 0, 0, 0]; q125=[0, 0, 0, 0]; q250=[0, 0, 0, 0]; q500=[0, 0, 0, 0]
+  Minidump written to                                          off=[0, 0, 0, 0]; cold-off=[0]; q0=[0, 0, 0, 0]; q125=[0, 0, 0, 0]; q250=[0, 0, 0, 0]; q500=[0, 0, 0, 0]
+  Recovered stale physical page protection                     off=[0, 0, 0, 0]; cold-off=[0]; q0=[0, 0, 0, 0]; q125=[0, 0, 0, 0]; q250=[0, 0, 0, 0]; q500=[0, 0, 0, 0]
+  Unhandled guest physical write fault                         off=[0, 0, 0, 0]; cold-off=[0]; q0=[0, 0, 0, 0]; q125=[0, 0, 0, 0]; q250=[0, 0, 0, 0]; q500=[0, 0, 0, 0]
+  PhysicalHeap::Protect failed                                 off=[0, 0, 0, 0]; cold-off=[0]; q0=[0, 0, 0, 0]; q125=[0, 0, 0, 0]; q250=[0, 0, 0, 0]; q500=[0, 0, 0, 0]
+  BaseHeap::Protect failed                                     off=[0, 0, 0, 0]; cold-off=[0]; q0=[0, 0, 0, 0]; q125=[0, 0, 0, 0]; q250=[0, 0, 0, 0]; q500=[0, 0, 0, 0]
+  GPU wait back-off:                                           off=[0, 0, 0, 0]; cold-off=[0]; q0=[1, 1, 1, 1]; q125=[1, 1, 1, 1]; q250=[1, 1, 1, 1]; q500=[1, 1, 1, 1]
+  GPU wait stats (5 s):                                        off=[0, 0, 0, 0]; cold-off=[0]; q0=[0, 0, 0, 0]; q125=[0, 0, 0, 0]; q250=[0, 0, 0, 0]; q500=[0, 0, 0, 0]
+  is not a plain number                                        off=[0, 0, 0, 0]; cold-off=[0]; q0=[0, 0, 0, 0]; q125=[0, 0, 0, 0]; q250=[0, 0, 0, 0]; q500=[0, 0, 0, 0]
+  [NtCreateFile] FAILED                                        off=[35, 35, 35, 35]; cold-off=[35]; q0=[35, 35, 35, 35]; q125=[35, 35, 35, 35]; q250=[35, 35, 35, 35]; q500=[35, 35, 35, 35]
+  Reserving the guest memory arena                             off=[1, 1, 1, 1]; cold-off=[1]; q0=[1, 1, 1, 1]; q125=[1, 1, 1, 1]; q250=[1, 1, 1, 1]; q500=[1, 1, 1, 1]
+  Title terminated                                             off=[1, 1, 1, 1]; cold-off=[1]; q0=[1, 1, 1, 1]; q125=[1, 1, 1, 1]; q250=[1, 1, 1, 1]; q500=[1, 1, 1, 1]
+
+ONLY keys per arm vs off (any level, not Toypad; in no off run), from w4b_logdiff
+  cold-off: 0
+  q0: 1
+    [info] [core] GPU wait back-off: ON (quantum # us, spin # us); stats OFF; GetData hook built.
+  q125: 1
+    [info] [core] GPU wait back-off: ON (quantum # us, spin # us); stats OFF; GetData hook built.
+  q250: 1
+    [info] [core] GPU wait back-off: ON (quantum # us, spin # us); stats OFF; GetData hook built.
+  q500: 1
+    [info] [core] GPU wait back-off: ON (quantum # us, spin # us); stats OFF; GetData hook built.
+
+w4b_logdiff: exit 0 in 1.2 s -> build\agent6\wnight\out-W9-20261123-0401\logdiff (log build\agent6\wnight\out-W9-20261123-0401\logdiff.log)
+w4b_extra: exit 0 in 3.3 s -> build\agent6\wnight\out-W9-20261123-0401\extra.txt (log build\agent6\wnight\out-W9-20261123-0401\extra.log)
+verdict: no FAIL; runtime 4.9 s; output build\agent6\wnight\out-W9-20261123-0401

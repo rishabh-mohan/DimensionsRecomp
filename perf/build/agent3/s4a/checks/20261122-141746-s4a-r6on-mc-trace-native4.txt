@@ -1,0 +1,19 @@
+# s4a_check 20261122-141746-s4a-r6on-mc-trace-native4 (native)
+run.json: exit 0 (0x00000000) dumps 0 crash_events 0 wer False; close wm_close 1.06 s; elapsed 219.21 of 420 s; cvars {"native_settings_frontend": "false"}; args -; env {"LEGO_NATIVE_SHADER_MISS_CACHE": "1", "LEGO_NATIVE_TRACE_DIR": "<workspace>\\build\\agent3\\s4a\\trace\\r6on-t"}; script b-gate-menus-long.txt steps 54/54
+summary: verdict RUNNING; first frame 11.0 s; levels {"info": 1711, "warning": 184}; unknown cvars []; errors 0
+log files game.log; greps s4_upload_hash=0 slow_frame=0 precise_wait=0 miss_cache=0 protect_failed=0 stuck_lock=0 minidump=0 fatal=0 storage=0 storage_init=0 clean_exit=1; gap after "Initializing shader storage" None s
+frames (frames.csv rows) 26082; per frame: s4_upload_hash 0.000 slow_frame 0.000
+logdiff vs 20261122-141355-s4a-r5-off-native4: NEW 0 (+0 allowed) MORE 0 (+0 allowed) GONE 13 (2 non-Toypad) FLAG 0; NEW at info 16 (1 non-Toypad)
+  GONE build\agent3\runs\20261122-141746-s4a-r6on-mc-trace-native4\game.log [info] [core] Native geometry content cache: hits=# misses=# pending=# cpu_bytes=# entries=#
+  GONE build\agent3\runs\20261122-141746-s4a-r6on-mc-trace-native4\game.log [info] [core] Native geometry content cache: hits=# misses=# pending=# cpu_bytes=#h entries=#
+  info NEW build\agent3\runs\20261122-141746-s4a-r6on-mc-trace-native4\game.log x17 [info] [core] Native GPU: placement buffer relocation type resource=#h type=# lr=#h
+levels (game*.log) cand {"info": 1711, "warning": 184} vs 20261122-141355-s4a-r5-off-native4 {"info": 1674, "warning": 184}; [error] 0 vs 0
+scenes (>= 2 s) base 20261122-141355-s4a-r5-off-native4: 2:56s 8:28s 0:23s 1:15s 59:12s 58:5s 57:4s 40:3s 41:3s 3649:2s
+scenes (>= 2 s) cand: 2:48s 8:31s 0:20s 1:15s 59:12s 58:5s 57:4s 40:3s 41:3s 3649:2s
+  missing in cand: -; extra in cand: -
+route marks: 10 same scene, 12 differ: back-2 n2->n0 back-3 n0->n40 idle-10 n41->n58 idle-20 n58->n59 idle-30 n59->n350 idle-40 n355->n2297 idle-50 n2299->n3405 idle-60 n2205->n258 idle-70 n727->n2184 idle-80 n185->n467 idle-90 n482->n186 end n482->n186
+  cand marks: first-frame=n0 title=n8 after-start=n8 after-a1=n2 after-a2=n2 after-a3=n2 down-1=n2 down-2=n2 up-2=n2 back-1=n2 back-2=n0 back-3=n40 idle-10=n58 idle-20=n59 idle-30=n350 idle-40=n2297 idle-50=n3405 idle-60=n258 idle-70=n2184 idle-80=n467 idle-90=n186 end=n186
+threads (% of one core, window [20.0, 196.8] s from the first frame, 176.8 s): XThread1644 (F800018C) x1 80.0 | Main XThread (F8000024) x1 44.6 | XThread4670 (F80000F4) x1 30.8 | rex::thread::TimerQueue x1 29.7 | XThread8DB4 (F8000128) x1 9.5 | 0xc0550001 x1 5.8 | XThread1F70 (F800010C) x1 5.7 | (unnamed) x30 3.5 | XThread77AC (F8000104) x1 2.2 | Audio Worker (F8000014) x1 1.9 | XThread35D4 (F8000068) x1 1.4 | XThread7C64 (F800017C) x1 1.2
+  TimerQueue: {"rex::thread::TimerQueue": {"pct": 29.74, "threads": 1}}
+  TimerQueue ticks (tid 35468): 108 samples over [-7.2, 206.8] s (step median 2.0 s), cycles non-rising in 0 of 107 steps 
+sys.csv slow state: {"rows": 209, "onset_s": null, "slow_pct": 0.0, "e_eff_mhz_median": 1522, "cpu_util_pct_median": 94.3, "slow": false}

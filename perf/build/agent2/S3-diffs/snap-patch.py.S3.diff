@@ -1,0 +1,109 @@
+--- snap-patch.py.pre-S3
++++ snap-patch.py
+@@ -12,4 +12,9 @@
+   python build\\agent2\\snap-patch.py verify <TAG> [--full]                  snap1 == the latest STATE-<TAG>-*.tsv
+   python build\\agent2\\snap-patch.py revert <TAG>                           undo PATCHES-<TAG>.tsv from the backups
++
++Options of plan and apply: --note=TEXT (repeatable) and --note-file=F (one note per non-empty line). Each note is
++written as a '# note: ...' line into PLAN-* and DIFF-*, and appended as '; note: ...' to the one '#' header line
++of PATCHES-<TAG>.tsv (when apply creates it) and of STATE-<TAG>-*.tsv, so both keep a single header line (S3: Agent
++1 asked for the S3 build inputs to be recorded there). Notes must not contain tabs.
+ 
+ What apply does for every selected file whose live content differs from snap1:
+@@ -529,6 +534,28 @@
+ 
+ 
+-def cmd_plan(tag, rules_path):
++def add_notes(P, notes):
++    # --note / --note-file: '# note: ...' lines after the plan's two '#' header lines (PLAN-* and DIFF-*)
++    P['text'][2:2] = ['# note: %s' % n for n in notes]
++
++
++def note_suffix(notes):
++    # the same notes for the one '#' header line of PATCHES-<TAG>.tsv and STATE-<TAG>-*.tsv
++    return ''.join('; note: %s' % n for n in notes)
++
++
++def patches_header(tag, notes=()):
++    return ('# patches applied to build/agent2/snap1 for %s by snap-patch.py (relpath under DimensionsRecomp/, '
++            'sha256 before, sha256 after, source, time, note)%s\n' % (tag, note_suffix(notes)))
++
++
++def state_header(tag, nrows, notes=()):
++    return ('# snap1 state after snap-patch %s apply %s: %d files (rel, live size, live mtime_ns, live sha256, '
++            'snap1 size, snap1 mtime_ns, snap1 sha256, origin); generated/ not listed%s\n'
++            % (tag, time.strftime('%Y-%m-%d %H:%M:%S'), nrows, note_suffix(notes)))
++
++
++def cmd_plan(tag, rules_path, notes=()):
+     P = make_plan(tag, rules_path)
++    add_notes(P, notes)
+     out = os.path.join(S.SNAP_ROOT, 'PLAN-%s-%s.txt' % (tag, P['stamp']))
+     write_text(out, P['text'])
+@@ -551,7 +578,8 @@
+ 
+ 
+-def cmd_apply(tag, rules_path, allow_delete):
++def cmd_apply(tag, rules_path, allow_delete, notes=()):
+     t0 = time.time()
+     P = make_plan(tag, rules_path, allow_delete)
++    add_notes(P, notes)
+     stamp = P['stamp']
+     write_text(os.path.join(S.SNAP_ROOT, 'PLAN-%s-%s.txt' % (tag, stamp)), P['text'])
+@@ -563,6 +591,10 @@
+     if not os.path.exists(pt):
+         with open(pt, 'w', encoding='utf-8', newline='\n') as f:
+-            f.write('# patches applied to build/agent2/snap1 for %s by snap-patch.py (relpath under DimensionsRecomp/, '
+-                    'sha256 before, sha256 after, source, time, note)\n' % tag)
++            f.write(patches_header(tag, notes))
++    elif notes:
++        with open(pt, encoding='utf-8-sig') as f:
++            head = f.readline()
++        if note_suffix(notes) not in head:
++            print('WARNING: %s exists and its header line lacks the --note text; left as is' % pt)
+     now = time.time()
+     done, gone, later = {}, set(), []
+@@ -620,7 +652,5 @@
+     sp = os.path.join(S.SNAP_ROOT, 'STATE-%s-%s.tsv' % (tag, stamp))
+     with open(sp, 'w', encoding='utf-8', newline='\n') as f:
+-        f.write('# snap1 state after snap-patch %s apply %s: %d files (rel, live size, live mtime_ns, live sha256, '
+-                'snap1 size, snap1 mtime_ns, snap1 sha256, origin); generated/ not listed\n'
+-                % (tag, time.strftime('%Y-%m-%d %H:%M:%S'), len(rows)))
++        f.write(state_header(tag, len(rows), notes))
+         f.write('\n'.join(rows) + '\n')
+     lines = list(P['text'])
+@@ -629,8 +659,8 @@
+         S.sha(sp), time.time() - t0))
+     for rel in later:
+-        lines.append('  NOTE: live %s changed again after its copy; S2 holds the planned version' % rel)
++        lines.append('  NOTE: live %s changed again after its copy; %s holds the planned version' % (rel, tag))
+     dp = os.path.join(S.SNAP_ROOT, 'DIFF-%s-%s.txt' % (tag, stamp))
+     write_text(dp, lines)
+-    print('\n'.join(P['text'][:4]))
++    print('\n'.join(P['text'][:4 + len(notes)]))
+     print(lines[-1 - len(later)])
+     for x in lines[len(lines) - len(later):]:
+@@ -735,7 +765,21 @@
+             raise SystemExit('%s needs a rules file' % cmd)
+         rp = os.path.abspath(argv[3])
++        notes, bad = [], []
++        for a in argv[4:]:
++            if a.startswith('--note='):
++                notes.append(a[len('--note='):])
++            elif a.startswith('--note-file='):
++                with open(a[len('--note-file='):], encoding='utf-8-sig') as f:
++                    notes += f.read().splitlines()
++            elif a != '--allow-delete':
++                bad.append(a)
++        if bad:
++            raise SystemExit('unknown option(s): %s' % ' '.join(bad))
++        notes = [n.strip() for n in notes if n.strip()]
++        if any('\t' in n for n in notes):
++            raise SystemExit('a note must not contain a tab (notes go into TSV header lines)')
+         if cmd == 'plan':
+-            return cmd_plan(tag, rp)
+-        return cmd_apply(tag, rp, '--allow-delete' in argv[4:])
++            return cmd_plan(tag, rp, notes)
++        return cmd_apply(tag, rp, '--allow-delete' in argv[4:], notes)
+     if cmd == 'verify':
+         return cmd_verify(tag, '--full' in argv[3:])

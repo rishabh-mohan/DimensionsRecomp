@@ -1,0 +1,685 @@
+diff --git "a/v2114\\include\\rex\\codegen\\config.h" "b/v2137\\include\\rex\\codegen\\config.h"
+index 9e74744..d744a1e 100644
+--- "a/v2114\\include\\rex\\codegen\\config.h"
++++ "b/v2137\\include\\rex\\codegen\\config.h"
+@@ -98,12 +98,22 @@ struct RecompilerConfig {
+   bool skipMsr = false;
+   bool crRegistersAsLocalVariables = false;
+   bool nonArgumentRegistersAsLocalVariables = false;
+   bool nonVolatileRegistersAsLocalVariables = false;
+   bool generateExceptionHandlers = false;  ///< Generate SEH exception handler wrappers
+ 
++  // Emission-only optimizations. Each one off keeps the emitted text unchanged.
++  bool rlwinmLowering = false;    ///< 32-bit shift/rotate forms for rlwinm/rlwnm/rlwimi
++  bool flushModeElision = false;  ///< No flush-mode switch for mode-independent FP/VMX ops
++  bool crCompareSoZero = false;   ///< Compares store SO=0 when no image instruction sets XER.SO
++  bool crBitLiveness = false;     ///< Skip CR bit stores that are dead (intra-function, exits live)
++  bool lazyXerCa = false;         ///< Skip XER.CA computations that are dead (same rule)
++  bool flushModeDataflow = false; ///< Known flush mode at labels whose predecessors all agree
++  bool musttailCalls = false;     ///< Tail calls as [[clang::musttail]] return f(ctx, base)
++  bool vmxVectorFallbacks = false;  ///< SSE forms for VMX ops emitted as scalar lane loops
++
+   // === Analysis tuning (optional) ===
+   uint32_t maxJumpExtension = 65536;  ///< Max bytes to extend function for jump table targets
+   uint32_t dataRegionThreshold = 16;  ///< Consecutive invalid instructions to mark as data region
+   uint32_t largeFunctionThreshold = 1048576;  ///< 1MB - warn if function exceeds this size
+ 
+   // Optional override for DLL module flag. If unset, the orchestrator infers
+diff --git "a/v2114\\src\\codegen\\builders\\floating_point.cpp" "b/v2137\\src\\codegen\\builders\\floating_point.cpp"
+index 1702241..d615183 100644
+--- "a/v2114\\src\\codegen\\builders\\floating_point.cpp"
++++ "b/v2137\\src\\codegen\\builders\\floating_point.cpp"
+@@ -7,53 +7,54 @@
+  *
+  * @license     BSD 3-Clause License
+  *              See LICENSE file in the project root for full license text.
+  */
+ 
+ #include "builder_context.h"
++#include "flush_mode.h"
+ #include "helpers.h"
+ 
+ namespace rex::codegen {
+ 
+ //=============================================================================
+ // Sign Manipulation
+ //=============================================================================
+ 
+ bool build_fabs(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println("\t{}.u64 = {}.u64 & ~0x8000000000000000;", ctx.f(ctx.insn.operands[0]),
+               ctx.f(ctx.insn.operands[1]));
+   return true;
+ }
+ 
+ bool build_fnabs(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println("\t{}.u64 = {}.u64 | 0x8000000000000000;", ctx.f(ctx.insn.operands[0]),
+               ctx.f(ctx.insn.operands[1]));
+   return true;
+ }
+ 
+ bool build_fneg(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println("\t{}.u64 = {}.u64 ^ 0x8000000000000000;", ctx.f(ctx.insn.operands[0]),
+               ctx.f(ctx.insn.operands[1]));
+   return true;
+ }
+ 
+ //=============================================================================
+ // Move and Conversion
+ //=============================================================================
+ 
+ bool build_fmr(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println("\t{}.f64 = {}.f64;", ctx.f(ctx.insn.operands[0]), ctx.f(ctx.insn.operands[1]));
+   return true;
+ }
+ 
+ bool build_fcfid(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println("\t{}.f64 = double({}.s64);", ctx.f(ctx.insn.operands[0]),
+               ctx.f(ctx.insn.operands[1]));
+   return true;
+ }
+ 
+ bool build_fctid(BuilderContext& ctx) {
+@@ -64,13 +65,13 @@ bool build_fctid(BuilderContext& ctx) {
+       "simde_mm_cvtsd_si64(simde_mm_load_sd(&{1}.f64));",
+       ctx.f(ctx.insn.operands[0]), ctx.f(ctx.insn.operands[1]));
+   return true;
+ }
+ 
+ bool build_fctidz(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println(
+       "\t{0}.s64 = std::isnan({1}.f64) ? int64_t(0x8000000000000000ULL) : "
+       "({1}.f64 > double(LLONG_MAX)) ? LLONG_MAX : "
+       "simde_mm_cvttsd_si64(simde_mm_load_sd(&{1}.f64));",
+       ctx.f(ctx.insn.operands[0]), ctx.f(ctx.insn.operands[1]));
+   return true;
+@@ -84,13 +85,13 @@ bool build_fctiw(BuilderContext& ctx) {
+       "simde_mm_cvtsd_si32(simde_mm_load_sd(&{1}.f64));",
+       ctx.f(ctx.insn.operands[0]), ctx.f(ctx.insn.operands[1]));
+   return true;
+ }
+ 
+ bool build_fctiwz(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println(
+       "\t{0}.s64 = std::isnan({1}.f64) ? int64_t(0x80000000U) : "
+       "({1}.f64 >= double(INT_MAX)) ? INT_MAX : "
+       "simde_mm_cvttsd_si32(simde_mm_load_sd(&{1}.f64));",
+       ctx.f(ctx.insn.operands[0]), ctx.f(ctx.insn.operands[1]));
+   return true;
+diff --git "a/v2114\\src\\codegen\\builders\\memory.cpp" "b/v2137\\src\\codegen\\builders\\memory.cpp"
+index 3dd7fa5..c8f8995 100644
+--- "a/v2114\\src\\codegen\\builders\\memory.cpp"
++++ "b/v2137\\src\\codegen\\builders\\memory.cpp"
+@@ -7,12 +7,13 @@
+  *
+  * @license     BSD 3-Clause License
+  *              See LICENSE file in the project root for full license text.
+  */
+ 
+ #include "builder_context.h"
++#include "flush_mode.h"
+ #include "helpers.h"
+ 
+ namespace rex::codegen {
+ 
+ //=============================================================================
+ // Load Immediate (not really memory operations, but L* category)
+@@ -217,22 +218,22 @@ bool build_ldarx(BuilderContext& ctx) {
+ 
+ //=============================================================================
+ // Floating Point Loads
+ //=============================================================================
+ 
+ bool build_lfd(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.print("\t{}.u64 = REX_LOAD_U64(", ctx.f(ctx.insn.operands[0]));
+   if (ctx.insn.operands[2] != 0)
+     ctx.print("{}.u32 + ", ctx.r(ctx.insn.operands[2]));
+   ctx.println("{});", static_cast<int32_t>(ctx.insn.operands[1]));
+   return true;
+ }
+ 
+ bool build_lfdx(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.print("\t{}.u64 = REX_LOAD_U64(", ctx.f(ctx.insn.operands[0]));
+   if (ctx.insn.operands[1] != 0)
+     ctx.print("{}.u32 + ", ctx.r(ctx.insn.operands[1]));
+   ctx.println("{}.u32);", ctx.r(ctx.insn.operands[2]));
+   return true;
+ }
+@@ -256,23 +257,23 @@ bool build_lfsx(BuilderContext& ctx) {
+   ctx.println("\t{}.f64 = double({}.f32);", ctx.f(ctx.insn.operands[0]), ctx.temp());
+   return true;
+ }
+ 
+ bool build_lfdu(BuilderContext& ctx) {
+   // Load Floating-point Double with Update
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println("\t{} = {} + {}.u32;", ctx.ea(), static_cast<int32_t>(ctx.insn.operands[1]),
+               ctx.r(ctx.insn.operands[2]));
+   ctx.println("\t{}.u64 = REX_LOAD_U64({});", ctx.f(ctx.insn.operands[0]), ctx.ea());
+   ctx.println("\t{}.u32 = {};", ctx.r(ctx.insn.operands[2]), ctx.ea());
+   return true;
+ }
+ 
+ bool build_lfdux(BuilderContext& ctx) {
+   // Load Floating-point Double with Update Indexed
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println("\t{} = {}.u32 + {}.u32;", ctx.ea(), ctx.r(ctx.insn.operands[1]),
+               ctx.r(ctx.insn.operands[2]));
+   ctx.println("\t{}.u64 = REX_LOAD_U64({});", ctx.f(ctx.insn.operands[0]), ctx.ea());
+   ctx.println("\t{}.u32 = {};", ctx.r(ctx.insn.operands[1]), ctx.ea());
+   return true;
+ }
+@@ -444,42 +445,42 @@ bool build_stdux(BuilderContext& ctx) {
+ 
+ //=============================================================================
+ // Floating Point Stores
+ //=============================================================================
+ 
+ bool build_stfd(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.print("{}", ctx.mmio_check_d_form() ? "\tREX_MM_STORE_U64(" : "\tREX_STORE_U64(");
+   if (ctx.insn.operands[2] != 0)
+     ctx.print("{}.u32 + ", ctx.r(ctx.insn.operands[2]));
+   ctx.println("{}, {}.u64);", static_cast<int32_t>(ctx.insn.operands[1]),
+               ctx.f(ctx.insn.operands[0]));
+   return true;
+ }
+ 
+ bool build_stfdx(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.print("{}", ctx.mmio_check_x_form() ? "\tREX_MM_STORE_U64(" : "\tREX_STORE_U64(");
+   if (ctx.insn.operands[1] != 0)
+     ctx.print("{}.u32 + ", ctx.r(ctx.insn.operands[1]));
+   ctx.println("{}.u32, {}.u64);", ctx.r(ctx.insn.operands[2]), ctx.f(ctx.insn.operands[0]));
+   return true;
+ }
+ 
+ bool build_stfdux(BuilderContext& ctx) {
+   // Store Floating-point Double with Update Indexed: EA = rA + rB; MEM(EA) = FRS; rA = EA
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println("\t{} = {}.u32 + {}.u32;", ctx.ea(), ctx.r(ctx.insn.operands[1]),
+               ctx.r(ctx.insn.operands[2]));
+   ctx.println("\tREX_STORE_U64({}, {}.u64);", ctx.ea(), ctx.f(ctx.insn.operands[0]));
+   ctx.println("\t{}.u32 = {};", ctx.r(ctx.insn.operands[1]), ctx.ea());
+   return true;
+ }
+ 
+ bool build_stfiwx(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.print("{}", ctx.mmio_check_x_form() ? "\tREX_MM_STORE_U32(" : "\tREX_STORE_U32(");
+   if (ctx.insn.operands[1] != 0)
+     ctx.print("{}.u32 + ", ctx.r(ctx.insn.operands[1]));
+   ctx.println("{}.u32, {}.u32);", ctx.r(ctx.insn.operands[2]), ctx.f(ctx.insn.operands[0]));
+   return true;
+ }
+@@ -503,13 +504,13 @@ bool build_stfsx(BuilderContext& ctx) {
+   ctx.println("{}.u32, {}.u32);", ctx.r(ctx.insn.operands[2]), ctx.temp());
+   return true;
+ }
+ 
+ bool build_stfdu(BuilderContext& ctx) {
+   // Store Floating-point Double with Update
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println("\t{} = {} + {}.u32;", ctx.ea(), static_cast<int32_t>(ctx.insn.operands[1]),
+               ctx.r(ctx.insn.operands[2]));
+   ctx.println("\tREX_STORE_U64({}, {}.u64);", ctx.ea(), ctx.f(ctx.insn.operands[0]));
+   ctx.println("\t{}.u32 = {};", ctx.r(ctx.insn.operands[2]), ctx.ea());
+   return true;
+ }
+diff --git "a/v2114\\src\\codegen\\builders\\vector.cpp" "b/v2137\\src\\codegen\\builders\\vector.cpp"
+index b29cd04..ba51dc1 100644
+--- "a/v2114\\src\\codegen\\builders\\vector.cpp"
++++ "b/v2137\\src\\codegen\\builders\\vector.cpp"
+@@ -7,12 +7,13 @@
+  *
+  * @license     BSD 3-Clause License
+  *              See LICENSE file in the project root for full license text.
+  */
+ 
+ #include "builder_context.h"
++#include "flush_mode.h"
+ #include "helpers.h"
+ 
+ #include <cmath>
+ 
+ #include <simde/x86/sse.h>
+ 
+@@ -214,13 +215,13 @@ bool build_vrfim(BuilderContext& ctx) {
+       "simde_mm_round_ps(simde_mm_load_ps({vA}.f32), "
+       "SIMDE_MM_FROUND_TO_NEG_INF | SIMDE_MM_FROUND_NO_EXC)");
+   return true;
+ }
+ 
+ bool build_vrfin(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(true);
++  emitFlushModeUnlessIndependent(ctx, true);
+   ctx.emit_vec_fp_unary_expr(
+       "simde_mm_round_ps(simde_mm_load_ps({vA}.f32), "
+       "SIMDE_MM_FROUND_TO_NEAREST_INT | SIMDE_MM_FROUND_NO_EXC)");
+   return true;
+ }
+ 
+@@ -230,13 +231,13 @@ bool build_vrfip(BuilderContext& ctx) {
+       "simde_mm_round_ps(simde_mm_load_ps({vA}.f32), "
+       "SIMDE_MM_FROUND_TO_POS_INF | SIMDE_MM_FROUND_NO_EXC)");
+   return true;
+ }
+ 
+ bool build_vrfiz(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(true);
++  emitFlushModeUnlessIndependent(ctx, true);
+   ctx.emit_vec_fp_unary_expr(
+       "simde_mm_round_ps(simde_mm_load_ps({vA}.f32), "
+       "SIMDE_MM_FROUND_TO_ZERO | SIMDE_MM_FROUND_NO_EXC)");
+   return true;
+ }
+ 
+@@ -752,25 +753,25 @@ bool build_vcmpgtsw(BuilderContext& ctx) {
+ 
+ //=============================================================================
+ // Vector Conversion
+ //=============================================================================
+ 
+ bool build_vctsxs(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(true);
++  emitFlushModeUnlessIndependent(ctx, true);
+   ctx.print("\tsimde_mm_store_si128((simde__m128i*){}.s32, rex::ppc::simde_mm_vctsxs(",
+             ctx.v(ctx.insn.operands[0]));
+   if (ctx.insn.operands[2] != 0)
+     ctx.println("simde_mm_mul_ps(simde_mm_load_ps({}.f32), simde_mm_set1_ps({}))));",
+                 ctx.v(ctx.insn.operands[1]), 1u << ctx.insn.operands[2]);
+   else
+     ctx.println("simde_mm_load_ps({}.f32)));", ctx.v(ctx.insn.operands[1]));
+   return true;
+ }
+ 
+ bool build_vcfsx(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(true);
++  emitFlushModeUnlessIndependent(ctx, true);
+   ctx.print("\tsimde_mm_store_ps({}.f32, ", ctx.v(ctx.insn.operands[0]));
+   if (ctx.insn.operands[2] != 0) {
+     const float value = std::ldexp(1.0f, -static_cast<int32_t>(ctx.insn.operands[2]));
+     ctx.println(
+         "simde_mm_mul_ps(simde_mm_cvtepi32_ps(simde_mm_load_si128((simde__m128i*){}.u32)), "
+         "simde_mm_castsi128_ps(simde_mm_set1_epi32(int(0x{:X})))));",
+@@ -780,13 +781,13 @@ bool build_vcfsx(BuilderContext& ctx) {
+                 ctx.v(ctx.insn.operands[1]));
+   }
+   return true;
+ }
+ 
+ bool build_vcfux(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(true);
++  emitFlushModeUnlessIndependent(ctx, true);
+   ctx.print("\tsimde_mm_store_ps({}.f32, ", ctx.v(ctx.insn.operands[0]));
+   if (ctx.insn.operands[2] != 0) {
+     const float value = std::ldexp(1.0f, -static_cast<int32_t>(ctx.insn.operands[2]));
+     ctx.println(
+         "simde_mm_mul_ps(rex::ppc::simde_mm_cvtepu32_ps_(simde_mm_load_si128((simde__m128i*){}.u32)"
+         "), "
+@@ -798,13 +799,13 @@ bool build_vcfux(BuilderContext& ctx) {
+   }
+   return true;
+ }
+ 
+ bool build_vctuxs(BuilderContext& ctx) {
+   // Vector Convert To Unsigned Fixed-Point Word Saturate
+-  ctx.emit_set_flush_mode(true);
++  emitFlushModeUnlessIndependent(ctx, true);
+   ctx.print("\tsimde_mm_store_si128((simde__m128i*){}.u32, rex::ppc::simde_mm_vctuxs(",
+             ctx.v(ctx.insn.operands[0]));
+   if (ctx.insn.operands[2] != 0)
+     ctx.println("simde_mm_mul_ps(simde_mm_load_ps({}.f32), simde_mm_set1_ps({}))));",
+                 ctx.v(ctx.insn.operands[1]), 1u << ctx.insn.operands[2]);
+   else
+@@ -1328,13 +1329,13 @@ bool build_vpkswus(BuilderContext& ctx) {
+   return true;
+ }
+ 
+ bool build_vpkd3d128(BuilderContext& ctx) {
+   // TODO(tomc): vectorize
+   // NOTE: handling vector reversal here too
+-  ctx.emit_set_flush_mode(true);
++  emitFlushModeUnlessIndependent(ctx, true);
+   switch (ctx.insn.operands[2]) {
+     case 0:  // D3D color
+     {
+       uint32_t mask = ctx.insn.operands[3];
+       uint32_t shift = ctx.insn.operands[4];
+ 
+diff --git "a/v2114\\tests\\regression\\emit_interior_entries.cpp" "b/v2137\\tests\\regression\\emit_interior_entries.cpp"
+index a3d0942..fd73aec 100644
+--- "a/v2114\\tests\\regression\\emit_interior_entries.cpp"
++++ "b/v2137\\tests\\regression\\emit_interior_entries.cpp"
+@@ -5,28 +5,32 @@
+ #include <rex/codegen/test_support.h>
+ 
+ #include <array>
+ #include <filesystem>
+ #include <fstream>
+ #include <iostream>
++#include <iterator>
++#include <set>
+ #include <stdexcept>
++#include <string>
+ #include <vector>
+ 
+ using namespace rex::codegen;
+ namespace fs = std::filesystem;
+ constexpr uint32_t kBase = 0x82000000;
+ constexpr uint32_t kEntry = kBase + 0x18;
+ constexpr uint32_t kExtraOwner = kBase + 0x40;
+ constexpr uint32_t kExtraEntry = kBase + 0x48;
++constexpr uint32_t kLate = kBase + 0x90;
+ 
+ void Check(bool result, const char* message) {
+   if (!result) throw std::runtime_error(message);
+ }
+ 
+-std::vector<uint8_t> Bytes(bool externalHole = false) {
+-  std::vector<uint8_t> bytes(0x90);
++std::vector<uint8_t> Bytes(bool externalHole = false, bool lateTable = false) {
++  std::vector<uint8_t> bytes(lateTable ? 0xC4 : 0x90);
+   auto put = [&](unsigned offset, uint32_t instruction) {
+     for (unsigned i = 0; i < 4; ++i)
+       bytes[offset + i] = static_cast<uint8_t>(instruction >> (24 - i * 8));
+   };
+   // A real frame, conditional backward branch, live CTR loop, and owner-only
+   // call metadata. The interior entry skips all four prologue instructions.
+@@ -58,19 +62,42 @@ std::vector<uint8_t> Bytes(bool externalHole = false) {
+   put(0x60, 0x48000029);  // bl helper at +0x88
+   put(0x64, 0x48000000 | (static_cast<uint32_t>(-0x14) & 0x03FFFFFC)); // b +0x50
+   put(0x80, 0x38A50001);  // addi r5,r5,1
+   put(0x84, 0x4E800020);
+   put(0x88, 0x38C60001);  // addi r6,r6,1
+   put(0x8C, 0x4E800020);
++  if (lateTable) {
++    // A bounded absolute switch that only emitCpp's late jump-table detection
++    // finds: no graph edge records that case 0 tail-calls the body= entry.
++    put(0x90, 0x3D608200);  // lis r11,0x8200
++    put(0x94, 0x396B00B8);  // addi r11,r11,0xB8 (table below)
++    put(0x98, 0x28030002);  // cmplwi r3,2
++    put(0x9C, 0x41810014);  // bgt +0xB0 (default)
++    put(0xA0, 0x546C103A);  // slwi r12,r3,2
++    put(0xA4, 0x7C0B602E);  // lwzx r0,r11,r12
++    put(0xA8, 0x7C0903A6);  // mtctr r0
++    put(0xAC, 0x4E800420);  // bctr
++    put(0xB0, 0x4E800020);  // blr
++    put(0xB8, kEntry);      // case 0: interior (body=) entry
++    put(0xBC, kBase + 0x88);  // case 1: plain function
++    put(0xC0, kBase + 0xB0);  // case 2: local label
++  }
+   return bytes;
+ }
+ 
+ CodegenContext Context(const fs::path& root, RecompilerConfig config,
+                        bool missingEntry = false, uint32_t pendingTarget = 0,
+-                       bool externalHole = false) {
+-  auto bytes = Bytes(externalHole);
++                       bool externalHole = false, bool localizationProbe = false,
++                       bool lateTable = false) {
++  auto bytes = Bytes(externalHole, lateTable);
++  if (localizationProbe) {
++    // lwarx r0,0,r31 replaces the nop shared by the extra owner and entry.
++    constexpr uint32_t probe = 0x7C00F828;
++    for (unsigned i = 0; i < 4; ++i)
++      bytes[0x48 + i] = static_cast<uint8_t>(probe >> (24 - i * 8));
++  }
+   if (pendingTarget) {
+     uint32_t instruction = 0x41820000 | ((pendingTarget - (kBase + 0x1C)) & 0xFFFC);
+     for (unsigned i = 0; i < 4; ++i)
+       bytes[0x1C + i] = static_cast<uint8_t>(instruction >> (24 - i * 8));
+   }
+   TestModule module;
+@@ -107,18 +134,99 @@ CodegenContext Context(const fs::path& root, RecompilerConfig config,
+   ctx.graph.addTailCallToFunction(kEntry, kBase + 0x1C, CallTarget::function(owner));
+   if (pendingTarget)
+     ctx.graph.addUnresolvedJumpToFunction(kEntry, kBase + 0x1C, pendingTarget, false, true);
+   for (auto* node : {helper, extraHelper, owner, entry, extraOwner, extraEntry}) {
+     if (node != entry || !pendingTarget) node->seal();
+   }
++  if (lateTable) {
++    auto* late = add(kLate, 0x24, {{kLate, 0x24}});
++    ctx.graph.addLabelToFunction(kLate, kBase + 0xB0);
++    late->seal();
++  }
+   if (pendingTarget)
+     Check(entry->isDiscovered() && !entry->isSealed() && entry->unresolvedJumps().size() == 1,
+           "fixture must retain a genuinely unsealed deferred alias branch");
+   return ctx;
+ }
+ 
++// Concatenated text of a project's emitted recompiled translation units.
++std::string ReadSources(const fs::path& dir, const std::string& project) {
++  std::string all;
++  for (const auto& file : fs::recursive_directory_iterator(dir)) {
++    auto name = file.path().filename().string();
++    if (!file.is_regular_file() || name.rfind(project + "_recomp.", 0) != 0 ||
++        file.path().extension() != ".cpp")
++      continue;
++    std::ifstream in(file.path(), std::ios::binary);
++    all.append(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
++    all += '\n';
++  }
++  Check(!all.empty(), "no recompiled translation units emitted");
++  return all;
++}
++
++// One emitted function, from its definition to the next one.
++std::string FunctionText(const std::string& sources, const std::string& name) {
++  auto start = sources.find("DEFINE_REX_FUNC(" + name + ") {");
++  Check(start != std::string::npos, "expected function missing from the output");
++  auto end = sources.find("DEFINE_REX_FUNC(", start + 1);
++  return sources.substr(start, end == std::string::npos ? std::string::npos : end - start);
++}
++
++// Names of the register locals a function declares (ctr, xer, reserved, crN,
++// rN, fN, vN); scratch locals such as temp, vTemp, env and ea are ignored.
++std::set<std::string> RegisterLocals(const std::string& text) {
++  std::set<std::string> names;
++  size_t pos = 0;
++  while (pos < text.size()) {
++    auto eol = text.find('\n', pos);
++    if (eol == std::string::npos) eol = text.size();
++    std::string line = text.substr(pos, eol - pos);
++    pos = eol + 1;
++    if (!line.empty() && line.back() == '\r') line.pop_back();
++    if (line.rfind("\tPPC", 0) != 0 || line.size() < 4 ||
++        line.compare(line.size() - 3, 3, "{};") != 0)
++      continue;
++    auto space = line.rfind(' ');
++    if (space == std::string::npos) continue;
++    auto name = line.substr(space + 1, line.size() - space - 4);
++    if (name != "temp" && name != "vTemp" && name != "env") names.insert(name);
++  }
++  return names;
++}
++
++// A plain function without body= entries that touches every localizable
++// register class: cmpwi r3,1 (cr0, xer.so); mtctr r4; addic r5,r5,1 (xer.ca);
++// lwarx r6,0,r4 (reserved); li r0,1; li r31,1; blr.
++CodegenContext ControlContext(const fs::path& root, const std::vector<bool RecompilerConfig::*>& flags) {
++  constexpr std::array<uint32_t, 7> code{0x2C030001, 0x7C8903A6, 0x30A50001, 0x7CC02028,
++                                         0x38000001, 0x3BE00001, 0x4E800020};
++  std::vector<uint8_t> bytes;
++  for (auto instruction : code)
++    for (unsigned i = 0; i < 4; ++i)
++      bytes.push_back(static_cast<uint8_t>(instruction >> (24 - i * 8)));
++  TestModule module;
++  module.Load(kBase, bytes.data(), bytes.size());
++  RecompilerConfig config;
++  config.projectName = "control";
++  config.outDirectoryPath = "generated";
++  for (auto flag : flags) config.*flag = true;
++  auto ctx = CodegenContext::Create(BinaryView::fromModule(module), std::move(config));
++  ctx.setConfigDir(root);
++  ctx.analysisState().format = "xex";
++  ctx.analysisState().loadAddress = kBase;
++  ctx.analysisState().entryPoint = kBase;
++  ctx.analysisState().imageSize = static_cast<uint32_t>(bytes.size());
++  auto* node = ctx.graph.addFunction(kBase, static_cast<uint32_t>(bytes.size()),
++                                     FunctionAuthority::CONFIG, true);
++  Check(node != nullptr, "control node rejected");
++  node->discover({{kBase, static_cast<uint32_t>(bytes.size())}}, {}, {});
++  node->seal();
++  return ctx;
++}
++
+ RecompilerConfig Config(const fs::path& root) {
+   fs::create_directories(root);
+   auto path = root / "fixture.toml";
+   std::ofstream(path) << "project_name = 'interior'\nfile_path = 'synthetic.bin'\n"
+       "out_directory_path = 'generated'\n"
+       "[functions]\n0x82000018 = { body = 0x82000000 }\n"
+@@ -206,15 +314,16 @@ int main(int argc, char** argv) try {
+   std::ofstream(root / "external_snapshot.cpp")
+       << "#include \"interior_pch.h\"\n"
+          "DECLARE_REX_FUNC(xstart);\nDECLARE_REX_FUNC(sub_82000030);\n"
+       << externalTarget->emitCpp(emission) << code;
+ 
+   auto reject = [&](RecompilerConfig invalid, const char* name, bool missingEntry = false,
+-                    uint32_t pendingTarget = 0) {
++                    uint32_t pendingTarget = 0, bool lateTable = false) {
+     auto out = root / name;
+-    auto bad = Context(out, std::move(invalid), missingEntry, pendingTarget);
++    auto bad = Context(out, std::move(invalid), missingEntry, pendingTarget, false, false,
++                       lateTable);
+     CodegenWriter rejected(bad);
+     Check(!rejected.write(true), "invalid body accepted even with force");
+     Check(!fs::exists(out / "generated"), "invalid body created output");
+   };
+   auto invalid = config;
+   invalid.functions.at(kEntry).bodyOwner = kBase + 0x30;
+@@ -234,35 +343,95 @@ int main(int argc, char** argv) try {
+   invalid = config;
+   invalid.functions.at(kEntry).bodyOwner = kBase + 1;
+   reject(invalid, "unaligned-owner");
+   invalid = config;
+   invalid.rexcrtFunctions["test"] = kEntry;
+   reject(invalid, "rexcrt-entry");
+-  constexpr std::array flags{
+-      &RecompilerConfig::ctrAsLocalVariable, &RecompilerConfig::xerAsLocalVariable,
+-      &RecompilerConfig::reservedRegisterAsLocalVariable,
+-      &RecompilerConfig::crRegistersAsLocalVariables,
+-      &RecompilerConfig::nonArgumentRegistersAsLocalVariables,
+-      &RecompilerConfig::nonVolatileRegistersAsLocalVariables};
+-  unsigned index = 0;
+-  for (auto flag : flags) {
+-    invalid = config;
+-    invalid.*flag = true;
+-    auto name = "localization-" + std::to_string(index++);
+-    reject(invalid, name.c_str());
++  // Register localization no longer rejects body= entries. Interior entries,
++  // their owners and partners keep every register in ctx (per-function
++  // fallback). Each case must emit, those four functions must declare no
++  // register local, and a control module without body= entries must still get
++  // the locals, which proves the flag itself took effect. The probe fixture
++  // puts lwarx r0,0,r31 in the extra owner/entry block so reserved, r0 and r31
++  // would be localized there without the fallback.
++  using Flag = bool RecompilerConfig::*;
++  const Flag ctrFlag = &RecompilerConfig::ctrAsLocalVariable;
++  const Flag xerFlag = &RecompilerConfig::xerAsLocalVariable;
++  const Flag reservedFlag = &RecompilerConfig::reservedRegisterAsLocalVariable;
++  const Flag crFlag = &RecompilerConfig::crRegistersAsLocalVariables;
++  const Flag nonArgumentFlag = &RecompilerConfig::nonArgumentRegistersAsLocalVariables;
++  const Flag nonVolatileFlag = &RecompilerConfig::nonVolatileRegistersAsLocalVariables;
++  struct Localization {
++    const char* name;
++    std::vector<Flag> flags;
++    std::set<std::string> controlLocals;
++  };
++  const std::vector<Localization> localizations{
++      {"ctr", {ctrFlag}, {"ctr"}},
++      {"xer", {xerFlag}, {"xer"}},
++      {"reserved", {reservedFlag}, {"reserved"}},
++      {"cr", {crFlag}, {"cr0"}},
++      {"non-volatile", {nonVolatileFlag}, {"r31"}},
++      {"non-argument-and-non-volatile", {nonArgumentFlag, nonVolatileFlag}, {"r0", "r31"}},
++      {"all", {ctrFlag, xerFlag, reservedFlag, crFlag, nonArgumentFlag, nonVolatileFlag},
++       {"ctr", "xer", "reserved", "cr0", "r0", "r31"}}};
++  for (const auto& localization : localizations) {
++    auto localized = config;
++    for (auto flag : localization.flags) localized.*flag = true;
++    auto out = root / (std::string("localization-") + localization.name);
++    auto probe = Context(out, localized, false, 0, false, true);
++    CodegenWriter probeWriter(probe);
++    Check(probeWriter.write(false), "register localization rejected a body= fixture");
++    auto sources = ReadSources(out / "generated", "interior");
++    for (const char* function : {"sub_82000000", "sub_82000018", "sub_82000040", "sub_82000048"}) {
++      Check(RegisterLocals(FunctionText(sources, function)).empty(),
++            "interior entry, owner or partner kept a localized register");
++    }
++    auto controlOut = root / (std::string("localization-control-") + localization.name);
++    auto control = ControlContext(controlOut, localization.flags);
++    CodegenWriter controlWriter(control);
++    Check(controlWriter.write(false), "localization control module emission failed");
++    auto controlLocals = RegisterLocals(FunctionText(ReadSources(controlOut / "generated", "control"),
++                                                     "xstart"));
++    for (const auto& expected : localization.controlLocals) {
++      Check(controlLocals.count(expected) == 1, "localization flag had no effect on the control module");
++    }
+   }
++  // Localized r11/r12 with r14-r31 kept in ctx would split one live value
++  // between ctx and a local across the save/restore helpers, so the writer
++  // refuses non_argument without non_volatile.
++  invalid = config;
++  invalid.nonArgumentRegistersAsLocalVariables = true;
++  reject(invalid, "localization-non-argument-only");
++  // A switch table that only emitCpp's late jump-table detection finds is no
++  // graph edge, so the fallback analysis cannot see that sub_82000090 reaches
++  // the body= entry through it. Without localization the module emits and the
++  // switch tail-calls the entry. With cr_as_local the emitter's handoff check
++  // must block the write rather than enter ctx-resident code with live locals.
++  auto lateOut = root / "late-table-control";
++  auto lateControl = Context(lateOut, config, false, 0, false, false, true);
++  CodegenWriter lateControlWriter(lateControl);
++  Check(lateControlWriter.write(false), "late jump table control emission failed");
++  auto lateText = FunctionText(ReadSources(lateOut / "generated", "interior"), "sub_82000090");
++  Check(lateText.find("switch (") != std::string::npos &&
++            lateText.find("sub_82000018(ctx, base);") != std::string::npos,
++        "late jump table detection did not reach the interior entry");
++  invalid = config;
++  invalid.crRegistersAsLocalVariables = true;
++  reject(invalid, "late-table-localized", false, 0, true);
+   // Invalid body values must fail config loading, rather than silently discard
+   // the override and emit the original lossy isolated function.
+   for (const char* value : {"'bad'", "0", "0x82000018", "0x82000001", "-1",
+                            "0x100000000"}) {
+     auto path = root / "invalid.toml";
+     std::ofstream(path) << "file_path = 'synthetic.bin'\n"
+         "[functions]\n0x82000018 = { body = " << value << " }\n";
+     RecompilerConfig bad;
+     Check(!bad.Load(path.string()), "invalid TOML body accepted");
+   }
+-  std::cout << "Real sealed/deferred codegen body emission and 21 rejection cases passed\n";
++  std::cout << "Real sealed/deferred codegen body emission, 7 register localization fallback "
++               "cases, a late jump-table handoff control and 17 rejection cases passed\n";
+   return 0;
+ } catch (const std::exception& e) {
+   std::cerr << e.what() << '\n';
+   return 1;
+ }

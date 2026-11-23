@@ -1,0 +1,27 @@
+﻿=== timing matrix: S4 invalidation volume (Agent 5, task #20): one functional devoff2 run with slow_frame_log_ms=1 (logging only, not for timing) ===
+matrix   <workspace>\bench\agent5\matrix-s4-invalvol.json
+note     Purpose: per-frame CPU-side invalidation volume on the devoff GPU path, for S4 (perf-notes/agent5-uploads.md, S4 section). slow_frame_log_ms=1 makes the existing ReportSlowFrame (rexglue-sdk src/graphics/d3d12/command_processor.cpp:242-283, called once per swap at :2193) log every frame. Its 'cpu-write invalidations Nx K KB' is the count and requested bytes of every PhysicalHeap::TriggerCallbacks call that hit a GPU-watched page: the game's MmSetAddressProtect (PhysicalHeap::Protect, xmemory.cpp:2132-2136), CPU write faults, file reads, alloc/free. It is a volume and an upper bound for the re-upload. It cannot show whether the re-uploaded bytes changed; no existing counter can.
+note     Same bin, phase and window as a-prof in build/agent8/matrix/20261122-0357: devoff2-bin, framerate_limit=0, title/attract loop, 10 s settle + 60 s warm-up after the first frame, 150 s window. The volume then lines up with that profile's 3.6 ms/f upload cost. No profiler, no input.
+note     Analysis: python bench/agent5/s4_slowframe.py <run dir> (window 70-220 s after the first logged frame, the a-prof window) prints the per-frame count and KB distribution and MB/s. Logging every frame costs a little time, so this run is functional only, never timing.
+note     Checks (Agent 8): status OK, clean WM_CLOSE, about one 'slow frame #' line per frame (the script reports index gaps), [error] count no higher than a-prof (0).
+settings warm-up from firstframe (boot timeout 240 s, settle 10 s); order fixed; close timeout 60 s; cooldown 10 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+       a-vol: bin build/agent2/devoff2-bin; frames perf; x1; warm-up 60 s; window 150 s; group functional (ref); cvars framerate_limit=0 slow_frame_log_ms=1
+         devoff2 + slow_frame_log_ms=1 (logging only), uncapped like a-prof; functional, not for timing
+round 1  a-vol
+order    a-vol
+estimate 1 runs (0 cold), about 5 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-5EAK6AEJUL54DUW4ZDEK36UVXE -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   7.72 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/devoff2-bin : ok (MANIFEST.txt)
+screensaver WPXSCR~1.SCR after 120 s: the keep-awake request should hold it off; if it starts during timing runs, set it to (None)
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   1 runs, about 5 min: done around 06:24
+keep-awake ON (SetThreadExecutionState continuous+system+display until the matrix ends)

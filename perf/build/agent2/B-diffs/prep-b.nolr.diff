@@ -1,0 +1,142 @@
+# prep-b.py.pre-nolr (2D1470BE77287A04) -> prep-b.py (C0067F18C299D551): +53 -18 lines
+--- prep-b.py.pre-nolr
++++ prep-b.py
+@@ -2,10 +2,12 @@
+ 3-5) in a separate source tree, so snap1 (S2, the base for S3) and its build trees stay untouched and A =
+ build/agent2/devoff2-bin stays the exact reference (Agent 1, 23:40: base snapB on S2). Copies and hashing only.
+   python build\\agent2\\prep-b.py [--resync] [--skip-copy] [--install DIR]
+-1. Agent 9's install tree (default build/agent9/install/batch): the last '[batch] END' line of
+-   build/agent9/logs/install-steps.txt (files, bytes, TUs, last TU, config sha); every SHA256SUMS.txt entry and no
+-   unlisted file; legodimensions_config.toml == build/agent9/configs/batch.toml; generated/rexglue.cmake and
+-   generated/default/codegen.d == baseline's; sources.cmake lists the TUs + init + register, ending at the last TU.
++1. Agent 9's install tree: ONLY build/agent9/install/batch-nolr (Agent 1, 02:05: --install exists for the negative test
++   and refuses anything else; install/batch has skip_lr, which is unsafe for LEGO, Agent 10 Review 4 row 21). The last
++   '[batch-nolr] END' line of build/agent9/logs/install-steps.txt (files, bytes, TUs, last TU, config sha);
++   SHA256SUMS.txt sha256 == the pinned 24CE1493... (872 entries); every entry and no unlisted file;
++   legodimensions_config.toml == build/agent9/configs/batch-nolr.toml == the pinned E60EAF1C...; generated/rexglue.cmake
++   and generated/default/codegen.d == baseline's; sources.cmake lists the TUs + init + register, ending at the last TU.
+ 2. Copy build/agent2/snap1/DimensionsRecomp -> build/agent2/snapB/DimensionsRecomp with robocopy (/E, mtimes kept;
+    --resync: /MIR after a new S-batch on snap1), except rexglue-sdk/out (snap1-sdk's output dir), rexlego/out
+    (Agent 6's native banks; the OFF build never reads them: snap1-off/build.ninja names none), rexlego/generated and
+@@ -27,7 +29,12 @@
+ DST = os.path.join(DST_ROOT, 'DimensionsRecomp')
+ BASE_GEN = os.path.join(R, 'baseline', 'DimensionsRecomp', 'rexlego', 'generated')
+ STEPS = os.path.join(R, 'build', 'agent9', 'logs', 'install-steps.txt')
+-BATCH_CFG = os.path.join(R, 'build', 'agent9', 'configs', 'batch.toml')
++# Build B uses only install/batch-nolr (Agent 1, 02:05: never install/batch, whose skip_lr is unsafe for LEGO)
++VARIANT = 'batch-nolr'
++INSTALL = os.path.join(R, 'build', 'agent9', 'install', VARIANT)
++BATCH_CFG = os.path.join(R, 'build', 'agent9', 'configs', VARIANT + '.toml')
++SUMS_SHA = '24ce1493fb8dae37e00b556eb8871d633921e44378d960de4359b104b16cdb8e'  # install/batch-nolr/SHA256SUMS.txt (23:54)
++CFG_SHA = 'e60eaf1ceb575572ba0274aa5f52e97f25a35c01690b41e6a637739408e6a090'  # configs/batch-nolr.toml (S2.10, no skip_lr)
+ TOOL = os.path.join(R, 'build', 'agent9', 'bin', 'rexglue.exe')
+ TOOL_SHA = '37b32713b7516402344bb4ddb402a3cd4131353adc1aef10e1602122e9b6036a'
+ LOG = os.path.join(A, 'snapB-prep.txt')
+@@ -47,6 +54,15 @@
+ def fail(m):
+     log('FAIL ' + m)
+     sys.exit(1)
++
++
++def read_text(p):
++    """A log file's text: PowerShell 5.1's Out-File writes UTF-16LE with a BOM (build/agent9/logs/install-steps.txt
++    does), Python and Out-File -Encoding utf8 write UTF-8."""
++    b = open(p, 'rb').read()
++    if b[:2] in (b'\xff\xfe', b'\xfe\xff'):
++        return b.decode('utf-16', errors='replace')
++    return b.decode('utf-8-sig', errors='replace')
+ 
+ 
+ def lp(p):
+@@ -114,16 +130,23 @@
+     ap = argparse.ArgumentParser()
+     ap.add_argument('--resync', action='store_true', help='robocopy /MIR snap1 -> snapB again (after a new S-batch)')
+     ap.add_argument('--skip-copy', action='store_true', help='keep the snapB copy; re-check it and redo steps 3-4')
+-    ap.add_argument('--install', default=os.path.join(R, 'build', 'agent9', 'install', 'batch'))
++    ap.add_argument('--install', default=INSTALL, help='only build/agent9/install/batch-nolr is accepted')
+     a = ap.parse_args()
+     I = os.path.abspath(a.install)
+     t0 = time.time()
+     log('START prep-b: install tree %s, snapshot copy %s' % (I, DST))
++    # refuse before anything is read or written: build B uses only install/batch-nolr (never install/batch)
++    if os.path.normcase(os.path.realpath(I)) != os.path.normcase(os.path.realpath(INSTALL)):
++        fail('refusing install tree %s: build B uses only %s (install/batch has skip_lr, unsafe for LEGO); nothing '
++             'copied' % (I, INSTALL))
++    if not os.path.isdir(INSTALL) or is_link(INSTALL):
++        fail('%s is missing or a link: stop' % INSTALL)
+ 
+     # 1. Agent 9's install tree
+-    ends = [l.strip() for l in open(STEPS, encoding='utf-8-sig', errors='replace') if '[batch] END ' in l]
++    tag = '[%s] END ' % VARIANT
++    ends = [l.strip() for l in read_text(STEPS).splitlines() if tag in l]
+     if not ends:
+-        fail('no [batch] END line in ' + STEPS)
++        fail('no %s line in %s' % (tag.strip(), STEPS))
+     m = re.search(r'files=(\d+) bytes=(\d+) TUs=(\d+) last=(\S+) config_sha=([0-9A-Fa-f]+)', ends[-1])
+     if not m:
+         fail('unparsed END line: ' + ends[-1])
+@@ -139,6 +162,10 @@
+         if not mm:
+             fail('bad SHA256SUMS.txt line: ' + line)
+         sums[os.path.normcase(os.path.normpath(mm[2]))] = mm[1].lower()
++    sums_sha = sha(sums_path)
++    if sums_sha != SUMS_SHA or len(sums) != 872:
++        fail('SHA256SUMS.txt sha256 %s with %d entries; build B expects the pinned %s (872 entries)'
++             % (sums_sha, len(sums), SUMS_SHA))
+     found, links = walk(I)
+     if links:
+         fail('links in the install tree: %s' % links[:5])
+@@ -154,14 +181,15 @@
+     bad = [r for r in sorted(files) if sha(os.path.join(I, r)) != sums[r]]
+     if bad:
+         fail('%d install file(s) differ from SHA256SUMS.txt: %s' % (len(bad), bad[:5]))
+-    sums_sha = sha(sums_path)
++    if sha(sums_path) != sums_sha:
++        fail('SHA256SUMS.txt changed during the check')
+     sums_time = time.strftime('%H:%M:%S')
+     log('install tree: %d files, %d bytes, every file matches SHA256SUMS.txt (sha256 %s), %.1fs'
+         % (len(files), nbytes, sums_sha, time.time() - t))
+     cfg = sums.get('legodimensions_config.toml')
+     bcfg = sha(BATCH_CFG)
+-    if cfg is None or cfg != bcfg or not cfg.startswith(e_cfg):
+-        fail('config: install %s, configs/batch.toml %s, END line %s' % (cfg, bcfg, e_cfg))
++    if cfg is None or cfg != bcfg or not cfg.startswith(e_cfg) or cfg != CFG_SHA:
++        fail('config: install %s, configs/%s.toml %s, END line %s, pinned %s' % (cfg, VARIANT, bcfg, e_cfg, CFG_SHA))
+     for rel in (r'rexglue.cmake', r'default\codegen.d'):
+         if sums[os.path.normcase(os.path.join('generated', rel))] != sha(os.path.join(BASE_GEN, rel)):
+             fail('install generated\\%s differs from baseline\'s (gen-check assumes the baseline layout)' % rel)
+@@ -173,11 +201,17 @@
+         fail('sources.cmake lists %d sources, %d TUs, last %s; the END line says %d TUs, last %s'
+              % (len(listed), len(tus), tus[-1] if tus else None, e_tus, e_last))
+     tool = sha(TOOL) if os.path.isfile(TOOL) else 'missing'
+-    log('config %s == configs/batch.toml == the END line; rexglue.cmake and codegen.d == baseline\'s; sources.cmake: '
+-        '%d sources (%d TUs, last %s); build/agent9/bin/rexglue.exe %s (%s the recipe\'s 37B32713)'
+-        % (cfg[:16], len(listed), len(tus), tus[-1], tool[:16], 'matches' if tool == TOOL_SHA else 'DIFFERS FROM'))
+-
+-    # 2. snapB = snap1 (S2) minus the excluded dirs and the config
++    log('config %s == configs/%s.toml == the END line == the pin; rexglue.cmake and codegen.d == baseline\'s; '
++        'sources.cmake: %d sources (%d TUs, last %s); build/agent9/bin/rexglue.exe %s (%s the recipe\'s 37B32713)'
++        % (cfg[:16], VARIANT, len(listed), len(tus), tus[-1], tool[:16],
++           'matches' if tool == TOOL_SHA else 'DIFFERS FROM'))
++
++    # 2. snapB = snap1 (S2) minus the excluded dirs and the config. Every write below goes under build/agent2/snapB:
++    #    stop if build/agent2, snapB or snapB/DimensionsRecomp is a link or resolves elsewhere.
++    for p in (A, DST_ROOT, DST):
++        if os.path.lexists(p) and (is_link(p) or os.path.normcase(os.path.realpath(p)) != os.path.normcase(
++                os.path.abspath(p))):
++            fail('%s is a link or resolves elsewhere (%s): stop' % (p, os.path.realpath(p)))
+     if not a.skip_copy:
+         if os.path.exists(DST) and not a.resync:
+             fail(DST + ' exists: use --resync (after a new S-batch) or --skip-copy')
+@@ -276,8 +310,9 @@
+     s2cfg = sha(os.path.join(SRC, 'rexlego', 'legodimensions_config.toml'))
+     notes = [
+         "codegen build B (Agent 9's codegen option; perf-notes/agent9-codegen.md 'Session 2: regen+build recipe'): "
+-        "generated by build/agent9/bin/rexglue.exe (sha256 %s) with build/agent9/configs/batch.toml." % tool,
+-        'install tree build/agent9/install/batch, %s' % ends[-1],
++        "generated by build/agent9/bin/rexglue.exe (sha256 %s) with build/agent9/configs/%s.toml (no skip_lr)."
++        % (tool, VARIANT),
++        'install tree build/agent9/install/%s, %s' % (VARIANT, ends[-1]),
+         'install SHA256SUMS.txt sha256 %s: %d entries, every file verified at %s; legodimensions_config.toml sha256 %s '
+         '(the S2 snapshot config is %s).' % (sums_sha, len(sums), sums_time, cfg, s2cfg),
+         'snapB = build/agent2/snap1/DimensionsRecomp at S2, copied by prep-b.py (robocopy, mtimes kept) without '

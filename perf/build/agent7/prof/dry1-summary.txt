@@ -1,0 +1,134 @@
+profile : build\agent8\runs\2008-dry1prof\profile-700429781.bin
+map     : build\agent8\runs\2008-dry1prof\legodimensions.map
+samples : 1842  threads: 81  modules: 112  duration: unknown (estimate)  rounds: ~23 (est)
+counting: busy samples (70)
+WARNING: sampler held timeBeginPeriod(1): guest Sleep granularity differs from an unprofiled run; use for attribution, not timing
+warning: profile-700429781.bin: no recording duration (no LSPX trailer, --duration-s or --meta): rates are per 1000 sampler rounds, rounds estimated as the max per-thread sample count (23; nominal rate ~1 kHz, lower in practice)
+
+busy 70 (3.8%)  waiting 1772 (96.2%)  io 0 (0.0%)
+busy samples by category (leaf): guest 24 (34.3%)  rexruntime 13 (18.6%)  rexlego 6 (8.6%)  d3d12+driver 14 (20.0%)  system 13 (18.6%)
+
+== threads ==
+   tid  name  samples   run%  busy  wait  io  top busy functions / role
+------  ----  -------  -----  ----  ----  --  --------------------------------------------------------------------------------------------------------------------------------
+ 42056             23   87.0    20     3   0  ntdll.dll!NtYieldExecution 25%; nvwgf2umx.dll!? 20%; igd10um64xe.DLL!? 10%
+ 83416             23    0.0     0    23   0  (waiting)
+ 55932             23    0.0     0    23   0  (waiting)
+ 80616             23   39.1     9    14   0  rexruntime.dll!??$wait_until_published@Usteady_... 100%
+ 76216             23    0.0     0    23   0  (waiting) rexruntime.dll!fn_602DA0 (near ??$HostToGuestFunction@$MP6AXV?$Mapp...
+ 10476             23    0.0     0    23   0  (waiting)
+ 93808             23    0.0     0    23   0  (waiting)
+ 71580             23    0.0     0    23   0  (waiting)
+ 91352             23    0.0     0    23   0  (waiting)
+ 23916             23    0.0     0    23   0  (waiting)
+ 37564             23    0.0     0    23   0  (waiting)
+ 55844             23    0.0     0    23   0  (waiting)
+ 69136             23    0.0     0    23   0  (waiting)
+ 46256             23    0.0     0    23   0  (waiting) rexruntime.dll!?DXGIUITickThread@Presenter@ui@rex@@AEAAXXZ
+ 35272             23    0.0     0    23   0  (waiting)
+ 16200             23    0.0     0    23   0  (waiting)
+ 57104             23    0.0     0    23   0  (waiting)
+ 84676             23    0.0     0    23   0  (waiting)
+ 41056             23    0.0     0    23   0  (waiting)
+ 46988             23    0.0     0    23   0  (waiting)
+ 22724             23    0.0     0    23   0  (waiting)
+ 82916             23    0.0     0    23   0  (waiting)
+ 53780             23    0.0     0    23   0  (waiting)
+ 35736             23    0.0     0    23   0  (waiting)
+ 50580             23    0.0     0    23   0  (waiting)
+100868             23   21.7     5    18   0  win32u.dll!NtGdiDdDDISignalSynchronizationObjec... 60%; win32u.dll!NtGdiDdDDIPresent 40%
+ 53012             23    0.0     0    23   0  (waiting) rexruntime.dll!?ListenerRun@EmulatedToypad@input@rex@@AEAAXG@Z
+ 23112             23    0.0     0    23   0  (waiting) rexruntime.dll!??$sleep_for@_JU?$ratio@$00$0DOI@@std@@@this_thread@...
+ 55388             23    0.0     0    23   0  (waiting) rexruntime.dll!?Wait@thread@rex@@YA?AW4WaitResult@12@PEAVWaitHandle...
+ 83280             23    0.0     0    23   0  (waiting) rexruntime.dll!?WaitMultiple@thread@rex@@YA?AU?$pair@W4WaitResult@t...
+ 63760             23    8.7     2    21   0  VCRUNTIME140.dll!fn_10E40 (near __NLG_Return2+0... 50%; ntdll.dll!NtSetInformationThread 50%
+ 47608             23    4.3     1    22   0  ntdll.dll!NtAlertThreadByThreadIdEx 100%
+ 91728             23    0.0     0    23   0  (waiting)
+ 88860             23    0.0     0    23   0  (waiting)
+ 45308             23    0.0     0    23   0  (waiting) rexruntime.dll!fn_5E8920 (near ??$HostToGuestFunction@$MP6AXV?$Mapp...
+ 51512             23    0.0     0    23   0  (waiting) rexruntime.dll!?ThreadStartRoutine@thread@rex@@YAKPEAX@Z
+ 98276             23    0.0     0    23   0  (waiting) rexruntime.dll!?ThreadStartRoutine@thread@rex@@YAKPEAX@Z
+ 80576             23    0.0     0    23   0  (waiting) rexruntime.dll!?ThreadStartRoutine@thread@rex@@YAKPEAX@Z
+ 62188             23    0.0     0    23   0  (waiting) rexruntime.dll!?ThreadStartRoutine@thread@rex@@YAKPEAX@Z
+ 73688             23    0.0     0    23   0  (waiting) rexruntime.dll!?ThreadStartRoutine@thread@rex@@YAKPEAX@Z
+ 99280             23    0.0     0    23   0  (waiting) rexruntime.dll!?ThreadStartRoutine@thread@rex@@YAKPEAX@Z
+ 67400             23    0.0     0    23   0  (waiting) rexruntime.dll!?ThreadStartRoutine@thread@rex@@YAKPEAX@Z
+ 88928             23    0.0     0    23   0  (waiting) rexruntime.dll!?ThreadStartRoutine@thread@rex@@YAKPEAX@Z
+ 49984             23    0.0     0    23   0  (waiting) rexruntime.dll!?ThreadStartRoutine@thread@rex@@YAKPEAX@Z
+ 80984             23    0.0     0    23   0  (waiting) rexruntime.dll!??$wait@V?$unique_lock@Vrecursive_mutex@std@@@std@@@...
+ 97208             23    0.0     0    23   0  (waiting) std::this_thread::sleep_for<__int64, struct std::ratio<1, 1000>>
+ 87852             23    0.0     0    23   0  (waiting)
+ 77796             23    0.0     0    23   0  (waiting)
+ 10224             23   17.4     4    19   0  sub_82A2F3B0 [guest 0x82A2F3B0] 25%; sub_83E44E60 [guest 0x83E44E60] 25%; rexruntime.dll!?ParseVirtualKey@ui@rex@@YA?AW4V... 25%
+ 92404             23    0.0     0    23   0  (waiting) rexruntime.dll!?ThreadStartRoutine@thread@rex@@YAKPEAX@Z
+ 71340             23    0.0     0    23   0  (waiting) rexruntime.dll!?Wait@thread@rex@@YA?AW4WaitResult@12@PEAVWaitHandle...
+ 51980             23    0.0     0    23   0  (waiting)
+ 89256             23    0.0     0    23   0  (waiting)
+ 33752             23    0.0     0    23   0  (waiting) rexruntime.dll!?Wait@thread@rex@@YA?AW4WaitResult@12@PEAVWaitHandle...
+ 36816             23    0.0     0    23   0  (waiting) rexruntime.dll!?Delay@XThread@system@rex@@QEAAIII_K@Z
+ 98248             23    0.0     0    23   0  (waiting) rexruntime.dll!?Wait@thread@rex@@YA?AW4WaitResult@12@PEAVWaitHandle...
+ 34380             23    0.0     0    23   0  (waiting) rexruntime.dll!?Wait@thread@rex@@YA?AW4WaitResult@12@PEAVWaitHandle...
+ 34796             23    4.3     1    22   0  rexruntime.dll!?Delay@XThread@system@rex@@QEAAI... 100%
+ 26644             23    8.7     2    21   0  rexruntime.dll!?mutex@global_critical_region@th... 50%; sub_83E4E5E0 [guest 0x83E4E5E0] 50%
+ 36044             23    0.0     0    23   0  (waiting) rexruntime.dll!?Delay@XThread@system@rex@@QEAAIII_K@Z
+ 68916             23    0.0     0    23   0  (waiting) rexruntime.dll!?MaybeYield@thread@rex@@YAXXZ
+ 96232             23    0.0     0    23   0  (waiting) rexruntime.dll!?Wait@thread@rex@@YA?AW4WaitResult@12@PEAVWaitHandle...
+ 45020             23    0.0     0    23   0  (waiting) rexruntime.dll!?Wait@thread@rex@@YA?AW4WaitResult@12@PEAVWaitHandle...
+ 39096             23   13.0     3    20   0  sub_83E80C10 [guest 0x83E80C10] 100%
+ 47292             23    0.0     0    23   0  (waiting) rexruntime.dll!fn_524FE0 (near ??$HostToGuestFunction@$MP6AXV?$Mapp...
+ 62812             23    0.0     0    23   0  (waiting)
+ 75312             23    0.0     0    23   0  (waiting) rexruntime.dll!fn_5ECAC0 (near ??$HostToGuestFunction@$MP6AXV?$Mapp...
+ 69540             23    0.0     0    23   0  (waiting) rexruntime.dll!?Delay@XThread@system@rex@@QEAAIII_K@Z
+ 20964             23    0.0     0    23   0  (waiting) rexruntime.dll!?Delay@XThread@system@rex@@QEAAIII_K@Z
+  9352             23    0.0     0    23   0  (waiting) rexruntime.dll!?Wait@thread@rex@@YA?AW4WaitResult@12@PEAVWaitHandle...
+ 79264             23    0.0     0    23   0  (waiting) rexruntime.dll!?Wait@thread@rex@@YA?AW4WaitResult@12@PEAVWaitHandle...
+ 67944             23    0.0     0    23   0  (waiting) rexruntime.dll!?Wait@thread@rex@@YA?AW4WaitResult@12@PEAVWaitHandle...
+ 49004             23  100.0    23     0   0  sub_83FAF180 [guest 0x83FAF180] 43%; sub_83FBF7D0 [guest 0x83FBF7D0] 26%; __restgprlr_29 13%
+ 80636             23    0.0     0    23   0  (waiting) rexruntime.dll!?Wait@thread@rex@@YA?AW4WaitResult@12@PEAVWaitHandle...
+  3676             23    0.0     0    23   0  (waiting) rexruntime.dll!?Delay@XThread@system@rex@@QEAAIII_K@Z
+ 93628             23    0.0     0    23   0  (waiting) rexruntime.dll!?Wait@thread@rex@@YA?AW4WaitResult@12@PEAVWaitHandle...
+ 60556             23    0.0     0    23   0  (waiting) rexruntime.dll!?Wait@thread@rex@@YA?AW4WaitResult@12@PEAVWaitHandle...
+ 27924             23    0.0     0    23   0  (waiting) rexruntime.dll!?Wait@thread@rex@@YA?AW4WaitResult@12@PEAVWaitHandle...
+ 50208             23    0.0     0    23   0  (waiting) rexruntime.dll!?Delay@XThread@system@rex@@QEAAIII_K@Z
+ 64696             23    0.0     0    23   0  (waiting) rexruntime.dll!?Wait@thread@rex@@YA?AW4WaitResult@12@PEAVWaitHandle...
+ 98152              2    0.0     0     2   0  (waiting)
+
+== top 15 by self (busy samples) ==
+samples      %  /1k rounds  category      function
+-------  -----  ----------  ------------  --------------------------------------------------------------------------------------------------------------
+     10  14.29       434.8  guest         sub_83FAF180 [guest 0x83FAF180]
+      9  12.86       391.3  rexruntime    rexruntime.dll!??$wait_until_published@Usteady_clock@chrono@std@@V?$duration@_JU?$ratio@$00$0DLJKMKAA@@std@...
+      6   8.57       260.9  guest         sub_83FBF7D0 [guest 0x83FBF7D0]
+      5   7.14       217.4  system        ntdll.dll!NtYieldExecution
+      4   5.71       173.9  d3d12+driver  nvwgf2umx.dll!?
+      3   4.29       130.4  guest         sub_83E80C10 [guest 0x83E80C10]
+      3   4.29       130.4  rexlego       __restgprlr_29
+      3   4.29       130.4  d3d12+driver  win32u.dll!NtGdiDdDDISignalSynchronizationObjectFromGpu2
+      2   2.86        87.0  d3d12+driver  win32u.dll!NtGdiDdDDIPresent
+      2   2.86        87.0  d3d12+driver  igd10um64xe.DLL!?
+      2   2.86        87.0  system        win32u.dll!NtNotifyPresentToCompositionSurface
+      1   1.43        43.5  system        ntdll.dll!RtlEnterCriticalSection
+      1   1.43        43.5  rexruntime    rexruntime.dll!?Delay@XThread@system@rex@@QEAAIII_K@Z
+      1   1.43        43.5  guest         sub_82A2F3B0 [guest 0x82A2F3B0]
+      1   1.43        43.5  system        VCRUNTIME140.dll!fn_10E40 (near __NLG_Return2+0x810)
+
+== top 15 by inclusive (busy samples) ==
+samples      %  /1k rounds  category    function
+-------  -----  ----------  ----------  ------------------------------------------------------------------------------
+     67  95.71      2913.0  system      KERNEL32.DLL!BaseThreadInitThunk
+     67  95.71      2913.0  system      ntdll.dll!RtlUserThreadStart
+     36  51.43      1565.2  rexruntime  rexruntime.dll!fn_280EE0 (near ?Execute@XHostThread@system@rex@@UEAAXXZ+0x580)
+     36  51.43      1565.2  rexruntime  rexruntime.dll!?ThreadStartRoutine@thread@rex@@YAKPEAX@Z
+     33  47.14      1434.8  rexruntime  rexruntime.dll!?Execute@XThread@system@rex@@UEAAXXZ
+     29  41.43      1260.9  guest       sub_83FAEB78 [guest 0x83FAEB78]
+     26  37.14      1130.4  guest       sub_82A32950 [guest 0x82A32950]
+     23  32.86      1000.0  guest       sub_82B73A78 [guest 0x82B73A78]
+     23  32.86      1000.0  guest       sub_82B73D48 [guest 0x82B73D48]
+     23  32.86      1000.0  guest       sub_82B74258 [guest 0x82B74258]
+     22  31.43       956.5  guest       sub_83FBF7D0 [guest 0x83FBF7D0]
+     22  31.43       956.5  guest       sub_83FB33E0 [guest 0x83FB33E0]
+     22  31.43       956.5  guest       sub_82B66AC0 [guest 0x82B66AC0]
+     22  31.43       956.5  guest       sub_82BD70A8 [guest 0x82BD70A8]
+     18  25.71       782.6  rexruntime  rexruntime.dll!?RunMainMessageLoop@SDLWindowedAppContext@ui@rex@@QEAAHXZ
+
+(read 0.021 s, map 14.136 s, symbolize 1.293 s; 130 unique stacks, 461 addresses, 322 functions)

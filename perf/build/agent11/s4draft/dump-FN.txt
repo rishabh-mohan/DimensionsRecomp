@@ -1,0 +1,24 @@
+@@ FN L1 [123]
+# Perf sprint: findings and changes (as of Nov 23, 06:55: the night's windows are done, and the project pauses for a break)
+
+@@ FN L6 [554]
+> **The project pauses from ~13:00 today for a few days to a week.** Start again from [RESUME.md](<workspace>/perf-notes/RESUME.md): what's committed, the results, the decisions still open and the next steps. The full plan and its history are in [S4-DRAFT.md](<workspace>/perf-notes/S4-DRAFT.md). The W6 and W4c rows below are Agent 8's formal read-outs; the W9 and W5b rows are still Agent 1's runner summaries, until their read-outs land.
+
+@@ FN L15 [254]
+| W9 | The render thread's busy-wait back-off (#24) at four sleep sizes | **500 µs: 0.70-0.79 core less (−28 to −31%)**, fps +1%, and the slowest 1% of frames a bit faster. 125 and 250 µs save a little less and were unsteady in the second pass | 500 µs |
+
+@@ FN L16 [198]
+| W5b | The timer thread's wait modes | **Precise wait: 0.20 [0.21] core less, fps unchanged in both passes.** The blocking wait saves about the same but lost 0.8% fps in the second pass | precise |
+
+@@ FN L25 [373]
+**The stuck game lock (finding 10) on a quiet PC.** Agent 3 ran two level runs on the quiet PC this morning: one with C1 off and one with P2 + fix (i) + C1. Neither hung. Their slowest frames took 1.8 and 2.9 s, against 4.9-12 s, and a hang in all four runs, under last night's 8-job build. That's one run per set, and the margin is modest; a second pair runs this morning.
+
+@@ FN L34 [410]
+**After the break** (details in RESUME.md): the W9 and W5b read-outs settle the last two leans; then W7 (#19), the native windows W8a and W8b (#21), the codegen window (CG26), the pop-in opt-in (#33), your screenshot check (#1), a confirmation window, the keep/drop calls, a final build with the kept switches on by default, and the write-up. On a new, faster PC, the baselines have to be measured again first.
+
+@@ FN L329 [571]
+- **The quiet-PC test (Nov 23, Agent 3, `build/agent3/f10/RESULTS.md`): no hang.** With the same sync bursts, each host-to-GPU round trip took 0.3-1.0 ms on the quiet PC against 1.8-6.1 ms under the build, so the busy host, not the GPU, stretched the stalls. P2 + fix (i) + C1's biggest bursts (2736 syncs in one frame) still took 2.7-2.9 s, so a busier or slower PC could push one past the 5 s detector; the set with C1 off never makes those bursts. One run per set; a second pair runs this morning, and a controlled-load repeat and a loaded s4b20-style row are offered.
+
+@@ FN L402 [804]
+- This morning's checks: [gates](<workspace>/build/agent12/w6-gates/NIGHT-RESULTS.md) (Agent 12), [logdiffs](<workspace>/build/agent6/wnight/RESULTS.md) (Agent 6), the read-outs [W6](<workspace>/build/agent8/readout/w-followup/W6.md) and [W4c](<workspace>/build/agent8/readout/w-followup/W4c.md) (Agent 8), the [quiet-PC rows](<workspace>/build/agent3/f10/RESULTS.md) (Agent 3) and the [screensaver fix](<workspace>/build/agent5/scrnsave-fix/README.md) (Agent 5)
+

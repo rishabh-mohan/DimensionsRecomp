@@ -1,0 +1,13 @@
+run      <workspace>\build\agent3\selftest-runs\20261121-214859-normal
+mode     FUNCTIONAL ONLY (hidden desktop exebox-CBRDIUIMKBJNS3FGWUFRSW7OY5), NOT FOR TIMING
+result   CRASHED; closed by WM_CLOSE in 0.12 s; exit code 0x00000000
+         dumps: <workspace>\build\agent3\selftest-runs\20261121-214859-normal\fakedimensions.exe, <workspace>\build\agent3\selftest-runs\20261121-214859-normal\fakedimensions.map, <workspace>\build\agent3\selftest-runs\20261121-214859-normal\frames.csv
+process  cpu 0.6 s over 12.16 s (avg 0.05 cores); peak working set 38 MB, peak private 25 MB
+boot     TU patch 0.0.0.3 -> 0.0.23.3 at 0.0 s; DXGI adapter 'Harness Fake Adapter' (0 MB) at 0.0 s; shader storage init at 0.0 s
+log      7 lines over 8.7 s: 1 warnings, 0 errors, 0 critical; 0 MISSING-FUNCTION addresses; unknown cvars: fake_selftest_cvar
+frames   427 presented over 8.35 s; 326 measured after a 2.0 s warm-up:
+         mean 19.446 ms (51.42 fps)  median 16.745  p95 30.79  p99 31.945  max 45.373 ms  >50 ms: 0  1% low 31.3 fps
+         draws/frame median 823.0; PSO creations 28 (70.0 ms), 0 after warm-up; scene 640x360 -> output 640x360; cap 60; vsync 0; focused 0.0
+perf     427 guest frames over 8.35 s (perf.csv); 326 measured from 2.0 s after the first frame:
+         mean 19.446 ms (51.43 fps)  median 16.744  p95 30.789  p99 31.944  p99.9 41.324  max 45.372 ms  >50 ms: 0  >100 ms: 0  1% low 31.31 fps
+         draws/frame p10/p50/p90 904.0/920.0/935.0; pipeline cache misses 84 (0 after warm-up); texture cache misses 140

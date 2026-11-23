@@ -1,0 +1,80 @@
+# #41 step 1 (run 2, task #11; Agent 9, 13:52). Static reads only. A tree = baseline/DimensionsRecomp/rexlego/generated/default.
+# Tools: build/agent9/s4/fe-gate/addr_scan.py -> addr-scan.txt (360 hits; 1,540 functions with lis 0x848E/0x8490 tracked;
+#   windows 848E2E00-848E2EBF and 84900400-849004FF; reports register formations, d-form ld/st, x-form ld/st and pointers
+#   passed in r3-r10 at bl/bctrl), then direct reads of each site in the TUs. 262.5 s at BelowNormal, 1 thread.
+# CORRECTION: "the single writer of 0x849004EC is sub_82A83570" (s6-clock-report.txt:424) came from s6's clock-function
+#   subset, not the whole tree. The whole-tree scan finds 12 writer sites (A below).
+
+## A. 0x849004EC bitset (bits 3/6 tested in mode 3)
+sub_82A832F8 TU411:6120 = Test(n): word at 0x849004EC + 4*(n>>5), mask 1 << (n & 31) (LSB-0), returns (word & mask) != 0;
+  r3 unused. So query 3 = mask 0x08 and query 6 = mask 0x40, both in the word at 0x849004EC.
+Writers (every lis-based site in the tree), by mask:
+  0x40 (bit 6)  sub_82A9F718 TU18:6499-6503   lwz/ori 64/stw through r29 = 0x849004EC (addi r29,r11,1260 at :6414).
+                Path: sub_82A7C080(&bitset) returns 0; [[r4+12]] == 0; r31 = [r3+72]; FNV-1 (prime 0x01000193) over the
+                4 bytes at [r31], inverted, compared with [r31+4] (mismatch -> sub_82A20188(0x4000) first, then go on);
+                then if word [r31] > 13 -> bit 6. Reads like a loaded block whose version word is above 13.
+  0x08 (bit 3)  NO writer found: no or/ori 8 at any site, no stw/stwx through a lis-formed base, no generic Set(n).
+  0x04 (bit 2)  sub_82A83570 TU61:5889 (end of a CreateFile / GetSystemTime / SystemTimeToFileTime / SetFileTime /
+                CloseHandle chain: set on any failure); sub_82A83328 TU327:6196; sub_82A93830 TU82:6066;
+                sub_82A93BF8 TU280:6348; sub_82A9F918 TU302:6330; sub_82AA7DD8 TU319:6284 and :6429;
+                sub_82A9F5C8 TU177:6473 (through r29, same prologue as sub_82A9F718).
+  0x01 (bit 0)  sub_82A9F670 TU114:6418.
+  clear word    sub_82A832E8 TU323:5985 (stw 0; Reset, sits 0x10 before Test); sub_82A93660 TU143:6094 (stw 0).
+  static init   sub_8408E300 TU3:36701 (sth 0 at 0x849004EC = the high half, bits 16-31 only).
+&bitset leaves a function only as r3 to sub_82A7C080 (from sub_82A9F718, sub_82A9F5C8 and the tail-call stub
+  sub_82A7EBE8 TU350:5838). sub_82A7C080 TU415:5846 = AnySet() over a 9-bit set (li r11,9; mask 0x1FF on word 0;
+  loads only, writes nothing). So the set has bits 0-8, and sub_82A9F718 sets bit 6 only while no bit is set yet.
+  sub_82A7EBE8 (AnySet on this bitset) is called at TU206:13770, TU206:13853, TU31:15064, TU360:13420, TU77:13173
+  (findstr-7C080-7EBE8.txt).
+=> Bit 3 has no static writer (lis-based sites plus the only pointer escape, which is read-only). Unless something
+  writes it through a pointer from data, query 3 is always false and the mode-3 term reduces to bit 6.
+
+## B. byte 0x848E2EA2 (gate: must be 0)
+Readers: sub_82A75FD8 TU328:5824 (getter, lbz r3,11938(r11)); sub_82A7EAA0 TU341:6165.
+Writers: NONE. Not by constant EA (fq.py, arm_scan.py), not through a base formed in 848E2E00-848E2EBF, no x-form,
+  no pointer into the window passed to a callee (the only pointers passed are 0x848E2E50 -> sub_83E46040 and
+  sub_82A828A0, and 0x848E2E7C -> sub_82A9CC28).
+Byte 0x848E2EA0 is the same (readers sub_82A7AA80 TU381:5903, sub_83A15318 TU383:27765/27774; no writer).
+Neighbours that do have writers: EA1 sub_829D4390 TU303:5200 (stb r30,11937(r9)); EA3 and EB8 sub_82A7EC08
+  TU109:6258/6282/6392/6394; E81/E82/E83/E94/E95/E96 tiny setters sub_82A755B8, sub_82A75620, sub_82A75630,
+  sub_82A75640, sub_82A75650, sub_82A75A80, sub_82A75AA0, sub_82A75AE0; EBB sub_82AA0028, sub_82AA8A78.
+So EA2 is either never written after load (it keeps the image's initial value, and the gate term is constant), or it
+  is written through a pointer from data or from a base below 0x848E2E00 (block copy or memset).
+Next (static): read the image's initial byte at 0x848E2EA2; rerun addr_scan with the 'arg' window down to the section
+  start. Next (run time): the #41 instrumented pair logs sub_82A75FD8's return value with each sub_82FD4868 call.
+
+## C. [app]+2288 (07:38-07:39, build/agent9/b-clock/fe-gate-flags.txt; unchanged)
+= 1: sub_82FE08C8 TU246:13296 (only caller sub_82FE7E40), when request byte +2289 != 0 (freeze).
+= 0: sub_82FE7E40 TU39:14188 when +2290 != 0 and +2288 != 0 (resume; also +2269 |= 64); sub_82FF68E8 TU246:13662.
+init: sub_8407C158 TU309:39808 (+2288/+2289/+2290).
+Requests: sub_82FF63A8 TU383 (only caller sub_83AA1170 TU279:28966): message match -> [r29+8] == 0 sets +2289,
+  == 1 sets +2290. Event 5 (sub_82FE70C0) adds dt only while [[0x849F5E8C]+2288] == 0.
+
+## D. Callers (fq.py callers; pickle rebuilt 13:54, 164,786 functions; raw output 41-callers.txt)
+sub_82A9F718 (bit 6 setter) and sub_82A9F5C8 (bit 2 setter, same shape): 0 direct callers, so they are reached through a
+  function pointer (they look like completion callbacks: r3 = object with a data block at +72 and a count at +252,
+  r4 = result record with a status pointer at +12).
+sub_82A832F8 Test(n):  sub_82FB9020 TU335:12774, sub_82FD4868 TU293:12534, sub_82FDBAD0 TU177:13916.
+sub_82A75FD8 (EA2):    sub_82FB9020, sub_82FBA9E8 TU44:13467, sub_82FD4868.
+sub_82A7EAA0 (EA2):    sub_82FE6CC0 TU384:13529.
+sub_82A7EBE8 AnySet:   sub_82FC1390 TU360:13370, sub_82FDD930 TU31:14952, sub_82FDDE78 TU206:13513, sub_82FDE3A8 TU77:13147.
+sub_82A832E8 Reset:    sub_82FDD930 TU31:14952, sub_82FDDC60 TU82:13578.
+sub_82A93660 (clear):  sub_82FC5AE8 TU42:13596.
+Stopped at 14:00 (task #11 time box). Not done: what sets the callback pointers for sub_82A9F718/sub_82A9F5C8; the
+  image's initial value at 0x848E2EA2; a wider pointer window for EA2.
+
+## E. Task #17 step 7 (14:15-14:22): what installs the sub_82A9F718 / sub_82A9F5C8 callbacks?
+A pointer built in code would be lis rS,-32086 (0x82AA) + addi rD,rS,-2280 (-> 0x82A9F718) or -2616 (-> 0x82A9F5C8),
+  or lis rS,-32087 (0x82A9) + ori rD,rS,63256/62920 (0xF718/0xF5C8).
+findstr-cb.txt (whole A tree, `,-2280` and `,-2616`): 140 lines, 33 of them addi. cb_formation.py walks back from each
+  addi to the instruction that sets its source register: all 33 are lis with another upper half (-31582, -31617,
+  -32241, -32237, ...), so none of them forms either address. Raw: 41-cb-formation.txt.
+findstr-cb2.txt (whole A tree, /i: `,63256` `,62920` `0xF718` `0xF5C8` `0x82A9F718` `0x82A9F5C8`): 0 hits.
+So no function in the generated tree builds either pointer. The pointers must sit in data, most likely in a vtable or
+  a static callback table in the image (.rdata/.data) that code loads (lwz) or copies. Finding the installer needs
+  the image's data sections: find the table word holding 0x82A9F718, then the lis/addi that forms the table's
+  address. There is no image reader here, so this is not done.
+Image initial byte at 0x848E2EA2: not done either, for the same reason (it needs the XEX's decompressed data, or at
+  least the section map to tell .data from .bss, where it would be 0).
+Note: `start /b x.cmd` runs the batch under cmd /K, so the prompt stays open and the PowerShell task never ends (the
+  "done" lines show findstr itself took 23 s and 9 s). Use `start "" /belownormal /wait /b cmd /c x.cmd` next time.

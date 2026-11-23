@@ -1,0 +1,120 @@
+tree-check report (read-only checker for Agent 2): composed snap1 tree S4b vs the staged after-files
+started 2026-11-22 20:05:32; script build/agent2/s4b/checks/tree-check.py; read-only (wrote only this report); no git, no builds
+tree build/agent2/snap1/DimensionsRecomp; records PATCHES-S4b.tsv, s4b/HASHES.txt, STATE-S4b-1950.tsv, STATE-S4a-1325.tsv, prep-s4b-apply-1950.txt, s4b-compose-check.py (o1-v3: c1v3 -> m1 -> p2c -> r1r2 -> n26; C1 v3 xmemory after BCA5E1CF63686E73)
+
+CHECK 0 (extra) FAIL: S4b records unchanged since the apply (HASHES.txt, PATCHES-S4b.tsv, STATE-S4b-1950.tsv == apply log)
+  FAIL build/agent2/s4b/HASHES.txt sha256 B9A450C3269DB6F96E4FE7373B2F0A6BC551596578AC81A8A11DD8646082CB2B; the apply log wrote it as None
+  FAIL build/agent2/snap1/PATCHES-S4b.tsv sha256 49D4E947BA7037DBE7E0937AF954E90C46A2FDFD0431803BE25B500C572B8028; the apply log wrote it as None
+  FAIL build/agent2/snap1/STATE-S4b-1950.tsv sha256 A739468D5FF55C400A5053748B757DDECA76D388DF788B2A303C06EE62E61378; the apply log wrote it as None
+  FAIL apply log build/agent2/prep-s4b-apply-1950.txt (sha256 DCB84EDCE9214E9A): RESULT none; no verify line
+  NOTE records read from build/agent2/s4b-compose-check.py (sha256 D08B74E0D86E7F14)
+
+CHECK 1 PASS: 16/16 rows: snap1 == PATCHES after == HASHES.txt after == STATE-S4b snap sha == staged after-file (15 files; command_processor.cpp = Agent 10 composite 027204B53A271D69) == o1-v3 (13 SDK files) == compose-check record; xmemory.cpp BCA5E1CF63686E73
+  PATCHES-S4b.tsv: 16 rows (want 16), 16 distinct rel(s), column counts [6]
+  PASS rexglue-sdk/include/rex/graphics/shared_memory.h: snap1 82A66445ED98B091B5CF8FAA75D0EF3E11DFA0344ABBC2184F3A23C46F0FF98C (13051 B)
+       == PATCHES after 82A66445ED98B091 | == HASHES.txt after 82A66445ED98B091 | == STATE-S4b snap sha 82A66445ED98B091 | == staged build/agent12/s4-c1v3/new/sdk/include/rex/graphics/shared_memory.h 82A66445ED98B091 | == o1-v3 82A66445ED98B091 | == compose-check record 82A66445ED98B091
+       size 13051 B vs HASHES.txt 13051 / STATE-S4b 13051: ok; mtime_ns 1795398619511324400 vs STATE-S4b 1795398619511324400: same
+  PASS rexglue-sdk/include/rex/system/xmemory.h: snap1 5A70782EF00F0FB6094A0F538690557E81B5EE21C7781E190A38ABD859541CB2 (31430 B)
+       == PATCHES after 5A70782EF00F0FB6 | == HASHES.txt after 5A70782EF00F0FB6 | == STATE-S4b snap sha 5A70782EF00F0FB6 | == staged build/agent12/s4-c1v3/new/sdk/include/rex/system/xmemory.h 5A70782EF00F0FB6 | == o1-v3 5A70782EF00F0FB6 | == compose-check record 5A70782EF00F0FB6
+       size 31430 B vs HASHES.txt 31430 / STATE-S4b 31430: ok; mtime_ns 1795398619511324400 vs STATE-S4b 1795398619511324400: same
+  PASS rexglue-sdk/src/graphics/primitive_processor.cpp: snap1 470BA4BED73B2ABFD32048F901C426BA24048C26A07694F9768F7AD35EC137F2 (79790 B)
+       == PATCHES after 470BA4BED73B2ABF | == HASHES.txt after 470BA4BED73B2ABF | == STATE-S4b snap sha 470BA4BED73B2ABF | == staged build/agent12/s4-c1v3/new/sdk/src/graphics/primitive_processor.cpp 470BA4BED73B2ABF | == o1-v3 470BA4BED73B2ABF | == compose-check record 470BA4BED73B2ABF
+       size 79790 B vs HASHES.txt 79790 / STATE-S4b 79790: ok; mtime_ns 1795398619511324400 vs STATE-S4b 1795398619511324400: same
+  PASS rexglue-sdk/src/graphics/shared_memory.cpp: snap1 A4A31038ABDFF94A1B97D28A13EE2ACBB67F44DC596F7A964C8C7493050390C6 (32711 B)
+       == PATCHES after A4A31038ABDFF94A | == HASHES.txt after A4A31038ABDFF94A | == STATE-S4b snap sha A4A31038ABDFF94A | == staged build/agent12/s4-c1v3/new/sdk/src/graphics/shared_memory.cpp A4A31038ABDFF94A | == o1-v3 A4A31038ABDFF94A | == compose-check record A4A31038ABDFF94A
+       size 32711 B vs HASHES.txt 32711 / STATE-S4b 32711: ok; mtime_ns 1795398619511324400 vs STATE-S4b 1795398619511324400: same
+  PASS rexglue-sdk/src/system/xmemory.cpp: snap1 BCA5E1CF63686E73FC5A12642B9B169E155FBBEC65D0A56CE1BE9B0B71022794 (121109 B)
+       == PATCHES after BCA5E1CF63686E73 | == HASHES.txt after BCA5E1CF63686E73 | == STATE-S4b snap sha BCA5E1CF63686E73 | == staged build/agent12/s4-c1v3/new/sdk/src/system/xmemory.cpp BCA5E1CF63686E73 | == o1-v3 BCA5E1CF63686E73 | == compose-check record BCA5E1CF63686E73 | == task BCA5E1CF63686E73
+       size 121109 B vs HASHES.txt 121109 / STATE-S4b 121109: ok; mtime_ns 1795398619511324400 vs STATE-S4b 1795398619511324400: same
+  PASS rexglue-sdk/src/graphics/d3d12/shared_memory.cpp: snap1 2A5ADF13B5E433F1F10B5C6AF9C14F8812527C4E155A5146B166723457B6EBB4 (24190 B)
+       == PATCHES after 2A5ADF13B5E433F1 | == HASHES.txt after 2A5ADF13B5E433F1 | == STATE-S4b snap sha 2A5ADF13B5E433F1 | == staged build/agent5/s4-m1/new/shared_memory.cpp 2A5ADF13B5E433F1 | == o1-v3 2A5ADF13B5E433F1 | == compose-check record 2A5ADF13B5E433F1
+       size 24190 B vs HASHES.txt 24190 / STATE-S4b 24190: ok; mtime_ns 1795398619511324400 vs STATE-S4b 1795398619511324400: same
+  PASS rexglue-sdk/src/graphics/d3d12/command_processor.cpp: snap1 027204B53A271D69275FCC6FEC6B2222905155E1FD67808F88A79329F4022C0E (273790 B)
+       == PATCHES after 027204B53A271D69 | == HASHES.txt after 027204B53A271D69 | == STATE-S4b snap sha 027204B53A271D69 | == o1-v3 027204B53A271D69 | == compose-check record 027204B53A271D69 | == task 027204B53A271D69
+       size 273790 B vs HASHES.txt 273790 / STATE-S4b 273790: ok; mtime_ns 1795398619511324400 vs STATE-S4b 1795398619511324400: same
+       NOTE single-step after-file build/agent12/s4-p2c/new/command_processor.cpp (p2c alone) 474C1CBAE6359D9E, == record p2c after 474C1CBAE6359D9E: yes; != snap1 as expected (P2c then r1r2 both touch this file)
+       NOTE single-step after-file build/agent7/s4-r1r2/new/sdk/src/graphics/d3d12/command_processor.cpp (r1r2 alone) 760833A5D7D89ADC, == record r1r2 after 760833A5D7D89ADC: yes; != snap1 as expected (P2c then r1r2 both touch this file)
+       NOTE o2-v3 (r1r2 then P2c) result 027204B53A271D69: == snap1 (both orders give the composite)
+  PASS rexglue-sdk/include/rex/graphics/d3d12/command_processor.h: snap1 67F4E8380C879377F06B6E3DD879EE737A82BBBE9682F123247ED5D0671FF325 (41218 B)
+       == PATCHES after 67F4E8380C879377 | == HASHES.txt after 67F4E8380C879377 | == STATE-S4b snap sha 67F4E8380C879377 | == staged build/agent7/s4-r1r2/new/sdk/include/rex/graphics/d3d12/command_processor.h 67F4E8380C879377 | == o1-v3 67F4E8380C879377 | == compose-check record 67F4E8380C879377
+       size 41218 B vs HASHES.txt 41218 / STATE-S4b 41218: ok; mtime_ns 1795398619511324400 vs STATE-S4b 1795398619511324400: same
+  PASS rexglue-sdk/include/rex/graphics/d3d12/deferred_command_list.h: snap1 9F6CC70A6922232D4FF7A32303E8B785A01D1C7A3CF54373369EF6B23F8AF0F0 (26607 B)
+       == PATCHES after 9F6CC70A6922232D | == HASHES.txt after 9F6CC70A6922232D | == STATE-S4b snap sha 9F6CC70A6922232D | == staged build/agent7/s4-r1r2/new/sdk/include/rex/graphics/d3d12/deferred_command_list.h 9F6CC70A6922232D | == o1-v3 9F6CC70A6922232D | == compose-check record 9F6CC70A6922232D
+       size 26607 B vs HASHES.txt 26607 / STATE-S4b 26607: ok; mtime_ns 1795398619511324400 vs STATE-S4b 1795398619511324400: same
+  PASS rexglue-sdk/src/graphics/d3d12/deferred_command_list.cpp: snap1 30FF57446EFB5D7643EC71024CE1D04884C210831053DEE39EAAB611FD346872 (34034 B)
+       == PATCHES after 30FF57446EFB5D76 | == HASHES.txt after 30FF57446EFB5D76 | == STATE-S4b snap sha 30FF57446EFB5D76 | == staged build/agent7/s4-r1r2/new/sdk/src/graphics/d3d12/deferred_command_list.cpp 30FF57446EFB5D76 | == o1-v3 30FF57446EFB5D76 | == compose-check record 30FF57446EFB5D76
+       size 34034 B vs HASHES.txt 34034 / STATE-S4b 34034: ok; mtime_ns 1795398619511324400 vs STATE-S4b 1795398619511324400: same
+  PASS rexglue-sdk/include/rex/codegen/config.h: snap1 CD39B0E110D3E0FD9E602446111183CB941478BF9057389BB815F125060D2087 (7032 B)
+       == PATCHES after CD39B0E110D3E0FD | == HASHES.txt after CD39B0E110D3E0FD | == STATE-S4b snap sha CD39B0E110D3E0FD | == staged build/agent9/s4/spin/db16cyc-pause/new/include/rex/codegen/config.h CD39B0E110D3E0FD | == o1-v3 CD39B0E110D3E0FD | == compose-check record CD39B0E110D3E0FD
+       size 7032 B vs HASHES.txt 7032 / STATE-S4b 7032: ok; mtime_ns 1795398619511324400 vs STATE-S4b 1795398619511324400: same
+  PASS rexglue-sdk/src/codegen/config.cpp: snap1 4706A7F22C3859D6DBE8E7A3150B3403548856BAD626952818F7B96B3D5935DF (23701 B)
+       == PATCHES after 4706A7F22C3859D6 | == HASHES.txt after 4706A7F22C3859D6 | == STATE-S4b snap sha 4706A7F22C3859D6 | == staged build/agent9/s4/spin/db16cyc-pause/new/src/codegen/config.cpp 4706A7F22C3859D6 | == o1-v3 4706A7F22C3859D6 | == compose-check record 4706A7F22C3859D6
+       size 23701 B vs HASHES.txt 23701 / STATE-S4b 23701: ok; mtime_ns 1795398619511324400 vs STATE-S4b 1795398619511324400: same
+  PASS rexglue-sdk/src/codegen/builders/system.cpp: snap1 FAD4372074D32D69D5B2CB0B100F283E239A426C3E015DBD66C22BCB693998D2 (12947 B)
+       == PATCHES after FAD4372074D32D69 | == HASHES.txt after FAD4372074D32D69 | == STATE-S4b snap sha FAD4372074D32D69 | == staged build/agent9/s4/spin/db16cyc-pause/new/src/codegen/builders/system.cpp FAD4372074D32D69 | == o1-v3 FAD4372074D32D69 | == compose-check record FAD4372074D32D69
+       size 12947 B vs HASHES.txt 12947 / STATE-S4b 12947: ok; mtime_ns 1795398619511324400 vs STATE-S4b 1795398619511324400: same
+  PASS rexlego/src/gpu_native/memory_watch.cpp: snap1 70829846C4F321A9B701B471634AC0806A9B0E6EF8730ADCBC84E937DE27105A (8054 B)
+       == PATCHES after 70829846C4F321A9 | == HASHES.txt after 70829846C4F321A9 | == STATE-S4b snap sha 70829846C4F321A9 | == staged build/agent12/s4-c1/new/game/rexlego/src/gpu_native/memory_watch.cpp 70829846C4F321A9 | == compose-check record 70829846 | == task 70829846C4F321A9
+       size 8054 B vs HASHES.txt 8054 / STATE-S4b 8054: ok; mtime_ns 1795398619511324400 vs STATE-S4b 1795398619511324400: same
+  PASS rexlego/CMakeLists.txt: snap1 1BF46D7878BA9A2535BD044A22EB50FC559067C72F0BAEFF6FDD742DFE5EF25E (52311 B)
+       == PATCHES after 1BF46D7878BA9A25 | == HASHES.txt after 1BF46D7878BA9A25 | == STATE-S4b snap sha 1BF46D7878BA9A25 | == staged build/agent9/s4/fence-wait/s4c/new/rexlego/CMakeLists.txt 1BF46D7878BA9A25 | == compose-check record 1BF46D7878BA9A25 | == task 1BF46D7878BA9A25
+       size 52311 B vs HASHES.txt 52311 / STATE-S4b 52311: ok; mtime_ns 1795398619511324400 vs STATE-S4b 1795398619511324400: same
+  PASS rexlego/src/gpu_wait_backoff.cpp: snap1 01D9F8F3464C861401C3BE98F797938619C5DD85B1AEA166B6D9CED053FA19DD (18177 B)
+       == PATCHES after 01D9F8F3464C8614 | == HASHES.txt after 01D9F8F3464C8614 | == STATE-S4b snap sha 01D9F8F3464C8614 | == staged build/agent9/s4/fence-wait/s4c/new/rexlego/src/gpu_wait_backoff.cpp 01D9F8F3464C8614 | == compose-check record 01D9F8F3464C8614 | == task 01D9F8F3464C8614
+       size 18177 B vs HASHES.txt 18177 / STATE-S4b 18177: ok; mtime_ns 1795398619511324400 vs STATE-S4b 1795398619511324400: same
+
+CHECK 2 PASS: memory_watch.cpp CRLF 70829846C4F321A9 (172 CRLF/0 bare LF); gpu_wait_backoff.cpp LF 01D9F8F3464C8614 (0 CRLF/395 bare LF); CMakeLists.txt CRLF 1BF46D7878BA9A25 (907 CRLF/0 bare LF)
+  PASS rexlego/src/gpu_native/memory_watch.cpp: sha256 70829846C4F321A9B701B471634AC0806A9B0E6EF8730ADCBC84E937DE27105A (== 70829846C4F321A9); 172 CRLF, 0 bare LF, 0 bare CR -> CRLF; BOM no; final newline yes
+       NOTE S4a form (backup): 166 CRLF, 0 bare LF, 0 bare CR
+  PASS rexlego/src/gpu_wait_backoff.cpp: sha256 01D9F8F3464C861401C3BE98F797938619C5DD85B1AEA166B6D9CED053FA19DD (== 01D9F8F3464C8614); 0 CRLF, 395 bare LF, 0 bare CR -> LF; BOM no; final newline yes
+  PASS rexlego/CMakeLists.txt: sha256 1BF46D7878BA9A2535BD044A22EB50FC559067C72F0BAEFF6FDD742DFE5EF25E (== 1BF46D7878BA9A25); 907 CRLF, 0 bare LF, 0 bare CR -> CRLF; BOM no; final newline yes
+       NOTE S4a form (backup): 885 CRLF, 0 bare LF, 0 bare CR
+
+CHECK 3 PASS: STATE-S4b 23844 rows = STATE-S4a 23843 rows + rexlego/src/gpu_wait_backoff.cpp; snap sha differs in 16 rows (15 changed + 1 new), == the 16 PATCHES-S4b rows; extra differences: none
+  STATE-S4a-1325.tsv: 23843 rows (header says 23843), 0 duplicate rel(s), 0 malformed line(s)
+  STATE-S4b-1950.tsv: 23844 rows (header says 23844), 0 duplicate rel(s), 0 malformed line(s)
+  rel paths only in S4b: rexlego/src/gpu_wait_backoff.cpp; only in S4a: none
+  rows with a different snap sha: 15 changed + 1 new = 16; not PATCHES-S4b rows: none; PATCHES-S4b rows without a difference: none
+    ok   rexglue-sdk/include/rex/graphics/shared_memory.h: S4a snap 4D861738A94B556B == before; S4b snap 82A66445ED98B091 == after; changed columns: snap size, snap mtime_ns, snap sha, origin; S4b origin S4b; S4b live sha 4D861738A94B556B (== before, live untouched)
+    ok   rexglue-sdk/include/rex/system/xmemory.h: S4a snap 80100865A654AF04 == before; S4b snap 5A70782EF00F0FB6 == after; changed columns: snap size, snap mtime_ns, snap sha, origin; S4b origin S4b; S4b live sha 80100865A654AF04 (== before, live untouched)
+    ok   rexglue-sdk/src/graphics/primitive_processor.cpp: S4a snap E07F690223B564AE == before; S4b snap 470BA4BED73B2ABF == after; changed columns: snap size, snap mtime_ns, snap sha, origin; S4b origin S4b; S4b live sha E07F690223B564AE (== before, live untouched)
+    ok   rexglue-sdk/src/graphics/shared_memory.cpp: S4a snap 0BE4BADCAC666BEE == before; S4b snap A4A31038ABDFF94A == after; changed columns: live size, live mtime_ns, live sha, snap size, snap mtime_ns, snap sha, origin; S4b origin S4b; S4b live sha 0BE4BADCAC666BEE (== before, live untouched)
+    ok   rexglue-sdk/src/system/xmemory.cpp: S4a snap 141FB1A947D59156 == before; S4b snap BCA5E1CF63686E73 == after; changed columns: live size, live mtime_ns, live sha, snap size, snap mtime_ns, snap sha, origin; S4b origin S4b; S4b live sha 141FB1A947D59156 (== before, live untouched)
+    ok   rexglue-sdk/src/graphics/d3d12/shared_memory.cpp: S4a snap BB0838CE3909E18A == before; S4b snap 2A5ADF13B5E433F1 == after; changed columns: live size, live mtime_ns, live sha, snap size, snap mtime_ns, snap sha, origin; S4b origin S4b; S4b live sha BB0838CE3909E18A (== before, live untouched)
+    ok   rexglue-sdk/src/graphics/d3d12/command_processor.cpp: S4a snap 3AB3AA5360D4E987 == before; S4b snap 027204B53A271D69 == after; changed columns: snap size, snap mtime_ns, snap sha, origin; S4b origin S4b; S4b live sha 3AB3AA5360D4E987 (== before, live untouched)
+    ok   rexglue-sdk/include/rex/graphics/d3d12/command_processor.h: S4a snap 41F32B80BABA213C == before; S4b snap 67F4E8380C879377 == after; changed columns: snap size, snap mtime_ns, snap sha, origin; S4b origin S4b; S4b live sha 41F32B80BABA213C (== before, live untouched)
+    ok   rexglue-sdk/include/rex/graphics/d3d12/deferred_command_list.h: S4a snap DA2F58B6CE3D7F6A == before; S4b snap 9F6CC70A6922232D == after; changed columns: snap size, snap mtime_ns, snap sha, origin; S4b origin S4b; S4b live sha DA2F58B6CE3D7F6A (== before, live untouched)
+    ok   rexglue-sdk/src/graphics/d3d12/deferred_command_list.cpp: S4a snap FFDF7FB66EC81715 == before; S4b snap 30FF57446EFB5D76 == after; changed columns: snap size, snap mtime_ns, snap sha, origin; S4b origin S4b; S4b live sha FFDF7FB66EC81715 (== before, live untouched)
+    ok   rexglue-sdk/include/rex/codegen/config.h: S4a snap D07C575FF2904B87 == before; S4b snap CD39B0E110D3E0FD == after; changed columns: snap size, snap mtime_ns, snap sha, origin; S4b origin S4b; S4b live sha D07C575FF2904B87 (== before, live untouched)
+    ok   rexglue-sdk/src/codegen/config.cpp: S4a snap 0ED529B7E5F0F4E7 == before; S4b snap 4706A7F22C3859D6 == after; changed columns: snap size, snap mtime_ns, snap sha, origin; S4b origin S4b; S4b live sha 0ED529B7E5F0F4E7 (== before, live untouched)
+    ok   rexglue-sdk/src/codegen/builders/system.cpp: S4a snap D1269273636B5A1A == before; S4b snap FAD4372074D32D69 == after; changed columns: snap size, snap mtime_ns, snap sha, origin; S4b origin S4b; S4b live sha D1269273636B5A1A (== before, live untouched)
+    ok   rexlego/src/gpu_native/memory_watch.cpp: S4a snap 19AE1606C6DB7273 == before; S4b snap 70829846C4F321A9 == after; changed columns: snap size, snap mtime_ns, snap sha, origin; S4b origin S4b; S4b live sha 19AE1606C6DB7273 (== before, live untouched)
+    ok   rexlego/CMakeLists.txt: S4a snap 3690D5D76AA9FBED == before; S4b snap 1BF46D7878BA9A25 == after; changed columns: snap size, snap mtime_ns, snap sha, origin; S4b origin S4b; S4b live sha 3690D5D76AA9FBED (== before, live untouched)
+    ok   rexlego/src/gpu_wait_backoff.cpp: S4a snap ABSENT == before; S4b snap 01D9F8F3464C8614 == after; changed columns: (new row); S4b origin S4b; S4b live sha - (not in live)
+  extra differences (rows outside the 16 with any column changed): 0
+
+CHECK 4 PASS: snap1 rexlego/legodimensions_config.toml 7F775847DB9CC2DA (== 7F775847DB9CC2DA), == STATE-S4b == STATE-S4a; db16cyc_pause lines: 0 (#26 stays OFF)
+  snap1 rexlego/legodimensions_config.toml: sha256 7F775847DB9CC2DA89DC3EDE57A0AD5F30FDF58D98F5021A0E27A4E0E4DA95BF (18145 B, 815 lines) == 7F775847DB9CC2DA
+  STATE-S4b row 7F775847DB9CC2DA, STATE-S4a row 7F775847DB9CC2DA: both == snap1; in PATCHES-S4b: no (S4b does not touch it)
+  lines containing db16cyc_pause: 0; lines mentioning db16cyc at all: 0
+
+CHECK 5 PASS: 15/15 backups present, sha256 == the row's before (== HASHES.txt before, sizes equal); extra backup files: none
+  PASS build/agent2/snap1-backup-S4b/DimensionsRecomp/rexglue-sdk/include/rex/graphics/shared_memory.h: backup 4D861738A94B556B08A4604D2CAB07AD7AFE1B3AD56B295F7F1E31C57BAED847 (12169 B) == before 4D861738A94B556B; HASHES.txt before 4D861738A94B556B (12169 B)
+  PASS build/agent2/snap1-backup-S4b/DimensionsRecomp/rexglue-sdk/include/rex/system/xmemory.h: backup 80100865A654AF047D25EDA70CF1C746B182C81BCBDFC5B027EE56E0AE7132F9 (29396 B) == before 80100865A654AF04; HASHES.txt before 80100865A654AF04 (29396 B)
+  PASS build/agent2/snap1-backup-S4b/DimensionsRecomp/rexglue-sdk/src/graphics/primitive_processor.cpp: backup E07F690223B564AE0D41D1192ACD9225BD35226A43A7ACA8F2798B1851291B35 (79508 B) == before E07F690223B564AE; HASHES.txt before E07F690223B564AE (79508 B)
+  PASS build/agent2/snap1-backup-S4b/DimensionsRecomp/rexglue-sdk/src/graphics/shared_memory.cpp: backup 0BE4BADCAC666BEE80F656669D072EDA8B55C2D25D25C448BC4C29E12BD503F4 (26439 B) == before 0BE4BADCAC666BEE; HASHES.txt before 0BE4BADCAC666BEE (26439 B)
+  PASS build/agent2/snap1-backup-S4b/DimensionsRecomp/rexglue-sdk/src/system/xmemory.cpp: backup 141FB1A947D59156EB40A835B27E64F94EE22A3F5BE0E0F70F17BC85C676C87A (108907 B) == before 141FB1A947D59156; HASHES.txt before 141FB1A947D59156 (108907 B)
+  PASS build/agent2/snap1-backup-S4b/DimensionsRecomp/rexglue-sdk/src/graphics/d3d12/shared_memory.cpp: backup BB0838CE3909E18A63099B47B4E852CB9D2307EB2BF2535C3BC8FF38BFD64587 (20888 B) == before BB0838CE3909E18A; HASHES.txt before BB0838CE3909E18A (20888 B)
+  PASS build/agent2/snap1-backup-S4b/DimensionsRecomp/rexglue-sdk/src/graphics/d3d12/command_processor.cpp: backup 3AB3AA5360D4E9875DCA8550346EE368EC9188BDC454C2EB93D9BB915BD1AD97 (269215 B) == before 3AB3AA5360D4E987; HASHES.txt before 3AB3AA5360D4E987 (269215 B)
+  PASS build/agent2/snap1-backup-S4b/DimensionsRecomp/rexglue-sdk/include/rex/graphics/d3d12/command_processor.h: backup 41F32B80BABA213CBC2821CD48661B51121D256E51054B8A46B83E5CBF8B2FA0 (40408 B) == before 41F32B80BABA213C; HASHES.txt before 41F32B80BABA213C (40408 B)
+  PASS build/agent2/snap1-backup-S4b/DimensionsRecomp/rexglue-sdk/include/rex/graphics/d3d12/deferred_command_list.h: backup DA2F58B6CE3D7F6A72EDBF3D2A577EBE1E6FBC664FB9EA368C9CC65E874FE174 (26456 B) == before DA2F58B6CE3D7F6A; HASHES.txt before DA2F58B6CE3D7F6A (26456 B)
+  PASS build/agent2/snap1-backup-S4b/DimensionsRecomp/rexglue-sdk/src/graphics/d3d12/deferred_command_list.cpp: backup FFDF7FB66EC8171557D1E4195147DE556BDDA342ACC7C3ED7EB81279494A3E30 (15589 B) == before FFDF7FB66EC81715; HASHES.txt before FFDF7FB66EC81715 (15589 B)
+  PASS build/agent2/snap1-backup-S4b/DimensionsRecomp/rexglue-sdk/include/rex/codegen/config.h: backup D07C575FF2904B8753FA4B4306847375EC2EB69156355947E874AFFFC19F46C2 (6941 B) == before D07C575FF2904B87; HASHES.txt before D07C575FF2904B87 (6941 B)
+  PASS build/agent2/snap1-backup-S4b/DimensionsRecomp/rexglue-sdk/src/codegen/config.cpp: backup 0ED529B7E5F0F4E7CC0A4551A1C5C3A3191F03D28D491D517850898D5062FCFD (23576 B) == before 0ED529B7E5F0F4E7; HASHES.txt before 0ED529B7E5F0F4E7 (23576 B)
+  PASS build/agent2/snap1-backup-S4b/DimensionsRecomp/rexglue-sdk/src/codegen/builders/system.cpp: backup D1269273636B5A1A57BE6E467CE19326EAEA38F7E0E5A0C157D4B23998D10506 (12635 B) == before D1269273636B5A1A; HASHES.txt before D1269273636B5A1A (12635 B)
+  PASS build/agent2/snap1-backup-S4b/DimensionsRecomp/rexlego/src/gpu_native/memory_watch.cpp: backup 19AE1606C6DB727369A5F119EF3371A8D307F4B42088D5C064F0D2DF8D62D47A (7613 B) == before 19AE1606C6DB7273; HASHES.txt before 19AE1606C6DB7273 (7613 B)
+  PASS build/agent2/snap1-backup-S4b/DimensionsRecomp/rexlego/CMakeLists.txt: backup 3690D5D76AA9FBED39D3559163C9F87D380124D9657FE450896AAD1F21607429 (51070 B) == before 3690D5D76AA9FBED; HASHES.txt before 3690D5D76AA9FBED (51070 B)
+  NOTE rexlego/src/gpu_wait_backoff.cpp: before ABSENT (new file, revert deletes it); backup absent (as expected)
+  files under build/agent2/snap1-backup-S4b: 15; not one of the 15 rows: none
+
+RESULT: FAIL (checks 1-5: 5 PASS, 0 FAIL; extra check 0 FAIL) failing: 0 (extra); 0.5 s

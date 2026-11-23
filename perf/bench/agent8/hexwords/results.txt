@@ -1,0 +1,48 @@
+﻿=== hexwords_bench  2026-11-21 18:32:32  runs=3 quick=True
+load before: total CPU 100% of 12 logical CPUs; busiest (per-CPU %): powershell#9=380%, PresentMon_x64=99%, clang++#3=85%, clang++#9=85%, clang++=77%, MsMpEng=62%, clang++#6=62%, System=48%
+EQUALITY PASS: cases=20030 chars=9255988 mismatches=0
+
+HexWords (ns/call)           median        min        max  speedup  runs
+old    8 words       15106.3     5992.6    23186.7              3
+new    8 words         178.3      172.3      178.8    84.7x     3
+old   16 words       10943.0    10797.6    25575.0              3
+new   16 words         268.7      253.8     1488.6    40.7x     3
+old   32 words       41485.4    32506.4    46369.8              3
+new   32 words         478.7      451.2      479.4    86.7x     3
+old   48 words       41723.1    41329.0    66277.9              3
+new   48 words         751.6      663.4     3711.8    55.5x     3
+old   64 words       47367.2    45139.2    51885.4              3
+new   64 words         796.9      772.8      849.9    59.4x     3
+old   84 words       61813.5    61456.8    65412.5              3
+new   84 words        1046.1     1011.3     1090.4    59.1x     3
+
+(sink 149292000)
+RESULT PASS
+load after: total CPU 100% of 12 logical CPUs; busiest (per-CPU %): clang++#4=100%, PresentMon_x64=96%, clang++=89%, dllhost=89%, clang++#2=89%, clang++#5=85%, clang++#3=65%, clang++#11=58%
+exit code: 0
+
+=== hexwords_bench  2026-11-21 18:49:11  runs=7 quick=False
+load before: total CPU 100% of 12 logical CPUs; busiest (per-CPU %): PresentMon_x64=95%, bench_cs=83%, clang++#4=71%, clang++=67%, MsMpEng=63%, clang++#1=55%, clang++#5=55%, clang++#3=47%
+priority: above-normal
+calibration: TSC 2.611 GHz; 50 ms spin: wall 50.00 ms, thread CPU 49.39 ms
+EQUALITY PASS: cases=200030 chars=91607878 mismatches=0
+
+HexWords (cpu ns/call)       median        min        max wall median  speedup  runs
+old    8 words        5501.4     5348.3     5936.8      5668.2              7
+new    8 words         165.1      152.8      197.0       166.9    33.3x     7
+old   16 words       11101.7    10333.9    12159.8     11161.7              7
+new   16 words         271.1      267.1      282.3       274.8    40.9x     7
+old   32 words       20554.7    17919.2    21995.9     20880.5              7
+new   32 words         446.3      415.7      449.0       448.4    46.1x     7
+old   48 words       29797.4    25015.5    34385.4     31285.7              7
+new   48 words         573.3      460.3      615.2       578.0    52.0x     7
+old   64 words       43382.9    36826.1    48294.3     44891.6              7
+new   64 words         682.0      630.5      826.4       700.8    63.6x     7
+old   84 words       79196.2    57737.5    82848.9     82448.5              7
+new   84 words        1297.4     1137.3     1569.4      1356.7    61.0x     7
+
+(sink 3483480000)
+RESULT PASS
+load after: total CPU 100% of 12 logical CPUs; busiest (per-CPU %): MsMpEng=155%, PresentMon_x64=100%, svchost#17=76%, bench_spinlock=76%, powershell#7=73%, powershell#9=66%, agy#10=66%, WmiPrvSE#2=45%
+exit code: 0
+

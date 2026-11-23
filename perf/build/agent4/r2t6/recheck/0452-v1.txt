@@ -1,0 +1,36 @@
+mc_smoke_check  OFF=build\agent8\matrix\20261122-0452\runs\0452-n0-r1  ON=build\agent8\matrix\20261122-0452\runs\0452-n0-r1
+
+C1 shaders.cpp warning lines (exact text, count OFF / ON):
+        4 /    4  [warning] placement pixel shader 0xAC448F28 backing 0xED23D540 prefix=0xC77B3ABB6F87ACD9 words=00000000 00000000 00000000 00000000 missing from AOT in
+        4 /    4  [warning] placement vertex shader 0xAC449538 backing 0xED23D3E0 prefix=0xDCD4AD8441398283 words=F2556004 600A1200 12000000 00006010 missing from AOT i
+        1 /    1  [warning] shader not present in AOT cache, hash=0x93B9F93B535E7CCA
+        1 /    1  [warning] shader not present in AOT cache, hash=0xA58EBA123EFB541C
+        8 /    8  [warning] unrecognized pixel shader resource 0xAC448F28
+        8 /    8  [warning] unrecognized vertex shader resource 0xAC449538
+  total 26 / 26; hash=0 lines 0 / 0; game.log lines 480 / 480
+  C1 PASS
+  info: adopted shaders 0 / 0; OFF-only 0, ON-only 0 (route timing can explain a few; many OFF-only = look)
+
+C2 draws/frame (frames.csv draw_calls, frames with draws > 0):
+  OFF   12259 frames  p10/p50/p90 1/8/8  max 8  (native-frames.csv)
+  ON    12259 frames  p10/p50/p90 1/8/8  max 8  (native-frames.csv)
+  common values (share OFF / ON):
+         1   19.4% /  19.4%
+         8   80.6% /  80.6%
+  C2 SAME
+
+OFF events.tsv: none (no LEGO_NATIVE_TRACE_DIR)
+
+ON events.tsv: none (no LEGO_NATIVE_TRACE_DIR)
+
+C3 unrecognized_shader (rows, frames with rows, rows per frame-with-rows), OFF | ON:
+  C3 SKIP (needs both traces)
+
+C4 shader_miss_cache_insert:
+  OFF: no trace
+  ON: no trace, so arming is unknown
+
+RESULT: PASS  flags: C3 SKIP; C4 SKIP
+Also run (not done here):
+  python build\agent10\bgate\logdiff.py --base build\agent8\matrix\20261122-0452\runs\0452-n0-r1 --cand build\agent8\matrix\20261122-0452\runs\0452-n0-r1   (NEW 0 / MORE 0)
+  python build\agent10\nb\warntypes.py --run OFF=build\agent8\matrix\20261122-0452\runs\0452-n0-r1 --run ON=build\agent8\matrix\20261122-0452\runs\0452-n0-r1   (equal counts)

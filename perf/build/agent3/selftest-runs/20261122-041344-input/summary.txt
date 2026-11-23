@@ -1,0 +1,13 @@
+run      <workspace>\build\agent3\selftest-runs\20261122-041344-input
+mode     FUNCTIONAL ONLY (hidden desktop exebox-JGWR2SVEU4PVVYD7BE2KMKVWMX), NOT FOR TIMING
+result   RUNNING; closed by WM_CLOSE in 0.08 s; exit code 0x00000000
+process  cpu 0.6 s over 7.16 s (avg 0.09 cores); peak working set 38 MB, peak private 25 MB
+boot     TU patch 0.0.0.3 -> 0.0.23.3 at 0.01 s; DXGI adapter 'Harness Fake Adapter' (0 MB) at 0.0 s; shader storage init at 0.01 s; frames first written 2.0 s after launch
+log      31 lines over 6.6 s: 1 warnings, 0 errors, 0 critical; 0 MISSING-FUNCTION addresses; unknown cvars: fake_selftest_cvar
+frames   335 presented over 6.47 s; 287 measured after a 1.0 s warm-up:
+         mean 19.041 ms (52.52 fps)  median 17.195  p95 30.875  p99 32.284  max 36.946 ms  >50 ms: 0  1% low 30.98 fps
+         draws/frame median 823.0; PSO creations 28 (70.0 ms), 0 after warm-up; scene 640x360 -> output 640x360; cap 60; vsync 0; focused 0.0
+perf     335 guest frames over 6.47 s (perf.csv); 287 measured from 1.0 s after the first frame:
+         mean 19.041 ms (52.52 fps)  median 17.195  p95 30.874  p99 32.284  p99.9 35.88  max 36.945 ms  >50 ms: 0  >100 ms: 0  1% low 30.98 fps
+         draws/frame p10/p50/p90 910.0/910.0/910.0; pipeline cache misses 84 (0 after warm-up); texture cache misses 140
+         scene draws 910 / vertices 120001: 269 frames over 5.12 s, 52.58 fps, median 17.27 ms, p99 32.398 ms

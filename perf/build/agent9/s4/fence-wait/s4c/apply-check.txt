@@ -1,0 +1,24 @@
+# apply check (S4c #24 package; Agent 9, task #22)  2026-11-22 15:52:15
+base rexlego/CMakeLists.txt 3690D5D76AA9FBED (live 3690D5D76AA9FBED); new TU 01D9F8F3464C8614 (draft 01D9F8F3464C8614)
+tools: git version 2.56.1.windows.1; GNU patch 2.8.1
+--- s4c-24-30.diff  DC02104EA76E0BF6  (expect rexlego/CMakeLists.txt 1BF46D7878BA9A25, rexlego/src/gpu_wait_backoff.cpp 01D9F8F3464C8614)
+  git   apply --check -v  exit 0  Checking patch rexlego/CMakeLists.txt... | Checking patch rexlego/src/gpu_wait_backoff.cpp...
+  git   apply             exit 0  
+  git   result: both files == new/ (sha256), no stray files
+  git   apply -R --check   exit 0  (reverses cleanly to base)
+  patch --dry-run         exit 0  checking file rexlego/CMakeLists.txt | checking file rexlego/src/gpu_wait_backoff.cpp
+  patch apply             exit 0  patching file rexlego/CMakeLists.txt | patching file rexlego/src/gpu_wait_backoff.cpp
+  patch result: both files == new/ (sha256), no stray files
+  EOL in the diff: 34 CMakeLists.txt hunk lines all CRLF, 395 new-file lines all LF: yes
+--- s4c-24-only.diff  A279DC71D6CD4FAA  (expect rexlego/CMakeLists.txt 9A4606A7031375F7, rexlego/src/gpu_wait_backoff.cpp 01D9F8F3464C8614)
+  git   apply --check -v  exit 0  Checking patch rexlego/CMakeLists.txt... | Checking patch rexlego/src/gpu_wait_backoff.cpp...
+  git   apply             exit 0  
+  git   result: both files == new-24only/ (sha256), no stray files
+  git   apply -R --check   exit 0  (reverses cleanly to base)
+  patch --dry-run         exit 0  checking file rexlego/CMakeLists.txt | checking file rexlego/src/gpu_wait_backoff.cpp
+  patch apply             exit 0  patching file rexlego/CMakeLists.txt | patching file rexlego/src/gpu_wait_backoff.cpp
+  patch result: both files == new-24only/ (sha256), no stray files
+  EOL in the diff: 15 CMakeLists.txt hunk lines all CRLF, 395 new-file lines all LF: yes
+snap1 (S4a tree) CMakeLists.txt == base: True (so both diffs apply there the same way)
+snapB (B tree) CMakeLists.txt == base: True (so both diffs apply there the same way)
+RESULT: PASS

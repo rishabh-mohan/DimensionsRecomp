@@ -1,0 +1,149 @@
+{
+  "run_dir": "<workspace>\\build\\agent3\\selftest-runs\\20261121-224956-crash",
+  "run": {
+    "harness": "harness/run-game.ps1",
+    "mode": "FUNCTIONAL ONLY (hidden desktop exebox-7T6FHH5QSWIXSTZXLNMFVGRIYF), NOT FOR TIMING",
+    "desktop": "exebox-7T6FHH5QSWIXSTZXLNMFVGRIYF",
+    "tag": "crash",
+    "run_dir": "<workspace>\\build\\agent3\\selftest-runs\\20261121-224956-crash",
+    "bin_dir": "<workspace>\\build\\agent3\\selftest-bin",
+    "exe": "<workspace>\\build\\agent3\\selftest-runs\\20261121-224956-crash\\fakedimensions.exe",
+    "exe_sha256": "A6C794E124E05B3FD584F40BDCC2BF841FDE90A8D95A187C1D13932EAB4E5C4C",
+    "map": "<workspace>\\build\\agent3\\selftest-runs\\20261121-224956-crash\\fakedimensions.map",
+    "files_linked": 2,
+    "files_copied": 0,
+    "cwd": "<workspace>\\build\\agent3\\selftest-runs\\20261121-224956-crash",
+    "command_line": "fakedimensions.exe --log_file=<workspace>\\build\\agent3\\selftest-runs\\20261121-224956-crash\\game.log --log_flush_interval=1 --perf_log_csv=<workspace>\\build\\agent3\\selftest-runs\\20261121-224956-crash\\perf.csv --native_settings_load=false --discord_rpc=false --audio_mute=true --pause_when_unfocused=false --fake_crash_after=4",
+    "env": {
+      "LEGO_NATIVE_FRAME_METRICS": "<workspace>\\build\\agent3\\selftest-runs\\20261121-224956-crash\\frames.csv"
+    },
+    "cvars": {},
+    "user_data_root": "<workspace>\\build\\agent3\\selftest-runs\\20261121-224956-crash\\user",
+    "toml_sha256_before": "8C100AC626A205DC645343B6952AFC23D3F2236359871F176CAE1EE04BAB0A4A",
+    "toml_sha256_after": "8C100AC626A205DC645343B6952AFC23D3F2236359871F176CAE1EE04BAB0A4A",
+    "toml_rewritten": false,
+    "started": "2026-11-21T22:49:57.5868728-06:00",
+    "started_epoch_s": 1795322997.587,
+    "pid": 48456,
+    "seconds_requested": 25,
+    "warmup_s": 2,
+    "elapsed_s": 18.53,
+    "exited_early": false,
+    "exit_code": -532462766,
+    "exit_code_hex": "0xE0434352",
+    "close_method": "wm_close",
+    "close_seconds": 9.45,
+    "close_timeout": 10,
+    "windows_at_close": [
+      "UAC_InputIndicatorOverlayWnd||0x0|bg|",
+      "UAC Input Indicator||0x0|bg|",
+      "WindowsForms10.Window.8.app.0.34f5582_r6_ad1|Fake Dimensions (harness self-test)|960x540|bg|"
+    ],
+    "wer_seen": true,
+    "crash_events": [
+      {
+        "id": 1001,
+        "provider": "Windows Error Reporting",
+        "time": "2026-11-21T22:50:14.1668714-06:00",
+        "summary": "Fault bucket 2133063596693472624, type 5 Event Name: CLR20r3 Response: Not available Cab Id: 0 Problem signature: P1: fakedimensions.exe P2: 0.0.0.0 P3: 6b02744a P4: fakedimensions P5: 0.0.0.0 P6: 6b02744a P7: 3 P8: 67 P9: System.InvalidOperationException P10: Attached files: \\\\?\\C:\\ProgramData\\Micr"
+      },
+      {
+        "id": 1000,
+        "provider": "Application Error",
+        "time": "2026-11-21T22:50:03.0010192-06:00",
+        "summary": "Faulting application name: fakedimensions.exe, version: 0.0.0.0, time stamp: 0x6b02744a Faulting module name: KERNELBASE.dll, version: 10.0.26100.9974, time stamp: 0xa3ff6954 Exception code: 0xe0434352 Fault offset: 0x00000000000c569a Faulting process id: 0xBD48 Faulting application start time: 0x1D"
+      },
+      {
+        "id": 1026,
+        "provider": ".NET Runtime",
+        "time": "2026-11-21T22:50:02.1547897-06:00",
+        "summary": "Application: fakedimensions.exe Framework Version: v4.0.30319 Description: The process was terminated due to an unhandled exception. Exception Info: System.InvalidOperationException at FakeGame.Present() at System.Windows.Forms.Timer.OnTick(System.EventArgs) at System.Windows.Forms.Timer+TimerNative"
+      }
+    ],
+    "dumps": [
+      "C:\\Users\\<user>\\AppData\\Local\\CrashDumps\\fakedimensions.exe.48456.dmp"
+    ],
+    "process": {
+      "cpu_s": 0.7,
+      "avg_cores": 0.04,
+      "peak_ws_mb": 72,
+      "peak_private_mb": 25,
+      "peak_threads": 16,
+      "samples": 9
+    },
+    "log_bytes": 1280,
+    "perf_csv_bytes": 7035,
+    "frames_csv_bytes": 5990,
+    "profile": null
+  },
+  "log": {
+    "files": [
+      "game.log"
+    ],
+    "lines": 7,
+    "levels": {
+      "info": 5,
+      "warning": 1,
+      "critical": 1
+    },
+    "markers": {
+      "dxgi_adapter": {
+        "at_s": 0.0,
+        "adapter": "Harness Fake Adapter",
+        "vendor": "0x0000",
+        "device": "0x0000",
+        "vram_mb": "0"
+      },
+      "xex_patch": {
+        "at_s": 0.01,
+        "base": "0.0.0.3",
+        "new": "0.0.23.3"
+      },
+      "shader_storage": {
+        "at_s": 0.01
+      }
+    },
+    "errors": [
+      "3.92s [critical] self-test crash"
+    ],
+    "missing_functions": 0,
+    "unknown_cvars": [
+      "fake_selftest_cvar"
+    ],
+    "first_ts": "2026-11-21 22:49:58.232",
+    "last_ts": "2026-11-21 22:50:02.151",
+    "duration_s": 3.92
+  },
+  "frames": {
+    "frames_total": 119,
+    "seconds_total": 2.47,
+    "warmup_s": 10.0,
+    "fps_per_10s": [],
+    "pipeline_creations": 28,
+    "pipeline_creation_ms": 70.0,
+    "last": {
+      "scene_render_width": "640",
+      "scene_render_height": "360",
+      "output_width": "640",
+      "output_height": "360",
+      "native_vsync": "0",
+      "native_fps_limit_cvar": "60"
+    },
+    "frames_measured": 0
+  },
+  "perf": {
+    "source": "perf.csv",
+    "frames_total": 120,
+    "seconds_total": 2.48,
+    "warmup_s": 10.0,
+    "bytes": 7035,
+    "fps_per_10s": [],
+    "draws_per_10s": [],
+    "vertices_per_10s": [],
+    "pipeline_cache_misses": 84,
+    "texture_cache_misses": 140,
+    "command_buffer_stalls": 0,
+    "frames_measured": 0
+  },
+  "verdict": "CRASHED"
+}

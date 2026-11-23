@@ -1,0 +1,19 @@
+sub_82FB9020: classes cr=3 decl=1 rlw=1; SO writers: none
+== prologue differs (decl)
+  A| REX_FUNC_PROLOGUE();
+  A| uint32_t ea{};
+  B| REX_FUNC_PROLOGUE();
+  B| PPCCRRegister cr6{};
+  B| uint32_t ea{};
+[8] cmpwi cr6,r10,3   (cr)
+  A| ctx.cr6.compare<int32_t>(ctx.r10.s32, 3, ctx.xer);
+  B| cr6.compare<int32_t>(ctx.r10.s32, 3, {});
+[15] cmplwi cr6,r11,0   (cr)
+  A| ctx.cr6.compare<uint32_t>(ctx.r11.u32, 0, ctx.xer);
+  B| cr6.compare<uint32_t>(ctx.r11.u32, 0, {});
+[27] cmplwi cr6,r11,0   (cr)
+  A| ctx.cr6.compare<uint32_t>(ctx.r11.u32, 0, ctx.xer);
+  B| cr6.compare<uint32_t>(ctx.r11.u32, 0, {});
+[32] rlwinm r3,r10,27,31,31   (rlw)
+  A| ctx.r3.u64 = __builtin_rotateleft64(ctx.r10.u32 | (ctx.r10.u64 << 32), 27) & 0x1;
+  B| ctx.r3.u64 = (ctx.r10.u32 >> 5) & 0x1;

@@ -1,0 +1,18 @@
+# harness/routes/selftest-input.txt - route for the self-test's 'input' case (fake game; harness\selftest\selftest.ps1).
+# The fake game moves to the next scene (perf.csv draws +10, vertices +1) on each A press.
+wait_first_frame 30
+wait_scene 900 120000 10
+mark first-frame
+press A
+wait_change 5
+wait_scene 910 120001 5
+press START 1 100 300
+press DOWN 2 120 250
+wait_log "fake xinput: key 0x5811 flags 2" 5
+hold B 300
+sleep 0.3                                      # 'hold' has no gap: without this the release and the stick share one poll
+stick L 0 -32767 200
+wait_log "ly -32767" 5
+wait_log "never written by the fake game" 1    # one TIMEOUT on purpose: logged, and the script goes on
+mark done
+stop

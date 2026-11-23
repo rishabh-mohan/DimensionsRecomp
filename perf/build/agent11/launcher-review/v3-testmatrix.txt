@@ -1,0 +1,127 @@
+﻿Test-Matrix at L242; Resolve-Driver/Get-RunnerArgs at 236,291
+V3L242: function Test-Matrix($Go, [string]$Path) {
+V3L243:     $why = New-Object System.Collections.Generic.List[string]
+V3L244:     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { $why.Add("matrix $($Go.json) not found in $MatrixDirEff"); return , $why }
+V3L245:     if (-not [string]::Equals((Split-Path -Parent ([IO.Path]::GetFullPath($Path))).TrimEnd('\'), $MatrixDirEff, [StringComparison]::OrdinalIgnoreCase)) { $why.Add("matrix is not directly in $MatrixDirEff"); return , $why }
+V3L246:     $sha = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash
+V3L247:     if ($sha -ne $Go.sha) { $why.Add("sha256 mismatch: the GO says $($Go.sha), the file is $sha"); return , $why }
+V3L248:     try { $mx = [IO.File]::ReadAllText($Path) | ConvertFrom-Json } catch { $why.Add("matrix is not valid JSON: $($_.Exception.Message)"); return , $why }
+V3L249:     $arms = @(Get-P $mx 'arms')
+V3L250:     if ($arms.Count -eq 0 -or $null -eq $arms[0]) { $why.Add('matrix has no arms'); return , $why }
+V3L251:     $ids = @()
+V3L252:     foreach ($a in $arms) {
+V3L253:         $id = [string](Get-P $a 'id'); $ids += $id
+V3L254:         $bin = [string](Get-P $a 'bin')
+V3L255:         $bn = $bin -replace '\\', '/'
+V3L256:         if ($bn -notmatch '^build/agent2/([A-Za-z0-9][A-Za-z0-9_.-]*)-bin/?$' -or $bn -match '\.\.') { $why.Add("arm '$id': bin '$bin' is not build/agent2/<name>-bin") }
+V3L257:         else {
+V3L258:             $bd = Join-Path $Repo ('build\agent2\' + $Matches[1] + '-bin')
+V3L259:             foreach ($need in @('MANIFEST.txt', 'legodimensions.exe')) { if (-not (Test-Path -LiteralPath (Join-Path $bd $need) -PathType Leaf)) { $why.Add("arm '$id': $bin has no $need") } }
+V3L260:         }
+V3L261:         $ev = Get-P $a 'env'
+V3L262:         if ($null -ne $ev) {
+V3L263:             if ($ev -isnot [System.Management.Automation.PSCustomObject]) { $why.Add("arm '$id': env is not an object") }
+V3L264:             else { foreach ($pp in $ev.PSObject.Properties) { if ($AllowedEnv -cnotcontains $pp.Name) { $why.Add("arm '$id': env key '$($pp.Name)' is not allowed (only $($AllowedEnv -join ', '))") } } }
+V3L265:         }
+V3L266:         # Launcher rule (unattended, pinned inputs only): no menu prompt, no profiler, no triggers, no toml edits, no seed cache.
+V3L267:         if ([string](Get-P $a 'menu')) { $why.Add("arm '$id': menu needs a person at the PC") }
+V3L268:         if ((Get-P $a 'profile') -eq $true) { $why.Add("arm '$id': profile runs are not timing runs") }
+V3L269:         if (@(Get-P $a 'triggers' | Where-Object { $_ }).Count) { $why.Add("arm '$id': triggers are not allowed here") }
+V3L270:         $tm = Get-P $a 'toml'; if ($null -ne $tm -and @($tm.PSObject.Properties).Count) { $why.Add("arm '$id': toml edits are not allowed here") }
+V3L271:         if ([string](Get-P $a 'seed_cache')) { $why.Add("arm '$id': seed_cache is not allowed here") }
+V3L272:         $dr = Get-P $a 'driver'
+V3L273:         if ($null -ne $dr) {
+V3L274:             $dp = if ($dr -is [string]) { $dr } else { [string](Get-P $dr 'script') }
+V3L275:             $full = Resolve-Driver $dp
+V3L276:             # Only a plain "drivers/<name>.ps1" string for one of $AllowedDrivers in bench\agent8\run\drivers (pinned), and
+V3L277:             # no args: any other runner file as a driver could start a game, bin, env or matrix that was never checked.
+V3L278:             $okDrv = $false
+V3L279:             if ($dr -is [string] -and $dr -cmatch '^drivers[/\\]([A-Za-z0-9_-]+\.ps1)$' -and $AllowedDrivers -contains $Matches[1]) {
+V3L280:                 $want = Join-Path $RunDir ('drivers\' + $Matches[1]); $fp = ''; try { $fp = [IO.Path]::GetFullPath($full) } catch { }
+V3L281:                 $okDrv = [string]::Equals($fp, $want, [StringComparison]::OrdinalIgnoreCase) -and (Test-Path -LiteralPath $want -PathType Leaf) -and (Test-Pinned $want)
+V3L282:             }
+V3L283:             if (-not $okDrv) { $why.Add("arm '$id': driver must be the plain string drivers/<name>.ps1, without args, for one of $($AllowedDrivers -join ', ') in bench\agent8\run\drivers (it is '$(if ($dr -is [string]) { $dr } else { $dr | ConvertTo-Json -Compress -Depth 4 })')") }
+V3L284:         }
+V3L285:     }
+V3L286:     foreach ($o in $Go.only) { if ($ids -cnotcontains $o) { $why.Add("only=: no arm '$o' in $($Go.json)") } }
+V3L287:     return , $why
+V3L288: }
+V3L289: # -NonInteractive: if the runner ever asked for input it would fail at once instead of waiting all night (run-matrix.ps1
+V3L290: # asks only without -Matrix or without -NoPrompt).
+V3L291: function Get-RunnerArgs([string]$Path, $Go) {
+V3L292:     return @('-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', $RunMatrix, '-Matrix', $Path, '-Only', ($Go.only -join ','), '-Repeats', [string]$Go.repeats, '-ColdShared', '-NoPrompt')
+V3L293: }
+V3L294: # sha256 of legodimensions.exe and MANIFEST.txt in the bins of the only= arms (paths already checked by Test-Matrix).
+V3L295: # Logged when the GO is accepted and compared again right before the start.
+V3L296: function Get-BinHashes($Go, [string]$Path) {
+V3L297:     $h = [ordered]@{}
+V3L298:     $mx = [IO.File]::ReadAllText($Path) | ConvertFrom-Json
+V3L299:     foreach ($a in @(Get-P $mx 'arms')) {
+V3L300:         if ($Go.only -cnotcontains [string](Get-P $a 'id')) { continue }
+V3L301:         $bn = (([string](Get-P $a 'bin')) -replace '\\', '/').TrimEnd('/')
+V3L302:         foreach ($f in @('legodimensions.exe', 'MANIFEST.txt')) {
+V3L303:             $k = "$bn/$f"; if ($h.Contains($k)) { continue }
+V3L304:             $p = Join-Path $Repo (($bn -replace '/', '\') + '\' + $f)
+V3L236: function Resolve-Driver([string]$P) {
+V3L237:     if ([IO.Path]::IsPathRooted($P)) { return $P }
+V3L238:     foreach ($b in @($MatrixDirEff, $RunDir, $Repo)) { $c = Join-Path $b $P; if (Test-Path -LiteralPath $c -PathType Leaf) { return (Resolve-Path -LiteralPath $c).Path } }
+V3L239:     return (Join-Path $Repo $P)
+V3L240: }
+V3L241: # Every arm in the file is checked, not only the -Only ones. Returns the list of reasons to refuse (empty = ok).
+V3L242: function Test-Matrix($Go, [string]$Path) {
+V3L243:     $why = New-Object System.Collections.Generic.List[string]
+V3L244:     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { $why.Add("matrix $($Go.json) not found in $MatrixDirEff"); return , $why }
+V3L291: function Get-RunnerArgs([string]$Path, $Go) {
+V3L292:     return @('-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', $RunMatrix, '-Matrix', $Path, '-Only', ($Go.only -join ','), '-Repeats', [string]$Go.repeats, '-ColdShared', '-NoPrompt')
+V3L293: }
+V3L294: # sha256 of legodimensions.exe and MANIFEST.txt in the bins of the only= arms (paths already checked by Test-Matrix).
+V3L295: # Logged when the GO is accepted and compared again right before the start.
+V3L296: function Get-BinHashes($Go, [string]$Path) {
+V3L297:     $h = [ordered]@{}
+V3L298:     $mx = [IO.File]::ReadAllText($Path) | ConvertFrom-Json
+V3L299:     foreach ($a in @(Get-P $mx 'arms')) {
+--- driver fields in matrices
+matrix-io-level.json:27: "driver": "drivers/io-counters.ps1",
+matrix-io-level.json:33: "driver": "drivers/io-counters.ps1",
+matrix-native-functional.json:28: "driver": "drivers/thread-cpu.ps1",
+matrix-native-functional.json:33: "driver": "drivers/thread-cpu.ps1",
+matrix-native-functional.json:38: "driver": "drivers/thread-cpu.ps1",
+matrix-native-functional.json:49: { "id": "p1", "group": "pso", "ref": true, "frames": "native", "bin": "build/agent2/native2-bin", "cvars": ["native_settings_frontend=false"
+matrix-native-functional.json:52: { "id": "p2", "group": "pso", "frames": "native", "bin": "build/agent2/native2-bin", "cvars": ["native_settings_frontend=false"], "seed_cach
+matrix-native-pso.json:23: { "id": "p1", "frames": "native", "bin": "build/agent2/native-bin", "cvars": [], "driver": "drivers/pso-stats-at-end.ps1",
+matrix-native-pso.json:26: { "id": "p2", "frames": "native", "bin": "build/agent2/native-bin", "cvars": [], "seed_cache": "p1", "driver": "drivers/pso-stats-at-end.ps1
+matrix-native-pso.json:29: { "id": "p3", "frames": "native", "bin": "build/agent2/native-bin", "cvars": [], "driver": "drivers/pso-stats-at-end.ps1",
+matrix-native-pso.json:33: { "id": "p4a", "frames": "native", "bin": "build/agent2/native-bin", "cvars": [], "seed_cache": "p2", "seed_recipes_only": true, "driver": "
+matrix-native-pso.json:37: { "id": "p4b", "frames": "native", "bin": "build/agent2/native-bin", "cvars": [], "seed_cache": "p2", "seed_recipes_only": true, "driver": "
+matrix-native-threaded.json:54: "driver": "drivers/thread-cpu.ps1"
+matrix-native-threaded.json:72: "driver": "drivers/thread-cpu.ps1"
+matrix-native-threaded.json:92: "driver": "drivers/thread-cpu.ps1"
+matrix-native-threaded.json:112: "driver": "drivers/thread-cpu.ps1"
+matrix-s3-functional.json:23: "driver": "drivers/thread-cpu.ps1", "note": "devoff2 + REX_TIMER_WAIT_BLOCKING=1: TimerQueue blocking wait, no rebuild (Agent 11)" },
+matrix-s3-functional.json:29: "driver": "drivers/thread-cpu.ps1", "note": "window 3's d11 (devoff2 + Agent 11 ON bundle R3) + REX_TIMER_WAIT_BLOCKING=1 (Agent 1, 03:42)" 
+matrix-s3-functional.json:31: "driver": "drivers/thread-cpu.ps1", "note": "devoff2 as window 3's d0: functional reference for d0t and d11t" }
+matrix-window3.json:28: "driver": "drivers/thread-cpu.ps1",
+matrix-window3.json:31: "driver": "drivers/thread-cpu.ps1",
+matrix-window3.json:37: "driver": "drivers/thread-cpu.ps1",
+matrix-window3.json:42: "driver": "drivers/thread-cpu.ps1",
+matrix-window3.json:47: "driver": "drivers/thread-cpu.ps1",
+matrix-window4.json:30: "driver": "drivers/thread-cpu.ps1", "note": "devoff2 = S2 sources + S1 codegen (window 3's d0, MANIFEST B87DC2D2)" },
+matrix-window4.json:32: "driver": "drivers/thread-cpu.ps1", "note": "devoffB = S2 sources + codegen B (Agent 9 recipe; MANIFEST 8709476FF4778768)" },
+matrix-window4.json:34: "driver": "drivers/thread-cpu.ps1", "note": "devoff3 = S3 sources (MANIFEST B9C5175DA1904235)" },
+matrix-window4.json:36: "driver": "drivers/thread-cpu.ps1", "note": "Not in W4a or W4b (Agent 1, 03:42: W4b runs d11t in its place). devoff2 + REX_TIMER_WAIT_BLOCKI
+matrix-window4.json:42: "driver": "drivers/thread-cpu.ps1", "note": "W4b only: window 3's d11 (devoff2 + Agent 11 ON bundle R3) + REX_TIMER_WAIT_BLOCKING=1, only if
+matrix-window5-s3d.json:35: "driver": "drivers/thread-cpu.ps1", "note": "base = devoff3, the bin S4a is built on (S3d sources; MANIFEST B9C5175DA1904235, rexruntime.dll
+matrix-window5-s3d.json:37: "driver": "drivers/thread-cpu.ps1", "note": "s0 = devoff4 = S4a: S3d + SDK #7 #8 #5(i) #38 with every new switch OFF by default, + #32 alway
+matrix-window5-s3d.json:43: "driver": "drivers/thread-cpu.ps1", "note": "d11 = s0 + the 8 timer cvars (window 3's d11 bundle, Agent 11 ON bundle R3; TimerQueue spin wai
+matrix-window5-s3d.json:49: "driver": "drivers/thread-cpu.ps1", "note": "d11t = d11 + REX_TIMER_WAIT_BLOCKING=1 (TimerQueue blocking wait; W4b's d11t, now on S4a). Proo
+matrix-window5-s3d.json:56: "driver": "drivers/thread-cpu.ps1", "note": "d11p = d11 + timer_queue_precise_wait=true (#38 precise wait; S4-DRAFT L283; confirmed by Agent
+--- drivers dir
+io-counters.ps1 5803
+LdSys.cs 52029
+pso-stats-at-end.ps1 6138
+sys-csv.ps1 10933
+thread-cpu.ps1 14541
+--- w6 candidates
+build\agent5\w6-draft\matrix-w6.json 9207 20:32:31 D6388096
+build\agent5\w6-draft\check\matrix-window6.json 9199 20:35:20 DE34A02A
+build\agent8\w6-stage\test\matrix-window6.json 9118 21:02:27 BD0696DA

@@ -1,0 +1,10 @@
+# logdiff: 2 baseline logs, 1 candidate logs, min level warning
+## per log (lines by level; fail markers; clean-exit)
+BASE build\agent8\matrix\20261122-0013\runs\0013-cold-d0\game.log | 00:13:25..00:14:17 | info=42 warning=40 | no fail markers | clean-exit=1
+BASE build\agent8\runs\0254-devoff3\game.log | 02:54:17..02:56:16 | info=42 warning=40 | no fail markers | clean-exit=1
+CAND build\agent8\runs\0247-devoffB\game.log | 02:47:58..02:49:57 | info=42 warning=40 | no fail markers | clean-exit=1
+## NEW keys (level >= warning; in a candidate log, in no baseline log)
+## MORE keys (level >= warning; candidate count > baseline max + max(5, baseline max))
+## GONE keys (any level; in every baseline log, missing from a candidate log)
+## MARKER CHECK (fail marker above the baseline max per log; clean-exit missing)
+# NEW total 0, marker flags 0

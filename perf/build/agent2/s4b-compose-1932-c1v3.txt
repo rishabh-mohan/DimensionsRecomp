@@ -1,0 +1,131 @@
+s4b-compose-check.py report, 2026-11-22 19:32:30 (read-only for every tree; scratch = build/agent2/s4b-check)
+C1 selection: v3 (--c1); S4c selection: 24-30; orders: o1-v3, o2-v3
+
+[1] staged SDK diffs: sha256 vs the staging records
+  C1 v2 (A12)              build/agent12/s4-c1v2/keep-watch-v2.diff                   418D3D39947DB146 (not selected; matches record)
+  C1 v3 (A12)              build/agent12/s4-c1v3/keep-watch-v3.diff                   DECCFE3373C27C3C ok
+  M1 (A5)                  build/agent5/s4-m1/m1-nontemporal-copy.diff                EBECE86E68369C88 ok
+  P2 counter (A12)         build/agent12/s4-p2c/memexport-full-buffer-counter.diff    29E02E249EDDFEFD ok
+  #18/#20 r1r2 (A7)        build/agent7/s4-r1r2/s4-r1r2.diff                          BD0C4A93446149BB ok
+  #26 db16cyc_pause (A9)   build/agent9/s4/spin/db16cyc-pause/db16cyc-pause.diff      AC554DBBD965BF94 ok
+
+[2] S4b SDK bases: snap1 (S4a level) must equal each file's first staged "before" (same for every C1 variant); live too (S4a is live and committed: SDK 3bb65bb)
+  include/rex/graphics/shared_memory.h                 snap1 4D861738A94B556B ok; live == snap1
+  include/rex/system/xmemory.h                         snap1 80100865A654AF04 ok; live == snap1
+  src/graphics/primitive_processor.cpp                 snap1 E07F690223B564AE ok; live == snap1
+  src/graphics/shared_memory.cpp                       snap1 0BE4BADCAC666BEE ok; live == snap1
+  src/system/xmemory.cpp                               snap1 141FB1A947D59156 ok; live == snap1
+  src/graphics/d3d12/shared_memory.cpp                 snap1 BB0838CE3909E18A ok; live == snap1
+  src/graphics/d3d12/command_processor.cpp             snap1 3AB3AA5360D4E987 ok; live == snap1
+  include/rex/graphics/d3d12/command_processor.h       snap1 41F32B80BABA213C ok; live == snap1
+  include/rex/graphics/d3d12/deferred_command_list.h   snap1 DA2F58B6CE3D7F6A ok; live == snap1
+  src/graphics/d3d12/deferred_command_list.cpp         snap1 FFDF7FB66EC81715 ok; live == snap1
+  include/rex/codegen/config.h                         snap1 D07C575FF2904B87 ok; live == snap1
+  src/codegen/config.cpp                               snap1 0ED529B7E5F0F4E7 ok; live == snap1
+  src/codegen/builders/system.cpp                      snap1 D1269273636B5A1A ok; live == snap1
+
+[3a] order o1-v3: c1v3 -> m1 -> p2c -> r1r2 -> n26
+    C1 v3 (A12)              git apply exit 0, no offsets
+                             include/rex/graphics/shared_memory.h             after  82A66445ED98B091 == record
+                             include/rex/system/xmemory.h                     after  5A70782EF00F0FB6 == record
+                             src/graphics/primitive_processor.cpp             after  470BA4BED73B2ABF == record
+                             src/graphics/shared_memory.cpp                   after  A4A31038ABDFF94A == record
+                             src/system/xmemory.cpp                           after  BCA5E1CF63686E73 == record
+    M1 (A5)                  git apply exit 0, no offsets
+                             src/graphics/d3d12/shared_memory.cpp             after  2A5ADF13B5E433F1 == record
+    P2 counter (A12)         git apply exit 0, no offsets
+                             src/graphics/d3d12/command_processor.cpp         after  474C1CBAE6359D9E == record
+    #18/#20 r1r2 (A7)        src/graphics/d3d12/command_processor.cpp         before 474C1CBAE6359D9E (chained: an earlier step changed it; record 3AB3AA5360D4E987)
+    #18/#20 r1r2 (A7)        git apply exit 0; Hunk #2 succeeded at 1194 (offset 9 lines).; Hunk #3 succeeded at 3114 (offset 10 lines).; Hunk #4 succeeded at 3712 (offset 10 lines).; Hunk #5 succeeded at 4369 (offset 10 lines).
+                             src/graphics/d3d12/command_processor.cpp         after  027204B53A271D69 (chained; record for the lone apply 760833A5D7D89ADC)
+                             include/rex/graphics/d3d12/command_processor.h   after  67F4E8380C879377 == record
+                             include/rex/graphics/d3d12/deferred_command_list.h after  9F6CC70A6922232D == record
+                             src/graphics/d3d12/deferred_command_list.cpp     after  30FF57446EFB5D76 == record
+    #26 db16cyc_pause (A9)   git apply exit 0, no offsets
+                             include/rex/codegen/config.h                     after  CD39B0E110D3E0FD == record
+                             src/codegen/config.cpp                           after  4706A7F22C3859D6 == record
+                             src/codegen/builders/system.cpp                  after  FAD4372074D32D69 == record
+
+[3b] order o2-v3: c1v3 -> m1 -> r1r2 -> p2c -> n26
+    C1 v3 (A12)              git apply exit 0, no offsets
+                             include/rex/graphics/shared_memory.h             after  82A66445ED98B091 == record
+                             include/rex/system/xmemory.h                     after  5A70782EF00F0FB6 == record
+                             src/graphics/primitive_processor.cpp             after  470BA4BED73B2ABF == record
+                             src/graphics/shared_memory.cpp                   after  A4A31038ABDFF94A == record
+                             src/system/xmemory.cpp                           after  BCA5E1CF63686E73 == record
+    M1 (A5)                  git apply exit 0, no offsets
+                             src/graphics/d3d12/shared_memory.cpp             after  2A5ADF13B5E433F1 == record
+    #18/#20 r1r2 (A7)        git apply exit 0, no offsets
+                             src/graphics/d3d12/command_processor.cpp         after  760833A5D7D89ADC == record
+                             include/rex/graphics/d3d12/command_processor.h   after  67F4E8380C879377 == record
+                             include/rex/graphics/d3d12/deferred_command_list.h after  9F6CC70A6922232D == record
+                             src/graphics/d3d12/deferred_command_list.cpp     after  30FF57446EFB5D76 == record
+    P2 counter (A12)         src/graphics/d3d12/command_processor.cpp         before 760833A5D7D89ADC (chained: an earlier step changed it; record 3AB3AA5360D4E987)
+    P2 counter (A12)         git apply exit 0; Hunk #1 succeeded at 247 (offset 12 lines).; Hunk #2 succeeded at 273 (offset 12 lines).; Hunk #3 succeeded at 292 (offset 12 lines).; Hunk #4 succeeded at 301 (offset 12 lines).; Hunk #5 succeeded at 3092 (offset 22 lines).
+                             src/graphics/d3d12/command_processor.cpp         after  027204B53A271D69 (chained; record for the lone apply 474C1CBAE6359D9E)
+    #26 db16cyc_pause (A9)   git apply exit 0, no offsets
+                             include/rex/codegen/config.h                     after  CD39B0E110D3E0FD == record
+                             src/codegen/config.cpp                           after  4706A7F22C3859D6 == record
+                             src/codegen/builders/system.cpp                  after  FAD4372074D32D69 == record
+
+[4] final files per C1 variant, o1 vs o2 (the S4b SDK file set on top of S4a)
+  C1 v3:
+    include/rex/graphics/shared_memory.h                 82A66445ED98B091B5CF8FAA75D0EF3E11DFA0344ABBC2184F3A23C46F0FF98C   13051 B o1 == o2
+    include/rex/system/xmemory.h                         5A70782EF00F0FB6094A0F538690557E81B5EE21C7781E190A38ABD859541CB2   31430 B o1 == o2
+    src/graphics/primitive_processor.cpp                 470BA4BED73B2ABFD32048F901C426BA24048C26A07694F9768F7AD35EC137F2   79790 B o1 == o2
+    src/graphics/shared_memory.cpp                       A4A31038ABDFF94A1B97D28A13EE2ACBB67F44DC596F7A964C8C7493050390C6   32711 B o1 == o2
+    src/system/xmemory.cpp                               BCA5E1CF63686E73FC5A12642B9B169E155FBBEC65D0A56CE1BE9B0B71022794  121109 B o1 == o2; = C1 v3 after BCA5E1CF...: yes
+    src/graphics/d3d12/shared_memory.cpp                 2A5ADF13B5E433F1F10B5C6AF9C14F8812527C4E155A5146B166723457B6EBB4   24190 B o1 == o2
+    src/graphics/d3d12/command_processor.cpp             027204B53A271D69275FCC6FEC6B2222905155E1FD67808F88A79329F4022C0E  273790 B o1 == o2; Agent 10 composite 027204B5...: match
+    include/rex/graphics/d3d12/command_processor.h       67F4E8380C879377F06B6E3DD879EE737A82BBBE9682F123247ED5D0671FF325   41218 B o1 == o2
+    include/rex/graphics/d3d12/deferred_command_list.h   9F6CC70A6922232D4FF7A32303E8B785A01D1C7A3CF54373369EF6B23F8AF0F0   26607 B o1 == o2
+    src/graphics/d3d12/deferred_command_list.cpp         30FF57446EFB5D7643EC71024CE1D04884C210831053DEE39EAAB611FD346872   34034 B o1 == o2
+    include/rex/codegen/config.h                         CD39B0E110D3E0FD9E602446111183CB941478BF9057389BB815F125060D2087    7032 B o1 == o2
+    src/codegen/config.cpp                               4706A7F22C3859D6DBE8E7A3150B3403548856BAD626952818F7B96B3D5935DF   23701 B o1 == o2
+    src/codegen/builders/system.cpp                      FAD4372074D32D69D5B2CB0B100F283E239A426C3E015DBD66C22BCB693998D2   12947 B o1 == o2
+
+[5] game repo file of C1 (keep-watch-rexlego.diff, v1, reused by C1 v2 and v3): rexlego/src/gpu_native/memory_watch.cpp
+  live  19AE1606C6DB7273 ok (= 19AE1606)
+  snap1 19AE1606C6DB7273 ok (= 19AE1606)
+  line ends (snap1): 166 CRLF, 0 bare LF
+  diff  4D0C10794188CF45 ok (= record 4D0C1079)
+  staged build/agent12/s4-c1/new/game/rexlego/src/gpu_native/memory_watch.cpp 70829846C4F321A9 after (70829846...)
+  staged build/agent12/s4-c1/orig/game/rexlego/src/gpu_native/memory_watch.cpp 19AE1606C6DB7273 = live base
+  git -c core.autocrlf=false apply --check on a scratch copy of the CRLF file: exit 1:  | error: patch failed: rexlego/src/gpu_native/memory_watch.cpp:28 | error: rexlego/src/gpu_native/memory_watch.cpp: patch does not apply
+  => landing rule (Agent 10): after the C1 apply memory_watch.cpp must hash 70829846...; if a plain apply gives anything else, copy the staged after-file (mtime = now)
+
+[6] S4c, the last step (game repo; Agent 9 R2.22; rated SAFE OFF, b2r row 38): rexlego/CMakeLists.txt + new rexlego/src/gpu_wait_backoff.cpp
+  base rexlego/CMakeLists.txt: snap1 3690D5D76AA9FBED ok (= 3690D5D7); live 3690D5D76AA9FBED ok (= snap1)
+  snap1 rexlego/src/gpu_wait_backoff.cpp: absent (ok: S4c adds it)
+  live rexlego/src/gpu_wait_backoff.cpp: absent (ok: S4c adds it)
+  [24-30] diff build/agent9/s4/fence-wait/s4c/s4c-24-30.diff: DC02104EA76E0BF6 ok
+    patches [('a/rexlego/CMakeLists.txt', 'b/rexlego/CMakeLists.txt'), ('/dev/null', 'b/rexlego/src/gpu_wait_backoff.cpp')]: ok
+    git -c core.autocrlf=false apply on a scratch copy of the snap1 file: exit 0, no offsets
+    rexlego/CMakeLists.txt after 1BF46D7878BA9A25 (52311 B, 907 CRLF, 0 bare LF) == record; Agent 9 new/ copy 1BF46D7878BA9A25
+    #30 option: option(LEGODIMENSIONS_SCENE_WALK_PROBE "Build the scene-walk call-count probe" OFF) ok (default OFF)
+    #24 block: if(NOT LEGODIMENSIONS_NATIVE_GPU) | list(APPEND LEGODIMENSIONS_SOURCES src/gpu_wait_backoff.cpp) | set_property(SOURCE src/gpu_wait_backoff.cpp APPEND PROPERTY | COMPILE_DEFINITIONS LEGO_GPU_WAIT_HOOK_GETDATA=1) ok (OFF builds only, GETDATA hooks on)
+    rexlego/src/gpu_wait_backoff.cpp 01D9F8F3464C8614 ok (= 01D9F8F3, LF); Agent 9 new/ TU 01D9F8F3464C8614
+      TU mentions REX_HOOK_RAW               4 time(s)
+      TU mentions sub_83FBF7D0               8 time(s)
+      TU mentions sub_83FAF180               7 time(s)
+      TU mentions sub_83FB09E8               8 time(s)
+      TU mentions sub_83FC0C10               6 time(s)
+      TU mentions LEGO_GPU_WAIT_BACKOFF_US   4 time(s)
+      TU mentions LEGO_GPU_WAIT_SPIN_US      3 time(s)
+      TU mentions LEGO_GPU_WAIT_STATS        4 time(s)
+  [24-only] (not selected; informational) diff build/agent9/s4/fence-wait/s4c/s4c-24-only.diff: A279DC71D6CD4FAA ok
+    patches [('a/rexlego/CMakeLists.txt', 'b/rexlego/CMakeLists.txt'), ('/dev/null', 'b/rexlego/src/gpu_wait_backoff.cpp')]: ok
+    git -c core.autocrlf=false apply on a scratch copy of the snap1 file: exit 0, no offsets
+    rexlego/CMakeLists.txt after 9A4606A7031375F7 (51537 B, 894 CRLF, 0 bare LF) == record; Agent 9 new/ copy 9A4606A7031375F7
+    #24 block: if(NOT LEGODIMENSIONS_NATIVE_GPU) | list(APPEND LEGODIMENSIONS_SOURCES src/gpu_wait_backoff.cpp) | set_property(SOURCE src/gpu_wait_backoff.cpp APPEND PROPERTY | COMPILE_DEFINITIONS LEGO_GPU_WAIT_HOOK_GETDATA=1) ok (OFF builds only, GETDATA hooks on)
+    rexlego/src/gpu_wait_backoff.cpp 01D9F8F3464C8614 ok (= 01D9F8F3, LF); Agent 9 new/ TU (no TU copy in n
+      TU mentions REX_HOOK_RAW               4 time(s)
+      TU mentions sub_83FBF7D0               8 time(s)
+      TU mentions sub_83FAF180               7 time(s)
+      TU mentions sub_83FB09E8               8 time(s)
+      TU mentions sub_83FC0C10               6 time(s)
+      TU mentions LEGO_GPU_WAIT_BACKOFF_US   4 time(s)
+      TU mentions LEGO_GPU_WAIT_SPIN_US      3 time(s)
+      TU mentions LEGO_GPU_WAIT_STATS        4 time(s)
+
+SUMMARY: C1=v3; S4c=24-30; 0 FAIL; 3.0 s

@@ -1,0 +1,20 @@
+INFO bench=cheat variant=old mode=freeze pid=62084
+RESULT cheat old hires_timer 1 bool
+INFO new_threads=2
+INFO picked tid=18928 by probe (10 switches in 400 ms)
+CHECK cheat old freeze_thread_found PASS new_threads=2
+RESULT cheat old idle_wakeups_5s 84 switches
+RESULT cheat old idle_wakeups_per_s 16.7592 switches/s
+RESULT cheat old idle_kcycles_per_s 615.794 kcycles/s
+RESULT cheat old frozen_restores_2s 33.8179 restores
+RESULT cheat old frozen_wakeups_2s 47.7429 switches
+RESULT cheat old frozen_kcycles_per_s 3194.2 kcycles/s
+RESULT cheat old frozen_polls_2s 1238 polls
+CHECK cheat old frozen_value_reapplied PASS restores=34
+RESULT cheat old dtor_idle_ms_median 21.6397 ms
+RESULT cheat old dtor_idle_ms_max 47.086 ms
+RESULT cheat old dtor_frozen_ms_median 20.6509 ms
+RESULT cheat old dtor_frozen_ms_max 61.2076 ms
+SAMPLES dtor_idle_ms 29.946 42.890 12.145 10.457 47.086 25.042 18.237 2.642
+SAMPLES dtor_frozen_ms 20.588 1.637 40.297 11.944 20.651 38.368 28.197 61.208 0.948
+INFO log_calls=17

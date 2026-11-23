@@ -1,0 +1,115 @@
+s33-popin.patch: apply check (item #33, staged only; nothing applied or built)
+================================================================================
+
+Base: DimensionsRecomp/rexglue-sdk at HEAD 5350b1d ("S4b: C1 v3 keep-watch, M1 non-temporal copy, P2 counter, r1r2, db16cyc_pause option").
+- `git status --porcelain` on the 4 target files was empty (clean). All 4 files use LF line endings.
+Patch: 11003 bytes, 220 lines, 0 CR bytes, ends with LF. Paths are a/... and b/..., relative to DimensionsRecomp/rexglue-sdk.
+
+Command (run at 2026-11-23 06:31 through cmd /c, so stderr is captured; <workspace> stands for the absolute workspace path used):
+  git -C DimensionsRecomp/rexglue-sdk apply --check --verbose <workspace>\build\agent6\s33-popin\s33-popin.patch
+
+Output (verbatim):
+Checking patch include/rex/graphics/d3d12/pipeline_cache.h...
+Checking patch src/graphics/d3d12/command_processor.cpp...
+Checking patch src/graphics/d3d12/pipeline_cache.cpp...
+Checking patch src/graphics/frame_stats.h...
+EXIT=0
+
+- No "Hunk #n succeeded at ... (offset ...)" lines, so every hunk applies at the line it states.
+
+git apply --numstat (read-only):
+10	0	include/rex/graphics/d3d12/pipeline_cache.h
+28	5	src/graphics/d3d12/command_processor.cpp
+65	19	src/graphics/d3d12/pipeline_cache.cpp
+2	0	src/graphics/frame_stats.h
+(total +105 / -24)
+
+Hunks (10, in patch order; DESIGN.md uses these numbers)
+---------------------------------------------------------
+#1  include/rex/graphics/d3d12/pipeline_cache.h  @@ -64,7 +64,15 @@
+    Adds a public AwaitPipelineCreation(), so IssueDraw can force the old wait, and an inline IsCreationNoWait() getter.
+#2  include/rex/graphics/d3d12/pipeline_cache.h  @@ -430,6 +438,8 @@
+    Adds the member `bool creation_no_wait_ = false;`. It is initialized in the class, so the mode is off unless the latch sets it.
+#3  src/graphics/d3d12/command_processor.cpp  @@ -293,15 +293,17 @@  ReportSlowFrame
+    Appends "| dropped draws {} | forced pipeline waits {:.1f} ({}x)" to the slow-frame line: 28 placeholders, 28 arguments. Prints only when slow_frame_log_ms > 0.
+#4  src/graphics/d3d12/command_processor.cpp  @@ -2754,9 +2756,27 @@  IssueDraw drop check
+    - In no-wait mode the drop check stays active even if async is turned off later. No draw is ever recorded with a pending pipeline.
+    - In no-wait mode, memexport and in-occlusion-query draws force AwaitPipelineCreation() (timed as kPipelineAwait) and are checked again.
+    - Every dropped draw counts as kDroppedDraw.
+    - With the mode off, control flow is unchanged.
+#5  src/graphics/d3d12/command_processor.cpp  @@ -4368,7 +4388,10 @@  CanEndSubmissionImmediately   [OPTIONAL]
+    Returns true in no-wait mode, because EndSubmission no longer blocks on creation. Primary-buffer-end submissions and splits then work during bursts too.
+    It is the last hunk in the file and independent of the others, so it can be deleted without touching anything else.
+#6  src/graphics/d3d12/pipeline_cache.cpp  @@ -59,6 +59,20 @@
+    Defines REXCVAR_DEFINE_BOOL(d3d12_pipeline_creation_no_wait, false, "GPU/D3D12", help) with kRequiresRestart, plus an explanatory comment, next to d3d12_pipeline_creation_threads.
+#7  src/graphics/d3d12/pipeline_cache.cpp  @@ -166,6 +180,22 @@  Initialize
+    - Latches creation_no_wait_ = cvar && async_shader_compilation && creation threads exist && bindless.
+    - Logs one INFO line when the latch is set, one WARN line when the cvar is set but the latch isn't, and nothing when the cvar is off.
+#8  src/graphics/d3d12/pipeline_cache.cpp  @@ -749,6 +779,13 @@  ShutdownShaderStorage
+    - No-wait mode only: calls AwaitPipelineCreation() first.
+    - This stops workers racing the storage queue clear and file close (L761-772) and the shader_storage_index_ bump (L346).
+    - After Shutdown has cleared the threads it returns immediately.
+#9  src/graphics/d3d12/pipeline_cache.cpp  @@ -792,25 +829,34 @@  EndSubmission / new AwaitPipelineCreation()
+    - EndSubmission waits only when !creation_no_wait_.
+    - The old wait block (L795-814) moves verbatim, one indent level less, into AwaitPipelineCreation(). Its `creation_threads_.empty()` test becomes an early return.
+#10 src/graphics/frame_stats.h  @@ -30,6 +30,8 @@
+    Adds kDroppedDraw (count) and kPipelineAwait (time and count) before kCount. The only code that walks the counters loops to kCount.
+
+C++ checks done by reading (no compile):
+- These names exist in 5350b1d:
+  - frame_stats::Add(Id, uint64_t us, uint64_t extra = 0) and frame_stats::Scope (frame_stats.h:47, 55);
+  - `using namespace frame_stats;` in ReportSlowFrame (command_processor.cpp:289);
+  - active_occlusion_query_.valid (command_processor.h:758);
+  - PipelineCache::bindless_resources_used_ (pipeline_cache.h:305);
+  - memexport_used in scope at the drop check (command_processor.cpp:2684);
+  - async_shader_compilation readable in pipeline_cache.cpp (used at L942).
+- No new name collides: git grep for AwaitPipelineCreation, creation_no_wait, IsCreationNoWait, kDroppedDraw, kPipelineAwait, skip_draw and await_scope finds nothing.
+- The pattern REXCVAR_DEFINE_BOOL(...).lifecycle(kRequiresRestart) is already used (command_processor.cpp:47-48). Argument-less REXGPU_INFO/REXGPU_WARN calls are already used (pipeline_cache.cpp:367, command_processor.cpp:336); the macros are variadic (logging/macros.h:93-94).
+- The only new member, creation_no_wait_, is initialized in the class. All new lines are at most 100 columns.
+
+
+Review by Agent 6 (2026-11-23 06:46, read-only; nothing applied or built)
+------------------------------------------------------------------------
+- Apply check: re-ran the same `git -C DimensionsRecomp/rexglue-sdk apply --check --verbose <abs patch>` at 06:45.
+  - Output: the same 4 "Checking patch" lines, EXIT=0, no offsets.
+  - HEAD is still 5350b1d, and `git status --porcelain -- src include` was empty afterwards.
+- #3 (slow-frame line): L291-304 has 25 placeholders for 25 args, and the patch adds 3 and 3, so 28/28. The new {:.1f} gets ms(...), which is a double.
+- #4:
+  - memexport_used is declared at function scope (L2684), before the drop check (L2757).
+  - frame_stats::Add(id, 0) and frame_stats::Scope are already used the same way at L3272 and L3278.
+- #7:
+  - bindless_resources_used_ is set in the constructor's init list (L93).
+  - The latch comes after the thread loop (L161-168), right before Initialize's `return true`.
+  - async_shader_compilation is visible here: it comes from a header, and its only use in this file is L942.
+- AwaitPipelineCreation():
+  - It returns early when there are no threads, so the assert_false(creation_threads_.empty()) in CreateQueuedPipelinesOnProcessorThread (L3288) holds.
+  - That function has no thread-affinity check, so the #8 call from InitializeShaderStorage's thread (CP paused) is fine.
+- #5: CanEndSubmissionImmediately has exactly two callers, OnPrimaryBufferEnd (L2589) and MaybeSplitSubmission (L4392), as DESIGN.md R4 says.
+- Macros: REXGPU_INFO and REXGPU_WARN are variadic (logging/macros.h:93-94), and an argument-less REXGPU_WARN already exists at pipeline_cache.cpp:367.
+- Verdict: OK as a staged opt-in. The compile risk (R8) stays open until it's built. The behavioural gate is DESIGN.md §8 row 3, the user's visible-desktop review.
+
+Withdrawn: s33-popin-no5.patch (Agent 10's rating, S1 and N1; Agent 6, 2026-11-23 07:37)
+------------------------------------------------------------------------------------------
+- Withdrawn at 07:40. Agent 1 asked for docs only this round: no patch or code changes, and keep the rated hashes.
+  - The copy and its generator, make_no5.py, were deleted.
+  - The rated s33-popin.patch was never changed.
+- To build without hunk #5 (S1): delete L82-93 of s33-popin.patch, from the `@@ -4368,7 +4388,10 @@` line up to, but not including, the `diff --git a/src/graphics/d3d12/pipeline_cache.cpp` line. No other hunk header changes.
+- The record below is for the withdrawn copy, which dropped hunk #5 and added N1's comment. It applied cleanly.
+- Made by `python -B build/agent6/s33-popin/make_no5.py`, which exited 0.
+  - It accepts only the rated s33-popin.patch (sha256 0D23024484CCDEE1...).
+  - It drops hunk #5, adds N1's 3 comment lines to hunk #1 and fixes the hunk #1 and #2 headers. Every other byte is copied.
+- Output: 10725 B, 211 lines, LF. sha256 2442037B0999D10DAAB95EA3FD0C67D770F413FC712033DA42AA41CCBAB9FAD8.
+- Apply check at 07:37, HEAD 5350b1d: `git -C DimensionsRecomp/rexglue-sdk apply --check --verbose <workspace>\build\agent6\s33-popin\s33-popin-no5.patch` printed the same 4 "Checking patch" lines, EXIT=0, no offsets.
+- `git apply --numstat`:
+  - 13/0 pipeline_cache.h
+  - 24/4 command_processor.cpp
+  - 65/19 pipeline_cache.cpp
+  - 2/0 frame_stats.h
+  - Total +104/-23: the rated +105/-24, minus #5's +4/-1, plus N1's +3.
+- `git diff --no-index s33-popin.patch s33-popin-no5.patch` shows only these changes:
+  - the hunk #1 header (+64,15 to +64,18);
+  - the 3 N1 lines;
+  - the hunk #2 header (+438,8 to +441,8);
+  - hunk #5 removed.
+- Afterwards the rated patch's sha256 was still 0D230244..., and `git status --porcelain -- src include` in the SDK was empty.
+- Keep the patch LF. The outer repo warns that git would turn LF into CRLF on checkout. If `git apply` fails after a checkout, convert the patch back to LF first.

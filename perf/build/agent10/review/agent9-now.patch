@@ -1,0 +1,1484 @@
+diff --git a/include/rex/codegen/config.h b/include/rex/codegen/config.h
+index 9e74744..79a2ed8 100644
+--- a/include/rex/codegen/config.h
++++ b/include/rex/codegen/config.h
+@@ -101,6 +101,13 @@ struct RecompilerConfig {
+   bool nonVolatileRegistersAsLocalVariables = false;
+   bool generateExceptionHandlers = false;  ///< Generate SEH exception handler wrappers
+ 
++  // Emission-only optimizations. Each one off keeps the emitted text unchanged.
++  bool rlwinmLowering = false;    ///< 32-bit shift/rotate forms for rlwinm/rlwnm/rlwimi
++  bool flushModeElision = false;  ///< No flush-mode switch for mode-independent FP/VMX ops
++  bool crCompareSoZero = false;   ///< Compares store SO=0 when no image instruction sets XER.SO
++  bool musttailCalls = false;     ///< Tail calls as [[clang::musttail]] return f(ctx, base)
++  bool vmxVectorFallbacks = false;  ///< SSE forms for VMX ops emitted as scalar lane loops
++
+   // === Analysis tuning (optional) ===
+   uint32_t maxJumpExtension = 65536;  ///< Max bytes to extend function for jump table targets
+   uint32_t dataRegionThreshold = 16;  ///< Consecutive invalid instructions to mark as data region
+diff --git a/include/rex/codegen/function_types.h b/include/rex/codegen/function_types.h
+index 8c6772d..6193394 100644
+--- a/include/rex/codegen/function_types.h
++++ b/include/rex/codegen/function_types.h
+@@ -56,12 +56,52 @@ struct EmitContext {
+   /// per-file declaration header, so a missed name is a compile error.
+   std::unordered_set<std::string>* referenced = nullptr;
+ 
++  /// Register localization fallback; both null unless a localization option is
++  /// on. interiorEntries: entries reached with live registers (body= entries and
++  /// entries inside another function's blocks). registersInCtx: functions emitted
++  /// with every register in ctx - those entries, body owners, functions with a
++  /// direct edge or jump table into one, and the save/restore helpers.
++  const std::unordered_set<uint32_t>* interiorEntries = nullptr;
++  const std::unordered_set<uint32_t>* registersInCtx = nullptr;
++
++  /// Counts control transfers from a function with localized registers into an
++  /// interior entry (BuilderContext::check_register_handoff). The writer fails
++  /// write() before flushing any output when the count is not zero.
++  size_t* handoffErrors = nullptr;
++
++  /// cr_compare_so_zero: entries whose emitted body writes XER.SO (mtxer, or a
++  /// mid-asm hook that takes xer), and whether one of them keeps XER in ctx.
++  /// Null unless the option is on (see PrepareEmitAnalyses).
++  const std::unordered_set<uint32_t>* xerWriters = nullptr;
++  bool ctxXerWritten = false;
++
++  /// skip_lr: entries whose emitted body uses LR as data - a bclrl (blrl or a
++  /// conditional form), or a bl to a label inside the function (bl $+4; mflr).
++  /// They keep the LR writes and reads that skip_lr drops everywhere else.
++  /// Null unless skip_lr is on (see PrepareEmitAnalyses).
++  const std::unordered_set<uint32_t>* lrUsers = nullptr;
++
+   void reference(std::string_view name) const {
+     if (referenced)
+       referenced->emplace(name);
+   }
+ };
+ 
++/// Storage for the analyses EmitContext points into. Must outlive emission.
++struct EmitAnalyses {
++  std::unordered_set<uint32_t> interiorEntries;
++  std::unordered_set<uint32_t> registersInCtx;
++  std::unordered_set<uint32_t> xerWriters;
++  std::unordered_set<uint32_t> lrUsers;
++};
++
++/// Runs the analyses that emitCtx.config enables (register localization
++/// fallback, skip_lr LR users, cr_compare_so_zero) for `functions`, the
++/// functions about to be emitted, and points emitCtx at the results. Defined
++/// in codegen_writer.cpp.
++void PrepareEmitAnalyses(EmitContext& emitCtx, const std::vector<const FunctionNode*>& functions,
++                         EmitAnalyses& storage);
++
+ //=============================================================================
+ // Authority Levels
+ //=============================================================================
+diff --git a/src/codegen/builders/builder_context.h b/src/codegen/builders/builder_context.h
+index 33ac6d0..cbc7555 100644
+--- a/src/codegen/builders/builder_context.h
++++ b/src/codegen/builders/builder_context.h
+@@ -98,12 +98,28 @@ struct BuilderContext {
+   /// Pointer to active jump table for bctr dispatch, or nullptr
+   const JumpTable* activeJumpTable = nullptr;
+ 
++  /// Ignore the register localization options for this function (see
++  /// EmitContext::registersInCtx). Its registers all live in ctx.
++  bool registersInCtx = false;
++
++  /// cr_compare_so_zero proved that XER.SO is 0 at every compare in this
++  /// function (EmitContext::xerWriters), so compares pass "{}" for XER.
++  bool compareSoZero = false;
++
++  /// skip_lr is on, but this body uses LR as data (EmitContext::lrUsers), so it
++  /// keeps the LR writes and reads.
++  bool keepLr = false;
++
+   /// Get the recompiler configuration
+   const RecompilerConfig& config() const;
+ 
+   /// Get the function graph (single source of truth for function info)
+   const FunctionGraph& graph() const;
+ 
++  /// Whether to emit the LR writes (bl, bctrl, blrl, mtlr) and reads (mflr):
++  /// skip_lr is off, or this body keeps LR (keepLr).
++  bool trackLr() const;
++
+   //=========================================================================
+   // Register Accessors
+   //=========================================================================
+@@ -231,6 +247,13 @@ struct BuilderContext {
+    */
+   void emit_function_call(uint32_t address);
+ 
++  /**
++   * @brief Report a transfer to an interior entry from a function that keeps
++   * registers in locals. The writer's registersInCtx set should prevent it.
++   * @param target Address of the branch or call target
++   */
++  void check_register_handoff(uint32_t target) const;
++
+   /**
+    * @brief Emit C++ code for a conditional branch.
+    * @param not_ If true, invert the condition
+diff --git a/src/codegen/builders/context.cpp b/src/codegen/builders/context.cpp
+index 8fad303..584a817 100644
+--- a/src/codegen/builders/context.cpp
++++ b/src/codegen/builders/context.cpp
+@@ -38,6 +38,10 @@ const FunctionGraph& BuilderContext::graph() const {
+   return emitCtx.graph;
+ }
+ 
++bool BuilderContext::trackLr() const {
++  return !config().skipLr || keepLr;
++}
++
+ //=============================================================================
+ // Register Accessors
+ //=============================================================================
+@@ -45,12 +49,13 @@ const FunctionGraph& BuilderContext::graph() const {
+ // Localizing a non-volatile assumes the function owns it across its whole body.
+ // An SEH funclet does not: it inherits its owner's live registers through ctx.
+ bool BuilderContext::localizeNonVolatiles() const {
+-  return config().nonVolatileRegistersAsLocalVariables && !fn.sharesRegisters();
++  return config().nonVolatileRegistersAsLocalVariables && !fn.sharesRegisters() &&
++         !registersInCtx;
+ }
+ 
+ std::string BuilderContext::r(size_t index) {
+   const auto& cfg = config();
+-  if ((cfg.nonArgumentRegistersAsLocalVariables &&
++  if ((cfg.nonArgumentRegistersAsLocalVariables && !registersInCtx &&
+        (index == 0 || index == 2 || index == 11 || index == 12)) ||
+       (localizeNonVolatiles() && index >= 14)) {
+     locals.r[index] = true;
+@@ -61,7 +66,7 @@ std::string BuilderContext::r(size_t index) {
+ 
+ std::string BuilderContext::f(size_t index) {
+   const auto& cfg = config();
+-  if ((cfg.nonArgumentRegistersAsLocalVariables && index == 0) ||
++  if ((cfg.nonArgumentRegistersAsLocalVariables && !registersInCtx && index == 0) ||
+       (localizeNonVolatiles() && index >= 14)) {
+     locals.f[index] = true;
+     return fmt::format("f{}", index);
+@@ -71,7 +76,8 @@ std::string BuilderContext::f(size_t index) {
+ 
+ std::string BuilderContext::v(size_t index) {
+   const auto& cfg = config();
+-  if ((cfg.nonArgumentRegistersAsLocalVariables && (index >= 32 && index <= 63)) ||
++  if ((cfg.nonArgumentRegistersAsLocalVariables && !registersInCtx &&
++       (index >= 32 && index <= 63)) ||
+       (localizeNonVolatiles() && ((index >= 14 && index <= 31) || (index >= 64 && index <= 127)))) {
+     locals.v[index] = true;
+     return fmt::format("v{}", index);
+@@ -80,7 +86,7 @@ std::string BuilderContext::v(size_t index) {
+ }
+ 
+ std::string BuilderContext::cr(size_t index) {
+-  if (config().crRegistersAsLocalVariables) {
++  if (config().crRegistersAsLocalVariables && !registersInCtx) {
+     locals.cr[index] = true;
+     return fmt::format("cr{}", index);
+   }
+@@ -88,7 +94,7 @@ std::string BuilderContext::cr(size_t index) {
+ }
+ 
+ const char* BuilderContext::ctr() {
+-  if (config().ctrAsLocalVariable) {
++  if (config().ctrAsLocalVariable && !registersInCtx) {
+     locals.ctr = true;
+     return "ctr";
+   }
+@@ -96,7 +102,7 @@ const char* BuilderContext::ctr() {
+ }
+ 
+ const char* BuilderContext::xer() {
+-  if (config().xerAsLocalVariable) {
++  if (config().xerAsLocalVariable && !registersInCtx) {
+     locals.xer = true;
+     return "xer";
+   }
+@@ -104,7 +110,7 @@ const char* BuilderContext::xer() {
+ }
+ 
+ const char* BuilderContext::reserved() {
+-  if (config().reservedRegisterAsLocalVariable) {
++  if (config().reservedRegisterAsLocalVariable && !registersInCtx) {
+     locals.reserved = true;
+     return "reserved";
+   }
+@@ -172,6 +178,134 @@ const CallTarget* BuilderContext::findCallTarget(uint32_t site) const {
+   return nullptr;
+ }
+ 
++void BuilderContext::check_register_handoff(uint32_t target) const {
++  if (!registersInCtx && emitCtx.interiorEntries && emitCtx.interiorEntries->contains(target)) {
++    REXCODEGEN_ERROR("0x{:08X} in 0x{:08X} reaches interior entry 0x{:08X} with localized registers",
++                     base, fn.base(), target);
++    if (emitCtx.handoffErrors)
++      ++*emitCtx.handoffErrors;
++  }
++}
++
++//=============================================================================
++// Guest Tail Calls (RecompilerConfig::musttailCalls, TOML musttail_calls)
++//=============================================================================
++//
++// With musttail_calls on, a guest tail call is emitted as
++//   [[clang::musttail]] return NAME(ctx, base);
++// instead of `NAME(ctx, base);` + `return;`. clang then has to lower it to a
++// jmp at every optimization level, and the host stack stops growing along guest
++// tail-call chains. That is valid because every guest function and import is
++// declared through REX_FUNC with the one signature
++// void(PPCContext& __restrict, uint8_t*), the call passes the caller's own
++// parameters through, and no generated local has a non-trivial destructor
++// (bench/agent9/musttail/README.md). The old text stays wherever that is not
++// provable:
++//  - SEH-wrapped bodies (generateExceptionHandlers with SEH scopes): a musttail
++//    cannot leave the __try / SehGuard try block (compile error), and the
++//    handler would no longer cover the callee.
++//  - Functions that call setjmp (setJmpAddress): the saved context refers to
++//    this frame, which a musttail releases before the callee could longjmp.
++//  - Anything but the plain one-line call: longjmp, setjmp, elided
++//    __save/__rest helpers, the SEH-funclet register handoff, unresolved targets.
++// REX_FUNC_PROLOGUE declares a Tracy zone (non-trivial destructor) when
++// REXGLUE_PROFILE_GUEST_FUNCTIONS and REXGLUE_ENABLE_PROFILING are both defined,
++// and clang rejects every musttail in that build: keep the option off there.
++// Mid-asm hooks get references to locals and must not keep them past the hook
++// call: the frame is gone before the tail-called function runs.
++
++namespace {
++
++constexpr std::string_view kMustTailReturn = "[[clang::musttail]] return ";
++
++// Whether a direct branch in this function targets setJmpAddress, so that
++// emit_function_call() puts ppc_setjmp() in this frame. Both readings of the
++// displacement (relative, and absolute for AA=1) count, which is conservative.
++bool calls_setjmp(const BuilderContext& ctx) {
++  const uint32_t target = ctx.config().setJmpAddress;
++  if (target == 0)
++    return false;
++  for (const auto& block : ctx.fn.blocks()) {
++    const uint8_t* p = ctx.emitCtx.binary.translate(block.base);
++    if (!p)
++      continue;
++    for (uint32_t addr = block.base; addr < block.end(); addr += 4, p += 4) {
++      const uint32_t w = (uint32_t(p[0]) << 24) | (uint32_t(p[1]) << 16) |
++                         (uint32_t(p[2]) << 8) | uint32_t(p[3]);
++      int32_t disp;
++      if ((w >> 26) == 18)  // b, ba, bl, bla: LI
++        disp = (int32_t(w << 6) >> 6) & ~3;
++      else if ((w >> 26) == 16)  // bc, bca, bcl, bcla: BD
++        disp = int32_t(int16_t(w & 0xFFFC));
++      else
++        continue;
++      if (addr + uint32_t(disp) == target || uint32_t(disp) == target)
++        return true;
++    }
++  }
++  return false;
++}
++
++bool musttail_allowed(const BuilderContext& ctx) {
++  const auto& cfg = ctx.config();
++  if (!cfg.musttailCalls)
++    return false;
++  // The generateSeh test of FunctionNode::recompile(): the body is in SEH_TRY.
++  if (cfg.generateExceptionHandlers && ctx.fn.hasExceptionInfo()) {
++    const auto* seh = ctx.fn.exceptionInfo()->asSeh();
++    if (seh && !seh->scopes.empty())
++      return false;
++  }
++  return !calls_setjmp(ctx);
++}
++
++bool is_identifier(std::string_view s) {
++  if (s.empty() || (s[0] >= '0' && s[0] <= '9'))
++    return false;
++  for (char c : s) {
++    if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_'))
++      return false;
++  }
++  return true;
++}
++
++}  // namespace
++
++// `<indent>NAME(ctx, base);` and `<indent>return;`, or the single line
++// `<indent>[[clang::musttail]] return NAME(ctx, base);` where musttail is
++// allowed. Used by the conditional tail calls below and by bctr jump tables.
++void emit_tail_call_line(BuilderContext& ctx, std::string_view indent, std::string_view name) {
++  if (musttail_allowed(ctx)) {
++    ctx.println("{}{}{}(ctx, base);", indent, kMustTailReturn, name);
++    return;
++  }
++  ctx.println("{}{}(ctx, base);", indent, name);
++  ctx.println("{}return;", indent);
++}
++
++// A `b` tail call: emit_function_call() followed by `return;`. Where musttail
++// is allowed and the call came out as the plain line `\tNAME(ctx, base);`, that
++// line becomes the musttail return; every other form keeps its text and the
++// `return;`.
++void emit_tail_call(BuilderContext& ctx, uint32_t address) {
++  const size_t mark = ctx.out.size();
++  ctx.emit_function_call(address);
++  if (musttail_allowed(ctx)) {
++    constexpr std::string_view kCallEnd = "(ctx, base);\n";
++    const std::string_view call = std::string_view(ctx.out).substr(mark);
++    if (call.size() > 1 + kCallEnd.size() && call.front() == '\t' && call.ends_with(kCallEnd)) {
++      const std::string_view name = call.substr(1, call.size() - 1 - kCallEnd.size());
++      if (is_identifier(name)) {
++        std::string line = fmt::format("\t{}{}(ctx, base);\n", kMustTailReturn, name);
++        ctx.out.resize(mark);
++        ctx.out += line;
++        return;
++      }
++    }
++  }
++  ctx.println("\treturn;");
++}
++
+ void BuilderContext::emit_function_call(uint32_t address) {
+   const auto& cfg = config();
+ 
+@@ -197,12 +331,15 @@ void BuilderContext::emit_function_call(uint32_t address) {
+     if (target->isFunction()) {
+       auto* targetFn = target->asFunction();
+       const auto& name = targetFn->name();
++      check_register_handoff(static_cast<uint32_t>(targetFn->base()));
+ 
+       // Handle save/restore helpers. Gated on the global setting, not this
+       // function's: the helper bodies are emitted under it too, so once they
+       // spill to locals they are no-ops that scribble zeros on the caller's
+-      // frame. A share_registers function still has to elide them.
+-      if (cfg.nonVolatileRegistersAsLocalVariables &&
++      // frame. A share_registers function still has to elide them. A
++      // registersInCtx function keeps its non-volatiles in ctx and needs the
++      // real save/restore; the writer emits the helpers in ctx for it.
++      if (cfg.nonVolatileRegistersAsLocalVariables && !registersInCtx &&
+           (name.find("__rest") == 0 || name.find("__save") == 0)) {
+         // print nothing - these are handled by local variable tracking
+         return;
+@@ -337,10 +474,10 @@ void BuilderContext::emit_conditional_branch(bool not_, std::string_view cond) {
+       if (const auto* callTarget = findCallTarget(base)) {
+         if (callTarget->isFunction()) {
+           auto* targetFn = callTarget->asFunction();
++          check_register_handoff(static_cast<uint32_t>(targetFn->base()));
+           emitCtx.reference(targetFn->name());
+           println("\tif ({}{}.{}) {{", not_ ? "!" : "", cr(insn.operands[0]), cond);
+-          println("\t\t{}(ctx, base);", targetFn->name());
+-          println("\t\treturn;");
++          emit_tail_call_line(*this, "\t\t", targetFn->name());
+           println("\t}}");
+         } else if (callTarget->isImport()) {
+           const auto& importTarget = std::get<CallTarget::ToImport>(callTarget->value);
+@@ -349,8 +486,7 @@ void BuilderContext::emit_conditional_branch(bool not_, std::string_view cond) {
+           std::replace(func_name.begin(), func_name.end(), '.', '_');
+           emitCtx.reference(func_name);
+           println("\tif ({}{}.{}) {{", not_ ? "!" : "", cr(insn.operands[0]), cond);
+-          println("\t\t{}(ctx, base);", func_name);
+-          println("\t\treturn;");
++          emit_tail_call_line(*this, "\t\t", func_name);
+           println("\t}}");
+         }
+       } else {
+diff --git a/src/codegen/builders/control_flow.cpp b/src/codegen/builders/control_flow.cpp
+index 26957fc..63bd804 100644
+--- a/src/codegen/builders/control_flow.cpp
++++ b/src/codegen/builders/control_flow.cpp
+@@ -20,6 +20,10 @@
+ 
+ namespace rex::codegen {
+ 
++// Guest tail-call emission, defined in context.cpp (RecompilerConfig::musttailCalls).
++void emit_tail_call(BuilderContext& ctx, uint32_t address);
++void emit_tail_call_line(BuilderContext& ctx, std::string_view indent, std::string_view name);
++
+ //=============================================================================
+ // Unconditional Branch
+ //=============================================================================
+@@ -40,8 +44,7 @@ bool build_b(BuilderContext& ctx) {
+     case TargetKind::Function:
+     case TargetKind::Import:
+       // Tail call to another function or import
+-      ctx.emit_function_call(target);
+-      ctx.println("\treturn;");
++      emit_tail_call(ctx, target);
+       break;
+ 
+     case TargetKind::Unknown:
+@@ -50,8 +53,7 @@ bool build_b(BuilderContext& ctx) {
+         ctx.println("\tgoto loc_{:X};", target);
+       } else {
+         REXCODEGEN_WARN("Unresolved b target 0x{:08X} from 0x{:08X}", target, ctx.base);
+-        ctx.emit_function_call(target);
+-        ctx.println("\treturn;");
++        emit_tail_call(ctx, target);
+       }
+       break;
+   }
+@@ -62,7 +64,7 @@ bool build_bl(BuilderContext& ctx) {
+   uint32_t target = ctx.insn.operands[0];
+ 
+   // Always set LR (unless skipLr)
+-  if (!ctx.config().skipLr)
++  if (ctx.trackLr())
+     ctx.println("\tctx.lr = 0x{:X};", ctx.base + 4);
+ 
+   // Use graph to classify the target
+@@ -99,7 +101,7 @@ bool build_blr(BuilderContext& ctx) {
+ bool build_blrl(BuilderContext& ctx) {
+   // BLRL: save return address, then branch-and-link to current LR
+   ctx.println("\t{{ auto old_lr = ctx.lr;");
+-  if (!ctx.config().skipLr)
++  if (ctx.trackLr())
+     ctx.println("\tctx.lr = 0x{:X};", ctx.base + 4);
+   ctx.println("\tREX_CALL_INDIRECT_FUNC(uint32_t(old_lr)); }}");
+   ctx.csrState = CSRState::Unknown;
+@@ -146,8 +148,9 @@ bool build_bctr(BuilderContext& ctx) {
+         case TargetKind::Function:
+         case TargetKind::Import:
+           if (auto* targetFn = ctx.graph().getFunction(label)) {
++            ctx.check_register_handoff(label);
+             ctx.emitCtx.reference(targetFn->name());
+-            ctx.println("\t\t{}(ctx, base);", targetFn->name());
++            emit_tail_call_line(ctx, "\t\t", targetFn->name());
+           } else {
+             REXCODEGEN_ERROR(
+                 "Jump target 0x{:08X} classified as function but not in graph at bctr 0x{:08X}",
+@@ -156,8 +159,8 @@ bool build_bctr(BuilderContext& ctx) {
+                 "\t\tREX_FATAL(\"Jump target 0x{:08X} classified as function but not "
+                 "in graph at bctr 0x{:08X}\");",
+                 label, ctx.base);
++            ctx.println("\t\treturn;");
+           }
+-          ctx.println("\t\treturn;");
+           break;
+         default:
+           REXCODEGEN_ERROR("Jump target 0x{:08X} unresolved at bctr 0x{:08X}", label, ctx.base);
+@@ -184,7 +187,7 @@ bool build_bctr(BuilderContext& ctx) {
+ }
+ 
+ bool build_bctrl(BuilderContext& ctx) {
+-  if (!ctx.config().skipLr)
++  if (ctx.trackLr())
+     ctx.println("\tctx.lr = 0x{:X};", ctx.base + 4);
+   ctx.println("\tREX_CALL_INDIRECT_FUNC({}.u32);", ctx.ctr());
+   ctx.csrState = CSRState::Unknown;  // the call could change it
+diff --git a/src/codegen/builders/floating_point.cpp b/src/codegen/builders/floating_point.cpp
+index 1702241..d615183 100644
+--- a/src/codegen/builders/floating_point.cpp
++++ b/src/codegen/builders/floating_point.cpp
+@@ -10,6 +10,7 @@
+  */
+ 
+ #include "builder_context.h"
++#include "flush_mode.h"
+ #include "helpers.h"
+ 
+ namespace rex::codegen {
+@@ -19,21 +20,21 @@ namespace rex::codegen {
+ //=============================================================================
+ 
+ bool build_fabs(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println("\t{}.u64 = {}.u64 & ~0x8000000000000000;", ctx.f(ctx.insn.operands[0]),
+               ctx.f(ctx.insn.operands[1]));
+   return true;
+ }
+ 
+ bool build_fnabs(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println("\t{}.u64 = {}.u64 | 0x8000000000000000;", ctx.f(ctx.insn.operands[0]),
+               ctx.f(ctx.insn.operands[1]));
+   return true;
+ }
+ 
+ bool build_fneg(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println("\t{}.u64 = {}.u64 ^ 0x8000000000000000;", ctx.f(ctx.insn.operands[0]),
+               ctx.f(ctx.insn.operands[1]));
+   return true;
+@@ -44,13 +45,13 @@ bool build_fneg(BuilderContext& ctx) {
+ //=============================================================================
+ 
+ bool build_fmr(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println("\t{}.f64 = {}.f64;", ctx.f(ctx.insn.operands[0]), ctx.f(ctx.insn.operands[1]));
+   return true;
+ }
+ 
+ bool build_fcfid(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println("\t{}.f64 = double({}.s64);", ctx.f(ctx.insn.operands[0]),
+               ctx.f(ctx.insn.operands[1]));
+   return true;
+@@ -67,7 +68,7 @@ bool build_fctid(BuilderContext& ctx) {
+ }
+ 
+ bool build_fctidz(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println(
+       "\t{0}.s64 = std::isnan({1}.f64) ? int64_t(0x8000000000000000ULL) : "
+       "({1}.f64 > double(LLONG_MAX)) ? LLONG_MAX : "
+@@ -87,7 +88,7 @@ bool build_fctiw(BuilderContext& ctx) {
+ }
+ 
+ bool build_fctiwz(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println(
+       "\t{0}.s64 = std::isnan({1}.f64) ? int64_t(0x80000000U) : "
+       "({1}.f64 >= double(INT_MAX)) ? INT_MAX : "
+diff --git a/src/codegen/builders/helpers.h b/src/codegen/builders/helpers.h
+index dbc8d51..a06ae99 100644
+--- a/src/codegen/builders/helpers.h
++++ b/src/codegen/builders/helpers.h
+@@ -64,6 +64,14 @@ inline bool isRecordForm(const ppc_insn& insn) {
+   return std::strchr(insn.opcode->name, '.') != nullptr;
+ }
+ 
++/**
++ * XER operand of a CR compare: "{}" (SO = 0) when cr_compare_so_zero proved
++ * that no XER.SO writer reaches this function, else the XER register.
++ */
++inline const char* compareXer(BuilderContext& ctx) {
++  return ctx.compareSoZero ? "{}" : ctx.xer();
++}
++
+ /**
+  * Emit CR0 comparison for record-form instructions.
+  *
+@@ -79,7 +87,7 @@ inline bool isRecordForm(const ppc_insn& insn) {
+ inline void emitRecordFormCompare(BuilderContext& ctx) {
+   if (isRecordForm(ctx.insn)) {
+     ctx.println("\t{}.compare<int32_t>({}.s32, 0, {});", ctx.cr(0), ctx.r(ctx.insn.operands[0]),
+-                ctx.xer());
++                compareXer(ctx));
+   }
+ }
+ 
+@@ -142,7 +150,8 @@ inline void emitCRBitOperation(BuilderContext& ctx, std::string_view op, bool in
+  */
+ inline void emitCompareRegister(BuilderContext& ctx, const char* type_name, const char* field) {
+   ctx.println("\t{}.compare<{}>({}.{}, {}.{}, {});", ctx.cr(ctx.insn.operands[0]), type_name,
+-              ctx.r(ctx.insn.operands[1]), field, ctx.r(ctx.insn.operands[2]), field, ctx.xer());
++              ctx.r(ctx.insn.operands[1]), field, ctx.r(ctx.insn.operands[2]), field,
++              compareXer(ctx));
+ }
+ 
+ /**
+@@ -161,10 +170,10 @@ inline void emitCompareImmediate(BuilderContext& ctx, const char* type_name, con
+   if (sign_extend) {
+     ctx.println("\t{}.compare<{}>({}.{}, {}, {});", ctx.cr(ctx.insn.operands[0]), type_name,
+                 ctx.r(ctx.insn.operands[1]), field, static_cast<int32_t>(ctx.insn.operands[2]),
+-                ctx.xer());
++                compareXer(ctx));
+   } else {
+     ctx.println("\t{}.compare<{}>({}.{}, {}, {});", ctx.cr(ctx.insn.operands[0]), type_name,
+-                ctx.r(ctx.insn.operands[1]), field, ctx.insn.operands[2], ctx.xer());
++                ctx.r(ctx.insn.operands[1]), field, ctx.insn.operands[2], compareXer(ctx));
+   }
+ }
+ 
+@@ -309,7 +318,10 @@ inline void emitAtomicStoreConditional(BuilderContext& ctx, const char* ptr_type
+       "{}.{}, {}({}.{}));",
+       ctx.cr(0), ptr_type, ctx.ea(), ctx.reserved(), field, bswap_func, ctx.r(ctx.insn.operands[0]),
+       field);
+-  ctx.println("\t{}.so = {}.so;", ctx.cr(0), ctx.xer());
++  if (ctx.compareSoZero)
++    ctx.println("\t{}.so = 0;", ctx.cr(0));
++  else
++    ctx.println("\t{}.so = {}.so;", ctx.cr(0), ctx.xer());
+ }
+ 
+ //=============================================================================
+diff --git a/src/codegen/builders/logical.cpp b/src/codegen/builders/logical.cpp
+index a58f51d..dff064d 100644
+--- a/src/codegen/builders/logical.cpp
++++ b/src/codegen/builders/logical.cpp
+@@ -10,6 +10,7 @@
+  */
+ 
+ #include "helpers.h"
++#include "rotate_mask.h"
+ 
+ namespace rex::codegen {
+ 
+@@ -36,7 +37,7 @@ bool build_andi(BuilderContext& ctx) {
+               ctx.insn.operands[2]);
+   // ANDI. always sets CR0
+   ctx.println("\t{}.compare<int32_t>({}.s32, 0, {});", ctx.cr(0), ctx.r(ctx.insn.operands[0]),
+-              ctx.xer());
++              compareXer(ctx));
+   return true;
+ }
+ 
+@@ -45,7 +46,7 @@ bool build_andis(BuilderContext& ctx) {
+               ctx.insn.operands[2] << 16);
+   // ANDIS. always sets CR0
+   ctx.println("\t{}.compare<int32_t>({}.s32, 0, {});", ctx.cr(0), ctx.r(ctx.insn.operands[0]),
+-              ctx.xer());
++              compareXer(ctx));
+   return true;
+ }
+ 
+@@ -277,6 +278,15 @@ bool build_rotldi(BuilderContext& ctx) {
+ //=============================================================================
+ 
+ bool build_rlwimi(BuilderContext& ctx) {
++  if (ctx.config().rlwinmLowering) {
++    if (auto s = rlw::lowerRlwimi(ctx.r(ctx.insn.operands[0]), ctx.r(ctx.insn.operands[1]),
++                                  ctx.insn.operands[2], ctx.insn.operands[3],
++                                  ctx.insn.operands[4])) {
++      ctx.println("\t{}", *s);
++      emitRecordFormCompare(ctx);
++      return true;
++    }
++  }
+   const uint64_t mask = compute_mask(ctx.insn.operands[3] + 32, ctx.insn.operands[4] + 32);
+   ctx.println(
+       "\t{}.u64 = (__builtin_rotateleft64({}.u32 | ({}.u64 << 32), {}) & 0x{:X}) | ({}.u64 & "
+@@ -288,6 +298,15 @@ bool build_rlwimi(BuilderContext& ctx) {
+ }
+ 
+ bool build_rlwinm(BuilderContext& ctx) {
++  if (ctx.config().rlwinmLowering) {
++    if (auto s = rlw::lowerRlwinm(ctx.r(ctx.insn.operands[0]), ctx.r(ctx.insn.operands[1]),
++                                  ctx.insn.operands[2], ctx.insn.operands[3],
++                                  ctx.insn.operands[4])) {
++      ctx.println("\t{}", *s);
++      emitRecordFormCompare(ctx);
++      return true;
++    }
++  }
+   ctx.println("\t{}.u64 = __builtin_rotateleft64({}.u32 | ({}.u64 << 32), {}) & 0x{:X};",
+               ctx.r(ctx.insn.operands[0]), ctx.r(ctx.insn.operands[1]), ctx.r(ctx.insn.operands[1]),
+               ctx.insn.operands[2],
+@@ -297,6 +316,15 @@ bool build_rlwinm(BuilderContext& ctx) {
+ }
+ 
+ bool build_rlwnm(BuilderContext& ctx) {
++  if (ctx.config().rlwinmLowering) {
++    if (auto s = rlw::lowerRlwnm(ctx.r(ctx.insn.operands[0]), ctx.r(ctx.insn.operands[1]),
++                                 ctx.r(ctx.insn.operands[2]), ctx.insn.operands[3],
++                                 ctx.insn.operands[4])) {
++      ctx.println("\t{}", *s);
++      emitRecordFormCompare(ctx);
++      return true;
++    }
++  }
+   // Like rlwinm but shift amount comes from register, not immediate
+   ctx.println("\t{}.u64 = __builtin_rotateleft64({}.u32 | ({}.u64 << 32), {}.u8 & 0x1F) & 0x{:X};",
+               ctx.r(ctx.insn.operands[0]), ctx.r(ctx.insn.operands[1]), ctx.r(ctx.insn.operands[1]),
+diff --git a/src/codegen/builders/memory.cpp b/src/codegen/builders/memory.cpp
+index 3dd7fa5..c8f8995 100644
+--- a/src/codegen/builders/memory.cpp
++++ b/src/codegen/builders/memory.cpp
+@@ -10,6 +10,7 @@
+  */
+ 
+ #include "builder_context.h"
++#include "flush_mode.h"
+ #include "helpers.h"
+ 
+ namespace rex::codegen {
+@@ -220,7 +221,7 @@ bool build_ldarx(BuilderContext& ctx) {
+ //=============================================================================
+ 
+ bool build_lfd(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.print("\t{}.u64 = REX_LOAD_U64(", ctx.f(ctx.insn.operands[0]));
+   if (ctx.insn.operands[2] != 0)
+     ctx.print("{}.u32 + ", ctx.r(ctx.insn.operands[2]));
+@@ -229,7 +230,7 @@ bool build_lfd(BuilderContext& ctx) {
+ }
+ 
+ bool build_lfdx(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.print("\t{}.u64 = REX_LOAD_U64(", ctx.f(ctx.insn.operands[0]));
+   if (ctx.insn.operands[1] != 0)
+     ctx.print("{}.u32 + ", ctx.r(ctx.insn.operands[1]));
+@@ -259,7 +260,7 @@ bool build_lfsx(BuilderContext& ctx) {
+ 
+ bool build_lfdu(BuilderContext& ctx) {
+   // Load Floating-point Double with Update
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println("\t{} = {} + {}.u32;", ctx.ea(), static_cast<int32_t>(ctx.insn.operands[1]),
+               ctx.r(ctx.insn.operands[2]));
+   ctx.println("\t{}.u64 = REX_LOAD_U64({});", ctx.f(ctx.insn.operands[0]), ctx.ea());
+@@ -269,7 +270,7 @@ bool build_lfdu(BuilderContext& ctx) {
+ 
+ bool build_lfdux(BuilderContext& ctx) {
+   // Load Floating-point Double with Update Indexed
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println("\t{} = {}.u32 + {}.u32;", ctx.ea(), ctx.r(ctx.insn.operands[1]),
+               ctx.r(ctx.insn.operands[2]));
+   ctx.println("\t{}.u64 = REX_LOAD_U64({});", ctx.f(ctx.insn.operands[0]), ctx.ea());
+@@ -447,7 +448,7 @@ bool build_stdux(BuilderContext& ctx) {
+ //=============================================================================
+ 
+ bool build_stfd(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.print("{}", ctx.mmio_check_d_form() ? "\tREX_MM_STORE_U64(" : "\tREX_STORE_U64(");
+   if (ctx.insn.operands[2] != 0)
+     ctx.print("{}.u32 + ", ctx.r(ctx.insn.operands[2]));
+@@ -457,7 +458,7 @@ bool build_stfd(BuilderContext& ctx) {
+ }
+ 
+ bool build_stfdx(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.print("{}", ctx.mmio_check_x_form() ? "\tREX_MM_STORE_U64(" : "\tREX_STORE_U64(");
+   if (ctx.insn.operands[1] != 0)
+     ctx.print("{}.u32 + ", ctx.r(ctx.insn.operands[1]));
+@@ -467,7 +468,7 @@ bool build_stfdx(BuilderContext& ctx) {
+ 
+ bool build_stfdux(BuilderContext& ctx) {
+   // Store Floating-point Double with Update Indexed: EA = rA + rB; MEM(EA) = FRS; rA = EA
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println("\t{} = {}.u32 + {}.u32;", ctx.ea(), ctx.r(ctx.insn.operands[1]),
+               ctx.r(ctx.insn.operands[2]));
+   ctx.println("\tREX_STORE_U64({}, {}.u64);", ctx.ea(), ctx.f(ctx.insn.operands[0]));
+@@ -476,7 +477,7 @@ bool build_stfdux(BuilderContext& ctx) {
+ }
+ 
+ bool build_stfiwx(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.print("{}", ctx.mmio_check_x_form() ? "\tREX_MM_STORE_U32(" : "\tREX_STORE_U32(");
+   if (ctx.insn.operands[1] != 0)
+     ctx.print("{}.u32 + ", ctx.r(ctx.insn.operands[1]));
+@@ -506,7 +507,7 @@ bool build_stfsx(BuilderContext& ctx) {
+ 
+ bool build_stfdu(BuilderContext& ctx) {
+   // Store Floating-point Double with Update
+-  ctx.emit_set_flush_mode(false);
++  emitFlushModeUnlessIndependent(ctx, false);
+   ctx.println("\t{} = {} + {}.u32;", ctx.ea(), static_cast<int32_t>(ctx.insn.operands[1]),
+               ctx.r(ctx.insn.operands[2]));
+   ctx.println("\tREX_STORE_U64({}, {}.u64);", ctx.ea(), ctx.f(ctx.insn.operands[0]));
+diff --git a/src/codegen/builders/system.cpp b/src/codegen/builders/system.cpp
+index b2d70f5..6c07995 100644
+--- a/src/codegen/builders/system.cpp
++++ b/src/codegen/builders/system.cpp
+@@ -242,7 +242,7 @@ bool build_mfocrf(BuilderContext& ctx) {
+ }
+ 
+ bool build_mflr(BuilderContext& ctx) {
+-  if (!ctx.config().skipLr)
++  if (ctx.trackLr())
+     ctx.println("\t{}.u64 = ctx.lr;", ctx.r(ctx.insn.operands[0]));
+   return true;
+ }
+@@ -310,7 +310,7 @@ bool build_mtctr(BuilderContext& ctx) {
+ }
+ 
+ bool build_mtlr(BuilderContext& ctx) {
+-  if (!ctx.config().skipLr)
++  if (ctx.trackLr())
+     ctx.println("\tctx.lr = {}.u64;", ctx.r(ctx.insn.operands[0]));
+   return true;
+ }
+diff --git a/src/codegen/builders/vector.cpp b/src/codegen/builders/vector.cpp
+index cbdd7f7..ba51dc1 100644
+--- a/src/codegen/builders/vector.cpp
++++ b/src/codegen/builders/vector.cpp
+@@ -10,6 +10,7 @@
+  */
+ 
+ #include "builder_context.h"
++#include "flush_mode.h"
+ #include "helpers.h"
+ 
+ #include <cmath>
+@@ -217,7 +218,7 @@ bool build_vrfim(BuilderContext& ctx) {
+ }
+ 
+ bool build_vrfin(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(true);
++  emitFlushModeUnlessIndependent(ctx, true);
+   ctx.emit_vec_fp_unary_expr(
+       "simde_mm_round_ps(simde_mm_load_ps({vA}.f32), "
+       "SIMDE_MM_FROUND_TO_NEAREST_INT | SIMDE_MM_FROUND_NO_EXC)");
+@@ -233,7 +234,7 @@ bool build_vrfip(BuilderContext& ctx) {
+ }
+ 
+ bool build_vrfiz(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(true);
++  emitFlushModeUnlessIndependent(ctx, true);
+   ctx.emit_vec_fp_unary_expr(
+       "simde_mm_round_ps(simde_mm_load_ps({vA}.f32), "
+       "SIMDE_MM_FROUND_TO_ZERO | SIMDE_MM_FROUND_NO_EXC)");
+@@ -322,7 +323,35 @@ bool build_vadduhs(BuilderContext& ctx) {
+ }
+ 
+ bool build_vsubsws(BuilderContext& ctx) {
+-  // TODO: vectorize
++  if (ctx.config().vmxVectorFallbacks) {
++    // SSE form (vmx_vector_fallbacks), same scheme as vaddsws. a - b overflows iff a and b
++    // differ in sign and the wrapped difference differs in sign from a; the saturated value is
++    // INT_MAX for a >= 0 and INT_MIN for a < 0. Bit-identical to the scalar form below in every
++    // lane (bench/agent9/vmx). Like the scalar form, it does not update VSCR.SAT.
++    auto vD = ctx.v(ctx.insn.operands[0]);
++    auto vA = ctx.v(ctx.insn.operands[1]);
++    auto vB = ctx.v(ctx.insn.operands[2]);
++    ctx.println("\t{{");
++    ctx.println("\t\tsimde__m128i a = simde_mm_load_si128((simde__m128i*){}.u8);", vA);
++    ctx.println("\t\tsimde__m128i b = simde_mm_load_si128((simde__m128i*){}.u8);", vB);
++    ctx.println("\t\tsimde__m128i diff = simde_mm_sub_epi32(a, b);");
++    ctx.println(
++        "\t\tsimde__m128i overflow = simde_mm_and_si128(simde_mm_xor_si128(a, b), "
++        "simde_mm_xor_si128(a, diff));");
++    ctx.println(
++        "\t\tsimde__m128i sat_val = simde_mm_xor_si128(simde_mm_srai_epi32(a, 31), "
++        "simde_mm_set1_epi32(0x7FFFFFFF));");
++    ctx.println(
++        "\t\tsimde_mm_store_si128((simde__m128i*){}.u8, "
++        "simde_mm_castps_si128(simde_mm_blendv_ps("
++        "simde_mm_castsi128_ps(diff), "
++        "simde_mm_castsi128_ps(sat_val), "
++        "simde_mm_castsi128_ps(overflow))));",
++        vD);
++    ctx.println("\t}}");
++    return true;
++  }
++  // Scalar form (default; output unchanged when the flag is off).
+   for (size_t i = 0; i < 4; i++) {
+     ctx.println("\t{}.s64 = int64_t({}.s32[{}]) - int64_t({}.s32[{}]);", ctx.temp(),
+                 ctx.v(ctx.insn.operands[1]), i, ctx.v(ctx.insn.operands[2]), i);
+@@ -727,7 +756,7 @@ bool build_vcmpgtsw(BuilderContext& ctx) {
+ //=============================================================================
+ 
+ bool build_vctsxs(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(true);
++  emitFlushModeUnlessIndependent(ctx, true);
+   ctx.print("\tsimde_mm_store_si128((simde__m128i*){}.s32, rex::ppc::simde_mm_vctsxs(",
+             ctx.v(ctx.insn.operands[0]));
+   if (ctx.insn.operands[2] != 0)
+@@ -739,7 +768,7 @@ bool build_vctsxs(BuilderContext& ctx) {
+ }
+ 
+ bool build_vcfsx(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(true);
++  emitFlushModeUnlessIndependent(ctx, true);
+   ctx.print("\tsimde_mm_store_ps({}.f32, ", ctx.v(ctx.insn.operands[0]));
+   if (ctx.insn.operands[2] != 0) {
+     const float value = std::ldexp(1.0f, -static_cast<int32_t>(ctx.insn.operands[2]));
+@@ -755,7 +784,7 @@ bool build_vcfsx(BuilderContext& ctx) {
+ }
+ 
+ bool build_vcfux(BuilderContext& ctx) {
+-  ctx.emit_set_flush_mode(true);
++  emitFlushModeUnlessIndependent(ctx, true);
+   ctx.print("\tsimde_mm_store_ps({}.f32, ", ctx.v(ctx.insn.operands[0]));
+   if (ctx.insn.operands[2] != 0) {
+     const float value = std::ldexp(1.0f, -static_cast<int32_t>(ctx.insn.operands[2]));
+@@ -773,7 +802,7 @@ bool build_vcfux(BuilderContext& ctx) {
+ 
+ bool build_vctuxs(BuilderContext& ctx) {
+   // Vector Convert To Unsigned Fixed-Point Word Saturate
+-  ctx.emit_set_flush_mode(true);
++  emitFlushModeUnlessIndependent(ctx, true);
+   ctx.print("\tsimde_mm_store_si128((simde__m128i*){}.u32, rex::ppc::simde_mm_vctuxs(",
+             ctx.v(ctx.insn.operands[0]));
+   if (ctx.insn.operands[2] != 0)
+@@ -887,7 +916,31 @@ bool build_vsrh(BuilderContext& ctx) {
+ }
+ 
+ bool build_vsrb(BuilderContext& ctx) {
+-  // TODO(tomc): vectorize
++  if (ctx.config().vmxVectorFallbacks) {
++    // SSE form (vmx_vector_fallbacks): per-byte logical shift right by (vB & 7), done as three
++    // conditional shifts by 4, 2 and 1. blendv_epi8 selects on each byte's MSB, and
++    // slli_epi16(s, 5/6/7) moves count bit 2/1/0 of every byte into that byte's MSB.
++    // srli_epi16 plus a byte mask is a per-byte logical shift.
++    auto vD = ctx.v(ctx.insn.operands[0]);
++    auto vA = ctx.v(ctx.insn.operands[1]);
++    auto vB = ctx.v(ctx.insn.operands[2]);
++    ctx.println("\t{{");
++    ctx.println("\t\tsimde__m128i x = simde_mm_load_si128((simde__m128i*){}.u8);", vA);
++    ctx.println("\t\tsimde__m128i s = simde_mm_load_si128((simde__m128i*){}.u8);", vB);
++    ctx.println(
++        "\t\tx = simde_mm_blendv_epi8(x, simde_mm_and_si128(simde_mm_srli_epi16(x, 4), "
++        "simde_mm_set1_epi8(0x0F)), simde_mm_slli_epi16(s, 5));");
++    ctx.println(
++        "\t\tx = simde_mm_blendv_epi8(x, simde_mm_and_si128(simde_mm_srli_epi16(x, 2), "
++        "simde_mm_set1_epi8(0x3F)), simde_mm_slli_epi16(s, 6));");
++    ctx.println(
++        "\t\tx = simde_mm_blendv_epi8(x, simde_mm_and_si128(simde_mm_srli_epi16(x, 1), "
++        "simde_mm_set1_epi8(0x7F)), simde_mm_slli_epi16(s, 7));");
++    ctx.println("\t\tsimde_mm_store_si128((simde__m128i*){}.u8, x);", vD);
++    ctx.println("\t}}");
++    return true;
++  }
++  // Scalar form (default; output unchanged when the flag is off).
+   for (size_t i = 0; i < 16; i++)
+     ctx.println("\t{}.u8[{}] = {}.u8[{}] >> ({}.u8[{}] & 0x7);", ctx.v(ctx.insn.operands[0]), i,
+                 ctx.v(ctx.insn.operands[1]), i, ctx.v(ctx.insn.operands[2]), i);
+@@ -895,7 +948,36 @@ bool build_vsrb(BuilderContext& ctx) {
+ }
+ 
+ bool build_vsrab(BuilderContext& ctx) {
+-  // TODO(tomc): vectorize
++  if (ctx.config().vmxVectorFallbacks) {
++    // SSE form (vmx_vector_fallbacks): arithmetic shift through the logical one. With
++    // u = x ^ 0x80 (= x + 128), x >> c == (u >>> c) - (0x80 >>> c) for c = vB & 7. The logical
++    // shift is the vsrb chain; 0x80 >>> c comes from a pshufb table.
++    auto vD = ctx.v(ctx.insn.operands[0]);
++    auto vA = ctx.v(ctx.insn.operands[1]);
++    auto vB = ctx.v(ctx.insn.operands[2]);
++    ctx.println("\t{{");
++    ctx.println("\t\tsimde__m128i s = simde_mm_load_si128((simde__m128i*){}.u8);", vB);
++    ctx.println(
++        "\t\tsimde__m128i x = simde_mm_xor_si128(simde_mm_load_si128((simde__m128i*){}.u8), "
++        "simde_mm_set1_epi8(-128));",
++        vA);
++    ctx.println(
++        "\t\tx = simde_mm_blendv_epi8(x, simde_mm_and_si128(simde_mm_srli_epi16(x, 4), "
++        "simde_mm_set1_epi8(0x0F)), simde_mm_slli_epi16(s, 5));");
++    ctx.println(
++        "\t\tx = simde_mm_blendv_epi8(x, simde_mm_and_si128(simde_mm_srli_epi16(x, 2), "
++        "simde_mm_set1_epi8(0x3F)), simde_mm_slli_epi16(s, 6));");
++    ctx.println(
++        "\t\tx = simde_mm_blendv_epi8(x, simde_mm_and_si128(simde_mm_srli_epi16(x, 1), "
++        "simde_mm_set1_epi8(0x7F)), simde_mm_slli_epi16(s, 7));");
++    ctx.println(
++        "\t\tsimde__m128i bias = simde_mm_shuffle_epi8(simde_mm_setr_epi8(-128, 64, 32, 16, 8, 4, "
++        "2, 1, 0, 0, 0, 0, 0, 0, 0, 0), simde_mm_and_si128(s, simde_mm_set1_epi8(7)));");
++    ctx.println("\t\tsimde_mm_store_si128((simde__m128i*){}.u8, simde_mm_sub_epi8(x, bias));", vD);
++    ctx.println("\t}}");
++    return true;
++  }
++  // Scalar form (default; output unchanged when the flag is off).
+   for (size_t i = 0; i < 16; i++)
+     ctx.println("\t{}.s8[{}] = {}.s8[{}] >> ({}.u8[{}] & 0x7);", ctx.v(ctx.insn.operands[0]), i,
+                 ctx.v(ctx.insn.operands[1]), i, ctx.v(ctx.insn.operands[2]), i);
+@@ -925,7 +1007,30 @@ bool build_vrlh(BuilderContext& ctx) {
+ }
+ 
+ bool build_vrlw(BuilderContext& ctx) {
+-  // TODO(tomc): vectorize
++  if (ctx.config().vmxVectorFallbacks) {
++    // SSE form (vmx_vector_fallbacks): (a << sh) | (a >> ((32 - sh) & 31)) with sh = vB & 31.
++    // For sh == 0 both shifts are by 0 and a | a == a, so every count stays in 0..31 (simde's
++    // non-AVX2 sllv/srlv fallback is only well-defined for counts below 32).
++    auto vD = ctx.v(ctx.insn.operands[0]);
++    auto vA = ctx.v(ctx.insn.operands[1]);
++    auto vB = ctx.v(ctx.insn.operands[2]);
++    ctx.println("\t{{");
++    ctx.println("\t\tsimde__m128i a = simde_mm_load_si128((simde__m128i*){}.u8);", vA);
++    ctx.println(
++        "\t\tsimde__m128i sh = simde_mm_and_si128(simde_mm_load_si128((simde__m128i*){}.u8), "
++        "simde_mm_set1_epi32(0x1F));",
++        vB);
++    ctx.println(
++        "\t\tsimde__m128i rsh = simde_mm_and_si128(simde_mm_sub_epi32(simde_mm_set1_epi32(32), "
++        "sh), simde_mm_set1_epi32(0x1F));");
++    ctx.println(
++        "\t\tsimde_mm_store_si128((simde__m128i*){}.u8, "
++        "simde_mm_or_si128(simde_mm_sllv_epi32(a, sh), simde_mm_srlv_epi32(a, rsh)));",
++        vD);
++    ctx.println("\t}}");
++    return true;
++  }
++  // Scalar form (default; output unchanged when the flag is off).
+   for (size_t i = 0; i < 4; i++) {
+     ctx.println("\t{{ uint32_t sh = {}.u32[{}] & 0x1F;", ctx.v(ctx.insn.operands[2]), i);
+     ctx.println("\t{}.u32[{}] = ({}.u32[{}] << sh) | (sh ? ({}.u32[{}] >> (32 - sh)) : 0); }}",
+@@ -992,7 +1097,22 @@ bool build_vsr(BuilderContext& ctx) {
+ }
+ 
+ bool build_vsraw(BuilderContext& ctx) {
+-  // TODO(tomc): vectorize
++  if (ctx.config().vmxVectorFallbacks) {
++    // SSE form (vmx_vector_fallbacks), as vslw. The scalar form's vB.u8[i * 4] is the low byte
++    // of word i, so (vB.u32[i] & 31) is the same count.
++    auto vD = ctx.v(ctx.insn.operands[0]);
++    auto vA = ctx.v(ctx.insn.operands[1]);
++    auto vB = ctx.v(ctx.insn.operands[2]);
++    ctx.println("\t{{");
++    ctx.println("\t\tsimde__m128i a = simde_mm_load_si128((simde__m128i*){}.u8);", vA);
++    ctx.println("\t\tsimde__m128i b = simde_mm_load_si128((simde__m128i*){}.u8);", vB);
++    ctx.println("\t\tsimde__m128i shift = simde_mm_and_si128(b, simde_mm_set1_epi32(0x1F));");
++    ctx.println("\t\tsimde_mm_store_si128((simde__m128i*){}.u8, simde_mm_srav_epi32(a, shift));",
++                vD);
++    ctx.println("\t}}");
++    return true;
++  }
++  // Scalar form (default; output unchanged when the flag is off).
+   for (size_t i = 0; i < 4; i++)
+     ctx.println("\t{}.s32[{}] = {}.s32[{}] >> ({}.u8[{}] & 0x1F);", ctx.v(ctx.insn.operands[0]), i,
+                 ctx.v(ctx.insn.operands[1]), i, ctx.v(ctx.insn.operands[2]), i * 4);
+@@ -1000,7 +1120,21 @@ bool build_vsraw(BuilderContext& ctx) {
+ }
+ 
+ bool build_vsrw(BuilderContext& ctx) {
+-  // TODO(tomc): vectorize
++  if (ctx.config().vmxVectorFallbacks) {
++    // SSE form (vmx_vector_fallbacks), as vslw (see vsraw for the count).
++    auto vD = ctx.v(ctx.insn.operands[0]);
++    auto vA = ctx.v(ctx.insn.operands[1]);
++    auto vB = ctx.v(ctx.insn.operands[2]);
++    ctx.println("\t{{");
++    ctx.println("\t\tsimde__m128i a = simde_mm_load_si128((simde__m128i*){}.u8);", vA);
++    ctx.println("\t\tsimde__m128i b = simde_mm_load_si128((simde__m128i*){}.u8);", vB);
++    ctx.println("\t\tsimde__m128i shift = simde_mm_and_si128(b, simde_mm_set1_epi32(0x1F));");
++    ctx.println("\t\tsimde_mm_store_si128((simde__m128i*){}.u8, simde_mm_srlv_epi32(a, shift));",
++                vD);
++    ctx.println("\t}}");
++    return true;
++  }
++  // Scalar form (default; output unchanged when the flag is off).
+   for (size_t i = 0; i < 4; i++)
+     ctx.println("\t{}.u32[{}] = {}.u32[{}] >> ({}.u8[{}] & 0x1F);", ctx.v(ctx.insn.operands[0]), i,
+                 ctx.v(ctx.insn.operands[1]), i, ctx.v(ctx.insn.operands[2]), i * 4);
+@@ -1098,6 +1232,21 @@ bool build_vpkuhus(BuilderContext& ctx) {
+   // NOTE(tomc): _mm_packus_epi16 treats inputs as signed, so we need custom saturation for
+   // unsigned. Unsigned halfwords >= 0x8000 would be interpreted as negative and clamped to 0
+   // instead of 0xFF.
++  if (ctx.config().vmxVectorFallbacks && ctx.insn.operands[0] != ctx.insn.operands[1] &&
++      ctx.insn.operands[0] != ctx.insn.operands[2]) {
++    // SSE form (vmx_vector_fallbacks): min_epu16(x, 0xFF) clamps as unsigned first, so the
++    // signed packus only sees 0..0xFF. vB fills the low host bytes, as in vpkshus.
++    // Only when vD is neither vA nor vB: the scalar form below writes vD byte by byte while it
++    // still reads vA/vB, so with aliasing its result differs from this one (and from the ISA).
++    ctx.println(
++        "\tsimde_mm_store_si128((simde__m128i*){}.u8, simde_mm_packus_epi16("
++        "simde_mm_min_epu16(simde_mm_load_si128((simde__m128i*){}.u16), "
++        "simde_mm_set1_epi16(0xFF)), "
++        "simde_mm_min_epu16(simde_mm_load_si128((simde__m128i*){}.u16), "
++        "simde_mm_set1_epi16(0xFF))));",
++        ctx.v(ctx.insn.operands[0]), ctx.v(ctx.insn.operands[2]), ctx.v(ctx.insn.operands[1]));
++    return true;
++  }
+   for (size_t i = 0; i < 8; i++) {
+     ctx.println("\t{}.u8[{}] = {}.u16[{}] > 0xFF ? 0xFF : (uint8_t){}.u16[{}];",
+                 ctx.v(ctx.insn.operands[0]), 15 - i, ctx.v(ctx.insn.operands[1]), 7 - i,
+@@ -1126,6 +1275,19 @@ bool build_vpkuwus(BuilderContext& ctx) {
+ 
+   // NOTE(tomc): _mm_packus_epi32 treats inputs as signed, so we need custom saturation for unsigned
+   // Saturate each u32 to [0, 0xFFFF], then pack to u16
++  if (ctx.config().vmxVectorFallbacks && ctx.insn.operands[0] != ctx.insn.operands[1] &&
++      ctx.insn.operands[0] != ctx.insn.operands[2]) {
++    // SSE form (vmx_vector_fallbacks): min_epu32(x, 0xFFFF) then packus_epi32, as vpkuwum.
++    // Only when vD is neither vA nor vB, for the same reason as vpkuhus.
++    ctx.println(
++        "\tsimde_mm_store_si128((simde__m128i*){}.u16, simde_mm_packus_epi32("
++        "simde_mm_min_epu32(simde_mm_load_si128((simde__m128i*){}.u32), "
++        "simde_mm_set1_epi32(0xFFFF)), "
++        "simde_mm_min_epu32(simde_mm_load_si128((simde__m128i*){}.u32), "
++        "simde_mm_set1_epi32(0xFFFF))));",
++        ctx.v(ctx.insn.operands[0]), ctx.v(ctx.insn.operands[2]), ctx.v(ctx.insn.operands[1]));
++    return true;
++  }
+   for (size_t i = 0; i < 4; i++) {
+     ctx.println("\t{}.u16[{}] = {}.u32[{}] > 0xFFFF ? 0xFFFF : (uint16_t){}.u32[{}];",
+                 ctx.v(ctx.insn.operands[0]), 7 - i, ctx.v(ctx.insn.operands[1]), 3 - i,
+@@ -1170,7 +1332,7 @@ bool build_vpkswus(BuilderContext& ctx) {
+ bool build_vpkd3d128(BuilderContext& ctx) {
+   // TODO(tomc): vectorize
+   // NOTE: handling vector reversal here too
+-  ctx.emit_set_flush_mode(true);
++  emitFlushModeUnlessIndependent(ctx, true);
+   switch (ctx.insn.operands[2]) {
+     case 0:  // D3D color
+     {
+diff --git a/src/codegen/codegen_writer.cpp b/src/codegen/codegen_writer.cpp
+index 80b1e3e..5995c51 100644
+--- a/src/codegen/codegen_writer.cpp
++++ b/src/codegen/codegen_writer.cpp
+@@ -15,6 +15,7 @@
+ #include <algorithm>
+ #include <array>
+ #include <filesystem>
++#include <set>
+ #include <string>
+ #include <unordered_map>
+ #include <unordered_set>
+@@ -26,6 +27,7 @@
+ #include <rex/codegen/output_partition.h>
+ #include <rex/codegen/template_registry.h>
+ #include <rex/logging.h>
++#include <rex/memory/utils.h>
+ #include <rex/runtime.h>
+ #include <rex/system/export_resolver.h>
+ 
+@@ -49,10 +51,6 @@ bool ValidateFunctionBodies(const rex::codegen::RecompilerConfig& config,
+     if ((address & 3) || (function.bodyOwner & 3) || function.parent ||
+         address == function.bodyOwner)
+       return reject("body requires a distinct aligned owner and cannot be a chunk");
+-    if (config.ctrAsLocalVariable || config.xerAsLocalVariable ||
+-        config.reservedRegisterAsLocalVariable || config.crRegistersAsLocalVariables ||
+-        config.nonArgumentRegistersAsLocalVariables || config.nonVolatileRegistersAsLocalVariables)
+-      return reject("interior body entries require all register localization options disabled");
+     auto ownerConfig = config.functions.find(function.bodyOwner);
+     if (ownerConfig != config.functions.end() && ownerConfig->second.bodyOwner)
+       return reject("nested or cyclic body owners are unsupported");
+@@ -149,6 +147,93 @@ bool ValidateFunctionBodies(const rex::codegen::RecompilerConfig& config,
+   return true;
+ }
+ 
++// Register localization assumes every transfer into a function is a real call
++// whose callee reads only argument registers from ctx. An interior entry breaks
++// that: the code before it can leave any register live. So while a localization
++// option is on, interior entries (body= entries and entries inside another
++// function's blocks), body owners and every function with a direct edge or jump
++// table into an interior entry keep all registers in ctx. Those make real calls
++// to the save/restore helpers, so the helpers keep their registers in ctx too.
++struct RegisterFallback {
++  std::unordered_set<uint32_t> interior;
++  std::unordered_set<uint32_t> inCtx;
++};
++
++RegisterFallback BuildRegisterFallback(const rex::codegen::RecompilerConfig& config,
++                                       const rex::codegen::FunctionGraph& graph) {
++  RegisterFallback result;
++  if (!config.ctrAsLocalVariable && !config.xerAsLocalVariable &&
++      !config.reservedRegisterAsLocalVariable && !config.crRegistersAsLocalVariables &&
++      !config.nonArgumentRegistersAsLocalVariables && !config.nonVolatileRegistersAsLocalVariables)
++    return result;
++
++  auto isHelper = [](const rex::codegen::FunctionNode& node) {
++    return node.authority() == rex::codegen::FunctionAuthority::HELPER ||
++           node.name().starts_with("__save") || node.name().starts_with("__rest");
++  };
++  size_t owners = 0;
++  for (const auto& [address, function] : config.functions) {
++    if (function.bodyOwner && result.interior.insert(address).second)
++      owners += result.inCtx.insert(function.bodyOwner).second;
++  }
++  const size_t bodyEntries = result.interior.size();
++
++  // Helpers overlap each other by design and are not interior entries.
++  std::set<uint32_t> entries;
++  for (const auto& [address, node] : graph.functions()) {
++    if (!node->isImport() && !isHelper(*node))
++      entries.insert(address);
++  }
++  for (const auto& [address, node] : graph.functions()) {
++    if (node->isImport() || isHelper(*node))
++      continue;
++    for (const auto& block : node->blocks()) {
++      for (auto it = entries.lower_bound(block.base); it != entries.end() && *it < block.end();
++           ++it) {
++        if (*it != address)
++          result.interior.insert(*it);
++      }
++    }
++  }
++  if (result.interior.empty())
++    return result;
++
++  auto hitsInterior = [&](const std::vector<uint32_t>& targets) {
++    return std::any_of(targets.begin(), targets.end(),
++                       [&](uint32_t target) { return result.interior.contains(target); });
++  };
++  auto intoInterior = [&](const rex::codegen::CallEdge& edge) {
++    const auto* target = edge.target.asFunction();
++    return target && result.interior.contains(static_cast<uint32_t>(target->base()));
++  };
++  size_t callers = 0, helpers = 0;
++  for (const auto& [address, node] : graph.functions()) {
++    bool reaches = std::any_of(node->calls().begin(), node->calls().end(), intoInterior) ||
++                   std::any_of(node->tailCalls().begin(), node->tailCalls().end(), intoInterior) ||
++                   std::any_of(node->jumpTables().begin(), node->jumpTables().end(),
++                               [&](const auto& table) { return hitsInterior(table.targets); });
++    if (reaches && !result.interior.contains(address))
++      callers += result.inCtx.insert(address).second;
++    else if (isHelper(*node))
++      helpers += result.inCtx.insert(address).second;
++  }
++  for (const auto& [bctr, table] : config.switchTables) {
++    if (!hitsInterior(table.targets))
++      continue;
++    for (const auto& [address, node] : graph.functions()) {
++      if (std::any_of(node->blocks().begin(), node->blocks().end(),
++                      [&](const auto& block) { return block.contains(bctr); }))
++        callers += result.inCtx.insert(address).second;
++    }
++  }
++  result.inCtx.insert(result.interior.begin(), result.interior.end());
++  REXCODEGEN_INFO(
++      "Register localization fallback: {} functions keep registers in ctx ({} interior entries, "
++      "{} of them body=; {} more body owners, {} callers, {} save/restore helpers)",
++      result.inCtx.size(), result.interior.size(), bodyEntries, owners, callers, helpers);
++  return result;
++}
++
+ nlohmann::json buildTemplateData(const rex::codegen::CodegenContext& ctx,
+                                  const std::vector<const rex::codegen::FunctionNode*>& functions,
+                                  const std::unordered_map<uint32_t, std::string>& rexcrtByAddr) {
+@@ -232,6 +317,116 @@ nlohmann::json buildTemplateData(const rex::codegen::CodegenContext& ctx,
+ 
+ namespace rex::codegen {
+ 
++// cr_compare_so_zero. Generated code writes XER.SO only in mtxer
++// (build_mtspr) and through mid-asm hooks that take xer: OE forms do not model
++// SO. A local xer is zero-initialized. ctx.xer.so starts at 0 (ThreadState
++// value-initializes its PPCContext, and so do GuestToHostFunction, the
++// auto-isolating ImportFunction call and the hook call contexts), and the
++// runtime only copies it (XThread::SaveContext/LoadContext). The one exception
++// is rex::CallFrame (hook.h): it leaves every register except r1, r13 and fpscr
++// uninitialized, so a guest call through it reads an indeterminate XER.SO with
++// or without this option (no LEGO code uses CallFrame). So SO is 0 at every
++// compare of a body without a writer whose XER is local, and of every body
++// without a writer when no body that keeps XER in ctx has one.
++void PrepareEmitAnalyses(EmitContext& emitCtx, const std::vector<const FunctionNode*>& functions,
++                         EmitAnalyses& storage) {
++  const auto& config = emitCtx.config;
++  auto fallback = BuildRegisterFallback(config, emitCtx.graph);
++  storage.interiorEntries = std::move(fallback.interior);
++  storage.registersInCtx = std::move(fallback.inCtx);
++  if (!storage.registersInCtx.empty()) {
++    emitCtx.interiorEntries = &storage.interiorEntries;
++    emitCtx.registersInCtx = &storage.registersInCtx;
++  }
++  // The blocks an entry's text is emitted from: its body= owner's, or its own.
++  auto bodyOf = [&](const FunctionNode* fn) {
++    const auto configured = config.functions.find(fn->base());
++    const auto* body = configured != config.functions.end() && configured->second.bodyOwner
++                           ? emitCtx.graph.getFunction(configured->second.bodyOwner)
++                           : fn;
++    return body ? body : fn;
++  };
++
++  // skip_lr drops every LR write (bl, bctrl, blrl, mtlr) and read (mflr). That
++  // is safe where LR only carries the return address: blr is `return;` either
++  // way, and mflr/mtlr just move it through the stack. A body that uses LR as
++  // data would read a stale ctx.lr: `mtlr rX; blrl` calls through it, and a bl
++  // to one of the body's own labels (`bl $+4; mflr rY`) takes an address from
++  // it. Such a body (a bclrl, i.e. blrl or a conditional form, or a bl that
++  // build_bl emits as a local goto) keeps LR exactly as without skip_lr.
++  if (config.skipLr) {
++    constexpr uint32_t kBclrlMask = 0xFC0007FF;  // opcode 19, XO 16, LK 1, any BO/BI
++    constexpr uint32_t kBclrl = 0x4C000021;
++    constexpr uint32_t kBlMask = 0xFC000003;  // opcode 18, AA 0, LK 1
++    constexpr uint32_t kBl = 0x48000001;
++    for (const auto* fn : functions) {
++      bool usesLr = false;
++      for (const auto& block : bodyOf(fn)->blocks()) {
++        const auto* data = reinterpret_cast<const uint8_t*>(emitCtx.binary.translate(block.base));
++        for (size_t offset = 0; data && !usesLr && block.base + offset < block.end(); offset += 4) {
++          const auto pc = static_cast<uint32_t>(block.base + offset);
++          const uint32_t word = rex::memory::load_and_swap<uint32_t>(data + offset);
++          if ((word & kBclrlMask) == kBclrl) {
++            usesLr = true;
++          } else if ((word & kBlMask) == kBl) {
++            // The classification build_bl uses: InternalLabel becomes a goto.
++            const auto disp = (static_cast<int32_t>(word << 6) >> 6) & ~3;
++            const uint32_t target = pc + static_cast<uint32_t>(disp);
++            usesLr = emitCtx.graph.classifyTarget(target, pc, true) ==
++                     rex::codegen::TargetKind::InternalLabel;
++          }
++        }
++        if (usesLr)
++          break;
++      }
++      if (usesLr)
++        storage.lrUsers.insert(static_cast<uint32_t>(fn->base()));
++    }
++    emitCtx.lrUsers = &storage.lrUsers;
++    REXCODEGEN_INFO("skip_lr: {} functions use LR as data (blrl, or bl to a local label) and keep LR",
++                    storage.lrUsers.size());
++  }
++
++  if (!config.crCompareSoZero)
++    return;
++
++  std::vector<uint32_t> hookWriters;
++  for (const auto& [address, hook] : config.midAsmHooks) {
++    if (std::any_of(hook.registers.begin(), hook.registers.end(),
++                    [](const std::string& reg) { return !reg.empty() && reg[0] == 'x'; }))
++      hookWriters.push_back(address);
++  }
++  constexpr uint32_t kMtxerMask = 0xFC1FFFFF;  // mtspr XER, rS with rS masked out
++  constexpr uint32_t kMtxer = 0x7C0103A6;
++  size_t inCtxWriters = 0;
++  for (const auto* fn : functions) {
++    const auto* body = bodyOf(fn);
++    bool writes = false;
++    for (const auto& block : body->blocks()) {
++      const auto* data = reinterpret_cast<const uint8_t*>(emitCtx.binary.translate(block.base));
++      for (size_t offset = 0; data && !writes && block.base + offset < block.end(); offset += 4)
++        writes = (rex::memory::load_and_swap<uint32_t>(data + offset) & kMtxerMask) == kMtxer;
++      writes = writes || std::any_of(hookWriters.begin(), hookWriters.end(),
++                                     [&](uint32_t hook) { return block.contains(hook); });
++      if (writes)
++        break;
++    }
++    if (!writes)
++      continue;
++    const auto address = static_cast<uint32_t>(fn->base());
++    storage.xerWriters.insert(address);
++    if (!config.xerAsLocalVariable || storage.registersInCtx.contains(address))
++      ++inCtxWriters;
++  }
++  emitCtx.xerWriters = &storage.xerWriters;
++  emitCtx.ctxXerWritten = inCtxWriters != 0;
++  REXCODEGEN_INFO(
++      "cr_compare_so_zero: {} functions write XER.SO ({} keep XER in ctx); the others compare "
++      "with SO = 0{}",
++      storage.xerWriters.size(), inCtxWriters,
++      inCtxWriters ? " where their XER is local" : "");
++}
++
+ bool IsGeneratedOutputName(std::string_view filename, std::string_view projectName) {
+   auto dot = filename.rfind('.');
+   if (dot == std::string_view::npos)
+@@ -296,6 +491,16 @@ bool CodegenWriter::write(bool force) {
+   }
+   if (!ValidateFunctionBodies(config(), graph(), binary()))
+     return false;
++  // The FPR/VMX save/restore helpers take r12/r11 implicitly from ctx. Their calls
++  // are elided only with non_volatile_as_local, so a local r11/r12 would hand a
++  // real helper call a stale ctx value (function_scanner.cpp helper patterns).
++  if (config().nonArgumentRegistersAsLocalVariables &&
++      !config().nonVolatileRegistersAsLocalVariables) {
++    REXCODEGEN_ERROR(
++        "non_argument_as_local requires non_volatile_as_local: the save/restore helpers read "
++        "r11/r12 from ctx");
++    return false;
++  }
+ 
+   // --- Output directory setup (from recompile.cpp) ---
+   std::filesystem::path outputPath = ctx_.configDir() / config().outDirectoryPath;
+@@ -373,6 +578,11 @@ bool CodegenWriter::write(bool force) {
+   if (runtime_)
+     emitCtx.resolver = runtime_->export_resolver();
+ 
++  // Interior entries and everything that can reach them keep registers in ctx;
++  // cr_compare_so_zero needs the XER.SO writers.
++  EmitAnalyses analyses;
++  PrepareEmitAnalyses(emitCtx, functions, analyses);
++
+   REXCODEGEN_TRACE("Recompiling {} functions...", functions.size());
+ 
+   std::vector<std::string> bodies;
+@@ -385,6 +595,8 @@ bool CodegenWriter::write(bool force) {
+   const size_t maxFileBytes = REXCVAR_GET(max_file_size_bytes);
+   std::unordered_set<std::string> referenced;
+   emitCtx.referenced = &referenced;
++  size_t handoffErrors = 0;
++  emitCtx.handoffErrors = &handoffErrors;
+   for (const auto* fn : functions) {
+     referenced.clear();
+     const auto configured = config().functions.find(fn->base());
+@@ -400,6 +612,17 @@ bool CodegenWriter::write(bool force) {
+     references.push_back(referenced);
+   }
+   emitCtx.referenced = nullptr;
++  emitCtx.handoffErrors = nullptr;
++  if (handoffErrors) {
++    // Nothing has been flushed yet: drop the buffered headers too.
++    REXCODEGEN_ERROR(
++        "Code generation blocked: {} control transfers reach an interior entry with localized "
++        "registers",
++        handoffErrors);
++    pendingWrites.clear();
++    out.clear();
++    return false;
++  }
+ 
+   auto partition = OutputPartition::Load(outputPath / kPartitionFileName);
+   auto buckets = partition.Assign(sizes, maxFileBytes);
+diff --git a/src/codegen/config.cpp b/src/codegen/config.cpp
+index 723fe8e..6f75365 100644
+--- a/src/codegen/config.cpp
++++ b/src/codegen/config.cpp
+@@ -116,6 +116,16 @@ bool ApplyToml(const toml::table& toml, RecompilerConfig& cfg, const std::string
+             hasBool("non_volatile_as_local"), "non_volatile_as_local");
+   MergeBool(cfg.generateExceptionHandlers, toml["generate_exception_handlers"].value_or(false),
+             hasBool("generate_exception_handlers"), "generate_exception_handlers");
++  MergeBool(cfg.rlwinmLowering, toml["rlwinm_lowering"].value_or(false),
++            hasBool("rlwinm_lowering"), "rlwinm_lowering");
++  MergeBool(cfg.flushModeElision, toml["flush_mode_elision"].value_or(false),
++            hasBool("flush_mode_elision"), "flush_mode_elision");
++  MergeBool(cfg.crCompareSoZero, toml["cr_compare_so_zero"].value_or(false),
++            hasBool("cr_compare_so_zero"), "cr_compare_so_zero");
++  MergeBool(cfg.musttailCalls, toml["musttail_calls"].value_or(false),
++            hasBool("musttail_calls"), "musttail_calls");
++  MergeBool(cfg.vmxVectorFallbacks, toml["vmx_vector_fallbacks"].value_or(false),
++            hasBool("vmx_vector_fallbacks"), "vmx_vector_fallbacks");
+   if (hasBool("is_dll")) {
+     cfg.isDll = toml["is_dll"].value_or(false);
+   }
+diff --git a/src/codegen/function_graph.cpp b/src/codegen/function_graph.cpp
+index dc3ff76..dd048c5 100644
+--- a/src/codegen/function_graph.cpp
++++ b/src/codegen/function_graph.cpp
+@@ -563,6 +563,18 @@ std::string FunctionNode::emitCppForEntry(const EmitContext& ctx,
+   bool allRecompiled = true;
+   CSRState csrState = CSRState::Unknown;
+   RecompilerLocalVariables localVariables;
++  // An interior body entry and its partners keep every register in ctx.
++  const bool registersInCtx = ctx.registersInCtx &&
++                              ctx.registersInCtx->contains(static_cast<uint32_t>(entry.base()));
++  // cr_compare_so_zero: this body writes no XER.SO, and its XER is a local
++  // (zero-initialized) or no body that keeps XER in ctx writes XER.SO.
++  const bool compareSoZero =
++      ctx.xerWriters && !ctx.xerWriters->contains(static_cast<uint32_t>(entry.base())) &&
++      ((ctx.config.xerAsLocalVariable && !registersInCtx) || !ctx.ctxXerWritten);
++  // skip_lr: this body uses LR as data (blrl, or bl to a local label), so it
++  // keeps LR.
++  const bool keepLr =
++      ctx.lrUsers && ctx.lrUsers->contains(static_cast<uint32_t>(entry.base()));
+ 
+   // Local map for late-detected jump tables (can't mutate const config)
+   std::unordered_map<uint32_t, JumpTable> lateJumpTables;
+@@ -660,8 +672,9 @@ std::string FunctionNode::emitCppForEntry(const EmitContext& ctx,
+ 
+         // Dispatch instruction to builder
+         int id = insn.opcode->id;
+-        BuilderContext builderCtx{body,           ctx,      *this,   insn, blockBase, data,
+-                                  localVariables, csrState, activeJt};
++        BuilderContext builderCtx{body,           ctx,      *this,    insn,           blockBase,
++                                  data,           localVariables, csrState, activeJt,
++                                  registersInCtx, compareSoZero,  keepLr};
+ 
+         if (hasHookBefore) {
+           builderCtx.emit_mid_asm_hook();
+diff --git a/src/codegen/test_support.cpp b/src/codegen/test_support.cpp
+index 06147ed..d07f1ac 100644
+--- a/src/codegen/test_support.cpp
++++ b/src/codegen/test_support.cpp
+@@ -102,13 +102,20 @@ void AnalyzeTestBinary(CodegenContext& ctx, std::string_view testName,
+       uint32_t raw = load_and_swap<uint32_t>(data + (fnAddr - baseAddress) + offset);
+       auto decoded = decode_instruction(pc, raw);
+ 
+-      // Check for bl (branch with link = function call)
+-      if (decoded.is_call() && decoded.branch_target.has_value()) {
+-        uint32_t target = decoded.branch_target.value();
+-        auto* targetNode = ctx.graph.getFunction(target);
+-        if (targetNode) {
+-          ctx.graph.addCallToFunction(fnAddr, pc, CallTarget::function(targetNode));
+-        }
++      // A bl to a test function is a call. A b or bc to another test function
++      // is a tail call. The builders resolve both through the function's call
++      // and tail-call edges (BuilderContext::findCallTarget), and emit
++      // REX_FATAL for a branch to a function entry without one.
++      if (!decoded.branch_target.has_value())
++        continue;
++      uint32_t target = decoded.branch_target.value();
++      auto* targetNode = ctx.graph.getFunction(target);
++      if (!targetNode)
++        continue;
++      if (decoded.is_call()) {
++        ctx.graph.addCallToFunction(fnAddr, pc, CallTarget::function(targetNode));
++      } else if (target < fnAddr || target >= nextAddr) {
++        ctx.graph.addTailCallToFunction(fnAddr, pc, CallTarget::function(targetNode));
+       }
+     }
+   }

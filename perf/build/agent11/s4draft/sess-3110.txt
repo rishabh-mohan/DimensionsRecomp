@@ -1,0 +1,64 @@
+3106:   - Agent 3 is fixing the sidecar and testing the rotation case without the game.
+3107: - **My ruling: gate B counts for W6, with a coverage note ("level load without tags").**
+3108:   - W6's timed runs are title + attract only, with no input script, tags or level load (matrix-window6.json L27, which notes the launcher refuses menu/trigger fields; Agent 6). So a tagless level load already goes beyond what W6 times.
+3109:   - Tags with C1 are covered to story-load by gate A (3/3 LOADs).
+3110:   - **For C1 default-ON:** s4bLV (p2fc + verify, cap 1800 s) must run with the fixed sidecar, show 3/3 LOADs and reach the level.
+3111:   - Agent 10 rates gate B for the record.
+3112: - **Correction to my 22:25/22:38 notes: W6 does not test finding 10** (Agent 6, build/agent6/hang/cp-state-s4b24-s4b20.md).
+3113:   - W6 is set up like W5 (title + attract), so it never runs the vpad L route where the hangs happen.
+3114:   - **Mechanism (inferred, high confidence; no rexgpu symbols):** the CP blocks in IssueDraw → IssueDraw_MemexportReadbackFullPath → AwaitAllQueueOperationsCompletion → CheckSubmissionFence → WaitForSingleObject(fence_completion_event_, INFINITE).
+3115:     - Each full-path memexport draw costs one submit plus a host↔GPU round trip.
+3116:     - Meanwhile render tid 0x17 holds CS 0x84959EDC while polling a fence that passes only after those draws.
+3117:   - It is not hashing, K-checks or hold_global_lock.
+3118:   - The 5 s detector needs a slow CP. Gate A's CP was slow from verify (kernel 75–86 %); s4b20 and s4b24 were slow from CPU starvation (kernel 3–11 %).
+3119:   - All 3 hangs Agent 6 analysed happened under the -j8 build. Starvation as the cause is not proven, and not ruled out either.
+3120:   - **Direct test, first thing after the last window, before any build restarts:** two untimed vpad L-route rows on the quiet host (Agent 3), both with slow_frame_log_ms=1 and tags via the fixed sidecar:
+3121:     - s4b20's set (C1 OFF);
+3122:     - w6gB's set (p2fc).
+3123:   - If both are clean, finding 10 stays a load-only WARN. If either hangs, Agents 6/12 study the full-path sync.
+3124:   - Later perf candidate (after S4): the memexport readback full-path sync.
+3125: 
+3126: ### 22:55 - Agent 1: finding-10 waiver extended; freeze-check notes
+3127: - Gate B (`20261122-222313-w6-gateB-p2fc-level`) also hit finding 10: STUCK-LOCK at 22:26:29, CS 0x84959EDC, owner lr 83FAF200, hang-38764.dmp, recovered (Agent 12). The 22:25 waiver now covers it too: raw FAIL + "WARN, finding 10". Gate B isn't an input to the W6 read-out.
+3128: - Decided now, before the runs, for s4bLV and the two finding-10 rows: a STUCK-LOCK counts as "WARN, finding 10" only if all of these hold:
+3129:   - CS 0x84959EDC; the owner (render thread, tid 0x17) is parked in sub_83FAF180 at lr 83FAF188 or 83FAF200; the waiter is at lr 82A2A270. (Corrected at 23:00 per Agent 12: gate A's owner was at 83FAF188, so "lr 83FAF200" alone would have failed a gate-A-type hang. All 4 hangs share the waiter callers and the GPU thread on PM4 opcode 0x22.)
+3130:   - it recovers by itself, with no crash or WER;
+3131:   - the run still reaches the level. For s4bLV that also means 3/3 LOADs and K 0 / F 0 over the whole run.
+3132:   - Anything else is FAIL.
+3133: - Agent 12: under verify the CP is ~50% kernel-bound (row 7, gate A). Without verify the median is 4-16%. Suspected cause: one VirtualQuery per upload. Candidate for after S4.
+3134: - `bench\agent5\launch\status-dryrun\` is the launcher's own dry-run folder (README L253-255, run-night.ps1 L70). The pin tests last wrote to it at 22:32:21. It holds no pinned files, so the freeze check covers only the 3 launcher files.
+3135:   - Dry runs take their own mutex (`Local\Agent5RunNight-dry-<tag>`, L73), so they can't block the real launch (`Local\Agent5RunNight-real`, L78).
+3136: - Agent 3's background scripts are still running:
+3137:   - s4b-queue.ps1: -LastLaunch 23:10, -GamesClosed 23:25;
+3138:   - hostload.ps1: -Until 23:40;
+3139:   - postcheck.ps1: -Until 23:59.
+3140:   - I asked Agent 3 to confirm all three are gone by 23:50.
+3141: - Board #19 for Agent 6: stage expect files for W9, W5b and W4c (paperwork only, by 23:45).
+3142: 
+3143: ### 22:57 - Agent 1: native4b map check AGREE; PSO cold start
+3144: - Agent 2's subagent ran its own map check of native4b, and it agrees with Agent 2's (`build/agent2/s4b/checks/sub2/`, mapcheck-native4b-sub2-vs-agent2.txt A31BAFA1BFB226DC).
+3145:   - 109 hooks, the same as native4-bin.
+3146:   - The +2 publics are C1 v3's `BlockPhysicalProtectKeepWatch` import pair.
+3147:   - The only other change is the GPU fingerprint string in pipeline_library.cpp.obj (9b40acbb... replaces 5e3ff55d...).
+3148: - **Morning note:** native4b's first start is PSO-cold. Its new fingerprint makes it reject native4's native-pso-recipes.bin / native-pso-seed.bin (pipeline_recipes.h:247-256) until it records them again.
+3149:   - Re-pin rows: don't read boot time or PSO/stall lines from the first native4b run. Agent 4 is checking REPIN.md §3.
+3150:   - W8a (Monday): its warm-up run must be a native4b run. Tell Agent 8 when it plans Monday.
+3151:   - Open question to Agent 2: do the two files live next to each bin, or in one shared place? If shared, any window that mixes native bins with different fingerprints needs a warm-up after each bin switch.
+3152: 
+3153: ### 23:00 - Agent 1: PSO cache question settled (corrects the 22:57 morning note); day-draft status
+3154: - I read the code (`DimensionsRecomp/rexlego/src/gpu_native/pipeline_library.cpp`). Every file path is relative to the exe's own folder:
+3155:   - `cache\native-pso.bin` (L99-105) is the driver blob. It isn't keyed by our fingerprint; the driver rejects a blob from another driver or adapter.
+3156:   - `cache\native-pso-recipes.bin` (L151) is checked against the fingerprint. On a mismatch the game logs "ignoring invalid or incompatible pipeline recipes", starts empty, and its next save replaces the file (L502-510, L529-550).
+3157:   - `native-pso-seed.bin` (L152) and `native-pso-seed\*.bin` (L483-500) are also checked against the fingerprint. The game only reads them; it never rewrites them.
+3158: - The runner makes a fresh run folder for every run (run-timing.ps1 L151). It copies cache files in only when the arm sets seed_cache (L138-173).
+3159:   - The re-pin matrices and W8a4 don't set seed_cache, and neither native4-bin nor native4b-bin has a seed file or a cache folder.
+3160:   - So **every run starts PSO-cold on both bins**, by design, and the warm-up absorbs it. The new fingerprint changes nothing for the re-pin or for W8a as staged.
+3161:   - **No REPIN.md change is needed.** This corrects my 22:57 note, and I told Agent 4.
+3162:   - For the future: any native4b arm with seed_cache must use a seed recorded by native4b. A native4 seed would get its recipes rejected, though its native-pso.bin would still load.
+3163:   - Agent 2 doesn't need to run the grep in the morning.
+3164: - Agent 5's day draft:
+3165:   - test-day.ps1 passed 25/25 at 22:54 on run-day.ps1 D86F6DE0 and launcher-ctl.ps1 43EC1AB7. It made 2 -PlanOnly calls and wrote nothing under bench\agent5\launch.
+3166:   - The night launcher ignores new files under bench\agent5\. It pins only run-night.ps1, RUN-NIGHT.cmd and the bench\agent8\run files, and writes only to bench\agent5\launch\status.
+3167:   - The install folder will be bench\agent5\day\. Day sessions write their status to bench\agent5\day\status, so Agent 12's read-out must look there too.
+3168:   - Hashes due by 23:35.
+3169: 

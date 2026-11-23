@@ -1,0 +1,13 @@
+S4.7 fix (i) physical_protect_hold_global_lock (Agent 12, task #27 follow-up). Staged 2026-11-22 06:57:07. Not applied, not built.
+SDK: DimensionsRecomp/rexglue-sdk, perf/opt HEAD c5fe668. File: src/system/xmemory.cpp (git clean, last commit 90e7ccd).
+pristine  6E8FA1BA80EF9271D4433DD1BB2CAD0403360E222B22CED78AA4C7951D811DB4  orig/xmemory.cpp = live, 107670 B, LF
+staged    141FB1A947D59156EB40A835B27E64F94EE22A3F5BE0E0F70F17BC85C676C87A  new/xmemory.cpp, 108907 B, LF
+diff      80CAD795EEEF7AD45DBD9DB52ECFFF38C7C7BAF73969FB5DE6FE275EE2F656D9  protect-hold-g.diff, 37 lines, 2 hunks, +19/-0
+git apply --check (live SDK): exit 0
+Apply chain (C1 = Agent 5, build/agent5/s4-c1/):
+  1. s4-diag  src/graphics/d3d12/shared_memory.cpp  B120D07C6709D0D2 -> BB0838CE3909E18A
+  2. s4-p2    src/graphics/shared_memory.cpp  15C89EDB4B197C17 -> 0BE4BADCAC666BEE
+  3. fix (i)  src/system/xmemory.cpp  6E8FA1BA80EF9271 -> 141FB1A947D59156
+  4. C1: its src/graphics/shared_memory.cpp based on 0BE4BADCAC666BEE, its src/system/xmemory.cpp based on 141FB1A947D59156; other files on live.
+Sequential apply on scratch copies (diag, P2, fix (i)): diag exit 0, p2 exit 0, fixi exit 0; results xmemory.cpp 141FB1A947D59156 (= staged: True), shared_memory.cpp 0BE4BADCAC666BEE (= staged: True), shared_memory.cpp (d3d12) BB0838CE3909E18A (= staged: True)
+Syntax (bench/agent12/s4fixi_syntax.ps1, 2026-11-22 07:02): PASS. Pristine and staged both exit 0 with the same 1 pre-existing warning (unused parameter global_lock_locked_once), none new (syntax-20261122-070230.txt).

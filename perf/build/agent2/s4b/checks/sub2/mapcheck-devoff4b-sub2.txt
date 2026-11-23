@@ -1,0 +1,162 @@
+# mapcheck_sub2: independent map check by NAME and OBJECT (Agent 2 / sub2)  2026-11-22 21:11:01  devoff4b-vs-devoff4
+# script: build\agent2\s4b\checks\sub2\mapcheck_sub2.py (own parser; no shared code with mapcheck-s4c.py / mapcmp.py / maplines.py)
+mode: moved (4 moved: sub_83FBF7D0=gpu_wait_backoff.cpp.obj@legodimensions_recomp.248.cpp.obj, sub_83FAF180=gpu_wait_backoff.cpp.obj@legodimensions_recomp.107.cpp.obj, sub_83FB09E8=gpu_wait_backoff.cpp.obj@legodimensions_recomp.422.cpp.obj, sub_83FC0C10=gpu_wait_backoff.cpp.obj@legodimensions_recomp.232.cpp.obj)
+NEW: build\agent2\devoff4b-bin\legodimensions.map  39181442 B  sha256 52155274A978A946  lines 363356  parse 19.0s
+     Timestamp is 6b03a981 (Sun Nov 22 20:48:33 2026); Preferred load address is 0000000140000000 | entry point at         0001:097fb434 | section table rows 44
+     sections at lines: section table 7, Publics by Value 53, entry point 353114, Static symbols 353116
+     publics 353058, statics 10238, unparsed lines in symbol sections 0, other unexpected lines 0, lines with f/i flags 0, symbols without object 0, lld re-format mismatches 0, exports lines 0
+REF: build\agent2\devoff4-bin\legodimensions.map  39162310 B  sha256 DCC51E2B7A0040E2  lines 363226  parse 12.1s
+     Timestamp is 6b0342cb (Sun Nov 22 13:30:19 2026); Preferred load address is 0000000140000000 | entry point at         0001:097f8d04 | section table rows 40
+     sections at lines: section table 7, Publics by Value 49, entry point 353083, Static symbols 353085
+     publics 353031, statics 10139, unparsed lines in symbol sections 0, other unexpected lines 0, lines with f/i flags 0, symbols without object 0, lld re-format mismatches 0, exports lines 0
+section-table names (by name only) only in NEW: .CRT$XDA .CRT$XDU .CRT$XDZ .CRT$XLC; only in REF: none
+statics: the "Static symbols" section (internal-linkage symbols, listed after "entry point at") is parsed separately with the same line parser; it is NOT used for a-e (publics only); it is compared as (name, object) multisets for information at the end.
+
+counts            publics  statics     sub_  __imp__sub_   pairs  hooked  hooked-same-obj  unhooked-diff-obj  sub_-in-recomp-TU  objects(publics)
+  REF             353031    10139   164786       164786  164786      27                0                  0             164759               550
+  NEW             353058    10238   164786       164786  164786      31                0                  0             164755               552
+
+a) sub_ / __imp__sub_ counts and name sets
+  REF: sub_ 164786, __imp__sub_ 164786 (names starting sub_ 164786 / __imp__sub_ 164786), pairs 164786, orphan sub_ 0, orphan __imp__sub_ 0, duplicate public names 1 (of them sub_/__imp__sub_ 0), address forms disagree 0
+    note: duplicate public names: @vol.md
+    sub_/__imp__sub_ names in Static symbols: 0
+  NEW: sub_ 164786, __imp__sub_ 164786 (names starting sub_ 164786 / __imp__sub_ 164786), pairs 164786, orphan sub_ 0, orphan __imp__sub_ 0, duplicate public names 1 (of them sub_/__imp__sub_ 0), address forms disagree 0
+    note: duplicate public names: @vol.md
+    sub_/__imp__sub_ names in Static symbols: 0
+  expected count 164786 in both maps: yes
+  sub_ name set: only in NEW 0, only in REF 0 -> identical
+  __imp__sub_ name set: only in NEW 0, only in REF 0 -> identical
+  => a) PASS
+
+b) hooked sets (hooked = sub_X and __imp__sub_X both public, __imp__sub_X not at the address of sub_X, same map)
+  REF hooked 27, NEW hooked 31
+  REF hooked vs expected list (27 names from build/agent9/s4/fence-wait/s4c/expected-map.txt lines 5-13): equal
+  NEW hooked vs expected list (31 names from build/agent9/s4/fence-wait/s4c/expected-map.txt lines 40-40): equal
+  NEW hooked == REF hooked + 4 moved (31): yes
+  REF hooked, by the object that defines sub_X:
+    crash_guards.cpp.obj                  2  sub_82A35B90 sub_83C01C08
+    main_menu_extras.cpp.obj              3  sub_82F03C40 sub_82FBE7A8 sub_82FE4A80
+    name_trace.cpp.obj                    5  sub_82A3D980 sub_83470AF8 sub_834B8168 sub_836F5AD0 sub_83715F00
+    native_atomics.cpp.obj                3  sub_82A2A0E8 sub_82A2A138 sub_82A2A160
+    native_constants.cpp.obj              1  sub_82B7ABF0
+    native_lock_elide.cpp.obj             7  sub_82A2CAB0 sub_82A2CC20 sub_82A34E28 sub_82A34FE8 sub_82A35D28 sub_82A4CA18 sub_83F99CB8
+    native_markers.cpp.obj                2  sub_82A3E238 sub_82A3E2B8
+    native_memops.cpp.obj                 2  sub_83E45090 sub_83E46040
+    scene_distance.cpp.obj                2  sub_82C6F428 sub_83A11F50
+  NEW hooked, by the object that defines sub_X:
+    crash_guards.cpp.obj                  2  sub_82A35B90 sub_83C01C08
+    gpu_wait_backoff.cpp.obj              4  sub_83FAF180 sub_83FB09E8 sub_83FBF7D0 sub_83FC0C10
+    main_menu_extras.cpp.obj              3  sub_82F03C40 sub_82FBE7A8 sub_82FE4A80
+    name_trace.cpp.obj                    5  sub_82A3D980 sub_83470AF8 sub_834B8168 sub_836F5AD0 sub_83715F00
+    native_atomics.cpp.obj                3  sub_82A2A0E8 sub_82A2A138 sub_82A2A160
+    native_constants.cpp.obj              1  sub_82B7ABF0
+    native_lock_elide.cpp.obj             7  sub_82A2CAB0 sub_82A2CC20 sub_82A34E28 sub_82A34FE8 sub_82A35D28 sub_82A4CA18 sub_83F99CB8
+    native_markers.cpp.obj                2  sub_82A3E238 sub_82A3E2B8
+    native_memops.cpp.obj                 2  sub_83E45090 sub_83E46040
+    scene_distance.cpp.obj                2  sub_82C6F428 sub_83A11F50
+  NEW hooked, sorted: sub_82A2A0E8 sub_82A2A138 sub_82A2A160 sub_82A2CAB0 sub_82A2CC20 sub_82A34E28 sub_82A34FE8 sub_82A35B90 sub_82A35D28 sub_82A3D980 sub_82A3E238 sub_82A3E2B8 sub_82A4CA18 sub_82B7ABF0 sub_82C6F428 sub_82F03C40 sub_82FBE7A8 sub_82FE4A80 sub_83470AF8 sub_834B8168 sub_836F5AD0 sub_83715F00 sub_83A11F50 sub_83C01C08 sub_83E45090 sub_83E46040 sub_83F99CB8 sub_83FAF180 sub_83FB09E8 sub_83FBF7D0 sub_83FC0C10
+  => b) PASS
+
+c) moved names
+  sub_83FBF7D0: REF sub_ legodimensions_recomp.248.cpp.obj / __imp__ legodimensions_recomp.248.cpp.obj (unhooked) -> NEW sub_ gpu_wait_backoff.cpp.obj / __imp__ legodimensions_recomp.248.cpp.obj (hooked): OK
+      REF  0001:0558ed90       sub_83FBF7D0               000000014558fd90     legodimensions_recomp.248.cpp.obj
+      REF  0001:0558ed90       __imp__sub_83FBF7D0        000000014558fd90     legodimensions_recomp.248.cpp.obj
+      NEW  0001:097a3a60       sub_83FBF7D0               00000001497a4a60     gpu_wait_backoff.cpp.obj
+      NEW  0001:0558ed90       __imp__sub_83FBF7D0        000000014558fd90     legodimensions_recomp.248.cpp.obj
+  sub_83FAF180: REF sub_ legodimensions_recomp.107.cpp.obj / __imp__ legodimensions_recomp.107.cpp.obj (unhooked) -> NEW sub_ gpu_wait_backoff.cpp.obj / __imp__ legodimensions_recomp.107.cpp.obj (hooked): OK
+      REF  0001:0251b220       sub_83FAF180               000000014251c220     legodimensions_recomp.107.cpp.obj
+      REF  0001:0251b220       __imp__sub_83FAF180        000000014251c220     legodimensions_recomp.107.cpp.obj
+      NEW  0001:097a4260       sub_83FAF180               00000001497a5260     gpu_wait_backoff.cpp.obj
+      NEW  0001:0251b220       __imp__sub_83FAF180        000000014251c220     legodimensions_recomp.107.cpp.obj
+  sub_83FB09E8: REF sub_ legodimensions_recomp.422.cpp.obj / __imp__ legodimensions_recomp.422.cpp.obj (unhooked) -> NEW sub_ gpu_wait_backoff.cpp.obj / __imp__ legodimensions_recomp.422.cpp.obj (hooked): OK
+      REF  0001:091a8990       sub_83FB09E8               00000001491a9990     legodimensions_recomp.422.cpp.obj
+      REF  0001:091a8990       __imp__sub_83FB09E8        00000001491a9990     legodimensions_recomp.422.cpp.obj
+      NEW  0001:097a4820       sub_83FB09E8               00000001497a5820     gpu_wait_backoff.cpp.obj
+      NEW  0001:091a8990       __imp__sub_83FB09E8        00000001491a9990     legodimensions_recomp.422.cpp.obj
+  sub_83FC0C10: REF sub_ legodimensions_recomp.232.cpp.obj / __imp__ legodimensions_recomp.232.cpp.obj (unhooked) -> NEW sub_ gpu_wait_backoff.cpp.obj / __imp__ legodimensions_recomp.232.cpp.obj (hooked): OK
+      REF  0001:04fe8910       sub_83FC0C10               0000000144fe9910     legodimensions_recomp.232.cpp.obj
+      REF  0001:04fe8910       __imp__sub_83FC0C10        0000000144fe9910     legodimensions_recomp.232.cpp.obj
+      NEW  0001:097a4a80       sub_83FC0C10               00000001497a5a80     gpu_wait_backoff.cpp.obj
+      NEW  0001:04fe8910       __imp__sub_83FC0C10        0000000144fe9910     legodimensions_recomp.232.cpp.obj
+  gpu_wait_backoff.cpp.obj: in REF publics 0, statics 0, same-named objects none -> absent
+    in NEW: publics 24 (sub_ 4: sub_83FAF180 sub_83FB09E8 sub_83FBF7D0 sub_83FC0C10; __imp__sub_ 0; other publics 20), statics 90 -> sub_ set exactly the moved names
+    other publics of gpu_wait_backoff.cpp.obj in NEW: ??$log_@AEAPEBD@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEAPEBD@Z ??$log_@AEAPEBDAEAI@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEAPEBDAEAI@Z ??$log_@AEB_K_K_K_K_K_K_KAEB_K_K_K_K_K_K_K_KN_KNN_K_K_K_K_KNN@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEB_K$$QEA_K4444434444444$$QEAN4554444455@Z ??$log_@PEBDAEAIAEAIPEBDPEBD@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@$$QEAPEBDAEAI433@Z ??_C@_02BFICIOJL@ON?$AA@ ??_C@_03MPPIHBHJ@OFF?$AA@ ??_C@_05HGIDKJIN@built?$AA@ ??_C@_0BE@HDGDEHF@LEGO_GPU_WAIT_STATS?$AA@ ??_C@_0BFD@LKMKECIC@GPU?5wait?5stats?5?$CI5?5s?$CJ?3?5L1?5waits?5?$HL@ ??_C@_0BG@PAIHAKBJ@LEGO_GPU_WAIT_SPIN_US?$AA@ ??_C@_0BJ@MCANBKBA@LEGO_GPU_WAIT_BACKOFF_US?$AA@ ??_C@_0CA@DMJCGMMG@?$CIanonymous?5namespace?$CJ?3?3MaybeLog?$AA@ ??_C@_0DD@PIALDNJM@?$CIanonymous?5namespace?$CJ?3?3Cfg?$CI?$CJ?3?3?$CIl@ ??_C@_0EO@NDBJGJPO@GPU?5wait?5back?9off?3?5?$HL?$HN?5?$CIquantum?5?$HL@ ??_C@_0FH@CCGGAFBH@GPU?5wait?5back?9off?3?5LEGO_GPU_WAIT@ ??_C@_0FM@KPGJMCDC@GPU?5wait?5back?9off?3?5LEGO_GPU_WAIT@ ??_C@_0IC@KOBONCDG@C?3?1Users?1<user>?1?4vscode?1projects?1@ __real@408f400000000000 __xmm@00000000000000004530000043300000 __xmm@45300000000000004330000000000000
+  => c) PASS
+
+d) objects of hooked / unhooked names; per-object sub_ and __imp__sub_ sets
+  hooked in both maps (moved excluded): 27; sub_ and __imp__ objects unchanged: 27; changed: 0
+  REF: unhooked 164759, of them sub_ and __imp__ in different objects: 0; hooked with both in one object: 0
+  NEW: unhooked 164755, of them sub_ and __imp__ in different objects: 0; hooked with both in one object: 0
+  per-object sub_ sets, REF with the 4 moved names re-homed vs NEW: 448 objects, 0 differ
+  raw per-object sub_ changes REF -> NEW (no re-homing): gpu_wait_backoff.cpp.obj(+4 -0), legodimensions_recomp.107.cpp.obj(+0 -1), legodimensions_recomp.232.cpp.obj(+0 -1), legodimensions_recomp.248.cpp.obj(+0 -1), legodimensions_recomp.422.cpp.obj(+0 -1)
+  per-object __imp__sub_ sets REF vs NEW: 438 objects, 0 differ
+  => d) PASS
+
+e) all publics as (name, object) pairs, REF -> NEW
+  names: REF 352983, NEW 353009; in both with the same object(s) 352976; only in NEW 26; only in REF 0; object changed 7
+  categories: (1) moved targets 4; (2) new names of the moved-to object 19; (3) COMDAT/constant re-attributions 1; (4) other 9
+  sub-categories: 1: 4, 2: 19, 3a re-attributed to the new object: 1, 4a library/CRT/import/linker, object changed: 2, 4a library/CRT/import/linker, only in NEW: 7
+  (1) the moved targets: 4
+    [1] legodimensions_recomp.107.cpp.obj -> gpu_wait_backoff.cpp.obj: 1
+        sub_83FAF180   (moved target)
+    [1] legodimensions_recomp.232.cpp.obj -> gpu_wait_backoff.cpp.obj: 1
+        sub_83FC0C10   (moved target)
+    [1] legodimensions_recomp.248.cpp.obj -> gpu_wait_backoff.cpp.obj: 1
+        sub_83FBF7D0   (moved target)
+    [1] legodimensions_recomp.422.cpp.obj -> gpu_wait_backoff.cpp.obj: 1
+        sub_83FB09E8   (moved target)
+  (2) new names defined by the moved-to object: 19
+    [2] gpu_wait_backoff.cpp.obj: 19
+        ??$log_@AEAPEBD@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEAPEBD@Z   (??$ template)
+        ??$log_@AEAPEBDAEAI@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEAPEBDAEAI@Z   (??$ template)
+        ??$log_@AEB_K_K_K_K_K_K_KAEB_K_K_K_K_K_K_K_KN_KNN_K_K_K_K_KNN@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEB_K$$QEA_K4444434444444$$QEAN4554444455@Z   (??$ template)
+        ??$log_@PEBDAEAIAEAIPEBDPEBD@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@$$QEAPEBDAEAI433@Z   (??$ template)
+        ??_C@_02BFICIOJL@ON?$AA@   (??_C@ string)
+        ??_C@_03MPPIHBHJ@OFF?$AA@   (??_C@ string)
+        ??_C@_05HGIDKJIN@built?$AA@   (??_C@ string)
+        ??_C@_0BE@HDGDEHF@LEGO_GPU_WAIT_STATS?$AA@   (??_C@ string)
+        ??_C@_0BFD@LKMKECIC@GPU?5wait?5stats?5?$CI5?5s?$CJ?3?5L1?5waits?5?$HL@   (??_C@ string)
+        ??_C@_0BG@PAIHAKBJ@LEGO_GPU_WAIT_SPIN_US?$AA@   (??_C@ string)
+        ??_C@_0BJ@MCANBKBA@LEGO_GPU_WAIT_BACKOFF_US?$AA@   (??_C@ string)
+        ??_C@_0CA@DMJCGMMG@?$CIanonymous?5namespace?$CJ?3?3MaybeLog?$AA@   (??_C@ string)
+        ??_C@_0DD@PIALDNJM@?$CIanonymous?5namespace?$CJ?3?3Cfg?$CI?$CJ?3?3?$CIl@   (??_C@ string)
+        ??_C@_0EO@NDBJGJPO@GPU?5wait?5back?9off?3?5?$HL?$HN?5?$CIquantum?5?$HL@   (??_C@ string)
+        ??_C@_0FH@CCGGAFBH@GPU?5wait?5back?9off?3?5LEGO_GPU_WAIT@   (??_C@ string)
+        ??_C@_0FM@KPGJMCDC@GPU?5wait?5back?9off?3?5LEGO_GPU_WAIT@   (??_C@ string)
+        ??_C@_0IC@KOBONCDG@C?3?1Users?1<user>?1?4vscode?1projects?1@   (??_C@ string)
+        __xmm@00000000000000004530000043300000   (__xmm@ constant)
+        __xmm@45300000000000004330000000000000   (__xmm@ constant)
+  (3) COMDAT/constant re-attributions: 1
+    [3a re-attributed to the new object] rex_app.cpp.obj -> gpu_wait_backoff.cpp.obj: 1
+        __real@408f400000000000   (__real@ constant)
+  (4) ANYTHING ELSE - flagged: 9
+    [4a library/CRT/import/linker, object changed] <absolute> x49 -> <absolute> x50: 1
+        @vol.md
+    [4a library/CRT/import/linker, object changed] <common> -> msvcrt:tlsdyn.obj: 1
+        __dyn_tls_init_callback
+    [4a library/CRT/import/linker, only in NEW] kernel32:KERNEL32.dll: 1
+        __imp_SwitchToThread
+    [4a library/CRT/import/linker, only in NEW] msvcrt:tlsdyn.obj: 3
+        __dyn_tls_init
+        __dyn_tls_on_demand_init
+        __tls_guard
+    [4a library/CRT/import/linker, only in NEW] ucrt:api-ms-win-crt-convert-l1-1-0.dll: 1
+        __imp_strtoul
+    [4a library/CRT/import/linker, only in NEW] vcruntime:VCRUNTIME140_1.dll: 2
+        __CxxFrameHandler4
+        __imp___CxxFrameHandler4
+  objects: only in NEW: gpu_wait_backoff.cpp.obj, msvcrt:tlsdyn.obj, vcruntime:VCRUNTIME140_1.dll; only in REF: <common>
+  import DLLs (by descriptor) only in NEW: vcruntime:VCRUNTIME140_1.dll; only in REF: none
+  public counts per object that changed: <absolute> 61->62; <common> 1->0; gpu_wait_backoff.cpp.obj 0->24; kernel32:KERNEL32.dll 90->91; legodimensions_recomp.107.cpp.obj 812->811; legodimensions_recomp.232.cpp.obj 833->832; legodimensions_recomp.248.cpp.obj 726->725; legodimensions_recomp.422.cpp.obj 979->978; msvcrt:tlsdyn.obj 0->4; rex_app.cpp.obj 243->242; ucrt:api-ms-win-crt-convert-l1-1-0.dll 1->2; vcruntime:VCRUNTIME140_1.dll 0->2
+  => e) PASS*  (PASS = no category 4; PASS* = category 4 only library/CRT/import/linker symbols (4a), flagged above; FAIL = category 4 in project objects, recompiled TUs or sub_ names)
+
+statics (information only, not part of a-e): (name, object) multisets REF -> NEW
+  statics REF 10139, NEW 10238; added 99, removed 0
+    msvcrt:tlsdyn.obj                            [lib:msvcrt] +9 -0  +: $cppxdata$__dyn_tls_init $ip2state$__dyn_tls_init $pdata$__dyn_tls_init $unwind$__dyn_tls_init __guard_fids__ __guard_fids__ __xd_a __xd_z __xl_c
+    gpu_wait_backoff.cpp.obj                     [project-obj] +90 -0  +: $cppxdata$??$log_@AEAPEBD@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEAPEBD@Z $cppxdata$??$log_@AEAPEBDAEAI@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEAPEBDAEAI@Z $cppxdata$??$log_@AEB_K_K_K_K_K_K_KAEB_K_K_K_K_K_K_K_KN_KNN_K_K_K_K_KNN@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEB_K$$QEA_K4444434444444$$QEAN4554444455@Z $cppxdata$??$log_@PEBDAEAIAEAIPEBDPEBD@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@$$QEAPEBDAEAI433@Z $cppxdata$??R<lambda_0>@?0??Cfg@?A0x14AD3790@@YAAEBUConfig@2@XZ@QEBA?A?<auto>@@XZ $cppxdata$??__Ft_timer@?A0x14AD3790@@YAXXZ $cppxdata$?MaybeLog@?A0x14AD3790@@YAXAEBUConfig@1@@Z $cppxdata$sub_83FAF180 $cppxdata$sub_83FB09E8 $cppxdata$sub_83FBF7D0 $cppxdata$sub_83FC0C10 $ehgcr_10_9 $ehgcr_22_9 $ehgcr_23_9 $ehgcr_24_9 $handlerMap$0$??$log_@AEAPEBD@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEAPEBD@Z $handlerMap$0$??$log_@AEAPEBDAEAI@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEAPEBDAEAI@Z $handlerMap$0$??$log_@AEB_K_K_K_K_K_K_KAEB_K_K_K_K_K_K_K_KN_KNN_K_K_K_K_KNN@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEB_K$$QEA_K4444434444444$$QEAN4554444455@Z $handlerMap$0$??$log_@PEBDAEAIAEAIPEBDPEBD@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@$$QEAPEBDAEAI433@Z $ip2state$??$log_@AEAPEBD@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEAPEBD@Z $ip2state$??$log_@AEAPEBDAEAI@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEAPEBDAEAI@Z $ip2state$??$log_@AEB_K_K_K_K_K_K_KAEB_K_K_K_K_K_K_K_KN_KNN_K_K_K_K_KNN@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEB_K$$QEA_K4444434444444$$QEAN4554444455@Z $ip2state$??$log_@PEBDAEAIAEAIPEBDPEBD@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@$$QEAPEBDAEAI433@Z $ip2state$??R<lambda_0>@?0??Cfg@?A0x14AD3790@@YAAEBUConfig@2@XZ@QEBA?A?<auto>@@XZ $ip2state$??__Ft_timer@?A0x14AD3790@@YAXXZ $ip2state$?MaybeLog@?A0x14AD3790@@YAXAEBUConfig@1@@Z $ip2state$sub_83FAF180 $ip2state$sub_83FB09E8 $ip2state$sub_83FBF7D0 $ip2state$sub_83FC0C10 $stateUnwindMap$??$log_@AEAPEBD@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEAPEBD@Z $stateUnwindMap$??$log_@AEAPEBDAEAI@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEAPEBDAEAI@Z $stateUnwindMap$??$log_@AEB_K_K_K_K_K_K_KAEB_K_K_K_K_K_K_K_KN_KNN_K_K_K_K_KNN@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEB_K$$QEA_K4444434444444$$QEAN4554444455@Z $stateUnwindMap$??$log_@PEBDAEAIAEAIPEBDPEBD@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@$$QEAPEBDAEAI433@Z $stateUnwindMap$??R<lambda_0>@?0??Cfg@?A0x14AD3790@@YAAEBUConfig@2@XZ@QEBA?A?<auto>@@XZ $stateUnwindMap$??__Ft_timer@?A0x14AD3790@@YAXXZ $stateUnwindMap$?MaybeLog@?A0x14AD3790@@YAXAEBUConfig@1@@Z $stateUnwindMap$sub_83FAF180 $stateUnwindMap$sub_83FB09E8 $stateUnwindMap$sub_83FBF7D0 ... (+50)
+
+find (information): publics/statics whose name or object matches (case-insensitive)
+  /memory_?watch/ REF: 0 hits (publics 0, statics 0)
+  /memory_?watch/ NEW: 0 hits (publics 0, statics 0)
+
+RESULT: PASS  (a=PASS b=PASS c=PASS d=PASS e=PASS*; hooked REF 27 -> NEW 31; e: cat1 4, cat2 19, cat3 1, cat4 9; 57.6s)

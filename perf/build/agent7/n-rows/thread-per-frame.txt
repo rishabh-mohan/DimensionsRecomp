@@ -1,0 +1,14 @@
+﻿ms of CPU per frame by thread role (busy_pct x 10 / fps; fps over the measure window)
+run            arm       fps     main   render  gpu_cmd   timerq  worker2    vsync    audio xt_other    other   total  main% render% | render handle
+0452-n0-r1     n0     101.03    4.325    7.760    0.000    3.256    1.247    0.000    0.376    1.010    0.940  18.914   43.7   78.4 | F800018C
+0454-n2-r1     n2     109.63    2.983    1.505    0.000    3.375    0.885    0.000    0.164    0.493    7.316  16.720   32.7   16.5 | F8000128
+0456-n3-r1     n3     116.72    3.187    1.388    0.000    3.376    1.071    0.000    0.334    0.625    8.045  18.026   37.2   16.2 | F8000128
+
+per-arm medians:
+median n=1     n0     101.03    4.325    7.760    0.000    3.256    1.247    0.000    0.376    1.010    0.940  18.914   43.7   78.4
+median n=1     n2     109.63    2.983    1.505    0.000    3.375    0.885    0.000    0.164    0.493    7.316  16.720   32.7   16.5
+median n=1     n3     116.72    3.187    1.388    0.000    3.376    1.071    0.000    0.334    0.625    8.045  18.026   37.2   16.2
+diff           n2-n0    8.59   -1.342   -6.255   +0.000   +0.119   -0.362   +0.000   -0.212   -0.517   +6.375  -2.194
+diff           n3-n0   15.69   -1.138   -6.372   +0.000   +0.119   -0.176   +0.000   -0.042   -0.384   +7.105  -0.888
+
+Note: busy_pct is over the driver window (measure start + 1-3 s to measure end); fps is over the runner's measure window from frames.json, so the two windows differ by the driver's late start.

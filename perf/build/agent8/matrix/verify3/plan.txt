@@ -1,0 +1,31 @@
+﻿=== timing matrix: Window 3: devoff2 (ref) vs baseline, devoff2 + Agent 11 ON bundle, devoff2 + Agent 12 ON bundle. Uncapped (framerate_limit=0), title loop, no input ===
+matrix   <workspace>\bench\agent8\run\matrix-window3.json
+note     Do not touch the PC while it runs (about 40 min). Every arm sits on the title/attract loop, which the game reaches with no input. The runner keeps the display on (SetThreadExecutionState) until the matrix ends.
+note     Order: one unscored cold run per bin (devoff2, baseline), then 4 rounds of d0 base d11 d12, rotated each round (d0 base d11 d12 | base d11 d12 d0 | d11 d12 d0 base | d12 d0 base d11).
+note     Window: 5 s settle + 40 s warm-up from the first frame (past the ~33 s intro-to-title step), then 50 s measured.
+note     Primary metric: uncapped frame rate. Every arm passes framerate_limit=0 (Agent 3 section 3.1: the only cap on OFF builds), so the median frame time / mean fps measures throughput. Secondary: drivers/thread-cpu.ps1 per run writes threads.csv and headroom.json (busiest thread busy %, headroom = 100 - that, total cores) and gpu.csv (nvidia-smi each second: check the GPU is not pinned at 100 %).
+note     The runner always passes --audio_mute=true --pause_when_unfocused=false --native_settings_load=false --discord_rpc=false.
+note     d11 check: every d11 game.log must show 'Host timer resolution set to 1 ms (background opt-out on)'. No profiler on these arms.
+note     Post-hoc: python bench/agent8/run/matrix_recheck.py <out dir> --write (paired deltas per round, headroom, foreign dumps).
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order roundrobin; close timeout 60 s; cooldown 10 s
+arms:
+       d0: bin build/agent2/devoff2-bin; frames perf; x1; warm-up 40 s; window 50 s; group w3 (ref); cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         devoff2 (S2, batch 2) at defaults, uncapped: the reference
+       base: bin build/baseline-bin; frames perf; x1; warm-up 40 s; window 50 s; group w3; cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         upstream baseline (batch 0) at defaults, uncapped
+round 1  d0 base
+order    d0 base
+estimate 2 runs (0 cold), about 6 min (warm boot 20 s, cold boot 61 s, close 35 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-IW4HBGG43BZHP4ZZR4S7KMR34E -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   9.83 GB
+game       no legodimensions.exe running
+builds     none (clang-cl, clang, lld-link, ninja, dxc, cl)
+bin        build/agent2/devoff2-bin : ok (MANIFEST.txt)
+bin        build/baseline-bin : ok (MANIFEST.txt)
+screensaver WPXSCR~1.SCR after 120 s: the keep-awake request should hold it off; if it starts during timing runs, set it to (None)
+estimate   2 runs, about 6 min: done around 23:40
+keep-awake ON (SetThreadExecutionState continuous+system+display until the matrix ends)

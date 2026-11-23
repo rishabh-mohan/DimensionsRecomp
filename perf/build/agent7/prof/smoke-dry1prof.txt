@@ -1,0 +1,155 @@
+prof_main_compare: A = dryA, B = dryB; ms of CPU per frame (busy samples) unless noted
+'~' = |delta| < 2se (Poisson); w = 1000/(rounds*fps) ms/frame per sample
+
+[A] dryA: <workspace>\build\agent8\runs\2008-dry1prof
+  profile profile-700429781.bin (0.2 MB), map <workspace>\build\agent8\runs\2008-dry1prof\legodimensions.map
+  samples 1842, threads 81, rounds 23 (estimated (max per-thread count)), duration n/a [estimate], rounds/s n/a, timer_mode None (observer effect True)
+  fps 100.00 [--fps] -> w 0.434783
+  thread fallback: most busy guest-leaf samples: tids [49004] 
+  thread samples 23 (busy 23, wait 0, io 0): busy 10.000 ms/frame, blocked 0.000 ms/frame
+
+[B] dryB: <workspace>\build\agent8\runs\2008-dry1prof
+  profile profile-700429781.bin (0.2 MB), map <workspace>\build\agent8\runs\2008-dry1prof\legodimensions.map
+  samples 1842, threads 81, rounds 23 (estimated (max per-thread count)), duration n/a [estimate], rounds/s n/a, timer_mode None (observer effect True)
+  fps 80.00 [--fps] -> w 0.543478
+  thread fallback: most busy guest-leaf samples: tids [49004] 
+  thread samples 23 (busy 23, wait 0, io 0): busy 12.500 ms/frame, blocked 0.000 ms/frame
+
+warning: dryA: no thread name matches /^Main XThread/ (trailer names: 0); using tid 49004, the thread with the most busy guest-code samples. Check the threads table and pass --tid-a if wrong
+warning: dryB: no thread name matches /^Main XThread/ (trailer names: 0); using tid 49004, the thread with the most busy guest-code samples. Check the threads table and pass --tid-b if wrong
+warning: A: profile-700429781.bin: no recording duration (no LSPX trailer, --duration-s or --meta): rates are per 1000 sampler rounds, rounds estimated as the max per-thread sample count (23; nominal rate ~1 kHz, lower in practice)
+warning: B: profile-700429781.bin: no recording duration (no LSPX trailer, --duration-s or --meta): rates are per 1000 sampler rounds, rounds estimated as the max per-thread sample count (23; nominal rate ~1 kHz, lower in practice)
+
+== buckets (busy ms/frame; first match over the host frames above the first guest frame) ==
+A ms/f  B ms/f    delta    2se  nA  nB  key
+------  ------  -------  -----  --  --  --------------------------
+ 9.565  11.957  +2.391~  6.529  22  22  guest code
+ 0.000   0.000  +0.000   0.000   0   0  write-tracking fault (VEH)
+ 0.000   0.000  +0.000   0.000   0   0  write-tracking arm/protect
+ 0.000   0.000  +0.000   0.000   0   0  CPU pool copy
+ 0.000   0.000  +0.000   0.000   0   0  sync/spin/yield (busy)
+ 0.000   0.000  +0.000   0.000   0   0  d3d12+driver
+ 0.000   0.000  +0.000   0.000   0   0  native upload/copy/hash
+ 0.000   0.000  +0.000   0.000   0   0  native-gpu other
+ 0.435   0.543  +0.109~  1.392   1   1  rexlego host
+ 0.000   0.000  +0.000   0.000   0   0  rexruntime
+ 0.000   0.000  +0.000   0.000   0   0  system/other
+10.000  12.500  +2.500~  6.676  23  23  total busy
+ 0.000   0.000  +0.000   0.000   0   0  blocked (wait/io, not CPU)
+
+== ranked candidates (buckets with B > A, largest first) ==
+ 1. guest code                   +2.391 ms/frame (2se 6.529)  ~noise
+ 2. rexlego host                 +0.109 ms/frame (2se 1.392)  ~noise
+
+== leaf categories (busy) ==
+A ms/f  B ms/f    delta    2se  nA  nB  key
+------  ------  -------  -----  --  --  ------------
+ 7.391   9.239  +1.848~  5.739  17  17  guest
+ 0.000   0.000  +0.000   0.000   0   0  rexruntime
+ 0.000   0.000  +0.000   0.000   0   0  native-gpu
+ 2.609   3.261  +0.652~  3.410   6   6  rexlego
+ 0.000   0.000  +0.000   0.000   0   0  d3d12+driver
+ 0.000   0.000  +0.000   0.000   0   0  system
+ 0.000   0.000  +0.000   0.000   0   0  other
+ 0.000   0.000  +0.000   0.000   0   0  unknown
+
+== boundary: host function entered from guest code (busy, by |delta|) ==
+A ms/f  B ms/f    delta    2se  nA  nB  key           top guest callers (B, else A)
+------  ------  -------  -----  --  --  ------------  -----------------------------
+ 9.565  11.957  +2.391~  6.529  22  22  (guest code)
+ 0.435   0.543  +0.109~  1.392   1   1  __chkstk      __restgprlr_29 100%
+
+== self (leaf function, busy) ==
+A ms/f  B ms/f    delta    2se  nA  nB  key
+------  ------  -------  -----  --  --  -------------------------------
+ 4.348   5.435  +1.087~  4.402  10  10  sub_83FAF180 [guest 0x83FAF180]
+ 2.609   3.261  +0.652~  3.410   6   6  sub_83FBF7D0 [guest 0x83FBF7D0]
+ 1.304   1.630  +0.326~  2.411   3   3  __restgprlr_29
+ 0.435   0.543  +0.109~  1.392   1   1  __chkstk
+ 0.435   0.543  +0.109~  1.392   1   1  __savegprlr_19
+ 0.435   0.543  +0.109~  1.392   1   1  __savegprlr_29
+ 0.435   0.543  +0.109~  1.392   1   1  sub_83FA2698 [guest 0x83FA2698]
+
+== inclusive (busy) ==
+A ms/f  B ms/f    delta    2se  nA  nB  key
+------  ------  -------  -----  --  --  -------------------------------------------------
+10.000  12.500  +2.500~  6.676  23  23  KERNEL32.DLL!BaseThreadInitThunk
+10.000  12.500  +2.500~  6.676  23  23  ntdll.dll!RtlUserThreadStart
+10.000  12.500  +2.500~  6.676  23  23  rexruntime.dll!rex::system::XThread::Execute
+10.000  12.500  +2.500~  6.676  23  23  rexruntime.dll!rex::thread::ThreadStartRoutine
+10.000  12.500  +2.500~  6.676  23  23  rexruntime.dll!~rex::system::XHostThread::Execute
+10.000  12.500  +2.500~  6.676  23  23  sub_82A32950 [guest 0x82A32950]
+10.000  12.500  +2.500~  6.676  23  23  sub_82B73A78 [guest 0x82B73A78]
+10.000  12.500  +2.500~  6.676  23  23  sub_82B73D48 [guest 0x82B73D48]
+10.000  12.500  +2.500~  6.676  23  23  sub_82B74258 [guest 0x82B74258]
+10.000  12.500  +2.500~  6.676  23  23  sub_83FAEB78 [guest 0x83FAEB78]
+ 9.565  11.957  +2.391~  6.529  22  22  sub_82B66AC0 [guest 0x82B66AC0]
+ 9.565  11.957  +2.391~  6.529  22  22  sub_82BD70A8 [guest 0x82BD70A8]
+ 9.565  11.957  +2.391~  6.529  22  22  sub_83FB33E0 [guest 0x83FB33E0]
+ 9.565  11.957  +2.391~  6.529  22  22  sub_83FBF7D0 [guest 0x83FBF7D0]
+ 5.217   6.522  +1.304~  4.822  12  12  sub_83FAF180 [guest 0x83FAF180]
+ 1.739   2.174  +0.435~  2.784   4   4  __restgprlr_29
+ 0.435   0.543  +0.109~  1.392   1   1  __chkstk
+ 0.435   0.543  +0.109~  1.392   1   1  __savegprlr_19
+ 0.435   0.543  +0.109~  1.392   1   1  __savegprlr_29
+ 0.435   0.543  +0.109~  1.392   1   1  sub_83FA2698 [guest 0x83FA2698]
+
+== guest self (guest leaf, busy) ==
+A ms/f  B ms/f    delta    2se  nA  nB  key
+------  ------  -------  -----  --  --  -------------------------------
+ 4.348   5.435  +1.087~  4.402  10  10  sub_83FAF180 [guest 0x83FAF180]
+ 2.609   3.261  +0.652~  3.410   6   6  sub_83FBF7D0 [guest 0x83FBF7D0]
+ 1.304   1.630  +0.326~  2.411   3   3  __restgprlr_29
+ 0.435   0.543  +0.109~  1.392   1   1  __savegprlr_19
+ 0.435   0.543  +0.109~  1.392   1   1  __savegprlr_29
+ 0.435   0.543  +0.109~  1.392   1   1  sub_83FA2698 [guest 0x83FA2698]
+
+== guest inclusive (guest functions on the stack, busy) ==
+A ms/f  B ms/f    delta    2se  nA  nB  key
+------  ------  -------  -----  --  --  -------------------------------
+10.000  12.500  +2.500~  6.676  23  23  sub_82A32950 [guest 0x82A32950]
+10.000  12.500  +2.500~  6.676  23  23  sub_82B73A78 [guest 0x82B73A78]
+10.000  12.500  +2.500~  6.676  23  23  sub_82B73D48 [guest 0x82B73D48]
+10.000  12.500  +2.500~  6.676  23  23  sub_82B74258 [guest 0x82B74258]
+10.000  12.500  +2.500~  6.676  23  23  sub_83FAEB78 [guest 0x83FAEB78]
+ 9.565  11.957  +2.391~  6.529  22  22  sub_82B66AC0 [guest 0x82B66AC0]
+ 9.565  11.957  +2.391~  6.529  22  22  sub_82BD70A8 [guest 0x82BD70A8]
+ 9.565  11.957  +2.391~  6.529  22  22  sub_83FB33E0 [guest 0x83FB33E0]
+ 9.565  11.957  +2.391~  6.529  22  22  sub_83FBF7D0 [guest 0x83FBF7D0]
+ 5.217   6.522  +1.304~  4.822  12  12  sub_83FAF180 [guest 0x83FAF180]
+ 1.739   2.174  +0.435~  2.784   4   4  __restgprlr_29
+ 0.435   0.543  +0.109~  1.392   1   1  __savegprlr_19
+ 0.435   0.543  +0.109~  1.392   1   1  __savegprlr_29
+ 0.435   0.543  +0.109~  1.392   1   1  sub_83FA2698 [guest 0x83FA2698]
+
+== busiest threads, dryA (busy ms/frame) ==
+   tid  name  samples  busy  wait  io  busy ms/f
+------  ----  -------  ----  ----  --  ---------
+ 49004             23    23     0   0     10.000
+ 42056             23    20     3   0      8.696
+ 80616             23     9    14   0      3.913
+100868             23     5    18   0      2.174
+ 10224             23     4    19   0      1.739
+ 39096             23     3    20   0      1.304
+ 63760             23     2    21   0      0.870
+ 26644             23     2    21   0      0.870
+ 47608             23     1    22   0      0.435
+ 34796             23     1    22   0      0.435
+ 83416             23     0    23   0      0.000
+ 55932             23     0    23   0      0.000
+
+== busiest threads, dryB (busy ms/frame) ==
+   tid  name  samples  busy  wait  io  busy ms/f
+------  ----  -------  ----  ----  --  ---------
+ 49004             23    23     0   0     12.500
+ 42056             23    20     3   0     10.870
+ 80616             23     9    14   0      4.891
+100868             23     5    18   0      2.717
+ 10224             23     4    19   0      2.174
+ 39096             23     3    20   0      1.630
+ 63760             23     2    21   0      1.087
+ 26644             23     2    21   0      1.087
+ 47608             23     1    22   0      0.543
+ 34796             23     1    22   0      0.543
+ 83416             23     0    23   0      0.000
+ 55932             23     0    23   0      0.000

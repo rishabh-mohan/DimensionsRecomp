@@ -1,0 +1,124 @@
+# bench_clock  2026-11-21 19:16:17  args: 5
+[start] AC=online battery=100% cpu_load=100% (GetSystemTimes, 250 ms)
+QPF=10000000 Hz, runs=5, threads<=2
+CHECK(a) enumeration: hb=0 gb=0 ratio 5/3, writer host sample hw=1..30, stale read at q in [hw,hw+10]
+  same ratio 5/3, naive rebase  : step-backs 110/330 pairs, max 1 tick(s)
+  same ratio 5/3, aligned rebase: step-backs   0/330 pairs, max 0 tick(s)
+  5/3 -> 1/1,     naive rebase  : step-backs 290/330 pairs, max 7 tick(s)
+  5/3 -> 1/1,     aligned rebase: step-backs 240/330 pairs, max 6 tick(s)
+  example hw=1 q=2: old=3 naive_new=2 aligned_new=5 (G0'=5 at h0'=3; q<h0' clamps to G0')
+  stale reads at q<=hw never step back (new >= G0' >= old(hw)); a ratio DEcrease steps back for both.
+--- run 1 ---
+  QPC only     1T  T1    56.6 ns/call             back 0 fb 0
+  QPC only     2T  T1    59.2 ns/call  T2    62.5  back 0 fb 0
+  OLD 1/1      1T  T1   130.5 ns/call             drift 1.0000  back 0 fb 0
+  NEW 1/1      1T  T1    99.2 ns/call             drift 1.0000  back 0 fb 0
+  OLD 5/3      1T  T1   142.4 ns/call             drift 0.7336  back 0 fb 0
+  NEW 5/3      1T  T1    83.8 ns/call             drift 1.0000  back 0 fb 0
+  OLD 1/1      2T  T1   657.7 ns/call  T2   287.0  drift 1.0905  back 0 fb 0
+  NEW 1/1      2T  T1   104.9 ns/call  T2   118.1  drift 1.0000  back 0 fb 0
+  OLD 5/3      2T  T1   946.0 ns/call  T2   285.5  drift 0.8952  back 0 fb 0
+  NEW 5/3      2T  T1   111.9 ns/call  T2   112.1  drift 1.0000  back 0 fb 0
+  OLD 5/1(rt)  2T  T1   483.8 ns/call  T2   329.3  drift 1.0728  back 0 fb 0
+  MONO alt 5/3<->1/1 ~1ms, SDK reader, naive(SDK) rebase: reads 3079168 rebases 75 step-backs 0 max 0 fb 62
+  MONO alt 5/3<->1/1 ~1ms, SDK reader, aligned rebase   : reads 3252992 rebases 79 step-backs 0 max 0 fb 61
+  MONO 5/3 every ~10us, late-QPC reader, naive rebase   : reads 33024 rebases 16045 step-backs 4 max 161 fb 0
+  MONO 5/3 every ~10us, late-QPC reader, aligned rebase : reads 33280 rebases 18197 step-backs 3 max 73 fb 3
+  MONO 5/3 every ~10us, SDK reader, naive(SDK) rebase   : reads 2514944 rebases 13840 step-backs 0 max 0 fb 1249
+  MONO 5/3 every ~10us, SDK reader, naive+mfence rebase : reads 3062784 rebases 14963 step-backs 0 max 0 fb 6991
+--- run 2 ---
+  NEW 1/1      1T  T1   117.1 ns/call             drift 1.0000  back 0 fb 0
+  OLD 5/3      1T  T1   276.7 ns/call             drift 0.8709  back 0 fb 0
+  NEW 5/3      1T  T1   113.0 ns/call             drift 1.0000  back 0 fb 0
+  OLD 1/1      2T  T1   325.4 ns/call  T2   335.2  drift 1.0664  back 0 fb 0
+  NEW 1/1      2T  T1   111.9 ns/call  T2   103.4  drift 1.0000  back 0 fb 0
+  OLD 5/3      2T  T1   383.2 ns/call  T2   328.6  drift 0.8583  back 0 fb 0
+  NEW 5/3      2T  T1    77.0 ns/call  T2    76.1  drift 1.0000  back 0 fb 0
+  OLD 5/1(rt)  2T  T1   302.4 ns/call  T2   304.8  drift 1.0616  back 0 fb 0
+  QPC only     1T  T1    43.2 ns/call             back 0 fb 0
+  QPC only     2T  T1    57.0 ns/call  T2    77.1  back 0 fb 0
+  OLD 1/1      1T  T1   138.3 ns/call             drift 1.0000  back 0 fb 0
+  MONO alt 5/3<->1/1 ~1ms, SDK reader, aligned rebase   : reads 2526720 rebases 59 step-backs 0 max 0 fb 43
+  MONO 5/3 every ~10us, late-QPC reader, naive rebase   : reads 27648 rebases 14957 step-backs 3 max 72 fb 2
+  MONO 5/3 every ~10us, late-QPC reader, aligned rebase : reads 32256 rebases 16338 step-backs 0 max 0 fb 1
+  MONO 5/3 every ~10us, SDK reader, naive(SDK) rebase   : reads 2244864 rebases 15051 step-backs 0 max 0 fb 906
+  MONO 5/3 every ~10us, SDK reader, naive+mfence rebase : reads 2369792 rebases 14919 step-backs 0 max 0 fb 5663
+  MONO alt 5/3<->1/1 ~1ms, SDK reader, naive(SDK) rebase: reads 2349312 rebases 30 step-backs 0 max 0 fb 13
+--- run 3 ---
+  OLD 1/1      2T  T1   439.8 ns/call  T2   273.8  drift 1.0577  back 0 fb 0
+  NEW 1/1      2T  T1    75.5 ns/call  T2    86.9  drift 1.0000  back 0 fb 0
+  OLD 5/3      2T  T1   464.1 ns/call  T2   274.4  drift 0.8956  back 0 fb 0
+  NEW 5/3      2T  T1    72.3 ns/call  T2   162.5  drift 1.0000  back 0 fb 0
+  OLD 5/1(rt)  2T  T1   516.3 ns/call  T2   247.5  drift 1.0085  back 0 fb 0
+  QPC only     1T  T1    52.7 ns/call             back 0 fb 0
+  QPC only     2T  T1    48.2 ns/call  T2    48.9  back 0 fb 0
+  OLD 1/1      1T  T1   110.1 ns/call             drift 1.0000  back 0 fb 0
+  NEW 1/1      1T  T1   168.3 ns/call             drift 1.0000  back 0 fb 0
+  OLD 5/3      1T  T1   397.8 ns/call             drift 0.9114  back 0 fb 0
+  NEW 5/3      1T  T1   155.8 ns/call             drift 1.0000  back 0 fb 0
+  MONO 5/3 every ~10us, late-QPC reader, naive rebase   : reads 32768 rebases 18830 step-backs 4 max 55 fb 6
+  MONO 5/3 every ~10us, late-QPC reader, aligned rebase : reads 29952 rebases 17261 step-backs 1 max 76 fb 2
+  MONO 5/3 every ~10us, SDK reader, naive(SDK) rebase   : reads 2106112 rebases 11310 step-backs 0 max 0 fb 603
+  MONO 5/3 every ~10us, SDK reader, naive+mfence rebase : reads 1561088 rebases 8984 step-backs 0 max 0 fb 2078
+  MONO alt 5/3<->1/1 ~1ms, SDK reader, naive(SDK) rebase: reads 1148416 rebases 105 step-backs 0 max 0 fb 33
+  MONO alt 5/3<->1/1 ~1ms, SDK reader, aligned rebase   : reads 2003968 rebases 73 step-backs 0 max 0 fb 35
+--- run 4 ---
+  NEW 5/3      2T  T1   108.4 ns/call  T2   113.9  drift 1.0000  back 0 fb 0
+  OLD 5/1(rt)  2T  T1  1156.1 ns/call  T2   238.9  drift 1.1458  back 0 fb 0
+  QPC only     1T  T1    47.4 ns/call             back 0 fb 0
+  QPC only     2T  T1    58.5 ns/call  T2    70.4  back 0 fb 0
+  OLD 1/1      1T  T1   316.6 ns/call             drift 1.0000  back 0 fb 0
+  NEW 1/1      1T  T1   137.2 ns/call             drift 1.0000  back 0 fb 0
+  OLD 5/3      1T  T1   156.6 ns/call             drift 0.7835  back 0 fb 0
+  NEW 5/3      1T  T1   169.8 ns/call             drift 1.0000  back 0 fb 0
+  OLD 1/1      2T  T1   274.9 ns/call  T2   422.2  drift 1.0783  back 0 fb 0
+  NEW 1/1      2T  T1   204.0 ns/call  T2   151.6  drift 1.0000  back 0 fb 0
+  OLD 5/3      2T  T1   305.5 ns/call  T2   367.9  drift 0.9033  back 0 fb 0
+  MONO 5/3 every ~10us, late-QPC reader, aligned rebase : reads 23296 rebases 10336 step-backs 0 max 0 fb 1
+  MONO 5/3 every ~10us, SDK reader, naive(SDK) rebase   : reads 1488896 rebases 8431 step-backs 0 max 0 fb 362
+  MONO 5/3 every ~10us, SDK reader, naive+mfence rebase : reads 2094336 rebases 10853 step-backs 0 max 0 fb 3601
+  MONO alt 5/3<->1/1 ~1ms, SDK reader, naive(SDK) rebase: reads 2993152 rebases 42 step-backs 0 max 0 fb 25
+  MONO alt 5/3<->1/1 ~1ms, SDK reader, aligned rebase   : reads 1579776 rebases 36 step-backs 0 max 0 fb 9
+  MONO 5/3 every ~10us, late-QPC reader, naive rebase   : reads 20992 rebases 12280 step-backs 3 max 80 fb 15
+--- run 5 ---
+  QPC only     2T  T1    59.9 ns/call  T2    65.4  back 0 fb 0
+  OLD 1/1      1T  T1   286.6 ns/call             drift 1.0000  back 0 fb 0
+  NEW 1/1      1T  T1   112.7 ns/call             drift 1.0000  back 0 fb 0
+  OLD 5/3      1T  T1   192.5 ns/call             drift 0.8337  back 0 fb 0
+  NEW 5/3      1T  T1   443.4 ns/call             drift 1.0000  back 0 fb 0
+  OLD 1/1      2T  T1   385.4 ns/call  T2   218.8  drift 1.3934  back 0 fb 0
+  NEW 1/1      2T  T1   123.4 ns/call  T2   165.4  drift 1.0000  back 0 fb 0
+  OLD 5/3      2T  T1   319.5 ns/call  T2   330.0  drift 0.9619  back 0 fb 0
+  NEW 5/3      2T  T1   116.0 ns/call  T2    96.9  drift 1.0000  back 0 fb 0
+  OLD 5/1(rt)  2T  T1   589.8 ns/call  T2   238.8  drift 1.0072  back 0 fb 0
+  QPC only     1T  T1   177.9 ns/call             back 0 fb 0
+  MONO 5/3 every ~10us, SDK reader, naive(SDK) rebase   : reads 2091520 rebases 12111 step-backs 0 max 0 fb 872
+  MONO 5/3 every ~10us, SDK reader, naive+mfence rebase : reads 2355968 rebases 9406 step-backs 0 max 0 fb 1501
+  MONO alt 5/3<->1/1 ~1ms, SDK reader, naive(SDK) rebase: reads 1395200 rebases 16 step-backs 0 max 0 fb 8
+  MONO alt 5/3<->1/1 ~1ms, SDK reader, aligned rebase   : reads 2409216 rebases 55 step-backs 0 max 0 fb 32
+  MONO 5/3 every ~10us, late-QPC reader, naive rebase   : reads 11264 rebases 15619 step-backs 3 max 176 fb 7
+  MONO 5/3 every ~10us, late-QPC reader, aligned rebase : reads 16128 rebases 17274 step-backs 1 max 333 fb 23
+
+SUMMARY ns/call (median of 5 runs [min..max]); drift = guest elapsed / (host elapsed * ratio)
+  config          | T1 ns/call               | T2 ns/call               | drift                      | back | fb
+  QPC only     1T |    52.7 [43.2..177.9] | -                        | -                          |    0 | 0
+  QPC only     2T |    58.5 [48.2..59.9] |    65.4 [48.9..77.1]     | -                          |    0 | 0
+  OLD 1/1      1T |   138.3 [110.1..316.6] | -                        | 1.0000 [1.0000..1.0000]    |    0 | 0
+  NEW 1/1      1T |   117.1 [99.2..168.3] | -                        | 1.0000 [1.0000..1.0000]    |    0 | 0
+  OLD 5/3      1T |   192.5 [142.4..397.8] | -                        | 0.8337 [0.7336..0.9114]    |    0 | 0
+  NEW 5/3      1T |   155.8 [83.8..443.4] | -                        | 1.0000 [1.0000..1.0000]    |    0 | 0
+  OLD 1/1      2T |   385.4 [274.9..657.7] |   287.0 [218.8..422.2]   | 1.0783 [1.0577..1.3934]    |    0 | 0
+  NEW 1/1      2T |   111.9 [75.5..204.0] |   118.1 [86.9..165.4]    | 1.0000 [1.0000..1.0000]    |    0 | 0
+  OLD 5/3      2T |   383.2 [305.5..946.0] |   328.6 [274.4..367.9]   | 0.8956 [0.8583..0.9619]    |    0 | 0
+  NEW 5/3      2T |   108.4 [72.3..116.0] |   112.1 [76.1..162.5]    | 1.0000 [1.0000..1.0000]    |    0 | 0
+  OLD 5/1(rt)  2T |   516.3 [302.4..1156.1] |   247.5 [238.8..329.3]   | 1.0616 [1.0072..1.1458]    |    0 | 0
+
+SUMMARY monotonicity (T1 reads while T2 rebases; per-run step-backs listed)
+  alt 5/3<->1/1 ~1ms, SDK reader, naive(SDK) rebase: reads/run 2349312, rebases/run 42, step-backs total 0 (0 0 0 0 0 ), max step 0, fallbacks 141
+  alt 5/3<->1/1 ~1ms, SDK reader, aligned rebase   : reads/run 2409216, rebases/run 59, step-backs total 0 (0 0 0 0 0 ), max step 0, fallbacks 180
+  5/3 every ~10us, late-QPC reader, naive rebase   : reads/run 27648, rebases/run 15619, step-backs total 17 (4 3 4 3 3 ), max step 176, fallbacks 30
+  5/3 every ~10us, late-QPC reader, aligned rebase : reads/run 29952, rebases/run 17261, step-backs total 5 (3 0 1 0 1 ), max step 333, fallbacks 30
+  5/3 every ~10us, SDK reader, naive(SDK) rebase   : reads/run 2106112, rebases/run 12111, step-backs total 0 (0 0 0 0 0 ), max step 0, fallbacks 3992
+  5/3 every ~10us, SDK reader, naive+mfence rebase : reads/run 2355968, rebases/run 10853, step-backs total 0 (0 0 0 0 0 ), max step 0, fallbacks 19834
+[end] AC=online battery=100% cpu_load=100% (GetSystemTimes, 250 ms)
+# exit=0 wall=16s

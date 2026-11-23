@@ -1,0 +1,56 @@
+shader_dump_check: run build\agent8\matrix\20261122-0509\runs\0509-sd-r1
+  dumps root build\agent8\matrix\20261122-0509\runs\0509-sd-r1\shader-dumps: present, 9 file(s)
+  game.log: dumped=9, dump_failed=0, dir_failed=0, missing_aot=8, pool_verify_failed=0, hash0=0
+    Native GPU: dumped missing shader '<workspace>\build\agent8\matrix\20261122-0509\runs\0509-sd-r1\shader-dumps\vs-A58EBA123EFB541C.bin'
+    Native GPU: dumped missing shader '<workspace>\build\agent8\matrix\20261122-0509\runs\0509-sd-r1\shader-dumps\ps-93B9F93B535E7CCA.bin'
+    Native GPU: dumped missing shader '<workspace>\build\agent8\matrix\20261122-0509\runs\0509-sd-r1\shader-dumps\placement-raw\vs-DCD4AD8441398283.bin'
+    Native GPU: dumped missing shader '<workspace>\build\agent8\matrix\20261122-0509\runs\0509-sd-r1\shader-dumps\placement-containers\vs-ACAF01F01E1C03D2.bin'
+    Native GPU: dumped missing shader '<workspace>\build\agent8\matrix\20261122-0509\runs\0509-sd-r1\shader-dumps\placement-raw\ps-C77B3ABB6F87ACD9.bin'
+    Native GPU: dumped missing shader '<workspace>\build\agent8\matrix\20261122-0509\runs\0509-sd-r1\shader-dumps\placement-containers\ps-75A4D1ABA62F7594.bin'
+    Native GPU: dumped missing shader '<workspace>\build\agent8\matrix\20261122-0509\runs\0509-sd-r1\shader-dumps\placement-raw\vs-98D43959C65B882A.bin'
+    Native GPU: dumped missing shader '<workspace>\build\agent8\matrix\20261122-0509\runs\0509-sd-r1\shader-dumps\placement-containers\vs-CCD7655302B54D80.bin'
+    Native GPU: dumped missing shader '<workspace>\build\agent8\matrix\20261122-0509\runs\0509-sd-r1\shader-dumps\placement-containers\ps-E81FD692C3AB35E1.bin'
+
+== dump files (category, file, bytes, sha256, non-zero bytes, first words)
+  .                      ps-93B9F93B535E7CCA.bin     156 D63867294038BB52 nz=   48  102A1100 00000078 00000024 00000000 00000024 00000000 00000058 00000000
+  .                      vs-A58EBA123EFB541C.bin     704 FD947EBF69C161EE nz=  289  102A1111 00000130 00000190 00000000 00000024 000000C0 000000E8 00000000
+  placement-containers   ps-75A4D1ABA62F7594.bin    1716 09D05274AFBC26A2 nz= 1128  102A1100 000005E0 000000D0 00000000 00000024 00000590 000005B8 00000000
+      container OK; flags=0x102a1100 virtual_size=0x5e0 physical_size=0xd0 field_0c=0x0 constant_table_offset=0x24 definition_table_offset=0x590 shader_offset=0x5b8 field_1c=0x0 field_20=0x0
+      physical 208 B, non-zero 103, first words 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  placement-containers   ps-E81FD692C3AB35E1.bin    1640 58B4FA21E3550052 nz= 1060  102A1100 000005AC 000000B8 00000000 00000024 00000560 00000588 00000000
+      container OK; flags=0x102a1100 virtual_size=0x5ac physical_size=0xb8 field_0c=0x0 constant_table_offset=0x24 definition_table_offset=0x560 shader_offset=0x588 field_1c=0x0 field_20=0x0
+      physical 184 B, non-zero 62, first words 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  placement-containers   vs-ACAF01F01E1C03D2.bin    1304 6C4F65C3161DF6BE nz=  801  102A1101 000003D0 00000144 00000000 00000024 00000000 00000384 00000000
+      container OK; flags=0x102a1101 virtual_size=0x3d0 physical_size=0x144 field_0c=0x0 constant_table_offset=0x24 definition_table_offset=0x0 shader_offset=0x384 field_1c=0x0 field_20=0x0
+      physical 324 B, non-zero 184, first words F2556004 600A1200 12000000 00006010 00001200 C2000000 00001016 00001200
+  placement-containers   vs-CCD7655302B54D80.bin     944 F4EE30B28DEE9E4A nz=  554  102A1101 0000028C 00000120 00000000 00000024 00000000 00000250 00000000
+      container OK; flags=0x102a1101 virtual_size=0x28c physical_size=0x120 field_0c=0x0 constant_table_offset=0x24 definition_table_offset=0x0 shader_offset=0x250 field_1c=0x0 field_20=0x0
+      physical 288 B, non-zero 162, first words 70956004 600A1200 12000000 00005010 00001200 C2000000 00001015 00001200
+  placement-raw          ps-C77B3ABB6F87ACD9.bin    2048 DC4E5BA3F092DFD8 nz=  913  00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  placement-raw          vs-98D43959C65B882A.bin      96 8A4B0825CAAE920A nz=   41  70956004 600A1200 12000000 00005010 00001200 C2000000 00001015 00001200
+  placement-raw          vs-DCD4AD8441398283.bin    2048 AFC54812402A6657 nz=  977  F2556004 600A1200 12000000 00006010 00001200 C2000000 00001016 00001200
+
+== warned shaders (game.log) vs raw dumps (raw name = XXH3 of the first 8 bytes = prefix)
+  ps 0xAC448F28 backing 0xED23D540 prefix C77B3ABB6F87ACD9 words 00000000 00000000 00000000 00000000 x4: raw ps-C77B3ABB6F87ACD9.bin (2048 B, non-zero 913)
+  vs 0xAC449538 backing 0xED23D3E0 prefix DCD4AD8441398283 words F2556004 600A1200 12000000 00006010 x4: raw vs-DCD4AD8441398283.bin (2048 B, non-zero 977)
+
+== raw vs container physical sections (same stage; compared over the shorter length)
+  raw ps-C77B3ABB6F87ACD9.bin: ps-75A4D1ABA62F7594.bin (208 B)
+  raw vs-98D43959C65B882A.bin: vs-CCD7655302B54D80.bin (96 B)
+  raw vs-DCD4AD8441398283.bin: vs-ACAF01F01E1C03D2.bin (324 B)
+
+== per stage
+  vs: raw 2 (all-zero 0), containers 2 (physical all-zero 0, non-zero 2)
+      non-zero container vs-ACAF01F01E1C03D2.bin: physical 324 B, first words F2556004 600A1200 12000000 00006010 00001200 C2000000 00001016 00001200
+      non-zero container vs-CCD7655302B54D80.bin: physical 288 B, first words 70956004 600A1200 12000000 00005010 00001200 C2000000 00001015 00001200
+  ps: raw 1 (all-zero 0), containers 2 (physical all-zero 0, non-zero 2)
+      non-zero container ps-75A4D1ABA62F7594.bin: physical 208 B, first words 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+      non-zero container ps-E81FD692C3AB35E1.bin: physical 184 B, first words 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+
+== bin dir check: build\agent2\native3d-bin: PASS (0 problem(s))
+  bin_manifest_check: build\agent2\native3d-bin vs build\agent2\native3d-bin\MANIFEST.txt (8 listed files, hash on)
+    MANIFEST sha256 368F9CE650EC56CE mtime 2026-11-22 03:46:16
+    newest file: manifest.txt (2026-11-22 03:46:16)
+  RESULT: PASS (0 problem(s))
+
+RESULT: PASS (0 problem(s))

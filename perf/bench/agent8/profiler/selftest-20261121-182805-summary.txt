@@ -1,0 +1,40 @@
+profile : <workspace>\build\agent8\profiler\profile-694345718.bin
+map     : <workspace>\build\agent8\profiler\profiler_selftest.map
+samples : 76  threads: 7  modules: 15  duration: 3.435 s (trailer)  rounds: 11
+counting: busy samples (19)
+
+busy 19 (25.0%)  waiting 57 (75.0%)  io 0 (0.0%)
+busy samples by category (leaf): guest 10 (52.6%)  rexlego 9 (47.4%)
+
+== threads ==
+  tid  name              samples   run%  busy  wait  io  top busy functions / role
+-----  ----------------  -------  -----  ----  ----  --  --------------------------------------------------------------------------------
+12592  selftest-main          11   81.8     9     2   0  lsp_selftest_hot 100%
+94648                         11    0.0     0    11   0  (waiting)
+48452                         11    0.0     0    11   0  (waiting)
+58604                         11    0.0     0    11   0  (waiting)
+94704  selftest-waiter        11    0.0     0    11   0  (waiting) std::thread::_Invoke<class std::tuple<class `extern "C" main'::`1':...
+73484  selftest-sleeper       11    0.0     0    11   0  (waiting) selftest::Sleeper
+86780  selftest-guest         10  100.0    10     0   0  sub_8200BEEF [guest 0x8200BEEF] 100%
+
+== top 2 by self (busy samples) ==
+samples      %   /s  category  function
+-------  -----  ---  --------  -------------------------------
+     10  52.63  2.9  guest     sub_8200BEEF [guest 0x8200BEEF]
+      9  47.37  2.6  rexlego   lsp_selftest_hot
+
+== top 10 by inclusive (busy samples) ==
+samples       %   /s  category  function
+-------  ------  ---  --------  -----------------------------------------------------------------------------------
+     19  100.00  5.5  system    KERNEL32.DLL!BaseThreadInitThunk
+     19  100.00  5.5  system    ntdll.dll!RtlUserThreadStart
+     10   52.63  2.9  guest     sub_8200BEEF [guest 0x8200BEEF]
+     10   52.63  2.9  rexlego   selftest::GuestLoop
+     10   52.63  2.9  rexlego   std::thread::_Invoke<class std::tuple<class `extern "C" main'::`1'::<lambda_0>>, 0>
+     10   52.63  2.9  rexlego   thread_start<unsigned int (__cdecl *)(void *), 1>
+      9   47.37  2.6  rexlego   main
+      9   47.37  2.6  rexlego   __scrt_common_main_seh
+      9   47.37  2.6  rexlego   lsp_selftest_hot
+      9   47.37  2.6  rexlego   lsp_selftest_outer
+
+(read 0.001 s, map 0.065 s, symbolize 0.395 s; 21 unique stacks, 39 addresses, 22 functions)

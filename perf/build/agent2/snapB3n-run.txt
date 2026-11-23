@@ -1,0 +1,26 @@
+﻿04:13:46 [nB] START nativeB (snapshot copy <workspace>\build\agent2\snapB3\DimensionsRecomp, game tree <workspace>\build\agent2\snapB3-on, -j 10, install tree build\agent9\install\batch-nolr)
+04:13:46 [nB] snapshot tag S3d (the prep-nb.py copy); A = native3d-bin; out nativeB-bin
+04:13:46 [nB] pins match: install tree <workspace>\build\agent9\install\batch-nolr (SHA256SUMS.txt 24CE1493FB8DAE37), snapB3 config E60EAF1CEB575572
+04:13:46 [nB] BEGIN build : <workspace>\build\agent2\build-snap.ps1 -Phase game -Native -Tag snapB3n -Jobs 10 -PrelinkJobs 10 -KeepGoing -SnapDir <workspace>\build\agent2\snapB3\DimensionsRecomp -GameDir <workspace>\build\agent2\snapB3-on -CodegenExe <workspace>\build\agent2\codegen-frozen\codegen-frozen2.exe -GenBase <workspace>\build\agent9\install\batch-nolr\generated
+04:33:31 [nB] END   build exit=0 wall=1,184.4s freeC=247.79GB
+04:33:32 [nB] rexruntime.dll in snapB3-on == install/bin (D1D66AC3716835AC)
+04:33:32 [nB] BEGIN stage : <workspace>\build\agent2\stage-snap-bin.ps1 -Variant native -SnapTag S3d -BuildTag snapB3n -GameTree <workspace>\build\agent2\snapB3-on -OutDir <workspace>\build\agent2\nativeB-bin -GameSnap <workspace>\build\agent2\snapB3\DimensionsRecomp -CompareBin <workspace>\build\agent2\native3d-bin -RuntimeStrings audio_shutdown_detach_worker,leave it running and leak what it can still reach -ExeStrings which can hang when the guest pauses,LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD,LEGO_NATIVE_FPS_CELL_RECTS,LEGO_NATIVE_TEXTURE_STAGING_POOL -WhatText nativeB: native build from S3d with Agent 9's batch-nolr codegen options, NATIVE_GPU=ON with Agent 6 AOT inputs -CodegenNote codegen: Agent 9's batch-nolr options (build/agent9/install/batch-nolr, 430 TUs, no skip_lr; the snapB3 generated output hash-checked against that install tree by gen-check.py --base; the codegen-frozen2.exe stand-in writes nothing) -ManifestNotesFile <workspace>\build\agent2\snapB3-manifest-notes.txt
+04:34:04 [nB] END   stage exit=0 wall=31.4s freeC=247.48GB
+04:34:04 [nB]   PASS legodimensions.exe differs from the one in native3d-bin (the generated code changed)
+04:34:04 [nB]   NOTE legodimensions.map differs from the one in native3d-bin
+04:34:04 [nB]   PASS rexruntime.dll == the one in native3d-bin
+04:34:04 [nB]   PASS rexgpu-xenos.dll == the one in native3d-bin
+04:34:04 [nB]   PASS TracyClient.dll == the one in native3d-bin
+04:34:04 [nB]   PASS achievement_unlocked.wav == the one in native3d-bin
+04:34:04 [nB]   PASS FiraSans-Regular.ttf == the one in native3d-bin
+04:34:04 [nB]   PASS amd_fidelityfx_dx12.dll == the one in native3d-bin
+04:34:04 [nB]   PASS staged copy identical: amd_fidelityfx_dx12.dll
+04:34:04 [nB]   staged 8 files into <workspace>\build\agent2\nativeB-bin (347.7 MB)
+04:34:04 [nB]   staged legodimensions.exe: 299045376 B, sha256 01C4D5A3E36FAC50C16B6CF8C0B6ACA6FC7D285BE67D66B30B229B7E2FEF5C5C
+04:34:05 [nB]   staged legodimensions.map: 43689378 B, sha256 C9259B05689E3AA571D54489BCE9C8ED80660CA4535DC5F5BBBDDE7B228CDC8A
+04:34:05 [nB]   staged rexruntime.dll: 10889728 B, sha256 D1D66AC3716835AC40E1C61BC0600C147564563AE20E0D339AE7A00A77E3A1D8
+04:34:05 [nB]   staged rexgpu-xenos.dll: 3385344 B, sha256 EE0A661FB0C30FCB1A9655D67B8968F346DC7EEBA1D32E748163D8D70620A5C5
+04:34:05 [nB]   staged MANIFEST.txt: 30684 B, sha256 E5CBF30A6132B00E8D8F67E1C7C0B748AED6E486C0B61DDC2BBE06F110F2A966
+04:34:05 [nB]   MANIFEST patch rows: S1 0 / S2 18 / S3 28 / S3d 1; checks: 149 PASS / 0 FAIL / 34 NOTE
+04:34:05 [nB]   native GPU fingerprint: LEGO Dimensions native GPU 81d1c3a71be3c096 (A: LEGO Dimensions native GPU 335ff2d47268f3a1)
+04:34:05 [nB] DONE nativeB -> nativeB-bin, total wall 1,219.2s

@@ -1,0 +1,67 @@
+Agent 7 batch-2 apply/verify, VerifyOnly=False
+[20:48:28] live files match the batch-1 hashes; applying
+[20:48:28]   device.h   12391F5CE364E280 -> 703939AA91EFEA81
+[20:48:28]   device.cpp 4C15043E486A6225 -> 2734F64D41AD6550
+[20:48:29]   fps_counter.h 79FC841E3180CA0D -> E05D6A554042B302
+[20:48:29]   device.cpp    2734F64D41AD6550 -> 3D01E63142DBFB50
+[20:48:29] device.h       703939AA91EFEA81 20:48:28 ok
+[20:48:29] device.cpp     3D01E63142DBFB50 20:48:29 ok
+[20:48:29] fps_counter.h  E05D6A554042B302 20:48:29 ok
+[20:48:29] changed since 20:2x: dimensionsrecomp\rexlego\src\gpu_native\device.h 12391F5CE364E280 -> 703939AA91EFEA81
+[20:48:29] changed since 20:2x: dimensionsrecomp\rexlego\src\gpu_native\device.cpp 4C15043E486A6225 -> 3D01E63142DBFB50
+[20:48:29] syntax pass, 18 includers, 2 at a time
+[20:51:16]   buffers.cpp exit=0 errors=0 warnings=15
+[20:51:16]   device.cpp exit=0 errors=0 warnings=28   (before: device.cpp exit=0 errors=0 warnings=27)
+[20:51:16]   draw.cpp exit=0 errors=0 warnings=71
+[20:51:16]   float_blend_indices.cpp exit=0 errors=0 warnings=0
+[20:51:16]   hooks_buffer.cpp exit=0 errors=0 warnings=2
+[20:51:16]   hooks_device.cpp exit=0 errors=0 warnings=6
+[20:51:16]   hooks_state.cpp exit=0 errors=0 warnings=1
+[20:51:16]   instanced_constants.cpp exit=0 errors=0 warnings=0
+[20:51:16]   integer_inputs.cpp exit=0 errors=0 warnings=1
+[20:51:16]   main.cpp exit=0 errors=0 warnings=1
+[20:51:16]   queries.cpp exit=0 errors=0 warnings=2
+[20:51:16]   settings_runtime.cpp exit=0 errors=0 warnings=3
+[20:51:16]   shaders.cpp exit=0 errors=0 warnings=2
+[20:51:16]   temporal_present.cpp exit=0 errors=0 warnings=1
+[20:51:16]   temporal_scene_depth.cpp exit=0 errors=0 warnings=0
+[20:51:16]   temporal_shaders.cpp exit=0 errors=0 warnings=1
+[20:51:16]   textures.cpp exit=0 errors=0 warnings=23
+[20:51:16]   vertex_declarations.cpp exit=0 errors=0 warnings=2
+[20:51:16] fixtures
+[20:52:06]   test_command_slots.py              exit=1  -> exit=1  diagnostics same (23 compiler diagnostics)
+[20:52:06]   test_frame_ring_transaction.py     exit=1  -> exit=1  diagnostics same (3 compiler diagnostics)
+[20:52:06]   test_submission_waits.py           exit=0  -> exit=0  diagnostics same (0 compiler diagnostics)
+[20:52:06]   test_frame_cadence.py              exit=1  -> exit=1  diagnostics same (16 compiler diagnostics)
+[20:52:06]   test_draw_device_view.py           exit=1  -> exit=1  diagnostics same (24 compiler diagnostics)
+[20:52:06]   test_gpu_timestamps.py             exit=1  -> exit=1  diagnostics same (4 compiler diagnostics)
+[20:52:06]   test_native_overlay.py             exit=0  -> exit=0  diagnostics same (0 compiler diagnostics)
+[20:52:06]   test_sampler_live_settings.py      exit=1  -> exit=1  diagnostics same (0 compiler diagnostics)
+[20:52:06]   test_frame_rate_settings.py        exit=1  -> exit=1  diagnostics same (0 compiler diagnostics)
+[20:52:06]   test_native_vsync.py               exit=1  -> exit=1  diagnostics same (0 compiler diagnostics)
+[20:52:06]   test_resize_fences.py              exit=0  -> exit=0  diagnostics same (0 compiler diagnostics)
+[20:52:06]   test_completion_callbacks.py       exit=0  -> exit=0  diagnostics same (1 compiler diagnostics)
+[20:52:06]   test_cpu_resource_wait.py          exit=1  -> exit=1  diagnostics same (12 compiler diagnostics)
+[20:52:06]   test_queued_frame_boundaries.py    exit=1  -> exit=1  diagnostics same (2 compiler diagnostics)
+[20:52:06]   test_threaded_callback.py          exit=1  -> exit=1  diagnostics same (1 compiler diagnostics)
+[20:52:06]   test_presentation_metrics.py       exit=0  -> exit=0  diagnostics same (0 compiler diagnostics)
+[20:52:06]   test_present_rect.cpp              exit=0  -> exit=0  diagnostics same (0 compiler diagnostics)
+[20:52:06]   RESULT: no change against baseline
+[20:52:06] test_fps_rects.py (live device.cpp vs build/agent7/batch1/device.cpp)
+[20:52:14]   digit cases: 640064 (readings 0..10000 x 64 sizes), all pixel-identical; cell-rect path identical to batch 1
+[20:52:14]   clears per present: batch 1 mean 79.7, merged mean 35.1 (44%); merged rects 1..28; worst ratio 7/13 at 8
+[20:52:14]       30 fps:  46 ->  18 clears
+[20:52:15]       60 fps:  48 ->  20 clears
+[20:52:15]      120 fps:  56 ->  20 clears
+[20:52:15]      144 fps:  46 ->  18 clears
+[20:52:15]      165 fps:  56 ->  24 clears
+[20:52:15]      240 fps:  64 ->  26 clears
+[20:52:15]     1000 fps:  82 ->  26 clears
+[20:52:15]     8888 fps: 104 ->  56 clears
+[20:52:15]   random bitmaps: 200000 (half shuffled), unions identical
+[20:52:15]   PASS
+[20:52:15]   exit=0
+[20:52:15] test_fps_counter.cpp
+[20:52:16]   build exit=0
+[20:52:17]   run exit=0
+[20:52:17] done

@@ -1,0 +1,19 @@
+# logdiff: 1 baseline logs, 1 candidate logs, min level warning
+## per log (lines by level; fail markers; clean-exit)
+BASE build\agent3\runs\20261122-055439-bgate-rev-native3d\game.log | 05:54:43..05:58:22 | info=1667 warning=186 | no fail markers | clean-exit=1
+CAND build\agent3\runs\20261122-055041-bgate-rev-nativeB\game.log | 05:50:48..05:54:25 | info=1686 warning=184 | no fail markers | clean-exit=1
+## NEW keys (level >= warning; in a candidate log, in no baseline log)
+## MORE keys (level >= warning; candidate count > baseline max + max(5, baseline max))
+## GONE keys (any level; in every baseline log, missing from a candidate log)
+GONE build\agent3\runs\20261122-055041-bgate-rev-nativeB\game.log [info] [core] Native GPU: re-registered placement shader #h, previous hash=#h
+GONE build\agent3\runs\20261122-055041-bgate-rev-nativeB\game.log [info] [core] Toypad[Read ] #B #C # # # # B# # # C# # # # # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-055041-bgate-rev-nativeB\game.log [info] [core] Toypad[Read ] #B #C # # # # F# D# D# A# # # # #D # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-055041-bgate-rev-nativeB\game.log [info] [core] Toypad[Read ] #B #C # # # B# #D #A #E F# # C# # C# # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-055041-bgate-rev-nativeB\game.log [info] [core] Toypad[Read ] #B #C # # # DE DD # # CF # # AB #E # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-055041-bgate-rev-nativeB\game.log [info] [core] Toypad[Write] #B # # #A B# # # #D # # #A # # # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-055041-bgate-rev-nativeB\game.log [info] [core] Toypad[Write] #B # # #A B# # # #F # # #D #D F# DB BE # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-055041-bgate-rev-nativeB\game.log [info] [core] Toypad[Write] #B # # #A B# # #A # B# #D #B # # # CB # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-055041-bgate-rev-nativeB\game.log [info] [core] Toypad[Write] #B # # #A B# # D# # A# # # # DB # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261122-055041-bgate-rev-nativeB\game.log [warning] [core] Native GPU: completion callback GPU wait took # ms
+## MARKER CHECK (fail marker above the baseline max per log; clean-exit missing)
+# NEW total 0, marker flags 0

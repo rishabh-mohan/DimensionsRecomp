@@ -1,0 +1,32 @@
+metric              batch-nolr   rb1-nolocal  d(rb1-nolocal-batch-nolr)
+files                      870           878                +8
+bytes              481,048,529   485,492,927        +4,444,398
+tus                        430           434                +4
+last_tu                    429           433                +4
+functions              165,023       165,023                +0
+ctx_refs            11,464,410    13,068,844        +1,604,434
+flush_switches         106,248       106,248                +0
+rotl64                  10,218        10,218                +0
+rlw_pin_form             6,336         6,336                +0
+rotl32                  11,908        11,908                +0
+musttail                63,167        63,167                +0
+lr_writes              719,232       719,232                +0
+cmp_xer_local                0             0                +0
+cmp_xer_ctx                  0       430,626          +430,626
+cmp_so_zero            430,626             0          -430,626
+lines               16,879,873    16,768,218          -111,655
+
+rb1-nolocal vs batch-nolr: 165,023 common functions, 0 only in batch-nolr, 0 only in rb1-nolocal
+  function text 450,116,310 -> 454,555,384 B (+0.99%); smaller 26,150, equal 95,249, larger 43,624
+  size ratio quantiles: p1=0.975, p5=0.992, p25=1.000, p50=1.000, p75=1.002, p95=1.021, p99=1.031
+
+top shrink (rb1-nolocal - batch-nolr, B): sub_83E5C88C 4,578->4,503, sub_82E28228 743->679, sub_8352C9AC 675->612, sub_83E22290 2,480->2,430, sub_839FBFD0 1,580->1,531, sub_83483920 1,337->1,288, sub_8280A578 6,067->6,018, sub_83674308 1,397->1,348
+top growth (rb1-nolocal - batch-nolr, B): sub_82B09280 480,218->495,541, sub_840668C8 779,351->789,224, sub_84042A18 462,836->471,538, sub_839B56D0 357,545->366,006, sub_82BF9478 245,380->252,892, sub_82C11EA8 242,169->249,631, sub_837D0F50 299,973->307,181, sub_84073A50 372,065->378,173
+
+samples (OUTDIR/samples/<fn>.<variant>.cpp):
+  median_ratio  sub_827AF6C8: batch-nolr=3,913B ctx=99 flush=0 tail=1 rotl32=0 so0=4 lr=13; rb1-nolocal=3,947B ctx=117 flush=0 tail=1 rotl32=0 so0=0 lr=13
+  max_shrink    sub_83E5C88C: batch-nolr=4,578B ctx=124 flush=0 tail=0 rotl32=0 so0=0 lr=1; rb1-nolocal=4,503B ctx=160 flush=0 tail=0 rotl32=0 so0=0 lr=1
+  musttail      sub_82C10CD8: batch-nolr=802B ctx=9 flush=0 tail=3 rotl32=0 so0=2 lr=0; rb1-nolocal=810B ctx=16 flush=0 tail=3 rotl32=0 so0=0 lr=0
+  rlwinm        sub_82C9C568: batch-nolr=1,203B ctx=28 flush=0 tail=0 rotl32=5 so0=2 lr=0; rb1-nolocal=1,207B ctx=34 flush=0 tail=0 rotl32=5 so0=0 lr=0
+  lr_kept       sub_8284A768: batch-nolr=177B ctx=4 flush=0 tail=0 rotl32=0 so0=0 lr=1; rb1-nolocal=177B ctx=4 flush=0 tail=0 rotl32=0 so0=0 lr=1
+  named         sub_8307C528: batch-nolr=32,750B ctx=818 flush=25 tail=1 rotl32=0 so0=0 lr=4; rb1-nolocal=32,750B ctx=818 flush=25 tail=1 rotl32=0 so0=0 lr=4

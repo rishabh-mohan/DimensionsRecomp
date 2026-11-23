@@ -1,0 +1,34 @@
+# timerq_pair 2026-11-22 03:46:45  reference 0330-d0f-r1  test arms 0332-d0t-r1
+
+| run | cvars; env | TimerQueue busy % (max 1 s) | all threads, cores | window cores | fps mean | >33 ms | >100 ms | eff MHz P / E | utility % P / E | status, close, exit | dumps |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 0330-d0f-r1 | framerate_limit=0; - | 39.1 (52.0) | 2.43 | 2.40 | 145.2 | 163 | 1 | 1,690 / 1,309 | 98.8 / 78.2 | OK WM_CLOSE 0x00000000 | 0 |
+| 0332-d0t-r1 | framerate_limit=0; REX_TIMER_WAIT_BLOCKING=1 | 0.4 (2.9) | 2.11 | 2.06 | 90.9 | 298 | 2 | 1,944 / 738 | 112.4 / 44.3 | OK WM_CLOSE 0x00000000 | 0 |
+| context: window 3 d0 (interactive desktop, mean of 4) | framerate_limit=0; - | 62.0 | 3.48 | | 163.6 | | | | | | |
+| context: verify3b d0 (hidden desktop, 23:46) | framerate_limit=0; - | 32.9 | 2.73 | 2.73 | 226.9 | 5 | 0 | | | | |
+Power overlay: best_efficiency
+
+Per 10 s from the first frame (* = inside the measured window, 60-110 s); MHz and E utility from sys.csv:
+| run | metric | 0 | 10 | 20 | 30 | 40 | 50 | 60* | 70* | 80* | 90* | 100* | 110 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 0330-d0f-r1 | fps | 254 | 310 | 279 | 222 | 176 | 146 | 145 | 183 | 194 | 154 | 57 | 43 |
+| 0330-d0f-r1 | P MHz | 1,848 | 1,964 | 1,808 | 1,925 | 1,691 | 1,685 | 1,692 | 1,691 | 1,684 | 1,691 | 1,693 | 1,694 |
+| 0330-d0f-r1 | E MHz | 1,792 | 1,960 | 1,701 | 1,933 | 1,510 | 1,493 | 1,494 | 1,492 | 1,484 | 1,430 | 646 | 763 |
+| 0330-d0f-r1 | E util % | 101 | 106 | 99 | 109 | 90 | 90 | 90 | 89 | 88 | 85 | 39 | 46 |
+| 0332-d0t-r1 | fps | 216 | 281 | 197 | 163 | 67 | 62 | 53 | 56 | 101 | 139 | 106 | 73 |
+| 0332-d0t-r1 | P MHz | 2,018 | 1,945 | 1,941 | 1,944 | 1,847 | 1,908 | 1,936 | 1,947 | 1,941 | 1,947 | 1,948 | 1,894 |
+| 0332-d0t-r1 | E MHz | 1,595 | 1,480 | 1,478 | 1,148 | 549 | 553 | 552 | 554 | 792 | 951 | 839 | 597 |
+| 0332-d0t-r1 | E util % | 96 | 86 | 90 | 69 | 33 | 33 | 33 | 33 | 48 | 57 | 50 | 36 |
+
+## 0332-d0t-r1 against 0330-d0f-r1
+PASS  TimerQueue busy <= 3 % (got 0.4; reference 39.1)
+FAIL  >100 ms frames <= reference (got 2 vs 1)
+FAIL  fps mean at most 10 % below the reference (got 90.9 vs 145.2, -37.4 %)
+PASS  closed cleanly (status OK, killed False, exit 0x00000000)
+PASS  no dump (dumps 0, WerFault False)
+PASS  REX_TIMER_WAIT_BLOCKING set in the test arm only (test True, reference False)
+INFO  TimerQueue 39.1 -> 0.4 % of a core (0.39 cores freed on the hidden desktop; window 3 d0 had 0.62 cores)
+INFO  window eff MHz P 1,690 -> 1,944, E 1,309 -> 738; utility P 98.8 -> 112.4, E 78.2 -> 44.3
+
+RESULT: FAIL (2)
+# log <workspace>\build\agent11\timerq\pair-20261122-034639.txt

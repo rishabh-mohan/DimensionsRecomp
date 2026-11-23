@@ -1,0 +1,22 @@
+﻿diff --git a/DimensionsRecomp/rexlego/src/gpu_native/draw_log_throttle.h b/DimensionsRecomp/rexlego/src/gpu_native/draw_log_throttle.h
+new file mode 100644
+index 0000000..8404a1d
+--- /dev/null
++++ b/DimensionsRecomp/rexlego/src/gpu_native/draw_log_throttle.h
+@@ -0,0 +1,16 @@
++// "Log the first N" throttles on per-draw paths. Standalone (bench/agent4 tests this header).
++#pragma once
++#include <atomic>
++#include <cstdint>
++
++namespace legodimensions::gpu_native {
++
++// True for exactly the first `limit` calls, as `counter.fetch_add(1) < limit` is. Once the budget is
++// spent a call is one relaxed load instead of a locked RMW on a line shared by every drawing thread.
++// The counter stops near `limit` instead of wrapping, so the lines are not printed again after 2^32
++// calls (log-only difference, accepted in perf-notes/STATUS.md decision 5).
++inline bool TakeLogBudget(std::atomic<std::uint32_t>& counter, std::uint32_t limit) {
++  return counter.load(std::memory_order_relaxed) < limit && counter.fetch_add(1) < limit;
++}
++
++}  // namespace legodimensions::gpu_native

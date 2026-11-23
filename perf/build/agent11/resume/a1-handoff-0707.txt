@@ -1,0 +1,117 @@
+﻿1: # Agent 1 HANDOFF (orchestrator), 2026-11-23
+2: 
+3: Paths are relative to the workspace root, the folder that holds `DimensionsRecomp/`, `build/`,
+4: `bench/`, `harness/` and `perf-notes/`. First version 07:10; the final pass (~12:30) adds the
+5: readout verdicts and the wrap-up status.
+6: 
+7: Read in this order after the break: `perf-notes/RESUME.md`, this file, then `build/agentN/HANDOFF.md`
+8: for each agent (2-12).
+9: 
+10: ## 1. What I own
+11: 
+12: - Orchestration of the 12-agent agy-grid. The board is `.agy-grid/board.md`; agy-grid rewrites it, so
+13:   never edit it. Board task numbers continue from #31.
+14: - Git. I am the only agent that commits or pushes (section 2).
+15: - The night-launcher GO files (`build/agent1/night/`), the hold manager (`build/agent1/hold/`), the
+16:   session log `perf-notes/SESSION2.md` and the notes export (`build/agent1/export/`, section 5).
+17: 
+18: ## 2. Git state and rules
+19: 
+20: | Repo | Branch | HEAD | Remote `mine` |
+21: |---|---|---|---|
+22: | DimensionsRecomp | perf/opt | b0bd3b4 "S4b/S4c: keep-watch memory_watch, GPU wait back-off hooks, probe option; SDK at S4b" | github.com/rishabh-mohan/DimensionsRecomp |
+23: | rexglue-sdk (submodule of DimensionsRecomp) | perf/opt | 5350b1d "S4b: C1 v3 keep-watch, M1 non-temporal copy, P2 counter, r1r2, db16cyc_pause option" | github.com/rishabh-mohan/rexglue-sdk |
+24: 
+25: - Commit only in these two repos, on `perf/opt`, and push to `mine`. Never push to `origin` (the
+26:   upstream NeverCookFirst repos), never to `main`, never force. Commit the SDK first, then the
+27:   superproject gitlink. Confirm with `git ls-remote mine perf/opt`.
+28: - SSH push without prompts: `$env:GIT_SSH_COMMAND='ssh -o BatchMode=yes -o ConnectTimeout=20'`.
+29:   PowerShell shows git's stderr progress as "NativeCommandError"; check `$LASTEXITCODE` instead.
+30: - Never commit in the workspace root: it sits untracked inside an unrelated parent repo.
+31: - Not in git, by design: `rexlego/generated` (recompiled game code), game data, logs, binaries, dumps.
+32:   The DimensionsRecomp `.gitignore` ignores `/*` except listed folders; a new top-level folder needs a
+33:   `!/name/` line.
+34: - Uncommitted on purpose: ` M thirdparty/plume` and ` m rexglue-sdk` (its `thirdparty/simde`). Both
+35:   are rebuilt from tracked files by `tools/gpu-aot/prepare_plume.py` (Plume pin e0c8871 + the
+36:   `tools/gpu-aot/patches/plume-*.patch` files) and `rexglue-sdk/scripts/prepare_simde.py` (SIMDe pin
+37:   71fd833d + `rexglue-sdk/patches/simde-native-m64-stream.patch`). `--check` verifies without
+38:   changing anything. Do NOT commit the plume pointer: the upstream gitlink ceaeeee0 is kept as is.
+39: - Agent 2's COMMIT-CHECK (`build/agent2/COMMIT-CHECK.md`): PASS. Tracked files = HEAD = index = the
+40:   tested S4b source (`build/agent2/snap1`), re-checked 06:33.
+41: 
+42: ## 3. Fresh clone (new PC), verified 11-23 07:04
+43: 
+44: Done from GitHub over https in a scratch folder outside the workspace:
+45: 
+46: ```
+47: git clone -b perf/opt https://github.com/rishabh-mohan/DimensionsRecomp.git
+48: cd DimensionsRecomp
+49: git submodule update --init rexglue-sdk                  # the fork, perf/opt at 5350b1d
+50: git -C rexglue-sdk submodule update --init --recursive   # SDK thirdparty (large; the test did only thirdparty/simde)
+51: git submodule update --init thirdparty/plume             # FAILS, see below; this creates the plume checkout
+52: git -C thirdparty/plume fetch origin e0c8871b930dc1a6544bf457f2348c456b9d7e13
+53: git -C thirdparty/plume checkout e0c8871b930dc1a6544bf457f2348c456b9d7e13
+54: python tools/gpu-aot/prepare_plume.py                    # applies the plume patches; prints PASS with --check
+55: python rexglue-sdk/scripts/prepare_simde.py              # applies the SIMDe patch; prints PASS with --check
+56: ```
+57: 
+58: - The plume step fails with `upload-pack: not our ref ceaeeee0...`: the upstream gitlink is not on the
+59:   public zolaware/plume repo. Fetching the pin by sha works.
+60: - Result: `git status` shows ` m rexglue-sdk` and ` M thirdparty/plume` (SDK: ` m thirdparty/simde`),
+61:   the same as the live workspace. The 4 patched files are byte-identical to the live ones
+62:   (plume_d3d12.cpp 564568D4, plume_d3d12.h 2F8B444C, plume_vulkan.cpp 71938A4C, simde/x86/sse.h DB31E25D).
+63: - `DimensionsModManager` and `DimensionsSaveConverter` (upstream submodules) are not needed for the
+64:   perf work.
+65: - The game still needs the game files and a recompile to regenerate `rexlego/generated`; see
+66:   `perf-notes/agent3-build.md` and the per-agent build notes. The workspace-side folders (`harness/`,
+67:   `bench/`, `build/`, `perf-notes/`) are not in git; they travel only through the notes export or a
+68:   copy of the workspace.
+69: - New PC: take new baselines before comparing anything with these results, and re-pin the launchers
+70:   and readout kits (their pins include binary and script hashes).
+71: 
+72: ## 4. Timed-window rules (for the next session)
+73: 
+74: - One-line GO file per window. The launcher refuses a GO on a sha, pin or arm mismatch, if the
+75:   estimate + 10 min passes the window's end, or if it is read at or after the cut-off.
+76: - Quiet gate: 3 quiet 1-minute samples before each window.
+77: - Pre-go self-match: never put the text of the runner script names into the command that runs
+78:   pre-go; the process check matches command lines (Agent 10 N-4 has the same fail-safe effect).
+79: - The 00:03:40 W6 refusal came from the launcher deleting `SCRNSAVE.EXE`; Agent 5's fix (#26) and the
+80:   regenerated day launcher (Agent 10: SAFE-IF, `build/agent10/t27/day-draft-rating.md`) are the
+81:   state to use. The day launcher stays staged until after the break.
+82: - Caveats for comparisons: a Defender exclusion for `build/` was added on 11-22 at about 23:16, so
+83:   compare with W4b/W5 and older only with a caveat. The night windows ran with the best_performance
+84:   power overlay; W5 ran best_efficiency.
+85: 
+86: ## 5. Notes export
+87: 
+88: - `python build/agent1/export/export_perf.py` is a dry run; `--copy` writes
+89:   `build/agent1/perf-export/perf/` plus `MANIFEST.tsv` and `EXCLUDED.tsv`. Run it at Idle priority.
+90: - Text only, with size caps; no game assets, generated code, disassembly, binaries, dumps, raw
+91:   per-frame data or copies of source files that are in git.
+92: - Each copy is scrubbed: the workspace path becomes `<workspace>` and the account name `<user>`
+93:   (plain, JSON-escaped and file:/// forms); a final pass counts leftovers. 07:02 run: 4529 files,
+94:   38.6 MB, 8319 edits in 1411 files, 0 leftovers.
+95: - The notes still mention the user's schedule in about 47 files. Where the export goes is the user's
+96:   call: a public `perf/` folder in DimensionsRecomp (needs `!/perf/` in its `.gitignore`), a private
+97:   repo, or local only. Nothing has been pushed.
+98: 
+99: ## 6. Open items
+100: 
+101: 1. Notes destination (the user).
+102: 2. Screenshot check: `build/agent4/screenshot-kit/README.md`, about 25 min, needs the user at the
+103:    visible desktop.
+104: 3. Pop-in #33 (opt-in, default OFF): staged in `build/agent6/s33-popin/`, not built. Build it, then
+105:    the user looks at it on the visible desktop.
+106: 4. Unbuilt pending diffs: `build/agent2/PENDING-DIFFS.md` (CG26 arm A, #21 and #19 apply to HEAD).
+107: 5. F-CA, a th2-only deadlock path that exists without #21: `build/agent10/t27/r21-s4t1.md`.
+108: 6. The stall is host-side: 0/4 hangs on a quiet host vs 4/6 under a -j8 build
+109:    (`build/agent3/f10/RESULTS.md`). Keep builds off the machine during timed or hang-sensitive runs.
+110: 
+111: ## 7. Night of 11-22/23
+112: 
+113: Seven windows in `build/agent8/matrix/`: W6 20261123-0009, W9 -0108, W5b -0155, W4c -0239,
+114: W6-2 -0313, W9-2 -0401, W5b-2 -0451. All 135 runs exited 0 (Agent 6,
+115: `build/agent6/wnight/RESULTS.md`); all 7 windows PASS the gates (Agent 12,
+116: `build/agent12/w6-gates/NIGHT-RESULTS.md`). Leans before the formal readouts (Agents 7 and 8):
+117: keep p2fc (P2 + fix (i) + C1 v3, verify off), back-off q500, timer wait d11p, drop codegen B.

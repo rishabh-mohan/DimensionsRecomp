@@ -1,0 +1,109 @@
+
+build\agent12\bench\obj_b5_log\b5_log.obj:	file format coff-x86-64
+
+Disassembly of section .text:
+
+0000000000000000 <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z>:
+       0:      	pushq	%r15
+       2:      	pushq	%r14
+       4:      	pushq	%r13
+       6:      	pushq	%r12
+       8:      	pushq	%rsi
+       9:      	pushq	%rdi
+       a:      	pushq	%rbp
+       b:      	pushq	%rbx
+       c:      	subq	$0x88, %rsp
+      13:      	movq	(%rip), %rax            # 0x1a <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x1a>
+		0000000000000016:  IMAGE_REL_AMD64_REL32	__security_cookie
+      1a:      	xorq	%rsp, %rax
+      1d:      	movq	%rax, 0x80(%rsp)
+      25:      	movq	$0x0, 0x50(%rsp)
+      2e:      	testq	%rcx, %rcx
+      31:      	je	0x13b <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x13b>
+      37:      	leaq	0x4e(%rsp), %rsi
+      3c:      	leaq	(%rip), %r12            # 0x43 <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x43>
+		000000000000003f:  IMAGE_REL_AMD64_REL32	??_C@_0BG@EFEOIDHG@read?5?$HL?$HN?5bytes?5at?5?$HL?3X?$HN?$AA@
+      43:      	leaq	(%rip), %r13            # 0x4a <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x4a>
+		0000000000000046:  IMAGE_REL_AMD64_REL32	??_C@_0FK@GJFJHOOI@C?3?2Users?2<user>?2?4vscode?2projects?2@
+      4a:      	leaq	(%rip), %rbp            # 0x51 <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x51>
+		000000000000004d:  IMAGE_REL_AMD64_REL32	??_C@_0BM@LHLBJCNK@?$CIanonymous?5namespace?$CJ?3?3loop?$AA@
+      51:      	leaq	0x48(%rsp), %r14
+      56:      	leaq	0x50(%rsp), %r15
+      5b:      	leaq	0x58(%rsp), %rdi
+      60:      	leaq	0x70(%rsp), %rbx
+      65:      	nopw	%cs:(%rax,%rax)
+      70:      	movq	(%rip), %rax            # 0x77 <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x77>
+		0000000000000073:  IMAGE_REL_AMD64_REL32	?g_log_level_floor_ptr@detail@rexb@@3U?$atomic@PEBU?$atomic@H@std@@@std@@A
+      77:      	movl	(%rax), %eax
+      79:      	testl	%eax, %eax
+      7b:      	jle	0x94 <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x94>
+      7d:      	movq	0x50(%rsp), %rax
+      82:      	incq	%rax
+      85:      	movq	%rax, 0x50(%rsp)
+      8a:      	cmpq	%rcx, %rax
+      8d:      	jb	0x70 <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x70>
+      8f:      	jmp	0x13b <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x13b>
+      94:      	movq	%rcx, 0x40(%rsp)
+      99:      	movq	%rsi, %rcx
+      9c:      	callq	0xa1 <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0xa1>
+		000000000000009d:  IMAGE_REL_AMD64_REL32	?fs@log@rexb@@YA?AULogCategoryId@2@XZ
+      a1:      	movzwl	0x4e(%rsp), %ecx
+      a6:      	movzbl	(%rip), %eax            # 0xad <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0xad>
+		00000000000000a9:  IMAGE_REL_AMD64_REL32	?g_log_level_floor_bound@detail@rexb@@3U?$atomic@_N@std@@A
+      ad:      	testb	$0x1, %al
+      af:      	je	0x118 <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x118>
+      b1:      	movq	(%rip), %rax            # 0xb8 <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0xb8>
+		00000000000000b4:  IMAGE_REL_AMD64_REL32	?GetLoggerRawImport@rexb@@3Q6APEAVlogger@spdlog@@ULogCategoryId@1@@ZEA
+      b8:      	callq	*%rax
+      ba:      	testq	%rax, %rax
+      bd:      	movq	0x40(%rsp), %rcx
+      c2:      	je	0x7d <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x7d>
+      c4:      	movl	0x40(%rax), %edx
+      c7:      	testl	%edx, %edx
+      c9:      	jg	0x7d <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x7d>
+      cb:      	movl	$0x2a, 0x48(%rsp)
+      d3:      	movq	%r12, 0x70(%rsp)
+      d8:      	movq	$0x15, 0x78(%rsp)
+      e1:      	movq	%r13, 0x58(%rsp)
+      e6:      	movl	$0x24, 0x60(%rsp)
+      ee:      	movq	%rbp, 0x68(%rsp)
+      f3:      	movq	%r14, 0x28(%rsp)
+      f8:      	movq	%r15, 0x20(%rsp)
+      fd:      	movq	%rax, %rcx
+     100:      	movq	%rdi, %rdx
+     103:      	xorl	%r8d, %r8d
+     106:      	movq	%rbx, %r9
+     109:      	callq	0x10e <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x10e>
+		000000000000010a:  IMAGE_REL_AMD64_REL32	??$log_@AEA_KH@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEA_K$$QEAH@Z
+     10e:      	movq	0x40(%rsp), %rcx
+     113:      	jmp	0x7d <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x7d>
+     118:      	movw	%cx, 0x3e(%rsp)
+     11d:      	callq	*(%rip)                 # 0x123 <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x123>
+		000000000000011f:  IMAGE_REL_AMD64_REL32	?SharedLogLevelFloorImport@detail@rexb@@3Q6APEBU?$atomic@H@std@@XZEA
+     123:      	movzwl	0x3e(%rsp), %ecx
+     128:      	movq	%rax, (%rip)            # 0x12f <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x12f>
+		000000000000012b:  IMAGE_REL_AMD64_REL32	?g_log_level_floor_ptr@detail@rexb@@3U?$atomic@PEBU?$atomic@H@std@@@std@@A
+     12f:      	movb	$0x1, -0x1(%rip)        # 0x135 <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x135>
+		0000000000000131:  IMAGE_REL_AMD64_REL32	?g_log_level_floor_bound@detail@rexb@@3U?$atomic@_N@std@@A
+     136:      	jmp	0xb1 <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0xb1>
+     13b:      	movq	0x80(%rsp), %rax
+     143:      	xorq	%rsp, %rax
+     146:      	movq	(%rip), %rcx            # 0x14d <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x14d>
+		0000000000000149:  IMAGE_REL_AMD64_REL32	__security_cookie
+     14d:      	cmpq	%rax, %rcx
+     150:      	jne	0x166 <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x166>
+     152:      	addq	$0x88, %rsp
+     159:      	popq	%rbx
+     15a:      	popq	%rbp
+     15b:      	popq	%rdi
+     15c:      	popq	%rsi
+     15d:      	popq	%r12
+     15f:      	popq	%r13
+     161:      	popq	%r14
+     163:      	popq	%r15
+     165:      	retq
+     166:      	movq	0x80(%rsp), %rcx
+     16e:      	xorq	%rsp, %rcx
+     171:      	callq	0x176 <??$loop@$00$01@?A0x97E3442B@@YAX_K@Z+0x176>
+		0000000000000172:  IMAGE_REL_AMD64_REL32	__security_check_cookie
+     176:      	int3

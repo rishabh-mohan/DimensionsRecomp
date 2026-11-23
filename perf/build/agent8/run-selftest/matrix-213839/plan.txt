@@ -1,0 +1,27 @@
+﻿=== timing matrix: selftest matrix (fake exe) ===
+matrix   <workspace>\build\agent8\run-selftest\matrix-test\matrix-st.json   [-Quick: short settle/menu/warm-up/window, FUNCTIONAL ONLY]
+note     selftest note
+settings warm-up from firstframe (boot timeout 30 s, settle 1 s); order roundrobin; close timeout 15 s; cooldown 1 s
+arms:
+       A: bin <workspace>\build\agent8\run-selftest\fake-bin; frames perf; x2; warm-up 2 s; window 3 s; group g (ref)
+         fake ref arm
+       B: bin <workspace>\build\agent8\run-selftest\fake-bin; frames perf; x2; warm-up 2 s; window 3 s; group g; cvars vsync=false; env LD_SELFTEST_ARM=B LD_PATH=<run>\x.txt; triggers <run>\t.trigger; MENU 'selftest menu step (nothing to do)' (2 s); driver <workspace>\bench\agent8\run\selftest\fake-driver.ps1 -Mode st
+  SKIP C: bin build\agent8\run-selftest\no-such-bin; frames perf; x2; warm-up 2 s; window 3 s; group g
+!!! SKIPPED ARM C: bin build\agent8\run-selftest\no-such-bin is missing or has no MANIFEST.txt (not staged yet?)
+cold     A (<workspace>\build\agent8\run-selftest\fake-bin): unscored, before round 1
+round 1  A B
+round 2  B A
+order    A B | B A
+estimate 5 runs (1 cold), about 7 min (warm boot 20 s, cold boot 61 s, close 35 s per run)
+staged   once the missing bins are staged: order A B C | B C A; 8 runs, about 11 min
+
+--- preflight ---
+desktop    WinSta0\exebox-3LMYHDBXIEQA4QZFS6Z436D4MI -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   8.49 GB
+game       no legodimensions.exe running
+builds     RUNNING: ninja:56668 -> timing not valid while they run
+bin        build\agent8\run-selftest\no-such-bin : MISSING -> arms skipped: C
+bin        <workspace>\build\agent8\run-selftest\fake-bin : ok (MANIFEST.txt)
+estimate   5 runs, about 7 min: done around 21:45

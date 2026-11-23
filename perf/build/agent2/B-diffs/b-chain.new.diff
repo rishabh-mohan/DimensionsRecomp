@@ -1,0 +1,55 @@
+# /dev/null (new file) -> b-chain.ps1 (AD7C76D774CE46A2): +51 -0 lines
+--- /dev/null
++++ b-chain.ps1
+@@ -0,0 +1,51 @@
++# Agent 2 (session 3, 02:15): build B end to end as ONE run_command background task (Agent 1's GO, 02:05). Stops at
++# the first failure; build/agent2/stop-snap.ps1 kills it (its driver list names b-chain.ps1, prep-b.py and run-b.ps1).
++#   powershell -NoProfile -ExecutionPolicy Bypass -File build\agent2\b-chain.ps1 [-Jobs 10]
++# 1. snap-patch.py verify S2: snap1 is still exactly S2 (the latest STATE-S2-*.tsv), so snapB is S2 + batch-nolr.
++# 2. prep-b.py: install\batch-nolr only (pinned SHA256SUMS 24CE1493..., config E60EAF1C...), snap1 -> snapB copy,
++#    Agent 9's step 4 under snapB (generated a real dir, every write under snapB), gen-check. Log: snapB-prep.txt.
++# 3. run-b.ps1 -Jobs N: the pins again, OFF configure, gen-check, gate (432), build -k 0, stage devoffB-bin with
++#    -CompareBin devoff2-bin. Log: snapB-run.txt (+ snapB-steps.txt, snapB-*.log, snapB-stage.log).
++# Log: build/agent2/b-chain.txt (console copies: b-chain-verify-S2.txt, b-chain-prep.txt, b-chain-run.txt).
++param([int]$Jobs = 10)
++$ErrorActionPreference = 'Continue'
++$R = '<workspace>'
++$A = "$R\build\agent2"
++$log = "$A\b-chain.txt"
++function Log([string]$m) { $l = "$(Get-Date -Format HH:mm:ss) [chain] $m"; $l | Out-File -Append -Encoding utf8 $log; Write-Host $l }
++function Tail([string]$p, [int]$n) { (@(Get-Content -LiteralPath $p -ErrorAction SilentlyContinue) | Select-Object -Last $n) -join ' | ' }
++$t0 = [Diagnostics.Stopwatch]::StartNew()
++Set-Location $R
++Log "START build B chain: verify S2 -> prep-b.py -> run-b.ps1 -Jobs $Jobs"
++if ($Jobs -gt 10) { Log 'STOP: -Jobs is capped at 10 (Agent 1, session 3)'; exit 2 }
++$now = (Get-Date).TimeOfDay
++if ($now -ge [TimeSpan]::Parse('08:30') -and $now -lt [TimeSpan]::Parse('12:00')) { Log 'STOP: no builds from 08:30 (Agent 1, session 3)'; exit 2 }
++# 1. snap1 == S2
++$o = "$A\b-chain-verify-S2.txt"
++$sw = [Diagnostics.Stopwatch]::StartNew()
++& python "$A\snap-patch.py" verify S2 > $o 2>&1
++$c = $LASTEXITCODE
++$pass = (@(Get-Content -LiteralPath $o) | ForEach-Object { $_.Trim() }) -contains 'RESULT: PASS'
++Log ("verify S2: exit {0}, {1:N1}s: {2}" -f $c, $sw.Elapsed.TotalSeconds, (Tail $o 2))
++if ($c -ne 0 -or -not $pass) { Log 'STOP: snap1 is not exactly S2 (see b-chain-verify-S2.txt)'; exit 20 }
++# 2. prep-b.py
++$o = "$A\b-chain-prep.txt"
++$sw = [Diagnostics.Stopwatch]::StartNew()
++& python "$A\prep-b.py" > $o 2>&1
++$c = $LASTEXITCODE
++Log ("prep-b.py: exit {0}, {1:N1}s: {2}" -f $c, $sw.Elapsed.TotalSeconds, (Tail $o 2))
++if ($c -ne 0 -or (Tail $o 1) -notmatch 'DONE prep-b') { Log 'STOP: prep-b.py failed (see snapB-prep.txt)'; exit 21 }
++# 3. run-b.ps1
++$o = "$A\b-chain-run.txt"
++$sw = [Diagnostics.Stopwatch]::StartNew()
++& powershell -NoProfile -ExecutionPolicy Bypass -File "$A\run-b.ps1" -Jobs $Jobs > $o 2>&1
++$c = $LASTEXITCODE
++Log ("run-b.ps1: exit {0}, {1:N1}s: {2}" -f $c, $sw.Elapsed.TotalSeconds, (Tail $o 3))
++if ($c -ne 0) { Log "STOP: run-b.ps1 exit $c (see snapB-run.txt / snapB-steps.txt)"; exit 22 }
++foreach ($f in 'legodimensions.exe', 'legodimensions.map', 'rexruntime.dll', 'MANIFEST.txt') {
++    $p = "$A\devoffB-bin\$f"
++    if (Test-Path -LiteralPath $p) { Log ("devoffB-bin\{0}: {1} B sha256 {2}" -f $f, (Get-Item -LiteralPath $p).Length, (Get-FileHash -LiteralPath $p).Hash) }
++    else { Log "devoffB-bin\$f is missing" }
++}
++Log ("DONE build B chain, total wall {0:N1}s, free C {1:N1} GB" -f $t0.Elapsed.TotalSeconds, ((Get-PSDrive C).Free / 1GB))
++exit 0

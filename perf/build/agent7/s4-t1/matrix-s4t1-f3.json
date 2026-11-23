@@ -1,0 +1,94 @@
+{
+  "title": "S4-T1 (#21) functional row F3 on native4b+#21 (Agent 7, task #17): MP3 query outcomes, th3 vs n0 with LEGO_NATIVE_QUERY_TRACE_FROM=0. FUNCTIONAL ONLY. Title/attract loop, no input needed",
+  "reference": "n0q",
+  "warmup_s": 55,
+  "warmup_from": "firstframe",
+  "measure_s": 60,
+  "repeats": 2,
+  "settle_s": 5,
+  "cooldown_s": 5,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "menu_s": 60,
+  "cold_run": false,
+  "order": "roundrobin",
+  "sys_csv": true,
+  "quick": {
+    "warmup_s": 10,
+    "measure_s": 20,
+    "settle_s": 5,
+    "menu_s": 20,
+    "cooldown_s": 5
+  },
+  "notes": [
+    "PURPOSE: row F3 of build/agent7/s4-t1/FUNCTIONAL-ROWS.md (b2r S15.4 must-prove 3: queries complete before the guest reads them). FUNCTIONAL ONLY. Run with -Quick -NoCold: n0q x2 (ref), th3q x2, th3cp3q x1 = 5 runs, about 7-12 min.",
+    "BINS: <NATIVE4B-S4T1> = native4b + build/agent7/s4-t1/s4-t1.diff; Agent 3 replaces it in a copy (as for g3q).",
+    "QUERY TRACE: LEGO_NATIVE_QUERY_TRACE_FROM=0 (queries.cpp:56-69, read once) logs 'Native query value frame= fsr= size= query= draws= samples=' at INFO for frames >= 0, at most 128 lines per FSR mode, i.e. the guest-visible result of each query. It is a functional trace, so it is not on the F1 night list (build/agent8/w8w9/ENV-KEYS-F1.txt) and never goes into a timed arm.",
+    "PASS: query lines in every run (none in a run = UNCLEAR, needs a route that issues queries); 0 'unsupported query' error lines (queries.cpp:53); th3q vs n0q (draws, samples) sequence agreement no worse than n0q-r1 vs n0q-r2; th3cp3q the same as th3q; no new warning type (check_n_rows n3=th3q,th3cp3q).",
+    "No LEGO_NATIVE_TIMING, LEGO_NATIVE_STATE_CALLS, trace toggles or debug layer in any arm."
+  ],
+  "arms": [
+    {
+      "id": "n0q",
+      "group": "s4t1q",
+      "ref": true,
+      "frames": "perf",
+      "repeats": 2,
+      "bin": "<NATIVE4B-S4T1>",
+      "cvars": [
+        "native_settings_frontend=false",
+        "native_fps_limit=0",
+        "framerate_limit=0"
+      ],
+      "env": {
+        "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv",
+        "LEGO_NATIVE_QUERY_TRACE_FROM": "0"
+      },
+      "note": "Reference query outcomes: threaded recording off",
+      "driver": "drivers/thread-cpu.ps1"
+    },
+    {
+      "id": "th3q",
+      "group": "s4t1q",
+      "frames": "perf",
+      "repeats": 2,
+      "bin": "<NATIVE4B-S4T1>",
+      "cvars": [
+        "native_settings_frontend=false",
+        "native_fps_limit=0",
+        "framerate_limit=0"
+      ],
+      "env": {
+        "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv",
+        "LEGO_NATIVE_THREADED": "1",
+        "LEGO_NATIVE_PREPARE_THREADS": "2",
+        "LEGO_NATIVE_FULL_DRAW_PREPARATION": "1",
+        "LEGO_NATIVE_QUERY_TRACE_FROM": "0"
+      },
+      "note": "th3 query outcomes, #21 unset",
+      "driver": "drivers/thread-cpu.ps1"
+    },
+    {
+      "id": "th3cp3q",
+      "group": "s4t1q",
+      "frames": "perf",
+      "repeats": 1,
+      "bin": "<NATIVE4B-S4T1>",
+      "cvars": [
+        "native_settings_frontend=false",
+        "native_fps_limit=0",
+        "framerate_limit=0"
+      ],
+      "env": {
+        "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv",
+        "LEGO_NATIVE_THREADED": "1",
+        "LEGO_NATIVE_PREPARE_THREADS": "2",
+        "LEGO_NATIVE_FULL_DRAW_PREPARATION": "1",
+        "LEGO_NATIVE_CHAIN_PRIORITY": "3",
+        "LEGO_NATIVE_QUERY_TRACE_FROM": "0"
+      },
+      "note": "th3 query outcomes with #21 ON (mode 3)",
+      "driver": "drivers/thread-cpu.ps1"
+    }
+  ]
+}

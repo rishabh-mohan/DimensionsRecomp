@@ -1,0 +1,27 @@
+﻿S2847: - **Decisions sent to Agent 8:**
+S2848:   - W6 bin = **devoff4b** (`build/agent2/devoff4b-bin`, with the MANIFEST sha Agent 2 reports), finalized once Agent 3's queue passes.
+S2849:   - W6 stays **without the timer bundle**: d11t has the p99 lead, and s0 stays comparable to W5's s0.
+S2850:   - **I write perf-notes/WINDOW-GO.txt** after the user leaves. Agent 8 sends me the GO line from promote-w6.ps1.
+S2851: - **20:45, Agent 4:** the -OutDir risk is closed. Every run-matrix.ps1 command in REPIN.md step 3 and in the matrix notes now writes to `build\agent3\runs\repin[-boot]-<stamp>`, and REPIN.md has a rule line for it. Agent 3 waits for Agent 4's go.
+S2852:   - The independent read found 2 mismatches, both fixed: stale S4-DRAFT line references, and boot-check group D can't fail on its own (a pass now also needs D's fingerprint line and `D=PASS`).
+S2853:   - New sha prefixes: REPIN.md 02D08AF9, matrix-repin-native4b.json 2580067D, -boot 37DFC58F, -packhit 490964AC. Step 1b waits for the snap1-on configure.
+S2854: 
+S2855: ### 20:56: devoff4b staged, gates pass; Agent 3's S4b queue running
+S2856: 
+S2857: - **devoff4b-bin staged 20:49:07** (S4b + S4c, C1 v3).
+S2858:   - MANIFEST DE11A914079D7DF7…, legodimensions.exe DFBE1D43B28861A6, rexruntime.dll A33801D1538D6175, rexgpu-xenos.dll E3CB99CFDEA95E66, map 52155274A978A946.
+S2859:   - **I re-hashed the MANIFEST, exe and both DLLs: all match.** devoff3-bin and devoff4-bin MANIFESTs are still B9C5175D and 16DCC939.
+S2860:   - Build: 3486 s total. The SDK took 1360 s (Defender). The game took 2093 s: the gen-check took 729 s because of the 20:17 overload, and the full 462-edge rebuild took 1339 s at -j8.
+S2861: - **Agent 10's gates:**
+S2862:   1. PASS: all 16 files match their after-hashes, checked three ways. The TU is **01D9F8F3** (LF), memory_watch.cpp 70829846 (CRLF), toml 7F775847 (#26 OFF).
+S2863:   2. PASS: full SDK and codegen-tool rebuild; gen-check 886/886 identical, no regen.
+S2864:   3. PASS: the map has 31 hooked aliases by name and object. The 4 targets now live in gpu_wait_backoff.cpp.obj; their `__imp__` aliases stay in TUs 248/107/422/232. An independent subagent check is still running.
+S2865:   4. Pending: the native re-pin on native4b.
+S2866:   5. PASS: the W5 re-hash at 20:35.
+S2867:   - Bin checks: MANIFEST 102/0, strings PASS, and the P2c counter string is in the xenos DLL (Agent 12).
+S2868: - **native4b:** configured 20:53:23. Gen-check and gate PASS. The fingerprint is **9b40acbbef4c57b3**, which confirms Agent 4's. Full 485-edge rebuild at -j8 since 20:53:30, ETA ~21:20; then CTR, then CG26.
+S2869: - **Agent 3's S4b queue** has run on devoff4b-bin since 20:52.
+S2870:   - Order: s4b01 → s4bL0 (gate A's s0) → w6gA → w6s2 → w6s1 → g3q → s4b23 → s4b07 → w6s3 → s4b20 → s4b22/24/04 → s4b08 → re-pin (rpb0/rpm4, after Agent 4's go) → s4b02/05 (native, needs native4b) → W7+ rows.
+S2871:   - ETAs: interim W6 result (G3/G4/G5/G8 inputs) ~21:35; rows 7/20/23 ~22:10; W6 block ~22:38; re-pin ~23:02. Last launch 23:10, games closed by 23:25.
+S2872:   - **Most W7+ functional rows won't run tonight**, so W7+ windows probably can't be promoted. The overnight plan is W6, plus any window built only from arms that have already passed their functional checks.
+S2873: 

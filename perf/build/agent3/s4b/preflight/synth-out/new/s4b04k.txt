@@ -1,0 +1,27 @@
+# s4b_check s4b04 s4b04k (off, scenario I420)
+run.json: exit 0 (0x00000000) dumps 0 crash_events 0 wer False; close wm_close 1.00 s; elapsed 40.0 of 420 s; cvars {"physical_protect_hold_global_lock": "true", "physical_protect_keep_watch": "true", "physical_protect_keep_watch_verify": "true"}; env -; steps None
+summary: verdict None; first frame None s; levels null; unknown cvars None; errors 0
+log files game.log; levels {"info": 6, "warning": 3}
+families: c1_any=4 k=1 c1_verify_on=1 c1_verify_f=2 c1_other=0 recovered_stale=0 unhandled_phys=0 protect_failed=0 split_init=0 split=0 deferred_counters=0 gpu_wait=0 memexport=0 slow_frame=0 s4_upload_hash=0 precise_wait=0 miss_cache=0 stuck_lock=0 minidump=0 fatal=0 debug_layer=0 dred=0 d3d12_msg=0 clean_exit=1
+  c1_any: [2026-11-22 20:10:05.000] [info] [sys] [t4242] C1 keep-watch: on (with physical_protect_hold_global_lock)
+  c1_any: [2026-11-22 20:10:15.002] [info] [sys] [t4242] C1 keep-watch: first kept protect at 0A1B2000, 4096 bytes
+  c1_any: [2026-11-22 20:10:20.003] [info] [sys] [t4242] C1 keep-watch: 2 protects kept so far
+  c1_any: ...
+  c1_any: [2026-11-22 20:10:25.004] [info] [sys] [t4242] C1 keep-watch: 4 protects kept so far
+  k: [2026-11-22 20:10:40.007] [warning] [gpu] [t4242] C1 verify K: page 0A1B2000 changed since its upload (1 so far); protect keeps the normal path
+  c1_verify_on: [2026-11-22 20:10:10.001] [info] [gpu] [t4242] C1 verify: on. Hashing CPU uploads; K checks keep-watch protects, F checks write faults
+  c1_verify_f: [2026-11-22 20:10:30.005] [warning] [gpu] [t4242] C1 verify F: page 0A1B3000 changed since its upload (1 so far)
+  c1_verify_f: [2026-11-22 20:10:35.006] [warning] [gpu] [t4242] C1 verify F: page 0A1B4000 changed since its upload (2 so far)
+C1 kept so far: last 4 (2 lines)
+threads: no threads-s4a.csv
+sys.csv slow state: no sys.csv
+PROOF ok   init "C1 keep-watch: on (with physical_protect_hold_global_lock)" x1
+PROOF ok   "first kept protect" x1 (gate D / positive control)
+PROOF ok   kept count: last "kept so far" = 4 (2 such lines)
+PROOF ok   C1 verify armed: "C1 verify: on. Hashing CPU uploads ..." x1 (without it K = 0 proves nothing)
+PROOF MISS verify-mismatch (K) lines 1 (gate A, menus part)
+PROOF note C1 verify F lines (write-fault side, not gate A): 2 20:10:30.005] [warning] [gpu] [t4242] C1 verify F: page 0A1B3000 changed since its upload (1 so far)
+PROOF ok   gate D zero lines: "Recovered stale physical page protection" 0, "Unhandled guest physical write fault" 0
+PROOF ok   no blocked/no-hold C1 line (0/0/0)
+BASE items missed: none
+VERDICT HINT LOOK: 0 BASE misses, 1 proof misses (apply QUEUE.md "passes if" for row s4b04)

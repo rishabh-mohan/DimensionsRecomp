@@ -1,0 +1,250 @@
+# make_proposed.py: ..\s4b_check.py -> s4b_check_proposed.py (newline '\n'); diff -> s4b_check_proposed.diff
+applied: K_DEFAULT (+GWS, DC_HDR)
+applied: GONE_OK_DEFAULT
+applied: FAM c1_verify_on/c1_verify_f
+applied: FAM gpu_wait_on
+applied: FAM dred
+applied: ITEM_FAMS
+applied: SHOW
+applied: scan: GPU wait stats parse
+applied: scan: deferred_counters header parse
+applied: row s4b04: verify armed + F note
+applied: row s4b09: KB per list for <N>
+applied: split rows: s4b25 may have no split line
+applied: row s4b15: DRED + not testable note
+applied: rows s4b14/17/18
+applied: scenes: attract/idle misses -> note
+applied: marks prefix without up-2
+== regex unit checks (old -> proposed) ==
+K regex on K line: old True, new True   | C1 verify K: page 0A1B2000 changed since its upload (7 so far); protect keeps the normal path
+K regex on F line: old True (counts F as K: BUG), new False   | C1 verify F: page 0A1B3000 changed since its upload (2 so far)
+K regex on verify init: old False, new False
+GPU wait stats: old kv() -> {}; new GWS -> 27 fields, sleep_fail=1 l1_waits=1500 l1_max_ms=3.512 l2_max_ms=0.875
+  len(GWS_KEYS) 27 == groups 27
+deferred_counters header: old kv() -> {}; new DC_HDR -> ('10.0', '1200', '96000', '5400')
+split kv (both): {'frame': 600, 'submission': 1900, 'splits': 1200, 'failed': 0, 'held_query': 3, 'held_scratch': 0, 'held_pipelines': 12}
+MEMEXPORT on slow-frame line: ('0', '5') (suffix printed by cp.cpp:296)
+KEPT on kept line: ('4096',)
+GONE_OK on logdiff key "S# upload hash": old False, new True
+== family needles per format line (old | proposed) ==
+  c1_init_on       old ['c1_any', 'c1_init_on'] | new ['c1_any', 'c1_init_on']
+  c1_init_blocked  old ['c1_any', 'c1_init_blocked'] | new ['c1_any', 'c1_init_blocked']
+  c1_init_nohold   old ['c1_any', 'c1_init_nohold'] | new ['c1_any', 'c1_init_nohold']
+  c1_first         old ['c1_any', 'c1_first'] | new ['c1_any', 'c1_first']
+  c1_kept          old ['c1_any', 'c1_kept'] | new ['c1_any', 'c1_kept']
+  c1_blocked       old ['c1_any', 'c1_blocked'] | new ['c1_any', 'c1_blocked']
+  c1_verify_on     old [] | new ['c1_verify_on']
+  split_init       old ['split_init'] | new ['split_init']
+  split            old ['split'] | new ['split']
+  slow             old ['memexport', 'slow_frame'] | new ['memexport', 'slow_frame']
+  dc_hdr           old ['deferred_counters'] | new ['deferred_counters']
+  dc_cmd           old ['deferred_counters'] | new ['deferred_counters']
+  gw_stats         old ['gpu_wait', 'gpu_wait_stats'] | new ['gpu_wait', 'gpu_wait_stats']
+  dred             old [] | new ['dred']
+  dbg_fail         old ['debug_layer'] | new ['debug_layer']
+  c1_verify_K      old [] +K | new [] +K
+  c1_verify_F      old [] +K | new ['c1_verify_f']
+  gw_init_on       old ['gpu_wait', 'gpu_wait_backoff'] | new ['gpu_wait', 'gpu_wait_backoff', 'gpu_wait_on']
+  gw_init_p1       old ['gpu_wait', 'gpu_wait_backoff'] | new ['gpu_wait', 'gpu_wait_backoff']
+
+== synthetic runs: old script vs proposed (no base; row proofs + base items of the run itself) ==
+
+### s4b04 (--row s4b04): 8 log lines; expected old LOOK, new PASS?
+[old] rc 0 hint LOOK (as expected)
+  PROOF ok   init "C1 keep-watch: on (with physical_protect_hold_global_lock)" x1
+  PROOF ok   "first kept protect" x1 (gate D / positive control)
+  PROOF ok   kept count: last "kept so far" = 4 (2 such lines)
+  PROOF MISS verify-mismatch (K) lines 2 (gate A, menus part)
+  PROOF ok   gate D zero lines: "Recovered stale physical page protection" 0, "Unhandled guest physical write fault" 0
+  PROOF ok   no blocked/no-hold C1 line (0/0/0)
+  BASE items missed: none
+  VERDICT HINT LOOK: 0 BASE misses, 1 proof misses (apply QUEUE.md "passes if" for row s4b04)
+[new] rc 0 hint PASS? (as expected)
+  PROOF ok   init "C1 keep-watch: on (with physical_protect_hold_global_lock)" x1
+  PROOF ok   "first kept protect" x1 (gate D / positive control)
+  PROOF ok   kept count: last "kept so far" = 4 (2 such lines)
+  PROOF ok   C1 verify armed: "C1 verify: on. Hashing CPU uploads ..." x1 (without it K = 0 proves nothing)
+  PROOF ok   verify-mismatch (K) lines 0 (gate A, menus part)
+  PROOF note C1 verify F lines (write-fault side, not gate A): 2 20:10:30.005] [warning] [gpu] [t4242] C1 verify F: page 0A1B3000 changed since its upload (1 so far)
+  PROOF ok   gate D zero lines: "Recovered stale physical page protection" 0, "Unhandled guest physical write fault" 0
+  PROOF ok   no blocked/no-hold C1 line (0/0/0)
+  BASE items missed: none
+  VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b04)
+
+### s4b04k (--row s4b04): 9 log lines; expected old LOOK, new LOOK
+[old] rc 0 hint LOOK (as expected)
+  PROOF ok   init "C1 keep-watch: on (with physical_protect_hold_global_lock)" x1
+  PROOF ok   "first kept protect" x1 (gate D / positive control)
+  PROOF ok   kept count: last "kept so far" = 4 (2 such lines)
+  PROOF MISS verify-mismatch (K) lines 3 (gate A, menus part)
+  PROOF ok   gate D zero lines: "Recovered stale physical page protection" 0, "Unhandled guest physical write fault" 0
+  PROOF ok   no blocked/no-hold C1 line (0/0/0)
+  BASE items missed: none
+  VERDICT HINT LOOK: 0 BASE misses, 1 proof misses (apply QUEUE.md "passes if" for row s4b04)
+[new] rc 0 hint LOOK (as expected)
+  PROOF ok   init "C1 keep-watch: on (with physical_protect_hold_global_lock)" x1
+  PROOF ok   "first kept protect" x1 (gate D / positive control)
+  PROOF ok   kept count: last "kept so far" = 4 (2 such lines)
+  PROOF ok   C1 verify armed: "C1 verify: on. Hashing CPU uploads ..." x1 (without it K = 0 proves nothing)
+  PROOF MISS verify-mismatch (K) lines 1 (gate A, menus part)
+  PROOF note C1 verify F lines (write-fault side, not gate A): 2 20:10:30.005] [warning] [gpu] [t4242] C1 verify F: page 0A1B3000 changed since its upload (1 so far)
+  PROOF ok   gate D zero lines: "Recovered stale physical page protection" 0, "Unhandled guest physical write fault" 0
+  PROOF ok   no blocked/no-hold C1 line (0/0/0)
+  BASE items missed: none
+  VERDICT HINT LOOK: 0 BASE misses, 1 proof misses (apply QUEUE.md "passes if" for row s4b04)
+
+### s4b08 (--row s4b08): 3 log lines; expected old PASS?, new PASS?
+[old] rc 0 hint PASS? (as expected)
+  memexport full-buffer: {"lines": 2, "last_total": 0, "max_total": 0, "sum_x": 0, "lines_x_gt0": 0}
+  PROOF ok   slow-frame lines 2
+  PROOF ok   the last slow-frame line ends with the memexport suffix: ...n memexport pages 0x 0 KB) | memexport syncs 1 (4 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)
+  PROOF ok   P2 COUNTER: memexport full-buffer total (last line) = 0; max 0; sum Nx 0; lines with Nx > 0: 0 -> closes P2 memexport gate
+  BASE items missed: none
+  VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b08)
+[new] rc 0 hint PASS? (as expected)
+  memexport full-buffer: {"lines": 2, "last_total": 0, "max_total": 0, "sum_x": 0, "lines_x_gt0": 0}
+  PROOF ok   slow-frame lines 2
+  PROOF ok   the last slow-frame line ends with the memexport suffix: ...n memexport pages 0x 0 KB) | memexport syncs 1 (4 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)
+  PROOF ok   P2 COUNTER: memexport full-buffer total (last line) = 0; max 0; sum Nx 0; lines with Nx > 0: 0 -> closes P2 memexport gate
+  BASE items missed: none
+  VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b08)
+
+### s4b08x (--row s4b08): 3 log lines; expected old LOOK, new LOOK
+[old] rc 0 hint LOOK (as expected)
+  memexport full-buffer: {"lines": 2, "last_total": 7, "max_total": 7, "sum_x": 0, "lines_x_gt0": 0}
+  PROOF ok   slow-frame lines 2
+  PROOF ok   the last slow-frame line ends with the memexport suffix: ...n memexport pages 0x 0 KB) | memexport syncs 1 (4 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 7)
+  PROOF MISS P2 COUNTER: memexport full-buffer total (last line) = 7; max 7; sum Nx 0; lines with Nx > 0: 0 -> > 0: goes to Agent 1 (hold cap)
+  BASE items missed: none
+  VERDICT HINT LOOK: 0 BASE misses, 1 proof misses (apply QUEUE.md "passes if" for row s4b08)
+[new] rc 0 hint LOOK (as expected)
+  memexport full-buffer: {"lines": 2, "last_total": 7, "max_total": 7, "sum_x": 0, "lines_x_gt0": 0}
+  PROOF ok   slow-frame lines 2
+  PROOF ok   the last slow-frame line ends with the memexport suffix: ...n memexport pages 0x 0 KB) | memexport syncs 1 (4 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 7)
+  PROOF MISS P2 COUNTER: memexport full-buffer total (last line) = 7; max 7; sum Nx 0; lines with Nx > 0: 0 -> > 0: goes to Agent 1 (hold cap)
+  BASE items missed: none
+  VERDICT HINT LOOK: 0 BASE misses, 1 proof misses (apply QUEUE.md "passes if" for row s4b08)
+
+### s4b09 (--row s4b09): 13 log lines; expected old PASS?, new PASS?
+[old] rc 0 hint PASS? (as expected)
+  deferred_counters fields: lines 3 (20:10:05.000..20:10:45.008); last {}; max {}; per frame null; monotonic {}
+  PROOF ok   deferred_counters headers 3 (about every 10 s; elapsed 40 s -> ~4 expected)
+  BASE items missed: none
+  VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b09)
+[new] rc 0 hint PASS? (as expected)
+  deferred_counters fields: lines 3 (20:10:05.000..20:10:45.008); last {"seconds": 10.1, "lists": 1250, "kb": 93750, "barriers": 5600, "kb_per_list": 75.0}; max {"seconds": 10.1, "lists": 1250, "kb": 99000, "barriers": 5600, "kb_per_list": 90.0}; per frame null; monotonic {"seconds": true, "lists": false, "kb": false, "barriers": 
+  PROOF ok   deferred_counters headers 3 (about every 10 s; elapsed 40 s -> ~4 expected)
+  PROOF note KB per list per header: median 80.0 (min 75.0, max 90.0; 3 headers); half the median 40.0 (QUEUE.md: <N> ~ half; Agent 7 sets N)
+  BASE items missed: none
+  VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b09)
+
+### s4b10 (--row s4b10): 4 log lines; expected old PASS?, new PASS?
+[old] rc 0 hint PASS? (as expected)
+  split fields: lines 2 (20:10:10.001..20:10:15.002); last {"frame": 1200, "submission": 3800, "splits": 2400, "failed": 0, "held_query": 5, "held_scratch": 0, "held_pipelines": 20}; max {"frame": 1200, "submission": 3800, "splits": 2400, "failed": 0, "held_query": 5, "held_scratch": 0, "held_pipelines": 20}; per frame {"submissio
+  PROOF ok   init "d3d12_submit_split_kb: splitting submissions at N KB" x1: 2026-11-22 20:10:05.000] [info] [gpu] [t4242] d3d12_submit_split_kb: splitting submissions at 40 KB of deferred commands
+  PROOF ok   failed=0 in every d3d12_submit_split line (max 0 over 2 lines)
+  PROOF ok   splits > 0 (max 2400)
+  PROOF note per frame: submission 3.1667, splits 2.0 (frames 600; fields monotonic {'frame': True, 'submission': True, 'splits': True, 'failed': True, 'held_query': True, 'held_scratch': True, 'held_pipelines': True})
+  BASE items missed: none
+  VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b10)
+[new] rc 0 hint PASS? (as expected)
+  split fields: lines 2 (20:10:10.001..20:10:15.002); last {"frame": 1200, "submission": 3800, "splits": 2400, "failed": 0, "held_query": 5, "held_scratch": 0, "held_pipelines": 20}; max {"frame": 1200, "submission": 3800, "splits": 2400, "failed": 0, "held_query": 5, "held_scratch": 0, "held_pipelines": 20}; per frame {"submissio
+  PROOF ok   init "d3d12_submit_split_kb: splitting submissions at N KB" x1: 2026-11-22 20:10:05.000] [info] [gpu] [t4242] d3d12_submit_split_kb: splitting submissions at 40 KB of deferred commands
+  PROOF ok   failed=0 in every d3d12_submit_split line (max 0 over 2 lines)
+  PROOF ok   splits > 0 (max 2400)
+  PROOF note per frame: submission 3.1667, splits 2.0 (frames 600; fields monotonic {'frame': True, 'submission': True, 'splits': True, 'failed': True, 'held_query': True, 'held_scratch': True, 'held_pipelines': True})
+  BASE items missed: none
+  VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b10)
+
+### s4b25 (--row s4b25): 2 log lines; expected old LOOK, new PASS?
+[old] rc 0 hint LOOK (as expected)
+  PROOF ok   init "d3d12_submit_split_kb: splitting submissions at N KB" x1: 2026-11-22 20:10:05.000] [info] [gpu] [t4242] d3d12_submit_split_kb: splitting submissions at 40 KB of deferred commands
+  PROOF MISS failed=0 in every d3d12_submit_split line (max None over 0 lines)
+  PROOF note per frame: submission None, splits None (frames None; fields monotonic None)
+  BASE items missed: none
+  VERDICT HINT LOOK: 0 BASE misses, 1 proof misses (apply QUEUE.md "passes if" for row s4b25)
+[new] rc 0 hint PASS? (as expected)
+  PROOF ok   init "d3d12_submit_split_kb: splitting submissions at N KB" x1: 2026-11-22 20:10:05.000] [info] [gpu] [t4242] d3d12_submit_split_kb: splitting submissions at 40 KB of deferred commands
+  PROOF note no d3d12_submit_split line (printed only while a split is due, at most every 10 s): failed not judged
+  PROOF note per frame: submission None, splits None (frames None; fields monotonic None)
+  BASE items missed: none
+  VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b25)
+
+### s4b14 (--row s4b14): 2 log lines; expected old PASS?, new PASS?
+[old] rc 0 hint PASS? (as expected)
+  PROOF note debug-layer control: "debug layer" lines 0, D3D12 message lines 0, NEW at warning None
+  BASE items missed: none
+  VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b14)
+[new] rc 0 hint PASS? (as expected)
+  PROOF ok   d3d12_debug on: DRED line x1, debug-layer enable failure x0
+  PROOF note debug-layer control: NEW at warning None (debug-layer messages go to the debugger, not game.log)
+  BASE items missed: none
+  VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b14)
+
+### s4b14x (--row s4b14): 2 log lines; expected old PASS?, new LOOK
+[old] rc 0 hint PASS? (as expected)
+  PROOF note debug-layer control: "debug layer" lines 1, D3D12 message lines 0, NEW at warning None
+  BASE items missed: none
+  VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b14)
+[new] rc 0 hint LOOK (as expected)
+  PROOF MISS d3d12_debug on: DRED line x0, debug-layer enable failure x1
+  PROOF note debug-layer control: NEW at warning None (debug-layer messages go to the debugger, not game.log)
+  BASE items missed: none
+  VERDICT HINT LOOK: 0 BASE misses, 1 proof misses (apply QUEUE.md "passes if" for row s4b14)
+
+### s4b17 (--row s4b17): 5 log lines; expected old LOOK, new PASS?
+[old] rc 0 hint LOOK (as expected)
+  gpu_wait_stats fields: lines 3 (20:10:10.001..20:10:20.003); last {}; max {}; per frame null; monotonic {}
+  PROOF MISS GPU wait stats l1_waits > 0 (max None)
+  PROOF MISS GPU wait stats l1_polls > 0 (max None)
+  PROOF MISS GPU wait stats l2_tries > 0 (max None)
+  PROOF MISS GPU wait stats kicks > 0 (max None)
+  PROOF ok   back-off lines 1 (OFF in P1)
+  BASE items missed: none
+  VERDICT HINT LOOK: 0 BASE misses, 4 proof misses (apply QUEUE.md "passes if" for row s4b17)
+[new] rc 0 hint PASS? (as expected)
+  gpu_wait_stats fields: lines 3 (20:10:10.001..20:10:20.003); last {"interval_s": 5, "l1_waits": 1500, "l1_polls": 30000, "l1_moved": 1400, "l1_gpu_off": 0, "l1_sleep_moved": 0, "l1_sleep_done": 0, "l2_tries": 800, "l2_waits": 50, "l2_polls": 900, "l2_delayed": 10, "l2_sleep_ready": 0, "kicks": 120, "pause": 25000, "yield": 4000,
+  PROOF ok   GPU wait stats lines 3, 3 parsed
+  PROOF ok   GPU wait stats l1_waits > 0 (max per 5 s 1500, sum 4500)
+  PROOF ok   GPU wait stats l1_polls > 0 (max per 5 s 30000, sum 90000)
+  PROOF ok   GPU wait stats l2_tries > 0 (max per 5 s 800, sum 2400)
+  PROOF ok   GPU wait stats kicks > 0 (max per 5 s 120, sum 360)
+  PROOF note init lines 1 (P1: one "GPU wait back-off: OFF (...); stats ON; GetData hook built."): :05.000] [info] [rex] [t4242] GPU wait back-off: OFF (quantum 0 us, spin 20 us); stats ON; GetData hook built.
+  BASE items missed: none
+  VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b17)
+
+### s4b18 (--row s4b18): 4 log lines; expected old PASS?, new PASS?
+[old] rc 0 hint PASS? (as expected)
+  gpu_wait_stats fields: lines 2 (20:10:10.001..20:10:15.002); last {}; max {}; per frame null; monotonic {}
+  PROOF ok   one "GPU wait back-off: ON (...)" line: x1 nfo] [rex] [t4242] GPU wait back-off: ON (quantum 250 us, spin 20 us); stats ON; GetData hook built.
+  PROOF ok   sleep_fail = 0 (max None over 2 stats lines)
+  PROOF ok   no STUCK-LOCK (0)
+  BASE items missed: none
+  VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b18)
+[new] rc 0 hint PASS? (as expected)
+  gpu_wait_stats fields: lines 2 (20:10:10.001..20:10:15.002); last {"interval_s": 5, "l1_waits": 1500, "l1_polls": 30000, "l1_moved": 1400, "l1_gpu_off": 0, "l1_sleep_moved": 0, "l1_sleep_done": 0, "l2_tries": 800, "l2_waits": 50, "l2_polls": 900, "l2_delayed": 10, "l2_sleep_ready": 0, "kicks": 120, "pause": 25000, "yield": 4000,
+  PROOF ok   GPU wait stats lines 2, 2 parsed
+  PROOF ok   one "GPU wait back-off: ON (quantum 250 us, ...); ...; GetData hook built." line (ON x1, back-off lines x1): 05.000] [info] [rex] [t4242] GPU wait back-off: ON (quantum 250 us, spin 20 us); stats ON; GetData hook built.
+  PROOF ok   sleep_fail = 0 (max 0 over 2 stats lines)
+  PROOF ok   no STUCK-LOCK (0)
+  BASE items missed: none
+  VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b18)
+
+### s4b18f (--row s4b18): 4 log lines; expected old PASS?, new LOOK
+[old] rc 0 hint PASS? (as expected)
+  gpu_wait_stats fields: lines 2 (20:10:10.001..20:10:15.002); last {}; max {}; per frame null; monotonic {}
+  PROOF ok   one "GPU wait back-off: ON (...)" line: x1 nfo] [rex] [t4242] GPU wait back-off: ON (quantum 250 us, spin 20 us); stats ON; GetData hook built.
+  PROOF ok   sleep_fail = 0 (max None over 2 stats lines)
+  PROOF ok   no STUCK-LOCK (0)
+  BASE items missed: none
+  VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b18)
+[new] rc 0 hint LOOK (as expected)
+  gpu_wait_stats fields: lines 2 (20:10:10.001..20:10:15.002); last {"interval_s": 5, "l1_waits": 1500, "l1_polls": 30000, "l1_moved": 1400, "l1_gpu_off": 0, "l1_sleep_moved": 0, "l1_sleep_done": 0, "l2_tries": 800, "l2_waits": 50, "l2_polls": 900, "l2_delayed": 10, "l2_sleep_ready": 0, "kicks": 120, "pause": 25000, "yield": 4000,
+  PROOF ok   GPU wait stats lines 2, 2 parsed
+  PROOF ok   one "GPU wait back-off: ON (quantum 250 us, ...); ...; GetData hook built." line (ON x1, back-off lines x1): 05.000] [info] [rex] [t4242] GPU wait back-off: ON (quantum 250 us, spin 20 us); stats ON; GetData hook built.
+  PROOF MISS sleep_fail = 0 (max 3 over 2 stats lines)
+  PROOF ok   no STUCK-LOCK (0)
+  BASE items missed: none
+  VERDICT HINT LOOK: 0 BASE misses, 1 proof misses (apply QUEUE.md "passes if" for row s4b18)
+
+synthetic cases with an unexpected hint: 0

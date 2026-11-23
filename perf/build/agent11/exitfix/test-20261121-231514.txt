@@ -1,0 +1,21 @@
+# exitfix_test (task #27)  2026-11-21 23:15:29  host INSPIRON
+# Each case: exit_test.exe <mode> from a non-main thread while a heartbeat thread runs and one thread is blocked.
+# 1 = marker present. raced = heartbeat still running during the EXE static destructor (the #27 hazard).
+# dll = exit_test_dll.dll static destructor ran (DLL_PROCESS_DETACH). exit_ms = process exit time - exit call time.
+# csv = unflushed FILE* row survived (info; perf.csv stand-in). (i) = informational cell.
+
+crt  mode             code wall_ms  exit_ms atexit static  raced  dll dllraced  log  csv(info)  ret  tmo  verdict
+md   exit0               0   1,849    256.7      1      1      1    1        0    1          1    0    0  ok
+md   exit1               1   1,213    253.5      1      1      1    1        0    1          1    0    0  ok
+md   _Exit0              0     866    128.4      0      0      0    1        0    1          1    0    0  ok
+md   _Exit1              1     546    131.6      0      0      0    1        0    1          1    0    0  ok
+md   _Exit1_noflush      1     437    125.5      0      0      0    1        0 1(i)          1    0    0  ok
+md   terminate1          1     254     34.4      0      0      0    0        0    1          0    0    0  ok
+mt   exit0               0   1,676    229.5      1      1      1    1        0    1          1    0    0  ok
+mt   exit1               1     433    225.8      1      1      1    1        0    1          1    0    0  ok
+mt   _Exit0              0     204    112.6      0      0      0    1        0    1          0    0    0  ok
+mt   _Exit1              1     237    119.5      0      0      0    1        0    1          0    0    0  ok
+mt   _Exit1_noflush      1     248    112.4      0      0      0    1        0 0(i)          0    0    0  ok
+mt   terminate1          1     126      2.2      0      0      0    0        0    1          0    0    0  ok
+
+RESULT: PASS (all asserted cells match)

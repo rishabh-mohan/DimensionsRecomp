@@ -1,0 +1,81 @@
+{
+  "verdict": "PASS",
+  "findings": [],
+  "notes": [],
+  "match": [
+    "placement buffer relocation lr=83F9B660: A 0, B 0 (route-dependent count; presence must match)",
+    "CPU pool copy callers: A -, B -",
+    "Native slot heap: registered: A 0, B 0",
+    "Native slot heap: extended: A 0, B 0"
+  ],
+  "diff": {
+    "new_in_b": [],
+    "new_in_b_total": 0,
+    "gone_in_b": [],
+    "gone_in_b_total": 0,
+    "count_changes": [],
+    "count_changes_total": 0
+  },
+  "a": {
+    "input": "<workspace>\\build\\agent8\\matrix\\20261122-1541\\runs\\1542-d0-r1",
+    "files": [
+      {
+        "path": "build/agent8/matrix/20261122-1541/runs/1542-d0-r1\\game.log",
+        "bytes": 11017
+      }
+    ],
+    "lines": 98,
+    "levels": {
+      "info": 50,
+      "warning": 40
+    },
+    "boot_lines_found": true,
+    "fail_counts": {},
+    "critical": 0,
+    "unimplemented": 0,
+    "unimplemented_examples": [],
+    "reloc_lr_83F9B660": 0,
+    "poolcopy_callers": {},
+    "slot_registered": 0,
+    "slot_extended": 0,
+    "warn_messages": 5,
+    "warn_lines": 40
+  },
+  "b": {
+    "input": "<workspace>\\build\\agent8\\matrix\\20261122-1541\\runs\\1547-d3-r1",
+    "files": [
+      {
+        "path": "build/agent8/matrix/20261122-1541/runs/1547-d3-r1\\game.log",
+        "bytes": 10406
+      }
+    ],
+    "lines": 94,
+    "levels": {
+      "info": 46,
+      "warning": 40
+    },
+    "boot_lines_found": true,
+    "fail_counts": {},
+    "critical": 0,
+    "unimplemented": 0,
+    "unimplemented_examples": [],
+    "reloc_lr_83F9B660": 0,
+    "poolcopy_callers": {},
+    "slot_registered": 0,
+    "slot_extended": 0,
+    "warn_messages": 5,
+    "warn_lines": 40
+  },
+  "fail_patterns": [
+    "REX_FATAL",
+    "__builtin_trap",
+    "Switch case out of range",
+    "not in any registered module",
+    "Native GPU: pool copy unsupported",
+    "pool copy POINTLIST contract mismatch",
+    "Native slot heap: external detach verification failed",
+    "0xC0000409",
+    "stack overflow"
+  ],
+  "unimpl_regex": "(?i)REX_UNIMPLEMENTED|unimplemented (?:ppc )?instruction|unimplemented opcode"
+}

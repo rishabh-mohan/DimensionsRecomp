@@ -1,0 +1,64 @@
+# native4: dropped draws over time (Agent 4, task #29, 2026-11-23). Read-only analysis; no game was run for this file.
+# Source: build/agent3/s4a/trace/r6off-t/events.tsv, from run build/agent3/runs/20261122-142131-s4a-r6off-trace-native4
+#   (native4-bin, b-gate route, LEGO_NATIVE_TRACE_DIR, hidden desktop, functional only).
+# Made with: python build/agent4/screenshot-kit/missing_timeline.py build/agent3/s4a/trace/r6off-t/events.tsv 5
+#   (one pass, about 15 s at below-normal priority).
+# Columns: 5 s buckets of trace time (about seconds after the first frame; input.csv t_s minus 9.9 s), frames in the
+#   bucket, median native draw_calls per frame, draw_missing_vertex_shader and draw_missing_pixel_shader rows, drops per
+#   frame, and the top 4 guest shader addresses. draw_calls includes the dropped draws: the DrawTimer in DispatchDraw
+#   (draw.cpp:2499) counts a draw before the binding check that drops it (draw.cpp:2712-2725).
+# Phases on this route: intro 0-30 s, title 30-60 s, menus 60-110 s, load 110-117 s, attract from ~117 s (first 3D
+#   picture ~120 s, first busy shot ~152 s).
+# Reading:
+#   - Title: 8 of 8 counted draws per frame dropped: VS 0xAC449538 x7 (the pack's first pair) and VS 0xAC44AFAC x1.
+#     0xAC44AFAC is first bound 27.0 s after 0xAC449538, the same gap as the second pair in 0509-sd-r1, so it is
+#     probably the pack's second pair.
+#   - Menus: 2 of 2 per frame dropped (0xAC449538). Intro: 0-1 per frame.
+#   - From the attract load (117.7 s) on: 46 more VS objects and 3 PS objects are dropped, 35-155 per frame
+#     (115,571 rows, against 46,549 for the two title VS). The only shader dump so far (0509-sd-r1) had no input and
+#     never reached the attract, so whether these objects use the pack's 4 shaders is unknown. Next step: one dump run
+#     (LEGO_DUMP_MISSING_SHADERS plus the trace dir) on native4 with harness/routes/attract-long.txt.
+#   - The trace events carry only the guest address (no microcode hash), so they can't answer that question themselves.
+totals: guest_vs:AC449538=42610 (first 4.4 s), guest_vs:AC5A9288=19650 (first 117.8 s), guest_vs:AC5B522C=17776 (first 117.8 s), guest_vs:AC5A82D0=11022 (first 126.2 s), guest_vs:AC48245C=7928 (first 181.3 s), guest_vs:AC5A9A90=7860 (first 117.8 s), guest_vs:AC451838=4694 (first 170.8 s), guest_vs:AC44C8DC=4066 (first 117.9 s), guest_vs:AC44AFAC=3939 (first 31.4 s), guest_vs:AC4503B0=3100 (first 170.8 s), guest_vs:AC5AD824=2709 (first 117.7 s), guest_vs:AC59D470=2709 (first 117.7 s), guest_vs:AC4746DC=2693 (first 170.5 s), guest_vs:AC5A19AC=1965 (first 117.7 s), guest_vs:AC5A2FC8=1965 (first 117.7 s), guest_vs:AC5A5A20=1965 (first 117.8 s), guest_vs:AC4B3730=1965 (first 117.9 s), guest_vs:AC53CBD8=1837 (first 126.1 s), guest_vs:AC4BB324=1837 (first 126.1 s), guest_vs:AC4A3E4C=1837 (first 126.2 s), guest_vs:AC4A654C=1837 (first 126.3 s), guest_vs:AC49B1A0=1837 (first 126.3 s), guest_vs:AC47E974=1812 (first 184.1 s), guest_vs:AC4796D4=1677 (first 170.4 s), guest_vs:AC46F658=1532 (first 170.5 s), guest_vs:AC549A94=1093 (first 126.1 s), guest_vs:AC4B27B4=927 (first 150.0 s), guest_vs:AC4750F4=911 (first 154.0 s), guest_vs:AC4778A0=892 (first 170.4 s), guest_vs:AC490C90=866 (first 153.1 s), guest_vs:AC44DA60=764 (first 170.8 s), guest_vs:AC5562E0=744 (first 154.0 s), guest_vs:AC54065C=690 (first 170.5 s), guest_vs:AC4782A8=398 (first 170.5 s), guest_vs:AC583BDC=345 (first 170.5 s), guest_vs:AC5A4AE0=291 (first 170.6 s), guest_vs:AC547504=262 (first 179.0 s), guest_ps:AB13F250=256 (first 117.7 s), guest_vs:AC548DC4=254 (first 178.9 s), guest_vs:AC5AFEBC=128 (first 117.8 s), guest_vs:AC4AF3A4=128 (first 117.9 s), guest_vs:AC5A5270=97 (first 170.6 s), guest_vs:AC56F640=59 (first 170.5 s), guest_vs:A7E41410=54 (first 178.8 s), guest_ps:A7E40190=38 (first 178.8 s), guest_ps:AC5A41E0=28 (first 126.2 s), guest_vs:AC551078=24 (first 188.4 s), guest_vs:A7E1F740=19 (first 178.8 s), guest_vs:A7E3F0F0=19 (first 178.8 s), guest_vs:AC48B1BC=8 (first 178.8 s), guest_vs:AC475B28=3 (first 184.0 s)
+     0-5      frames=  866 draws p50=    0.0  miss_vs=   142 miss_ps=     0  per_frame=   0.2  AC449538=142
+     5-10     frames=  840 draws p50=    1.0  miss_vs=   691 miss_ps=     0  per_frame=   0.8  AC449538=691
+    10-15     frames= 1026 draws p50=    0.0  miss_vs=    95 miss_ps=     0  per_frame=   0.1  AC449538=95
+    15-20     frames=  728 draws p50=    1.0  miss_vs=   606 miss_ps=     0  per_frame=   0.8  AC449538=606
+    20-25     frames=  754 draws p50=    1.0  miss_vs=   445 miss_ps=     0  per_frame=   0.6  AC449538=445
+    25-30     frames= 1070 draws p50=    0.0  miss_vs=   206 miss_ps=     0  per_frame=   0.2  AC449538=206
+    30-35     frames=  656 draws p50=    8.0  miss_vs=  2790 miss_ps=     0  per_frame=   4.3  AC449538=2440 AC44AFAC=350
+    35-40     frames=  589 draws p50=    8.0  miss_vs=  4719 miss_ps=     0  per_frame=   8.0  AC449538=4130 AC44AFAC=589
+    40-45     frames=  795 draws p50=    8.0  miss_vs=  6353 miss_ps=     0  per_frame=   8.0  AC449538=5558 AC44AFAC=795
+    45-50     frames=  867 draws p50=    8.0  miss_vs=  6936 miss_ps=     0  per_frame=   8.0  AC449538=6069 AC44AFAC=867
+    50-55     frames=  776 draws p50=    8.0  miss_vs=  6208 miss_ps=     0  per_frame=   8.0  AC449538=5432 AC44AFAC=776
+    55-60     frames=  607 draws p50=    8.0  miss_vs=  4580 miss_ps=     0  per_frame=   7.5  AC449538=4018 AC44AFAC=562
+    60-65     frames=  595 draws p50=    2.0  miss_vs=  1192 miss_ps=     0  per_frame=   2.0  AC449538=1192
+    65-70     frames=  579 draws p50=    2.0  miss_vs=  1156 miss_ps=     0  per_frame=   2.0  AC449538=1156
+    70-75     frames=  622 draws p50=    2.0  miss_vs=  1244 miss_ps=     0  per_frame=   2.0  AC449538=1244
+    75-80     frames=  635 draws p50=    2.0  miss_vs=  1272 miss_ps=     0  per_frame=   2.0  AC449538=1272
+    80-85     frames=  647 draws p50=    2.0  miss_vs=  1294 miss_ps=     0  per_frame=   2.0  AC449538=1294
+    85-90     frames=  577 draws p50=    2.0  miss_vs=  1152 miss_ps=     0  per_frame=   2.0  AC449538=1152
+    90-95     frames=  661 draws p50=    2.0  miss_vs=  1322 miss_ps=     0  per_frame=   2.0  AC449538=1322
+    95-100    frames=  666 draws p50=    2.0  miss_vs=  1332 miss_ps=     0  per_frame=   2.0  AC449538=1332
+   100-105    frames=  859 draws p50=    2.0  miss_vs=  1720 miss_ps=     0  per_frame=   2.0  AC449538=1720
+   105-110    frames=  617 draws p50=    2.0  miss_vs=  1094 miss_ps=     0  per_frame=   1.8  AC449538=1094
+   110-115    frames=  997 draws p50=    0.0  miss_vs=     0 miss_ps=     0  per_frame=   0.0  
+   115-120    frames=  626 draws p50=    0.0  miss_vs=  1128 miss_ps=    70  per_frame=   1.9  AC5A9288=340 AC5B522C=306 AC5A9A90=136 AB13F250=70
+   120-125    frames=   94 draws p50=   41.0  miss_vs=  3165 miss_ps=   186  per_frame=  35.6  AC5A9288=940 AC5B522C=846 AC5A9A90=376 AC44C8DC=256
+   125-130    frames=   75 draws p50=   59.0  miss_vs=  3285 miss_ps=     4  per_frame=  43.9  AC5A9288=750 AC5B522C=672 AC5A82D0=450 AC5A9A90=300
+   130-135    frames=  167 draws p50=   59.0  miss_vs=  7150 miss_ps=     0  per_frame=  42.8  AC5A9288=1660 AC5B522C=1495 AC5A82D0=996 AC5A9A90=664
+   135-140    frames=  150 draws p50=   59.0  miss_vs=  6444 miss_ps=     0  per_frame=  43.0  AC5A9288=1500 AC5B522C=1350 AC5A82D0=900 AC5A9A90=600
+   140-145    frames=  264 draws p50=   59.0  miss_vs= 11390 miss_ps=     0  per_frame=  43.1  AC5A9288=2650 AC5B522C=2384 AC5A82D0=1590 AC5A9A90=1060
+   145-150    frames=  256 draws p50=   57.0  miss_vs= 10970 miss_ps=     0  per_frame=  42.9  AC5A9288=2550 AC5B522C=2296 AC5A82D0=1530 AC5A9A90=1020
+   150-155    frames=   98 draws p50= 1082.0  miss_vs=  4451 miss_ps=     0  per_frame=  45.4  AC5A9288=990 AC5B522C=890 AC5A82D0=594 AC5A9A90=396
+   155-160    frames=   77 draws p50= 2302.0  miss_vs=  3516 miss_ps=     0  per_frame=  45.7  AC5A9288=760 AC5B522C=685 AC5A82D0=456 AC5A9A90=304
+   160-165    frames=  109 draws p50= 2297.0  miss_vs=  5089 miss_ps=     0  per_frame=  46.7  AC5A9288=1090 AC5B522C=981 AC5A82D0=654 AC5A9A90=436
+   165-170    frames=   71 draws p50= 2808.0  miss_vs=  3456 miss_ps=     0  per_frame=  48.7  AC5A9288=710 AC5B522C=639 AC5A82D0=426 AC5A9A90=284
+   170-175    frames=   52 draws p50= 5837.0  miss_vs=  5158 miss_ps=     4  per_frame=  99.3  AC4746DC=812 AC5A9288=520 AC4796D4=518 AC5B522C=467
+   175-180    frames=   84 draws p50=  728.0  miss_vs=  7798 miss_ps=    20  per_frame=  93.1  AC4746DC=1127 AC5A9288=840 AC5B522C=787 AC46F658=645
+   180-185    frames=   80 draws p50=  286.0  miss_vs=  8600 miss_ps=     0  per_frame= 107.5  AC4503B0=923 AC5A9288=800 AC5B522C=772 AC4746DC=754
+   185-190    frames=   54 draws p50= 2184.0  miss_vs=  7798 miss_ps=     8  per_frame= 144.6  AC48245C=2690 AC47E974=712 AC4503B0=634 AC5A9288=550
+   190-195    frames=   75 draws p50= 1090.0  miss_vs=  5865 miss_ps=    22  per_frame=  78.5  AC451838=1064 AC5A9288=750 AC5B522C=684 AC48245C=662
+   195-200    frames=   96 draws p50=  482.0  miss_vs=  6742 miss_ps=     8  per_frame=  70.3  AC451838=1302 AC5A9288=960 AC5B522C=863 AC5A82D0=576
+   200-205    frames=   98 draws p50=  974.0  miss_vs=  8270 miss_ps=     0  per_frame=  84.4  AC48245C=1466 AC451838=1206 AC5A9288=970 AC5B522C=874
+   205-210    frames=   32 draws p50=  350.0  miss_vs=  4974 miss_ps=     0  per_frame= 155.4  AC48245C=2068 AC47E974=572 AC5A9288=320 AC5B522C=288

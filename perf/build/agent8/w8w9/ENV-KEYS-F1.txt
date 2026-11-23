@@ -1,0 +1,59 @@
+F1 env keys for the W8a, W8b and W9 arms (Agent 8, run-2 task #7, 2026-11-22 21:12), for Agent 5's run-night.ps1 $AllowedEnv.
+Exact case, no patterns. The two keys already allowed come first.
+
+--- the list (11 keys)
+REX_TIMER_WAIT_BLOCKING
+LEGO_GPU_WAIT_STATS
+LEGO_GPU_WAIT_BACKOFF_US
+LEGO_GPU_WAIT_SPIN_US
+LEGO_NATIVE_FRAME_METRICS
+LEGO_NATIVE_SHADER_MISS_CACHE
+LEGO_NATIVE_THREADED
+LEGO_NATIVE_PREPARE_THREADS
+LEGO_NATIVE_SNAPSHOT_STATE
+LEGO_NATIVE_FULL_DRAW_PREPARATION
+LEGO_NATIVE_CHAIN_PRIORITY
+--- end of list
+
+PowerShell form:
+$AllowedEnv = @('REX_TIMER_WAIT_BLOCKING', 'LEGO_GPU_WAIT_STATS', 'LEGO_GPU_WAIT_BACKOFF_US', 'LEGO_GPU_WAIT_SPIN_US', 'LEGO_NATIVE_FRAME_METRICS', 'LEGO_NATIVE_SHADER_MISS_CACHE', 'LEGO_NATIVE_THREADED', 'LEGO_NATIVE_PREPARE_THREADS', 'LEGO_NATIVE_SNAPSHOT_STATE', 'LEGO_NATIVE_FULL_DRAW_PREPARATION', 'LEGO_NATIVE_CHAIN_PRIORITY')
+
+Which arm uses which key. The windows are S4-DRAFT section 2c L373-375; the arms are the ones I will write into the matrices.
+W9, render busy-wait (devoff only: #24 is Xenos-only and is in devoff4b-bin). 1 cold + 5 x 3 = 16 runs, ~40 min:
+  off   no env (every hook goes straight to __imp__)
+  q0    LEGO_GPU_WAIT_BACKOFF_US=0;   LEGO_GPU_WAIT_SPIN_US=30; LEGO_GPU_WAIT_STATS=1
+  q125  LEGO_GPU_WAIT_BACKOFF_US=125; LEGO_GPU_WAIT_SPIN_US=30; LEGO_GPU_WAIT_STATS=1
+  q250  LEGO_GPU_WAIT_BACKOFF_US=250; LEGO_GPU_WAIT_SPIN_US=30; LEGO_GPU_WAIT_STATS=1
+  q500  LEGO_GPU_WAIT_BACKOFF_US=500; LEGO_GPU_WAIT_SPIN_US=30; LEGO_GPU_WAIT_STATS=1
+  STATS=1 gives the sleep_fail counter, which must be 0 in every Q arm (b2r section 26). S4b queue row 18 uses the same
+  BACKOFF_US + STATS pair. SPIN_US is pinned to the default, 30, or to the S that Agent 9 sizes from P1 (queue row 17;
+  a9 S5.2.4 step 1).
+W8a, native shaders (native4b after Agent 4's re-pin, else native4). ABBAAB x 2 + 1 = 13 runs, ~33 min:
+  ref   LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv   (native3d, or the same bin with the cache off)
+  mc    LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv; LEGO_NATIVE_SHADER_MISS_CACHE=1
+  The #1 pack instead of #2 would be another bin and needs no extra key.
+W8b, native threading (needs #21 built). 1 + 3 x 4 = 13 runs, ~33 min:
+  n0    LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv
+  th    n0 + LEGO_NATIVE_THREADED=1; LEGO_NATIVE_PREPARE_THREADS=2; plus either LEGO_NATIVE_SNAPSHOT_STATE=1 (th2) or
+        LEGO_NATIVE_FULL_DRAW_PREPARATION=1 (th3). These are the two threaded modes of matrix-native-threaded.json, i.e.
+        Agent 7's grid n2/n3. Both keys are listed because the threaded mode is not picked yet.
+  thcp  th + LEGO_NATIVE_CHAIN_PRIORITY=3 (Agent 7's grid {0,3}; 1 or 2 only if 3 helps).
+LEGO_NATIVE_FRAME_METRICS: the runner sets it by itself only for "frames": "native". The W8 arms keep "frames": "perf"
+and set the key in env as a cross-check, as all 4 arms of matrix-native-threaded.json do, so it is on the list.
+
+Checked against the bins (NUL-terminated string literals in legodimensions.exe, 21:09):
+  devoff4b-bin: LEGO_GPU_WAIT_BACKOFF_US, LEGO_GPU_WAIT_SPIN_US and LEGO_GPU_WAIT_STATS are present; no LEGO_NATIVE_*
+    keys (Xenos build).
+  native4-bin: LEGO_NATIVE_FRAME_METRICS, _SHADER_MISS_CACHE, _THREADED, _PREPARE_THREADS, _SNAPSHOT_STATE and
+    _FULL_DRAW_PREPARATION are present (native3d-bin: the same minus _SHADER_MISS_CACHE).
+  LEGO_NATIVE_CHAIN_PRIORITY is in no bin yet (absent in native3d and native4). #21 is not built, so W8b is not ready
+    tonight unless native4b carries #21.
+  REX_TIMER_WAIT_BLOCKING is read outside the exe (rexruntime), as before.
+
+Left off the list on purpose:
+  LEGO_NATIVE_RUNTIME_SHADER_CACHE (S4-DRAFT L169) and LEGO_GPU_WAIT_HOOK_GETDATA (L204) are CMake/compile defines,
+    not env keys.
+  LEGO_NATIVE_TIMING and LEGO_NATIVE_PARALLEL_DRAWS are #22's functional diagnostics; TIMING perturbs timing.
+  LEGO_DUMP_MISSING_SHADERS, LEGO_NATIVE_TRACE_DIR, LEGO_SAMPLE_PROFILE and LEGO_SAMPLE_PROFILE_TRIGGER are capture,
+    trace and profile switches and are never timed.
+Agent 11's census (build/agent11/launcher-review/static4-out.txt) has the same keys, plus the two defines above.

@@ -1,0 +1,36 @@
+# pthrottle_syntax (S4 task #19)  2026-11-22 04:37:18  config Release  candidate: staged copies
+threading_win.cpp  pristine  exit=0   5.8s diagnostics=3  <workspace>\build\agent11\pthrottle\stage\pristine\threading_win.cpp (pristine header)
+    | <workspace>\build\agent11\pthrottle\stage\pristine\threading_win.cpp:474:8: warning: 'SetRepeatingAt' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+    |   474 |   bool SetRepeatingAt(GClock_::time_point due_time, std::chrono::milliseconds period,
+    |       |        ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/thread.h:366:16: note: overridden virtual function is here
+    |   366 |   virtual bool SetRepeatingAt(GClock_::time_point due_time, std::chrono::milliseconds period,
+    |       |                ^
+    | <workspace>\build\agent11\pthrottle\stage\pristine\threading_win.cpp:501:58: warning: unused parameter 'timer_low' [-Wunused-parameter]
+    |   501 |   static void CompletionRoutine(Win32Timer* timer, DWORD timer_low, DWORD timer_high) {
+    |       |                                                          ^
+    | <workspace>\build\agent11\pthrottle\stage\pristine\threading_win.cpp:501:75: warning: unused parameter 'timer_high' [-Wunused-parameter]
+    |   501 |   static void CompletionRoutine(Win32Timer* timer, DWORD timer_low, DWORD timer_high) {
+    |       |                                                                           ^
+    | 3 warnings generated.
+threading_win.cpp  candidate exit=0   6.0s diagnostics=3  <workspace>\build\agent11\pthrottle\stage\threading_win.cpp (staged header)
+    | <workspace>\build\agent11\pthrottle\stage\threading_win.cpp:497:8: warning: 'SetRepeatingAt' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+    |   497 |   bool SetRepeatingAt(GClock_::time_point due_time, std::chrono::milliseconds period,
+    |       |        ^
+    | <workspace>/DimensionsRecomp/rexglue-sdk/include\rex/thread.h:366:16: note: overridden virtual function is here
+    |   366 |   virtual bool SetRepeatingAt(GClock_::time_point due_time, std::chrono::milliseconds period,
+    |       |                ^
+    | <workspace>\build\agent11\pthrottle\stage\threading_win.cpp:524:58: warning: unused parameter 'timer_low' [-Wunused-parameter]
+    |   524 |   static void CompletionRoutine(Win32Timer* timer, DWORD timer_low, DWORD timer_high) {
+    |       |                                                          ^
+    | <workspace>\build\agent11\pthrottle\stage\threading_win.cpp:524:75: warning: unused parameter 'timer_high' [-Wunused-parameter]
+    |   524 |   static void CompletionRoutine(Win32Timer* timer, DWORD timer_low, DWORD timer_high) {
+    |       |                                                                           ^
+    | 3 warnings generated.
+threading_win.cpp  control   exit=1   5.8s diagnostics=6  <workspace>\build\agent11\pthrottle\stage\threading_win.cpp (pristine header)
+    control failed as expected: <workspace>\build\agent11\pthrottle\stage\threading_win.cpp:236:16: error: no member named 'keep_execution_speed_in_background' in 'rex::thread::HostTimingConfig'
+    no new diagnostics in the candidate
+runtime.cpp        pristine  exit=0   6.9s diagnostics=0  <workspace>\build\agent11\pthrottle\stage\pristine\runtime.cpp (pristine header)
+runtime.cpp        candidate exit=0   6.7s diagnostics=0  <workspace>\build\agent11\pthrottle\stage\runtime.cpp (staged header)
+    no new diagnostics in the candidate
+RESULT: PASS

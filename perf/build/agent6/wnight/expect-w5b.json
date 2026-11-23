@@ -1,0 +1,30 @@
+{
+  "reference": "d11",
+  "forbid_all": ["Recovered stale physical page protection", "Unhandled guest physical write fault", "PhysicalHeap::Protect failed", "BaseHeap::Protect failed"],
+  "note_all": ["STUCK-LOCK", "Minidump written to"],
+  "levels": {"warning": 40, "error": 0, "critical": 0},
+  "arms": {
+    "d11":  {"require": ["Reserving the guest memory arena", "Host timer resolution set to 1 ms (background opt-out on)"],
+             "forbid": ["TimerQueue: precise wait (timer_queue_precise_wait)", "C1 keep-watch:", "C1 verify", "S4 upload hash:", "slow frame #", "GPU wait back-off", "GPU wait stats"],
+             "exact": {"Host timer resolution set to 1 ms (background opt-out on)": 1}},
+    "d11t": {"require": ["Reserving the guest memory arena", "Host timer resolution set to 1 ms (background opt-out on)"],
+             "forbid": ["TimerQueue: precise wait (timer_queue_precise_wait)", "C1 keep-watch:", "C1 verify", "S4 upload hash:", "slow frame #", "GPU wait back-off", "GPU wait stats"],
+             "exact": {"Host timer resolution set to 1 ms (background opt-out on)": 1}},
+    "d11p": {"require": ["Reserving the guest memory arena", "Host timer resolution set to 1 ms (background opt-out on)", "TimerQueue: precise wait (timer_queue_precise_wait)"],
+             "forbid": ["C1 keep-watch:", "C1 verify", "S4 upload hash:", "slow frame #", "GPU wait back-off", "GPU wait stats"],
+             "exact": {"Host timer resolution set to 1 ms (background opt-out on)": 1, "TimerQueue: precise wait (timer_queue_precise_wait)": 1}},
+    "base": {"require": ["Reserving the guest memory arena"],
+             "forbid": ["Host timer resolution set to 1 ms", "TimerQueue: precise wait (timer_queue_precise_wait)", "C1 keep-watch:", "C1 verify", "S4 upload hash:", "slow frame #", "GPU wait back-off", "GPU wait stats"]},
+    "s0":   {"require": ["Reserving the guest memory arena"],
+             "forbid": ["Host timer resolution set to 1 ms", "TimerQueue: precise wait (timer_queue_precise_wait)", "C1 keep-watch:", "C1 verify", "S4 upload hash:", "slow frame #", "GPU wait back-off", "GPU wait stats"]}
+  },
+  "count": ["STUCK-LOCK", "still not acquired after", "Minidump written to", "Recovered stale physical page protection", "Unhandled guest physical write fault", "PhysicalHeap::Protect failed", "BaseHeap::Protect failed", "Host timer resolution set to 1 ms", "TimerQueue: precise wait (timer_queue_precise_wait)", "[NtCreateFile] FAILED", "Reserving the guest memory arena", "Title terminated"],
+  "notes": [
+    "Expectations for build/agent6/w6/w6_kit.py on window 5b, written by Agent 6 for task #19 (22:54 brief). Source of the arms: bench/agent8/run/matrix-window5b.json (read-only): reference d11; arms d11, d11t and d11p, all bin build/agent2/devoff4-bin (S4a), repeats 6, round robin. build/agent6/wnight/cmp_arms.py (23:01) checked each arm's bin, cvars and env against the arm of the same name in the W5 folder's matrix.json (build/agent8/matrix/20261122-1756): identical; only group, ref and repeats differ.",
+    "cvars from the matrix file: every arm has framerate_limit=0 plus the 8 timer cvars host_timer_resolution_ms=1, host_timer_throttling_optout=true, precise_guest_sleep=true, wait_timeout_round_up=true, cs_spin=true, spinlock_pause_spin=true, clock_lockfree=true and tls_bounds_fix=true. d11p adds timer_queue_precise_wait=true. env: d11t has REX_TIMER_WAIT_BLOCKING=1; d11 and d11p have {}.",
+    "Proof rules (S4-DRAFT 2c / W5's matrix notes): every arm logs 'Host timer resolution set to 1 ms (background opt-out on)' exactly once (W5: one per d11, d11t and d11p run, none in base or s0). Every d11p log has exactly one 'TimerQueue: precise wait (timer_queue_precise_wait)' and no other arm has it. d11t has no log line of its own: its proof is REX_TIMER_WAIT_BLOCKING in run.json env_set, which the kit checks against matrix.json's env for every arm. C1, S4 upload hash, slow-frame and GPU wait lines are forbidden as a wrong-bin/wrong-switch check: none of those switches is set, and gpu_wait_backoff.cpp does not exist before S4b (devoff4b MANIFEST: 'S4b A9 ... ABSENT -> 01D9F8F3464C8614').",
+    "base and s0 are NOT W5b arms. They are here only so that the test on W5 checks all 16 runs with task #13's rules (no 1 ms line, no precise line). The cold run uses its arm's rules (cold-<arm> -> <arm>). The logdiff reference is d11, so vs d11 the W5 runs of base and s0 show the 1 ms line as GONE; that is expected and is not a W5b result.",
+    "Not covered by substring rules: d11t's blocking TimerQueue wait itself (no log line; env_set only) and the slow state (read Agent 11's timerq_slowstate_3mode.ps1 / the kit's slow-state table).",
+    "Tested 23:06 with RUN-W5B-LOGDIFF.cmd on W5 (build/agent8/matrix/20261122-1756 -> build/agent6/wnight/out-W5B-20261122-1756): exit 0. d11, d11t and d11p PASS (status OK, exit 0 after one WM_CLOSE, 40/0/0, no STUCK, dump or Recovered line). The 1 ms line appears once per d11/d11t/d11p run and the precise line once per d11p run. Logdiff vs d11: d11t 0/0/0/0/0; d11p ONLY 1 = the precise line; base, s0 and cold-base NOTE only for the 1 ms line GONE. Slow state equals task #13's (timerq3.csv). Same result as task #13."
+  ]
+}

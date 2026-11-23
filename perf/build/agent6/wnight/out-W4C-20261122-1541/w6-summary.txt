@@ -1,0 +1,61 @@
+W6 logdiff kit (Agent 6, task #16): <workspace>\build\agent8\matrix\20261122-1541
+expect build\agent6\wnight\expect-w4c.json (reference d0); matrix.json build\agent8\matrix\20261122-1541\matrix.json
+runs 17 in 5 arms: d0=4; b=4; cold-d0=1; d11t=4; d3=4
+
+Per arm. stuck = STUCK-LOCK episodes (sites; IN = in the measured window); recov/unh/pfail = Recovered stale protection / Unhandled write fault / Protect failed lines per run; W/E/C = warning/error/critical lines per run; slow = slow runs/runs, mean slow_pct, mean onset s; logdiff vs d0 = gate FAIL findings/NEW/MORE/GONE/ONLY keys
+  arm        runs verdict stuck                  dumps recov      unh        pfail      W/E/C                      slow                   logdiff F/N/M/G/O
+  d0         4    PASS    0                      0     [0, 0, 0, 0] [0, 0, 0, 0] [0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 4/4 61.3% 42.7s        (reference)
+  b          4    FAIL    0                      0     [0, 0, 0, 0] [0, 0, 0, 0] [0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 4/4 59.6% 25.5s        0/0/0/0/0
+  cold-d0    1    PASS    0                      0     [0]        [0]        [0]        40/0/0                     0/1 0.0% -s            0/0/0/0/0
+  d11t       4    PASS    0                      0     [0, 0, 0, 0] [0, 0, 0, 0] [0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 4/4 63.4% 31.5s        0/0/0/0/1
+  d3         4    PASS    0                      0     [0, 0, 0, 0] [0, 0, 0, 0] [0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 4/4 51.6% 53.6s        0/0/0/0/0
+
+Per run. exit = run.json exit code; close = WM_CLOSE posted/clean; seq = log ends with the clean-exit lines; stuck = episodes; slow = onset s / slow_pct / span s (sys.csv rows); nogrowth = perf.csv max no-growth s in the window; free = GB at start
+  run                arm      verdict status exit  close     seq  W/E/C     stuck dmp  slow                 nogrowth free  lines
+  1541-cold-d0       cold-d0  PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/91 (92)          0        13.8  94
+  1542-d0-r1         d0       PASS    OK     0     1/True    ok   40/0/0    0     0    93/22/117 (118)      0        13.93 98
+  1545-B-r1          b        PASS    OK     0     1/True    ok   40/0/0    0     0    94/19/115 (116)      0        13.54 98
+  1547-d3-r1         d3       PASS    OK     0     1/True    ok   40/0/0    0     0    76/35/115 (115)      0        14    94
+  1549-d11t-r1       d11t     PASS    OK     0     1/True    ok   40/0/0    0     0    61/42/113 (113)      0        14.34 95
+  1551-B-r2          b        FAIL    OK     0     1/True    ok   40/0/0    0     0    1/32/113 (114)       0        14.28 94
+  1553-d3-r2         d3       PASS    OK     0     1/True    ok   40/0/0    0     0    84/26/113 (114)      0        14.07 98
+  1556-d11t-r2       d11t     PASS    OK     0     1/True    ok   40/0/0    0     0    63/46/114 (114)      0        14.32 99
+  1558-d0-r2         d0       PASS    OK     0     1/True    ok   40/0/0    0     0    72/37/114 (115)      0        14.11 98
+  1600-d3-r3         d3       PASS    OK     0     1/True    ok   40/0/0    0     0    54/52/113 (111)      0        14.08 98
+  1602-d11t-r3       d11t     PASS    OK     0     1/True    ok   40/0/0    0     0    1/81/113 (113)       0        14.95 95
+  1604-d0-r3         d0       PASS    OK     0     1/True    ok   40/0/0    0     0    2/90/114 (115)       0        15.12 98
+  1606-B-r3          b        PASS    OK     0     1/True    ok   40/0/0    0     0    4/97/114 (114)       0        15.08 94
+  1608-d11t-r4       d11t     PASS    OK     0     1/True    ok   40/0/0    0     0    1/85/113 (113)       0        14.86 95
+  1611-d0-r4         d0       PASS    OK     0     1/True    ok   40/0/0    0     0    4/96/113 (112)       0        15.08 94
+  1613-B-r4          b        PASS    OK     0     1/True    ok   40/0/0    0     0    3/90/114 (115)       0        15.06 94
+  1615-d3-r4         d3       PASS    OK     0     1/True    ok   40/0/0    0     0    1/93/113 (113)       0        15.1  98
+
+STUCK-LOCK episodes: 0 (H1 = owner parked in sub_83FAF180, the L1 fence-wait poll; finding 10)
+
+Reasons, FAIL first (per arm: its runs, then its logdiff findings)
+  FAIL b        1551-B-r2: valid_timing false: ['build processes: clang++:34584 clang++:36068 clang++:6544']
+
+Counts per arm (lines containing each expect count text; one number per run, run-dir order)
+  STUCK-LOCK                                                   d0=[0, 0, 0, 0]; b=[0, 0, 0, 0]; cold-d0=[0]; d11t=[0, 0, 0, 0]; d3=[0, 0, 0, 0]
+  still not acquired after                                     d0=[0, 0, 0, 0]; b=[0, 0, 0, 0]; cold-d0=[0]; d11t=[0, 0, 0, 0]; d3=[0, 0, 0, 0]
+  Minidump written to                                          d0=[0, 0, 0, 0]; b=[0, 0, 0, 0]; cold-d0=[0]; d11t=[0, 0, 0, 0]; d3=[0, 0, 0, 0]
+  Recovered stale physical page protection                     d0=[0, 0, 0, 0]; b=[0, 0, 0, 0]; cold-d0=[0]; d11t=[0, 0, 0, 0]; d3=[0, 0, 0, 0]
+  Unhandled guest physical write fault                         d0=[0, 0, 0, 0]; b=[0, 0, 0, 0]; cold-d0=[0]; d11t=[0, 0, 0, 0]; d3=[0, 0, 0, 0]
+  PhysicalHeap::Protect failed                                 d0=[0, 0, 0, 0]; b=[0, 0, 0, 0]; cold-d0=[0]; d11t=[0, 0, 0, 0]; d3=[0, 0, 0, 0]
+  BaseHeap::Protect failed                                     d0=[0, 0, 0, 0]; b=[0, 0, 0, 0]; cold-d0=[0]; d11t=[0, 0, 0, 0]; d3=[0, 0, 0, 0]
+  Host timer resolution set to 1 ms                            d0=[0, 0, 0, 0]; b=[0, 0, 0, 0]; cold-d0=[0]; d11t=[1, 1, 1, 1]; d3=[0, 0, 0, 0]
+  TimerQueue: precise wait (timer_queue_precise_wait)          d0=[0, 0, 0, 0]; b=[0, 0, 0, 0]; cold-d0=[0]; d11t=[0, 0, 0, 0]; d3=[0, 0, 0, 0]
+  [NtCreateFile] FAILED                                        d0=[35, 35, 35, 35]; b=[35, 35, 35, 35]; cold-d0=[35]; d11t=[35, 35, 35, 35]; d3=[35, 35, 35, 35]
+  Reserving the guest memory arena                             d0=[1, 1, 1, 1]; b=[1, 1, 1, 1]; cold-d0=[1]; d11t=[1, 1, 1, 1]; d3=[1, 1, 1, 1]
+  Title terminated                                             d0=[1, 1, 1, 1]; b=[1, 1, 1, 1]; cold-d0=[1]; d11t=[1, 1, 1, 1]; d3=[1, 1, 1, 1]
+
+ONLY keys per arm vs d0 (any level, not Toypad; in no d0 run), from w4b_logdiff
+  b: 0
+  cold-d0: 0
+  d11t: 1
+    [info] [core] Host timer resolution set to # ms (background opt-out on)
+  d3: 0
+
+w4b_logdiff: exit 0 in 0.2 s -> build\agent6\wnight\out-W4C-20261122-1541\logdiff (log build\agent6\wnight\out-W4C-20261122-1541\logdiff.log)
+w4b_extra: exit 0 in 0.3 s -> build\agent6\wnight\out-W4C-20261122-1541\extra.txt (log build\agent6\wnight\out-W4C-20261122-1541\extra.log)
+verdict: FAIL; runtime 0.6 s; output build\agent6\wnight\out-W4C-20261122-1541

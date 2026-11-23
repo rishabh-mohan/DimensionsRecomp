@@ -1,0 +1,36 @@
+﻿=== FINDINGS L283-292
+L283: - **Fix for S4:** capture the shaders with an existing debug switch, then add them to the pack (Agent 4). That restores the draws and removes the search. Because it changes the image, it needs a side-by-side screenshot check against the standard GPU path first. The capture ran at 05:09. Agent 7 checked the data: the pixel shader isn't all zeros (only its first 12 words are), and the dump matches guest memory. The capture also found a second missing pair, whose warning a log cap had hidden, so the fix adds 4 shaders. A stopgap that only remembers the miss (off by default, same output) is ready on scratch (06:10): it compiles clean, only the intended functions change, and it removes ~6.0 of the 6.1 ms/frame bind cost in the slow-state profile. Agent 10 rated it SAFE at default off (06:18); it stays staged for S4 and isn't built tonight. Possible effect: up to +15-25% fps on the native path, until the main game thread becomes the limit (Agent 7's estimate, unmeasured). **All 4 shaders are packed on scratch (07:17, Agent 4):** every check passed, the game's own lookup finds all 4, and nothing is applied. The S4 build must also re-run the runtime prelink step.
+L284: 
+L285: ### 10. The stuck game lock is a long wait, not a deadlock (Agent 6, 06:23; v0.2.0 confirmed 07:15)
+L286: - **What happened:** 3 runs tonight logged a watchdog report that a game lock had been held for 5+ s, 6 reports in total: native3d on the long menu route, and devoffB and devoff3 (with a pre-filled shader store) on the attract sequence. All recovered, and every run closed normally with exit code 0.
+L287: - **The pattern:** the render thread holds the graphics lock while it waits for the GPU, and the main thread, tearing down a scene, waits for that lock. On the native path the render thread was waiting for the driver to build pipelines (one frame built 56 in 4.3 s on a cold driver cache). On the standard path it was in the game's own wait loop for the GPU command thread, which never yields the CPU. In v0.2.0's run (07:15) the holder was in a different loop: it polled a GPU query result back to back with no pause, while the GPU command thread was compiling a shader. So shader and pipeline builds on the GPU command thread can feed these waits on the standard path too.
+L288: - **A busy CPU makes it worse but doesn't cause it.** During those waits the CPU was 97-100% busy (Defender 1.2-4.8 cores, PresentMon 1), the game got only 1.3-1.8 cores, and the GPU was just 17-29% busy. All 3 runs fell between 05:03 and 05:32, the busiest stretch of the night.
+L289: - **The watchdog adds to it:** its crash dump freezes the game for another 1.7-3.6 s at each first report.
+L290: - **Not caused by our changes:** v0.2.0 does it too. Its first attract run (06:44) logged the same report with the same lock, owner and waiting thread, on the same busy machine (98% CPU), then recovered and closed normally (Agent 3). **Agent 6 confirmed it from the crash dump (07:15):** the same lock, the same owner object and thread, and a waiting chain identical to devoffB's, 219 s in. The 5 s hold plus the 3.5 s dump made one 8.6 s frame. Earlier evidence pointed the same way: devoffB predates the 05:02 fix, and native3d ran clean in the reverse-order check with a warm driver cache (187 pipelines in 283 ms).
+L291: - **For S4 (proposals, off by default):** the fix for the standard path's busy-waiting wait loop (see "Leads"), which now covers this too as one item, with a stuck-lock check on a loaded machine in its test plan; the same kind of back-off for the GPU-query poll seen in v0.2.0's run, which the wait-loop fix alone wouldn't cover (Agent 6, 07:15); and pre-building the cached native pipelines at boot. Delaying the watchdog's dump until a lock has been held ~30 s is staged on scratch (diagnostics only), but it isn't an S4 item.
+L292: 
+=== S4 headings
+L1: # S4 draft plan, for the user and Agent 1 to decide
+L156: ## Decisions this draft asks for
+L172: ## 1. Items
+L174: ### 1a. GPU memory / upload path, and native shaders
+L196: ### 1b. D3D12 submission and native threading
+L207: ### 1c. Render-thread busy-wait, stuck lock and codegen
+L222: ### 1d. Pipelines and shader storage
+L233: ### 1e. Timer and power (Agent 11)
+L241: ### 1f. Dropped (not in S4)
+L255: ### 1g. Shared files and apply order (from the notes; check again when staging)
+L274: ### 1h. Root-cause investigations (functional only; from 07:47)
+L280: ## 2. Proposed order (draft)
+L282: ### 2a. Build batches, every new switch OFF
+L320: ### 2b. Functional checks for S4a (hidden desktop, never timed, one game at a time)
+L346: ### 2c. Timing windows (45 min or less each)
+L395: ## 3. Build time and disk (Agent 2, 07:08; estimates only, ±30%, nothing built)
+L409: ## 4. Open questions
+L411: ### 4a. For the user
+L432: ### 4b. For Agents 1, 10 and 12 (not for the user)
+L458: ## 5. Open, but not S4 items
+L474: ## 6. Sources (line ranges)
+=== S4 finding 10 / memexport mentions
+L31:   - **Gate A (w6gA, p2fc + verify, devoff4b): RECOVERED HANG**, one STUCK-LOCK whose owner sits in #24's L1 poll (sub_83FAF180), under verify mode's ~9x slowdown and the -j8 compile: finding 10 (§5). Agent 1's rule: such a STUCK-LOCK is a W
+L464: - **The stuck game lock (finding 10):** v0.2.0 hits it too (F 06:48), so our changes didn't cause it. The S4 answer is #24, whose H2 hook covers the GetData loop that base1's lock owner spun in (a9 S5.2.1). #37, the watchdog dump delay, is 

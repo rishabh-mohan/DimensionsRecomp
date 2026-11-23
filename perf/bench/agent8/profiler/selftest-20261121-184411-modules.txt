@@ -1,0 +1,70 @@
+profile : <workspace>\build\agent8\profiler\profile-695311421.bin
+map     : <workspace>\build\agent8\profiler\profiler_selftest.map
+samples : 53  threads: 6  modules: 14  duration: 3.475 s (trailer)  rounds: 9
+counting: all samples (53)
+warning: profile-695311421.bin: low sampling rate (3 rounds/s, nominal ~1000): the machine was probably CPU-saturated (each SuspendThread/GetThreadContext waits until the target thread is scheduled); attribution is still usable but noisy
+
+busy 16 (30.2%)  waiting 37 (69.8%)  io 0 (0.0%)
+busy samples by category (leaf): guest 8 (50.0%)  rexlego 7 (43.8%)  system 1 (6.2%)
+
+== threads ==
+  tid  name              samples   run%  busy  wait  io  top busy functions / role
+-----  ----------------  -------  -----  ----  ----  --  ----------------------------------------------------------------------------------------------
+98172  selftest-main           9   88.9     8     1   0  lsp_selftest_hot 78%; ntdll.dll!RtlQueryPerformanceCounter 11%; ntdll.dll!NtDelayExecution 11%
+10412                          9    0.0     0     9   0  (waiting)
+33504                          9    0.0     0     9   0  (waiting)
+60324  selftest-waiter         9    0.0     0     9   0  (waiting) selftest::Waiter
+97288  selftest-sleeper        9    0.0     0     9   0  (waiting) selftest::Sleeper
+31892  selftest-guest          8  100.0     8     0   0  sub_8200BEEF [guest 0x8200BEEF] 100%
+
+== top 6 by self (all samples) ==
+samples      %   /s  category  function
+-------  -----  ---  --------  ---------------------------------------
+     18  33.96  5.2  system    ntdll.dll!NtWaitForWorkViaWorkerFactory
+     10  18.87  2.9  system    ntdll.dll!NtDelayExecution
+      9  16.98  2.6  system    ntdll.dll!NtWaitForSingleObject
+      8  15.09  2.3  guest     sub_8200BEEF [guest 0x8200BEEF]
+      7  13.21  2.0  rexlego   lsp_selftest_hot
+      1   1.89  0.3  system    ntdll.dll!RtlQueryPerformanceCounter
+
+== top 22 by inclusive (all samples) ==
+samples       %    /s  category  function
+-------  ------  ----  --------  -----------------------------------------------------------------------------------
+     53  100.00  15.2  system    KERNEL32.DLL!BaseThreadInitThunk
+     53  100.00  15.2  system    ntdll.dll!RtlUserThreadStart
+     26   49.06   7.5  rexlego   thread_start<unsigned int (__cdecl *)(void *), 1>
+     18   33.96   5.2  system    ntdll.dll!NtWaitForWorkViaWorkerFactory
+     18   33.96   5.2  system    ntdll.dll!fn_24990 (near TpCallbackMayRunLong+0x1690)
+     10   18.87   2.9  system    ntdll.dll!NtDelayExecution
+     10   18.87   2.9  system    ntdll.dll!RtlDelayExecution
+     10   18.87   2.9  system    KERNELBASE.dll!SleepEx
+      9   16.98   2.6  rexlego   main
+      9   16.98   2.6  rexlego   __scrt_common_main_seh
+      9   16.98   2.6  system    ntdll.dll!NtWaitForSingleObject
+      9   16.98   2.6  system    KERNELBASE.dll!WaitForSingleObjectEx
+      9   16.98   2.6  rexlego   selftest::Waiter
+      9   16.98   2.6  rexlego   std::thread::_Invoke<class std::tuple<class `extern "C" main'::`1'::<lambda_1>>, 0>
+      9   16.98   2.6  rexlego   selftest::Sleeper
+      9   16.98   2.6  rexlego   std::thread::_Invoke<class std::tuple<class `extern "C" main'::`1'::<lambda_2>>, 0>
+      8   15.09   2.3  rexlego   lsp_selftest_outer
+      8   15.09   2.3  guest     sub_8200BEEF [guest 0x8200BEEF]
+      8   15.09   2.3  rexlego   selftest::GuestLoop
+      8   15.09   2.3  rexlego   std::thread::_Invoke<class std::tuple<class `extern "C" main'::`1'::<lambda_0>>, 0>
+      7   13.21   2.0  rexlego   lsp_selftest_hot
+      1    1.89   0.3  system    ntdll.dll!RtlQueryPerformanceCounter
+
+== modules by self ==
+samples      %  module
+-------  -----  ---------------------
+     38  71.70  ntdll.dll
+     15  28.30  profiler_selftest.exe
+
+== modules by inclusive ==
+samples       %  module
+-------  ------  ---------------------
+     53  100.00  KERNEL32.DLL
+     53  100.00  ntdll.dll
+     35   66.04  profiler_selftest.exe
+     19   35.85  KERNELBASE.dll
+
+(read 0.001 s, map 0.093 s, symbolize 0.243 s; 17 unique stacks, 37 addresses, 24 functions)

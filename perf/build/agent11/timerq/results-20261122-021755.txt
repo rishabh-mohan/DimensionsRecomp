@@ -1,0 +1,61 @@
+# timerq_bench 2026-11-22 02:17:58  12th Gen Intel(R) Core(TM) i7-1255U  timer_queue.cpp D8724B29C432  seconds 10
+[cl] bench_timerq.cpp
+[cl] bench\agent11\bench_timerq.cpp(123): warning C4996: 'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+[cl] timer_queue.cpp
+[cl] DimensionsRecomp\rexglue-sdk\src\core\timer_queue.cpp(42): warning C4996: 'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+[cl] Generating Code...
+built <workspace>\build\agent11\timerq\bench_timerq.exe
+# 02:18:25 a legodimensions process is running (Agent 8's slot): waiting
+# 02:18:45 game gone, continuing
+
+## P/E classes  [02:18:47  AC=True  charge=100%  CPU load 99%  compiler/linker processes 0]  bench_timerq classes
+P 0xf E 0xff0
+
+## spin_wait costs  [02:18:52  AC=True  charge=100%  CPU load 93%  compiler/linker processes 0]  bench_timerq spin 300
+LP  0 class 1: busy phase median 394.5 us (96.4 ns per pause), min 369.2, max 386316.5
+LP  1 class 1: busy phase median 414.7 us (101.3 ns per pause), min 361.1, max 5302.8
+LP  2 class 1: busy phase median 390.8 us (95.5 ns per pause), min 358.2, max 7114.2
+LP  3 class 1: busy phase median 398.5 us (97.4 ns per pause), min 358.6, max 261539.2
+LP  4 class 0: busy phase median 272.3 us (66.5 ns per pause), min 233.5, max 15009.9
+LP  5 class 0: busy phase median 239.4 us (58.5 ns per pause), min 233.6, max 5117.4
+LP  6 class 0: busy phase median 237.1 us (57.9 ns per pause), min 233.5, max 17514.1
+LP  7 class 0: busy phase median 236.7 us (57.8 ns per pause), min 233.6, max 6684.0
+LP  8 class 0: busy phase median 236.1 us (57.7 ns per pause), min 233.5, max 50491.2
+LP  9 class 0: busy phase median 235.9 us (57.6 ns per pause), min 233.7, max 776.2
+LP 10 class 0: busy phase median 236.4 us (57.8 ns per pause), min 233.6, max 576.5
+LP 11 class 0: busy phase median 236.5 us (57.8 ns per pause), min 233.7, max 761.5
+sleep_for(1 ms), timeBeginPeriod 0: median 15.38 ms, min 3.71, max 29.93
+sleep_for(1 ms), timeBeginPeriod 1: median 6.87 ms, min 1.24, max 15.33
+SwitchToThread: 0.75 us per call, 562 of 100000 switched
+
+## 1 ms timer, spin, timeBeginPeriod 0  [02:18:57  AC=True  charge=100%  CPU load 99%  compiler/linker processes 0]  bench_timerq run 10 0
+mode SPIN (default)  timeBeginPeriod 0  affinity 0x0  window 10.00 s
+  timer thread CPU: 30.6% of a core by GetThreadTimes (user 28.3%, kernel 2.3%), 31.8% by cycles
+  callbacks: 1000/s; gap ms p10 0.235 p50 0.381 p90 1.132 p99 13.288 max 39.870; gaps <0.5 ms 8148, >2 ms 786, >5 ms 542, >10 ms 287; tick count >2 ms stale 49.5% of the time
+
+## 1 ms timer, blocking, timeBeginPeriod 0  [02:19:10  AC=True  charge=100%  CPU load 85%  compiler/linker processes 1]  bench_timerq run 10 0  (REX_TIMER_WAIT_BLOCKING=1)
+mode BLOCKING (REX_TIMER_WAIT_BLOCKING)  timeBeginPeriod 0  affinity 0x0  window 10.01 s
+  timer thread CPU: 0.5% of a core by GetThreadTimes (user 0.5%, kernel 0.0%), 0.6% by cycles
+  callbacks: 1001/s; gap ms p10 0.000 p50 0.001 p90 0.004 p99 16.242 max 27.068; gaps <0.5 ms 9164, >2 ms 806, >5 ms 664, >10 ms 595; tick count >2 ms stale 83.0% of the time
+
+## 1 ms timer, spin, timeBeginPeriod 1  [02:19:23  AC=True  charge=100%  CPU load 85%  compiler/linker processes 0]  bench_timerq run 10 1
+mode SPIN (default)  timeBeginPeriod 1  affinity 0x0  window 10.00 s
+  timer thread CPU: 28.1% of a core by GetThreadTimes (user 24.8%, kernel 3.3%), 28.6% by cycles
+  callbacks: 1000/s; gap ms p10 0.129 p50 0.402 p90 2.208 p99 6.893 max 25.153; gaps <0.5 ms 6231, >2 ms 1272, >5 ms 231, >10 ms 34; tick count >2 ms stale 22.1% of the time
+
+## 1 ms timer, blocking, timeBeginPeriod 1  [02:19:35  AC=True  charge=100%  CPU load 76%  compiler/linker processes 0]  bench_timerq run 10 1  (REX_TIMER_WAIT_BLOCKING=1)
+mode BLOCKING (REX_TIMER_WAIT_BLOCKING)  timeBeginPeriod 1  affinity 0x0  window 10.00 s
+  timer thread CPU: 1.4% of a core by GetThreadTimes (user 0.8%, kernel 0.6%), 1.9% by cycles
+  callbacks: 1000/s; gap ms p10 0.002 p50 1.105 p90 1.667 p99 3.398 max 10.738; gaps <0.5 ms 2637, >2 ms 643, >5 ms 27, >10 ms 2; tick count >2 ms stale 4.7% of the time
+
+## 1 ms timer, spin, timeBeginPeriod 0, P cores only  [02:19:48  AC=True  charge=100%  CPU load 60%  compiler/linker processes 0]  bench_timerq run 10 0 f
+mode SPIN (default)  timeBeginPeriod 0  affinity 0xf  window 10.01 s
+  timer thread CPU: 33.7% of a core by GetThreadTimes (user 33.2%, kernel 0.5%), 34.5% by cycles
+  callbacks: 1000/s; gap ms p10 0.228 p50 0.387 p90 0.820 p99 13.195 max 30.182; gaps <0.5 ms 8222, >2 ms 694, >5 ms 536, >10 ms 310; tick count >2 ms stale 49.3% of the time
+
+## 1 ms timer, spin, timeBeginPeriod 0, E cores only  [02:20:01  AC=True  charge=100%  CPU load 24%  compiler/linker processes 0]  bench_timerq run 10 0 ff0
+mode SPIN (default)  timeBeginPeriod 0  affinity 0xff0  window 10.01 s
+  timer thread CPU: 21.1% of a core by GetThreadTimes (user 17.3%, kernel 3.7%), 22.3% by cycles
+  callbacks: 1001/s; gap ms p10 0.109 p50 0.242 p90 1.804 p99 14.042 max 26.246; gaps <0.5 ms 7949, >2 ms 953, >5 ms 516, >10 ms 312; tick count >2 ms stale 51.1% of the time
+
+# done 02:20:13  log <workspace>\build\agent11\timerq\results-20261122-021755.txt

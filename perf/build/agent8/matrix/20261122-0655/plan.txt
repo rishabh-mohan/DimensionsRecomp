@@ -1,0 +1,27 @@
+﻿=== timing matrix: NATIVE3D zero-code checks (agent slot, hidden desktop, functional, NOT timing): Agent 7's specs for Agent 1's slot item 3b (06:29). n2t/n3t/n2s on build/agent2/native3d-bin ===
+matrix   <workspace>\bench\agent8\zero\matrix-native3d-zero-code.json
+note     Written by Agent 8 at 06:31 from Agent 7's spec. Settings and the n2/n3 rows are copied exactly from bench/agent4/s3/matrix-native3d-functional.json (the 0452 rows); each arm adds exactly one env var. sys_csv is on (drivers/sys-csv.ps1, 1 s) so the slow-state check can be applied; the 0452 rows had none.
+note     n2t = n2 + LEGO_NATIVE_TIMING=1 and n3t = n3 + LEGO_NATIVE_TIMING=1: no log line, but the *_ms columns in native-frames.csv and perf.csv must be non-zero (textures.cpp:1531-1541).
+note     n2s = n2 + LEGO_NATIVE_PARALLEL_DRAWS=0: game.log must show 'Native draw batches: serial workers=' (draw.cpp:5586).
+note     Run by Agent 8's slot one arm at a time (run-matrix.ps1 -Only <id> -NoPrompt), each only if it can end by 07:30. Functional only: log lines and counts, never timing. Analysis (if Agent 1 assigns it): Agent 7, bench/agent7/threaded_tail.py.
+settings warm-up from firstframe (boot timeout 240 s, settle 0 s); order fixed; close timeout 60 s; cooldown 5 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+       n3t: bin build/agent2/native3d-bin; frames native; x1; warm-up 60 s (raised from 30 s for the floor); window 60 s; group native3d; cvars native_settings_frontend=false native_fps_limit=0 framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv LEGO_NATIVE_THREADED=1 LEGO_NATIVE_PREPARE_THREADS=2 LEGO_NATIVE_FULL_DRAW_PREPARATION=1 LEGO_NATIVE_TIMING=1; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         Agent 7 n3t: Agent 4's native3d n3 row plus LEGO_NATIVE_TIMING=1. Expect non-zero *_ms columns in native-frames.csv and perf.csv
+round 1  n3t
+order    n3t
+estimate 1 runs (0 cold), about 3 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-Z6GPK4FJA27AD6EDS7HLIJPEVI -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   7.44 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/native3d-bin : ok (MANIFEST.txt)
+screensaver WPXSCR~1.SCR after 120 s: the keep-awake request should hold it off; if it starts during timing runs, set it to (None)
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   1 runs, about 3 min: done around 06:57
+keep-awake ON (SetThreadExecutionState continuous+system+display until the matrix ends)

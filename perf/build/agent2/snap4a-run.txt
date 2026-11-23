@@ -1,0 +1,62 @@
+﻿13:25:16 [S4a off] STOP: another snapshot build driver is running (pid 30236: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Command "try { $OutputEncoding = [System.Text.UTF8Encoding]::new($false); [Console]::OutputEncoding = $OutputEncoding } catch {}; $e = @(); foreach ($f in 'build\agent2\run-s4a.ps1', 'build\agent2\stage-snap-bin.ps1', 'build\agent2\stop-snap.ps1') { $t = $null; $er = $null; [void][System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $f).Path, [ref]$t, [ref]$er); \"$f parse errors: $($er.Count)\"; $e += $er }; if ($e.Count) { $e | ForEach-Object { $_.ToString() }; exit 1 }; Get-Date -Format HH:mm:ss; powershell -NoProfile -ExecutionPolicy Bypass -File build\agent2\run-s4a.ps1 -Stage off")
+13:25:29 [S4a off] verify S4a : exit 0 : verify S4a against STATE-S4a-1325.tsv: 23843 files, 0 hashed (size/mtime changed), 6 backups checked, 0 extra file(s) in snap1, 0 problem(s), 0.7s
+13:25:31 [S4a off]   rexglue-sdk/src/graphics/d3d12/shared_memory.cpp: B120D07C6709D0D2 -> BB0838CE3909E18A == snap1
+13:25:31 [S4a off]   rexglue-sdk/src/graphics/shared_memory.cpp: 15C89EDB4B197C17 -> 0BE4BADCAC666BEE == snap1
+13:25:31 [S4a off]   rexglue-sdk/src/system/xmemory.cpp: 6E8FA1BA80EF9271 -> 141FB1A947D59156 == snap1
+13:25:31 [S4a off]   rexglue-sdk/src/core/timer_queue.cpp: D8724B29C43286B0 -> 015C04A22DACC592 == snap1
+13:25:31 [S4a off]   rexglue-sdk/src/graphics/d3d12/pipeline_cache.cpp: 5DBED81F611E25B1 -> DA77744302CFC149 == snap1
+13:25:31 [S4a off]   rexlego/src/gpu_native/shaders.cpp: E87A2DEE43D38D8E -> 9567FE3F3B63637D == snap1
+13:25:32 [S4a off] START S4a off (tag snap4a, -j 10) -> devoff4-bin
+13:25:32 [S4a off] BEGIN build : <workspace>\build\agent2\build-snap.ps1 -Phase all -Tag snap4a -Jobs 10 -KeepGoing -SkipConfigure
+13:30:29 [S4a off] END   build exit=0 wall=297.1s freeC=269.16GB
+13:30:31 [S4a off] rexruntime.dll in snap1-off == install/bin (870276A6D0E8DE57)
+13:30:31 [S4a off] BEGIN stage : <workspace>\build\agent2\stage-snap-bin.ps1 -Variant off -SnapTag S4a -BuildTag snap4a -OutDir <workspace>\build\agent2\devoff4-bin -PatchTagList S1,S2,S3,S3d,S4a -RuntimeStrings audio_shutdown_detach_worker,leave it running and leak what it can still reach,physical_protect_hold_global_lock,timer_queue_precise_wait -XenosStrings shared_memory_upload_hash_log,shared_memory_single_hold_rearm -ExeStrings which can hang when the guest pauses -ManifestNotesFile <workspace>\build\agent2\S4a-notes.txt -WhatText dev OFF build 4 (S4a = S3d + SDK #7 #8 #5(i) #38 with every new switch OFF + #32 always on): NATIVE_GPU=OFF
+13:31:40 [S4a off] END   stage exit=0 wall=68.7s freeC=268.93GB
+13:31:40 [S4a off]   PASS staged copy identical: FiraSans-Regular.ttf
+13:31:40 [S4a off]   staged 7 files into <workspace>\build\agent2\devoff4-bin (214.3 MB)
+13:31:40 [S4a off]   staged achievement_unlocked.wav: 191018 B, sha256 A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5; == devoff3-bin
+13:31:40 [S4a off]   staged FiraSans-Regular.ttf: 456996 B, sha256 C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23; == devoff3-bin
+13:31:42 [S4a off]   staged legodimensions.exe: 170335232 B, sha256 6BE3C713229232B29C183D27B397A3560B46E2279C6AF47C64CF8A2EFA287376; differs from devoff3-bin
+13:31:42 [S4a off]   staged legodimensions.map: 39162310 B, sha256 DCC51E2B7A0040E20E017C1FE9877CA88926B543B75B58884CEF05CAACF95253; differs from devoff3-bin
+13:31:42 [S4a off]   staged rexgpu-xenos.dll: 3406848 B, sha256 59662F767F8B9C7CA78C38370EC6ED6CFB499805F833B458543C206254F65BE5; differs from devoff3-bin
+13:31:42 [S4a off]   staged rexruntime.dll: 10898432 B, sha256 870276A6D0E8DE570848FB811591BA5B0AFD8B36413A09F154D0BCAF4902AECA; differs from devoff3-bin
+13:31:42 [S4a off]   staged TracyClient.dll: 233472 B, sha256 85044850B6C663B5CE8722285D13070381C33C9ABC49D06B3E59BA0277F8FF4E; == devoff3-bin
+13:31:42 [S4a off]   staged MANIFEST.txt: 24908 B, sha256 16DCC9399239E5774BF571869B5248DF36DB0D374BF6A159BF1A9839784CAD6D
+13:31:42 [S4a off]   MANIFEST patch rows: S1 0 / S2 18 / S3 28 / S3d 1 / S4a 6; checks: 81 PASS / 0 FAIL / 54 NOTE
+13:31:43 [S4a off]   #   PASS rexgpu-xenos.dll contains 'shared_memory_upload_hash_log'
+13:31:43 [S4a off]   #   PASS rexgpu-xenos.dll contains 'shared_memory_single_hold_rearm'
+13:31:43 [S4a off]   #   PASS rexruntime.dll contains 'physical_protect_hold_global_lock'
+13:31:43 [S4a off]   #   PASS rexruntime.dll contains 'timer_queue_precise_wait'
+13:31:43 [S4a off] DONE S4a off, total wall 371.2s
+13:33:01 [S4a native] verify S4a : exit 0 : verify S4a against STATE-S4a-1325.tsv: 23843 files, 0 hashed (size/mtime changed), 6 backups checked, 0 extra file(s) in snap1, 0 problem(s), 0.9s
+13:33:02 [S4a native]   rexglue-sdk/src/graphics/d3d12/shared_memory.cpp: B120D07C6709D0D2 -> BB0838CE3909E18A == snap1
+13:33:02 [S4a native]   rexglue-sdk/src/graphics/shared_memory.cpp: 15C89EDB4B197C17 -> 0BE4BADCAC666BEE == snap1
+13:33:02 [S4a native]   rexglue-sdk/src/system/xmemory.cpp: 6E8FA1BA80EF9271 -> 141FB1A947D59156 == snap1
+13:33:02 [S4a native]   rexglue-sdk/src/core/timer_queue.cpp: D8724B29C43286B0 -> 015C04A22DACC592 == snap1
+13:33:02 [S4a native]   rexglue-sdk/src/graphics/d3d12/pipeline_cache.cpp: 5DBED81F611E25B1 -> DA77744302CFC149 == snap1
+13:33:02 [S4a native]   rexlego/src/gpu_native/shaders.cpp: E87A2DEE43D38D8E -> 9567FE3F3B63637D == snap1
+13:33:02 [S4a native] START S4a native (tag snap4a, -j 10) -> native4-bin
+13:33:02 [S4a native] BEGIN build : <workspace>\build\agent2\build-snap.ps1 -Phase game -Native -Tag snap4a -Jobs 10 -PrelinkJobs 10 -KeepGoing
+13:34:51 [S4a native] END   build exit=0 wall=107.0s freeC=268.92GB
+13:35:00 [S4a native] rexruntime.dll in snap1-on == install/bin (870276A6D0E8DE57)
+13:35:00 [S4a native] BEGIN stage : <workspace>\build\agent2\stage-snap-bin.ps1 -Variant native -SnapTag S4a -BuildTag snap4a -OutDir <workspace>\build\agent2\native4-bin -PatchTagList S1,S2,S3,S3d,S4a -RuntimeStrings audio_shutdown_detach_worker,leave it running and leak what it can still reach,physical_protect_hold_global_lock,timer_queue_precise_wait -XenosStrings shared_memory_upload_hash_log,shared_memory_single_hold_rearm -ExeStrings which can hang when the guest pauses,LEGO_NATIVE_TEXTURE_LEGACY_UPLOAD,LEGO_NATIVE_FPS_CELL_RECTS,LEGO_NATIVE_TEXTURE_STAGING_POOL,LEGO_NATIVE_SHADER_MISS_CACHE -ManifestNotesFile <workspace>\build\agent2\S4a-notes.txt -WhatText native build 4 (S4a = S3d + SDK #7 #8 #5(i) #38 with every new switch OFF + #32 always on + #2 miss cache, OFF by default): NATIVE_GPU=ON with Agent 6 AOT inputs
+13:37:54 [S4a native] END   stage exit=0 wall=173.7s freeC=268.09GB
+13:37:54 [S4a native]   PASS staged copy identical: amd_fidelityfx_dx12.dll
+13:37:54 [S4a native]   staged 8 files into <workspace>\build\agent2\native4-bin (363.8 MB)
+13:37:54 [S4a native]   staged achievement_unlocked.wav: 191018 B, sha256 A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5; == native3d-bin
+13:37:55 [S4a native]   staged amd_fidelityfx_dx12.dll: 6675664 B, sha256 12A5081257EC95B0B53AD51B4A87FB3C03F97FE0BBB59F9496968F8D50EF93A6; == native3d-bin
+13:37:55 [S4a native]   staged FiraSans-Regular.ttf: 456996 B, sha256 C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23; == native3d-bin
+13:38:15 [S4a native]   staged legodimensions.exe: 315811328 B, sha256 65432C81D8C7D29A35D80A5D971F2373A1188BC43FF3F92232CD1A8A500FB811; differs from native3d-bin
+13:38:20 [S4a native]   staged legodimensions.map: 43741350 B, sha256 136CF59158249EED500F3860FB8B49435AE9754786F7BD31C2B97A568F9B8734; differs from native3d-bin
+13:38:21 [S4a native]   staged rexgpu-xenos.dll: 3406848 B, sha256 59662F767F8B9C7CA78C38370EC6ED6CFB499805F833B458543C206254F65BE5; differs from native3d-bin
+13:38:32 [S4a native]   staged rexruntime.dll: 10898432 B, sha256 870276A6D0E8DE570848FB811591BA5B0AFD8B36413A09F154D0BCAF4902AECA; differs from native3d-bin
+13:38:32 [S4a native]   staged TracyClient.dll: 233472 B, sha256 85044850B6C663B5CE8722285D13070381C33C9ABC49D06B3E59BA0277F8FF4E; == native3d-bin
+13:38:33 [S4a native]   staged MANIFEST.txt: 27221 B, sha256 00D33D4FFB46776DED60F60C2793C01029E435492013D92B39F2AE39634214DE
+13:38:34 [S4a native]   MANIFEST patch rows: S1 0 / S2 18 / S3 28 / S3d 1 / S4a 6; checks: 107 PASS / 0 FAIL / 38 NOTE
+13:38:34 [S4a native]   #   PASS legodimensions.exe contains 'LEGO_NATIVE_SHADER_MISS_CACHE'
+13:38:34 [S4a native]   #   PASS rexgpu-xenos.dll contains 'shared_memory_upload_hash_log'
+13:38:34 [S4a native]   #   PASS rexgpu-xenos.dll contains 'shared_memory_single_hold_rearm'
+13:38:35 [S4a native]   #   PASS rexruntime.dll contains 'physical_protect_hold_global_lock'
+13:38:35 [S4a native]   #   PASS rexruntime.dll contains 'timer_queue_precise_wait'
+13:38:35 [S4a native]   native GPU fingerprint: LEGO Dimensions native GPU 5e3ff55de10f4f64
+13:38:35 [S4a native] DONE S4a native, total wall 333.2s

@@ -1,0 +1,31 @@
+{
+ "title": "NEGATIVE TEST ONLY (Agent 6, task #19): s4b18 labelled q250 and s4b17 labelled q0 must FAIL",
+ "reference": "off",
+ "notes": [
+  "Not a timed window. Arms p1 and q250s are gate-only arms (not W9 arms); off is s4b-01-off (menus route).",
+  "cvars [] and env {} for every arm, because Agent 3's run.json records cvars {} and keeps the env under 'env', not 'env_set', so the kit reads {} for both. The real W9 arms are in bench/agent8/run/matrix-window9.json."
+ ],
+ "arms": [
+  {
+   "id": "off",
+   "bin": "build/agent2/devoff4b-bin",
+   "cvars": [],
+   "env": {},
+   "note": "s4b-01-off: no LEGO_GPU_WAIT_* key"
+  },
+  {
+   "id": "q250",
+   "bin": "build/agent2/devoff4b-bin",
+   "cvars": [],
+   "env": {},
+   "note": "really s4b18 (Q 250, stats ON)"
+  },
+  {
+   "id": "q0",
+   "bin": "build/agent2/devoff4b-bin",
+   "cvars": [],
+   "env": {},
+   "note": "really s4b17 (back-off OFF, stats ON)"
+  }
+ ]
+}

@@ -1,0 +1,34 @@
+{
+  "production_source_sha256": "62970ca3bf4ae7083c13a9ca87631b326b8f8dfc8d2c751364f3449c5363f52f",
+  "sdk_depth_loader_sha256": "b84e788045a2b41db348f3991dd4f83cf47fde653f8693607b0bef1c00477c76",
+  "sdk_depth_table_sha256": "949ccf4f4d80975d4df3e833604bdbec8c1442d787e2492085f0fa966e7f8c99",
+  "sdk_swizzle_source_sha256": "f25701208d56bbcfdd8718ccc15a9723b77e58d09b099e37aff049fe20ec728e",
+  "depth_mirror_orders": [
+    "CPU upload then GPU resolve",
+    "GPU resolve before CPU upload"
+  ],
+  "depth_mirror_swizzles": [
+    "B48",
+    "688"
+  ],
+  "depth_mirror_full_d3d_format_gpu_first": "80000016",
+  "gpu_first_failure_retry_cases": 5,
+  "legacy_negative": null,
+  "decoder_sha256": "d6aaabe20c699aaef5cb771a28cb7f165a48da6c73e7d52352ceb2b534560c17",
+  "retained_source_sha256": "1948ff0aceca4910f494dd5af3f4cadf4b89462ac1d4628eeaaccc9b26bdccf2",
+  "publication_sha256": "0e38501ce2ba571c8651dfd6fb4d8e069358090ddbd776aabf3d7d8b5aa0c3be",
+  "test_sha256": "f7dc2e352d1ae9e544816137f0179e533ab9818603284af314052096bb570787",
+  "publication_helpers_exercised": true,
+  "scope": "Production depth decode, authority and binding; publication helpers when present. Plume copy and recorder/fence are injected boundaries. Actual D3D12/tape publication is covered separately.",
+  "actual_bodies": [
+    "UploadGuestDepthTexture",
+    "EnsureDepthSamplingMirror",
+    "QueuePreparedTextureUpload",
+    "PublishPreparedTextureUpload",
+    "ResolveTextureResource",
+    "UploadTextureResource entry guards",
+    "ResolveTextureFromSurface depth atlas branch",
+    "BindConstants upload/refresh"
+  ],
+  "result": "passed"
+}

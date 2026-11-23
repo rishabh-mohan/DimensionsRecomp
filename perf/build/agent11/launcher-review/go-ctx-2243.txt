@@ -1,0 +1,141 @@
+﻿--- run-night.ps1 L300-321
+L300: # -NonInteractive: if the runner ever asked for input it would fail at once instead of waiting all night (run-matrix.ps1
+L301: # asks only without -Matrix or without -NoPrompt).
+L302: function Get-RunnerArgs([string]$Path, $Go) {
+L303:     return @('-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', $RunMatrix, '-Matrix', $Path, '-Only', ($Go.only -join ','), '-Repeats', [string]$Go.repeats, '-ColdShared', '-NoPrompt')
+L304: }
+L305: # sha256 of legodimensions.exe and MANIFEST.txt in the bins of the only= arms (paths already checked by Test-Matrix).
+L306: # Logged when the GO is accepted and compared again right before the start.
+L307: function Get-BinHashes($Go, [string]$Path) {
+L308:     $h = [ordered]@{}
+L309:     $mx = [IO.File]::ReadAllText($Path) | ConvertFrom-Json
+L310:     foreach ($a in @(Get-P $mx 'arms')) {
+L311:         if ($Go.only -cnotcontains [string](Get-P $a 'id')) { continue }
+L312:         $bn = (([string](Get-P $a 'bin')) -replace '\\', '/').TrimEnd('/')
+L313:         foreach ($f in @('legodimensions.exe', 'MANIFEST.txt')) {
+L314:             $k = "$bn/$f"; if ($h.Contains($k)) { continue }
+L315:             $p = Join-Path $Repo (($bn -replace '/', '\') + '\' + $f)
+L316:             $h[$k] = if (Test-Path -LiteralPath $p -PathType Leaf) { (Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash } else { 'MISSING' }
+L317:         }
+L318:     }
+L319:     return $h
+L320: }
+L321: # Not reasons to refuse: logged as WARN in the window log.
+--- run-matrix.ps1 repeats handling
+L4: #       [-Only id,id] [-Repeats N] [-Quick] [-PlanOnly] [-NoPrompt] [-NoCold | -ColdShared] [-OutDir build\agent8\matrix\<yyyyMMdd-HHmm>]
+L7: #   top: title reference warmup_s warmup_from(firstframe|launch) measure_s repeats settle_s cooldown_s boot_timeout_s
+L10: #   arm: id group ref repeats frames(perf|native) bin cvars[] env{} toml{} seed_cache seed_recipes_only triggers[]
+L12: # Order: round k runs the arms with repeats >= k; roundrobin rotates the start arm each round (over the arms of that
+L33: [int]$Repeats = 0,
+L49: $TopKeys = @('title', 'reference', 'warmup_s', 'warmup_from', 'measure_s', 'repeats', 'settle_s', 'cooldown_s', 'boot_timeout_s',
+L52: $ArmKeys = @('id', 'group', 'ref', 'repeats', 'frames', 'bin', 'cvars', 'env', 'toml', 'seed_cache', 'seed_recipes_only', 'triggers',
+L54: $QuickKeys = @('warmup_s', 'measure_s', 'repeats', 'settle_s', 'cooldown_s', 'boot_timeout_s', 'close_timeout_s', 'menu_s', 'profile_s',
+L56: $NumKeys = @('warmup_s', 'measure_s', 'repeats', 'settle_s', 'cooldown_s', 'boot_timeout_s', 'close_timeout_s', 'menu_s', 'profile_s',
+L58: $D = @{ warmup_s = 60; measure_s = 120; repeats = 3; settle_s = 20; cooldown_s = 10; boot_timeout_s = 240; close_timeout_s = 60
+L144: foreach ($k in @('repeats', 'menu_s', 'profile_s')) { $v = Get-P $a $k; if ($null -ne $v -and -not (Test-Num $v)) { $E.Add("arm '$id': $k must be a number") } }
+L230: $rp = if ($Repeats -gt 0) { $Repeats } else { [int](Get-Val $mx $a 'repeats') }
+L231: $ai = @{ id = $id; arm = $a; bin = $bin; bin_abs = $binAbs; group = [string](Get-P $a 'group' ''); skip = $null; repeats = $rp
+L262: $maxRep = 0; foreach ($id in $runnable) { if ($P.arms[$id].repeats -gt $maxRep) { $maxRep = $P.arms[$id].repeats } }
+L267: $ids = @($runnable | Where-Object { $P.arms[$_].repeats -ge $k })
+L313: $bits = @("bin $($ai.bin)", "frames $([string](Get-P $a 'frames' 'perf'))", "x$($ai.repeats)",
+--- stage estimates
+stage-W6-220900.txt L4: run: only=s0,p2,p2f,p2fc repeats=5 -ColdShared; -PlanOnly: 21 runs, about 48 min (runner); expected 21 runs; Agent 7's formula 1.70 + 2.14 x 4 x 5 = 44.5 min
+stage-W6-220900.txt L6: GO line: GO W6 matrix-window6.json E50D791B6C38638F718A1AF65EB15EAF543A78AC8EA50B69DD1CC96AB7C9A0D2 only=s0,p2,p2f,p2fc repeats=5
+stage-W6-220900.txt L29: note     W6 (S4-DRAFT L346): run\run-matrix.ps1 -Matrix <this file> -Only s0,p2,p2f,p2fc -Repeats 3 -ColdShared -NoPrompt. One unscored cold run shared by all arms (they all use one bin), then 3 round
+stage-W6-220900.txt L31: note     Pairs (R3), all on the same bin: P2 = p2 - s0; fix (i) = p2f - p2; C1 = p2fc - p2f, with fix (i) ON in both arms (a12 S4.12 step 7; b2r §25 correction 3); stack = p2fc - s0. Read GPU Commands
+stage-W6-220900.txt L49: cold     s0 (build/agent2/devoff4b-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+stage-W6-220900.txt L50: -ColdShared: one cold run for all 1 bin(s); the other bins first launch as scored round-1 runs
+stage-W9-221141.txt L4: run: only=off,q0,q125,q250,q500 repeats=4 -ColdShared; -PlanOnly: 21 runs, about 48 min (runner); expected 21 runs; Agent 7's formula 1.70 + 2.14 x 5 x 4 = 44.5 min
+stage-W9-221141.txt L6: GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): GO W9 matrix-window9.json CE0AD75792B47D59876C864B39797CD877404F911D12F92E6CC9C4351D747610 only=off,q0,q12
+stage-W9-221141.txt L26: note     Follow-up window proposed by Agent 8 (run-2 task #7) on 2026-11-22 for the 01:00-06:45 slot; Agent 1 picks. Staged and checked with build/agent8/w-followup/stage-window.ps1. GO: 'GO W9 matrix
+stage-W9-221141.txt L30: note     Proof per run: every q* game.log has exactly one 'GPU wait back-off: ON (quantum <Q> us, spin 30 us); stats OFF; GetData hook built.' with its arm's Q, and run.json env_set holds LEGO_GPU_WAI
+stage-W9-221141.txt L49: cold     off (build/agent2/devoff4b-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+stage-W9-221141.txt L50: -ColdShared: one cold run for all 1 bin(s); the other bins first launch as scored round-1 runs
+stage-W5b-221447.txt L4: run: only=d11,d11t,d11p repeats=6 -ColdShared; -PlanOnly: 19 runs, about 44 min (runner); expected 19 runs; Agent 7's formula 1.70 + 2.14 x 3 x 6 = 40.2 min
+stage-W5b-221447.txt L6: GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): GO W5b matrix-window5b.json 23575AAAE9DCBB85C9965AC8A3A8794916FFA881C09C656A6512C7EE462D5F76 only=d11,d11t
+stage-W5b-221447.txt L24: note     Follow-up window proposed by Agent 8 (run-2 task #7) on 2026-11-22 for the 01:00-06:45 slot; Agent 1 picks. Staged and checked with build/agent8/w-followup/stage-window.ps1. GO (a): 'GO W5b m
+stage-W5b-221447.txt L26: note     All three arms ran in W5 (16/16 runs OK; Agent 6's logdiff: only the expected timer lines). The shared cold run is on devoff4, the bin of every arm, so every scored run is a warm run of one b
+stage-W5b-221447.txt L43: cold     d11 (build/agent2/devoff4-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+stage-W5b-221447.txt L44: -ColdShared: one cold run for all 1 bin(s); the other bins first launch as scored round-1 runs
+stage-W5b2-222310.txt L4: run: only=d11,d11t repeats=6 -ColdShared; -PlanOnly: 13 runs, about 30 min (runner); expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+stage-W5b2-222310.txt L6: GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): GO W5b2 matrix-window5b.json 23575AAAE9DCBB85C9965AC8A3A8794916FFA881C09C656A6512C7EE462D5F76 only=d11,d11
+stage-W5b2-222310.txt L24: note     Follow-up window proposed by Agent 8 (run-2 task #7) on 2026-11-22 for the 01:00-06:45 slot; Agent 1 picks. Staged and checked with build/agent8/w-followup/stage-window.ps1. GO (a): 'GO W5b m
+stage-W5b2-222310.txt L26: note     All three arms ran in W5 (16/16 runs OK; Agent 6's logdiff: only the expected timer lines). The shared cold run is on devoff4, the bin of every arm, so every scored run is a warm run of one b
+stage-W5b2-222310.txt L41: cold     d11 (build/agent2/devoff4-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+stage-W5b2-222310.txt L42: -ColdShared: one cold run for all 1 bin(s); the other bins first launch as scored round-1 runs
+stage-W4c-222347.txt L4: run: only=d0,B repeats=6 -ColdShared; -PlanOnly: 13 runs, about 30 min (runner); expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+stage-W4c-222347.txt L6: GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): GO W4c matrix-window4c.json E2E3E4DAAF7D30C7B8B2D28D21911E6EACDA5260963F9B99095EE70C09022396 only=d0,B rep
+stage-W4c-222347.txt L26: note     Follow-up window proposed by Agent 8 (run-2 task #7) on 2026-11-22 for the 01:00-06:45 slot; Agent 1 picks. Staged and checked with build/agent8/w-followup/stage-window.ps1 (the launcher's ow
+stage-W4c-222347.txt L28: note     Both bins ran in window 4 and in W4b (17/17 runs OK). Agent 6's W4b logdiff: B's game.log is text-identical to d0's (NEW, MORE, GONE and ONLY 0) and its Toypad frames are identical. B's first
+stage-W4c-222347.txt L41: cold     d0 (build/agent2/devoff2-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+stage-W4c-222347.txt L42: -ColdShared: one cold run for all 2 bin(s); the other bins first launch as scored round-1 runs
+stage-W8a4-223101.txt L4: run: only=n4,n4mc repeats=6 -ColdShared; -PlanOnly: 13 runs, about 30 min (runner); expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+stage-W8a4-223101.txt L6: GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): GO W8a4 matrix-window8a4.json 56BE00D8131981A735CC40142980316F9E834D0B51F103A143BA6105AA5DA1D1 only=n4,n4m
+stage-W8a4-223101.txt L23: note     Follow-up window proposed by Agent 8 (run-2 task #7) on 2026-11-22 for the 01:00-06:45 slot; Agent 1 picks. W8a's fallback if native4b-bin or its rows miss the 23:25 cut: the same pair on nat
+stage-W8a4-223101.txt L36: cold     n4 (build/agent2/native4-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+stage-W8a4-223101.txt L37: -ColdShared: one cold run for all 1 bin(s); the other bins first launch as scored round-1 runs
+stage-W8a4-223101.txt L45: estimate 13 runs (1 cold), about 30 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+stage-W4cR-223130.txt L4: run: only=d0,B repeats=6 -ColdShared; -PlanOnly: 13 runs, about 30 min (runner); expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+stage-W4cR-223130.txt L6: GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): GO W4cR matrix-window4c.json E2E3E4DAAF7D30C7B8B2D28D21911E6EACDA5260963F9B99095EE70C09022396 only=d0,B re
+stage-W4cR-223130.txt L21: note     Follow-up window proposed by Agent 8 (run-2 task #7) on 2026-11-22 for the 01:00-06:45 slot; Agent 1 picks. Staged and checked with build/agent8/w-followup/stage-window.ps1 (the launcher's ow
+stage-W4cR-223130.txt L23: note     Both bins ran in window 4 and in W4b (17/17 runs OK). Agent 6's W4b logdiff: B's game.log is text-identical to d0's (NEW, MORE, GONE and ONLY 0) and its Toypad frames are identical. B's first
+stage-W4cR-223130.txt L36: cold     d0 (build/agent2/devoff2-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+stage-W4cR-223130.txt L37: -ColdShared: one cold run for all 2 bin(s); the other bins first launch as scored round-1 runs
+stage-W8a-223143-NOTOK.txt L4: run: only=n0,mc repeats=6 -ColdShared; -PlanOnly: not run or failed; expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+stage-W9n-223146-NOTOK.txt L4: run: only=off,q0 repeats=3 -ColdShared; -PlanOnly: not run or failed; expected 7 runs; Agent 7's formula 1.70 + 2.14 x 2 x 3 = 14.5 min
+stage-W4cn-223154-NOTOK.txt L4: run: only=B repeats=6 -ColdShared; -PlanOnly: not run or failed; expected 7 runs; Agent 7's formula 1.70 + 2.14 x 1 x 6 = 14.5 min
+stage-W4cE-223204-NOTOK.txt L4: run: only=d0,B repeats=6 -ColdShared; -PlanOnly: not run or failed; expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+stage-W5b-224054.txt L4: run: only=d11,d11t,d11p repeats=6 -ColdShared; -PlanOnly: 19 runs, about 44 min (runner); expected 19 runs; Agent 7's formula 1.70 + 2.14 x 3 x 6 = 40.2 min
+stage-W5b-224054.txt L6: GO line: GO W5b matrix-window5b.json 23575AAAE9DCBB85C9965AC8A3A8794916FFA881C09C656A6512C7EE462D5F76 only=d11,d11t,d11p repeats=6
+stage-W5b-224054.txt L24: note     Follow-up window proposed by Agent 8 (run-2 task #7) on 2026-11-22 for the 01:00-06:45 slot; Agent 1 picks. Staged and checked with build/agent8/w-followup/stage-window.ps1. GO (a): 'GO W5b m
+stage-W5b-224054.txt L26: note     All three arms ran in W5 (16/16 runs OK; Agent 6's logdiff: only the expected timer lines). The shared cold run is on devoff4, the bin of every arm, so every scored run is a warm run of one b
+stage-W5b-224054.txt L43: cold     d11 (build/agent2/devoff4-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+stage-W5b-224054.txt L44: -ColdShared: one cold run for all 1 bin(s); the other bins first launch as scored round-1 runs
+stage-W4c-224057.txt L4: run: only=d0,B repeats=6 -ColdShared; -PlanOnly: 13 runs, about 30 min (runner); expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+stage-W4c-224057.txt L6: GO line: GO W4c matrix-window4c.json E2E3E4DAAF7D30C7B8B2D28D21911E6EACDA5260963F9B99095EE70C09022396 only=d0,B repeats=6
+stage-W4c-224057.txt L26: note     Follow-up window proposed by Agent 8 (run-2 task #7) on 2026-11-22 for the 01:00-06:45 slot; Agent 1 picks. Staged and checked with build/agent8/w-followup/stage-window.ps1 (the launcher's ow
+stage-W4c-224057.txt L28: note     Both bins ran in window 4 and in W4b (17/17 runs OK). Agent 6's W4b logdiff: B's game.log is text-identical to d0's (NEW, MORE, GONE and ONLY 0) and its Toypad frames are identical. B's first
+stage-W4c-224057.txt L41: cold     d0 (build/agent2/devoff2-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+stage-W4c-224057.txt L42: -ColdShared: one cold run for all 2 bin(s); the other bins first launch as scored round-1 runs
+stage-W9-224128.txt L4: run: only=off,q0,q125,q250,q500 repeats=4 -ColdShared; -PlanOnly: 21 runs, about 48 min (runner); expected 21 runs; Agent 7's formula 1.70 + 2.14 x 5 x 4 = 44.5 min
+stage-W9-224128.txt L6: GO line: GO W9 matrix-window9.json CE0AD75792B47D59876C864B39797CD877404F911D12F92E6CC9C4351D747610 only=off,q0,q125,q250,q500 repeats=4
+stage-W9-224128.txt L26: note     Follow-up window proposed by Agent 8 (run-2 task #7) on 2026-11-22 for the 01:00-06:45 slot; Agent 1 picks. Staged and checked with build/agent8/w-followup/stage-window.ps1. GO: 'GO W9 matrix
+stage-W9-224128.txt L30: note     Proof per run: every q* game.log has exactly one 'GPU wait back-off: ON (quantum <Q> us, spin 30 us); stats OFF; GetData hook built.' with its arm's Q, and run.json env_set holds LEGO_GPU_WAI
+stage-W9-224128.txt L49: cold     off (build/agent2/devoff4b-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+stage-W9-224128.txt L50: -ColdShared: one cold run for all 1 bin(s); the other bins first launch as scored round-1 runs
+stage-W6-224132.txt L4: run: only=s0,p2,p2f,p2fc repeats=5 -ColdShared; -PlanOnly: 21 runs, about 48 min (runner); expected 21 runs; Agent 7's formula 1.70 + 2.14 x 4 x 5 = 44.5 min
+stage-W6-224132.txt L6: GO line: GO W6 matrix-window6.json E50D791B6C38638F718A1AF65EB15EAF543A78AC8EA50B69DD1CC96AB7C9A0D2 only=s0,p2,p2f,p2fc repeats=5
+stage-W6-224132.txt L29: note     W6 (S4-DRAFT L346): run\run-matrix.ps1 -Matrix <this file> -Only s0,p2,p2f,p2fc -Repeats 3 -ColdShared -NoPrompt. One unscored cold run shared by all arms (they all use one bin), then 3 round
+stage-W6-224132.txt L31: note     Pairs (R3), all on the same bin: P2 = p2 - s0; fix (i) = p2f - p2; C1 = p2fc - p2f, with fix (i) ON in both arms (a12 S4.12 step 7; b2r §25 correction 3); stack = p2fc - s0. Read GPU Commands
+stage-W6-224132.txt L49: cold     s0 (build/agent2/devoff4b-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+stage-W6-224132.txt L50: -ColdShared: one cold run for all 1 bin(s); the other bins first launch as scored round-1 runs
+stage-W8a4-223501.txt L4: run: only=n4,n4mc repeats=6 -ColdShared; -PlanOnly: 13 runs, about 30 min (runner); expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+stage-W8a4-223501.txt L6: GO line: GO W8a4 matrix-window8a4.json 56BE00D8131981A735CC40142980316F9E834D0B51F103A143BA6105AA5DA1D1 only=n4,n4mc repeats=6
+stage-W8a4-223501.txt L23: note     Follow-up window proposed by Agent 8 (run-2 task #7) on 2026-11-22 for the 01:00-06:45 slot; Agent 1 picks. W8a's fallback if native4b-bin or its rows miss the 23:25 cut: the same pair on nat
+stage-W8a4-223501.txt L36: cold     n4 (build/agent2/native4-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+stage-W8a4-223501.txt L37: -ColdShared: one cold run for all 1 bin(s); the other bins first launch as scored round-1 runs
+stage-W8a4-223501.txt L45: estimate 13 runs (1 cold), about 30 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+--- bench/agent8/run matrices
+matrix-base-vs-devoff1.json created 21:38:43 written 21:38:43 91AC59B0
+matrix-codegen-check.json created 22:03:09 written 02:46:23 D64F2BE2
+matrix-codegen.json created 22:03:08 written 02:14:48 40CF4072
+matrix-io-level.json created 22:03:10 written 22:18:30 AFAABD33
+matrix-native-functional.json created 22:03:08 written 00:22:21 7E94C186
+matrix-native-pso.json created 20:14:44 written 22:03:05 41F32CF8
+matrix-native-threaded.json created 22:05:15 written 06:04:52 76FE0BAA
+matrix-native-tier1.json created 20:14:43 written 22:03:04 95200E0B
+matrix-native-tier2.json created 22:03:06 written 22:03:06 3B147D5C
+matrix-native-tier3.json created 22:03:07 written 22:03:07 50E82C8F
+matrix-native-uploads-45.json created 03:38:20 written 03:54:25 114A0242
+matrix-native-uploads.json created 22:05:15 written 03:04:27 15BB7822
+matrix-s3-functional.json created 02:47:09 written 03:44:18 3A5C277F
+matrix-window3.json created 23:33:20 written 23:44:16 DE293D96
+matrix-window4.json created 02:47:08 written 03:44:24 6CA4AC6E
+matrix-window4c.json created 22:40:59 written 21:41:07 E2E3E4DA
+matrix-window5-s3d.json created 16:42:26 written 16:42:26 4D7D689B
+matrix-window5b.json created 22:40:55 written 21:41:16 23575AAA
+matrix-window6.json created 21:56:37 written 21:16:51 E50D791B
+matrix-window8a4.json created 22:37:04 written 21:41:28 56BE00D8
+matrix-window9.json created 22:41:29 written 21:41:22 CE0AD757
+matrix.example.json created 20:03:44 written 20:03:44 26809577
+matrix.json created 20:13:13 written 22:03:10 F68A58EC

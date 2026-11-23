@@ -1,0 +1,42 @@
+run: <workspace>\build\agent6\attract-stalls\fixture-slowframe\B
+perf.csv rows: 9648; slow-frame lines: 305
+alignment: perf row = frame# + -1; matched 305/305 (shifted by one row: 0); median |d ms| 0.14; smallest logged frame 49.8 ms
+perf rows >= 50.8 ms without a line: 0
+H0: row 9282 (the time column is H0+s)
+
+rows over 250 ms (plus --rows); component columns are ms from the slow-frame line:
+   row        t      ms class  draws  pm pm-1   cb |    idle   fence   xlate  create new    tex  rb_st     rem  rem%
+  8140   -28.80    1902    P0    625  21    0   10 |   570.6   190.2     0.0     0.0  21   95.1    0.0  1046.2    55
+  8141   -26.90     524    P1    594   0   21    0 |   157.3    52.4     0.0     0.0   0   26.2    0.0   288.5    55
+  8274   -24.18     440   PRE    219   0    0    0 |   307.7    44.0     0.0     0.0   0   44.0    0.0    43.9    10
+  8275   -23.74    1297    P0    768  23    0    4 |   389.0   129.7     0.0     0.0  23   64.8    0.0   713.2    55
+  8276   -22.44     662    P1    789   0   23    0 |   198.7    66.2     0.0     0.0   0   33.1    0.0   364.2    55
+  9259    -1.91     797    P1    790   0    1    0 |   239.1    79.7     0.0     0.0   0   39.9    0.0   438.4    55
+  9268    -0.98     644    P1   1370   0    1    0 |   193.4    64.5     0.0     0.0   0   32.2    0.0   354.5    55
+  9370    +4.63     730    P1   8066   0    4    0 |    73.0   145.9     0.0     0.0   0   36.5    0.0   474.3    65
+  9630   +20.93    5609    P0  12390  67    0    1 |   280.5   112.2  2524.1  1963.2  67  280.5    0.0   448.5     8
+  9631   +26.54     477    P1  12398   0   67    0 |    23.9     9.5   214.7   167.0   0   23.9    0.0    38.1     8
+  9633   +27.24    2387    P1   2520   0   10  120 |   119.3  1789.7     0.0     0.0   0  119.3    0.0   358.0    15
+  9635   +29.68     632   PRE   1822   0    0  231 |    31.6   474.3     0.0     0.0   0   31.6    0.0    94.9    15
+  9637   +30.42    2489    P0   1491   1    6   27 |   746.8   248.9     0.0     0.0   1  124.5    0.0  1369.1    55
+  9638   +32.91     319    P1   1383   0    1    2 |    95.8    31.9     0.0     0.0   0   16.0    0.0   175.5    55
+  9639   +33.23     949    P0   4660  12    0   13 |   284.8    94.9     0.0     0.0  12   47.5    0.0   522.1    55
+  9640   +34.18     703    P0   4701   4   12   15 |   211.0    70.3     0.0     0.0   4   35.2    0.0   386.7    55
+  9641   +34.88    1194    P0   5058  15    4    2 |   358.1   119.4     0.0     0.0  15   59.7    0.0   656.5    55
+  9642   +36.07    2353    P0   5118  31   15   15 |   705.8   235.3     0.0     0.0  31  117.6    0.0  1294.0    55
+  9643   +38.43     547    P1   5156   0   31    2 |    54.7   109.3     0.0     0.0   0   27.3    0.0   355.2    65
+  9647   +39.28     410    P0  10625   3    0    2 |   123.1    41.0     0.0     0.0   3   20.5    0.0   225.7    55
+  9648   +39.69     805    P0  10883   2    3    6 |   241.6    80.5     0.0     0.0   2   40.3    0.0   442.9    55
+
+per class (the rows above that have a line): share of frame time
+   P0:  10 rows   17.71 s | idle  22% fence   7% xlate  14% create  11% tex   5% rem  40%
+   P1:   9 rows    7.09 s | idle  16% fence  33% xlate   3% create   2% tex   5% rem  40%
+  PRE:   2 rows    1.07 s | idle  32% fence  48% xlate   0% create   0% tex   7% rem  13%
+
+decision hints (note section 11):
+Q1: 885 of 887 load-signature rows have no line (under the threshold; menu frames share the signature), first row 355
+Q1 load frame row 354 (62 ms): idle 70%, tex 10%, fence 10%, rem 10% -> guest side (game code or file loading): neither warm storage nor S4 helps
+Q1 load frame row 8274 (440 ms): idle 70%, tex 10%, fence 10%, rem 10% -> guest side (game code or file loading): neither warm storage nor S4 helps
+Q2 cb>=100 rows [9633, 9635]: host-gpu wait 75% of 3019 ms -> host-GPU fence wait confirmed
+Q3 burst rows [9630, 9631] (pm 67, 6086 ms): translate 2739 ms, create 2130 ms, share 0.56 -> translation dominates: do S4 (a), note section 10.1
+Q4 heavy rows with a line: 173 (12048 ms): idle 10%, fence 20% -> GPU-thread draw processing (throughput)

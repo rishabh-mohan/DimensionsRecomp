@@ -1,0 +1,97 @@
+W6 finalize (Agent 5, finalize-w6.ps1), 2026-11-22 21:16, -Bin build/agent2/devoff4b-bin
+result: OK
+matrix-window6.json  sha256 E50D791B6C38638F718A1AF65EB15EAF543A78AC8EA50B69DD1CC96AB7C9A0D2  (<workspace>\build\agent5\w6-draft\matrix-window6.json)
+RUN-WINDOW6.cmd      sha256 3F31CBA8BD62C430F95048575870B3E150E2FE8E13E2017005AB49537E7A5AB5  (<workspace>\build\agent5\w6-draft\RUN-WINDOW6.cmd)
+bin build/agent2/devoff4b-bin  legodimensions.exe sha256 DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83
+
+Agent 8: copy matrix-window6.json to bench\agent8\run\ and RUN-WINDOW6.cmd to bench\agent8\ byte for byte, then check both sha256s.
+GO line for the overnight launcher (perf-notes\WINDOW-GO.txt, one line, only after the copy and Agent 1's go):
+GO W6 matrix-window6.json E50D791B6C38638F718A1AF65EB15EAF543A78AC8EA50B69DD1CC96AB7C9A0D2 only=s0,p2,p2f,p2fc repeats=3
+
+--- MANIFEST.txt (first 40 lines)
+# build/agent2/devoff4b-bin - Agent 2 (Agent 1's batch schedule). dev OFF build 4b (S4b = S4a + SDK C1 v3 + M1 + P2c + r1r2 + #26 tool with every new switch OFF + S4c #24 and #30 OFF): NATIVE_GPU=OFF; Release, game x86-64-v3, SDK x86-64-v2.
+# staged 2026-11-22 20:49:02. Source: snapshot build/agent2/snap1/DimensionsRecomp at S4b (STATE-S4b-1950.tsv, sha256 A739468D5FF55C400A5053748B757DDECA76D388DF788B2A303C06EE62E61378); build tag snap4b; every patch applied to the snapshot since S1 is listed below.
+# SDK: build/agent2/snap1-sdk (REXGLUE_BUILD_TESTS=OFF), built from the same snapshot (incrementally after S1) and installed to snap1-sdk/install; game tree build/agent2/snap1-off; codegen 0.0.23.3 (pinned generated output hash-checked against baseline/ by gen-check.py; codegen-frozen.exe stand-in writes nothing).
+# S4b build inputs (board run 2, task #1 = old #28): snap1 at S4a (STATE-S4a-1325.tsv; the trees behind devoff4-bin and native4-bin) + 16 files. rexglue-sdk: 13 files, made by git apply of the staged diffs in the order C1 v3 -> M1 -> P2c -> r1r2 -> #26 to the S4a snap1 copies, each step hash-checked against its staging record (command_processor.cpp: P2c then r1r2, final 027204B53A271D69 = Agent 10 composite); nothing was copied from live and live was not written.
+# C1 = v3 (Agent 12, build/agent12/s4-c1v3/keep-watch-v3.diff sha256 DECCFE3373C27C3C; --c1): include/rex/graphics/shared_memory.h, include/rex/system/xmemory.h (PCH closure: a full rebuild), src/graphics/primitive_processor.cpp, src/graphics/shared_memory.cpp, src/system/xmemory.cpp; rexlego/src/gpu_native/memory_watch.cpp (native builds only) = the staged CRLF after-file 70829846C4F321A9 (== keep-watch-rexlego.diff applied to the LF form).
+# M1 (Agent 5): src/graphics/d3d12/shared_memory.cpp. P2c (Agent 12) + r1r2 (#18/#20, Agent 7): command_processor.cpp/.h, deferred_command_list.cpp/.h (REX_D3D12_DEFERRED_COUNTERS 0: counters compiled out). #26 (Agent 9): codegen tool option db16cyc_pause, default OFF; the game builds keep the pinned S1 generated output (gen-check against baseline/).
+# New switches, all OFF by default: physical_protect_keep_watch_verify (rexgpu-xenos.dll, BOOL, default false); physical_protect_keep_watch (rexruntime.dll, BOOL, default false); shared_memory_upload_nontemporal_copy (rexgpu-xenos.dll, BOOL, default false); d3d12_submit_split_kb (rexgpu-xenos.dll, UINT32, default 0).
+# S4c, the last step (Agent 9, build/agent9/s4/fence-wait/s4c/s4c-24-30.diff sha256 DC02104EA76E0BF6): rexlego/CMakeLists.txt + new rexlego/src/gpu_wait_backoff.cpp (01D9F8F3): #24 GPU wait back-off hooks on sub_83FBF7D0, sub_83FAF180, sub_83FB09E8, sub_83FC0C10, OFF builds only (LEGO_GPU_WAIT_HOOK_GETDATA=1); env LEGO_GPU_WAIT_BACKOFF_US unset = OFF (every hook calls the original at once), LEGO_GPU_WAIT_SPIN_US, LEGO_GPU_WAIT_STATS; #30 CMake option LEGODIMENSIONS_SCENE_WALK_PROBE, default OFF.
+# B4 deferred. Per-file hashes: build/agent2/s4b/HASHES.txt; new strings: build/agent2/S4b-strings.tsv.
+# patches in PATCHES-S1.tsv (sha256 74655029008CAFE72595CDA70BE7A85479742022E9E295E12AD157BE7C779499); before -> after sha256 prefixes:
+#   S1+p1 rexlego/src/gpu_native/device.cpp: 4C15043E486A6225 -> 4DC63FA0B804C5FE
+#   S1+p2 thirdparty/plume/plume_d3d12.cpp: B88E4E86DE5E5DEC -> 564568D4D5853F22
+# patches in PATCHES-S2.tsv (sha256 B25547164383CC7514498BBFC1B6EDDC3B505DDA1223B26D3368DEBFF6729C6F); before -> after sha256 prefixes:
+#   S2 A12 rexglue-sdk/include/rex/audio/audio_system.h: 8F8A2E71A05258B0 -> 4836B139802D3438
+#   S2 A12 rexglue-sdk/src/audio/audio_system.cpp: 7E129AF6EA359947 -> C281FA8625435EFE
+#   S2 A5 rexlego/src/gpu_native/buffers.cpp: DB8FE4864DBAF207 -> 75025044C39FF910
+#   S2 A7 rexlego/src/gpu_native/device.cpp: 4DC63FA0B804C5FE -> 3D01E63142DBFB50
+#   S2 A7 rexlego/src/gpu_native/device.h: 12391F5CE364E280 -> 703939AA91EFEA81
+#   S2 A6 (applied by A4) rexlego/src/gpu_native/draw.cpp: 751C219EA5CCCD2F -> 50AA3B1DEE615678
+#   S2 A7 rexlego/src/gpu_native/fps_counter.h: 79FC841E3180CA0D -> E05D6A554042B302
+#   S2 A6 rexlego/src/gpu_native/pipeline_snapshot.h: A0B71DB586139545 -> 42318B849FAE030B
+#   S2 A5 rexlego/src/gpu_native/texture_scratch.h: D1F0A5C3BB8427D6 -> 8F6A12AE70994065
+#   S2 A5 rexlego/src/gpu_native/texture_upload_source.h: E8BD27D3713FFE28 -> FF9E11417227A8BA
+#   S2 A5 rexlego/src/gpu_native/texture_volume_upload.h: 328DFCEC476599C2 -> D0601ECF0150DF8F
+#   S2 A5 (+A4 (a)) rexlego/src/gpu_native/textures.cpp: A6B45772D017F8D4 -> 3011ADD45516123F
+#   S2 A5 rexlego/src/gpu_native/upload_buffer_pool.h: 3EDE3AFC0F6A368E -> 853E6C16BE4082B9
+#   S2 A5 rexlego/src/gpu_native/upload_legacy_paths.h: ABSENT -> 5C823F13B067C93A
+#   S2 A5 rexlego/src/gpu_native/vertex_upload.h: 7FC6952362FF4B8E -> FFD2B023AC4CC6D5
+#   S2 A6 tools/gpu-aot/patches/plume-winsdk-compat.patch: ABSENT -> E03D29D0758E6150
+#   S2 A6 tools/gpu-aot/prepare_plume.py: CED19F81CF923329 -> B3C877379038091E
+#   S2 A6 tools/gpu-aot/test_prepare_plume.py: 82039EBA12F58180 -> DA360ABA28D609A3
+# patches in PATCHES-S3.tsv (sha256 2DA2AB6CA49E3723AFD4E26FA07927511E9C5C9FC71C54701EE599C88430F3B0); before -> after sha256 prefixes:
+#   S3 A1 .gitignore: 09246E1BCE8B929F -> 600E2436DED4671D
+#   S3 A1 (user fork url) .gitmodules: E7D25A2108620FFC -> C6E629165C283832
+#   S3 A9 rexglue-sdk/include/rex/codegen/config.h: 929EEDA15600105B -> D07C575FF2904B87
+#   S3 A9 rexglue-sdk/include/rex/codegen/function_types.h: 7331CDE11B9BFACE -> 3CBD9F6DC3850CD1
+#   S3 A12 rexglue-sdk/src/audio/audio_system.cpp: C281FA8625435EFE -> 4331A312A9FE8F15
+#   S3 A9 rexglue-sdk/src/codegen/builders/builder_context.h: 2168678C8A40CA4B -> 873A69BBC0134BBA
+#   S3 A9 rexglue-sdk/src/codegen/builders/context.cpp: AA887012DA1F7F1D -> 7710107CE9C577CA
+#   S3 A9 rexglue-sdk/src/codegen/builders/control_flow.cpp: 046462FCB7B46677 -> 61538970604512DB
+
+--- run-matrix.ps1 -Matrix <matrix-window6.json> -Only s0,p2,p2f,p2fc -Repeats 3 -ColdShared -NoPrompt -PlanOnly
+=== timing matrix: Window 6 (Agent 5's draft v2, finalized 2026-11-22 21:16 for build/agent2/devoff4b-bin): upload path on the S4b bin. s0 (every switch OFF) vs p2 = #8 P2, p2f = #8 + #5 fix (i), p2fc = #8 + #5 + #4 C1 v3 keep-watch (verify off); f and fc = the decision table's arms without P2 ===
+matrix   <workspace>\build\agent5\w6-draft\matrix-window6.json
+note     W6 finalized 2026-11-22 21:16 for build/agent2/devoff4b-bin by build/agent5/w6-draft/finalize-w6.ps1 from Agent 5's draft v2 (matrix-w6.json): bin build/agent2/devoff4b-bin in every arm (legodimensions.exe sha256 DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83). The gates before any timed run are G1-G12 in build/agent12/w6-gates/W6-GATES.md (v2, 20:20); build/agent5/w6-draft/README.md has the summary.
+note     W6 (S4-DRAFT L346): run\run-matrix.ps1 -Matrix <this file> -Only s0,p2,p2f,p2fc -Repeats 3 -ColdShared -NoPrompt. One unscored cold run shared by all arms (they all use one bin), then 3 round-robin rounds rotated each round (3 rows of a 4x4 Latin square), with s0, p2, p2f and p2fc x3 each: 13 runs, about 33 min (S4-DRAFT L328). Overnight it starts from Agent 5's launcher (bench/agent5/launch/RUN-NIGHT.cmd) with the GO line 'GO W6 matrix-window6.json <sha256> only=s0,p2,p2f,p2fc repeats=3'; RUN-WINDOW6.cmd is the double-click fallback. Check with -PlanOnly first.
+note     The arms differ only in these switches. p2 adds shared_memory_single_hold_rearm (#8 P2). p2f also adds physical_protect_hold_global_lock (#5 fix (i)). p2fc also adds physical_protect_keep_watch (#4 C1 v3) with physical_protect_keep_watch_verify=false. f = fix (i) alone and fc = f + C1 v3 (no P2), for the decision table's 'G4 FAIL, no cap' row only. Every other S4b switch stays at its default OFF (#7's hash log, M1, #18/#20 and the rest). Switches are set at launch only, hands off (G9): C1 v3 latches physical_protect_keep_watch and physical_protect_hold_global_lock at init (kInitOnly), so a console set never reaches Protect; physical_protect_keep_watch_verify and every other cvar are still read live.
+note     Pairs (R3), all on the same bin: P2 = p2 - s0; fix (i) = p2f - p2; C1 = p2fc - p2f, with fix (i) ON in both arms (a12 S4.12 step 7; b2r §25 correction 3); stack = p2fc - s0. Read GPU Commands ms/f (threads.csv, the main metric), Main ms/f (C1 swaps Main's lock-time protects for write faults), fps and the slowest frames (perf.csv, summary.md). Per arm: median of 3 and min-max. Per pair: the difference of medians plus the 3 per-round differences. Noise rule: if the two arms' min-max ranges overlap, write 'no detectable change' with the median difference in brackets. A12 asks for 5 or more repeats (S4-DRAFT L322).
+note     Never in a timing arm: #7's upload hash log (shared_memory_upload_hash_log, +1-3 ms/f on GPU Commands) or slow_frame_log_ms. Upload KB/f, kept protects per frame and P2's full-buffer counter come from untimed agent runs on the same bin: side 1 = p2f's set and side 2 = p2fc's set, both + shared_memory_upload_hash_log=true and slow_frame_log_ms=1; gate A = p2fc's set with physical_protect_keep_watch_verify=true and slow_frame_log_ms=1 over the title, the menu walk and one level load; side 3 (suggested) = p2fc's set + slow_frame_log_ms=1 on harness/routes/attract-long.txt. See W6-GATES.md, 'Untimed runs'.
+note     Per-run validity (G10, S4-DRAFT L323-327): each run's slow state, >= 6 GB free, Defender below ~5 % (or the launcher's RELAXED gate, G12), and the log lines. Every p2fc and fc game.log needs 'C1 keep-watch: on (with physical_protect_hold_global_lock)' and 'C1 keep-watch: first kept protect at', and must have no 'C1 verify: on'. No arm may log 'Recovered stale physical page protection', 'Unhandled guest physical write fault' or 'PhysicalHeap::Protect failed' (b2r L1178). P2 and fix (i) print no line of their own: their ON proof is the cvar list the runner records per run; p2fc's init line also shows that fix (i) is ON.
+note     Environment (G11, G12): keep sys_csv true. After the window: python build\agent12\w6-gates\w6_env_record.py <matrix out dir> --gate-log bench\agent5\launch\status\window-<id>-<HHmm>.log --json <out>. G11: one power overlay, scheme and AC in all 13 runs; if the overlay is not W5's best_efficiency, compare W6 only within itself. G12: the launcher's gate line says STRICT or RELAXED; RELAXED means a steady ~1 core of Defender through the window, which the round-robin spreads over all arms alike (quote the MsMpEng triple in R7).
+note     Window as in windows 4 and 5: a 5 s settle and a 55 s warm-up from the first frame, then 50 s measured, so every window starts >= 60 s after the first frame (Agent 1's floor). The cold run has a 55 s warm-up and a 30 s window. Runner flags, frame source (perf.csv, uncapped) and driver (drivers/thread-cpu.ps1) as in window 5. Agent 5's launcher refuses arms with menu, profile, triggers, toml or seed_cache fields, bins other than build/agent2/<name>-bin with MANIFEST.txt and legodimensions.exe, and env keys outside the 11 in build/agent8/w8w9/ENV-KEYS-F1.txt, and it refuses drivers that are not a plain string drivers/<name>.ps1; this matrix has none of them (env {} and drivers/thread-cpu.ps1 in every arm).
+note     Decision table (W6-GATES.md; Agent 1 decides). G4 PASS and C1 go: -Only s0,p2,p2f,p2fc -Repeats 3 (13 runs). G4 PASS and C1 no-go: -Only s0,p2 -Repeats 6 (1 + 12 = 13 runs; the runner rotates AB, BA, ...). G4 FAIL with a cap: rebuild with the cap, redo G2-G4, then row 1. G4 FAIL, no cap, C1 go: -Only s0,f,fc -Repeats 3 (10 runs, ~25 min); C1 = fc - f, fix (i) = f - s0. G4 FAIL, no cap, C1 no-go: Agent 1's call; not 's0 vs f only' (b2r L1181: fix (i) is timed only inside the C1 A/B).
+note     Timing comes only from the user's unlocked desktop (screensaver None, AC power, hands off): the overnight launcher or a double-click. Agent runs of this matrix (-Quick, hidden desktop) are functional only (G3).
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order roundrobin; close timeout 60 s; cooldown 5 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+       s0: bin build/agent2/devoff4b-bin; frames perf; x3; warm-up 55 s; window 50 s; group w6 (ref); cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         s0 = the S4b bin with every switch OFF (S4-DRAFT L338 defines s0 the same way on S4a)
+       p2: bin build/agent2/devoff4b-bin; frames perf; x3; warm-up 55 s; window 50 s; group w6; cvars framerate_limit=0 shared_memory_single_hold_rearm=true; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         #8 P2 ON (Agent 12, build/agent12/s4-p2): one G hold across a range's valid-bit update and its watch re-arm. Timed only if P2's full-buffer counter totals 0 in the untimed runs (G4); otherwise Agent 1 decides a cap. No log line of its own.
+       p2f: bin build/agent2/devoff4b-bin; frames perf; x3; warm-up 55 s; window 50 s; group w6; cvars framerate_limit=0 shared_memory_single_hold_rearm=true physical_protect_hold_global_lock=true; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         #8 + #5 fix (i) ON (latched at init in C1 v3): C1's control arm. No log line of its own.
+       p2fc: bin build/agent2/devoff4b-bin; frames perf; x3; warm-up 55 s; window 50 s; group w6; cvars framerate_limit=0 shared_memory_single_hold_rearm=true physical_protect_hold_global_lock=true physical_protect_keep_watch=true physical_protect_keep_watch_verify=false; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         #8 + #5 + #4: C1 v3 keep-watch ON, verify off (keep_watch and hold_global_lock latched at init). Every game.log needs 'C1 keep-watch: on (with physical_protect_hold_global_lock)' and 'C1 keep-watch: first kept protect at', no 'C1 verify: on', and no stale-protection, unhandled-fault or 'PhysicalHeap::Protect failed' lines. Kept protects per frame: R4 (side 2 is the main source; timed p2fc runs are a cross-check).
+cold     s0 (build/agent2/devoff4b-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+         -ColdShared: one cold run for all 1 bin(s); the other bins first launch as scored round-1 runs
+round 1  s0 p2 p2f p2fc
+round 2  p2 p2f p2fc s0
+round 3  p2f p2fc s0 p2
+order    s0 p2 p2f p2fc | p2 p2f p2fc s0 | p2f p2fc s0 p2
+estimate 13 runs (1 cold), about 30 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-COP4E6DEHPYTD36H4G3EEQ3BVA -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   8.48 GB
+game       legodimensions.exe RUNNING (pid 36276) -> close it first
+builds     RUNNING: clang++:19888 clang++:20512 clang++:24580 clang++:25944 clang++:28836 clang++:35092 clang++:38056 clang++:38496 cmake:38524 ninja:35152 -> timing not valid while they run
+bin        build/agent2/devoff4b-bin : ok (MANIFEST.txt)
+screensaver none
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   13 runs, about 30 min: done around 21:47
+!!! FATAL: legodimensions.exe is running (pid 36276)
+PlanOnly: nothing started.
