@@ -1,0 +1,12 @@
+offd: 22 dests, eps 101, heals 101, not ok at end []
+ond: 29 dests, eps 136, heals 136, not ok at end []
+only in ond: 1BCCA000 (eps 1, max 0.046s), 1BCCC000 (eps 1, max 0.046s), 1BCD0000 (eps 1, max 0.046s), 1BCD6000 (eps 1, max 0.046s), 1BCE2000 (eps 1, max 0.044s), 1BDD2000 (eps 1, max 0.048s), 1EC08000 (eps 3, max 0.092s)
+only in offd: -
+common dests where ond max latency > offd max latency:
+   1ADB0000: offd 11.713s (eps 3) -> ond 11.799s (eps 3)
+   1BCCE000: offd 0.009s (eps 1) -> ond 0.046s (eps 1)
+   1BD00000: offd 7.662s (eps 1) -> ond 8.000s (eps 1)
+   1BD78000: offd 0.141s (eps 2) -> ond 0.169s (eps 2)
+   1BDB4000: offd 0.005s (eps 1) -> ond 0.049s (eps 1)
+max latency overall: offd 11.713s, ond 11.799s
+dests with max latency > 1 s: offd 1ADB0000 11.713, 1BD00000 7.662 | ond 1ADB0000 11.799, 1BD00000 8.000

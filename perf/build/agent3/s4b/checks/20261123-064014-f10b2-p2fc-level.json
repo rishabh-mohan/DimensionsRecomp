@@ -1,6 +1,6 @@
 {
  "run": "20261123-064014-f10b2-p2fc-level",
- "row": "f10b2",
+ "row": "s4bV0",
  "kind": "off",
  "scenario": "level-l.txt",
  "runjson": {
@@ -139,8 +139,8 @@
   "GONE": 57,
   "GONE_unexpected": 0,
   "FLAG": 0,
-  "NEW_info_other": 3,
-  "NEW_info_allowed": 1,
+  "NEW_info_other": 4,
+  "NEW_info_allowed": 0,
   "rc": 0,
   "new": [],
   "new_allowed": [],
@@ -148,13 +148,12 @@
   "gone_unexpected": [],
   "flag": [],
   "new_info_other": [
+   "NEW build\\agent3\\s4b\\checks\\joined\\20261123-064014-f10b2-p2fc-level\\game.log x39936 [info] [gpu] slow frame ##: # ms | gpu-thread idle # | host-gpu wait # (#x) | shader translate # (#x) | pipeline create # (#x), new # | texture load # (#x) | readback #x # KB, # stalled | cpu-write invalidations #",
    "NEW build\\agent3\\s4b\\checks\\joined\\20261123-064014-f10b2-p2fc-level\\game.log x43 [info] [sys] C# keep-watch: # protects kept so far",
    "NEW build\\agent3\\s4b\\checks\\joined\\20261123-064014-f10b2-p2fc-level\\game.log x1 [info] [sys] C# keep-watch: first kept protect at #h, #h bytes",
    "NEW build\\agent3\\s4b\\checks\\joined\\20261123-064014-f10b2-p2fc-level\\game.log x1 [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)"
   ],
-  "new_info_allowed": [
-   "NEW build\\agent3\\s4b\\checks\\joined\\20261123-064014-f10b2-p2fc-level\\game.log x39936 [info] [gpu] slow frame ##: # ms | gpu-thread idle # | host-gpu wait # (#x) | shader translate # (#x) | pipeline create # (#x), new # | texture load # (#x) | readback #x # KB, # stalled | cpu-write invalidations #"
-  ]
+  "new_info_allowed": []
  },
  "scenes": {
   "base": "20261122-210059-s4b-L0-off-level",
@@ -430,70 +429,22 @@
  },
  "proofs": [
   {
-   "ok": true,
-   "text": "init \"C1 keep-watch: on (with physical_protect_hold_global_lock)\" x1"
+   "ok": false,
+   "text": "keep-watch off: init-on x1, first kept x1, kept x43"
   },
   {
-   "ok": true,
-   "text": "\"first kept protect\" x1 (gate D / positive control)"
+   "ok": false,
+   "text": "C1 verify armed: \"C1 verify: on. Hashing CPU uploads ...\" x0 (without it F = 0 proves nothing: INCONCLUSIVE)"
   },
   {
-   "ok": true,
-   "text": "kept count: last \"kept so far\" = 131072 (43 such lines)"
-  },
-  {
-   "ok": true,
-   "text": "verify off (keep_watch_verify=false): \"C1 verify: on\" x0, K lines 0"
-  },
-  {
-   "ok": true,
-   "text": "kept count rises through the level load (last mark end): first 2 -> last 131072 (43 \"kept so far\" lines)"
+   "ok": null,
+   "text": "K lines 0; F lines 0 (Agent 12 predicts F > 0; F = 0 refutes it; compare s4b07r over the same marks) -"
   },
   {
    "ok": true,
    "text": "gate D zero lines: \"Recovered stale physical page protection\" 0, \"Unhandled guest physical write fault\" 0"
-  },
-  {
-   "ok": true,
-   "text": "no blocked/no-hold C1 line (0/0/0)"
-  },
-  {
-   "ok": true,
-   "text": "slow-frame lines 39936"
-  },
-  {
-   "ok": true,
-   "text": "the last slow-frame line ends with the memexport suffix: ...n memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)"
-  },
-  {
-   "ok": true,
-   "text": "P2 COUNTER: memexport full-buffer total (last line) = 0; max 0; sum Nx 0; lines with Nx > 0: 0 -> closes P2 memexport gate"
-  },
-  {
-   "ok": true,
-   "text": "f10 f10b cvars in run.json (6 expected, w6gB's set): all as planned"
-  },
-  {
-   "ok": true,
-   "text": "tags placed: 3 game.log LOAD lines (3 needed); sidecar: listener=True trigger=True placed=True load-confirms=3/3 then=off remove-confirms=0"
-  },
-  {
-   "ok": true,
-   "text": "L route reached the level: through the level load (last mark end)"
-  },
-  {
-   "ok": null,
-   "text": "FINDING 10 (Agent 6 direct test): STUCK-LOCK events 0"
-  },
-  {
-   "ok": true,
-   "text": "quiet host: hostload.csv rows with clang/cl/ninja/link during the run: 0 of 13"
-  },
-  {
-   "ok": true,
-   "text": "G8 bad lines: Protect failed 0, Recovered stale 0, Unhandled guest physical write fault 0"
   }
  ],
  "base_misses": [],
- "hint": "PASS?"
+ "hint": "LOOK"
 }

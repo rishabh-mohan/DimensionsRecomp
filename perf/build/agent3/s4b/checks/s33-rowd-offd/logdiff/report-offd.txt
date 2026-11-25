@@ -1,0 +1,17 @@
+== arm offd (1 runs) vs offsf (1 runs)
+  runs\0002-offd-r1: exit=0 close=wm_close early=False wer=False dumps=0 exit_line=1 stuck=0 | 23722 lines game.1.log 5242677+game.log 4951693, 2026-11-25 11:14:23.547..2026-11-25 11:22:05.584 (462 s) | levels info=23572 raw=8 warning=142 | Toypad R/W 64/161 (8.3/20.9 per min)
+gate_logdiff FAIL findings (B = arm run, A = each base run): none
+  note A: 2 log files (rotated at 5 MB) [1]
+  note B: 2 log files (rotated at 5 MB) [1]
+NEW warning/error/critical keys (in an arm run, in no base run): 0
+MORE (arm run count > base max + max(5, base max)): 0
+GONE (in every base run, missing from an arm run; any level): 0
+Toypad (base: runs\0001-offsf-r1 {'info Write': 162, 'info Read': 64})
+  runs\0002-offd-r1: {'info Write': 161, 'info Read': 64}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+ONLY in offd (any level, not Toypad; in no base run): 3 keys
+  1/1 runs, counts [101], also in -  [info] [gpu] resolve after drop: dest #h after # skipped draws (new) | resolves #, after drops #, healed #, tainted #
+      e.g. [2026-11-25 11:14:26.943] [info] [gpu] [t37632] resolve after drop: dest 1E870000 after 1 skipped draws (new) | resolves 2, after drops 1, healed 0, tainted 1
+  1/1 runs, counts [101], also in -  [info] [gpu] resolve after drop: dest #h resolved clean again | resolves #, after drops #, healed #, tainted #
+      e.g. [2026-11-25 11:14:26.963] [info] [gpu] [t37632] resolve after drop: dest 1E870000 resolved clean again | resolves 4, after drops 1, healed 1, tainted 0
+  1/1 runs, counts [9], also in -  [info] [gpu] resolve after drop: dest #h after # skipped draws (again) | resolves #, after drops #, healed #, tainted #
+      e.g. [2026-11-25 11:16:04.507] [info] [gpu] [t37632] resolve after drop: dest 1BD78000 after 1 skipped draws (again) | resolves 5857, after drops 11, healed 5, tainted 5

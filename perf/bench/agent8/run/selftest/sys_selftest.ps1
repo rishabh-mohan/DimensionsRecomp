@@ -24,7 +24,7 @@ $clock = [Diagnostics.Stopwatch]::StartNew()
 $results = New-Object System.Collections.ArrayList
 $mine = New-Object System.Collections.ArrayList          # every process this script started
 $facts = [ordered]@{}
-$Header = 't_s,epoch_s,wall,idle_s,fg_pid,fg_game,game_alive,input_desktop,screensaver,cpu_util_pct,cpu_perf_pct,base_mhz,eff_mhz,p_eff_mhz,e_eff_mhz,p_util_pct,e_util_pct,tz_passive_min_pct,tz_temp_max_c,ac,batt_saver,batt_pct,scheme,overlay'
+$Header = 't_s,epoch_s,wall,idle_s,fg_pid,fg_game,game_alive,input_desktop,screensaver,cpu_util_pct,cpu_perf_pct,base_mhz,eff_mhz,p_eff_mhz,e_eff_mhz,p_util_pct,e_util_pct,tz_passive_min_pct,tz_temp_max_c,ac,batt_saver,batt_pct,scheme,overlay,nongame_cores,game_cores,proc_nongame_cores,nongame_io_MBps,disk_MBps,top_cpu,top_io'
 $Col = @{}; $ci = 0; foreach ($h in $Header.Split(',')) { $Col[$h] = $ci; $ci++ }
 
 function Log([string]$M) {
@@ -354,6 +354,7 @@ try {
     # ---------------- g) sys_summary.py ----------------
     $dG = New-Dir (Join-Path $root 'g')
     $ep = @($R | ForEach-Object { Num $_[$Col['epoch_s']] })
+    $nCsv = $R.Count   # $r = Run-Py below overwrites $R (case-insensitive names), so keep the csv row count here
     $topKeys = @('csv', 'window_start_epoch', 'window_end_epoch', 'flags', 'window', 'run')
     $winKeys = @('rows', 'span_s', 'max_gap_s', 'idle_min_s', 'input_events', 'fg_game_share', 'game_alive_all', 'desktop_not_default_rows', 'screensaver_rows',
         'cpu_util_mean', 'eff_mhz_mean', 'eff_mhz_min', 'p_eff_mhz_mean', 'e_eff_mhz_mean', 'p_util_mean', 'e_util_mean', 'tz_passive_min', 'tz_temp_max_c',
@@ -378,8 +379,8 @@ try {
         $r = Run-Py @('--csv', $csvB, '--start-epoch', (F ($ep[0] - 0.001)), '--end-epoch', (F ($ep[$ep.Count - 1] + 0.001)), '--out', $j)
         $J = Read-Json $j
         $fl = if ($J) { @($J.flags) } else { @() }
-        Check 'g) whole file: exit 0, window rows = csv rows' ($r.code -eq 0 -and $J -and [int]$J.window.rows -eq $R.Count -and [int]$J.run.rows -eq $R.Count -and $fl -notcontains 'short_window') `
-            ("exit=$($r.code) window_rows=$(if ($J) { $J.window.rows }) csv_rows=$($R.Count) flags=[$($fl -join ',')]")
+        Check 'g) whole file: exit 0, window rows = csv rows' ($r.code -eq 0 -and $J -and [int]$J.window.rows -eq $nCsv -and [int]$J.run.rows -eq $nCsv -and $fl -notcontains 'short_window') `
+            ("exit=$($r.code) window_rows=$(if ($J) { $J.window.rows }) csv_rows=$nCsv flags=[$($fl -join ',')]")
         $facts['g_whole_summary'] = $r.out
         $tr = Join-Path $dG 'truncated.csv'
         $bytes = [IO.File]::ReadAllBytes($csvB)
@@ -387,8 +388,8 @@ try {
         $j = Join-Path $dG 'truncated.json'
         $r = Run-Py @('--csv', $tr, '--start-epoch', (F ($ep[0] - 0.001)), '--end-epoch', (F ($ep[$ep.Count - 1] + 0.001)), '--out', $j)
         $J = Read-Json $j
-        Check 'g) csv with a truncated last line: exit 0, partial row dropped' ($r.code -eq 0 -and $J -and $J.file.truncated_last_line -eq $true -and [int]$J.run.rows -eq ($R.Count - 1)) `
-            ("exit=$($r.code) truncated_last_line=$(if ($J) { $J.file.truncated_last_line }) rows=$(if ($J) { $J.run.rows }) (csv rows $($R.Count))")
+        Check 'g) csv with a truncated last line: exit 0, partial row dropped' ($r.code -eq 0 -and $J -and $J.file.truncated_last_line -eq $true -and [int]$J.run.rows -eq ($nCsv - 1)) `
+            ("exit=$($r.code) truncated_last_line=$(if ($J) { $J.file.truncated_last_line }) rows=$(if ($J) { $J.run.rows }) (csv rows $nCsv)")
     }
     $j = Join-Path $dG 'missing.json'
     $r = Run-Py @('--csv', (Join-Path $dG 'no-such.csv'), '--start-epoch', '0', '--end-epoch', '1', '--out', $j)

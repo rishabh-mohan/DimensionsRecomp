@@ -1,0 +1,48 @@
+﻿$ python -B build\agent7\session3\mp\mp2_same_frames.py --ref build\agent8\matrix\20261123-0313\runs\0315-s0-r1 --ref build\agent8\matrix\20261123-0313\runs\0329-s0-r2 --cand build\agent8\matrix\20261123-0313\runs\0335-s0-r3 --cand build\agent8\matrix\20261123-0313\runs\0341-s0-r4 --cand build\agent8\matrix\20261123-0313\runs\0348-s0-r5
+mp2_same_frames explicit runs (logdiff: <workspace>\build\agent10\bgate\logdiff.py)
+PASS       ref runs: 2 (need 2: n0-r1 vs n0-r2 = noise): 0315-s0-r1, 0329-s0-r2
+           ref 0315-s0-r1: light share 0.97460 (frames.json share_lt_light (light_ms 4.5)); draw_calls p10/p50/p90 226/226/226 mean 226 n 20868; perf.csv rows 27180..48047 (frames.json window)
+           ref 0329-s0-r2: light share 0.96370 (frames.json share_lt_light (light_ms 4.5)); draw_calls p10/p50/p90 226/226/226 mean 226 n 19097; perf.csv rows 24540..43636 (frames.json window)
+           noise band (ref runs 0315-s0-r1, 0329-s0-r2): light share [0.96370, 0.97460] (--ls-pad 0); draw_calls p10 [226, 226], p50 [226, 226], p90 [226, 226] (--dc-pad 0); --spread-k 0
+PASS       cand: candidate runs found: 3
+FAIL       cand 0335-s0-r3 LS: light share 0.96360 NOT inside [0.96370, 0.97460] (outside by 0.00010 = 0.01 x the ref spread 0.01090)
+PASS       cand 0335-s0-r3 DC: draw_calls p10 226 inside [226, 226]
+PASS       cand 0335-s0-r3 DC: draw_calls p50 226 inside [226, 226]
+PASS       cand 0335-s0-r3 DC: draw_calls p90 226 inside [226, 226]
+           cand 0335-s0-r3: draw_calls mean 226 n 19185; perf.csv rows 24480..43664 (frames.json window)
+PASS       cand 0335-s0-r3 LOG: no NEW key at >= warning (0)
+PASS       cand 0335-s0-r3 LOG: no GONE key at >= warning outside the noise (0)
+PASS       cand 0335-s0-r3 LOG: no MORE key at >= warning outside the noise (0)
+PASS       cand 0335-s0-r3 LOG: fail markers no higher than the ref max
+PASS       cand 0335-s0-r3 LOG: clean-exit line present
+           cand 0335-s0-r3 LOG info (>= info, < warning): NEW 16; x1 [info] [core] Toypad[Read ] #B #C # # # # # #C # #C # E# # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # # E# # D# D# C# # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # # F# FC FE #B EE #A #F # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #A D# EC E# CD # # # #B # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #B #E # # #A D# B# A# # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #E #B B# B# # #A FA # #C # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # BB B# # #E # # FC # EC # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # #A #E C# #D # C# #C # C# #B # # # # # # # # # # # # # # # # # #  | ... (8 more)
+           cand 0335-s0-r3 LOG info: GONE 0
+           cand 0335-s0-r3 LOG info: MORE 0
+PASS       cand 0341-s0-r4 LS: light share 0.96450 inside [0.96370, 0.97460]
+PASS       cand 0341-s0-r4 DC: draw_calls p10 226 inside [226, 226]
+PASS       cand 0341-s0-r4 DC: draw_calls p50 226 inside [226, 226]
+PASS       cand 0341-s0-r4 DC: draw_calls p90 226 inside [226, 226]
+           cand 0341-s0-r4: draw_calls mean 226 n 19252; perf.csv rows 24540..43791 (frames.json window)
+PASS       cand 0341-s0-r4 LOG: no NEW key at >= warning (0)
+PASS       cand 0341-s0-r4 LOG: no GONE key at >= warning outside the noise (0)
+PASS       cand 0341-s0-r4 LOG: no MORE key at >= warning outside the noise (0)
+PASS       cand 0341-s0-r4 LOG: fail markers no higher than the ref max
+PASS       cand 0341-s0-r4 LOG: clean-exit line present
+           cand 0341-s0-r4 LOG info (>= info, < warning): NEW 16; x1 [info] [core] Toypad[Read ] #B #C # # # # # DA # # #F A# # #E # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # #B # # # #C C# # #A # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #B # # # # #A CB EB # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #F #F #E F# # C# # F# E# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # A# #E # # #D EC D# F# F# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # BD #A # CD #C D# #F # E# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # E# # # # FB E# # # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # #A D# #D BD E# # F# C# B# FE # # # # # # # # # # # # # # # # # #  | ... (8 more)
+           cand 0341-s0-r4 LOG info: GONE 0
+           cand 0341-s0-r4 LOG info: MORE 0
+PASS       cand 0348-s0-r5 LS: light share 0.96460 inside [0.96370, 0.97460]
+PASS       cand 0348-s0-r5 DC: draw_calls p10 226 inside [226, 226]
+PASS       cand 0348-s0-r5 DC: draw_calls p50 226 inside [226, 226]
+PASS       cand 0348-s0-r5 DC: draw_calls p90 226 inside [226, 226]
+           cand 0348-s0-r5: draw_calls mean 226 n 19279; perf.csv rows 24240..43518 (frames.json window)
+PASS       cand 0348-s0-r5 LOG: no NEW key at >= warning (0)
+PASS       cand 0348-s0-r5 LOG: no GONE key at >= warning outside the noise (0)
+PASS       cand 0348-s0-r5 LOG: no MORE key at >= warning outside the noise (0)
+PASS       cand 0348-s0-r5 LOG: fail markers no higher than the ref max
+PASS       cand 0348-s0-r5 LOG: clean-exit line present
+           cand 0348-s0-r5 LOG info (>= info, < warning): NEW 16; x1 [info] [core] Toypad[Read ] #B #C # # # # # # A# #B #D #F # B# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # # #D # #E # D# #E #B # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # #A # DA # # C# #C # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # F# # A# # B# E# # #E # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #A # #C # # #F FF F# #E # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #A D# # # #A B# BB #C D# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # E# # CF F# F# E# CD #C # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # #A B# # # # # #B #C #B D# # # # # # # # # # # # # # # # # # #  | ... (8 more)
+           cand 0348-s0-r5 LOG info: GONE 0
+           cand 0348-s0-r5 LOG info: MORE 0
+RESULT: FAIL (1 failed, 0 incomplete)
+[exit code 1]

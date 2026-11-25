@@ -1,0 +1,67 @@
+ok    gate a clean                                row a want PASS       got PASS
+ok    gate a split init present                   row a want FAIL       got FAIL
+ok    gate a async warn present                   row a want FAIL       got FAIL
+ok    gate a watchdog off row = note only         row a want PASS       got PASS
+ok    gate b one warn                             row b want PASS       got PASS
+ok    gate b no warn                              row b want FAIL       got FAIL
+ok    gate b two warns                            row b want FAIL       got FAIL
+ok    gate b warn at info level                   row b want FAIL       got FAIL
+ok    gate b warn + async init                    row b want FAIL       got FAIL
+ok    gate b warn + split init                    row b want FAIL       got FAIL
+ok    gate i splits                               row i want PASS       got PASS
+ok    gate i wrong N in init                      row i want FAIL       got FAIL
+ok    gate i failed > 0                           row i want FAIL       got FAIL
+ok    gate i async line                           row i want FAIL       got FAIL
+ok    gate i no split line                        row i want INCOMPLETE got INCOMPLETE
+ok    gate i split counter decreases              row i want FAIL       got FAIL
+ok    gate i two inits                            row i want FAIL       got FAIL
+ok    gate c good (held_query 0 not gating)       row c want PASS       got PASS
+ok    gate g good                                 row g want PASS       got PASS
+ok    gate f good                                 row f want PASS       got PASS
+ok    gate c queued_max 4                         row c want FAIL       got FAIL
+ok    gate c no async init                        row c want FAIL       got FAIL
+ok    gate c staying-off warn                     row c want FAIL       got FAIL
+ok    gate c create-thread error                  row c want FAIL       got FAIL
+ok    gate c split failed=1                       row c want FAIL       got FAIL
+ok    gate c async counter decreases              row c want FAIL       got FAIL
+ok    gate c wrong N                              row c want FAIL       got FAIL
+ok    gate d no split due (fallback A)            row d want INCOMPLETE got INCOMPLETE
+ok    gate d good                                 row d want PASS       got PASS
+ok    gate c watchdog -> FLAG                     row c want FLAG       got FLAG
+ok    gate j good fifo filled                     row j want PASS       got PASS
+ok    gate j fifo never filled                    row j want INCOMPLETE got INCOMPLETE
+ok    gate j queued_max 4                         row j want FAIL       got FAIL
+ok    gate e good                                 row e want PASS       got PASS
+ok    gate e no queries                           row e want FAIL       got FAIL
+ok    gate e no split at all                      row e want INCOMPLETE got INCOMPLETE
+ok    gate e watchdog -> FLAG                     row e want FLAG       got FLAG
+ok    gate g16 fifo never filled, --j1-info       row j want PASS       got PASS
+ok    gate g16 queued_max 4, --j1-info            row j want FAIL       got FAIL
+ok    gate g16 no split at all, --j1-info         row j want INCOMPLETE got INCOMPLETE
+ok    queue bin: s4bN16 vs devoff4b-bin -> 0 FAIL, 0 INCOMPLETE
+ok    queue bin: s4bN16 vs devoff4b-r19-bin -> 2 FAIL, 0 INCOMPLETE
+ok    queue bin: a log file, not a run dir -> INCOMPLETE
+ok    queue queue as written: 0 FAIL
+ok    queue mut: c and g swapped -> FAIL
+ok    queue mut: go-r19on dropped from c -> FAIL
+ok    queue mut: go-r19on added to i -> FAIL
+ok    queue mut: chain marker of b wrong -> FAIL
+ok    queue mut: #33 cvar on e -> FAIL
+ok    queue mut: res scaling on c -> FAIL
+ok    queue mut: ctr bin on f -> FAIL
+ok    queue mut: ready-N dropped from d -> FAIL
+ok    queue mut: -Env added to j -> FAIL
+ok    queue mut: async on ref r19r10 -> FAIL
+ok    queue mut: duplicate id -> FAIL
+ok    queue mut: existing id clash -> FAIL
+ok    queue mut: i and i16 swapped -> FAIL
+ok    queue mut: unless dropped from i16 -> FAIL
+ok    queue mut: r19-pathN dropped from c -> FAIL
+ok    queue mut: j chained on r19-ok-g16 -> FAIL
+ok    queue mut: path marker on d -> FAIL
+ok    queue mut: g16 at <N> -> FAIL
+ok    queue path: PASS -> r19-pathN
+ok    queue path: only no-split INCOMPLETE -> r19-path16
+ok    queue path: no-split INCOMPLETE + FLAG -> STOP
+ok    queue path: no-split INCOMPLETE + FAIL -> STOP
+SELFTEST PASS 66/66

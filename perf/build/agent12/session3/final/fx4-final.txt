@@ -1,0 +1,36 @@
+NOTE  run <workspace>\build\agent3\runs\20261125-081835-fx4-devfinal-env500 (harness); logs ['game.log'], 179 lines
+NOTE  elapsed 240.6 s (elapsed_s)
+NOTE  cvars {'framerate_limit': '0'}; env (LEGO_*) {'LEGO_GPU_WAIT_BACKOFF_US': '500'}
+PASS  exit_code 0 (0x00000000)
+PASS  exited_early False
+PASS  WER False
+PASS  dialogs None
+PASS  crash_events []
+PASS  dumps 0 in dir, run.json []
+PASS  close wm_close
+PASS  "Title terminated" x1 (clean exit)
+PASS  bad string "Recovered stale physical page protection" x0
+PASS  bad string "Unhandled guest physical write fault" x0
+PASS  bad string "PhysicalHeap::Protect failed" x0
+PASS  bad string "BaseHeap::Protect failed" x0
+PASS  bad string "is not a plain number" x0
+PASS  bad string "C1 verify: on" x0
+PASS  bad string "STUCK-LOCK" x0
+PASS  bad string "REX_FATAL" x0
+PASS  bad string "Minidump written to" x0
+PASS  bad string "still not acquired after" x0
+PASS  run.json bin_dir <workspace>\build\agent2\devfinal-bin (want build/agent2/devfinal-bin)
+PASS  devfinal-bin MANIFEST F9C2BE722E5B3517 = BIN-PINS F9C2BE722E5B3517
+PASS  run-dir MANIFEST.txt copy = pin
+PASS  run.json exe_sha256 = pin
+PASS  run-dir legodimensions.exe 545D28B9DDEAD51E (pin 545D28B9DDEAD51E)
+PASS  run-dir rexruntime.dll C5BC627BB2E83CF2 (pin C5BC627BB2E83CF2)
+PASS  run-dir rexgpu-xenos.dll CB3A2CC967A9BE81 (pin CB3A2CC967A9BE81)
+PASS  cvars only framerate_limit=0: {'framerate_limit': '0'}
+PASS  env LEGO_GPU_WAIT_* = {'LEGO_GPU_WAIT_BACKOFF_US': '500'} (want BACKOFF_US=500 only)
+PASS  check-defaults.py D9936C56C5E04B98 (rated D9936C56C5E04B98)
+NOTE  check-defaults --mode xenos exit 0; RESULT PASS
+PASS  check-defaults --mode xenos PASS
+FAIL  proof lines = F1 run (61 vs 65); env-source differences ignored
+NOTE  F4 documents q500 R3: check-defaults cannot tell env 500 from unset; run.json env is the proof
+F-GATE F4 20261125-081835-fx4-devfinal-env500: FAIL

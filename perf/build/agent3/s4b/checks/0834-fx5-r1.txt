@@ -1,0 +1,20 @@
+# s4b_check fx5 0834-fx5-r1 (off, scenario ?)
+run.json: exit 0 (0x00000000) dumps 0 crash_events 0 wer None; close None 0.00 s; elapsed None of None s; cvars {}; env -; steps None
+summary: verdict None; first frame None s; levels null; unknown cvars None; errors 0
+log files game.log; levels {"info": 422, "warning": 66}
+families: c1_any=0 k=0 c1_verify_on=0 c1_verify_f=0 c1_other=0 recovered_stale=0 unhandled_phys=0 protect_failed=0 split_init=0 split=0 deferred_counters=0 gpu_wait=0 memexport=0 slow_frame=0 s4_upload_hash=0 precise_wait=0 miss_cache=0 stuck_lock=0 minidump=0 fatal=0 debug_layer=0 dred=0 d3d12_msg=0 clean_exit=1
+frames (perf.csv rows) 44912; slow_frame per frame 0.000
+logdiff vs 0400-n0-r1 (base scenario ?): NEW 0 (+0 allowed) MORE 0 (+0 allowed) GONE 18 (2 unexpected) FLAG 0; NEW at info 1 other, 1 allowed; rc 0
+  GONE build\agent3\runs\fx5-20261125-0834\runs\0834-fx5-r1\game.log [info] [core] Execution complete
+  GONE build\agent3\runs\fx5-20261125-0834\runs\0834-fx5-r1\game.log [info] [core] Native presentation: frame=# output=#x# scene=#x# source=#x# focus=true borderless=false monitor=# fps_limit_cvar=# vsync=false tearing=tru
+  info NEW build\agent3\runs\fx5-20261125-0834\runs\0834-fx5-r1\game.log x1 [info] [core] Native presentation: frame=# output=#x# scene=#x# source=#x# focus=false borderless=false monitor=# fps_limit_cvar=# vsync=false tearing=true exclusive=false query=#h
+  info allowed NEW build\agent3\runs\fx5-20261125-0834\runs\0834-fx5-r1\game.log x1 [info] [core] Native GPU: shader miss cache ON (build default)
+levels cand {"info": 422, "warning": 66} vs 0400-n0-r1 {"info": 422, "warning": 66}
+scenes (>= 2 s) base: 0/0:112s
+scenes (>= 2 s) cand: 0/0:110s
+  missing in cand: -; extra in cand: -
+threads: no threads-s4a.csv
+sys.csv slow state: no sys.csv
+hangs: 0 STUCK-LOCK event(s); hostload rows during the run: {}; toypad: {"confirms": 0, "result": ""}
+BASE items missed: logdiff GONE 2 beyond Toypad/u-diag lines; close None
+VERDICT HINT LOOK: 2 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row fx5)

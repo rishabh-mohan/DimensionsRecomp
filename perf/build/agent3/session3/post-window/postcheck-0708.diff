@@ -1,0 +1,25 @@
+﻿diff --git a/build/agent3/s4b/postcheck.ps1.bak-0706 b/build/agent3/s4b/postcheck.ps1
+index 2667642..4e69b06 100644
+--- a/build/agent3/s4b/postcheck.ps1.bak-0706
++++ b/build/agent3/s4b/postcheck.ps1
+@@ -65,12 +65,19 @@ function S33([string]$id, [string]$bArm, [string]$bRun, [string]$oArm, [string]$
+     $f = Join-Path $logs "$id.s33.txt"
+     if (-not $bRun) { Say "s33 $id SKIP: no $bArm run"; "SKIP: no $bArm run" | Set-Content -LiteralPath $f; return }
+     $row = if ($oArm -eq 'off') { 's33-row1a' } else { 's33-row1b' }
++    # 07:06: the kit refuses to write inside build/agent3, so it writes to %TEMP%\m3-s33\<row> and the result is copied
++    # to checks\<row> afterwards
++    $tmp = Join-Path $env:TEMP "m3-s33\$row"
+     & cmd /c build\agent6\s33-popin\RUN-S33-LOGDIFF.cmd --run "$bArm=$bRun" --run "$oArm=$oRun" --ref $oArm `
+-        --matrix-json build\agent6\s33-popin\harness-s33.json --out "build\agent3\s4b\checks\$row" *> $f
++        --matrix-json build\agent6\s33-popin\harness-s33.json --out $tmp *> $f
+     $x = $LASTEXITCODE
++    Add-Content -LiteralPath $f -Value "kit exit $x (RUN-S33-LOGDIFF, ref $oArm; out $tmp -> build\agent3\s4b\checks\$row)"
++    try { New-Item -ItemType Directory -Force -Path "build\agent3\s4b\checks\$row" | Out-Null
++          Copy-Item -Path (Join-Path $tmp '*') -Destination "build\agent3\s4b\checks\$row" -Recurse -Force } catch { }
+     if ($oArm -eq 'offsf') {
+         & python -B build\agent6\s33-popin\s33_fields.py --arm "offsf=$oRun" --out (Join-Path $logs "$id.s33fields.txt") *>> $f
+         $x = "$x/fields $LASTEXITCODE"
++        Add-Content -LiteralPath $f -Value "s33_fields exit $($x.Split(' ')[-1])"
+     }
+     Say "s33 $id $row (exit $x): $bRun vs $oRun"
+ }

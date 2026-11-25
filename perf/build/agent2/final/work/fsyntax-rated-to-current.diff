@@ -1,0 +1,25 @@
+--- a/fsyntax.py (rated E9E4E131D04177C5)
++++ b/fsyntax.py (current 66C7D74022A068DA)
+@@ -44,6 +44,9 @@
+ ]
+ 
+ 
++WANT_N = {'rt': 8, 'gpu': 1, 'xe': 1, 'xeoff': 1, 'nat': 4, 'natoff': 4}  # = 19 (final-build-rating S1)
++
++
+ def main():
+     ap = argparse.ArgumentParser()
+     ap.add_argument('--jobs', type=int, default=8)
+@@ -84,7 +87,11 @@
+                 continue
+             jobs.append({'set': name, 'tag': tag, 'cwd': cwd, 'cmd': ' '.join(toks),
+                          'log': os.path.join(d, tag[:-4] + '.fsyntax.log')})
+-        say('%s: %d TU(s)' % (name, sum(1 for j in jobs if j['set'] == name)))
++        cnt = sum(1 for j in jobs if j['set'] == name)
++        ok = cnt == WANT_N[name]
++        say('%s %s: %d TU(s) (want %d)' % ('PASS' if ok else 'FAIL', name, cnt, WANT_N[name]))
++        if not ok:
++            fails.append('%s count' % name)
+     with open(os.path.join(top, 'fsyntax-commands.txt'), 'w', encoding='utf-8', newline='\n') as f:
+         for j in jobs:
+             f.write('cwd: %s\ncmd: %s\n\n' % (j['cwd'], j['cmd']))

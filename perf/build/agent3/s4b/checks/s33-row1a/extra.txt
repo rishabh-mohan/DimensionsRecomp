@@ -1,0 +1,76 @@
+W4b/W5 extra checks (Agent 6, tasks #5/#13): C:\Users\<user>\AppData\Local\Temp\m3-s33\s33-row1a\staging; base arm off
+arms: base=1; off=1
+
+1. run.json close/crash fields; exit_seq = the last 3 game.log lines are closing / complete / terminated; STUCK/WM_CLOSE = text-file lines in the run dir that contain the word
+  base      0001-base-r1      exit_seq=ok status=None problems=0 exit=0x00000000 early=False wm_close=None repost=None exit_wait_s=None killed=None clean=None wer=None foreign_dumps=0 dialogs=0 not_resp=None perf_stalled=None artifacts=0 log_lines=None runner_error=None excluded=None dmp=0
+                              bin=devoff4b-bin env=- cvar+[] cvar-[] flags_info=None flags_excl=None sys_flags=None STUCK=0 WM_CLOSE=0
+  off       0002-off-r1       exit_seq=ok status=None problems=0 exit=0x00000000 early=False wm_close=None repost=None exit_wait_s=None killed=None clean=None wer=None foreign_dumps=0 dialogs=0 not_resp=None perf_stalled=None artifacts=0 log_lines=None runner_error=None excluded=None dmp=0
+                              bin=devoff4b-s33-bin env=- cvar+[] cvar-[] flags_info=None flags_excl=None sys_flags=None STUCK=0 WM_CLOSE=0
+  matrix top-level text files: STUCK=0 WM_CLOSE=0
+
+2. exact-text diff vs off (0002-off-r1)
+   off keys: union 94, in all 1 runs 94; off-internal variable keys (count range):
+  arm base (1 runs): ONLY-exact 1, GONE-exact 1, count outside off min..max 10
+    ONLY 1/1  [info] [core] UI font loaded: <workspace>\build\agent3\runs\20261125-064824-s33-base\FiraSans-Regular.ttf at 18px   [0001-base-r1=1]
+    GONE 1/1  [info] [core] UI font loaded: <workspace>\build\agent3\runs\20261125-065726-s33-off\FiraSans-Regular.ttf at 18px   [0001-base-r1]
+    COUNT off 26..26, 0001-base-r1=25  [info] [core] Toypad: pad 1 mode 3 lit 00 00 18 (on 0 off 0 count 1 speed 30)
+    COUNT off 27..27, 0001-base-r1=26  [info] [core] Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 30)
+    COUNT off 26..26, 0001-base-r1=25  [info] [core] Toypad: pad 1 mode 3 lit FF 00 18 (on 0 off 0 count 1 speed 30)
+    COUNT off 26..26, 0001-base-r1=25  [info] [core] Toypad: pad 2 mode 3 lit 00 00 18 (on 0 off 0 count 1 speed 30)
+    COUNT off 27..27, 0001-base-r1=26  [info] [core] Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 30)
+    COUNT off 26..26, 0001-base-r1=25  [info] [core] Toypad: pad 2 mode 3 lit FF 00 18 (on 0 off 0 count 1 speed 30)
+    COUNT off 26..26, 0001-base-r1=25  [info] [core] Toypad: pad 3 mode 3 lit 00 00 18 (on 0 off 0 count 1 speed 30)
+    COUNT off 27..27, 0001-base-r1=26  [info] [core] Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 30)
+    COUNT off 26..26, 0001-base-r1=25  [info] [core] Toypad: pad 3 mode 3 lit FF 00 18 (on 0 off 0 count 1 speed 30)
+    COUNT off 159..159, 0001-base-r1=156  [info] [core] Toypad[Write] 0B 16 55 14 C6
+
+3. Toypad: write-command sequence; B1 (challenge) times and window close, s after the first Toypad write
+  base      0001-base-r1      seq B0 C0 B1 B3 C0 C8 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 B1 C6 B3 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 | B1 at [0.0, 288.0] | intervals [288.0] | close at 458.9
+  base      B1 intervals: n=1 mean 288.0 median 288.0 min 288.0 max 288.0
+  off       0002-off-r1       seq B0 C0 B1 B3 C0 C8 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 B1 B3 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 C6 | B1 at [0.0, 286.8] | intervals [286.7] | close at 457.7
+  off       B1 intervals: n=1 mean 286.7 median 286.7 min 286.7 max 286.7
+
+4. boot milestones, s after the first log line (median per arm; min..max)
+  base      launch 0.98 (0.98..0.98) | storage 0.99 (0.99..0.99) | audio 2.98 (2.98..2.98) | toyB0 3.04 (3.04..3.04) | hdr_fail 3.14 (3.14..3.14) | dat_fail 4.82 (4.82..4.82) | closing 461.90 (461.90..461.90) | exit 462.10 (462.10..462.10)
+  off       launch 1.07 (1.07..1.07) | storage 1.09 (1.09..1.09) | audio 3.26 (3.26..3.26) | toyB0 4.17 (4.17..4.17) | hdr_fail 3.45 (3.45..3.45) | dat_fail 5.40 (5.40..5.40) | closing 461.87 (461.87..461.87) | exit 461.92 (461.92..461.92)
+
+5. run order (run.json start). close = s after the first Toypad write; med/p99/max = frame ms; mhz/P/E = sys window eff MHz; util/Putil = %%; cores = window CPU cores; bprocs = build procs window/warmup
+   c1 = lines containing 'STUCK-LOCK'
+   c2 = lines containing 'still not acquired after'
+   c3 = lines containing 'Minidump written to'
+   c4 = lines containing 'Recovered stale physical page protection'
+   c5 = lines containing 'Unhandled guest physical write fault'
+   c6 = lines containing 'PhysicalHeap::Protect failed'
+   c7 = lines containing 'BaseHeap::Protect failed'
+   c8 = lines containing 'd3d12_pipeline_creation_no_wait'
+   c9 = lines containing 'slow frame #'
+   c10 = lines containing 'dropped draws'
+   c11 = lines containing 'forced pipeline waits'
+   c12 = lines containing 'resolve after drop:'
+   c13 = lines containing '[NtCreateFile] FAILED'
+   c14 = lines containing 'Reserving the guest memory arena'
+   c15 = lines containing 'Title terminated'
+  0001-base-r1      base      devoff4b-bin  lines=896 B=111758 info=746 warn=142 err=0 other=0 toyW=164 toyR=64 B1=2 close=458.9 exit_wait=- med=- p99=- max=- mhz=- P=- E=- util=- Putil=- cores=- bprocs=0/0 boot=- free=- input=- fg=- nogrowth=- c1=0 c2=0 c3=0 c4=0 c5=0 c6=0 c7=0 c8=0 c9=0 c10=0 c11=0 c12=0 c13=137 c14=1 c15=1
+  0002-off-r1       off       devoff4b-s33-bin  lines=908 B=112876 info=758 warn=142 err=0 other=0 toyW=167 toyR=64 B1=2 close=457.7 exit_wait=- med=- p99=- max=- mhz=- P=- E=- util=- Putil=- cores=- bprocs=0/0 boot=- free=- input=- fg=- nogrowth=- c1=0 c2=0 c3=0 c4=0 c5=0 c6=0 c7=0 c8=0 c9=0 c10=0 c11=0 c12=0 c13=137 c14=1 c15=1
+  c1 per arm: base=[0]; off=[0]
+  c2 per arm: base=[0]; off=[0]
+  c3 per arm: base=[0]; off=[0]
+  c4 per arm: base=[0]; off=[0]
+  c5 per arm: base=[0]; off=[0]
+  c6 per arm: base=[0]; off=[0]
+  c7 per arm: base=[0]; off=[0]
+  c8 per arm: base=[0]; off=[0]
+  c9 per arm: base=[0]; off=[0]
+  c10 per arm: base=[0]; off=[0]
+  c11 per arm: base=[0]; off=[0]
+  c12 per arm: base=[0]; off=[0]
+  c13 per arm: base=[137]; off=[137]
+  c14 per arm: base=[1]; off=[1]
+  c15 per arm: base=[1]; off=[1]
+  env_set per arm: base=['-']; off=['-']
+
+6. per-arm presence (runs with the key / runs) of every exact key that is not in all 2 runs
+  SIG (every arm all-or-none): 2
+    base=1/1 off=0/1  [info] [core] UI font loaded: <workspace>\build\agent3\runs\20261125-064824-s33-base\FiraSans-Regular.ttf at 18px
+    base=0/1 off=1/1  [info] [core] UI font loaded: <workspace>\build\agent3\runs\20261125-065726-s33-off\FiraSans-Regular.ttf at 18px
+  VAR (present in only some runs of an arm): 0

@@ -1,0 +1,52 @@
+queue row: {"id": "f10b3", "est": 560, "toypad": true, "needs": ["build\\agent3\\s4b\\ready-s4b-off", "build\\agent3\\session3\\go-quiet", "build\\agent1\\night\\ROWS-RESUME.txt"], "args": ["-BinDir", "build\\agent2\\devoff4b-bin", "-Seconds", "600", "-Tag", "f10b3-p2fc-level", "-InputScript", "build\\agent3\\toypad\\routes\\level-l.txt", "-Cvar", "framerate_limit=0;shared_memory_single_hold_rearm=true;physical_protect_hold_global_lock=true;physical_protect_keep_watch=true;physical_protect_keep_watch_verify=false;slow_frame_log_ms=1", "-GpuLog"], "note": "S3T-3 (d1): third quiet pair, = f10b + -GpuLog."}
+ok   exit_code 0 (0x00000000), close wm_close, elapsed 398.36 s of 600
+ok   wer_seen False
+ok   crash_events []
+ok   exited_early False
+ok   bin_dir <workspace>\build\agent2\devoff4b-bin (queued build\agent2\devoff4b-bin)
+ok   run exe sha256 DFBE1D43B28861A6 = run.json and in <workspace>\build\agent2\devoff4b-bin\MANIFEST.txt
+ok   cvars {'framerate_limit': '0', 'shared_memory_single_hold_rearm': 'true', 'physical_protect_hold_global_lock': 'true', 'physical_protect_keep_watch': 'true', 'physical_protect_keep_watch_verify': 'false', 'slow_frame_log_ms': '1'} (queued {'framerate_limit': '0', 'shared_memory_single_hold_rearm': 'true', 'physical_protect_hold_global_lock': 'true', 'physical_protect_keep_watch': 'true', 'physical_protect_keep_watch_verify': 'false', 'slow_frame_log_ms': '1'})
+ok   env {} (queued {})
+ok   input script <workspace>\build\agent3\toypad\routes\level-l.txt (queued build\agent3\toypad\routes\level-l.txt)
+     logs 4 (53404 lines); counts: Recovered stale physical page protection=0; Unhandled guest physical write fault=0; PhysicalHeap::Protect failed=0; STUCK-LOCK=0; REX_FATAL=0; C1 keep-watch: on (with=1; C1 keep-watch: on, but=0; blocked for this process=0; C1 verify: on.=0; C1 verify K:=0; C1 verify F:=0; GPU wait back-off: ON=0; d3d12_submit_split_kb: splitting=0; d3d12_submit_split: =0; Host timer resolution set=0; TimerQueue: precise wait=0
+ok   C4 "Recovered stale physical page protection" x0
+ok   C4 "Unhandled guest physical write fault" x0
+ok   C4 "PhysicalHeap::Protect failed" x0
+ok   C4 "REX_FATAL" x0
+ok   C4 "C1 keep-watch: on, but" x0
+ok   C4 "blocked for this process" x0
+ok   C3 keep-watch init x1 (keep_watch=True)
+ok   C3 "C1 verify: on." x0 (verify=False)
+ok   C3 back-off init x0 (env set False)
+ok   C3 split init x0 (split cvar False)
+ok   C3 host timer line x0 (cvar False)
+ok   C3 precise-wait line x0 (cvar False)
+     STUCK-LOCK lines 0 (C5: see f10 output / by hand)
+ok   C6 dumps in dir [], run.json dumps []
+     C7 steps 119/119 last done timeouts 29; marks ['vortex', 'v-idle', 'v-start', 'v-start-a', 'settled', 'end']
+ok   C7 vortex mark reached
+--- f10b3.check.txt (65 lines)
+    missing in cand: -; extra in cand: ['785/123950', '8127/762167']
+  PROOF ok   init "C1 keep-watch: on (with physical_protect_hold_global_lock)" x1
+  PROOF ok   "first kept protect" x1 (gate D / positive control)
+  PROOF ok   kept count: last "kept so far" = 192512 (58 such lines)
+  PROOF ok   verify off (keep_watch_verify=false): "C1 verify: on" x0, K lines 0
+  PROOF ok   kept count rises through the level load (last mark end): first 2 -> last 192512 (58 "kept so far" lines)
+  PROOF ok   gate D zero lines: "Recovered stale physical page protection" 0, "Unhandled guest physical write fault" 0
+  PROOF ok   no blocked/no-hold C1 line (0/0/0)
+  PROOF ok   slow-frame lines 52699
+  PROOF ok   the last slow-frame line ends with the memexport suffix: ...n memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)
+  PROOF ok   P2 COUNTER: memexport full-buffer total (last line) = 0; max 0; sum Nx 0; lines with Nx > 0: 0 -> closes P2 memexport gate
+  PROOF ok   f10 f10b cvars in run.json (6 expected, w6gB's set): all as planned
+  PROOF ok   tags placed: 3 game.log LOAD lines (3 needed); sidecar: listener=True trigger=True placed=True load-confirms=3/3 then=off remove-confirms=0
+  PROOF ok   L route reached the level: through the level load (last mark end)
+  PROOF note FINDING 10 (Agent 6 direct test): STUCK-LOCK events 0
+  PROOF ok   quiet host: hostload.csv rows with clang/cl/ninja/link during the run: 0 of 12
+  PROOF ok   G8 bad lines: Protect failed 0, Recovered stale 0, Unhandled guest physical write fault 0
+  BASE items missed: logdiff GONE 1 beyond Toypad/u-diag lines
+  VERDICT HINT LOOK: 1 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row f10b3)
+--- f10b3.f10.txt (2 lines)
+  RESULT: PASS
+--- f10b3.p2c.txt (9 lines)
+  RESULT: PASS (total 0): the memexport full-buffer fallback never ran, up to the last logged frame
+COMMON: OK (0 problems)

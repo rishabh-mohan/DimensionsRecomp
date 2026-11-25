@@ -1,0 +1,30 @@
+{
+  "title": "M8 session 3 smoke: functional check of the installed runner improvements (warmup_runs, new results.csv columns, 31-column sys.csv sampler). Hidden desktop, -Quick, never scored (m8-runner-rating.md C08604D8, C4/C5).",
+  "reference": "s0",
+  "warmup_s": 55,
+  "warmup_from": "firstframe",
+  "measure_s": 50,
+  "repeats": 1,
+  "order": "roundrobin",
+  "settle_s": 5,
+  "cooldown_s": 5,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "cold_run": true,
+  "sys_csv": true,
+  "warmup_runs": 1,
+  "min_window_after_ff_s": 60,
+  "cold_warmup_s": 55,
+  "cold_measure_s": 30,
+  "quick": { "warmup_s": 10, "measure_s": 30, "settle_s": 5, "cooldown_s": 5, "repeats": 1, "min_window_after_ff_s": 20, "cold_warmup_s": 5, "cold_measure_s": 10, "warmup_runs": 1 },
+  "notes": [
+    "Run: run-matrix.ps1 -Matrix <this> -Quick -NoPrompt -OutDir build\\agent8\\session3\\smoke\\out-<HHmm>. Plan: cold-s0, warm1-s0b, s0-r1, s0b-r1 (4 runs). Both arms are the same bin and settings; s0b exists only so that round 1 has two arms and the warm-up arm choice is exercised.",
+    "Functional only: hidden desktop, quick timings. No number from this matrix is a timing result."
+  ],
+  "arms": [
+    { "id": "s0", "group": "smoke", "ref": true, "repeats": 1, "bin": "build/agent2/devoff4b-bin", "frames": "perf", "cvars": ["framerate_limit=0"], "env": {},
+      "driver": "drivers/thread-cpu.ps1", "note": "devoff4b, every switch OFF" },
+    { "id": "s0b", "group": "smoke", "repeats": 1, "bin": "build/agent2/devoff4b-bin", "frames": "perf", "cvars": ["framerate_limit=0"], "env": {},
+      "driver": "drivers/thread-cpu.ps1", "note": "same as s0 (second arm for the warm-up order check)" }
+  ]
+}

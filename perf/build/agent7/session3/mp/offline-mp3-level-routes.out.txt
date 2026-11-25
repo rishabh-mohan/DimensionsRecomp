@@ -1,0 +1,22 @@
+﻿$ python -B build\agent7\session3\mp\mp3_query_seq.py --ref build\agent3\runs\20261122-045945-bgate-long-native3d --ref build\agent3\runs\20261122-050343-bgate-long-nativeB --cand build\agent3\runs\20261122-135155-s4a-r5-off-native4 --cand build\agent3\runs\20261122-141355-s4a-r5-off-native4 --json build\agent7\session3\mp\offline-mp3-level-routes.json
+mp3_query_seq explicit runs
+PASS       ref runs: 2 (need 2): 20261122-045945-bgate-long-native3d, 20261122-050343-bgate-long-nativeB
+           20261122-045945-bgate-long-native3d: 0 trace lines, 0 slots, zero-sample share -, frames -..-, unsupported 0, failed-draw invalidations 16, created-query lines 16
+INCOMPLETE Q1 20261122-045945-bgate-long-native3d: has query trace lines (0) - UNCLEAR: 16 created-query lines but no trace line: LEGO_NATIVE_QUERY_TRACE_FROM not set, or no query result reached the guest (failed-draw invalidations 16)
+PASS       Q2 20261122-045945-bgate-long-native3d: 0 'unsupported query' lines (0)
+           20261122-050343-bgate-long-nativeB: 0 trace lines, 0 slots, zero-sample share -, frames -..-, unsupported 0, failed-draw invalidations 16, created-query lines 16
+INCOMPLETE Q1 20261122-050343-bgate-long-nativeB: has query trace lines (0) - UNCLEAR: 16 created-query lines but no trace line: LEGO_NATIVE_QUERY_TRACE_FROM not set, or no query result reached the guest (failed-draw invalidations 16)
+PASS       Q2 20261122-050343-bgate-long-nativeB: 0 'unsupported query' lines (0)
+           20261122-135155-s4a-r5-off-native4: 0 trace lines, 0 slots, zero-sample share -, frames -..-, unsupported 0, failed-draw invalidations 0, created-query lines 0
+INCOMPLETE Q1 20261122-135155-s4a-r5-off-native4: has query trace lines (0) - UNCLEAR: the route created no hardware query (created-query lines 0); needs a route that issues queries
+PASS       Q2 20261122-135155-s4a-r5-off-native4: 0 'unsupported query' lines (0)
+           20261122-141355-s4a-r5-off-native4: 0 trace lines, 0 slots, zero-sample share -, frames -..-, unsupported 0, failed-draw invalidations 16, created-query lines 16
+INCOMPLETE Q1 20261122-141355-s4a-r5-off-native4: has query trace lines (0) - UNCLEAR: 16 created-query lines but no trace line: LEGO_NATIVE_QUERY_TRACE_FROM not set, or no query result reached the guest (failed-draw invalidations 16)
+PASS       Q2 20261122-141355-s4a-r5-off-native4: 0 'unsupported query' lines (0)
+INCOMPLETE Q3 noise pair: needs 2 noise-arm runs with trace lines
+PASS       cand vs ref: candidate runs found: 2
+PASS       cand vs ref: comparison runs found: 2
+PASS       Q4 cand vs ref 20261122-135155-s4a-r5-off-native4: failed-draw invalidations 0 <= max(2 x ref max, ref max + 4) = 32
+PASS       Q4 cand vs ref 20261122-141355-s4a-r5-off-native4: failed-draw invalidations 16 <= max(2 x ref max, ref max + 4) = 32
+RESULT: INCOMPLETE (0 failed, 5 incomplete)
+[exit code 2]

@@ -1,0 +1,34 @@
+# s4b_check s4bN4 20261125-030425-s4b-N4-title-split4 (off, scenario I180)
+run.json: exit 0 (0x00000000) dumps 0 crash_events 0 wer False; close wm_close 0.56 s; elapsed 180.6 of 180 s; cvars {"d3d12_submit_split_kb": "4", "framerate_limit": "0"}; env -; steps None
+summary: verdict RUNNING; first frame 6.0 s; levels {"info": 72, "warning": 40}; unknown cvars []; errors 0
+log files game.log; levels {"info": 72, "warning": 40}
+families: c1_any=0 k=0 c1_verify_on=0 c1_verify_f=0 c1_other=0 recovered_stale=0 unhandled_phys=0 protect_failed=0 split_init=1 split=18 deferred_counters=0 gpu_wait=0 memexport=0 slow_frame=0 s4_upload_hash=0 precise_wait=0 miss_cache=0 stuck_lock=0 minidump=0 fatal=0 debug_layer=0 dred=0 d3d12_msg=0 clean_exit=1
+  split_init: [2026-11-25 03:04:25.896] [info] [gpu] [t31312] d3d12_submit_split_kb: splitting submissions at 4 KB of deferred commands
+  split: [2026-11-25 03:04:30.399] [info] [gpu] [t31312] d3d12_submit_split: frame=2 submission=2 splits=0 failed=0 held_query=0 held_scratch=0 held_pipelines=1
+  split: [2026-11-25 03:04:40.399] [info] [gpu] [t31312] d3d12_submit_split: frame=3680 submission=9224 splits=5459 failed=0 held_query=0 held_scratch=0 held_pipelines=174
+  split: [2026-11-25 03:04:50.400] [info] [gpu] [t31312] d3d12_submit_split: frame=6870 submission=17385 splits=10174 failed=0 held_query=0 held_scratch=0 held_pipelines=174
+  split: ... (12 more)
+  split: [2026-11-25 03:07:00.415] [info] [gpu] [t31312] d3d12_submit_split: frame=47074 submission=145385 splits=88166 failed=0 held_query=0 held_scratch=0 held_pipelines=174
+  split: [2026-11-25 03:07:10.416] [info] [gpu] [t31312] d3d12_submit_split: frame=50384 submission=156240 splits=94785 failed=0 held_query=0 held_scratch=0 held_pipelines=174
+  split: [2026-11-25 03:07:20.417] [info] [gpu] [t31312] d3d12_submit_split: frame=53667 submission=167080 splits=101351 failed=0 held_query=0 held_scratch=0 held_pipelines=174
+split fields: lines 18 (03:04:30.399..03:07:20.417); last {"frame": 53667, "submission": 167080, "splits": 101351, "failed": 0, "held_query": 0, "held_scratch": 0, "held_pipelines": 174}; max {"frame": 53667, "submission": 167080, "splits": 101351, "failed": 0, "held_query": 0, "held_scratch": 0, "held_pipelines": 174}; per frame {"submission": 3.1134, "splits": 1.8886, "failed": 0.0, "held_query": 0.0, "held_scratch": 0.0, "held_pipelines": 0.0032}; monotonic {"frame": true, "submission": true, "splits": true, "failed": true, "held_query": true, "held_scratch": true, "held_pipelines": true}
+frames (perf.csv rows) 55185; slow_frame per frame 0.000
+logdiff base 20261122-133730-s4a-udiag: 9 logs joined -> build\agent3\s4b\checks\joined\20261122-133730-s4a-udiag
+logdiff vs 20261122-133730-s4a-udiag (base scenario I330): NEW 0 (+0 allowed) MORE 0 (+0 allowed) GONE 32 (1 unexpected) FLAG 0; NEW at info 2 other, 0 allowed; rc 0
+  info NEW build\agent3\runs\20261125-030425-s4b-N4-title-split4\game.log x18 [info] [gpu] d#d#_submit_split: frame=# submission=# splits=# failed=# held_query=# held_scratch=# held_pipelines=#
+  info NEW build\agent3\runs\20261125-030425-s4b-N4-title-split4\game.log x1 [info] [gpu] d#d#_submit_split_kb: splitting submissions at # KB of deferred commands
+levels cand {"info": 72, "warning": 40} vs 20261122-133730-s4a-udiag {"info": 149789, "warning": 40}
+scenes (>= 2 s) base: 226/1022:294s 219/226:15s 218/222:15s
+scenes (>= 2 s) cand: 226/1022:144s 218/222:16s 219/226:15s
+  missing in cand: -; extra in cand: -
+threads (% of one core, window [20.0, 164.4] s from the first frame, 144.4 s): Main XThread (F800002C) x1 86.8 | GPU Commands (F8000018) x1 78.2 | XThread9E58 (F80001AC) x1 30.4 | rex::thread::TimerQueue x1 27.9 | (unnamed) x33 19.9 | XThread1B38 (F8000144) x1 10.3 | XThread9810 (F8000114) x1 7.7 | 0xc0550001 x1 6.3 | XThread94AC (F800010C) x1 3.0 | GPU VSync (F800001C) x1 2.4
+  TimerQueue ticks (tid 21004): 90 samples over [-5.6, 172.4] s, cycles non-rising in 0 of 89 steps 
+sys.csv slow state: {"rows": 176, "onset_s": null, "slow_pct": 0.0, "e_eff_mhz_median": 1676, "cpu_util_pct_median": 62.3, "slow": false}
+hangs: 0 STUCK-LOCK event(s); hostload rows during the run: {"rows": 6, "busy_rows": 0}; toypad: {"confirms": 0, "result": ""}
+PROOF ok   init "d3d12_submit_split_kb: splitting submissions at N KB" x1: 2026-11-25 03:04:25.896] [info] [gpu] [t31312] d3d12_submit_split_kb: splitting submissions at 4 KB of deferred commands
+PROOF ok   init line says "at 4 KB"
+PROOF ok   failed=0 in every d3d12_submit_split line (max 0 over 18 lines)
+PROOF ok   splits > 0 (max 101351)
+PROOF note per frame: submission 3.1134, splits 1.8886 (frames 53665; fields monotonic {'frame': True, 'submission': True, 'splits': True, 'failed': True, 'held_query': True, 'held_scratch': True, 'held_pipelines': True})
+BASE items missed: none (base scenario differs: scenes/marks/GONE not judged)
+VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4bN4)

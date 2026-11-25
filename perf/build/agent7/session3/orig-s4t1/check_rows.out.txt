@@ -1,0 +1,75 @@
+run-matrix fields: top 20, arm 18, quick 12; params: allowrunninggame coldshared matrix nocold noprompt only outdir planonly quick repeats
+PASS run-matrix lists parsed
+PASS ENV-KEYS-F1 list: 11 keys, CHAIN_PRIORITY in it
+PASS template n0 env = FRAME_METRICS only
+PASS template th3 env = n0 + THREADED=1, PREPARE_THREADS=2, FULL_DRAW_PREPARATION=1
+PASS template th2 env = n0 + THREADED=1, PREPARE_THREADS=2, SNAPSHOT_STATE=1
+
+== matrix-s4t1-f1.json
+PASS ASCII, no BOM
+PASS top-level fields allowed
+PASS quick fields allowed
+PASS timing fields = template (warmup_s, warmup_from, measure_s, settle_s, cooldown_s, boot_timeout_s, close_timeout_s, menu_s, order, sys_csv, quick)
+PASS reference=n0 cold_run=False repeats=2
+PASS exactly one ref arm = reference (['n0'])
+PASS arm ids/order: n0 th3old th3 th3cp3 th2 th2cp3
+PASS arm n0       bin <NATIVE4B-S4T1> x2 env n0+[]
+PASS arm th3old   bin <NATIVE4B>      x2 env n0+['LEGO_NATIVE_FULL_DRAW_PREPARATION', 'LEGO_NATIVE_PREPARE_THREADS', 'LEGO_NATIVE_THREADED']
+PASS arm th3      bin <NATIVE4B-S4T1> x2 env n0+['LEGO_NATIVE_FULL_DRAW_PREPARATION', 'LEGO_NATIVE_PREPARE_THREADS', 'LEGO_NATIVE_THREADED']
+PASS arm th3cp3   bin <NATIVE4B-S4T1> x2 env n0+['LEGO_NATIVE_CHAIN_PRIORITY', 'LEGO_NATIVE_FULL_DRAW_PREPARATION', 'LEGO_NATIVE_PREPARE_THREADS', 'LEGO_NATIVE_THREADED']
+PASS arm th2      bin <NATIVE4B-S4T1> x1 env n0+['LEGO_NATIVE_PREPARE_THREADS', 'LEGO_NATIVE_SNAPSHOT_STATE', 'LEGO_NATIVE_THREADED']
+PASS arm th2cp3   bin <NATIVE4B-S4T1> x1 env n0+['LEGO_NATIVE_CHAIN_PRIORITY', 'LEGO_NATIVE_PREPARE_THREADS', 'LEGO_NATIVE_SNAPSHOT_STATE', 'LEGO_NATIVE_THREADED']
+
+== matrix-s4t1-f3.json
+PASS ASCII, no BOM
+PASS top-level fields allowed
+PASS quick fields allowed
+PASS timing fields = template (warmup_s, warmup_from, measure_s, settle_s, cooldown_s, boot_timeout_s, close_timeout_s, menu_s, order, sys_csv, quick)
+PASS reference=n0q cold_run=False repeats=2
+PASS exactly one ref arm = reference (['n0q'])
+PASS arm ids/order: n0q th3q th3cp3q
+PASS arm n0q      bin <NATIVE4B-S4T1> x2 env n0+['LEGO_NATIVE_QUERY_TRACE_FROM']
+PASS arm th3q     bin <NATIVE4B-S4T1> x2 env n0+['LEGO_NATIVE_FULL_DRAW_PREPARATION', 'LEGO_NATIVE_PREPARE_THREADS', 'LEGO_NATIVE_QUERY_TRACE_FROM', 'LEGO_NATIVE_THREADED']
+PASS arm th3cp3q  bin <NATIVE4B-S4T1> x1 env n0+['LEGO_NATIVE_CHAIN_PRIORITY', 'LEGO_NATIVE_FULL_DRAW_PREPARATION', 'LEGO_NATIVE_PREPARE_THREADS', 'LEGO_NATIVE_QUERY_TRACE_FROM', 'LEGO_NATIVE_THREADED']
+
+== matrix-w8b-draft.json
+PASS ASCII, no BOM
+PASS top-level fields allowed
+PASS quick fields allowed
+PASS timing fields = template (warmup_s, warmup_from, measure_s, settle_s, cooldown_s, boot_timeout_s, close_timeout_s, menu_s, order, sys_csv, quick)
+PASS reference=n0 cold_run=True repeats=4
+PASS exactly one ref arm = reference (['n0'])
+PASS arm ids/order: n0 th3 th3cp
+PASS arm n0       bin <NATIVE4B-S4T1> x4 env n0+[]
+PASS arm th3      bin <NATIVE4B-S4T1> x4 env n0+['LEGO_NATIVE_FULL_DRAW_PREPARATION', 'LEGO_NATIVE_PREPARE_THREADS', 'LEGO_NATIVE_THREADED']
+PASS arm th3cp    bin <NATIVE4B-S4T1> x4 env n0+['LEGO_NATIVE_CHAIN_PRIORITY', 'LEGO_NATIVE_FULL_DRAW_PREPARATION', 'LEGO_NATIVE_PREPARE_THREADS', 'LEGO_NATIVE_THREADED']
+PASS W8b env keys all in ENV-KEYS-F1: LEGO_NATIVE_CHAIN_PRIORITY, LEGO_NATIVE_FRAME_METRICS, LEGO_NATIVE_FULL_DRAW_PREPARATION, LEGO_NATIVE_PREPARE_THREADS, LEGO_NATIVE_THREADED
+PASS W8b th3 = n0 + 3 keys; th3cp = th3 + CHAIN_PRIORITY=3 (ENV-KEYS-F1 th/thcp)
+
+== queue-s4t1.jsonl
+PASS row ids: s4t1-f1 s4t1-f3 s4t1-w1
+PASS s4t1-f1: matrix-s4t1-f1.json -NoCold -> 10 scored + 0 cold runs, full, about 26 min (est 1700 s >= 1580 s)
+PASS s4t1-f3: matrix-s4t1-f3.json -Quick -NoCold -> 5 scored + 0 cold runs, quick, about 12 min (est 750 s >= 750 s)
+PASS s4t1-w1: matrix-w8b-draft.json -Quick -NoCold -Repeats 1 -> 3 scored + 0 cold runs, quick, about 8 min (est 450 s >= 450 s)
+queue total about 46 min of runs (plus checks)
+PASS W8b full window: 12 scored + 1 cold = 13 runs, about 34 min at 158 s/run (planner 142 s: 31 min)
+
+== placeholders (replace in a copy; a bin dir without MANIFEST.txt skips its arms)
+  <NATIVE4B-S4T1>  matrix-s4t1-f1.json, matrix-s4t1-f3.json, matrix-w8b-draft.json
+  <NATIVE4B>       matrix-s4t1-f1.json
+PASS only the two bin placeholders are used
+
+== staged diff: SHA256SUMS.txt vs files, before/ vs S4b sources
+PASS SHA256SUMS.txt entries: 7
+PASS sha256 after/src/gpu_native/native_preparation.h 88C57831AF2B200A...
+PASS sha256 after/src/gpu_native/native_recording.cpp 00F03D84A0C594FA...
+PASS sha256 after/src/gpu_native/native_worker.cpp 071E2F4B784D40DE...
+PASS sha256 before/src/gpu_native/native_preparation.h 889F3FA6F207011B...
+PASS sha256 before/src/gpu_native/native_recording.cpp 48F0C429DDB89E45...
+PASS sha256 before/src/gpu_native/native_worker.cpp 7157E8F2EDC3D5C4...
+PASS sha256 s4-t1.diff 46FFD2E9044094DC...
+PASS before/native_worker.cpp == build/agent2/snap1/DimensionsRecomp/rexlego/src/gpu_native/native_worker.cpp (7157E8F2EDC3D5C4...)
+PASS before/native_recording.cpp == build/agent2/snap1/DimensionsRecomp/rexlego/src/gpu_native/native_recording.cpp (48F0C429DDB89E45...)
+PASS before/native_preparation.h == build/agent2/snap1/DimensionsRecomp/rexlego/src/gpu_native/native_preparation.h (889F3FA6F207011B...)
+
+RESULT: ALL CHECKS PASS (0 failed)

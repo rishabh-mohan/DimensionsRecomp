@@ -1,0 +1,316 @@
+{
+ "reference": "offsf",
+ "forbid_all": [
+  "Recovered stale physical page protection",
+  "Unhandled guest physical write fault",
+  "PhysicalHeap::Protect failed",
+  "BaseHeap::Protect failed"
+ ],
+ "note_all": [
+  "STUCK-LOCK",
+  "Minidump written to"
+ ],
+ "levels": {
+  "warning": 40,
+  "error": 0,
+  "critical": 0
+ },
+ "arms": {
+  "base": {
+   "require": [
+    "Reserving the guest memory arena"
+   ],
+   "forbid": [
+    "d3d12_pipeline_creation_no_wait",
+    "resolve after drop:",
+    "slow frame #",
+    "memexport flush reasons",
+    "dropped draws",
+    "forced pipeline waits",
+    "C1 keep-watch:",
+    "C1 verify",
+    "S4 upload hash:",
+    "GPU wait back-off",
+    "GPU wait stats",
+    "Host timer resolution set to 1 ms",
+    "TimerQueue: precise wait (timer_queue_precise_wait)"
+   ]
+  },
+  "off": {
+   "require": [
+    "Reserving the guest memory arena"
+   ],
+   "forbid": [
+    "d3d12_pipeline_creation_no_wait",
+    "resolve after drop:",
+    "slow frame #",
+    "memexport flush reasons",
+    "dropped draws",
+    "forced pipeline waits",
+    "C1 keep-watch:",
+    "C1 verify",
+    "S4 upload hash:",
+    "GPU wait back-off",
+    "GPU wait stats",
+    "Host timer resolution set to 1 ms",
+    "TimerQueue: precise wait (timer_queue_precise_wait)"
+   ]
+  },
+  "basesf": {
+   "require": [
+    "Reserving the guest memory arena"
+   ],
+   "forbid": [
+    "d3d12_pipeline_creation_no_wait",
+    "resolve after drop:",
+    "dropped draws",
+    "forced pipeline waits",
+    "C1 keep-watch:",
+    "C1 verify",
+    "S4 upload hash:",
+    "GPU wait back-off",
+    "GPU wait stats",
+    "Host timer resolution set to 1 ms",
+    "TimerQueue: precise wait (timer_queue_precise_wait)"
+   ]
+  },
+  "off-sf": {
+   "require": [
+    "Reserving the guest memory arena"
+   ],
+   "forbid": [
+    "d3d12_pipeline_creation_no_wait",
+    "resolve after drop:",
+    "C1 keep-watch:",
+    "C1 verify",
+    "S4 upload hash:",
+    "GPU wait back-off",
+    "GPU wait stats",
+    "Host timer resolution set to 1 ms",
+    "TimerQueue: precise wait (timer_queue_precise_wait)"
+   ]
+  },
+  "offwarm": {
+   "require": [
+    "Reserving the guest memory arena"
+   ],
+   "forbid": [
+    "d3d12_pipeline_creation_no_wait",
+    "resolve after drop:",
+    "C1 keep-watch:",
+    "C1 verify",
+    "S4 upload hash:",
+    "GPU wait back-off",
+    "GPU wait stats",
+    "Host timer resolution set to 1 ms",
+    "TimerQueue: precise wait (timer_queue_precise_wait)"
+   ]
+  },
+  "offd": {
+   "require": [
+    "Reserving the guest memory arena"
+   ],
+   "forbid": [
+    "d3d12_pipeline_creation_no_wait",
+    "C1 keep-watch:",
+    "C1 verify",
+    "S4 upload hash:",
+    "GPU wait back-off",
+    "GPU wait stats",
+    "Host timer resolution set to 1 ms",
+    "TimerQueue: precise wait (timer_queue_precise_wait)"
+   ]
+  },
+  "onsf": {
+   "require": [
+    "Reserving the guest memory arena",
+    "d3d12_pipeline_creation_no_wait: not waiting for pipeline creation"
+   ],
+   "forbid": [
+    "d3d12_pipeline_creation_no_wait ignored",
+    "resolve after drop:",
+    "C1 keep-watch:",
+    "C1 verify",
+    "S4 upload hash:",
+    "GPU wait back-off",
+    "GPU wait stats",
+    "Host timer resolution set to 1 ms",
+    "TimerQueue: precise wait (timer_queue_precise_wait)"
+   ],
+   "exact": {
+    "d3d12_pipeline_creation_no_wait: not waiting for pipeline creation": 1,
+    "d3d12_pipeline_creation_no_wait": 1
+   }
+  },
+  "onwarm": {
+   "require": [
+    "Reserving the guest memory arena",
+    "d3d12_pipeline_creation_no_wait: not waiting for pipeline creation"
+   ],
+   "forbid": [
+    "d3d12_pipeline_creation_no_wait ignored",
+    "resolve after drop:",
+    "C1 keep-watch:",
+    "C1 verify",
+    "S4 upload hash:",
+    "GPU wait back-off",
+    "GPU wait stats",
+    "Host timer resolution set to 1 ms",
+    "TimerQueue: precise wait (timer_queue_precise_wait)"
+   ],
+   "exact": {
+    "d3d12_pipeline_creation_no_wait: not waiting for pipeline creation": 1,
+    "d3d12_pipeline_creation_no_wait": 1
+   }
+  },
+  "onstop": {
+   "require": [
+    "Reserving the guest memory arena",
+    "d3d12_pipeline_creation_no_wait: not waiting for pipeline creation"
+   ],
+   "forbid": [
+    "d3d12_pipeline_creation_no_wait ignored",
+    "resolve after drop:",
+    "C1 keep-watch:",
+    "C1 verify",
+    "S4 upload hash:",
+    "GPU wait back-off",
+    "GPU wait stats",
+    "Host timer resolution set to 1 ms",
+    "TimerQueue: precise wait (timer_queue_precise_wait)"
+   ],
+   "exact": {
+    "d3d12_pipeline_creation_no_wait: not waiting for pipeline creation": 1,
+    "d3d12_pipeline_creation_no_wait": 1
+   }
+  },
+  "ond": {
+   "require": [
+    "Reserving the guest memory arena",
+    "d3d12_pipeline_creation_no_wait: not waiting for pipeline creation"
+   ],
+   "forbid": [
+    "d3d12_pipeline_creation_no_wait ignored",
+    "C1 keep-watch:",
+    "C1 verify",
+    "S4 upload hash:",
+    "GPU wait back-off",
+    "GPU wait stats",
+    "Host timer resolution set to 1 ms",
+    "TimerQueue: precise wait (timer_queue_precise_wait)"
+   ],
+   "exact": {
+    "d3d12_pipeline_creation_no_wait: not waiting for pipeline creation": 1,
+    "d3d12_pipeline_creation_no_wait": 1
+   }
+  },
+  "gthr0": {
+   "require": [
+    "Reserving the guest memory arena",
+    "d3d12_pipeline_creation_no_wait ignored"
+   ],
+   "forbid": [
+    "not waiting for pipeline creation",
+    "resolve after drop:",
+    "C1 keep-watch:",
+    "C1 verify",
+    "S4 upload hash:",
+    "GPU wait back-off",
+    "GPU wait stats",
+    "Host timer resolution set to 1 ms",
+    "TimerQueue: precise wait (timer_queue_precise_wait)"
+   ],
+   "exact": {
+    "d3d12_pipeline_creation_no_wait ignored": 1,
+    "d3d12_pipeline_creation_no_wait": 1
+   },
+   "levels": {
+    "warning": 41,
+    "error": 0,
+    "critical": 0
+   }
+  },
+  "gasync": {
+   "require": [
+    "Reserving the guest memory arena",
+    "d3d12_pipeline_creation_no_wait ignored"
+   ],
+   "forbid": [
+    "not waiting for pipeline creation",
+    "resolve after drop:",
+    "C1 keep-watch:",
+    "C1 verify",
+    "S4 upload hash:",
+    "GPU wait back-off",
+    "GPU wait stats",
+    "Host timer resolution set to 1 ms",
+    "TimerQueue: precise wait (timer_queue_precise_wait)"
+   ],
+   "exact": {
+    "d3d12_pipeline_creation_no_wait ignored": 1,
+    "d3d12_pipeline_creation_no_wait": 1
+   },
+   "levels": {
+    "warning": 41,
+    "error": 0,
+    "critical": 0
+   }
+  },
+  "gbindful": {
+   "require": [
+    "Reserving the guest memory arena",
+    "d3d12_pipeline_creation_no_wait ignored"
+   ],
+   "forbid": [
+    "not waiting for pipeline creation",
+    "resolve after drop:",
+    "C1 keep-watch:",
+    "C1 verify",
+    "S4 upload hash:",
+    "GPU wait back-off",
+    "GPU wait stats",
+    "Host timer resolution set to 1 ms",
+    "TimerQueue: precise wait (timer_queue_precise_wait)"
+   ],
+   "exact": {
+    "d3d12_pipeline_creation_no_wait ignored": 1,
+    "d3d12_pipeline_creation_no_wait": 1
+   },
+   "levels": {
+    "warning": 41,
+    "error": 0,
+    "critical": 0
+   }
+  }
+ },
+ "count": [
+  "STUCK-LOCK",
+  "still not acquired after",
+  "Minidump written to",
+  "Recovered stale physical page protection",
+  "Unhandled guest physical write fault",
+  "PhysicalHeap::Protect failed",
+  "BaseHeap::Protect failed",
+  "d3d12_pipeline_creation_no_wait",
+  "slow frame #",
+  "dropped draws",
+  "forced pipeline waits",
+  "resolve after drop:",
+  "[NtCreateFile] FAILED",
+  "Reserving the guest memory arena",
+  "Title terminated"
+ ],
+ "notes": [
+  "Expectations for build/agent6/w6/w6_kit.py on the #33 pop-in window (d3d12_pipeline_creation_no_wait), written 2026-11-25 by E5.1 for M6. Wrapper: build/agent6/s33-popin/RUN-S33-LOGDIFF.cmd (reference offsf; matrix mode <folder>, harness mode --run ARM=DIR). Source of the lines: build/agent6/s33-popin/s33-popin-nohunk5.patch (pipeline_cache.cpp Initialize: one REXGPU_INFO 'd3d12_pipeline_creation_no_wait: not waiting for pipeline creation at the end of submissions; ...' when the latch is set, one REXGPU_WARN 'd3d12_pipeline_creation_no_wait ignored: it needs async_shader_compilation, pipeline creation threads and bindless resources' when the cvar is set but the latch isn't; command_processor.cpp ReportSlowFrame: three fields appended) and s33-popin-nohunk5-diagd.patch ('resolve after drop: ...' REXGPU_INFO lines, cvar d3d12_resolve_after_drop_log).",
+  "Arm ids are [A-Za-z0-9]+ (the kit splits run dirs HHMM-<arm>-rN at '-' and exits 2 on any other id). Rules are cvar-agnostic: bin, cvars and env come from the matrix folder's matrix.json (else build/agent6/s33-popin/matrix-s33-draft.json) in matrix mode and from build/agent6/s33-popin/harness-s33.json in harness mode. Matrix arms: off, base, offsf, basesf, onsf, gthr0, gasync, gbindful, offd, ond. Harness arms: those plus offwarm, onwarm, onstop.",
+  "Off-type arms (base, off, basesf, offsf, offwarm, offd): forbid 'd3d12_pipeline_creation_no_wait' (no line with the cvar name at all; game.log never echoes cvar names, checked on W6 p2f). base and off also forbid 'slow frame #', 'memexport flush reasons' and the new fields (slow_frame_log_ms is off there). basesf forbids 'dropped draws' and 'forced pipeline waits': the unpatched bin cannot print them, so one would mean the wrong bin.",
+  "On-type arms (onsf, onwarm, onstop, ond): exactly one 'd3d12_pipeline_creation_no_wait: not waiting for pipeline creation' (the INFO line, also required) and exactly one line containing 'd3d12_pipeline_creation_no_wait' at all, so a WARN next to it is caught twice (forbid 'd3d12_pipeline_creation_no_wait ignored' and the exact 1). The INFO line is [info]: levels stay 40/0/0. onstop closes early by design (-Seconds 203..211) but must still close cleanly via wm_close: exit/close rules unchanged.",
+  "Gate arms (gthr0, gasync, gbindful): exactly one 'd3d12_pipeline_creation_no_wait ignored' (the WARN line, also required), exactly one line with the cvar name, and no 'not waiting for pipeline creation'. The WARN is [warning], so W = base + 1: each gate arm states 'levels' 41/0/0 (the kit reads an arm's own 'levels' since 2026-11-25); any other total is a NOTE. Against offsf the WARN is also a NEW warning key; the kit excuses a NEW warning key that the arm's own require/exact texts name (since 2026-11-25), so it is no NOTE either.",
+  "Diagnostic (d): offd and ond count 'resolve after drop:' (count list, one number per run in the summary); every other arm forbids it (a line there means the wrong bin or cvar).",
+  "Levels 40/0/0 (41 for gates) are the night title-run totals of devoff4b-bin (W6/W9). Harness attract runs (540 s, route) may log a different number of warnings: a mismatch is a NOTE only; set 'levels' here from the first clean base/offsf harness runs if it differs.",
+  "Slow-frame key: the patched line ends '... | memexport full-buffer #x (total #) | dropped draws # | forced pipeline waits # (#x)' (normalized), the unpatched one ends after 'memexport full-buffer #x (total #)'. They are different logdiff keys. With the reference offsf, every patched arm (offsf, offwarm, on*, gates, offd, ond) has the same key, so only counts move (slow-frame lines are [info], so no MORE). basesf vs offsf gives an expected ONLY/GONE pair: the unpatched key is ONLY in basesf and the patched key is GONE from basesf (GONE only if every offsf run logged a slow frame). The ONLY half is named by the count text 'slow frame #' (count texts name ONLY keys), so only the GONE half shows, as a NOTE: expected. base and off (no slow_frame_log_ms) show the same GONE slow-frame key NOTE against offsf: expected too (or run them with --ref off / --ref base). MORE/GONE slow-frame keys between on* and offsf are the measurement, not a regression (DESIGN.md section 8).",
+  "Rule texts are substrings of the message part of a line, counted raw. ONLY-key naming compares them after number normalization (gate_logdiff.norm): 'd3d12_pipeline_creation_no_wait' normalizes to 'd#d#_pipeline_creation_no_wait' in both the key and the rule, so the INFO/WARN ONLY keys are named in their arms.",
+  "Every arm: the generic forbid_all of expect-w6.json/expect-w9.json (Recovered stale physical page protection, Unhandled guest physical write fault, PhysicalHeap::Protect failed, BaseHeap::Protect failed -> FAIL), the other windows' switch lines forbidden (C1 keep-watch/verify, S4 upload hash, GPU wait back-off/stats, the 1 ms timer and precise-wait lines), 'Reserving the guest memory arena' required (the log starts at boot), STUCK-LOCK and 'Minidump written to' as NOTEs (FAIL only when a stall overlaps the measured window; harness runs have no window, so 'unknown' -> NOTE; a dump no episode names FAILs), the shutdown race as INFO and the shutdown watchdog as a NOTE (kit 2026-11-25).",
+  "Tests: build/agent6/s33-popin/make_test_s33.py (builds test-s33/, --check), run by build/agent6/wnight/s3-regress/run_test_s33.ps1; results in s3-regress/test_s33.check.txt; see build/agent6/w6/README.txt (2026-11-25)."
+ ]
+}

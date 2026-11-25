@@ -1,0 +1,64 @@
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-25 01:46:19
+mode: PROMOTE (copied to bench\agent8\run)
+result: OK
+run: only=s0,cg26 repeats=6 -ColdShared; -PlanOnly: 13 runs, about 30 min (runner); expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+latest start: the launcher accepts this GO before 06:45 (no start at or after it; 07:30 - 30 - 10 min would allow 06:50); started at 06:45 it ends about 07:12 by Agent 7's formula
+GO line: GO W10 matrix-window10.json 289F4B4F008FA0C8D2EDD6371F9FAA28C3A40AABF554BA680042367D5A975F55 only=s0,cg26 repeats=6
+draft: build\agent8\w-followup\matrix-window10.json  sha256 289F4B4F008FA0C8D2EDD6371F9FAA28C3A40AABF554BA680042367D5A975F55  4252 bytes
+matrix for the GO: bench\agent8\run\matrix-window10.json  sha256 289F4B4F008FA0C8D2EDD6371F9FAA28C3A40AABF554BA680042367D5A975F55
+launcher: bench\agent5\launch\run-night.ps1 sha256 565D30D40DC5025AD63FD9B9F606724BABC167BC81FCB6FBEB6362B603977112 (2026-11-23 06:14:32); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/devoff4b-bin (arms s0): MANIFEST.txt sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA (expected DE11A914079D7DF7); legodimensions.exe DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83; 7 files listed, 7 of 7 checked match; check lines PASS 102, FAIL 0
+bin: build/agent2/devoff4b-cg26-bin (arms cg26): MANIFEST.txt sha256 917AE86E6C0CC9B370901397EF8FD72F65449E5EC9594D14D9902215BBBC1D5C (expected 917AE86E6C0CC9B3); legodimensions.exe 45952D171D6204A1C8AC072C97D933E676BEAA654F67D32852E1C630DEE038ED; 7 files listed, 7 of 7 checked match; check lines PASS 7, FAIL 0
+arm: s0 (devoff4b; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+arm: cg26 (devoff4b-cg26; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: 28 / 28
+NOTE: queue gap: a queue game runs (LAUNCH 01:45:54, 33 s ago); -PlanOnly at 01:46:26 after 0 s of waiting
+
+--- launcher Get-BinHashes (only= arms)
+DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83  build/agent2/devoff4b-bin/legodimensions.exe
+DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA  build/agent2/devoff4b-bin/MANIFEST.txt
+45952D171D6204A1C8AC072C97D933E676BEAA654F67D32852E1C630DEE038ED  build/agent2/devoff4b-cg26-bin/legodimensions.exe
+917AE86E6C0CC9B370901397EF8FD72F65449E5EC9594D14D9902215BBBC1D5C  build/agent2/devoff4b-cg26-bin/MANIFEST.txt
+
+--- run-matrix.ps1 -Matrix bench\agent8\run\matrix-window10.json -Only s0,cg26 -Repeats 6 -ColdShared -NoPrompt -PlanOnly (launcher Get-Plan)
+=== timing matrix: Window 10 (M8, session 3; shape from build/agent9/session3/CG26-W10-REVIEW.md, a copy of W4c with new arms): codegen CG26 timing. cg26 = devoff4b relinked with the 10 CG26 TUs vs s0 = devoff4b, every switch OFF, 6 round-robin rounds ===
+matrix   <workspace>\bench\agent8\run\matrix-window10.json
+note     Staged and checked with build/agent8/w-followup/stage-window.ps1 (the launcher's own Parse-Go, Test-Matrix and -PlanOnly). GO: 'GO W10 matrix-window10.json <sha256> only=s0,cg26 repeats=6'. The launcher always adds -ColdShared, so: one unscored cold run (devoff4b, s0's bin), then 6 round-robin rounds with the start arm alternating (s0 cg26 | cg26 s0 | ...): 1 + 12 = 13 runs, runner estimate about 30 min. cg26's first launch is a scored round-1 run whose window still starts >= 60 s after the first frame, as in W4c (B).
+note     Question: does the CG26 codegen change frame time or CPU? Both arms run devoff4b's sources with every runtime switch OFF (no LEGO_GPU_WAIT_*, no p2fc, no timer bundle; #24 off); the only difference is the relinked legodimensions.exe (and its map).
+note     Arms: s0 = build/agent2/devoff4b-bin (MANIFEST sha256 DE11A914079D7DF7, legodimensions.exe DFBE1D43B28861A6). cg26 = build/agent2/devoff4b-cg26-bin (M2; MANIFEST sha256 917AE86E6C0CC9B3, legodimensions.exe 45952D17), copied from devoff4b with exe/map relinked with 10 CG26 TUs. If M2 stages a control relink bin (build/agent2/cg26 link-ctl), it is the better reference; this file does not use it.
+note     M10 rated #26 CG26 SAFE-IF for W10 (build/agent10/session3/r26-cg26.md, 423FE10F). Its conditions: (1) the bins above, checked before the first run (the launcher's bin hashes), no restaging. (2) env {} in both arms (#24 off). (3) Each bin keeps its own cache; never copy cache or seeds. cg26 has no cache, so its first launch (round 1, scored by the runner) is a cold run: the read-out reports round 1 separately and gives the verdict with and without it. (4) Every cg26 run gets the normal per-run functional check (exit 0, no dump/WER, level reached, K0/F0); any cg26 FAIL voids the arm. (5) STUCK-LOCK is judged by the finding-10 rule (RESUME section 6 item 3), counted per arm.
+note     Window: 5 s settle + 55 s warm-up from the first frame, then 50 s measured, so every window starts >= 60 s after the first frame (min_window_after_ff_s 60); the runner flags window_before_floor (excluded) below 59.5 s. The cold run: 55 s warm-up, 30 s window. GPU warm-up: the read-out reports round 1 separately and gives the verdict with and without it (RESUME section 7 step 0).
+note     One frame source for every arm: perf.csv (frames perf), uncapped (framerate_limit=0), the same driver (drivers/thread-cpu.ps1 -> threads.csv). Runner flags on every run: --audio_mute=true --pause_when_unfocused=false --native_settings_load=false --discord_rpc=false. sys_csv on.
+note     Read-out: per round cg26 - s0, difference of medians with a 95 % CI, median ms, fps, p99, the 1 % low and process cores. A timing claim needs a CI that excludes 0; otherwise the row reads 'overlap'. Timing comes only from the user's unlocked desktop through the night launcher; agent runs of this matrix (-Quick, hidden desktop) are functional only.
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order roundrobin; close timeout 60 s; cooldown 5 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+       s0: bin build/agent2/devoff4b-bin; frames perf; x6; warm-up 55 s; window 50 s; group w10 (ref); cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         devoff4b, every switch OFF (MANIFEST DE11A914079D7DF7)
+       cg26: bin build/agent2/devoff4b-cg26-bin; frames perf; x6; warm-up 55 s; window 50 s; group w10; cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         devoff4b relinked with the 10 CG26 TUs, every switch OFF (MANIFEST 917AE86E6C0CC9B3)
+cold     s0 (build/agent2/devoff4b-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+         -ColdShared: one cold run for all 2 bin(s); the other bins first launch as scored round-1 runs
+round 1  s0 cg26
+round 2  cg26 s0
+round 3  s0 cg26
+round 4  cg26 s0
+round 5  s0 cg26
+round 6  cg26 s0
+order    s0 cg26 | cg26 s0 | s0 cg26 | cg26 s0 | s0 cg26 | cg26 s0
+estimate 13 runs (1 cold), about 30 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-YKCG2EGLGPTCKF2UI6RSSUJCX5 -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   14.37 GB
+game       legodimensions.exe RUNNING (pid 2384) -> close it first
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/devoff4b-bin : ok (MANIFEST.txt)
+bin        build/agent2/devoff4b-cg26-bin : ok (MANIFEST.txt)
+screensaver none
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   13 runs, about 30 min: done around 02:16
+!!! FATAL: legodimensions.exe is running (pid 2384)
+PlanOnly: nothing started.

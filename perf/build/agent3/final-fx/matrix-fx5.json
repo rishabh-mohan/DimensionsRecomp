@@ -1,0 +1,34 @@
+{
+  "title": "FINAL F5 + F5w (M3 draft, functional only): nativefinal-bin plain launch on the W8a route; fx5 = first launch (cold cache, records recipes), fx5w = second launch in its own run dir, seeded with fx5's cache (native-pso-recipes.bin + native-pso.bin only)",
+  "reference": "fx5",
+  "warmup_s": 55,
+  "warmup_from": "firstframe",
+  "measure_s": 50,
+  "repeats": 1,
+  "order": "fixed",
+  "settle_s": 5,
+  "cooldown_s": 5,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "cold_run": false,
+  "sys_csv": false,
+  "min_window_after_ff_s": 60,
+  "cold_warmup_s": 55,
+  "cold_measure_s": 30,
+  "notes": [
+    "M10 final-defaults-rating C20B6FDB F5 + M10 final-gate-rating AE8EB2A5 G1: exactly one launch per run dir. fx5w runs in its own run dir; run-timing -SeedCache copies only native-pso.bin + native-pso-recipes.bin from fx5's run-dir cache\\ into fx5w's cache\\ before launch (game not started if either is missing) and records seed_cache {requested, source_dir, dest, files[name, source, bytes, sha256]} in fx5w's run.json. No logs are carried over.",
+    "W8a route = plain launch, cvars native_settings_frontend=false, native_fps_limit=0, framerate_limit=0 (as matrix-window8a.json arm n0), window 5 s settle + 55 s warm-up from the first frame + 50 s. No LEGO_NATIVE_SHADER_MISS_CACHE in either arm (plain launch = build default ON).",
+    "Hidden desktop (s4b-queue): functional only, the numbers are not timing results. Gate: build/agent12/session3/final_gate.py <fx5 run> F5 --ref build/agent8/matrix/20261125-0359/runs/0400-n0-r1; <fx5w run> F5w --first <fx5 run> --ref <same n0>."
+  ],
+  "arms": [
+    { "id": "fx5", "group": "fx5", "ref": true, "repeats": 1, "frames": "native", "bin": "build/agent2/nativefinal-bin",
+      "cvars": ["native_settings_frontend=false", "native_fps_limit=0", "framerate_limit=0"],
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv" },
+      "note": "F5 first launch: no cache/ in the staged bin, so the run records startup pipeline recipes" },
+    { "id": "fx5w", "group": "fx5", "repeats": 1, "frames": "native", "bin": "build/agent2/nativefinal-bin",
+      "cvars": ["native_settings_frontend=false", "native_fps_limit=0", "framerate_limit=0"],
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv" },
+      "seed_cache": "fx5",
+      "note": "F5w second launch (warm): own run dir, cache/ seeded from fx5's latest run in this matrix" }
+  ]
+}

@@ -1,0 +1,120 @@
+W4b/W5 extra checks (Agent 6, tasks #5/#13): <workspace>\build\agent6\w6\test-synth\W6SYNTH; base arm s0
+arms: p2fc=3; s0=3
+
+1. run.json close/crash fields; exit_seq = the last 3 game.log lines are closing / complete / terminated; STUCK/WM_CLOSE = text-file lines in the run dir that contain the word
+  p2fc      1830-p2fc-r1      exit_seq=ok status=OK problems=0 exit=0x00000000 early=False wm_close=1 repost=None exit_wait_s=0.67 killed=False clean=True wer=False foreign_dumps=0 dialogs=0 not_resp=0 perf_stalled=False artifacts=0 log_lines=98 runner_error=None excluded=False dmp=1
+                              bin=devoff4-bin env=- cvar+[] cvar-[] flags_info=['light_share_high'] flags_excl=[] sys_flags=[] STUCK=5 WM_CLOSE=0
+  p2fc      1832-p2fc-r2      exit_seq=ok status=OK problems=0 exit=0x00000000 early=False wm_close=1 repost=None exit_wait_s=0.67 killed=False clean=True wer=False foreign_dumps=0 dialogs=0 not_resp=0 perf_stalled=False artifacts=0 log_lines=98 runner_error=None excluded=False dmp=1
+                              bin=devoff4-bin env=- cvar+[] cvar-[] flags_info=['light_share_high'] flags_excl=[] sys_flags=[] STUCK=5 WM_CLOSE=0
+  p2fc      1834-p2fc-r3      exit_seq=ok status=OK problems=0 exit=0x00000000 early=False wm_close=1 repost=None exit_wait_s=0.67 killed=False clean=True wer=False foreign_dumps=0 dialogs=0 not_resp=0 perf_stalled=False artifacts=0 log_lines=98 runner_error=None excluded=False dmp=0
+                              bin=devoff4-bin env=- cvar+[] cvar-[] flags_info=['light_share_high'] flags_excl=[] sys_flags=[] STUCK=0 WM_CLOSE=0
+  s0        1800-s0-r1        exit_seq=ok status=OK problems=0 exit=0x00000000 early=False wm_close=1 repost=None exit_wait_s=0.67 killed=False clean=True wer=False foreign_dumps=0 dialogs=0 not_resp=0 perf_stalled=False artifacts=0 log_lines=98 runner_error=None excluded=False dmp=0
+                              bin=devoff4-bin env=- cvar+[] cvar-[] flags_info=['light_share_high'] flags_excl=[] sys_flags=[] STUCK=0 WM_CLOSE=0
+  s0        1808-s0-r2        exit_seq=ok status=OK problems=0 exit=0x00000000 early=False wm_close=1 repost=None exit_wait_s=0.91 killed=False clean=True wer=False foreign_dumps=0 dialogs=0 not_resp=0 perf_stalled=False artifacts=0 log_lines=98 runner_error=None excluded=False dmp=0
+                              bin=devoff4-bin env=- cvar+[] cvar-[] flags_info=['light_share_high'] flags_excl=[] sys_flags=[] STUCK=0 WM_CLOSE=0
+  s0        1827-s0-r3        exit_seq=ok status=OK problems=0 exit=0x00000000 early=False wm_close=1 repost=None exit_wait_s=0.75 killed=False clean=True wer=False foreign_dumps=0 dialogs=0 not_resp=0 perf_stalled=False artifacts=0 log_lines=98 runner_error=None excluded=False dmp=0
+                              bin=devoff4-bin env=- cvar+[] cvar-[] flags_info=['light_share_high'] flags_excl=[] sys_flags=[] STUCK=0 WM_CLOSE=0
+    1830-p2fc-r1 game.log: [2026-11-22 18:01:40.914] [error] [krnl] [t8520] STUCK-LOCK: critical section 0x84959edc still not acquired after 5s. owner=guest thread object 0x30111018, lock_count=1, recursion=1; waiting thread is 0x6. An owner of 0,
+    1830-p2fc-r1 game.log: [2026-11-22 18:01:40.915] [error] [krnl] [t8520] STUCK-LOCK: the owner is tid 0x0017 (unnamed), parked at lr=83FAF188 with r3=7048F7E0. If that lr is another RtlEnterCriticalSection, the two threads are holding each othe
+    1830-p2fc-r1 game.log: [2026-11-22 18:01:40.916] [error] [krnl] [t8520] STUCK-LOCK: owner's callers: 83FBFBDC <- 83FC0CA8 <- 83FB3AC8 <- 83FBF698 <- 83FBFA98 <- 82BD6BA4
+    1830-p2fc-r1 game.log: [2026-11-22 18:01:40.917] [error] [krnl] [t8520] STUCK-LOCK: waiter's callers: lr=82A2A270 <- 82AED6BC <- 82B7132C <- 82FB01A0 <- 82B7995C <- 82AB2108 <- 82FEBDE0
+    1830-p2fc-r1 game.log: [2026-11-22 18:01:40.918] [error] [krnl] [t8520] STUCK-LOCK: GPU thread: executing PM4 opcode 0x22 | read ptr 0x2665, write ptr 0x26fb
+    1832-p2fc-r2 game.log: [2026-11-22 18:02:18.926] [error] [krnl] [t8520] STUCK-LOCK: critical section 0x84959edc still not acquired after 5s. owner=guest thread object 0x30111018, lock_count=1, recursion=1; waiting thread is 0x6. An owner of 0,
+    1832-p2fc-r2 game.log: [2026-11-22 18:02:18.927] [error] [krnl] [t8520] STUCK-LOCK: the owner is tid 0x0017 (unnamed), parked at lr=83FAF188 with r3=7048F7E0. If that lr is another RtlEnterCriticalSection, the two threads are holding each othe
+    1832-p2fc-r2 game.log: [2026-11-22 18:02:18.928] [error] [krnl] [t8520] STUCK-LOCK: owner's callers: 83FBFBDC <- 83FC0CA8 <- 83FB3AC8 <- 83FBF698 <- 83FBFA98 <- 82BD6BA4
+    1832-p2fc-r2 game.log: [2026-11-22 18:02:18.929] [error] [krnl] [t8520] STUCK-LOCK: waiter's callers: lr=82A2A270 <- 82AED6BC <- 82B7132C <- 82FB01A0 <- 82B7995C <- 82AB2108 <- 82FEBDE0
+    1832-p2fc-r2 game.log: [2026-11-22 18:02:18.930] [error] [krnl] [t8520] STUCK-LOCK: GPU thread: executing PM4 opcode 0x22 | read ptr 0x2665, write ptr 0x26fb
+  matrix top-level text files: STUCK=0 WM_CLOSE=0
+
+2. exact-text diff vs s0 (1800-s0-r1, 1808-s0-r2, 1827-s0-r3)
+   s0 keys: union 67, in all 3 runs 65; s0-internal variable keys (count range):
+     s0 0..2  [warning] [krnl] IoDismountVolumeByFileHandle(0xf8000160) - stub
+     s0 0..2  [warning] [krnl] IoDismountVolumeByFileHandle(0xf8000164) - stub
+  arm p2fc (3 runs): ONLY-exact 8, GONE-exact 0, count outside s0 min..max 0
+    ONLY 2/3  [critical] [core] [FATAL] Minidump written to hang-36276.dmp   [1830-p2fc-r1=1, 1832-p2fc-r2=1]
+    ONLY 2/3  [error] [krnl] STUCK-LOCK: GPU thread: executing PM4 opcode 0x22 | read ptr 0x2665, write ptr 0x26fb   [1830-p2fc-r1=1, 1832-p2fc-r2=1]
+    ONLY 2/3  [error] [krnl] STUCK-LOCK: critical section 0x84959edc still not acquired after 5s. owner=guest thread object 0x30111018, lock_count=1, recursion=1; waiting thread is 0x6. An owner of 0, or one naming a thread that has e   [1830-p2fc-r1=1, 1832-p2fc-r2=1]
+    ONLY 2/3  [error] [krnl] STUCK-LOCK: owner's callers: 83FBFBDC <- 83FC0CA8 <- 83FB3AC8 <- 83FBF698 <- 83FBFA98 <- 82BD6BA4   [1830-p2fc-r1=1, 1832-p2fc-r2=1]
+    ONLY 2/3  [error] [krnl] STUCK-LOCK: the owner is tid 0x0017 (unnamed), parked at lr=83FAF188 with r3=7048F7E0. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.   [1830-p2fc-r1=1, 1832-p2fc-r2=1]
+    ONLY 2/3  [error] [krnl] STUCK-LOCK: waiter's callers: lr=82A2A270 <- 82AED6BC <- 82B7132C <- 82FB01A0 <- 82B7995C <- 82AB2108 <- 82FEBDE0   [1830-p2fc-r1=1, 1832-p2fc-r2=1]
+    ONLY 3/3  [info] [sys] C1 keep-watch: first kept protect at ED19F000, 299892736 bytes   [1830-p2fc-r1=1, 1832-p2fc-r2=1, 1834-p2fc-r3=1]
+    ONLY 3/3  [info] [sys] C1 keep-watch: on (with physical_protect_hold_global_lock)   [1830-p2fc-r1=1, 1832-p2fc-r2=1, 1834-p2fc-r3=1]
+
+3. Toypad: write-command sequence; B1 (challenge) times and window close, s after the first Toypad write
+  p2fc      1830-p2fc-r1      seq B0 C0 B1 B3 B1 B3 B1 B3 B1 B3 | B1 at [0.0, 25.9, 59.5, 95.7] | intervals [25.9, 33.6, 36.1] | close at 112.3
+  p2fc      1832-p2fc-r2      seq B0 C0 B1 B3 B1 B3 B1 B3 B1 B3 | B1 at [0.0, 25.9, 59.5, 95.7] | intervals [25.9, 33.6, 36.1] | close at 112.3
+  p2fc      1834-p2fc-r3      seq B0 C0 B1 B3 B1 B3 B1 B3 B1 B3 | B1 at [0.0, 25.9, 59.5, 95.7] | intervals [25.9, 33.6, 36.1] | close at 112.3
+  p2fc      B1 intervals: n=9 mean 31.9 median 33.6 min 25.9 max 36.1
+  s0        1800-s0-r1        seq B0 C0 B1 B3 B1 B3 B1 B3 B1 B3 | B1 at [0.0, 25.9, 59.5, 95.7] | intervals [25.9, 33.6, 36.1] | close at 112.3
+  s0        1808-s0-r2        seq B0 C0 B1 B3 B1 B3 B1 B3 B1 B3 | B1 at [0.0, 26.0, 58.7, 95.5] | intervals [26.0, 32.6, 36.8] | close at 112.3
+  s0        1827-s0-r3        seq B0 C0 B1 B3 B1 B3 B1 B3 B1 B3 | B1 at [0.0, 28.0, 63.0, 96.0] | intervals [28.0, 35.0, 33.1] | close at 112.5
+  s0        B1 intervals: n=9 mean 31.9 median 33.1 min 25.9 max 36.8
+
+4. boot milestones, s after the first log line (median per arm; min..max)
+  p2fc      launch 1.24 (1.24..1.24) | storage 1.26 (1.26..1.26) | audio 3.55 (3.55..3.55) | toyB0 4.32 (4.32..4.32) | hdr_fail 3.90 (3.90..3.90) | dat_fail 7.51 (7.51..7.51) | closing 116.61 (116.61..116.61) | exit 116.76 (116.76..116.76)
+  s0        launch 1.24 (1.21..1.28) | storage 1.26 (1.24..1.31) | audio 3.36 (3.34..3.55) | toyB0 4.32 (4.30..4.36) | hdr_fail 3.60 (3.56..3.90) | dat_fail 7.17 (7.05..7.51) | closing 116.63 (116.61..116.85) | exit 116.83 (116.76..117.05)
+
+5. run order (run.json start). close = s after the first Toypad write; med/p99/max = frame ms; mhz/P/E = sys window eff MHz; util/Putil = %%; cores = window CPU cores; bprocs = build procs window/warmup
+   c1 = lines containing 'STUCK-LOCK'
+   c2 = lines containing 'still not acquired after'
+   c3 = lines containing 'Minidump written to'
+   c4 = lines containing 'Recovered stale physical page protection'
+   c5 = lines containing 'Unhandled guest physical write fault'
+   c6 = lines containing 'PhysicalHeap::Protect failed'
+   c7 = lines containing 'BaseHeap::Protect failed'
+   c8 = lines containing 'C1 keep-watch:'
+   c9 = lines containing 'C1 keep-watch: on (with physical_protect_hold_global_lock)'
+   c10 = lines containing 'C1 keep-watch: on, but'
+   c11 = lines containing 'C1 keep-watch: blocked'
+   c12 = lines containing 'C1 keep-watch: first kept protect at'
+   c13 = lines containing 'protects kept so far'
+   c14 = lines containing 'C1 verify'
+   c15 = lines containing 'S4 upload hash:'
+   c16 = lines containing 'slow frame #'
+   c17 = lines containing 'memexport full-buffer'
+   c18 = lines containing 'memexport flush reasons'
+   c19 = lines containing '[NtCreateFile] FAILED'
+   c20 = lines containing 'Reserving the guest memory arena'
+   c21 = lines containing 'Title terminated'
+  1800-s0-r1        s0        devoff4-bin  18:00:10 lines=98 B=11064 info=50 warn=40 err=0 other=0 toyW=10 toyR=10 B1=4 close=112.3 exit_wait=0.67 med=2.687 p99=7.579 max=17.355 mhz=1066.0 P=1923.0 E=725.0 util=55.99 Putil=86.44 cores=3.19 bprocs=0/0 boot=5.01 free=14.29 input=0 fg=1.0 nogrowth=0 c1=0 c2=0 c3=0 c4=0 c5=0 c6=0 c7=0 c8=0 c9=0 c10=0 c11=0 c12=0 c13=0 c14=0 c15=0 c16=0 c17=0 c18=0 c19=35 c20=1 c21=1
+  1830-p2fc-r1      p2fc      devoff4-bin  18:00:10 lines=106 B=12243 info=52 warn=40 err=6 other=0 toyW=10 toyR=10 B1=4 close=112.3 exit_wait=0.67 med=2.687 p99=7.579 max=17.355 mhz=1066.0 P=1923.0 E=725.0 util=55.99 Putil=86.44 cores=3.19 bprocs=0/0 boot=5.01 free=14.29 input=0 fg=1.0 nogrowth=0 c1=5 c2=1 c3=1 c4=0 c5=0 c6=0 c7=0 c8=2 c9=1 c10=0 c11=0 c12=1 c13=0 c14=0 c15=0 c16=0 c17=0 c18=0 c19=35 c20=1 c21=1
+  1832-p2fc-r2      p2fc      devoff4-bin  18:00:10 lines=106 B=12243 info=52 warn=40 err=6 other=0 toyW=10 toyR=10 B1=4 close=112.3 exit_wait=0.67 med=2.687 p99=7.579 max=17.355 mhz=1066.0 P=1923.0 E=725.0 util=55.99 Putil=86.44 cores=3.19 bprocs=0/0 boot=5.01 free=14.29 input=0 fg=1.0 nogrowth=0 c1=5 c2=1 c3=1 c4=0 c5=0 c6=0 c7=0 c8=2 c9=1 c10=0 c11=0 c12=1 c13=0 c14=0 c15=0 c16=0 c17=0 c18=0 c19=35 c20=1 c21=1
+  1834-p2fc-r3      p2fc      devoff4-bin  18:00:10 lines=100 B=11192 info=52 warn=40 err=0 other=0 toyW=10 toyR=10 B1=4 close=112.3 exit_wait=0.67 med=2.687 p99=7.579 max=17.355 mhz=1066.0 P=1923.0 E=725.0 util=55.99 Putil=86.44 cores=3.19 bprocs=0/0 boot=5.01 free=14.29 input=0 fg=1.0 nogrowth=0 c1=0 c2=0 c3=0 c4=0 c5=0 c6=0 c7=0 c8=2 c9=1 c10=0 c11=0 c12=1 c13=0 c14=0 c15=0 c16=0 c17=0 c18=0 c19=35 c20=1 c21=1
+  1808-s0-r2        s0        devoff4-bin  18:08:46 lines=98 B=11029 info=50 warn=40 err=0 other=0 toyW=10 toyR=10 B1=4 close=112.3 exit_wait=0.91 med=2.764 p99=8.285 max=19.374 mhz=986.0 P=1938.0 E=597.0 util=53.28 Putil=91.49 cores=3.38 bprocs=0/0 boot=5.01 free=14.52 input=0 fg=1.0 nogrowth=0 c1=0 c2=0 c3=0 c4=0 c5=0 c6=0 c7=0 c8=0 c9=0 c10=0 c11=0 c12=0 c13=0 c14=0 c15=0 c16=0 c17=0 c18=0 c19=35 c20=1 c21=1
+  1827-s0-r3        s0        devoff4-bin  18:27:55 lines=98 B=11064 info=50 warn=40 err=0 other=0 toyW=10 toyR=10 B1=4 close=112.5 exit_wait=0.75 med=2.52 p99=7.37 max=13.27 mhz=1075.0 P=1924.0 E=749.0 util=52.04 Putil=77.88 cores=3.08 bprocs=0/0 boot=5.02 free=14.69 input=0 fg=1.0 nogrowth=0 c1=0 c2=0 c3=0 c4=0 c5=0 c6=0 c7=0 c8=0 c9=0 c10=0 c11=0 c12=0 c13=0 c14=0 c15=0 c16=0 c17=0 c18=0 c19=35 c20=1 c21=1
+  c1 per arm: p2fc=[5, 5, 0]; s0=[0, 0, 0]
+  c2 per arm: p2fc=[1, 1, 0]; s0=[0, 0, 0]
+  c3 per arm: p2fc=[1, 1, 0]; s0=[0, 0, 0]
+  c4 per arm: p2fc=[0, 0, 0]; s0=[0, 0, 0]
+  c5 per arm: p2fc=[0, 0, 0]; s0=[0, 0, 0]
+  c6 per arm: p2fc=[0, 0, 0]; s0=[0, 0, 0]
+  c7 per arm: p2fc=[0, 0, 0]; s0=[0, 0, 0]
+  c8 per arm: p2fc=[2, 2, 2]; s0=[0, 0, 0]
+  c9 per arm: p2fc=[1, 1, 1]; s0=[0, 0, 0]
+  c10 per arm: p2fc=[0, 0, 0]; s0=[0, 0, 0]
+  c11 per arm: p2fc=[0, 0, 0]; s0=[0, 0, 0]
+  c12 per arm: p2fc=[1, 1, 1]; s0=[0, 0, 0]
+  c13 per arm: p2fc=[0, 0, 0]; s0=[0, 0, 0]
+  c14 per arm: p2fc=[0, 0, 0]; s0=[0, 0, 0]
+  c15 per arm: p2fc=[0, 0, 0]; s0=[0, 0, 0]
+  c16 per arm: p2fc=[0, 0, 0]; s0=[0, 0, 0]
+  c17 per arm: p2fc=[0, 0, 0]; s0=[0, 0, 0]
+  c18 per arm: p2fc=[0, 0, 0]; s0=[0, 0, 0]
+  c19 per arm: p2fc=[35, 35, 35]; s0=[35, 35, 35]
+  c20 per arm: p2fc=[1, 1, 1]; s0=[1, 1, 1]
+  c21 per arm: p2fc=[1, 1, 1]; s0=[1, 1, 1]
+  env_set per arm: p2fc=['-', '-', '-']; s0=['-', '-', '-']
+
+6. per-arm presence (runs with the key / runs) of every exact key that is not in all 6 runs
+  SIG (every arm all-or-none): 2
+    p2fc=3/3 s0=0/3  [info] [sys] C1 keep-watch: first kept protect at ED19F000, 299892736 bytes
+    p2fc=3/3 s0=0/3  [info] [sys] C1 keep-watch: on (with physical_protect_hold_global_lock)
+  VAR (present in only some runs of an arm): 8
+    p2fc=2/3 s0=0/3  [critical] [core] [FATAL] Minidump written to hang-36276.dmp
+    p2fc=2/3 s0=0/3  [error] [krnl] STUCK-LOCK: GPU thread: executing PM4 opcode 0x22 | read ptr 0x2665, write ptr 0x26fb
+    p2fc=2/3 s0=0/3  [error] [krnl] STUCK-LOCK: critical section 0x84959edc still not acquired after 5s. owner=guest thread object 0x30111018, lock_count=1, recursion=1; waiting thread is 0x6. An owner of 0, or one naming
+    p2fc=2/3 s0=0/3  [error] [krnl] STUCK-LOCK: owner's callers: 83FBFBDC <- 83FC0CA8 <- 83FB3AC8 <- 83FBF698 <- 83FBFA98 <- 82BD6BA4
+    p2fc=2/3 s0=0/3  [error] [krnl] STUCK-LOCK: the owner is tid 0x0017 (unnamed), parked at lr=83FAF188 with r3=7048F7E0. If that lr is another RtlEnterCriticalSection, the two threads are holding each other.
+    p2fc=2/3 s0=0/3  [error] [krnl] STUCK-LOCK: waiter's callers: lr=82A2A270 <- 82AED6BC <- 82B7132C <- 82FB01A0 <- 82B7995C <- 82AB2108 <- 82FEBDE0
+    p2fc=0/3 s0=2/3  [warning] [krnl] IoDismountVolumeByFileHandle(0xf8000160) - stub
+    p2fc=3/3 s0=1/3  [warning] [krnl] IoDismountVolumeByFileHandle(0xf8000164) - stub

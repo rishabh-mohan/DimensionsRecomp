@@ -1,0 +1,23 @@
+diff --git a/src/graphics/shared_memory.cpp b/src/graphics/shared_memory.cpp
+index 59a636d..6c9c58a 100644
+--- a/src/graphics/shared_memory.cpp
++++ b/src/graphics/shared_memory.cpp
+@@ -368,6 +368,18 @@ void SharedMemory::MakeRangeValid(uint32_t start, uint32_t length, bool written_
+       uint64_t& gpu_written = system_page_flags_valid_and_gpu_written_[i];
+       gpu_written = written_by_gpu ? (gpu_written | valid_bits) : (gpu_written & ~valid_bits);
+     }
++
++    // S4 C1 verify: a page that turns valid has no upload hash until
++    // KeepWatchVerifyRecord below re-hashes it. Without P2, G is released between
++    // here and that re-hash, and the watch is armed in between, so a write fault in
++    // the gap would run the F check (and a keep-watch protect the K check) against
++    // the page's previous upload. Hash 0 makes both checks skip the page until the
++    // re-hash. With P2, G is held throughout, so nothing observable changes. Valid
++    // bits are set only above, so a valid page's hash is 0 or from its latest upload.
++    if (keep_watch_verify_hashes_) {
++      std::fill_n(&keep_watch_verify_hashes_[valid_page_first],
++                  valid_page_last - valid_page_first + 1, uint64_t(0));
++    }
+   }
+ 
+   if (memory_invalidation_callback_handle_) {

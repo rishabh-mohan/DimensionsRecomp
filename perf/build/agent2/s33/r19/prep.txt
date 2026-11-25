@@ -1,0 +1,75 @@
+# prep-s33 (M2 session 3) 2026-11-25 02:35:57  tag r19
+PASS patch sha256 build\agent7\s4-r1s2\s4-r1s2.diff: 06B0D371686CD384193DF30E8509BC4DA586E8EDD0F45F4122D5911483E33AD7
+patch files (5): include/rex/graphics/d3d12/command_processor.h, include/rex/graphics/d3d12/deferred_command_list.h, src/graphics/d3d12/command_processor.cpp, src/graphics/d3d12/shared_memory.cpp, src/graphics/d3d12/texture_cache.cpp
+PASS patch path allowed include/rex/graphics/d3d12/command_processor.h
+PASS before-file exists include/rex/graphics/d3d12/command_processor.h
+PASS patch path allowed include/rex/graphics/d3d12/deferred_command_list.h
+PASS before-file exists include/rex/graphics/d3d12/deferred_command_list.h
+PASS patch path allowed src/graphics/d3d12/command_processor.cpp
+PASS before-file exists src/graphics/d3d12/command_processor.cpp
+PASS patch path allowed src/graphics/d3d12/shared_memory.cpp
+PASS before-file exists src/graphics/d3d12/shared_memory.cpp
+PASS patch path allowed src/graphics/d3d12/texture_cache.cpp
+PASS before-file exists src/graphics/d3d12/texture_cache.cpp
+affected Release objects (9):
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/command_processor.cpp.obj
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/deferred_command_list.cpp.obj
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/graphics_system.cpp.obj
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/pipeline_cache.cpp.obj
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/primitive_processor.cpp.obj
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/render_target_cache.cpp.obj
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/shared_memory.cpp.obj
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/texture_cache.cpp.obj
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/plugin_main.cpp.obj
+PASS affected objects found
+PASS source exists src/graphics/d3d12/command_processor.cpp
+PASS source exists src/graphics/d3d12/deferred_command_list.cpp
+PASS source exists src/graphics/d3d12/graphics_system.cpp
+PASS source exists src/graphics/d3d12/pipeline_cache.cpp
+PASS source exists src/graphics/d3d12/primitive_processor.cpp
+PASS source exists src/graphics/d3d12/render_target_cache.cpp
+PASS source exists src/graphics/d3d12/shared_memory.cpp
+PASS source exists src/graphics/d3d12/texture_cache.cpp
+PASS source exists src/graphics/plugin_main.cpp
+PASS overlay copy of src/graphics equals snap1 (272 files)
+before include/rex/graphics/d3d12/command_processor.h 67F4E8380C879377 CRLF 0
+before include/rex/graphics/d3d12/deferred_command_list.h 9F6CC70A6922232D CRLF 0
+before src/graphics/d3d12/command_processor.cpp 027204B53A271D69 CRLF 0
+before src/graphics/d3d12/shared_memory.cpp 2A5ADF13B5E433F1 CRLF 0
+before src/graphics/d3d12/texture_cache.cpp 949CCF4F4D80975D CRLF 0
+git apply --check exit 0:
+Checking patch include/rex/graphics/d3d12/command_processor.h...
+Checking patch include/rex/graphics/d3d12/deferred_command_list.h...
+Checking patch src/graphics/d3d12/command_processor.cpp...
+Checking patch src/graphics/d3d12/shared_memory.cpp...
+Checking patch src/graphics/d3d12/texture_cache.cpp...
+PASS git apply --check: exit 0, 5 Checking lines, 0 Skipped: exit 0, checking 5, skipped 0
+git apply (apply) exit 0:
+Checking patch include/rex/graphics/d3d12/command_processor.h...
+Checking patch include/rex/graphics/d3d12/deferred_command_list.h...
+Checking patch src/graphics/d3d12/command_processor.cpp...
+Checking patch src/graphics/d3d12/shared_memory.cpp...
+Checking patch src/graphics/d3d12/texture_cache.cpp...
+Applied patch include/rex/graphics/d3d12/command_processor.h cleanly.
+Applied patch include/rex/graphics/d3d12/deferred_command_list.h cleanly.
+Applied patch src/graphics/d3d12/command_processor.cpp cleanly.
+Applied patch src/graphics/d3d12/shared_memory.cpp cleanly.
+Applied patch src/graphics/d3d12/texture_cache.cpp cleanly.
+PASS git apply (apply): exit 0, 5 Checking lines, 0 Skipped: exit 0, checking 5, skipped 0
+after  include/rex/graphics/d3d12/command_processor.h EF0DC13DA29703C7FEDC13FE7C8542E592FB82460817F1B88C4930D92F12CD4C CRLF 0
+PASS changed include/rex/graphics/d3d12/command_processor.h
+PASS no CRLF introduced include/rex/graphics/d3d12/command_processor.h
+after  include/rex/graphics/d3d12/deferred_command_list.h E7512824D8E6F9673C59457CD28FA34DD7795E4D495B3BAB76D07774AEA60650 CRLF 0
+PASS changed include/rex/graphics/d3d12/deferred_command_list.h
+PASS no CRLF introduced include/rex/graphics/d3d12/deferred_command_list.h
+after  src/graphics/d3d12/command_processor.cpp 05BBCE8B7E3FB27D43F364031082F73DFCD5BD223307DB794FB3C6DD6E91807C CRLF 0
+PASS changed src/graphics/d3d12/command_processor.cpp
+PASS no CRLF introduced src/graphics/d3d12/command_processor.cpp
+after  src/graphics/d3d12/shared_memory.cpp 9E908D31E6F64A31A55126CB0E97B37F1DD1A677B7026872A839FAE53A8FEB8A CRLF 0
+PASS changed src/graphics/d3d12/shared_memory.cpp
+PASS no CRLF introduced src/graphics/d3d12/shared_memory.cpp
+after  src/graphics/d3d12/texture_cache.cpp 4183887C9D625B97D8DDB7B5D2BF5F28D2B9B122DBF3488BDA1753100CB9BAB4 CRLF 0
+PASS changed src/graphics/d3d12/texture_cache.cpp
+PASS no CRLF introduced src/graphics/d3d12/texture_cache.cpp
+wrote list-on.tsv, list-ctl.tsv, replace-on.txt, replace-ctl.txt (9 rows each)
+RESULT: PASS

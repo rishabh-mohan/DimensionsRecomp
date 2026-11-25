@@ -1,0 +1,14 @@
+== arm basesf (1 runs) vs offsf (1 runs)
+  runs\0002-basesf-r1: exit=0 close=wm_close early=False wer=False dumps=0 exit_line=1 stuck=0 | 23787 lines game.1.log 5242487+game.log 3862354, 2026-11-25 07:09:00.460..2026-11-25 07:16:42.553 (462 s) | levels info=23637 raw=8 warning=142 | Toypad R/W 64/171 (8.3/22.2 per min)
+gate_logdiff FAIL findings (B = arm run, A = each base run): none
+  note A: 2 log files (rotated at 5 MB) [1]
+  note B: 2 log files (rotated at 5 MB) [1]
+NEW warning/error/critical keys (in an arm run, in no base run): 0
+MORE (arm run count > base max + max(5, base max)): 0
+GONE (in every base run, missing from an arm run; any level): 1
+  missing in 1/1 runs  [info] [gpu] slow frame ##: # ms | gpu-thread idle # | host-gpu wait # (#x) | shader translate # (#x) | pipeline create # (#x), new # | texture load # (#x) | readback #x # KB, # stalled | cpu-write in
+Toypad (base: runs\0001-offsf-r1 {'info Write': 162, 'info Read': 64})
+  runs\0002-basesf-r1: {'info Write': 171, 'info Read': 64}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+ONLY in basesf (any level, not Toypad; in no base run): 1 keys
+  1/1 runs, counts [22863], also in -  [info] [gpu] slow frame ##: # ms | gpu-thread idle # | host-gpu wait # (#x) | shader translate # (#x) | pipeline create # (#x), new # | texture load # (#x) | readback #x # KB, # stalled | cpu-write in
+      e.g. [2026-11-25 07:09:03.830] [info] [gpu] [t18348] slow frame #2: 21.6 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.2 (2x), new 3 | texture load 1.5 (1x) | readback 0x 0 KB, 0 stalled | cpu-

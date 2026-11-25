@@ -1,0 +1,71 @@
+apply-check-s3 2026-11-25 01:21:53 (read-only; M2 session 3)
+
+HEAD DimensionsRecomp = c9e215f2e5c42836ec00fd35abd933989daa6880
+HEAD DimensionsRecomp\rexglue-sdk = 5350b1de99276b7a7be701bf00914f1ee58ce9bc
+game gitlink rexglue-sdk = 5350b1de99276b7a7be701bf00914f1ee58ce9bc
+game b0bd3b4..HEAD outside perf/: .gitignore | 4 ++++ |  1 file changed, 4 insertions(+)
+
+## Hashes
+OK       CG26 A diff            95D901B9784705FA build/agent9/s4/spin/db16cyc-pause/toml-db16cyc-pause-A.diff
+OK       CG26 A after           11707872E82D8B52 build/agent9/s4/spin/db16cyc-pause/toml/new-A/rexlego/legodimensions_config.toml
+OK       CG26 A base            7F775847DB9CC2DA build/agent9/s4/spin/db16cyc-pause/toml/base-A/rexlego/legodimensions_config.toml
+OK       CG26 build toml        11707872E82D8B52 build/agent2/cg26/DimensionsRecomp/rexlego/legodimensions_config.toml
+OK       CG26 tool              9145166CDBEF5500 build/agent2/cg26/tool/rexglue.exe
+OK       live toml (HEAD)       7F775847DB9CC2DA DimensionsRecomp/rexlego/legodimensions_config.toml
+OK       snap1 toml             7F775847DB9CC2DA build/agent2/snap1/DimensionsRecomp/rexlego/legodimensions_config.toml
+OK       CG26 B diff            5D5892D33D09AF9D build/agent9/s4/spin/db16cyc-pause/toml-db16cyc-pause-B.diff
+OK       CG26 tool option diff  AC554DBBD965BF94 build/agent9/s4/spin/db16cyc-pause/db16cyc-pause.diff
+OK       codegen B toml         E60EAF1CEB575572 build/agent9/configs/batch-nolr.toml
+OK       #21 diff               46FFD2E9044094DC build/agent7/s4-t1/s4-t1.diff
+OK       #19 diff               06B0D371686CD384 build/agent7/s4-r1s2/s4-r1s2.diff
+OK       #19 SHA256SUMS         8A38FD9D3CD8B375 build/agent7/s4-r1s2/SHA256SUMS.txt
+OK       #19 RATE-REQUEST       1C2B8688A43ED4DC build/agent7/s4-r1s2/RATE-REQUEST.md
+OK       #33 patch              0D23024484CCDEE1 build/agent6/s33-popin/s33-popin.patch
+OK       #33 DESIGN             B2E33FE8B99F4041 build/agent6/s33-popin/DESIGN.md
+OK       #33 CHECK              5101A7B136CCCBE4 build/agent6/s33-popin/CHECK.txt
+CHANGED  #21 rating             7736004D2DFC1B46 build/agent10/t27/r21-s4t1.md
+OK       #33 rating             ACF0BDB5A5262362 build/agent10/t27/r33-popin.md
+OK       CTR list-ctl           6A357FEFBB0CE06A build/agent2/ctr/list-ctl.tsv
+OK       CTR list-on            A63A77CD86AB7DA0 build/agent2/ctr/list-on.tsv
+OK       plume patch            BF38B18300164ECF build/agent2/pending/plume-local-on-e0c8871.patch
+OK       simde patch            2A6DE738794F5DA0 build/agent2/pending/simde-local-on-71fd833d.patch
+OK       simde tracked patch    2A6DE738794F5DA0 DimensionsRecomp/rexglue-sdk/patches/simde-native-m64-stream.patch
+
+## Before-files (= HEAD) in live and snap1
+OK       #21  live  7157E8F2EDC3D5C4 rexlego/src/gpu_native/native_worker.cpp
+OK       #21  snap1 7157E8F2EDC3D5C4 rexlego/src/gpu_native/native_worker.cpp
+OK       #21  live  48F0C429DDB89E45 rexlego/src/gpu_native/native_recording.cpp
+OK       #21  snap1 48F0C429DDB89E45 rexlego/src/gpu_native/native_recording.cpp
+OK       #21  live  889F3FA6F207011B rexlego/src/gpu_native/native_preparation.h
+OK       #21  snap1 889F3FA6F207011B rexlego/src/gpu_native/native_preparation.h
+OK       #19  live  67F4E8380C879377 rexglue-sdk/include/rex/graphics/d3d12/command_processor.h
+OK       #19  snap1 67F4E8380C879377 rexglue-sdk/include/rex/graphics/d3d12/command_processor.h
+OK       #19  live  9F6CC70A6922232D rexglue-sdk/include/rex/graphics/d3d12/deferred_command_list.h
+OK       #19  snap1 9F6CC70A6922232D rexglue-sdk/include/rex/graphics/d3d12/deferred_command_list.h
+OK       #19  live  027204B53A271D69 rexglue-sdk/src/graphics/d3d12/command_processor.cpp
+OK       #19  snap1 027204B53A271D69 rexglue-sdk/src/graphics/d3d12/command_processor.cpp
+OK       #19  live  2A5ADF13B5E433F1 rexglue-sdk/src/graphics/d3d12/shared_memory.cpp
+OK       #19  snap1 2A5ADF13B5E433F1 rexglue-sdk/src/graphics/d3d12/shared_memory.cpp
+OK       #19  live  949CCF4F4D80975D rexglue-sdk/src/graphics/d3d12/texture_cache.cpp
+OK       #19  snap1 949CCF4F4D80975D rexglue-sdk/src/graphics/d3d12/texture_cache.cpp
+
+## #33 S1 copy
+made build\agent2\session3\s33-popin-no5.patch: 10495 B, 208 lines, sha256 4061ED2DB7BBB64D7ECFA024F3F3379444493D085F8A6FB0CB51B1D25AE67E76 (rated patch minus L82-93; no N1 comment, unlike the withdrawn 2442037B copy)
+
+## Apply checks (fwd = apply --check; rev = apply --check -R)
+OK    live  CG26 arm A                   fwd exit 0 (1 checking, 0 skipped) / -R exit 1 -> applies, not in tree
+OK    snap1 CG26 arm A                   fwd exit 0 (1 checking, 0 skipped) / -R exit 1 -> applies, not in tree
+OK    live  CG26 arm B (B line only)     fwd exit 1 (1 checking, 0 skipped) / -R exit 1 -> does not apply
+OK    snap1 CG26 arm B (B line only)     fwd exit 1 (1 checking, 0 skipped) / -R exit 1 -> does not apply
+OK    live  CG26 tool option (in HEAD)   fwd exit 1 (3 checking, 0 skipped) / -R exit 0 -> already in tree
+OK    snap1 CG26 tool option (in HEAD)   fwd exit 1 (3 checking, 0 skipped) / -R exit 0 -> already in tree
+OK    live  #21 S4-T1 rev 2              fwd exit 0 (3 checking, 0 skipped) / -R exit 1 -> applies, not in tree
+OK    snap1 #21 S4-T1 rev 2              fwd exit 0 (3 checking, 0 skipped) / -R exit 1 -> applies, not in tree
+OK    live  #19 R1 stage 2               fwd exit 0 (5 checking, 0 skipped) / -R exit 1 -> applies, not in tree
+OK    snap1 #19 R1 stage 2               fwd exit 0 (5 checking, 0 skipped) / -R exit 1 -> applies, not in tree
+OK    live  #33+#34 rated                fwd exit 0 (4 checking, 0 skipped) / -R exit 1 -> applies, not in tree
+OK    snap1 #33+#34 rated                fwd exit 0 (4 checking, 0 skipped) / -R exit 1 -> applies, not in tree
+OK    live  #33+#34 no hunk #5 (S1)      fwd exit 0 (4 checking, 0 skipped) / -R exit 1 -> applies, not in tree
+OK    snap1 #33+#34 no hunk #5 (S1)      fwd exit 0 (4 checking, 0 skipped) / -R exit 1 -> applies, not in tree
+
+RESULT: FAIL (1 unexpected)

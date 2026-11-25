@@ -18,6 +18,7 @@ import argparse, hashlib, os, re, subprocess, sys, time
 R = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 HOLD = os.path.join(R, 'perf-notes', 'WINDOW-HOLD.txt')
 BELOW_NORMAL = 0x00004000
+PRIO = {'idle': 0x00000040, 'belownormal': BELOW_NORMAL, 'normal': 0x00000020}  # normal: 11-25 night (cap lifted)
 
 
 def sha(p):
@@ -261,6 +262,9 @@ def main():
     ap.add_argument('--replace-file', help='a file with one OLD=NEW --replace per line')
     ap.add_argument('--compare')
     ap.add_argument('--compare-map')
+    ap.add_argument('--priority', choices=sorted(PRIO), default='idle')  # session 3: Idle by default
+    ap.add_argument('--link-flag', action='append', default=[],
+                    help='session 3: append to LINK_FLAGS, e.g. "-Xlinker /threads:2"')
     ap.add_argument('--dry-run', action='store_true')
     a = ap.parse_args()
     if a.replace_file:
@@ -320,6 +324,12 @@ def main():
         if k in binds:
             binds[k] = re.sub(r'(?i)/MAP:(\S+)', lambda m: '/MAP:' + os.path.join(
                 od, os.path.basename(m.group(1).replace('/', os.sep))), binds[k])
+    if a.link_flag:
+        if 'LINK_FLAGS' not in binds and '$LINK_FLAGS' not in rule['command']:
+            print('FAIL: --link-flag given but neither the edge nor the rule has LINK_FLAGS')
+            return 2
+        binds['LINK_FLAGS'] = (binds.get('LINK_FLAGS', '') + ' ' + ' '.join(a.link_flag)).strip()
+    print('priority %s, link flags added: %s' % (a.priority, ' '.join(a.link_flag) or '-'))
     for k, v in orig.items():
         if v != binds[k]:
             print('  %s: %s\n    -> %s' % (k, v[:300], binds[k][:300]))
@@ -371,7 +381,7 @@ def main():
     log = os.path.join(od, 'relink.log')
     t0 = time.time()
     with open(log, 'wb') as lf:
-        p = subprocess.Popen(cmd, cwd=bdir, stdout=lf, stderr=subprocess.STDOUT, creationflags=BELOW_NORMAL)
+        p = subprocess.Popen(cmd, cwd=bdir, stdout=lf, stderr=subprocess.STDOUT, creationflags=PRIO[a.priority])
         while p.poll() is None:
             if os.path.exists(HOLD):
                 subprocess.run('taskkill /T /F /PID %d' % p.pid, stdout=subprocess.DEVNULL,

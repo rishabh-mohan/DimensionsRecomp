@@ -1,0 +1,162 @@
+Night regression diff (task s3, 2026-11-25): stored night outputs vs re-run in build/agent6/wnight/s3-regress/
+
+== W6 20261123-0009
+  run 0009-cold-s0     A: verdict NOTE -> PASS; NOTE removed ["log does not end with the clean-exit lines: ['Toypad[Read ] 0B 0C 55 0"]; NOTE added []; INFO added ['no "Execution complete" line, benign hard-exit race (log ends with "Ti']
+  arm cold-s0  A: verdict NOTE -> PASS (removed NOTEs: ['logdiff GONE: [info] [core] Execution complete', "0009-cold-s0: log does not end with the clean-exit lines: ['"])
+  watchdog_runs []; race_runs ['0009-cold-s0']
+  summary diff (runtime/timing/out path normalized): 25 line(s)
+    --- build/agent6/w6/night-W6-0009.out.txt
+    +++ build/agent6/wnight/s3-regress/W6-20261123-0009.out.txt
+    @@ -9 +9 @@
+    -  cold-s0    1    NOTE    0                      0     [0]        [0]        [0]        40/0/0                     0/1 0.0% -s            0/0/0/1/0
+    +  cold-s0    1    PASS    0                      0     [0]        [0]        [0]        40/0/0                     0/1 0.0% -s            0/0/0/1/0
+    @@ -16 +16 @@
+    -  0009-cold-s0       cold-s0  NOTE    OK     0     1/True    NO   40/0/0    0     0    -/0/91 (90)          0        14.51 97
+    +  0009-cold-s0       cold-s0  PASS    OK     0     1/True    NO   40/0/0    0     0    -/0/91 (90)          0        14.51 97
+    @@ -40,3 +40,6 @@
+    -Reasons, FAIL first (per arm: its runs, then its logdiff findings)
+    -  NOTE cold-s0  logdiff GONE: [info] [core] Execution complete
+    -  NOTE cold-s0  0009-cold-s0: log does not end with the clean-exit lines: ['Toypad[Read ] 0B 0C 55 09 0A 98 8C E0 73 28 40 13 C7 21 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ', 'Window closing, shutting down...', 'Title terminated; hard-exiting pr
+    +watchdog runs: 0
+    +Execution complete race runs: 1 (0009-cold-s0; INFO)
+    +
+    +Reasons, FAIL first (per arm: its runs, then its logdiff findings; INFO does not change a verdict)
+    +  INFO cold-s0  logdiff GONE: [info] [core] Execution complete (missing only in the hard-exit race run(s) 0009-cold-s0)
+    +  INFO cold-s0  0009-cold-s0: no "Execution complete" line, benign hard-exit race (log ends with "Title terminated; hard-exiting process.", exit 0): ['Toypad[Read ] 0B 0C 55 09 0A 98 8C E0 73 28 40 13 C7 21 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0
+    @@ -76,3 +79,3 @@
+    -w4b_logdiff: exit 0 in # s -> <out>\out-20261123-0009\logdiff (log <out>\out-20261123-0009\logdiff.log)
+    -w4b_extra: exit 0 in # s -> <out>\out-20261123-0009\extra.txt (log <out>\out-20261123-0009\extra.log)
+    -verdict: no FAIL; runtime # s; output <out>\out-20261123-0009
+    +w4b_logdiff: exit 0 in # s -> <out>\out-W6-20261123-0009\logdiff (log <out>\out-W6-20261123-0009\logdiff.log)
+    +w4b_extra: exit 0 in # s -> <out>\out-W6-20261123-0009\extra.txt (log <out>\out-W6-20261123-0009\extra.log)
+    +verdict: no FAIL; runtime # s; output <out>\out-W6-20261123-0009
+
+== W6 20261123-0313
+  run 0345-p2f-r4      A: verdict NOTE -> PASS; NOTE removed ["log does not end with the clean-exit lines: ['Toypad[Read ] 0B 0C 55 0"]; NOTE added []; INFO added ['no "Execution complete" line, benign hard-exit race (log ends with "Ti']
+  arm p2f      A: verdict NOTE -> PASS (removed NOTEs: ['logdiff GONE: [info] [core] Execution complete', "0345-p2f-r4: log does not end with the clean-exit lines: ['T"])
+  watchdog_runs []; race_runs ['0345-p2f-r4']
+  summary diff (runtime/timing/out path normalized): 25 line(s)
+    --- build/agent6/w6/night-W6-0313.out.txt
+    +++ build/agent6/wnight/s3-regress/W6-20261123-0313.out.txt
+    @@ -11 +11 @@
+    -  p2f        5    NOTE    0                      0     [0, 0, 0, 0, 0] [0, 0, 0, 0, 0] [0, 0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 0/5 0.0% -s            0/0/0/1/0
+    +  p2f        5    PASS    0                      0     [0, 0, 0, 0, 0] [0, 0, 0, 0, 0] [0, 0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 0/5 0.0% -s            0/0/0/1/0
+    @@ -32 +32 @@
+    -  0345-p2f-r4        p2f      NOTE    OK     0     1/True    NO   40/0/0    0     0    -/0/112 (113)        0        13.95 97
+    +  0345-p2f-r4        p2f      PASS    OK     0     1/True    NO   40/0/0    0     0    -/0/112 (113)        0        13.95 97
+    @@ -40,3 +40,6 @@
+    -Reasons, FAIL first (per arm: its runs, then its logdiff findings)
+    -  NOTE p2f      logdiff GONE: [info] [core] Execution complete
+    -  NOTE p2f      0345-p2f-r4: log does not end with the clean-exit lines: ['Toypad[Read ] 0B 0C 55 09 0A E9 FE 3E 60 12 90 9B 32 5C 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ', 'Window closing, shutting down...', 'Title terminated; hard-exiting pro
+    +watchdog runs: 0
+    +Execution complete race runs: 1 (0345-p2f-r4; INFO)
+    +
+    +Reasons, FAIL first (per arm: its runs, then its logdiff findings; INFO does not change a verdict)
+    +  INFO p2f      logdiff GONE: [info] [core] Execution complete (missing only in the hard-exit race run(s) 0345-p2f-r4)
+    +  INFO p2f      0345-p2f-r4: no "Execution complete" line, benign hard-exit race (log ends with "Title terminated; hard-exiting process.", exit 0): ['Toypad[Read ] 0B 0C 55 09 0A E9 FE 3E 60 12 90 9B 32 5C 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    @@ -76,3 +79,3 @@
+    -w4b_logdiff: exit 0 in # s -> <out>\out-20261123-0313\logdiff (log <out>\out-20261123-0313\logdiff.log)
+    -w4b_extra: exit 0 in # s -> <out>\out-20261123-0313\extra.txt (log <out>\out-20261123-0313\extra.log)
+    -verdict: no FAIL; runtime # s; output <out>\out-20261123-0313
+    +w4b_logdiff: exit 0 in # s -> <out>\out-W6-20261123-0313\logdiff (log <out>\out-W6-20261123-0313\logdiff.log)
+    +w4b_extra: exit 0 in # s -> <out>\out-W6-20261123-0313\extra.txt (log <out>\out-W6-20261123-0313\extra.log)
+    +verdict: no FAIL; runtime # s; output <out>\out-W6-20261123-0313
+
+== W9 20261123-0108
+  run 0128-off-r2      B: verdict NOTE -> NOTE; NOTE removed ['levels W/E/C 41/0/0, expected 40/0/0', "log does not end with the clean-exit lines: ['Toypad[Write] 0B 16 55 0"]; NOTE added ['WATCHDOG: shutdown watchdog fired (3 s after WM_CLOSE): "Shutdown wedged past the close request; hard-exiting." x1; not a FAIL (exit code and timing a']; INFO added []
+  arm off      verdict NOTE unchanged, NOTEs changed: -['0128-off-r2: levels W/E/C 41/0/0, expected 40/0/0', "0128-off-r2: log does not end with the clean-exit lines: ['T"] +['0128-off-r2: WATCHDOG: shutdown watchdog fired (3 s after WM_CLOSE): "Shutdown wedged past the close request; hard-exiting." x1; not a FAIL (exit code']
+  watchdog_runs ['0128-off-r2']; race_runs []
+  summary diff (runtime/timing/out path normalized): 11 line(s)
+    --- build/agent6/wnight/night-W9-0108.out.txt
+    +++ build/agent6/wnight/s3-regress/W9-20261123-0108.out.txt
+    @@ -41,3 +41,5 @@
+    -Reasons, FAIL first (per arm: its runs, then its logdiff findings)
+    -  NOTE off      0128-off-r2: levels W/E/C 41/0/0, expected 40/0/0
+    -  NOTE off      0128-off-r2: log does not end with the clean-exit lines: ['Toypad[Write] 0B 16 55 0A B3 0A E3 06 C2 91 1E A4 5D 6B E2 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ', 'Toypad[Read ] 0B 0C 55 09 0A CD EF 37 F6 41 36 C2 9B 25 00 00 00 00 00
+    +watchdog runs: 1 (0128-off-r2; NOTE)
+    +Execution complete race runs: 0
+    +
+    +Reasons, FAIL first (per arm: its runs, then its logdiff findings; INFO does not change a verdict)
+    +  NOTE off      0128-off-r2: WATCHDOG: shutdown watchdog fired (3 s after WM_CLOSE): "Shutdown wedged past the close request; hard-exiting." x1; not a FAIL (exit code and timing are checked on their own); explains: levels W/E/C 41/0/0, expected 40/0/0 (+1 = t
+
+== W9 20261123-0401
+  run 0429-off-r3      A: verdict NOTE -> PASS; NOTE removed ["log does not end with the clean-exit lines: ['Toypad[Read ] 0B 0C 55 0"]; NOTE added []; INFO added ['no "Execution complete" line, benign hard-exit race (log ends with "Ti']
+  arm off      A: verdict NOTE -> PASS (removed NOTEs: ["0429-off-r3: log does not end with the clean-exit lines: ['T"])
+  watchdog_runs []; race_runs ['0429-off-r3']
+  summary diff (runtime/timing/out path normalized): 16 line(s)
+    --- build/agent6/wnight/night-W9-0401.out.txt
+    +++ build/agent6/wnight/s3-regress/W9-20261123-0401.out.txt
+    @@ -8 +8 @@
+    -  off        4    NOTE    0                      0     [0, 0, 0, 0] [0, 0, 0, 0] [0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 0/4 0.0% -s            (reference)
+    +  off        4    PASS    0                      0     [0, 0, 0, 0] [0, 0, 0, 0] [0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 0/4 0.0% -s            (reference)
+    @@ -31 +31 @@
+    -  0429-off-r3        off      NOTE    OK     0     1/True    NO   40/0/0    0     0    -/0/112 (112)        0        13.99 97
+    +  0429-off-r3        off      PASS    OK     0     1/True    NO   40/0/0    0     0    -/0/112 (112)        0        13.99 97
+    @@ -41,2 +41,5 @@
+    -Reasons, FAIL first (per arm: its runs, then its logdiff findings)
+    -  NOTE off      0429-off-r3: log does not end with the clean-exit lines: ['Toypad[Read ] 0B 0C 55 09 0A 07 A8 B8 1A 76 B9 F7 2C 3B 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ', 'Window closing, shutting down...', 'Title terminated; hard-exiting pro
+    +watchdog runs: 0
+    +Execution complete race runs: 1 (0429-off-r3; INFO)
+    +
+    +Reasons, FAIL first (per arm: its runs, then its logdiff findings; INFO does not change a verdict)
+    +  INFO off      0429-off-r3: no "Execution complete" line, benign hard-exit race (log ends with "Title terminated; hard-exiting process.", exit 0): ['Toypad[Read ] 0B 0C 55 09 0A 07 A8 B8 1A 76 B9 F7 2C 3B 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+== W5B 20261123-0155
+  run 0215-d11-r4      A: verdict NOTE -> PASS; NOTE removed ["log does not end with the clean-exit lines: ['Toypad[Read ] 0B 0C 55 0"]; NOTE added []; INFO added ['no "Execution complete" line, benign hard-exit race (log ends with "Ti']
+  arm d11      A: verdict NOTE -> PASS (removed NOTEs: ["0215-d11-r4: log does not end with the clean-exit lines: ['T"])
+  watchdog_runs []; race_runs ['0215-d11-r4']
+  summary diff (runtime/timing/out path normalized): 16 line(s)
+    --- build/agent6/wnight/night-W5B-0155.out.txt
+    +++ build/agent6/wnight/s3-regress/W5B-20261123-0155.out.txt
+    @@ -8 +8 @@
+    -  d11        6    NOTE    0                      0     [0, 0, 0, 0, 0, 0] [0, 0, 0, 0, 0, 0] [0, 0, 0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 0/6 0.0% -s            (reference)
+    +  d11        6    PASS    0                      0     [0, 0, 0, 0, 0, 0] [0, 0, 0, 0, 0, 0] [0, 0, 0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 0/6 0.0% -s            (reference)
+    @@ -25 +25 @@
+    -  0215-d11-r4        d11      NOTE    OK     0     1/True    NO   40/0/0    0     0    -/0/112 (112)        0        13.95 98
+    +  0215-d11-r4        d11      PASS    OK     0     1/True    NO   40/0/0    0     0    -/0/112 (112)        0        13.95 98
+    @@ -37,2 +37,5 @@
+    -Reasons, FAIL first (per arm: its runs, then its logdiff findings)
+    -  NOTE d11      0215-d11-r4: log does not end with the clean-exit lines: ['Toypad[Read ] 0B 0C 55 09 0A D2 9F C1 04 AE A7 9F E1 73 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ', 'Window closing, shutting down...', 'Title terminated; hard-exiting pro
+    +watchdog runs: 0
+    +Execution complete race runs: 1 (0215-d11-r4; INFO)
+    +
+    +Reasons, FAIL first (per arm: its runs, then its logdiff findings; INFO does not change a verdict)
+    +  INFO d11      0215-d11-r4: no "Execution complete" line, benign hard-exit race (log ends with "Title terminated; hard-exiting process.", exit 0): ['Toypad[Read ] 0B 0C 55 09 0A D2 9F C1 04 AE A7 9F E1 73 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+== W5B 20261123-0451
+  run 0528-d11t-r6     A: verdict NOTE -> PASS; NOTE removed ["log does not end with the clean-exit lines: ['Toypad[Read ] 0B 0C 55 0"]; NOTE added []; INFO added ['no "Execution complete" line, benign hard-exit race (log ends with "Ti']
+  arm d11t     A: verdict NOTE -> PASS (removed NOTEs: ['logdiff GONE: [info] [core] Execution complete', "0528-d11t-r6: log does not end with the clean-exit lines: ['"])
+  watchdog_runs []; race_runs ['0528-d11t-r6']
+  summary diff (runtime/timing/out path normalized): 18 line(s)
+    --- build/agent6/wnight/night-W5B-0451.out.txt
+    +++ build/agent6/wnight/s3-regress/W5B-20261123-0451.out.txt
+    @@ -11 +11 @@
+    -  d11t       6    NOTE    0                      0     [0, 0, 0, 0, 0, 0] [0, 0, 0, 0, 0, 0] [0, 0, 0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 0/6 0.0% -s            0/0/0/1/0
+    +  d11t       6    PASS    0                      0     [0, 0, 0, 0, 0, 0] [0, 0, 0, 0, 0, 0] [0, 0, 0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 0/6 0.0% -s            0/0/0/1/0
+    @@ -33 +33 @@
+    -  0528-d11t-r6       d11t     NOTE    OK     0     1/True    NO   40/0/0    0     0    -/0/112 (112)        0        13.96 98
+    +  0528-d11t-r6       d11t     PASS    OK     0     1/True    NO   40/0/0    0     0    -/0/112 (112)        0        13.96 98
+    @@ -37,3 +37,6 @@
+    -Reasons, FAIL first (per arm: its runs, then its logdiff findings)
+    -  NOTE d11t     logdiff GONE: [info] [core] Execution complete
+    -  NOTE d11t     0528-d11t-r6: log does not end with the clean-exit lines: ['Toypad[Read ] 0B 0C 55 09 0A 99 87 23 F6 C4 47 9B EA 31 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ', 'Window closing, shutting down...', 'Title terminated; hard-exiting pr
+    +watchdog runs: 0
+    +Execution complete race runs: 1 (0528-d11t-r6; INFO)
+    +
+    +Reasons, FAIL first (per arm: its runs, then its logdiff findings; INFO does not change a verdict)
+    +  INFO d11t     logdiff GONE: [info] [core] Execution complete (missing only in the hard-exit race run(s) 0528-d11t-r6)
+    +  INFO d11t     0528-d11t-r6: no "Execution complete" line, benign hard-exit race (log ends with "Title terminated; hard-exiting process.", exit 0): ['Toypad[Read ] 0B 0C 55 09 0A 99 87 23 F6 C4 47 9B EA 31 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0
+
+== W4C 20261123-0239
+  watchdog_runs []; race_runs []
+  summary diff (runtime/timing/out path normalized): 8 line(s)
+    --- build/agent6/wnight/night-W4C-0239.out.txt
+    +++ build/agent6/wnight/s3-regress/W4C-20261123-0239.out.txt
+    @@ -30 +30,4 @@
+    -Reasons, FAIL first (per arm: its runs, then its logdiff findings)
+    +watchdog runs: 0
+    +Execution complete race runs: 0
+    +
+    +Reasons, FAIL first (per arm: its runs, then its logdiff findings; INFO does not change a verdict)
+
+RESULT: only the allowed A/B differences

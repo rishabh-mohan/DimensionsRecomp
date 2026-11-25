@@ -1,0 +1,12 @@
+== arm offd (1 runs) vs offsf (1 runs)
+  runs\0106-offd-r1: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 102 lines game.log 12603, 2026-11-23 04:29:48.532..2026-11-23 04:31:43.800 (115 s) | levels info=54 raw=8 warning=40 | Toypad R/W 10/10 (5.2/5.2 per min)
+gate_logdiff FAIL findings (B = arm run, A = each base run): none
+NEW warning/error/critical keys (in an arm run, in no base run): 0
+MORE (arm run count > base max + max(5, base max)): 0
+GONE (in every base run, missing from an arm run; any level): 1
+  missing in 1/1 runs  [info] [core] Execution complete
+Toypad (base: runs\0107-offsf-r1 {'info Write': 14, 'info Read': 14})
+  runs\0106-offd-r1: {'info Write': 10, 'info Read': 10}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+ONLY in offd (any level, not Toypad; in no base run): 1 keys
+  1/1 runs, counts [2], also in ['ond']  [info] [gpu] resolve after drop: dest #h after # skipped draws (pipeline in creation) | resolves #, skipped draws #
+      e.g. [2026-11-23 04:31:22.019] [info] [gpu] [t999] resolve after drop: dest 1F2E3000 after 3 skipped draws (pipeline in creation) | resolves 2, skipped draws 3

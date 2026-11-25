@@ -1,0 +1,98 @@
+diff --git a/r19prep/orig/check_queue_r19.py b/check_queue_r19.py
+index ce80a93..797fcb6 100644
+--- a/r19prep/orig/check_queue_r19.py
++++ b/check_queue_r19.py
+@@ -18,6 +18,13 @@ Checks
+   Q7 combination guard (S2): no d3d12_pipeline_creation_no_wait, no *resolution_scale*, no native_* cvar, no -Env,
+      no ctr/native bin, d3d12_async_submit only on #19 rows.
+   Q8 the -Seconds / -InputScript / -StatsWarmup / toypad of each #19 row equal those of its source S4b row shape.
++Live chain (r19prep, M10 r19-rows-mp-rating C2): i16 and g16 are the 16 KB substitutes for i and g. File order is
++  a, b, i, i16, c, g, g16, j, d, f, e; the r19-ok chain runs over M10's 9 slots (i16 fills slot i, g16 slot g), so Q2/Q4
++  check the slots. M3 picks the path from the ref r19r10 by writing r19-pathN (r10 splits at N) or r19-path16 (C2 'no
++  split'), never both:
++  Q9 rows i, c, g, f need r19-pathN and have "unless": r19-path16; rows i16, g16 need r19-path16 and have "unless":
++     r19-pathN (s4b-queue.ps1 L133-135 drops a row whose unless-file exists); no other row has a path marker or unless.
++  Q10 with --expect-n K: build/agent3/s4b/ready-N line 1 == K (<N> stays a placeholder in the args, r19-rating (b) 6).
+ """
+ import argparse
+ import json
+@@ -28,8 +35,12 @@ HERE = os.path.dirname(os.path.abspath(__file__))
+ WS_DEFAULT = os.path.normpath(os.path.join(HERE, '..', '..', '..'))
+ BIN19 = 'build\\agent2\\devoff4b-r19-bin'
+ BINREF = 'build\\agent2\\devoff4b-bin'
+-ORDER = ['a', 'b', 'i', 'c', 'g', 'j', 'd', 'f', 'e']
+-ON = {'c', 'g', 'j', 'd', 'f', 'e'}
++ORDER = ['a', 'b', 'i', 'i16', 'c', 'g', 'g16', 'j', 'd', 'f', 'e']
++SLOT = {'i16': 'i', 'g16': 'g'}
++SLOTS = ['a', 'b', 'i', 'c', 'g', 'j', 'd', 'f', 'e']
++ON = {'c', 'g', 'g16', 'j', 'd', 'f', 'e'}
++PATHN = {'i', 'c', 'g', 'f'}
++PATH16 = {'i16', 'g16'}
+ M = 'build\\agent3\\s4b\\'
+ G = 'build\\agent3\\session3\\'
+ MENUS = 'harness\\routes\\b-gate-menus-long.txt'
+@@ -41,8 +52,10 @@ SPEC19 = {
+     'a': (set(), '420', MENUS, None, False),
+     'b': ({ASYNC}, '90', None, None, False),
+     'i': ({SPLITN}, '420', MENUS, None, False),
++    'i16': ({'d3d12_submit_split_kb=16'}, '420', MENUS, None, False),
+     'c': ({SPLITN, ASYNC}, '420', MENUS, None, False),
+     'g': ({'d3d12_debug=true', SPLITN, ASYNC}, '420', MENUS, None, False),
++    'g16': ({'d3d12_debug=true', 'd3d12_submit_split_kb=16', ASYNC}, '420', MENUS, None, False),
+     'j': ({'d3d12_submit_split_kb=16', ASYNC}, '420', MENUS, None, False),
+     'd': ({SPLITN, ASYNC, 'framerate_limit=0'}, '180', None, '20', False),
+     'f': ({SPLITN, 'd3d12_readback_memexport=true', ASYNC}, '420', MENUS, None, False),
+@@ -140,13 +153,23 @@ def check(rows, existing_ids):
+             chk(am.get('-BinDir') == BINREF, 'Q3 %s bin %s' % (rid, am.get('-BinDir')))
+             chk(M + 'ready-s4b-off' in needs and G + 'go-quiet' in needs, 'Q3 %s needs ready-s4b-off + go-quiet' % rid)
+             chk(not any('r19-ok' in x or 'go-r19on' in x for x in needs), 'Q3 %s (ref) needs no #19 chain marker' % rid)
+-        # Q4
++        # Q4 (chain over M10's 9 slots; i16/g16 fill slots i/g)
+         if is19:
+-            k = ORDER.index(row)
++            k = SLOTS.index(SLOT.get(row, row))
+             okm = [x for x in needs if 'r19-ok-' in x]
+-            want = [G + 'r19-ok-' + ORDER[k - 1]] if k > 0 else []
++            want = [G + 'r19-ok-' + SLOTS[k - 1]] if k > 0 else []
+             chk(okm == want, 'Q4 %s chain needs %s (has %s)' % (rid, want, okm))
+             chk((G + 'go-r19on' in needs) == (row in ON), 'Q4 %s go-r19on %s' % (rid, 'needed' if row in ON else 'absent'))
++        # Q9 (path markers, C2)
++        pm = sorted(x for x in needs if 'r19-path' in x)
++        if is19 and row in PATHN:
++            chk(pm == [G + 'r19-pathN'] and r.get('unless') == G + 'r19-path16',
++                'Q9 %s needs r19-pathN, unless r19-path16 (needs %s, unless %s)' % (rid, pm, r.get('unless')))
++        elif is19 and row in PATH16:
++            chk(pm == [G + 'r19-path16'] and r.get('unless') == G + 'r19-pathN',
++                'Q9 %s needs r19-path16, unless r19-pathN (needs %s, unless %s)' % (rid, pm, r.get('unless')))
++        else:
++            chk(not pm and 'unless' not in r, 'Q9 %s has no path marker and no unless' % rid)
+         # Q5
+         hasn = '<N>' in ' '.join(r['args'])
+         chk(hasn == (M + 'ready-N' in needs), 'Q5 %s <N> in args %s == needs ready-N' % (rid, hasn))
+@@ -167,13 +190,25 @@ def check(rows, existing_ids):
+     return out
+ 
+ 
++def ready_n(ws):
++    try:
++        with open(os.path.join(ws, 'build', 'agent3', 's4b', 'ready-N'), 'r', encoding='utf-8-sig') as fh:
++            return fh.readline().strip()
++    except OSError:
++        return None
++
++
+ def main(argv=None):
+     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
+-    ap.add_argument('queue', nargs='?', default=os.path.join(HERE, 'queue-r19.jsonl'))
++    ap.add_argument('queue', nargs='?', default=os.path.join(HERE, 'r19prep', 'queue-r19-live.jsonl'))
+     ap.add_argument('--ws', default=WS_DEFAULT)
++    ap.add_argument('--expect-n', help='Q10: ready-N line 1 must equal this')
+     a = ap.parse_args(argv)
+     rows, errs = load_rows(a.queue)
+     out = [('FAIL', e) for e in errs] + check(rows, known_ids(a.ws))
++    if a.expect_n:
++        got = ready_n(a.ws)
++        out.append(('PASS' if got == a.expect_n else 'FAIL', 'Q10 ready-N line 1 %r == %r' % (got, a.expect_n)))
+     for tag, msg in out:
+         print('%-5s %s' % (tag, msg))
+     nf = sum(1 for t, _ in out if t == 'FAIL')

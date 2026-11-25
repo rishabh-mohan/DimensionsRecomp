@@ -83,7 +83,7 @@ python build\agent12\p2c-check\p2c_check.py <run dir | log files, oldest first> 
 ### W6 environment record (G11, G12)
 
 ```
-python build\agent12\w6-gates\w6_env_record.py <W6 matrix out dir> --gate-log bench\agent5\launch\status\window-<id>-<HHmm>.log --json <out>
+python build\agent12\w6-gates\w6_env_record.py <W6 matrix out dir> --gate-log bench\agent5\launch\status\window-<id>-<HHmm>.log --json <out>   (night: bench\agent5\launch\status\, day: bench\agent5\day\status\; M12 session 3, N6)
 ```
 
 - **Per run** (from sys.json, with run.json as the fallback): scheme, overlay, AC and battery saver at the window's first
@@ -132,7 +132,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File build\agent12\w6-gates\run_g
     matrices that compare bins (W4b).
   - Without `--side` or `--gate-a`, G4 and G5 are PENDING (exit 3).
   - `--json` can go anywhere (e.g. with Agent 8's read-out). Keep it with the window.
-- **The launcher's window log** is searched in `bench/agent5/launch/status` (or `--status DIR`, or given with
+- **The launcher's window log** is searched in `bench/agent5/launch/status` and `bench/agent5/day/status` (N6, session 3; a same-strength match in both = ambiguous, give `--status`) (or `--status DIR`, or given with
   `--window-log FILE`). It is matched by, in this order:
   1. the `window <id> END: ... out dir <dir>` line;
   2. a `runner-<tag>.txt` that names the out dir;

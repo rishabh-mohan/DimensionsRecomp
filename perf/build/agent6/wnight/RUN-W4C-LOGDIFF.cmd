@@ -8,6 +8,8 @@ rem Exit 0 = no FAIL, 1 = at least one FAIL, 2 = usage error, 3 = perf-notes\WIN
 rem Options given after the folder override the defaults below (argparse keeps the last one), e.g.
 rem   --out <dir>   --skip-logdiff   --top 50
 setlocal
+rem The repo root, taken before any shift: shift also moves %0, so %~dp0 would follow the last option (2026-11-25).
+set "KITROOT=%~dp0..\..\.."
 if "%~1"=="" (
   echo usage: %~nx0 ^<W4c matrix folder^> [w6_kit.py options]
   exit /b 2
@@ -23,7 +25,7 @@ set REST=%REST% %1
 shift
 goto collect
 :run
-cd /d "%~dp0..\..\.."
+cd /d "%KITROOT%"
 if exist "perf-notes\WINDOW-HOLD.txt" (
   echo perf-notes\WINDOW-HOLD.txt exists: a timed window is running. Not starting.
   exit /b 3

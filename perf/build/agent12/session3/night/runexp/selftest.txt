@@ -1,0 +1,60 @@
+ok   END line parsed
+ok   END line with SUSPECT
+ok   window log found by its END line
+ok   window log found by runner file
+ok   window log found by its START time
+ok   no window log: a dry-run START doesn't count
+ok   N6: two status dirs, a runner-file match beats a START-time match
+ok   N6: two status dirs matching alike are ambiguous
+ok   N6: no match in any status dir
+ok   plan.txt parsed (arms, repeats, cold, estimate, rounds, sys.csv)
+ok   slow state: a 4-sample stretch overlapping the window start
+ok   slow state: a 3-sample stretch before the window doesn't count
+ok   d11p proof ok
+ok   d11 proof ok
+ok   a precise-wait line without the switch fails
+ok   two precise-wait lines fail
+ok   the 1 ms line without '(background opt-out on)' fails
+ok   a 1 ms line without the switch fails
+ok   p2fc proof ok
+ok   p2fc with 'C1 verify: on' fails
+ok   keep-watch without the lock fails
+ok   keep-watch without a first kept protect fails
+ok   a keep-watch line without the switch fails
+ok   p2f proof ok (no log line)
+ok   a 'C1 verify K:' line fails
+ok   kv_norm on a list
+ok   kv_norm on a dict
+ok   env_norm
+ok   <run> env: the run's own dir matches (case, slashes, trailing slash ignored)
+ok   <run> env: another run's dir fails
+ok   <run> env: no run dir fails
+ok   <run> env: a missing key fails
+ok   plain env: exact value compare, as before
+ok   timing-forbidden switches
+ok   exit codes
+ok   logdiff against merged reference runs: one NEW kind, no false notes
+ok   logdiff: a fail pattern is a finding
+ok   W6-like matrix: every gate's status
+ok   W6-like: G2 finds s4-p2c in the P2 bin; side 1 and gate A on it
+ok   W6-like: G3 with the launcher's END line
+ok   W6-like: G4 p2c_check PASS on side 1 and gate A
+ok   W6-like: G8 keep-watch on 3 p2fc runs + gate A; logdiff NEW 0
+ok   W6-like: G12 STRICT with the MsMpEng averages, from the window log
+ok   W6-like: exit 3 (G11 has no sys data)
+ok   W6-like: G11 quotes the launcher's scheme line
+ok   W6-like with faults (fallback on side 1, verify K: on gate A, a stale line): G4, G5, G8 FAIL, exit 1
+ok   a crash in one gate: that gate is ERROR (with the exception); the other 11 still run
+ok   ERROR alone is exit 3, never 0 or 1
+ok   a crash outside the gates: traceback, 'GATES: ERROR; exit 6', exit 6
+ok   G10: a switch with no known proof line is CHECK, named in the key
+ok   G2: a dll copy of the same size but another SHA-256 FAILs
+ok   G2 --one-bin: s0 on a second bin FAILs
+ok   G2 without --one-bin: two bins, each run on its arm's bin, PASS
+ok   G11: one overlay, scheme, AC and saver value in every run: PASS
+ok   G11: another scheme in one run, AC changing inside one window: FAIL
+ok   G12: a gate line 40 min before the window start is CHECK
+ok   G12: a gate line inside the start minute (06:50:01, dir 0650) is PASS at 0 min (task #24 fix)
+ok   G12: a gate line 5 min after the window start is CHECK
+ok   a side run in the timing runner's format (params.cvar, no exe_sha256): cvars read, exe copy SHA-256 checked
+SELFTEST PASS (59/59 checks)

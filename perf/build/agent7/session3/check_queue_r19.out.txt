@@ -1,0 +1,184 @@
+PASS  Q1 ids unique (14 rows)
+PASS  Q1 tags unique and present
+PASS  Q1 no id already in queue.jsonl / queue-state.jsonl 
+PASS  Q1 L13 r19r11 has int est, list needs, list args
+PASS  Q1 L14 r19r10 has int est, list needs, list args
+PASS  Q1 L15 r19r13 has int est, list needs, list args
+PASS  Q1 L16 r19r15 has int est, list needs, list args
+PASS  Q1 L17 r19r25 has int est, list needs, list args
+PASS  Q1 L18 r19a has int est, list needs, list args
+PASS  Q1 L19 r19b has int est, list needs, list args
+PASS  Q1 L20 r19i has int est, list needs, list args
+PASS  Q1 L21 r19c has int est, list needs, list args
+PASS  Q1 L22 r19g has int est, list needs, list args
+PASS  Q1 L23 r19j has int est, list needs, list args
+PASS  Q1 L24 r19d has int est, list needs, list args
+PASS  Q1 L25 r19f has int est, list needs, list args
+PASS  Q1 L26 r19e has int est, list needs, list args
+PASS  Q2 #19 row order a,b,i,c,g,j,d,f,e == a,b,i,c,g,j,d,f,e
+PASS  Q2 ref rows ['r19r10', 'r19r11', 'r19r13', 'r19r15', 'r19r25']
+PASS  Q2 every ref row before every #19 row
+PASS  Q3 r19r11 bin build\agent2\devoff4b-bin
+PASS  Q3 r19r11 needs ready-s4b-off + go-quiet
+PASS  Q3 r19r11 (ref) needs no #19 chain marker
+PASS  Q5 r19r11 <N> in args False == needs ready-N
+PASS  Q5 r19r11 d3d12_debug <-> ready-dbg
+PASS  Q6 r19r11 cvars ['d3d12_submit_split_kb=16'] == spec ['d3d12_submit_split_kb=16']
+PASS  Q7 r19r11 no #33/res-scaling/native cvar 
+PASS  Q7 r19r11 no -Env (native/env combos)
+PASS  Q7 r19r11 bin is not ctr/native
+PASS  Q7 r19r11 async only on #19 rows
+PASS  Q8 r19r11 seconds/route/warmup/toypad ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False) == ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False)
+PASS  Q3 r19r10 bin build\agent2\devoff4b-bin
+PASS  Q3 r19r10 needs ready-s4b-off + go-quiet
+PASS  Q3 r19r10 (ref) needs no #19 chain marker
+PASS  Q5 r19r10 <N> in args True == needs ready-N
+PASS  Q5 r19r10 d3d12_debug <-> ready-dbg
+PASS  Q6 r19r10 cvars ['d3d12_submit_split_kb=<N>'] == spec ['d3d12_submit_split_kb=<N>']
+PASS  Q7 r19r10 no #33/res-scaling/native cvar 
+PASS  Q7 r19r10 no -Env (native/env combos)
+PASS  Q7 r19r10 bin is not ctr/native
+PASS  Q7 r19r10 async only on #19 rows
+PASS  Q8 r19r10 seconds/route/warmup/toypad ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False) == ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False)
+PASS  Q3 r19r13 bin build\agent2\devoff4b-bin
+PASS  Q3 r19r13 needs ready-s4b-off + go-quiet
+PASS  Q3 r19r13 (ref) needs no #19 chain marker
+PASS  Q5 r19r13 <N> in args True == needs ready-N
+PASS  Q5 r19r13 d3d12_debug <-> ready-dbg
+PASS  Q6 r19r13 cvars ['d3d12_readback_memexport=true', 'd3d12_submit_split_kb=<N>'] == spec ['d3d12_readback_memexport=true', 'd3d12_submit_split_kb=<N>']
+PASS  Q7 r19r13 no #33/res-scaling/native cvar 
+PASS  Q7 r19r13 no -Env (native/env combos)
+PASS  Q7 r19r13 bin is not ctr/native
+PASS  Q7 r19r13 async only on #19 rows
+PASS  Q8 r19r13 seconds/route/warmup/toypad ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False) == ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False)
+PASS  Q3 r19r15 bin build\agent2\devoff4b-bin
+PASS  Q3 r19r15 needs ready-s4b-off + go-quiet
+PASS  Q3 r19r15 (ref) needs no #19 chain marker
+PASS  Q5 r19r15 <N> in args True == needs ready-N
+PASS  Q5 r19r15 d3d12_debug <-> ready-dbg
+PASS  Q6 r19r15 cvars ['d3d12_debug=true', 'd3d12_submit_split_kb=<N>'] == spec ['d3d12_debug=true', 'd3d12_submit_split_kb=<N>']
+PASS  Q7 r19r15 no #33/res-scaling/native cvar 
+PASS  Q7 r19r15 no -Env (native/env combos)
+PASS  Q7 r19r15 bin is not ctr/native
+PASS  Q7 r19r15 async only on #19 rows
+PASS  Q8 r19r15 seconds/route/warmup/toypad ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False) == ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False)
+PASS  Q3 r19r25 bin build\agent2\devoff4b-bin
+PASS  Q3 r19r25 needs ready-s4b-off + go-quiet
+PASS  Q3 r19r25 (ref) needs no #19 chain marker
+PASS  Q5 r19r25 <N> in args True == needs ready-N
+PASS  Q5 r19r25 d3d12_debug <-> ready-dbg
+PASS  Q6 r19r25 cvars ['d3d12_submit_split_kb=<N>', 'framerate_limit=0'] == spec ['d3d12_submit_split_kb=<N>', 'framerate_limit=0']
+PASS  Q7 r19r25 no #33/res-scaling/native cvar 
+PASS  Q7 r19r25 no -Env (native/env combos)
+PASS  Q7 r19r25 bin is not ctr/native
+PASS  Q7 r19r25 async only on #19 rows
+PASS  Q8 r19r25 seconds/route/warmup/toypad ('180', None, '20', False) == ('180', None, '20', False)
+PASS  Q3 r19a bin build\agent2\devoff4b-r19-bin
+PASS  Q3 r19a needs ready-r19 + go-quiet
+PASS  Q4 r19a chain needs [] (has [])
+PASS  Q4 r19a go-r19on absent
+PASS  Q5 r19a <N> in args False == needs ready-N
+PASS  Q5 r19a d3d12_debug <-> ready-dbg
+PASS  Q6 r19a cvars [] == spec []
+PASS  Q7 r19a no #33/res-scaling/native cvar 
+PASS  Q7 r19a no -Env (native/env combos)
+PASS  Q7 r19a bin is not ctr/native
+PASS  Q7 r19a async only on #19 rows
+PASS  Q8 r19a seconds/route/warmup/toypad ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False) == ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False)
+PASS  Q3 r19b bin build\agent2\devoff4b-r19-bin
+PASS  Q3 r19b needs ready-r19 + go-quiet
+PASS  Q4 r19b chain needs ['build\\agent3\\session3\\r19-ok-a'] (has ['build\\agent3\\session3\\r19-ok-a'])
+PASS  Q4 r19b go-r19on absent
+PASS  Q5 r19b <N> in args False == needs ready-N
+PASS  Q5 r19b d3d12_debug <-> ready-dbg
+PASS  Q6 r19b cvars ['d3d12_async_submit=true'] == spec ['d3d12_async_submit=true']
+PASS  Q7 r19b no #33/res-scaling/native cvar 
+PASS  Q7 r19b no -Env (native/env combos)
+PASS  Q7 r19b bin is not ctr/native
+PASS  Q7 r19b async only on #19 rows
+PASS  Q8 r19b seconds/route/warmup/toypad ('90', None, None, False) == ('90', None, None, False)
+PASS  Q3 r19i bin build\agent2\devoff4b-r19-bin
+PASS  Q3 r19i needs ready-r19 + go-quiet
+PASS  Q4 r19i chain needs ['build\\agent3\\session3\\r19-ok-b'] (has ['build\\agent3\\session3\\r19-ok-b'])
+PASS  Q4 r19i go-r19on absent
+PASS  Q5 r19i <N> in args True == needs ready-N
+PASS  Q5 r19i d3d12_debug <-> ready-dbg
+PASS  Q6 r19i cvars ['d3d12_submit_split_kb=<N>'] == spec ['d3d12_submit_split_kb=<N>']
+PASS  Q7 r19i no #33/res-scaling/native cvar 
+PASS  Q7 r19i no -Env (native/env combos)
+PASS  Q7 r19i bin is not ctr/native
+PASS  Q7 r19i async only on #19 rows
+PASS  Q8 r19i seconds/route/warmup/toypad ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False) == ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False)
+PASS  Q3 r19c bin build\agent2\devoff4b-r19-bin
+PASS  Q3 r19c needs ready-r19 + go-quiet
+PASS  Q4 r19c chain needs ['build\\agent3\\session3\\r19-ok-i'] (has ['build\\agent3\\session3\\r19-ok-i'])
+PASS  Q4 r19c go-r19on needed
+PASS  Q5 r19c <N> in args True == needs ready-N
+PASS  Q5 r19c d3d12_debug <-> ready-dbg
+PASS  Q6 r19c cvars ['d3d12_async_submit=true', 'd3d12_submit_split_kb=<N>'] == spec ['d3d12_async_submit=true', 'd3d12_submit_split_kb=<N>']
+PASS  Q7 r19c no #33/res-scaling/native cvar 
+PASS  Q7 r19c no -Env (native/env combos)
+PASS  Q7 r19c bin is not ctr/native
+PASS  Q7 r19c async only on #19 rows
+PASS  Q8 r19c seconds/route/warmup/toypad ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False) == ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False)
+PASS  Q3 r19g bin build\agent2\devoff4b-r19-bin
+PASS  Q3 r19g needs ready-r19 + go-quiet
+PASS  Q4 r19g chain needs ['build\\agent3\\session3\\r19-ok-c'] (has ['build\\agent3\\session3\\r19-ok-c'])
+PASS  Q4 r19g go-r19on needed
+PASS  Q5 r19g <N> in args True == needs ready-N
+PASS  Q5 r19g d3d12_debug <-> ready-dbg
+PASS  Q6 r19g cvars ['d3d12_async_submit=true', 'd3d12_debug=true', 'd3d12_submit_split_kb=<N>'] == spec ['d3d12_async_submit=true', 'd3d12_debug=true', 'd3d12_submit_split_kb=<N>']
+PASS  Q7 r19g no #33/res-scaling/native cvar 
+PASS  Q7 r19g no -Env (native/env combos)
+PASS  Q7 r19g bin is not ctr/native
+PASS  Q7 r19g async only on #19 rows
+PASS  Q8 r19g seconds/route/warmup/toypad ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False) == ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False)
+PASS  Q3 r19j bin build\agent2\devoff4b-r19-bin
+PASS  Q3 r19j needs ready-r19 + go-quiet
+PASS  Q4 r19j chain needs ['build\\agent3\\session3\\r19-ok-g'] (has ['build\\agent3\\session3\\r19-ok-g'])
+PASS  Q4 r19j go-r19on needed
+PASS  Q5 r19j <N> in args False == needs ready-N
+PASS  Q5 r19j d3d12_debug <-> ready-dbg
+PASS  Q6 r19j cvars ['d3d12_async_submit=true', 'd3d12_submit_split_kb=16'] == spec ['d3d12_async_submit=true', 'd3d12_submit_split_kb=16']
+PASS  Q7 r19j no #33/res-scaling/native cvar 
+PASS  Q7 r19j no -Env (native/env combos)
+PASS  Q7 r19j bin is not ctr/native
+PASS  Q7 r19j async only on #19 rows
+PASS  Q8 r19j seconds/route/warmup/toypad ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False) == ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False)
+PASS  Q3 r19d bin build\agent2\devoff4b-r19-bin
+PASS  Q3 r19d needs ready-r19 + go-quiet
+PASS  Q4 r19d chain needs ['build\\agent3\\session3\\r19-ok-j'] (has ['build\\agent3\\session3\\r19-ok-j'])
+PASS  Q4 r19d go-r19on needed
+PASS  Q5 r19d <N> in args True == needs ready-N
+PASS  Q5 r19d d3d12_debug <-> ready-dbg
+PASS  Q6 r19d cvars ['d3d12_async_submit=true', 'd3d12_submit_split_kb=<N>', 'framerate_limit=0'] == spec ['d3d12_async_submit=true', 'd3d12_submit_split_kb=<N>', 'framerate_limit=0']
+PASS  Q7 r19d no #33/res-scaling/native cvar 
+PASS  Q7 r19d no -Env (native/env combos)
+PASS  Q7 r19d bin is not ctr/native
+PASS  Q7 r19d async only on #19 rows
+PASS  Q8 r19d seconds/route/warmup/toypad ('180', None, '20', False) == ('180', None, '20', False)
+PASS  Q3 r19f bin build\agent2\devoff4b-r19-bin
+PASS  Q3 r19f needs ready-r19 + go-quiet
+PASS  Q4 r19f chain needs ['build\\agent3\\session3\\r19-ok-d'] (has ['build\\agent3\\session3\\r19-ok-d'])
+PASS  Q4 r19f go-r19on needed
+PASS  Q5 r19f <N> in args True == needs ready-N
+PASS  Q5 r19f d3d12_debug <-> ready-dbg
+PASS  Q6 r19f cvars ['d3d12_async_submit=true', 'd3d12_readback_memexport=true', 'd3d12_submit_split_kb=<N>'] == spec ['d3d12_async_submit=true', 'd3d12_readback_memexport=true', 'd3d12_submit_split_kb=<N>']
+PASS  Q7 r19f no #33/res-scaling/native cvar 
+PASS  Q7 r19f no -Env (native/env combos)
+PASS  Q7 r19f bin is not ctr/native
+PASS  Q7 r19f async only on #19 rows
+PASS  Q8 r19f seconds/route/warmup/toypad ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False) == ('420', 'harness\\routes\\b-gate-menus-long.txt', None, False)
+PASS  Q3 r19e bin build\agent2\devoff4b-r19-bin
+PASS  Q3 r19e needs ready-r19 + go-quiet
+PASS  Q4 r19e chain needs ['build\\agent3\\session3\\r19-ok-f'] (has ['build\\agent3\\session3\\r19-ok-f'])
+PASS  Q4 r19e go-r19on needed
+PASS  Q5 r19e <N> in args True == needs ready-N
+PASS  Q5 r19e d3d12_debug <-> ready-dbg
+PASS  Q6 r19e cvars ['d3d12_async_submit=true', 'd3d12_submit_split_kb=<N>', 'framerate_limit=0'] == spec ['d3d12_async_submit=true', 'd3d12_submit_split_kb=<N>', 'framerate_limit=0']
+PASS  Q7 r19e no #33/res-scaling/native cvar 
+PASS  Q7 r19e no -Env (native/env combos)
+PASS  Q7 r19e bin is not ctr/native
+PASS  Q7 r19e async only on #19 rows
+PASS  Q8 r19e seconds/route/warmup/toypad ('600', 'build\\agent3\\toypad\\routes\\level-l.txt', None, True) == ('600', 'build\\agent3\\toypad\\routes\\level-l.txt', None, True)
+ALL CHECKS PASS (183 checks)

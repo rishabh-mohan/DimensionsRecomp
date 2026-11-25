@@ -1,0 +1,38 @@
+queue row: {"id": "s4bN4", "est": 205, "needs": ["build\\agent3\\s4b\\ready-s4b-off", "build\\agent3\\session3\\go-n", "build\\agent1\\night\\ROWS-RESUME.txt"], "args": ["-BinDir", "build\\agent2\\devoff4b-bin", "-Seconds", "180", "-StatsWarmup", "20", "-Tag", "s4b-N4-title-split4", "-Cvar", "d3d12_submit_split_kb=4;framerate_limit=0"], "note": "Overseer 01:47: s4bN16 printed 0 split lines (nothing reached 16 KiB); = s4bN16 at split 4. Still 0 lines -> fallback A (W7 title arms cannot show #18)."}
+ok   exit_code 0 (0x00000000), close wm_close, elapsed 180.6 s of 180
+ok   wer_seen False
+ok   crash_events []
+ok   exited_early False
+ok   bin_dir <workspace>\build\agent2\devoff4b-bin (queued build\agent2\devoff4b-bin)
+ok   run exe sha256 DFBE1D43B28861A6 = run.json and in <workspace>\build\agent2\devoff4b-bin\MANIFEST.txt
+ok   cvars {'d3d12_submit_split_kb': '4', 'framerate_limit': '0'} (queued {'d3d12_submit_split_kb': '4', 'framerate_limit': '0'})
+ok   env {} (queued {})
+ok   input script None (queued None)
+     logs 1 (120 lines); counts: Recovered stale physical page protection=0; Unhandled guest physical write fault=0; PhysicalHeap::Protect failed=0; STUCK-LOCK=0; REX_FATAL=0; C1 keep-watch: on (with=0; C1 keep-watch: on, but=0; blocked for this process=0; C1 verify: on.=0; C1 verify K:=0; C1 verify F:=0; GPU wait back-off: ON=0; d3d12_submit_split_kb: splitting=1; d3d12_submit_split: =18; Host timer resolution set=0; TimerQueue: precise wait=0
+ok   C4 "Recovered stale physical page protection" x0
+ok   C4 "Unhandled guest physical write fault" x0
+ok   C4 "PhysicalHeap::Protect failed" x0
+ok   C4 "REX_FATAL" x0
+ok   C4 "C1 keep-watch: on, but" x0
+ok   C4 "blocked for this process" x0
+ok   C3 keep-watch init x0 (keep_watch=False)
+ok   C3 "C1 verify: on." x0 (verify=False)
+ok   C3 back-off init x0 (env set False)
+ok   C3 split init x1 (split cvar True)
+ok   C3 host timer line x0 (cvar False)
+ok   C3 precise-wait line x0 (cvar False)
+     STUCK-LOCK lines 0 (C5: see f10 output / by hand)
+ok   C6 dumps in dir [], run.json dumps []
+     C7 steps None/None last None timeouts None; marks []
+--- s4bN4.check.txt (34 lines)
+    missing in cand: -; extra in cand: -
+  PROOF ok   init "d3d12_submit_split_kb: splitting submissions at N KB" x1: 2026-11-25 03:04:25.896] [info] [gpu] [t31312] d3d12_submit_split_kb: splitting submissions at 4 KB of deferred commands
+  PROOF ok   init line says "at 4 KB"
+  PROOF ok   failed=0 in every d3d12_submit_split line (max 0 over 18 lines)
+  PROOF ok   splits > 0 (max 101351)
+  PROOF note per frame: submission 3.1134, splits 1.8886 (frames 53665; fields monotonic {'frame': True, 'submission': True, 'splits': True, 'failed': True, 'held_query': True, 'held_scratch': True, 'held_pipelines': True})
+  BASE items missed: none (base scenario differs: scenes/marks/GONE not judged)
+  VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4bN4)
+--- s4bN4.f10.txt: not present
+--- s4bN4.p2c.txt: not present
+COMMON: OK (0 problems)

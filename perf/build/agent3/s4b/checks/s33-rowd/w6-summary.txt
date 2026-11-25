@@ -1,0 +1,55 @@
+W6 logdiff kit (Agent 6, task #16): C:\Users\<user>\AppData\Local\Temp\m3-s33\s33-rowd\staging
+expect build\agent6\s33-popin\expect-s33.json (reference offd); matrix.json build\agent6\s33-popin\harness-s33.json
+runs 2 in 2 arms: offd=1; ond=1
+HARNESS MODE, functional only: valid_timing not checked; status from exit_code/exited_early/close_method/wer_seen; slow state skipped; logdiff on the staging copies in ..\..\..\..\AppData\Local\Temp\m3-s33\s33-rowd\staging
+  0001-offd-r1 <- build\agent3\runs\20261125-111422-s33-offd
+  0002-ond-r1 <- build\agent3\runs\20261125-123609-s33-ond
+arms in the expect file with no run here: base, basesf, gasync, gbindful, gthr0, off, offsf, offwarm, onsf, onstop, onwarm
+
+Per arm. stuck = STUCK-LOCK episodes (sites; IN = in the measured window); recov/unh/pfail = Recovered stale protection / Unhandled write fault / Protect failed lines per run; W/E/C = warning/error/critical lines per run; slow = slow runs/runs, mean slow_pct, mean onset s; logdiff vs offd = gate FAIL findings/NEW/MORE/GONE/ONLY keys
+  arm        runs verdict stuck                  dumps recov      unh        pfail      W/E/C                      slow                   logdiff F/N/M/G/O
+  offd       1    NOTE    0                      0     [0]        [0]        [0]        142/0/0                    0/0 -% -s              (reference)
+  ond        1    NOTE    0                      0     [0]        [0]        [0]        142/0/0                    0/0 -% -s              0/0/0/0/1
+
+Per run. exit = run.json exit code; close = WM_CLOSE posted/clean; seq = log ends with the clean-exit lines; stuck = episodes; slow = onset s / slow_pct / span s (sys.csv rows); nogrowth = perf.csv max no-growth s in the window; free = GB at start
+  run                arm      verdict status exit  close     seq  W/E/C     stuck dmp  slow                 nogrowth free  lines
+  0001-offd-r1       offd     NOTE    OK     0     wm_close  NO   142/0/0   0     0    -                    -        -     23722
+  0002-ond-r1        ond      NOTE    OK     0     wm_close  NO   142/0/0   0     0    -                    -        -     24911
+
+STUCK-LOCK episodes: 0 (H1 = owner parked in sub_83FAF180, the L1 fence-wait poll; finding 10)
+
+watchdog runs: 0
+Execution complete race runs: 0
+
+Reasons, FAIL first (per arm: its runs, then its logdiff findings; INFO does not change a verdict)
+  NOTE offd     0001-offd-r1: levels W/E/C 142/0/0, expected 40/0/0
+  NOTE offd     0001-offd-r1: log does not end with the clean-exit lines: ['Execution complete', 'slow frame #22634: 13.5 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.1 (34x) | readback 23x 2300 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0) | dropped draws 0 | forced pipeline waits 0.0 (0x)', 'Title terminated; hard-exiting process.']
+  NOTE ond      0002-ond-r1: levels W/E/C 142/0/0, expected 40/0/0
+  NOTE ond      0002-ond-r1: log does not end with the clean-exit lines: ['Execution complete', 'slow frame #23671: 16.3 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.2 (34x) | readback 23x 2300 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0) | dropped draws 0 | forced pipeline waits 0.0 (0x)', 'Title terminated; hard-exiting process.']
+  INFO offd     0001-offd-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)
+  INFO ond      0002-ond-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)
+
+Counts per arm (lines containing each expect count text; one number per run, run-dir order)
+  STUCK-LOCK                                                   offd=[0]; ond=[0]
+  still not acquired after                                     offd=[0]; ond=[0]
+  Minidump written to                                          offd=[0]; ond=[0]
+  Recovered stale physical page protection                     offd=[0]; ond=[0]
+  Unhandled guest physical write fault                         offd=[0]; ond=[0]
+  PhysicalHeap::Protect failed                                 offd=[0]; ond=[0]
+  BaseHeap::Protect failed                                     offd=[0]; ond=[0]
+  d3d12_pipeline_creation_no_wait                              offd=[0]; ond=[1]
+  slow frame #                                                 offd=[22633]; ond=[23670]
+  dropped draws                                                offd=[22633]; ond=[23670]
+  forced pipeline waits                                        offd=[22633]; ond=[23670]
+  resolve after drop:                                          offd=[211]; ond=[308]
+  [NtCreateFile] FAILED                                        offd=[137]; ond=[137]
+  Reserving the guest memory arena                             offd=[1]; ond=[1]
+  Title terminated                                             offd=[1]; ond=[1]
+
+ONLY keys per arm vs offd (any level, not Toypad; in no offd run), from w4b_logdiff
+  ond: 1
+    [info] [gpu] d#d#_pipeline_creation_no_wait: not waiting for pipeline creation at the end of submissions; draws stay skipped until their pipeline is ready
+
+w4b_logdiff: exit 0 in 3.3 s -> ..\..\..\..\AppData\Local\Temp\m3-s33\s33-rowd\logdiff (log ..\..\..\..\AppData\Local\Temp\m3-s33\s33-rowd\logdiff.log)
+w4b_extra: exit 0 in 1.5 s -> ..\..\..\..\AppData\Local\Temp\m3-s33\s33-rowd\extra.txt (log ..\..\..\..\AppData\Local\Temp\m3-s33\s33-rowd\extra.log)
+verdict: no FAIL; runtime 5.1 s; output ..\..\..\..\AppData\Local\Temp\m3-s33\s33-rowd

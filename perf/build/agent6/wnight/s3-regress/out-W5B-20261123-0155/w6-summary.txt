@@ -1,0 +1,65 @@
+W6 logdiff kit (Agent 6, task #16): <workspace>\build\agent8\matrix\20261123-0155
+expect build\agent6\wnight\expect-w5b.json (reference d11); matrix.json build\agent8\matrix\20261123-0155\matrix.json
+runs 19 in 4 arms: d11=6; cold-d11=1; d11p=6; d11t=6
+arms in the expect file with no run here: base, s0
+
+Per arm. stuck = STUCK-LOCK episodes (sites; IN = in the measured window); recov/unh/pfail = Recovered stale protection / Unhandled write fault / Protect failed lines per run; W/E/C = warning/error/critical lines per run; slow = slow runs/runs, mean slow_pct, mean onset s; logdiff vs d11 = gate FAIL findings/NEW/MORE/GONE/ONLY keys
+  arm        runs verdict stuck                  dumps recov      unh        pfail      W/E/C                      slow                   logdiff F/N/M/G/O
+  d11        6    PASS    0                      0     [0, 0, 0, 0, 0, 0] [0, 0, 0, 0, 0, 0] [0, 0, 0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 0/6 0.0% -s            (reference)
+  cold-d11   1    PASS    0                      0     [0]        [0]        [0]        40/0/0                     0/1 0.0% -s            0/0/0/0/0
+  d11p       6    PASS    0                      0     [0, 0, 0, 0, 0, 0] [0, 0, 0, 0, 0, 0] [0, 0, 0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 0/6 0.0% -s            0/0/0/0/1
+  d11t       6    PASS    0                      0     [0, 0, 0, 0, 0, 0] [0, 0, 0, 0, 0, 0] [0, 0, 0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 40/0/0 0/6 0.0% -s            0/0/0/0/0
+
+Per run. exit = run.json exit code; close = WM_CLOSE posted/clean; seq = log ends with the clean-exit lines; stuck = episodes; slow = onset s / slow_pct / span s (sys.csv rows); nogrowth = perf.csv max no-growth s in the window; free = GB at start
+  run                arm      verdict status exit  close     seq  W/E/C     stuck dmp  slow                 nogrowth free  lines
+  0155-cold-d11      cold-d11 PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/91 (91)          0        13.97 99
+  0157-d11-r1        d11      PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (113)        0        13.98 103
+  0159-d11t-r1       d11t     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (113)        0        14.01 99
+  0201-d11p-r1       d11p     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.98 104
+  0203-d11t-r2       d11t     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        14    99
+  0205-d11p-r2       d11p     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        14.05 100
+  0207-d11-r2        d11      PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.99 99
+  0209-d11p-r3       d11p     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.98 100
+  0211-d11-r3        d11      PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.96 99
+  0213-d11t-r3       d11t     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.99 103
+  0215-d11-r4        d11      PASS    OK     0     1/True    NO   40/0/0    0     0    -/0/112 (112)        0        13.95 98
+  0217-d11t-r4       d11t     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (111)        0        13.96 99
+  0219-d11p-r4       d11p     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (113)        0        13.91 104
+  0221-d11t-r5       d11t     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.9  99
+  0223-d11p-r5       d11p     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (113)        0        13.92 104
+  0225-d11-r5        d11      PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.92 99
+  0227-d11p-r6       d11p     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.93 100
+  0229-d11-r6        d11      PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (113)        0        13.94 99
+  0231-d11t-r6       d11t     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        13.93 99
+
+STUCK-LOCK episodes: 0 (H1 = owner parked in sub_83FAF180, the L1 fence-wait poll; finding 10)
+
+watchdog runs: 0
+Execution complete race runs: 1 (0215-d11-r4; INFO)
+
+Reasons, FAIL first (per arm: its runs, then its logdiff findings; INFO does not change a verdict)
+  INFO d11      0215-d11-r4: no "Execution complete" line, benign hard-exit race (log ends with "Title terminated; hard-exiting process.", exit 0): ['Toypad[Read ] 0B 0C 55 09 0A D2 9F C1 04 AE A7 9F E1 73 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ', 'Window closing, shutting down...', 'Title terminated; hard-exiting process.']
+
+Counts per arm (lines containing each expect count text; one number per run, run-dir order)
+  STUCK-LOCK                                                   d11=[0, 0, 0, 0, 0, 0]; cold-d11=[0]; d11p=[0, 0, 0, 0, 0, 0]; d11t=[0, 0, 0, 0, 0, 0]
+  still not acquired after                                     d11=[0, 0, 0, 0, 0, 0]; cold-d11=[0]; d11p=[0, 0, 0, 0, 0, 0]; d11t=[0, 0, 0, 0, 0, 0]
+  Minidump written to                                          d11=[0, 0, 0, 0, 0, 0]; cold-d11=[0]; d11p=[0, 0, 0, 0, 0, 0]; d11t=[0, 0, 0, 0, 0, 0]
+  Recovered stale physical page protection                     d11=[0, 0, 0, 0, 0, 0]; cold-d11=[0]; d11p=[0, 0, 0, 0, 0, 0]; d11t=[0, 0, 0, 0, 0, 0]
+  Unhandled guest physical write fault                         d11=[0, 0, 0, 0, 0, 0]; cold-d11=[0]; d11p=[0, 0, 0, 0, 0, 0]; d11t=[0, 0, 0, 0, 0, 0]
+  PhysicalHeap::Protect failed                                 d11=[0, 0, 0, 0, 0, 0]; cold-d11=[0]; d11p=[0, 0, 0, 0, 0, 0]; d11t=[0, 0, 0, 0, 0, 0]
+  BaseHeap::Protect failed                                     d11=[0, 0, 0, 0, 0, 0]; cold-d11=[0]; d11p=[0, 0, 0, 0, 0, 0]; d11t=[0, 0, 0, 0, 0, 0]
+  Host timer resolution set to 1 ms                            d11=[1, 1, 1, 1, 1, 1]; cold-d11=[1]; d11p=[1, 1, 1, 1, 1, 1]; d11t=[1, 1, 1, 1, 1, 1]
+  TimerQueue: precise wait (timer_queue_precise_wait)          d11=[0, 0, 0, 0, 0, 0]; cold-d11=[0]; d11p=[1, 1, 1, 1, 1, 1]; d11t=[0, 0, 0, 0, 0, 0]
+  [NtCreateFile] FAILED                                        d11=[35, 35, 35, 35, 35, 35]; cold-d11=[35]; d11p=[35, 35, 35, 35, 35, 35]; d11t=[35, 35, 35, 35, 35, 35]
+  Reserving the guest memory arena                             d11=[1, 1, 1, 1, 1, 1]; cold-d11=[1]; d11p=[1, 1, 1, 1, 1, 1]; d11t=[1, 1, 1, 1, 1, 1]
+  Title terminated                                             d11=[1, 1, 1, 1, 1, 1]; cold-d11=[1]; d11p=[1, 1, 1, 1, 1, 1]; d11t=[1, 1, 1, 1, 1, 1]
+
+ONLY keys per arm vs d11 (any level, not Toypad; in no d11 run), from w4b_logdiff
+  cold-d11: 0
+  d11p: 1
+    [info] [core] TimerQueue: precise wait (timer_queue_precise_wait)
+  d11t: 0
+
+w4b_logdiff: exit 0 in 0.3 s -> build\agent6\wnight\s3-regress\out-W5B-20261123-0155\logdiff (log build\agent6\wnight\s3-regress\out-W5B-20261123-0155\logdiff.log)
+w4b_extra: exit 0 in 0.3 s -> build\agent6\wnight\s3-regress\out-W5B-20261123-0155\extra.txt (log build\agent6\wnight\s3-regress\out-W5B-20261123-0155\extra.log)
+verdict: no FAIL; runtime 0.8 s; output build\agent6\wnight\s3-regress\out-W5B-20261123-0155

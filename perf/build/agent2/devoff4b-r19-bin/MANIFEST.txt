@@ -1,0 +1,44 @@
+# build\agent2\devoff4b-r19-bin - Agent 2 (board run 2 task #1). devoff4b-r19: devoff4b-bin with only rexgpu-xenos.dll rebuilt with #19 (s4-r1s2.diff, async submit, default off) by the dependency-scoped 9-TU recompile; method build/agent10/session3/r19-build-method.md (A813D340, M10 ACCEPT-IF C1-C5), rating build/agent10/session3/r19-rating.md condition (a) [M2 successor, build/agent2/session3/build-bin.py]
+# staged 2026-11-25 02:47:29 from build\agent2\devoff4b-bin (MANIFEST sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA); every file copied with mtime = now; replaced: rexgpu-xenos.dll <- build\agent2\s33\r19\link-on\rexgpu-xenos.dll.
+# Source: fresh overlay build/agent2/s33/r19/sdk = copy of snap1 rexglue-sdk/src/graphics + include/rex/graphics/d3d12 headers (5350b1d) + s4-r1s2.diff (git -c core.autocrlf=false apply, 5 files clean); after-hashes == build/agent7/s4-r1s2/new/sdk. 9 affected TUs (ninja deps of command_processor.h/deferred_command_list.h) recompiled with snap1-sdk ccdb (Release, --include-first overlay include, existing PCH reused unchanged, source with /, -fmacro-prefix-map overlay->snap1); rexgpu-xenos.dll relinked; snap1-sdk/install not touched. Run 2 (02:47): run 1 (02:46, build-bin-run1-0246.txt) built identically but stopped before staging because the driver also required d3d12_submit_split_kb to be absent from devoff4b (it is a pre-existing cvar); run 2 checks it as present-only (--have).
+# tools (sha256/16): build-bin.py D6FC7973B14556BE, recompile.py 855BCC79148E2DA8, relink.py F3C6EEAF332AB213, stage-variant.py D2BD1C6358FC19C1, verify-bins.py 80FF4C5F581C4B1B, prep-s33.py A311E35401ABE799
+# prep: PASS patch sha256 build\agent7\s4-r1s2\s4-r1s2.diff: 06B0D371686CD384193DF30E8509BC4DA586E8EDD0F45F4122D5911483E33AD7
+# prep: before include/rex/graphics/d3d12/command_processor.h 67F4E8380C879377 CRLF 0
+# prep: before include/rex/graphics/d3d12/deferred_command_list.h 9F6CC70A6922232D CRLF 0
+# prep: before src/graphics/d3d12/command_processor.cpp 027204B53A271D69 CRLF 0
+# prep: before src/graphics/d3d12/shared_memory.cpp 2A5ADF13B5E433F1 CRLF 0
+# prep: before src/graphics/d3d12/texture_cache.cpp 949CCF4F4D80975D CRLF 0
+# prep: after  include/rex/graphics/d3d12/command_processor.h EF0DC13DA29703C7FEDC13FE7C8542E592FB82460817F1B88C4930D92F12CD4C CRLF 0
+# prep: after  include/rex/graphics/d3d12/deferred_command_list.h E7512824D8E6F9673C59457CD28FA34DD7795E4D495B3BAB76D07774AEA60650 CRLF 0
+# prep: after  src/graphics/d3d12/command_processor.cpp 05BBCE8B7E3FB27D43F364031082F73DFCD5BD223307DB794FB3C6DD6E91807C CRLF 0
+# prep: after  src/graphics/d3d12/shared_memory.cpp 9E908D31E6F64A31A55126CB0E97B37F1DD1A677B7026872A839FAE53A8FEB8A CRLF 0
+# prep: after  src/graphics/d3d12/texture_cache.cpp 4183887C9D625B97D8DDB7B5D2BF5F28D2B9B122DBF3488BDA1753100CB9BAB4 CRLF 0
+# control: PASS compare rexgpu-xenos.dll vs build\agent2\devoff4b-bin\rexgpu-xenos.dll: identical except 1 TimeDateStamp field(s) (6b06a096 vs 6b03a0ae; COFF header at 0x80, included)
+# ON object d3d12__command_processor.cpp.obj exit 0 7.1 s obj 853665 B BE5B3140497D83FF (log 12243 B)
+# ON object d3d12__deferred_command_list.cpp.obj exit 0 3.1 s obj 24112 B D4A69D986BDAC893 (log 9378 B)
+# ON object d3d12__graphics_system.cpp.obj exit 0 3.1 s obj 20675 B 747D3D141E97C9E0 (log 9354 B)
+# ON object d3d12__pipeline_cache.cpp.obj exit 0 6.1 s obj 545875 B 48EFD2A6ED0A93EA (log 10071 B)
+# ON object d3d12__primitive_processor.cpp.obj exit 0 3.0 s obj 44073 B 4B970B6F672A6134 (log 9370 B)
+# ON object d3d12__render_target_cache.cpp.obj exit 0 6.5 s obj 1159060 B 480F9A858049310F (log 9370 B)
+# ON object d3d12__shared_memory.cpp.obj exit 0 3.5 s obj 123834 B 36ED6F4E2795CE78 (log 9346 B)
+# ON object d3d12__texture_cache.cpp.obj exit 0 4.5 s obj 533367 B 1312651F27674236 (log 10410 B)
+# ON object plugin_main.cpp.obj exit 0 1.5 s obj 34857 B BFFA81BADE429D1B (log 1030 B)
+# needles: ON has ['d3d12_async_submit', 'd3d12_async_submit: needs d3d12_submit_split_kb above 0, staying off', 'd3d12_async_submit: submitting splits on the submit thread ({} slots)', 'd3d12_async_submit: frame={} submission={} chunks={} queued_max={}']; ON lacks -; devoff4b-bin DLL lacks ['d3d12_async_submit', 'd3d12_async_submit: needs d3d12_submit_split_kb above 0, staying off', 'd3d12_async_submit: submitting splits on the submit thread ({} slots)', 'd3d12_async_submit: frame={} submission={} chunks={} queued_max={}']
+# needles: ON also has ['d3d12_submit_split_kb'] (d3d12_submit_split_kb also in devoff4b-bin DLL)
+# times: ctl compile 7.3 s, ctl link 1.4 s, on compile 7.8 s, on link 1.4 s
+# files: name, size, mtime, sha256, source
+FiraSans-Regular.ttf	456996	2026-11-25 02:47:29	C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23	build\agent2\snap1\DimensionsRecomp\rexlego\res\FiraSans-Regular.ttf
+TracyClient.dll	233472	2026-11-25 02:47:29	85044850B6C663B5CE8722285D13070381C33C9ABC49D06B3E59BA0277F8FF4E	build\agent2\snap1-sdk\install\bin\TracyClient.dll
+achievement_unlocked.wav	191018	2026-11-25 02:47:29	A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5	build\agent2\snap1-off\achievement_unlocked.wav
+legodimensions.exe	170350080	2026-11-25 02:47:29	DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83	build\agent2\snap1-off\legodimensions.exe
+legodimensions.map	39181442	2026-11-25 02:47:29	52155274A978A946870446A1C8F573EC381A486D50636AF13DA8920E4DC18EA5	build\agent2\snap1-off\legodimensions.map
+rexgpu-xenos.dll	3438592	2026-11-25 02:47:29	5DCDD8CB6DA30F06D19B238F2B63E0DAD74AAD9396864600D84406DCCE5B9423	build\agent2\s33\r19\link-on\rexgpu-xenos.dll
+rexruntime.dll	10909184	2026-11-25 02:47:29	A33801D1538D61759D35FD137EBC9F5EAD636D7D26E9A79DC3B4994A22CB9F12	build\agent2\snap1-off\rexruntime.dll
+# checks:
+#   PASS staged copy identical: FiraSans-Regular.ttf
+#   PASS staged copy identical: TracyClient.dll
+#   PASS staged copy identical: achievement_unlocked.wav
+#   PASS staged copy identical: legodimensions.exe
+#   PASS staged copy identical: legodimensions.map
+#   PASS staged copy identical: rexgpu-xenos.dll (replaced: base E3CB99CFDEA95E66 -> 5DCDD8CB6DA30F06)
+#   PASS staged copy identical: rexruntime.dll

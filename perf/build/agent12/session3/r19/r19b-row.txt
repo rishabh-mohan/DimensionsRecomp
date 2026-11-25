@@ -1,0 +1,33 @@
+queue row: {"id": "r19b", "est": 115, "needs": ["build\\agent3\\s4b\\ready-r19", "build\\agent3\\session3\\go-quiet", "build\\agent3\\session3\\r19-ok-a"], "args": ["-BinDir", "build\\agent2\\devoff4b-r19-bin", "-Seconds", "90", "-Tag", "r19b-async-nosplit", "-Cvar", "d3d12_async_submit=true"], "note": "#19 row b: async on, split 0 -> exactly 1 [warning] 'staying off'. r19_gate --row b --bin devoff4b-r19-bin. Gate: r19prep\\LAUNCH-R19.md."}
+ok   exit_code 0 (0x00000000), close wm_close, elapsed 90.41 s of 90
+ok   wer_seen False
+ok   crash_events []
+ok   exited_early False
+ok   bin_dir <workspace>\build\agent2\devoff4b-r19-bin (queued build\agent2\devoff4b-r19-bin)
+ok   run exe sha256 DFBE1D43B28861A6 = run.json and in <workspace>\build\agent2\devoff4b-r19-bin\MANIFEST.txt
+ok   cvars {'d3d12_async_submit': 'true'} (queued {'d3d12_async_submit': 'true'})
+ok   env {} (queued {})
+ok   input script None (queued None)
+     logs 1 (87 lines); counts: Recovered stale physical page protection=0; Unhandled guest physical write fault=0; PhysicalHeap::Protect failed=0; STUCK-LOCK=0; REX_FATAL=0; C1 keep-watch: on (with=0; C1 keep-watch: on, but=0; blocked for this process=0; C1 verify: on.=0; C1 verify K:=0; C1 verify F:=0; GPU wait back-off: ON=0; d3d12_submit_split_kb: splitting=0; d3d12_submit_split: =0; Host timer resolution set=0; TimerQueue: precise wait=0
+ok   C4 "Recovered stale physical page protection" x0
+ok   C4 "Unhandled guest physical write fault" x0
+ok   C4 "PhysicalHeap::Protect failed" x0
+ok   C4 "REX_FATAL" x0
+ok   C4 "C1 keep-watch: on, but" x0
+ok   C4 "blocked for this process" x0
+ok   C3 keep-watch init x0 (keep_watch=False)
+ok   C3 "C1 verify: on." x0 (verify=False)
+ok   C3 split init x0 (split cvar False)
+ok   C3 back-off init x0 (env set False)
+ok   C3 host timer line x0 (cvar False)
+ok   C3 precise-wait line x0 (cvar False)
+     STUCK-LOCK lines 0 (C5: see f10 output / by hand)
+ok   C6 dumps in dir [], run.json dumps []
+     C7 steps None/None last None timeouts None; marks []
+--- r19b.check.txt (21 lines)
+    missing in cand: ['220/528', '220/534', '594/2813', '8019/1043795', '839/31674']; extra in cand: -
+  BASE items missed: logdiff NEW 1 (base scenario differs: scenes/marks/GONE not judged)
+  VERDICT HINT LOOK: 1 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row r19b)
+--- r19b.f10.txt: not present
+--- r19b.p2c.txt: not present
+COMMON: OK (0 problems)

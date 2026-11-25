@@ -1,0 +1,67 @@
+Window staging (M8 session 3, build\agent8\session3\confirm\stage-confirm.ps1 = stage-window.ps1 with -Launcher bench\agent5\day\run-day.ps1), 2026-11-25 07:51:30; latest-start line below uses the night rule (07:30); the day launcher instead refuses when now + estimate + slack passes its -StopAt
+mode: TEST (copy in build\agent8\session3\confirm\test\CF2; no bench writes)
+result: OK
+run: only=nf,mc repeats=6 -ColdShared; -PlanOnly: 13 runs, about 30 min (runner); expected 13 runs; Agent 7's formula 1.70 + 2.14 x 2 x 6 = 27.4 min
+latest start: the launcher accepts this GO before 06:45 (no start at or after it; 07:30 - 30 - 10 min would allow 06:50); started at 06:45 it ends about 07:12 by Agent 7's formula
+GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): GO CF2 matrix-windowCF2.json DF8A2D3B7D0ACA1428F3B41AC2F5E587741BA8D1C5D390CD68C3646900AE0F60 only=nf,mc repeats=6
+draft: build\agent8\session3\confirm\matrix-windowCF2.json  sha256 DF8A2D3B7D0ACA1428F3B41AC2F5E587741BA8D1C5D390CD68C3646900AE0F60  5974 bytes
+matrix for the GO: build\agent8\session3\confirm\test\CF2\matrix-windowCF2.json  sha256 DF8A2D3B7D0ACA1428F3B41AC2F5E587741BA8D1C5D390CD68C3646900AE0F60
+launcher: bench\agent5\day\run-day.ps1 sha256 B67EBD6C2C9A378C8897558DD71AD383DCC85015952601F3EDF2FAED415ADC65 (2026-11-23 07:34:09); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/nativefinal-bin (arms nf): MANIFEST.txt sha256 D7C7B7060519A4950EE794FB5FF51D1E1BFB62394DBBF132D1AA99FFE7A6EE79 (expected D7C7B7060519A495); legodimensions.exe 5C21941DAF9DF36B7B098B5A825B4BB5F66615827AD0C9C75E1DAD94D63963A9; 8 files listed, 8 of 8 checked match; check lines PASS 8, FAIL 0
+bin: build/agent2/native4b-bin (arms mc,n0): MANIFEST.txt sha256 B63769FE46CC04592F2BEDAF04A51C362000325D3291BC4D7489369C2160B817 (expected B63769FE46CC0459); legodimensions.exe DC6484C224585E54190078A2225EA85848BFF36AAC5B3FC5B66F17235B59DD65; 8 files listed, 8 of 8 checked match; check lines PASS 124, FAIL 0
+arm: nf (nativefinal; frames native; cvars native_settings_frontend=false;native_fps_limit=0;framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv; drivers/thread-cpu.ps1)
+arm: mc (native4b; frames native; cvars native_settings_frontend=false;native_fps_limit=0;framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv LEGO_NATIVE_SHADER_MISS_CACHE=1; drivers/thread-cpu.ps1)
+arm: n0 (native4b; frames native; cvars native_settings_frontend=false;native_fps_limit=0;framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: 33 / 33
+NOTE: queue gap: the queue is idle (last line 07:25:26: 07:25:26 idle; waiting for: [f10aL,f10bL]); -PlanOnly at 07:51:33 after 0 s of waiting
+
+--- launcher Get-BinHashes (only= arms)
+5C21941DAF9DF36B7B098B5A825B4BB5F66615827AD0C9C75E1DAD94D63963A9  build/agent2/nativefinal-bin/legodimensions.exe
+D7C7B7060519A4950EE794FB5FF51D1E1BFB62394DBBF132D1AA99FFE7A6EE79  build/agent2/nativefinal-bin/MANIFEST.txt
+DC6484C224585E54190078A2225EA85848BFF36AAC5B3FC5B66F17235B59DD65  build/agent2/native4b-bin/legodimensions.exe
+B63769FE46CC04592F2BEDAF04A51C362000325D3291BC4D7489369C2160B817  build/agent2/native4b-bin/MANIFEST.txt
+
+--- run-matrix.ps1 -Matrix build\agent8\session3\confirm\test\CF2\matrix-windowCF2.json -Only nf,mc -Repeats 6 -ColdShared -NoPrompt -PlanOnly (launcher Get-Plan)
+=== timing matrix: Window CF2 (M8, session 3): confirmation of the shipped native default. nf = build/agent2/nativefinal-bin (N-A: FINAL native exe on the old SDK DLLs, miss cache ON by build default), plain launch, DEFAULT ARM, vs mc = native4b-bin + LEGO_NATIVE_SHADER_MISS_CACHE=1 (W8a's mc as timed). Optional: n0 (W8a's reference, miss cache OFF). W8a route and frames, 6 round-robin rounds, round 1 discarded ===
+matrix   <workspace>\build\agent8\session3\confirm\test\CF2\matrix-windowCF2.json
+note     Default arm (BIN-PINS D7): nf. Reference: mc. GO (primary): 'GO CF2 matrix-windowCF2.json <sha256> only=nf,mc repeats=6'. The launcher adds -ColdShared: one unscored cold run on the bin of round 1's first arm, which is nf (nativefinal-bin, staged without cache/; its native fingerprint 1616ce65e973c583 rejects any old recipe/pack, so its first launch is cold anyway), and mc keeps native4b's own cache. Then 6 round-robin rounds with the start arm alternating: 1 + 12 = 13 runs. Alternative with W8a's reference: 'only=nf,mc,n0 repeats=6', 1 + 18 = 19 runs (same file and sha256).
+note     Warm-up policy: as CF1, the read-out drops round 1 (tags *-r1) and scores rounds 2-6 (5 per arm); check gpu.csv for the plateau at round 2; verdict with and without round 1. nf's first scored launch follows its unscored cold run, so its cache is warm in every scored run.
+note     Question: is the plain FINAL native bin the same as W8a's mc (equivalence: nf vs mc CI inside about +-3 %, a timing claim only if the CI excludes 0)? With n0: does nf reproduce W8a's mc vs n0 (median about -29 %, fps about +44 %, p99 about -34 %; READOUT-NIGHT (3))?
+note     Bins (build/agent2/final/BIN-PINS.md FE4CD4FF; the launcher hashes them before the first run; no restaging, never copy cache or seeds): nativefinal-bin MANIFEST sha256 D7C7B7060519A495 (legodimensions.exe 5C21941DAF9DF36B; rexruntime.dll / rexgpu-xenos.dll = native4b's), native4b-bin MANIFEST sha256 B63769FE46CC0459.
+note     Arms, all W8a's cvars (native_settings_frontend=false, native_fps_limit=0, framerate_limit=0) and LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv (the native frame source; the runner expands <run>). nf: no other env (plain launch: the miss cache is ON by build default). mc: LEGO_NATIVE_SHADER_MISS_CACHE=1 (W8a's mc). n0: no other env (W8a's n0; the old exe's default is OFF).
+note     Proof per run, before any number is read (BIN-PINS D7): run.json env_set + the bin's MANIFEST sha256; nf -> build/agent2/final/check-defaults.py <game.log> --mode native-old (no 'Final defaults' / 1 ms / C1 / precise-wait / back-off lines, 'Native GPU: shader miss cache ON (build default)' exactly once) and env_set without LEGO_NATIVE_SHADER_MISS_CACHE; mc -> env_set has LEGO_NATIVE_SHADER_MISS_CACHE=1 (the old exe logs no miss-cache line); n0 -> env_set without it. No trace in any arm (a trace turns off reuse paths). Normal per-run functional check (exit 0, no dump/WER, level reached, K0/F0); a FAIL of an nf run voids the arm. STUCK-LOCK by the finding-10 rule, counted per arm.
+note     Read-out: per pair the difference of medians with a bootstrap 95 % CI over the scored rounds, median ms, fps mean, p99, the 1 % low, process cores and render-thread ms/f (threads.csv). A timing claim needs a CI that excludes 0. Flag runs with non-game load >= median + 1 core (M12 gate) and give verdicts with and without them. sys.csv rows are all 31-column (runner 72370A1E); never pool with 24-column rows.
+note     Window: 5 s settle + 55 s warm-up from the first frame, then 50 s measured (every window >= 60 s after the first frame; window_before_floor below 59.5 s); the cold run 55 s warm-up, 30 s window. One frame source for every arm: native-frames.csv (frames native), uncapped; one driver (drivers/thread-cpu.ps1). sys_csv on.
+note     Scope: W8a's route, uncapped, AC power, this laptop. Native numbers compare only with native runs in this window. Timing comes only from the user's unlocked, idle desktop through a launcher; agent runs of this matrix (-Quick, hidden desktop) are functional only.
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order roundrobin; close timeout 60 s; cooldown 5 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+       nf: bin build/agent2/nativefinal-bin; frames native; x6; warm-up 55 s; window 50 s; group cf2; cvars native_settings_frontend=false native_fps_limit=0 framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         DEFAULT ARM: nativefinal plain launch (miss cache ON by build default). Proof: check-defaults --mode native-old, env_set without LEGO_NATIVE_SHADER_MISS_CACHE (MANIFEST D7C7B7060519A495)
+       mc: bin build/agent2/native4b-bin; frames native; x6; warm-up 55 s; window 50 s; group cf2 (ref); cvars native_settings_frontend=false native_fps_limit=0 framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv LEGO_NATIVE_SHADER_MISS_CACHE=1; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         W8a's mc as timed: native4b + LEGO_NATIVE_SHADER_MISS_CACHE=1, no trace. Proof: env_set only (MANIFEST B63769FE46CC0459)
+cold     nf (build/agent2/nativefinal-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+         -ColdShared: one cold run for all 2 bin(s); the other bins first launch as scored round-1 runs
+round 1  nf mc
+round 2  mc nf
+round 3  nf mc
+round 4  mc nf
+round 5  nf mc
+round 6  mc nf
+order    nf mc | mc nf | nf mc | mc nf | nf mc | mc nf
+estimate 13 runs (1 cold), about 30 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-PL7G3HVKSSWPTK7CDHR37USI7R -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   15.76 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/native4b-bin : ok (MANIFEST.txt)
+bin        build/agent2/nativefinal-bin : ok (MANIFEST.txt)
+screensaver none
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   13 runs, about 30 min: done around 08:21
+!!! These runs will be FUNCTIONAL ONLY (see above): their numbers are not timing results.
+PlanOnly: nothing started.

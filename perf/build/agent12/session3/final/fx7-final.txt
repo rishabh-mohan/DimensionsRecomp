@@ -1,0 +1,46 @@
+NOTE  run <workspace>\build\agent3\runs\20261125-084301-fx7-nativefinal-level (harness); logs ['game.log'], 3824 lines
+NOTE  elapsed 574.91 s (elapsed_s)
+NOTE  cvars {'native_settings_frontend': 'false', 'native_fps_limit': '0', 'framerate_limit': '0'}; env (LEGO_*) {}
+PASS  exit_code 0 (0x00000000)
+PASS  exited_early False
+PASS  WER False
+PASS  dialogs None
+PASS  crash_events []
+PASS  dumps 0 in dir, run.json []
+PASS  close wm_close
+PASS  "Title terminated" x1 (clean exit)
+PASS  bad string "Recovered stale physical page protection" x0
+PASS  bad string "Unhandled guest physical write fault" x0
+PASS  bad string "PhysicalHeap::Protect failed" x0
+PASS  bad string "BaseHeap::Protect failed" x0
+PASS  bad string "is not a plain number" x0
+PASS  bad string "C1 verify: on" x0
+PASS  bad string "STUCK-LOCK" x0
+PASS  bad string "REX_FATAL" x0
+PASS  bad string "Minidump written to" x0
+PASS  bad string "still not acquired after" x0
+PASS  run.json bin_dir <workspace>\build\agent2\nativefinal-bin (want build/agent2/nativefinal-bin)
+PASS  nativefinal-bin MANIFEST D7C7B7060519A495 = BIN-PINS D7C7B7060519A495
+PASS  run-dir MANIFEST.txt copy = pin
+PASS  run.json exe_sha256 = pin
+PASS  run-dir legodimensions.exe 5C21941DAF9DF36B (pin 5C21941DAF9DF36B)
+PASS  run-dir rexruntime.dll A33801D1538D6175 (pin A33801D1538D6175)
+PASS  run-dir rexgpu-xenos.dll E3CB99CFDEA95E66 (pin E3CB99CFDEA95E66)
+PASS  plain launch: LEGO_NATIVE_SHADER_MISS_CACHE unset (None)
+PASS  no SDK key / back-off env on the old-SDK native bin: {} {}
+PASS  check-defaults.py D9936C56C5E04B98 (rated D9936C56C5E04B98)
+NOTE  check-defaults --mode native-old exit 0; RESULT PASS
+PASS  check-defaults --mode native-old PASS
+FAIL  elapsed 574.91 s (elapsed_s; level route, >= 10 min; 590 s floor)
+PASS  route <workspace>\build\agent3\final-fx\level-l-tail.txt
+PASS  vortex mark reached (marks ['v-start-a', 'settled', 'end', 'tail'])
+PASS  route steps 121/121, stopped_by_script True
+PASS  route script_sha256 BE08A790 = level-l-tail.txt
+PASS  timeouts 28 = timeout_lines count 28
+PASS  timeouts on by-design wait lines only: 28 of 31 by-design
+NOTE  3 by-design waits did not time out (lines [48, 105, 109]); normal on level-l (27-31 seen)
+PASS  Toypad lines 1061
+PASS  run-dir exe has fingerprint 1616ce65e973c583, not 9b40acbbef4c57b3
+PASS  native-gpu-build.txt: 'LEGO Dimensions native GPU 1616ce65e973c583'
+PASS  nativefinal-bin MANIFEST lists rexruntime A33801D1 + rexgpu E3CB99CF
+F-GATE F7 20261125-084301-fx7-nativefinal-level: FAIL

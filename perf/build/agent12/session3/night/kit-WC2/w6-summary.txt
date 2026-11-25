@@ -1,0 +1,106 @@
+W6 logdiff kit (Agent 6, task #16): <workspace>\build\agent8\matrix\20261125-0440
+expect build\agent6\w6\expect-w6.json (reference s0); matrix.json build\agent8\matrix\20261125-0440\matrix.json
+runs 17 in 5 arms: s0=4; c1np=4; cold-p2fc=1; p2fc=4; win3=4
+arms in the expect file with no run here: f, fc, p2, p2f
+arms here with no rules in the expect file (NOTE): c1np, win3
+
+Per arm. stuck = STUCK-LOCK episodes (sites; IN = in the measured window); recov/unh/pfail = Recovered stale protection / Unhandled write fault / Protect failed lines per run; W/E/C = warning/error/critical lines per run; slow = slow runs/runs, mean slow_pct, mean onset s; logdiff vs s0 = gate FAIL findings/NEW/MORE/GONE/ONLY keys
+  arm        runs verdict stuck                  dumps recov      unh        pfail      W/E/C                      slow                   logdiff F/N/M/G/O
+  s0         4    PASS    0                      0     [0, 0, 0, 0] [0, 0, 0, 0] [0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 0/4 0.0% -s            (reference)
+  c1np       4    NOTE    0                      0     [0, 0, 0, 0] [0, 0, 0, 0] [0, 0, 0, 0] 40/0/0 40/0/0 41/0/0 40/0/0 0/4 0.0% -s            0/1/0/3/4
+  cold-p2fc  1    PASS    0                      0     [0]        [0]        [0]        40/0/0                     0/1 0.0% -s            0/0/0/0/3
+  p2fc       4    PASS    0                      0     [0, 0, 0, 0] [0, 0, 0, 0] [0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 0/4 0.0% -s            0/0/0/0/3
+  win3       4    NOTE    0                      0     [0, 0, 0, 0] [0, 0, 0, 0] [0, 0, 0, 0] 40/0/0 40/0/0 40/0/0 40/0/0 0/4 0.0% -s            0/0/0/0/6
+
+Per run. exit = run.json exit code; close = WM_CLOSE posted/clean; seq = log ends with the clean-exit lines; stuck = episodes; slow = onset s / slow_pct / span s (sys.csv rows); nogrowth = perf.csv max no-growth s in the window; free = GB at start
+  run                arm      verdict status exit  close     seq  W/E/C     stuck dmp  slow                 nogrowth free  lines
+  0440-cold-p2fc     cold-p2fc PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/90 (91)          0        16.69 136
+  0442-p2fc-r1       p2fc     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        16.69 140
+  0444-c1np-r1       c1np     NOTE    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        16.73 140
+  0446-win3-r1       win3     NOTE    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        16.7  144
+  0448-s0-r1         s0       PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (113)        0        16.71 102
+  0450-c1np-r2       c1np     NOTE    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        16.7  140
+  0452-win3-r2       win3     NOTE    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (113)        0        16.73 144
+  0454-s0-r2         s0       PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (113)        0        16.72 106
+  0456-p2fc-r2       p2fc     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        16.69 140
+  0458-win3-r3       win3     NOTE    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        16.72 144
+  0500-s0-r3         s0       PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (113)        0        16.7  102
+  0502-p2fc-r3       p2fc     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        16.71 140
+  0504-c1np-r3       c1np     NOTE    OK     0     1/True    NO   41/0/0    0     0    -/0/115 (115)        0        16.69 138
+  0506-s0-r4         s0       PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (113)        0        16.67 102
+  0508-p2fc-r4       p2fc     PASS    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (113)        0        16.72 140
+  0510-c1np-r4       c1np     NOTE    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        16.69 144
+  0513-win3-r4       win3     NOTE    OK     0     1/True    ok   40/0/0    0     0    -/0/112 (112)        0        16.68 148
+
+STUCK-LOCK episodes: 0 (H1 = owner parked in sub_83FAF180, the L1 fence-wait poll; finding 10)
+
+watchdog runs: 1 (0504-c1np-r3; NOTE)
+Execution complete race runs: 0
+
+Reasons, FAIL first (per arm: its runs, then its logdiff findings; INFO does not change a verdict)
+  NOTE c1np     logdiff NEW warning key: [warning] [core] Shutdown wedged past the close request; hard-exiting. (the shutdown watchdog line, see the run's WATCHDOG NOTE)
+  NOTE c1np     logdiff GONE: [info] [core] Window closing, shutting down... (missing only in WATCHDOG run(s) 0504-c1np-r3)
+  NOTE c1np     logdiff GONE: [info] [core] Execution complete (missing only in WATCHDOG run(s) 0504-c1np-r3)
+  NOTE c1np     logdiff GONE: [info] [core] Title terminated; hard-exiting process. (missing only in WATCHDOG run(s) 0504-c1np-r3)
+  NOTE c1np     logdiff ONLY key that no rule names: [warning] [core] Shutdown wedged past the close request; hard-exiting.
+  NOTE c1np     0444-c1np-r1: no rules for arm c1np in the expect file
+  NOTE c1np     0450-c1np-r2: no rules for arm c1np in the expect file
+  NOTE c1np     0504-c1np-r3: no rules for arm c1np in the expect file
+  NOTE c1np     0504-c1np-r3: WATCHDOG: shutdown watchdog fired (3 s after WM_CLOSE): "Shutdown wedged past the close request; hard-exiting." x1; not a FAIL (exit code and timing are checked on their own); explains: levels W/E/C 41/0/0, expected 40/0/0 (+1 = the watchdog warning); the log ends with the watchdog line, not the clean-exit lines
+  NOTE c1np     0510-c1np-r4: no rules for arm c1np in the expect file
+  NOTE win3     logdiff ONLY key that no rule names: [info] [core] Host timer resolution set to # ms (background opt-out on)
+  NOTE win3     logdiff ONLY key that no rule names: [info] [core] TimerQueue: precise wait (timer_queue_precise_wait)
+  NOTE win3     logdiff ONLY key that no rule names: [info] [core] GPU wait back-off: ON (quantum # us, spin # us); stats OFF; GetData hook built.
+  NOTE win3     0446-win3-r1: no rules for arm win3 in the expect file
+  NOTE win3     0452-win3-r2: no rules for arm win3 in the expect file
+  NOTE win3     0458-win3-r3: no rules for arm win3 in the expect file
+  NOTE win3     0513-win3-r4: no rules for arm win3 in the expect file
+
+Counts per arm (lines containing each expect count text; one number per run, run-dir order)
+  STUCK-LOCK                                                   s0=[0, 0, 0, 0]; c1np=[0, 0, 0, 0]; cold-p2fc=[0]; p2fc=[0, 0, 0, 0]; win3=[0, 0, 0, 0]
+  still not acquired after                                     s0=[0, 0, 0, 0]; c1np=[0, 0, 0, 0]; cold-p2fc=[0]; p2fc=[0, 0, 0, 0]; win3=[0, 0, 0, 0]
+  Minidump written to                                          s0=[0, 0, 0, 0]; c1np=[0, 0, 0, 0]; cold-p2fc=[0]; p2fc=[0, 0, 0, 0]; win3=[0, 0, 0, 0]
+  Recovered stale physical page protection                     s0=[0, 0, 0, 0]; c1np=[0, 0, 0, 0]; cold-p2fc=[0]; p2fc=[0, 0, 0, 0]; win3=[0, 0, 0, 0]
+  Unhandled guest physical write fault                         s0=[0, 0, 0, 0]; c1np=[0, 0, 0, 0]; cold-p2fc=[0]; p2fc=[0, 0, 0, 0]; win3=[0, 0, 0, 0]
+  PhysicalHeap::Protect failed                                 s0=[0, 0, 0, 0]; c1np=[0, 0, 0, 0]; cold-p2fc=[0]; p2fc=[0, 0, 0, 0]; win3=[0, 0, 0, 0]
+  BaseHeap::Protect failed                                     s0=[0, 0, 0, 0]; c1np=[0, 0, 0, 0]; cold-p2fc=[0]; p2fc=[0, 0, 0, 0]; win3=[0, 0, 0, 0]
+  C1 keep-watch:                                               s0=[0, 0, 0, 0]; c1np=[38, 38, 38, 38]; cold-p2fc=[34]; p2fc=[38, 38, 38, 38]; win3=[39, 39, 39, 39]
+  C1 keep-watch: on (with physical_protect_hold_global_lock)   s0=[0, 0, 0, 0]; c1np=[1, 1, 1, 1]; cold-p2fc=[1]; p2fc=[1, 1, 1, 1]; win3=[1, 1, 1, 1]
+  C1 keep-watch: on, but                                       s0=[0, 0, 0, 0]; c1np=[0, 0, 0, 0]; cold-p2fc=[0]; p2fc=[0, 0, 0, 0]; win3=[0, 0, 0, 0]
+  C1 keep-watch: blocked                                       s0=[0, 0, 0, 0]; c1np=[0, 0, 0, 0]; cold-p2fc=[0]; p2fc=[0, 0, 0, 0]; win3=[0, 0, 0, 0]
+  C1 keep-watch: first kept protect at                         s0=[0, 0, 0, 0]; c1np=[1, 1, 1, 1]; cold-p2fc=[1]; p2fc=[1, 1, 1, 1]; win3=[1, 1, 1, 1]
+  protects kept so far                                         s0=[0, 0, 0, 0]; c1np=[36, 36, 36, 36]; cold-p2fc=[32]; p2fc=[36, 36, 36, 36]; win3=[37, 37, 37, 37]
+  C1 verify                                                    s0=[0, 0, 0, 0]; c1np=[0, 0, 0, 0]; cold-p2fc=[0]; p2fc=[0, 0, 0, 0]; win3=[0, 0, 0, 0]
+  S4 upload hash:                                              s0=[0, 0, 0, 0]; c1np=[0, 0, 0, 0]; cold-p2fc=[0]; p2fc=[0, 0, 0, 0]; win3=[0, 0, 0, 0]
+  slow frame #                                                 s0=[0, 0, 0, 0]; c1np=[0, 0, 0, 0]; cold-p2fc=[0]; p2fc=[0, 0, 0, 0]; win3=[0, 0, 0, 0]
+  memexport full-buffer                                        s0=[0, 0, 0, 0]; c1np=[0, 0, 0, 0]; cold-p2fc=[0]; p2fc=[0, 0, 0, 0]; win3=[0, 0, 0, 0]
+  memexport flush reasons                                      s0=[0, 0, 0, 0]; c1np=[0, 0, 0, 0]; cold-p2fc=[0]; p2fc=[0, 0, 0, 0]; win3=[0, 0, 0, 0]
+  [NtCreateFile] FAILED                                        s0=[35, 35, 35, 35]; c1np=[35, 35, 35, 35]; cold-p2fc=[35]; p2fc=[35, 35, 35, 35]; win3=[35, 35, 35, 35]
+  Reserving the guest memory arena                             s0=[1, 1, 1, 1]; c1np=[1, 1, 1, 1]; cold-p2fc=[1]; p2fc=[1, 1, 1, 1]; win3=[1, 1, 1, 1]
+  Title terminated                                             s0=[1, 1, 1, 1]; c1np=[1, 1, 0, 1]; cold-p2fc=[1]; p2fc=[1, 1, 1, 1]; win3=[1, 1, 1, 1]
+
+ONLY keys per arm vs s0 (any level, not Toypad; in no s0 run), from w4b_logdiff
+  c1np: 4 (not named by a rule: 1)
+    [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)
+    [info] [sys] C# keep-watch: first kept protect at #h, #h bytes
+    [info] [sys] C# keep-watch: # protects kept so far
+    [warning] [core] Shutdown wedged past the close request; hard-exiting.
+  cold-p2fc: 3
+    [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)
+    [info] [sys] C# keep-watch: first kept protect at #h, #h bytes
+    [info] [sys] C# keep-watch: # protects kept so far
+  p2fc: 3
+    [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)
+    [info] [sys] C# keep-watch: first kept protect at #h, #h bytes
+    [info] [sys] C# keep-watch: # protects kept so far
+  win3: 6 (not named by a rule: 3)
+    [info] [core] Host timer resolution set to # ms (background opt-out on)
+    [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)
+    [info] [core] TimerQueue: precise wait (timer_queue_precise_wait)
+    [info] [sys] C# keep-watch: first kept protect at #h, #h bytes
+    [info] [sys] C# keep-watch: # protects kept so far
+    [info] [core] GPU wait back-off: ON (quantum # us, spin # us); stats OFF; GetData hook built.
+
+w4b_logdiff: exit 0 in 0.2 s -> build\agent12\session3\night\kit-WC2\logdiff (log build\agent12\session3\night\kit-WC2\logdiff.log)
+w4b_extra: exit 0 in 0.2 s -> build\agent12\session3\night\kit-WC2\extra.txt (log build\agent12\session3\night\kit-WC2\extra.log)
+verdict: no FAIL; runtime 0.5 s; output build\agent12\session3\night\kit-WC2

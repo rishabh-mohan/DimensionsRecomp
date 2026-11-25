@@ -1,0 +1,126 @@
+# build/agent3/final-fx/level-l-tail.txt - M3, 2026-11-25: the F2/F7 level route for the FINAL bins = build/agent3/toypad/routes/level-l.txt
+# (sha256 6F9E6009, steps lines 13-130 copied unchanged) plus a 180 s idle tail in the vortex scene before the stop, so the run
+# lasts >= 10 min (M10 final-defaults-rating F2; M12 FINAL-F-GATES elapsed >= 590 s). level-l alone ends ~430-555 s after launch.
+# Needs the toypad sidecar (queue row "toypad":true). The 31 wait_log timeouts of level-l (lines 55-116 there: the press-A-until-
+# orange loop) are expected and stay. FUNCTIONAL ONLY (hidden desktop).
+wait_first_frame 240
+mark first-frame
+sleep 50
+mark title
+press START
+sleep 3
+press A                                         # title -> front end (C8 all white); tags 2 s later
+wait_log "Toypad: pad 3 mode 1 lit FF FF FF" 25
+mark pads-white
+wait_log "Toypad listener: LOAD -> pad=3" 20
+mark tags-placed
+sleep 3
+press A
+sleep 5
+mark m01
+press A
+sleep 5
+mark m02
+press A
+sleep 5
+mark m03
+press A
+sleep 5
+mark m04
+press A
+sleep 5
+mark m05
+press A
+sleep 5
+mark m06
+press A
+sleep 5
+mark m07
+press A
+sleep 5
+mark m08
+press A
+sleep 5
+mark m09
+press A
+sleep 5
+mark m10
+wait_log "lit 99 42 0E" 60                       # story load: amber fade after the profile read
+mark story-load
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+press A
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 240
+mark vortex                                     # the post-load scene: 766/110956, rainbow pads
+sleep 15
+mark v-idle
+press START
+sleep 8
+mark v-start
+press A
+sleep 8
+mark v-start-a
+sleep 30
+mark settled
+sleep 30
+mark end
+sleep 180
+mark tail
+stop

@@ -1,0 +1,37 @@
+#33 diag (d) resolve-after-drop report (build/agent6/s33-popin/diagd_report.py)
+eps = taint episodes ("new"); lat = heal latency from episode start, in resolves and seconds; end = TAINT if still tainted at end of log.
+
+== run 0101-ond-r1  (arm ond)  <workspace>/build/agent6/s33-popin/test-diagd/matrix/runs/0101-ond-r1/game.log
+   diag lines 64, cap hit no, final: resolves 66, after drops 33, healed 31, tainted 1
+   dest     taints  eps heals lat res med/max   lat s med/max           end    first        last        
+   A0000000     30   30    30 1/1               0.100/0.100             ok     01:00:00.100 01:00:06.600
+   B0001000      1    1     0 -                 -                       TAINT  01:00:01.000 01:00:01.000
+   C0002000      2    1     1 41/41             4.100/4.100             ok     01:00:00.700 01:00:04.800
+   distinct dests tainted 3; still tainted at end 1: B0001000 (last taint 6.600 s before end, never healed)
+   heal latency: n 31, resolves med/p95/max 1.0/1.0/41.0, seconds med/p95/max 0.100/0.100/4.100
+== run 0103-offd-r1  (arm offd)  <workspace>/build/agent6/s33-popin/test-diagd/matrix/runs/0103-offd-r1/game.log
+   diag lines 0, cap hit no, final: (no event lines)
+   distinct dests tainted 0; still tainted at end 0
+   heal latency: n 0, resolves med/p95/max -, seconds med/p95/max -
+== run 0104-offd-r2  (arm offd)  <workspace>/build/agent6/s33-popin/test-diagd/matrix/runs/0104-offd-r2/game.log
+   diag lines 10, cap hit no, final: resolves 10, after drops 5, healed 5, tainted 0
+   dest     taints  eps heals lat res med/max   lat s med/max           end    first        last        
+   A0000000      5    5     5 1/1               0.100/0.100             ok     01:00:00.100 01:00:01.000
+   distinct dests tainted 1; still tainted at end 0
+   heal latency: n 5, resolves med/p95/max 1.0/1.0/1.0, seconds med/p95/max 0.100/0.100/0.100
+== run capped-run  (arm ond)  <workspace>/build/agent6/s33-popin/test-diagd/matrix/runs/capped-run/game.log
+   diag lines 4097, cap hit yes, final: resolves 4096, after drops 2049, healed 2047, tainted 2
+   dest     taints  eps heals lat res med/max   lat s med/max           end    first        last        
+   A0000000   2048 2048  2047 1/1               0.100/0.100             TAINT  01:00:00.200 01:06:49.600
+   B0001000      1    1     0 -                 -                       TAINT  01:00:00.100 01:00:00.100
+   distinct dests tainted 2; still tainted at end 2: A0000000 (last taint 11.500 s before end, healed before); B0001000 (last taint 421.000 s before end, never healed)
+   note: cap hit, so the state at end is as of the cap line
+   heal latency: n 2047, resolves med/p95/max 1.0/1.0/1.0, seconds med/p95/max 0.100/0.100/0.100
+
+-- arm offd: runs 2 (with diag lines 1, cap hit 0, with WARN 0); totals: resolves 10, after drops 5, healed 5, tainted at end 0
+   heal latency: n 5, resolves med/p95/max 1.0/1.0/1.0, seconds med/p95/max 0.100/0.100/0.100
+   dests tainted at end (union): none
+-- arm ond: runs 2 (with diag lines 2, cap hit 1, with WARN 0); totals: resolves 4162, after drops 2082, healed 2078, tainted at end 3
+   heal latency: n 2078, resolves med/p95/max 1.0/1.0/41.0, seconds med/p95/max 0.100/0.100/4.100
+   dests tainted at end (union): B0001000 in 2/2 runs (never healed in 2), A0000000 in 1/2 runs (never healed in 0)
+TOTAL: 4 run(s), 2 arm(s), 0 WARN(s)

@@ -4,7 +4,7 @@ Paths are relative to the workspace root, the folder that holds `DimensionsRecom
 `bench/`, `harness/` and `perf-notes/`. First version 07:10; updated 10:17 with the readout verdicts
 and the wrap-up status. Final pass 12:35: the notes destination (section 5) and the final git state.
 Updated 13:52: at 13:49 the user chose a public `perf/` folder in DimensionsRecomp for the notes
-(sections 2, 3, 5 and 6).
+(sections 2, 3, 5 and 6); committed and pushed as c9e215f at 14:01.
 
 Read in this order after the break: `perf-notes/RESUME.md` (sections 1 and 7 first), this file, then
 `build/agentN/HANDOFF.md` for each agent (2-12). RESUME is the fuller document; where it and this
@@ -24,15 +24,15 @@ file differ on anything outside sections 1-3 and 5 here, RESUME wins.
 
 | Repo | Branch | HEAD | Remote `mine` |
 |---|---|---|---|
-| DimensionsRecomp | perf/opt | b0bd3b4 "S4b/S4c: keep-watch memory_watch, GPU wait back-off hooks, probe option; SDK at S4b" | github.com/rishabh-mohan/DimensionsRecomp |
+| DimensionsRecomp | perf/opt | c9e215f "perf: S4 sprint notes, scripts and results" (notes only); last code commit b0bd3b4 "S4b/S4c: keep-watch memory_watch, GPU wait back-off hooks, probe option; SDK at S4b" | github.com/rishabh-mohan/DimensionsRecomp |
 | rexglue-sdk (submodule of DimensionsRecomp) | perf/opt | 5350b1d "S4b: C1 v3 keep-watch, M1 non-temporal copy, P2 counter, r1r2, db16cyc_pause option" | github.com/rishabh-mohan/rexglue-sdk |
 
-- Final check 11-23 12:31: both repos on `perf/opt` at these HEADs, equal to `mine/perf/opt`
+- Checked 11-23 14:01: both repos on `perf/opt` at these HEADs, equal to `mine/perf/opt`
   (`git ls-remote`); `git status` shows only the two expected entries below. No code commits after
   the 11-23 05:40 push.
-- 11-23 afternoon: the notes export was committed on top of b0bd3b4 and pushed to `mine`. That commit
-  changes only `.gitignore` (a `!/perf/` line) and `perf/` (section 5). b0bd3b4 stays the last code
-  commit; the SDK is unchanged.
+- 11-23 14:01: the notes export was committed as c9e215f on top of b0bd3b4 and pushed to `mine` (no
+  force). It changes only `.gitignore` (a `!/perf/` line) and `perf/` (4619 files; section 5).
+  b0bd3b4 stays the last code commit; the SDK is unchanged at 5350b1d.
 - Commit only in these two repos, on `perf/opt`, and push to `mine`. Never push to `origin` (the
   upstream NeverCookFirst repos), never to `main`, never force. Commit the SDK first, then the
   superproject gitlink. Confirm with `git ls-remote mine perf/opt`.
@@ -122,8 +122,9 @@ python rexglue-sdk/scripts/prepare_simde.py              # applies the SIMDe pat
   out (`EXCLUDED.tsv`). Re-run `--copy` after any later change, before using it.
 - The notes still mention the user's schedule in about 60 files; the user accepted that. At 13:49
   they chose a public `perf/` folder in DimensionsRecomp: the export is committed under `perf/` on
-  perf/opt in the commit after b0bd3b4 (plus a `!/perf/` line in its `.gitignore`) and pushed to
-  `mine`.
+  perf/opt in c9e215f (14:01, on top of b0bd3b4, plus a `!/perf/` line in its `.gitignore`) and
+  pushed to `mine`. The repo copy of this file predates the hash, so it says "the commit after
+  b0bd3b4".
 - To update it: re-run `--copy`, delete `DimensionsRecomp/perf/`, copy the new
   `build/agent1/perf-export/perf/` in, stage with `git add -A -- perf` (that path only; never the
   plume or SDK pointers) and commit on perf/opt.

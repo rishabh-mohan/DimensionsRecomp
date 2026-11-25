@@ -1,5 +1,26 @@
 # RESUME: the perf sprint, paused on Nov 23
 
+> **Session 3 update (Nov 25, 15:50). Read this first; the rest of this doc is the Nov 23 state.**
+> - **Structure:** agy-grid now runs one Overseer (grid Agent 4, the old orchestrator "Agent 1") with Managers as subagents (TypeName `agy-grid-manager`, at most 6 direct reports): M3 functional rows/queue, M12 gates, M10 safety reviewer, M8 runner/matrices, M2 builds. Managers write only in `build/agentN/`. Only the Overseer writes GO lines, edits perf-notes and commits.
+> - **Log:** `perf-notes/SESSION3.md` (everything since Nov 25 01:14). Night read-out: `build/agent8/session3/READOUT-NIGHT.md`.
+> - **Confirmed by day windows:**
+>   - CF1 (`build/agent8/session3/confirm/READOUT-CF1.md` D4D13F23, M10 CONFIRMED-WITH-CHANGES): win3 vs s0 fps +10.0%, p99 −16.1%, 1% low −17.7%, cores −38.5%; ship vs s0 same sign on all four; ship vs win3 not shown different (weak form).
+>   - CF2 (`READOUT-CF2.md` 888DEB9B, M10 CONFIRMED): nf ≈ mc (weak form).
+> - **User decisions (Nov 25, SESSION3 "14:31-15:05" and "15:28-15:46"):**
+>   1. win3 settings as the shipped defaults (P2): KEEP;
+>   2. native renderer (mc) as the default: KEEP;
+>   3. CG26: stays OFF;
+>   4. #33 pop-in (`d3d12_pipeline_creation_no_wait`): a SUGGESTED opt-in setting, default OFF (verdict "a" after the row 3 side-by-sides).
+> - **Done:** the final defaults build (devfinal/nativefinal, pins in `build/agent2/BIN-PINS.md`); F1-F7 8/8 PASS; #19 14/14 PASS; #33 rows 1-6 and (d) PASS (row 3 = the visual review, `build/agent3/session3/s33-rows/row3/`).
+> - **Open:**
+>   - notes export refreshed and committed after the code (see SESSION3 for the hash);
+>   - builds: #21 (s4-t1.diff 46FFD2E9) + F1/F3/W1, the InfoQueue drain patch;
+>   - the screenshot kit (native4 vs standard, needs native4bp);
+>   - gate reviews PS1-PS4; doc fixes (full open list: SESSION3 "15:46-15:55");
+>   - the code is committed and pushed (Nov 25, 15:57): SDK perf/opt a7e79c0 (1ba3cdb final defaults + a7e79c0 #33 opt-in), superproject perf/opt 2de88ce. Bins built from exactly that source: `build/agent2/final2/BIN-PINS.md` (devfinal2 4A4A13ED, nativefinal2 4E5E2620), smoke PASS incl. first 3D (`build/agent8/session3/SMOKE-FINAL2.md`). The final2 bins are smoke-tested only, not timed;
+>   - queued rows r19eL, f10aL/f10bL (never run);
+>   - next sprint idea: upscaling/GPU + async PSO (no_wait still lets pipeline creation hit the frame path, e.g. 322 ms).
+
 **Status:** paused on Monday, Nov 23, for a few days to a week. Start again from this doc. All paths are relative to the workspace root, the folder that holds `DimensionsRecomp/`, `perf-notes/`, `bench/` and `build/`.
 
 This is the final version (Nov 23, 08:09; updated at 08:18 for #19's rate request and at 08:39 for Agent 10's review). It has all four formal read-outs of the night, each final and cross-checked: W6 and W4c by Agent 8, W9 and W5b by Agent 7. It also has Agent 12's gates, Agent 6's logdiffs, Agent 3's four finding-10 rows, Agent 10's ratings of #21 and #33, and the SCRNSAVE install of 07:33 with its post-install tests, which Agent 10 checked at 07:56.

@@ -232,6 +232,7 @@ Alternatives:
 Build one patched bin and use it for every arm. The base bin is only needed for row 1.
 - Build it without hunk #5 (Agent 10 S1; §10 says which lines to drop). Without #5, `CanEndSubmissionImmediately()` stays false during bursts, as it does with OFF.
 - Hunk #5 can become its own arm once row 2 is in.
+- **Session 3 (M6, 2026-11-25):** staged as `s33-popin-nohunk5.patch` (sha256 57CFA8ADF1E90079…, apply check PASS in `APPLY-CHECK.txt`). Diagnostic (d) staged, unrated: `s33-diagd-on-nohunk5.patch`. The exact runs, arms and commands are in `TESTPLAN.md`, which supersedes this table where they differ (harness arms use `slow_frame_log_ms=1`; arm ids are alphanumeric for the w6 kit).
 
 | # | Run | Pass | Watch for |
 |---|---|---|---|

@@ -16,6 +16,7 @@ import argparse, hashlib, json, os, subprocess, sys, time
 R = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 HOLD = os.path.join(R, 'perf-notes', 'WINDOW-HOLD.txt')
 BELOW_NORMAL = 0x00004000
+PRIO = {'idle': 0x00000040, 'belownormal': BELOW_NORMAL, 'normal': 0x00000020}  # normal: 11-25 night (cap lifted)
 BAD = ('-MF', '-MD', '-MMD', '-MT', '-MQ', '/Fo', '/Fd')
 
 
@@ -40,6 +41,12 @@ def main():
                                          'e.g. /Release/ for a multi-config ccdb')
     ap.add_argument('--jobs', type=int, default=8)
     ap.add_argument('--log-dir')
+    ap.add_argument('--priority', choices=sorted(PRIO), default='idle')  # session 3: Idle by default
+    ap.add_argument('--include-first', action='append', default=[],
+                    help='session 3: add -I<abs dir> right after the compiler (overlay headers)')
+    ap.add_argument('--flag', action='append', default=[],
+                    help='11-25 night: extra compiler flag after the compiler, e.g. -fmacro-prefix-map=OLD=NEW')
+    ap.add_argument('--fwd-src', action='store_true', help='11-25 night: compile the source path with / separators')
     ap.add_argument('--dry-run', action='store_true')
     a = ap.parse_args()
     if a.jobs > 8:
@@ -100,9 +107,17 @@ def main():
             return 2
         old_obj = toks[io[0] + 1]
         toks[io[0] + 1] = obj
-        toks[ic[0] + 1] = new
+        # 11-25 night: --fwd-src passes the source with / separators, as ninja's $in does (it becomes __FILE__)
+        toks[ic[0] + 1] = new.replace('\\', '/') if a.fwd_src else new
+        for f_ in reversed(a.flag):
+            toks.insert(1, f_)
         for d in reversed(a.define):
             toks.insert(1, '-D' + d)
+        for d in reversed(a.include_first):
+            if not os.path.isdir(d):
+                print('FAIL: --include-first dir does not exist: %s' % d)
+                return 2
+            toks.insert(1, '-I' + os.path.abspath(d).replace('\\', '/'))
         os.makedirs(os.path.dirname(obj), exist_ok=True)
         cmd = ' '.join(toks)
         tag = os.path.basename(obj)
@@ -111,6 +126,7 @@ def main():
     with open(os.path.join(log_dir, 'recompile-commands.txt'), 'w', encoding='utf-8') as f:
         for j in jobs:
             f.write('cwd: %s\nwas -o %s\ncmd: %s\n\n' % (j['cwd'], j['old_obj'], j['cmd']))
+    print('priority %s, jobs %d, include-first: %s' % (a.priority, a.jobs, ', '.join(a.include_first) or '-'))
     print('%d TU(s); defines: %s; commands in %s' % (len(jobs), ', '.join(a.define) or '-',
                                                    os.path.relpath(os.path.join(log_dir, 'recompile-commands.txt'),
                                                                    R)))
@@ -136,7 +152,7 @@ def main():
             j['lf'] = open(j['log'], 'wb')
             j['t'] = time.time()
             j['p'] = subprocess.Popen(j['cmd'], cwd=j['cwd'], stdout=j['lf'], stderr=subprocess.STDOUT,
-                                      creationflags=BELOW_NORMAL)
+                                      creationflags=PRIO[a.priority])
             running.append(j)
         for j in list(running):
             if j['p'].poll() is not None:

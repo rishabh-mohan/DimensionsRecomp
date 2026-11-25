@@ -1,0 +1,34 @@
+{
+  "title": "Window 10 (M8, session 3; shape from build/agent9/session3/CG26-W10-REVIEW.md, a copy of W4c with new arms): codegen CG26 timing. cg26 = devoff4b relinked with the 10 CG26 TUs vs s0 = devoff4b, every switch OFF, 6 round-robin rounds",
+  "reference": "s0",
+  "warmup_s": 55,
+  "warmup_from": "firstframe",
+  "measure_s": 50,
+  "repeats": 6,
+  "order": "roundrobin",
+  "settle_s": 5,
+  "cooldown_s": 5,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "cold_run": true,
+  "sys_csv": true,
+  "min_window_after_ff_s": 60,
+  "cold_warmup_s": 55,
+  "cold_measure_s": 30,
+  "quick": { "warmup_s": 10, "measure_s": 20, "settle_s": 5, "cooldown_s": 5, "repeats": 1, "min_window_after_ff_s": 20, "cold_warmup_s": 5, "cold_measure_s": 10 },
+  "notes": [
+    "Staged and checked with build/agent8/w-followup/stage-window.ps1 (the launcher's own Parse-Go, Test-Matrix and -PlanOnly). GO: 'GO W10 matrix-window10.json <sha256> only=s0,cg26 repeats=6'. The launcher always adds -ColdShared, so: one unscored cold run (devoff4b, s0's bin), then 6 round-robin rounds with the start arm alternating (s0 cg26 | cg26 s0 | ...): 1 + 12 = 13 runs, runner estimate about 30 min. cg26's first launch is a scored round-1 run whose window still starts >= 60 s after the first frame, as in W4c (B).",
+    "Question: does the CG26 codegen change frame time or CPU? Both arms run devoff4b's sources with every runtime switch OFF (no LEGO_GPU_WAIT_*, no p2fc, no timer bundle; #24 off); the only difference is the relinked legodimensions.exe (and its map).",
+    "Arms: s0 = build/agent2/devoff4b-bin (MANIFEST sha256 DE11A914079D7DF7, legodimensions.exe DFBE1D43B28861A6). cg26 = build/agent2/devoff4b-cg26-bin (M2; MANIFEST sha256 917AE86E6C0CC9B3, legodimensions.exe 45952D17), copied from devoff4b with exe/map relinked with 10 CG26 TUs. If M2 stages a control relink bin (build/agent2/cg26 link-ctl), it is the better reference; this file does not use it.",
+    "M10 rated #26 CG26 SAFE-IF for W10 (build/agent10/session3/r26-cg26.md, 423FE10F). Its conditions: (1) the bins above, checked before the first run (the launcher's bin hashes), no restaging. (2) env {} in both arms (#24 off). (3) Each bin keeps its own cache; never copy cache or seeds. cg26 has no cache, so its first launch (round 1, scored by the runner) is a cold run: the read-out reports round 1 separately and gives the verdict with and without it. (4) Every cg26 run gets the normal per-run functional check (exit 0, no dump/WER, level reached, K0/F0); any cg26 FAIL voids the arm. (5) STUCK-LOCK is judged by the finding-10 rule (RESUME section 6 item 3), counted per arm.",
+    "Window: 5 s settle + 55 s warm-up from the first frame, then 50 s measured, so every window starts >= 60 s after the first frame (min_window_after_ff_s 60); the runner flags window_before_floor (excluded) below 59.5 s. The cold run: 55 s warm-up, 30 s window. GPU warm-up: the read-out reports round 1 separately and gives the verdict with and without it (RESUME section 7 step 0).",
+    "One frame source for every arm: perf.csv (frames perf), uncapped (framerate_limit=0), the same driver (drivers/thread-cpu.ps1 -> threads.csv). Runner flags on every run: --audio_mute=true --pause_when_unfocused=false --native_settings_load=false --discord_rpc=false. sys_csv on.",
+    "Read-out: per round cg26 - s0, difference of medians with a 95 % CI, median ms, fps, p99, the 1 % low and process cores. A timing claim needs a CI that excludes 0; otherwise the row reads 'overlap'. Timing comes only from the user's unlocked desktop through the night launcher; agent runs of this matrix (-Quick, hidden desktop) are functional only."
+  ],
+  "arms": [
+    { "id": "s0", "group": "w10", "ref": true, "repeats": 6, "bin": "build/agent2/devoff4b-bin", "frames": "perf", "cvars": ["framerate_limit=0"], "env": {},
+      "driver": "drivers/thread-cpu.ps1", "note": "devoff4b, every switch OFF (MANIFEST DE11A914079D7DF7)" },
+    { "id": "cg26", "group": "w10", "repeats": 6, "bin": "build/agent2/devoff4b-cg26-bin", "frames": "perf", "cvars": ["framerate_limit=0"], "env": {},
+      "driver": "drivers/thread-cpu.ps1", "note": "devoff4b relinked with the 10 CG26 TUs, every switch OFF (MANIFEST 917AE86E6C0CC9B3)" }
+  ]
+}

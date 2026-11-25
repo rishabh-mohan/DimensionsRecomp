@@ -500,7 +500,7 @@ if ($SysCsv) {
         try { $sysInfo.exit_code = $sysDrv.ExitCode } catch { }
         $sysOutTxt = Join-Path $run 'sys.out.txt'
         if (Test-Path -LiteralPath $sysOutTxt) {
-            $sysStopLines = @(Get-Content -LiteralPath $sysOutTxt -ErrorAction SilentlyContinue | Where-Object { $_ -match '^sys-csv: stop' })
+            $sysStopLines = @(Get-Content -LiteralPath $sysOutTxt -ErrorAction SilentlyContinue | Where-Object { $_ -match '(^|\s)sys-csv: stop ' })
             if ($sysStopLines.Count) { $sysInfo.stop_line = [string]$sysStopLines[-1] }
         }
         "sys.csv sampler: exit $($sysInfo.exit_code)$(if ($sysInfo.killed) { ' (KILLED after 10 s)' })$(if ($sysInfo.stop_line) { '; ' + $sysInfo.stop_line })"

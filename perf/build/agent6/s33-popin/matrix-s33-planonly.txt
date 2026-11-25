@@ -1,0 +1,62 @@
+=== timing matrix: #33 pop-in opt-in (DRAFT, M6, 2026-11-25, NOT STAGED, no GO): row 1 identity (base vs off) and title-idle checks of the s33 nohunk5 bin; cold-attract rows run via harness\run-game.ps1, see TESTPLAN.md ===
+matrix   <workspace>\build\agent6\s33-popin\matrix-s33-draft.json
+note     DRAFT by M6 (build/agent6/s33-popin/TESTPLAN.md). Nothing here is staged or GO'd; the Overseer / matrix owner copies it to bench/agent8/run/ only after the bin exists and LOAD GO. Arm ids are alphanumeric on purpose: w6_kit.py reads the arm from runs/HHMM-<arm>-rN with [A-Za-z0-9]+.
+note     Bins: base = build/agent2/devoff4b-bin (S4b base, SDK 5350b1d, MANIFEST DE11A914079D7DF7). Patched = build/agent2/devoff4b-s33-bin (PROVISIONAL name; M2 builds it after LOAD GO from 5350b1d + build/agent6/s33-popin/s33-popin-nohunk5.patch, sha256 57CFA8ADF1E90079...). offd/ond need a bin with diagnostic (d) (s33-popin-nohunk5-diagd.patch, sha256 797E614284B64226..., UNRATED): devoff4b-s33d-bin if built as a second bin; if (d) goes into the first bin, set their bin to devoff4b-s33-bin. A missing bin skips its arms (runner rule).
+note     This runner has no pad route, so these runs stay on the title / front end: they test row 1 (identity: the same code path with the cvar off, counters within noise, W/E/C 40/0/0, no d3d12_pipeline_creation_no_wait line), boot and title pipeline creation, and the gate WARNs (row 6). The pop-in scene points (first 3D frame ~launch+151 s, H0 ~launch+180 s, the 67-miss burst ~H0+21 s, the 12.4k shot) need harness\routes\attract-long.txt via harness\run-game.ps1 (TESTPLAN.md rows 1c, 2, 4, 5, (d)).
+note     Every run is cold: run-timing.ps1 gives each run a fresh run dir and cache (no seed_cache here). Never copy cache/ or seeds between bin dirs.
+note     Logdiff: build\agent6\s33-popin\RUN-S33-LOGDIFF.cmd <matrix folder> --ref off (row 1a: base vs off, both default cvars) and --ref offsf (onsf, gates). Expect rules: build/agent6/s33-popin/expect-s33.json. MORE/GONE slow-frame keys between onsf and offsf are the measurement, not a regression; basesf vs offsf differ by the appended slow-frame text (ONLY/GONE key, NOTE only).
+note     Agent runs of this matrix (-Quick, hidden desktop) are functional only; timing only from the user's unlocked desktop.
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order roundrobin; close timeout 60 s; cooldown 5 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+  SKIP off: bin build/agent2/devoff4b-s33-bin; frames perf; x3; warm-up 55 s; window 50 s; group s33 (ref); cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         patched bin, cvar off (default false): must equal base (row 1a)
+       base: bin build/agent2/devoff4b-bin; frames perf; x3; warm-up 55 s; window 50 s; group s33; cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         S4b base bin (W6 s0 / W9 off): row 1a identity reference
+  SKIP offsf: bin build/agent2/devoff4b-s33-bin; frames perf; x3; warm-up 55 s; window 50 s; group s33; cvars framerate_limit=0 slow_frame_log_ms=17; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         patched, cvar off, slow-frame line on: dropped draws 0 and forced pipeline waits 0.0 (0x) in every line; ref for onsf and gates
+       basesf: bin build/agent2/devoff4b-bin; frames perf; x3; warm-up 55 s; window 50 s; group s33; cvars framerate_limit=0 slow_frame_log_ms=17; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         row 1b: base with the slow-frame line; the 25 old fields within noise of offsf, key differs by the 3 appended fields (NOTE)
+  SKIP onsf: bin build/agent2/devoff4b-s33-bin; frames perf; x3; warm-up 55 s; window 50 s; group s33; cvars framerate_limit=0 slow_frame_log_ms=17 d3d12_pipeline_creation_no_wait=true; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         row 2 (title part): exactly one 'd3d12_pipeline_creation_no_wait: not waiting for pipeline creation' INFO line
+  SKIP gthr0: bin build/agent2/devoff4b-s33-bin; frames perf; x1; warm-up 55 s; window 50 s; group s33gate; cvars framerate_limit=0 slow_frame_log_ms=17 d3d12_pipeline_creation_no_wait=true d3d12_pipeline_creation_threads=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         row 6: exactly one 'd3d12_pipeline_creation_no_wait ignored' WARN (W 41), else row-1 behaviour
+  SKIP gasync: bin build/agent2/devoff4b-s33-bin; frames perf; x1; warm-up 55 s; window 50 s; group s33gate; cvars framerate_limit=0 slow_frame_log_ms=17 d3d12_pipeline_creation_no_wait=true async_shader_compilation=false; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         row 6: one 'ignored' WARN (W 41)
+  SKIP gbindful: bin build/agent2/devoff4b-s33-bin; frames perf; x1; warm-up 55 s; window 50 s; group s33gate; cvars framerate_limit=0 slow_frame_log_ms=17 d3d12_pipeline_creation_no_wait=true d3d12_bindless=false; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         row 6: one 'ignored' WARN (W 41); bindful changes the root-signature path, so its counters are not comparable to offsf
+  SKIP offd: bin build/agent2/devoff4b-s33d-bin; frames perf; x1; warm-up 55 s; window 50 s; group s33diag; cvars framerate_limit=0 slow_frame_log_ms=17 d3d12_resolve_after_drop_log=true; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         diagnostic (d), cvar off: the baseline drop exposure of today's EndSubmission path (UNRATED patch)
+  SKIP ond: bin build/agent2/devoff4b-s33d-bin; frames perf; x1; warm-up 55 s; window 50 s; group s33diag; cvars framerate_limit=0 slow_frame_log_ms=17 d3d12_pipeline_creation_no_wait=true d3d12_resolve_after_drop_log=true; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         diagnostic (d), cvar on: resolve-after-drop exposure (Agent 10 S2); read with diagd_report.py
+!!! SKIPPED ARM off: bin build/agent2/devoff4b-s33-bin is missing or has no MANIFEST.txt (not staged yet?)
+!!! SKIPPED ARM offsf: bin build/agent2/devoff4b-s33-bin is missing or has no MANIFEST.txt (not staged yet?)
+!!! SKIPPED ARM onsf: bin build/agent2/devoff4b-s33-bin is missing or has no MANIFEST.txt (not staged yet?)
+!!! SKIPPED ARM gthr0: bin build/agent2/devoff4b-s33-bin is missing or has no MANIFEST.txt (not staged yet?)
+!!! SKIPPED ARM gasync: bin build/agent2/devoff4b-s33-bin is missing or has no MANIFEST.txt (not staged yet?)
+!!! SKIPPED ARM gbindful: bin build/agent2/devoff4b-s33-bin is missing or has no MANIFEST.txt (not staged yet?)
+!!! SKIPPED ARM offd: bin build/agent2/devoff4b-s33d-bin is missing or has no MANIFEST.txt (not staged yet?)
+!!! SKIPPED ARM ond: bin build/agent2/devoff4b-s33d-bin is missing or has no MANIFEST.txt (not staged yet?)
+cold     base (build/agent2/devoff4b-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+round 1  base basesf
+round 2  basesf base
+round 3  base basesf
+order    base basesf | basesf base | base basesf
+estimate 7 runs (1 cold), about 16 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+staged   once the missing bins are staged: order off base offsf basesf onsf gthr0 gasync gbindful offd ond | base offsf basesf onsf off | offsf basesf onsf off base; 23 runs, about 53 min
+
+--- preflight ---
+desktop    WinSta0\exebox-HGHBDOWUUP6YOZUW2HGHKFLYO4 -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   7.82 GB
+game       no legodimensions.exe running
+builds     RUNNING: rexglue:34664 -> timing not valid while they run
+bin        build/agent2/devoff4b-bin : ok (MANIFEST.txt)
+bin        build/agent2/devoff4b-s33-bin : MISSING -> arms skipped: off offsf onsf gthr0 gasync gbindful
+bin        build/agent2/devoff4b-s33d-bin : MISSING -> arms skipped: offd ond
+screensaver none
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   7 runs, about 16 min: done around 01:45
+!!! These runs will be FUNCTIONAL ONLY (see above): their numbers are not timing results.
+PlanOnly: nothing started.

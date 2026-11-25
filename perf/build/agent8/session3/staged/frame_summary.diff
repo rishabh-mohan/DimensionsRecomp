@@ -1,0 +1,58 @@
+﻿diff --git a/bench/agent8/run/frame_summary.py b/build/agent8/session3/staged/frame_summary.py
+index 045d995..0361494 100644
+--- a/bench/agent8/run/frame_summary.py
++++ b/build/agent8/session3/staged/frame_summary.py
+@@ -24,7 +24,9 @@ run of rows whose frame-time sum is >= S seconds (at most one frame of overshoot
+ Rows with a frame time <= 0 (perf.csv: the first swap has no previous swap, so it is 0) are kept in the
+ row counts but left out of the statistics (zero_rows). Percentiles are nearest-rank on the sorted
+ frame times: value = sorted[ceil(p * n) - 1]; the median is p50 (the lower middle for even n).
+-over_33ms / over_100ms count frame times > 33 ms / > 100 ms (a 33.3 ms frame counts as > 33 ms).
++over_33ms / over_100ms count frame times > 33 ms / > 100 ms (a 33.3 ms frame counts as > 33 ms);
++over_8ms / over_10ms / over_16_7ms count frame times > 8 ms / > 10 ms / > 16.667 ms.
++share_lt_light is unrounded; frames_lt_light is its numerator (frames under --light-ms).
+ """
+ import argparse
+ import json
+@@ -128,8 +130,9 @@ def stats(fts, light_ms=None):
+     out = dict(frames=len(fts))
+     if not fts:
+         out.update(window_s=0.0, mean_fps=None, mean_ms=None, median_ms=None, p95_ms=None, p99_ms=None,
+-                   p99_9_ms=None, min_ms=None, max_ms=None, over_33ms=0, over_100ms=0,
+-                   light_ms=light_ms, share_lt_light=None, share_lt_light_bins_10s=[])
++                   p99_9_ms=None, min_ms=None, max_ms=None, over_8ms=0, over_10ms=0, over_16_7ms=0,
++                   over_33ms=0, over_100ms=0,
++                   light_ms=light_ms, frames_lt_light=None, share_lt_light=None, share_lt_light_bins_10s=[])
+         return out
+     s = sorted(fts)
+     total = sum(fts)
+@@ -142,13 +145,18 @@ def stats(fts, light_ms=None):
+         p99_ms=ms(nearest_rank(s, 99, 100)),
+         p99_9_ms=ms(nearest_rank(s, 999, 1000)),
+         min_ms=ms(s[0]), max_ms=ms(s[-1]),
++        over_8ms=sum(1 for v in fts if v > 8000),
++        over_10ms=sum(1 for v in fts if v > 10000),
++        over_16_7ms=sum(1 for v in fts if v > 16667),
+         over_33ms=sum(1 for v in fts if v > 33000),
+         over_100ms=sum(1 for v in fts if v > 100000),
+-        light_ms=light_ms, share_lt_light=None, share_lt_light_bins_10s=[],
++        light_ms=light_ms, frames_lt_light=None, share_lt_light=None, share_lt_light_bins_10s=[],
+     )
+     if light_ms:
+         thr = light_ms * 1000.0
+-        out['share_lt_light'] = round(sum(1 for v in fts if v < thr) / len(fts), 4)
++        k = sum(1 for v in fts if v < thr)
++        out['frames_lt_light'] = k
++        out['share_lt_light'] = k / len(fts)  # full precision (was rounded to 4 dp; run-matrix took 3)
+         out['share_lt_light_bins_10s'] = light_bins(fts, thr)
+     return out
+ 
+@@ -235,7 +243,8 @@ def text(r):
+     else:
+         lines.append(f"frames   {r['frames']} over {r['window_s']:.3f} s = {r['mean_fps']:.2f} fps mean")
+         lines.append(f"frame ms median {r['median_ms']:.3f}  p95 {r['p95_ms']:.3f}  p99 {r['p99_ms']:.3f}  "
+-                     f"p99.9 {r['p99_9_ms']:.3f}  max {r['max_ms']:.3f}  >33ms {r['over_33ms']}  >100ms {r['over_100ms']}  "
++                     f"p99.9 {r['p99_9_ms']:.3f}  max {r['max_ms']:.3f}  >8ms {r['over_8ms']}  >10ms {r['over_10ms']}  "
++                     f">16.7ms {r['over_16_7ms']}  >33ms {r['over_33ms']}  >100ms {r['over_100ms']}  "
+                      f"(nearest-rank)")
+         if r.get("share_lt_light") is not None:
+             lines.append(f"light    share of frames < {r['light_ms']} ms: {r['share_lt_light']:.3f}; per 10 s: "

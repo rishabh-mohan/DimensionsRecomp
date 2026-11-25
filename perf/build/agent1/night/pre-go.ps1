@@ -1,17 +1,19 @@
 # Agent 1: pre-GO check for tonight's windows. Without -Go it only checks.
 # With -Go and every check passing, it writes perf-notes\WINDOW-GO.txt from build\agent1\night\GO-<Window>.txt.
 param(
-  [Parameter(Mandatory = $true)][ValidateSet('W6', 'W9', 'W5b', 'W4c')][string]$Window,
+  [Parameter(Mandatory = $true)][ValidatePattern('^W[0-9A-Za-z-]+$')][string]$Window,
+  [string]$Latest = '',   # session 3: 'HH:mm' latest GO; default 07:30 - 10 min margin - 10 min gate - runner estimate (pass -Latest)
   [switch]$Go
 )
 $ErrorActionPreference = 'Stop'
 $root = '<workspace>'
 $night = Join-Path $root 'build\agent1\night'
 $pn = Join-Path $root 'perf-notes'
-$latest = @{ 'W6' = '06:22'; 'W9' = '06:22'; 'W5b' = '06:26'; 'W4c' = '06:40' }  # second passes (SESSION2 03:09): 07:30 - 10 min margin - 10 min gate - runner estimate
+$latestTbl = @{ 'W6' = '06:22'; 'W9' = '06:22'; 'W5b' = '06:26'; 'W4c' = '06:40' }  # second passes (SESSION2 03:09): 07:30 - 10 min margin - 10 min gate - runner estimate
+if ($Latest) { $latestTbl[$Window] = $Latest } elseif (-not $latestTbl.ContainsKey($Window)) { $latestTbl[$Window] = '06:00' }
 $fail = New-Object System.Collections.Generic.List[string]
 $now = Get-Date
-"now: " + $now.ToString('yyyy-MM-dd HH:mm:ss') + "  window: $Window  latest GO: " + $latest[$Window]
+"now: " + $now.ToString('yyyy-MM-dd HH:mm:ss') + "  window: $Window  latest GO: " + $latestTbl[$Window]
 
 # 1. GO line and the matrix sha
 $goFile = Join-Path $night ("GO-" + $Window + ".txt")
@@ -29,9 +31,9 @@ else {
 "GO line: $line"
 
 # 2. time: GOs only between 00:00 and the window's latest GO
-$lt = [datetime]::ParseExact($latest[$Window], 'HH:mm', $null)
+$lt = [datetime]::ParseExact($latestTbl[$Window], 'HH:mm', $null)
 if ($now.Hour -ge 12) { $fail.Add('before midnight: no GO before 00:00') }
-elseif ($now.TimeOfDay -gt $lt.TimeOfDay) { $fail.Add("past the latest GO " + $latest[$Window]) }
+elseif ($now.TimeOfDay -gt $lt.TimeOfDay) { $fail.Add("past the latest GO " + $latestTbl[$Window]) }
 
 # 3. control files
 foreach ($f in 'WINDOW-HOLD.txt', 'WINDOW-GO.txt', 'WINDOW-STOP.txt') {

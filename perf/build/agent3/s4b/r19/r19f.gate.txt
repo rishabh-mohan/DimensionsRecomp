@@ -1,0 +1,75 @@
+﻿gate r19f run build\agent3\runs\20261125-094143-r19f-rbme-async-n base build\agent3\runs\20261125-090250-r19r13-s4b13-rbme bin build\agent2\devoff4b-r19-bin (09:45:28)
+# s4b_check s4b13 20261125-094143-r19f-rbme-async-n (off, scenario M)
+run.json: exit 0 (0x00000000) dumps 0 crash_events 0 wer False; close wm_close 0.76 s; elapsed 212.83 of 420 s; cvars {"d3d12_submit_split_kb": "4", "d3d12_readback_memexport": "true", "d3d12_async_submit": "true"}; env -; steps 54/54
+summary: verdict RUNNING; first frame 6.0 s; levels {"info": 111, "warning": 142}; unknown cvars []; errors 0
+log files game.log; levels {"info": 111, "warning": 142}
+families: c1_any=0 k=0 c1_verify_on=0 c1_verify_f=0 c1_other=0 recovered_stale=0 unhandled_phys=0 protect_failed=0 split_init=1 split=21 deferred_counters=0 gpu_wait=0 memexport=0 slow_frame=0 s4_upload_hash=0 precise_wait=0 miss_cache=0 stuck_lock=0 minidump=0 fatal=0 debug_layer=0 dred=0 d3d12_msg=0 clean_exit=1
+  split_init: [2026-11-25 09:41:44.790] [info] [gpu] [t33392] d3d12_submit_split_kb: splitting submissions at 4 KB of deferred commands
+  split: [2026-11-25 09:41:48.649] [info] [gpu] [t33392] d3d12_submit_split: frame=2 submission=2 splits=0 failed=0 held_query=0 held_scratch=0 held_pipelines=1
+  split: [2026-11-25 09:41:58.652] [info] [gpu] [t33392] d3d12_submit_split: frame=593 submission=1478 splits=884 failed=0 held_query=0 held_scratch=0 held_pipelines=174
+  split: [2026-11-25 09:42:08.653] [info] [gpu] [t33392] d3d12_submit_split: frame=1193 submission=3018 splits=1824 failed=0 held_query=0 held_scratch=0 held_pipelines=174
+  split: ... (15 more)
+  split: [2026-11-25 09:44:48.696] [info] [gpu] [t33392] d3d12_submit_split: frame=8874 submission=232978 splits=195715 failed=0 held_query=1 held_scratch=0 held_pipelines=24572
+  split: [2026-11-25 09:44:58.697] [info] [gpu] [t33392] d3d12_submit_split: frame=9292 submission=254324 splits=215242 failed=0 held_query=1 held_scratch=0 held_pipelines=24572
+  split: [2026-11-25 09:45:08.697] [info] [gpu] [t33392] d3d12_submit_split: frame=9497 submission=293508 splits=253813 failed=0 held_query=1 held_scratch=0 held_pipelines=30547
+split fields: lines 21 (09:41:48.649..09:45:08.697); last {"frame": 9497, "submission": 293508, "splits": 253813, "failed": 0, "held_query": 1, "held_scratch": 0, "held_pipelines": 30547}; max {"frame": 9497, "submission": 293508, "splits": 253813, "failed": 0, "held_query": 1, "held_scratch": 0, "held_pipelines": 30547}; per frame {"submission": 30.9116, "splits": 26.7312, "failed": 0.0, "held_query": 0.0001, "held_scratch": 0.0, "held_pipelines": 3.2171}; monotonic {"frame": true, "submission": true, "splits": true, "failed": true, "held_query": true, "held_scratch": true, "held_pipelines": true}
+frames (perf.csv rows) 9747; slow_frame per frame 0.000
+logdiff vs 20261125-090250-r19r13-s4b13-rbme (base scenario M): NEW 0 (+0 allowed) MORE 0 (+0 allowed) GONE 4 (0 unexpected) FLAG 0; NEW at info 0 other, 3 allowed; rc 0
+  info allowed NEW build\agent3\runs\20261125-094143-r19f-rbme-async-n\game.log x12 [info] [gpu] d#d#_async_submit: frame=# submission=# chunks=# queued_max=# full_waits=# full_wait_us=# drains_waited=# drain_wait_us=# worker_us=#
+  info allowed NEW build\agent3\runs\20261125-094143-r19f-rbme-async-n\game.log x9 [info] [gpu] d#d#_async_submit: frame=# submission=# chunks=# queued_max=# full_waits=# full_wait_us=# drains_waited=# drain_wait_us=# worker_us=#h
+  info allowed NEW build\agent3\runs\20261125-094143-r19f-rbme-async-n\game.log x1 [info] [gpu] d#d#_async_submit: submitting splits on the submit thread (# slots)
+levels cand {"info": 111, "warning": 142} vs 20261125-090250-r19r13-s4b13-rbme {"info": 85, "warning": 142}
+scenes (>= 2 s) base: 226/1022:30s 220/534:18s 218/222:17s 219/226:15s 790/31625:5s 220/528:4s 841/31696:3s 8019/1043795:2s 788/31613:2s
+scenes (>= 2 s) cand: 226/1022:30s 220/534:26s 218/222:19s 219/226:15s 790/31625:6s 220/528:4s 788/31613:4s 8127/762167:4s 841/31696:4s 8019/1043795:2s
+  missing in cand: -; extra in cand: ['8127/762167']
+  front-end scenes in cand (s): 218/222=18.8 226/1022=30.4 220/528=4.4 220/534=25.7 219/226=14.9
+route marks first-frame..up-2: 9, 4 differ: after-a3 839/31674->220/534 down-1 843/33114->218/222 down-2 796/34115->218/222 up-2 790/31625->645/3156; all marks: 17 differ
+  cand marks: first-frame=218/222 title=226/1022 after-start=226/1022 after-a1=220/534 after-a2=220/534 after-a3=220/534 down-1=218/222 down-2=218/222 up-2=645/3156 back-1=789/31619 back-2=790/31625 back-3=790/31625 idle-10=2838/516686 idle-20=4385/821295 idle-30=7594/1124013 idle-40=1470/445495 idle-50=2971/568445 idle-60=2790/766588 idle-70=1139/310302 idle-80=8119/761999 idle-90=2852/1240070 end=2852/1240070
+threads (% of one core, window [20.0, 196.3] s from the first frame, 176.3 s): XThreadB2E4 (F80001A8) x1 91.6 | GPU Commands (F8000018) x1 40.6 | D3D12 Submit x1 29.1 | Main XThread (F800002C) x1 24.8 | XThreadAAA8 (F80000F4) x1 23.1 | rex::thread::TimerQueue x1 21.8 | (unnamed) x32 11.2 | XThread4128 (F8000144) x1 7.2 | XThreadA888 (F8000114) x1 5.4 | D3D12 Pipelines x9 3.7
+  TimerQueue ticks (tid 34324): 106 samples over [-5.7, 204.3] s, cycles non-rising in 0 of 105 steps 
+sys.csv slow state: {"rows": 207, "onset_s": null, "slow_pct": 0.0, "e_eff_mhz_median": 1941, "cpu_util_pct_median": 59.7, "slow": false}
+hangs: 0 STUCK-LOCK event(s); hostload rows during the run: {"rows": 7, "busy_rows": 0}; toypad: {"confirms": 0, "result": ""}
+PROOF ok   init "d3d12_submit_split_kb: splitting submissions at N KB" x1: 2026-11-25 09:41:44.790] [info] [gpu] [t33392] d3d12_submit_split_kb: splitting submissions at 4 KB of deferred commands
+PROOF ok   failed=0 in every d3d12_submit_split line (max 0 over 21 lines)
+PROOF ok   splits > 0 (max 253813)
+PROOF note per frame: submission 30.9116, splits 26.7312 (frames 9495; fields monotonic {'frame': True, 'submission': True, 'splits': True, 'failed': True, 'held_query': True, 'held_scratch': True, 'held_pipelines': True})
+BASE items missed: marks differ before up-2: after-a3 839/31674->220/534 down-1 843/33114->218/222 down-2 796/34115->218/222 up-2 790/31625->645/3156
+VERDICT HINT LOOK: 1 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4b13)
+s4b_check exit 0 : --row s4b13 --cand build\agent3\runs\20261125-094143-r19f-rbme-async-n --base build\agent3\runs\20261125-090250-r19r13-s4b13-rbme --out-dir build\agent3\s4b\r19\checks --allow-new d#d#_async_submit: 
+r19_gate build\agent3\runs\20261125-094143-r19f-rbme-async-n row f: game.log
+           row f: lines with d3d12_async_submit 22, d3d12_submit_split 22 (split init 1, split counter 21, async init 1, async counter 21), watchdog 0
+PASS       #18 init line exactly once (1)
+PASS       #18 init says 'at 4 KB': 12_submit_split_kb: splitting submissions at 4 KB of deferred commands
+PASS       async init line exactly once (1)
+PASS       async init says '(3 slots)'
+           soak_check: lines: async init 1, async counter 21, split counter 21, split init 1
+PASS       soak_check: no 'staying off' / 'failed to create the submit thread' line
+PASS       soak_check: one segment (one SetupContext): 1
+PASS       soak_check: seg 1: async init line L24
+PASS       soak_check: seg 1: every async counter line has the 9 keys
+PASS       soak_check: seg 1: async counters never decrease over 21 lines
+PASS       soak_check: seg 1: queued_max <= 3 (max 3)
+PASS       soak_check: seg 1: chunks > 0 (last line L258: 253903)
+PASS       soak_check: seg 1: every split counter line has the 7 keys
+PASS       soak_check: seg 1: failed = 0 in every split line (21 lines)
+PASS       soak_check: seg 1: split counters never decrease over 21 lines
+PASS       soak_check: seg 1: merged async+split lines: frame and submission never decrease
+PASS       soak_check: seg 1: chunks/splits consistent (every split went async)
+PASS       soak_check: at least 2 async counter lines (found 21)
+PASS       soak_check: held_query > 0 in at least one split line (queries ran)
+           soak_check: rule 5, L42..L258: 9496 frames over 200.1 s
+           soak_check: chunks         delta 253902       per frame 26.7378      per s 1269.10
+           soak_check: submissions    delta 293597       per frame 30.9180      per s 1467.51
+           soak_check: drains_waited  delta 12507        per frame 1.3171       per s 62.51
+           soak_check: drain_wait_us  delta 3334374      per frame 351.1346     per s 16666.45
+           soak_check: full_wait_us   delta 5912884      per frame 622.6710     per s 29554.81
+           soak_check: worker_us      delta 56048313     per frame 5902.3076    per s 280150.52
+           rule 5 per frame: chunks 26.7378, submission 30.9180, drains_waited 1.3171, drain_wait_us 351.1346, full_wait_us 622.6710, worker_us 5902.3076
+PASS       bin identity: build\agent2\devoff4b-r19-bin MANIFEST lists ['legodimensions.exe', 'rexgpu-xenos.dll', 'rexruntime.dll']
+PASS       bin identity: run.json bin_dir <workspace>\build\agent2\devoff4b-r19-bin (want build\agent2\devoff4b-r19-bin)
+PASS       bin identity: run-dir legodimensions.exe DFBE1D43B28861A6 == MANIFEST DFBE1D43B28861A6
+PASS       bin identity: run-dir rexgpu-xenos.dll 5DCDD8CB6DA30F06 == MANIFEST 5DCDD8CB6DA30F06
+PASS       bin identity: run-dir rexruntime.dll A33801D1538D6175 == MANIFEST A33801D1538D6175
+RESULT: PASS (0 failed, 0 incomplete, 0 flags)
+r19_gate exit 0 : build\agent3\runs\20261125-094143-r19f-rbme-async-n --row f --bin build\agent2\devoff4b-r19-bin --json build\agent3\s4b\r19\checks\r19f.r19.json --n 4
+rule-d mark names+order equal: True (base 22, cand 22)

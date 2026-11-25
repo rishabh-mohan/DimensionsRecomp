@@ -1,0 +1,44 @@
+﻿=== timing matrix: Window CF1 (M8, session 3): confirmation of the shipped Xenos defaults. ship = build/agent2/devfinal-bin, plain launch (the FINAL defaults = WC win3), DEFAULT ARM, vs s0 = devoff4b-bin with every switch OFF (WC's s0). Optional: win3 (WC's arm on devoff4b, the anchor) and dfoff (devfinal with the D7 OFF set). 6 round-robin rounds, round 1 discarded ===
+matrix   <workspace>\bench\agent8\run\matrix-windowCF1.json
+note     Default arm (BIN-PINS D7): ship. Reference: s0. GO (primary): 'GO CF1 matrix-windowCF1.json <sha256> only=ship,s0 repeats=6'. The launcher adds -ColdShared: one unscored cold run on the bin of round 1's first arm, which is ship (devfinal-bin, staged without cache/), so the new bin's cold launch is the unscored run and s0 keeps devoff4b's own cache. Then 6 round-robin rounds with the start arm alternating: 1 + 12 = 13 runs. Alternative (WC1 shape with the anchors): 'only=ship,s0,win3,dfoff repeats=4', 1 + 16 = 17 runs (same file and sha256).
+note     Warm-up policy: the read-out drops round 1 (tags *-r1, every arm) as the GPU warm-up, as in WC1/WC2/WC3 (READOUT-NIGHT.md, M10 CONFIRMED 25BF9B1C), and scores rounds 2-6 (5 per arm; with the 4-arm alternative rounds 2-4, 3 per arm). Check gpu.csv that round 2 is on the ~1500 MHz plateau; drop more rounds if not. Verdict with and without round 1.
+note     Question: does the plain FINAL Xenos bin reproduce WC's win3 vs s0 (pooled WC1-WC3, rounds 2-4: fps mean +7.7 % [+6.3, +8.7], p99 -14.8 %, 1 % low -17.0 %, process cores -38.7 % [-40.3, -35.2])? ship vs win3 (alternative only) is an equivalence check: the FINAL build vs the timed cvars/env on devoff4b; dfoff vs s0 is the new-bin parity check (FINAL sources with the old values set).
+note     Bins (build/agent2/final/BIN-PINS.md FE4CD4FF; the launcher hashes them before the first run; no restaging, never copy cache or seeds): devfinal-bin MANIFEST sha256 F9C2BE722E5B3517 (legodimensions.exe 545D28B9DDEAD51E), devoff4b-bin MANIFEST sha256 DE11A914079D7DF7 (legodimensions.exe DFBE1D43B28861A6).
+note     Arms. ship: devfinal, cvars framerate_limit=0 only (the bench's uncapped setting, not a shipped default), env {} (a plain launch). s0: devoff4b, framerate_limit=0, env {} (old bin, every switch OFF by build). win3: WC's win3 exactly (devoff4b, 13 cvars + LEGO_GPU_WAIT_BACKOFF_US=500, LEGO_GPU_WAIT_SPIN_US=30). dfoff: devfinal with the D7 OFF set: the 12 old cvar values (DEFAULTS-TABLE.md L92) + LEGO_GPU_WAIT_BACKOFF_US=off (lowercase).
+note     Proof per run, before any number is read (BIN-PINS D7): run.json env_set + the bin's MANIFEST sha256 + build/agent2/final/check-defaults.py <game.log> --mode: ship -> xenos (every key '(default)', the full back-off ON 500/30 line once, env_set has no LEGO_GPU_WAIT_* key); dfoff -> off (old values, 'GPU wait back-off: OFF (LEGO_GPU_WAIT_BACKOFF_US=off).' once, env_set BACKOFF_US=off); win3 -> legacy (WC's proof lines, env_set 500/30); s0 -> no 'Final defaults' line, no back-off / C1 / precise-wait / 1 ms line, no LEGO_GPU_WAIT_* key. Every arm: none of check-defaults' bad strings. Normal per-run functional check (exit 0, no dump/WER, level reached, K0/F0); a FAIL of a devfinal run voids that arm. STUCK-LOCK by the finding-10 rule, counted per arm.
+note     Read-out: per pair the difference of medians with a bootstrap 95 % CI over the scored rounds; verdict metrics fps mean, p99, the 1 % low and process cores (not median ms: C1's short-frame mode, READOUT-NIGHT S1). A timing claim needs a CI that excludes 0. Flag runs with non-game load >= median + 1 core (M12 gate) and give verdicts with and without them. sys.csv rows are all 31-column (runner 72370A1E); never pool with 24-column rows from before 07:30 2026-11-25.
+note     Window: 5 s settle + 55 s warm-up from the first frame, then 50 s measured (every window >= 60 s after the first frame; the runner flags window_before_floor below 59.5 s); the cold run 55 s warm-up, 30 s window. One frame source: perf.csv (frames perf), uncapped (framerate_limit=0); one driver (drivers/thread-cpu.ps1). Runner flags on every run: --audio_mute=true --pause_when_unfocused=false --native_settings_load=false --discord_rpc=false. sys_csv on.
+note     Scope (READOUT-NIGHT S2): one light route, uncapped, AC power, this laptop. Timing comes only from the user's unlocked, idle desktop through a launcher; agent runs of this matrix (-Quick, hidden desktop) are functional only. Compare within this window only.
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order roundrobin; close timeout 60 s; cooldown 5 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+       ship: bin build/agent2/devfinal-bin; frames perf; x6; warm-up 55 s; window 50 s; group cf1; cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         DEFAULT ARM: devfinal plain launch = the FINAL defaults (WC win3). Proof: check-defaults --mode xenos, env_set without LEGO_GPU_WAIT_* (MANIFEST F9C2BE722E5B3517)
+       s0: bin build/agent2/devoff4b-bin; frames perf; x6; warm-up 55 s; window 50 s; group cf1 (ref); cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         s0 = devoff4b, every switch OFF (WC's s0; MANIFEST DE11A914079D7DF7)
+       win3: bin build/agent2/devoff4b-bin; frames perf; x6; warm-up 55 s; window 50 s; group cf1; cvars framerate_limit=0 shared_memory_single_hold_rearm=true physical_protect_hold_global_lock=true physical_protect_keep_watch=true physical_protect_keep_watch_verify=false host_timer_resolution_ms=1 host_timer_throttling_optout=true precise_guest_sleep=true wait_timeout_round_up=true cs_spin=true spinlock_pause_spin=true clock_lockfree=true tls_bounds_fix=true timer_queue_precise_wait=true; env LEGO_GPU_WAIT_BACKOFF_US=500 LEGO_GPU_WAIT_SPIN_US=30; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         optional anchor: WC's win3 exactly (matrix-windowC.json). Proof: check-defaults --mode legacy, env_set 500/30
+cold     ship (build/agent2/devfinal-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+         -ColdShared: one cold run for all 2 bin(s); the other bins first launch as scored round-1 runs
+round 1  ship s0 win3
+round 2  s0 win3 ship
+round 3  win3 ship s0
+round 4  ship s0 win3
+round 5  s0 win3 ship
+round 6  win3 ship s0
+order    ship s0 win3 | s0 win3 ship | win3 ship s0 | ship s0 win3 | s0 win3 ship | win3 ship s0
+estimate 19 runs (1 cold), about 44 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\Default -> interactive desktop: timing can be valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   15.54 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/devfinal-bin : ok (MANIFEST.txt)
+bin        build/agent2/devoff4b-bin : ok (MANIFEST.txt)
+screensaver none
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   19 runs, about 44 min: done around 13:38
+keep-awake ON (SetThreadExecutionState continuous+system+display until the matrix ends)

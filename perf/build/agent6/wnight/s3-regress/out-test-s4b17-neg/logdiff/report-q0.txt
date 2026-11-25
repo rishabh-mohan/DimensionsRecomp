@@ -1,0 +1,19 @@
+== arm q0 (1 runs) vs off (1 runs)
+  runs\2231-q0-r1: exit=0 close=wm_close early=False wer=False dumps=0 exit_line=1 stuck=0 | 655 lines game.log 102426, 2026-11-22 22:31:06.753..2026-11-22 22:38:04.885 (418 s) | levels info=504 raw=8 warning=143 | Toypad R/W 64/83 (9.2/11.9 per min)
+gate_logdiff FAIL findings (B = arm run, A = each base run): none
+NEW warning/error/critical keys (in an arm run, in no base run): 1
+  1/1 runs, counts [1]  [warning] [krnl] __imp__XNetLogonGetTitleID STUB
+      e.g. [2026-11-22 22:36:13.763] [warning] [krnl] [t38032] __imp__XNetLogonGetTitleID STUB
+MORE (arm run count > base max + max(5, base max)): 0
+GONE (in every base run, missing from an arm run; any level): 0
+Toypad (base: runs\2053-off-r1 {'info Write': 9, 'info Read': 9})
+  runs\2231-q0-r1: {'info Write': 83, 'info Read': 64}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base ['[info] [core] Toypad: pad # mode # lit # #E # (on # off # count # speed #)', '[info] [core] Toypad: pad # mode # lit FF # # (on # off # count # speed #)', '[info] [core] Toypad: pad # mode # lit FF #E # (on # off # count # speed #)']
+ONLY in q0 (any level, not Toypad; in no base run): 4 keys
+  1/1 runs, counts [80], also in -  [info] [core] GPU wait stats (# s): L# waits # polls #h moved # gpu_off # sleep>moved # sleep>done # | L# tries # waits # polls # delayed # sleep>ready # | kicks # | pause # yield # sleep # sleep_sum 
+      e.g. [2026-11-22 22:31:17.693] [info] [core] [t29900] GPU wait stats (5 s): L1 waits 296 polls 68327907 moved 205 gpu_off 0 sleep>moved 0 sleep>done 0 | L2 tries 0 waits 0 polls 0 delayed 0 sleep>ready 0 | kicks 580 | pause 0 yield 0 sleep 0 sle
+  1/1 runs, counts [1], also in -  [info] [core] GPU wait back-off: OFF (quantum # us, spin # us); stats ON; GetData hook built.
+      e.g. [2026-11-22 22:31:09.284] [info] [core] [t37068] GPU wait back-off: OFF (quantum 0 us, spin 30 us); stats ON; GetData hook built.
+  1/1 runs, counts [1], also in -  [warning] [krnl] __imp__XNetLogonGetTitleID STUB
+      e.g. [2026-11-22 22:36:13.763] [warning] [krnl] [t38032] __imp__XNetLogonGetTitleID STUB
+  1/1 runs, counts [1], also in ['q250']  [info] [core] GPU wait stats (# s): L# waits # polls # moved # gpu_off # sleep>moved # sleep>done # | L# tries # waits # polls # delayed # sleep>ready # | kicks # | pause # yield # sleep # sleep_sum #
+      e.g. [2026-11-22 22:37:59.953] [info] [core] [t29900] GPU wait stats (5 s): L1 waits 225 polls 8755203 moved 207 gpu_off 0 sleep>moved 0 sleep>done 0 | L2 tries 604 waits 0 polls 0 delayed 0 sleep>ready 0 | kicks 1350 | pause 0 yield 0 sleep 0 s

@@ -16,6 +16,7 @@ The last line is a verdict HINT only; the reader applies QUEUE.md's "passes if" 
 import argparse
 import csv
 import datetime
+import hashlib
 import json
 import os
 import re
@@ -411,6 +412,59 @@ def hang_scan(cand, hostload=HOSTLOAD):
     return out, quiet, {'confirms': loads, 'result': res_row}
 
 
+# post-window rows (M3, 11-25): the bin each must run on, as sha256 prefixes (16 hex) of the files the run dir holds.
+# Sources: build/agent2/<bin>/MANIFEST.txt (devoff4bv 353846A3, staged 02:43:40; devoff4b-s33 50CC5BE2, 02:44:14;
+# devoff4b DE11A914). Only rexgpu-xenos.dll differs between the three bins.
+_EXE = 'DFBE1D43B28861A6'
+_RT = 'A33801D1538D6175'
+_GPU = {'devoff4b-bin': 'E3CB99CFDEA95E66', 'devoff4bv-bin': '82A0DE742AAAAE44', 'devoff4b-s33-bin': '0B57BBD5D7B96CBD',
+        'devoff4b-s33d-bin': '962D88D68EFE84A8'}   # s33d: MANIFEST 0B1CD3C2 (staged 02:45:37), nohunk5 + diagnostic (d)
+
+
+def _pw(bin_name):
+    return {'bin': bin_name, 'sha': {'legodimensions.exe': _EXE, 'rexruntime.dll': _RT, 'rexgpu-xenos.dll': _GPU[bin_name]}}
+
+
+POSTWIN = {'s4bV0f': _pw('devoff4bv-bin'), 's4b07f': _pw('devoff4bv-bin'),
+           's33base': _pw('devoff4b-bin'), 's33basesf': _pw('devoff4b-bin'),
+           's33off': _pw('devoff4b-s33-bin'), 's33offsf': _pw('devoff4b-s33-bin')}
+
+# #33 rows 2-7 + (d) (M3 draft 11-25 07:30; M6 build/agent6/s33-popin/TESTPLAN.md section 2, arms of harness-s33.json
+# 4E30E135). mode: 'off' = cvar off (no no_wait text at all), 'on' = the INFO line exactly once and no "ignored" WARN,
+# 'gate' = exactly one "ignored" WARN and no INFO line. cvars = the run.json values the row must carry (lower case).
+# seed = the run dir whose user\cache\shaders\shareable the row was seeded from (-SeedXenos; row 5, same bin).
+# diag = (d) bin: "resolve after drop" lines allowed (M10 r33-nohunk5-diagd N3), counted as a reading.
+# Row 7 (debug layer) has no row here: the SDK logs no D3D12 info-queue message to game.log (no message callback in
+# ui/d3d12/d3d12_provider.cpp; they go to OutputDebugString), so a game-log check can't read it (S33-ROWS-PLAN.md).
+# short = the run is shorter than its 540 s base (row 4 onstop 203-211 s, row 6 gates 300 s): unexpected GONE keys and
+# the attract step count are notes, not BASE items (the route simply ends earlier).
+_SF = {'slow_frame_log_ms': '1'}
+_ON = {'slow_frame_log_ms': '1', 'd3d12_pipeline_creation_no_wait': 'true'}
+S33_SEED = '20261125-071741-s33-offsf'   # row 1b offsf run (devoff4b-s33-bin), PASS? 07:25
+S33X = {'s33onsf': {'mode': 'on', 'cvars': _ON},
+        's33offw': {'mode': 'off', 'cvars': _SF, 'seed': S33_SEED},
+        's33onw': {'mode': 'on', 'cvars': _ON, 'seed': S33_SEED},
+        's33gthr0': {'mode': 'gate', 'cvars': dict(_ON, d3d12_pipeline_creation_threads='0'), 'short': True},
+        's33gasync': {'mode': 'gate', 'cvars': dict(_ON, async_shader_compilation='false'), 'short': True},
+        's33gbind': {'mode': 'gate', 'cvars': dict(_ON, d3d12_bindless='false'), 'short': True},
+        's33offd': {'mode': 'off', 'cvars': dict(_SF, d3d12_resolve_after_drop_log='true'), 'diag': True},
+        's33ond': {'mode': 'on', 'cvars': dict(_ON, d3d12_resolve_after_drop_log='true'), 'diag': True}}
+for _i in range(1, 8):   # row 4: s33stop1..5, plus spares 6-7 (only if a run doesn't count; TESTPLAN row 4)
+    S33X['s33stop%d' % _i] = {'mode': 'on', 'cvars': _ON, 'short': True}
+for _r, _x in S33X.items():
+    POSTWIN[_r] = _pw('devoff4b-s33d-bin' if _x.get('diag') else 'devoff4b-s33-bin')
+
+
+def sha16(p):
+    if not os.path.isfile(p):
+        return None
+    h = hashlib.sha256()
+    with open(p, 'rb') as f:
+        for b in iter(lambda: f.read(1 << 20), b''):
+            h.update(b)
+    return h.hexdigest().upper()[:16]
+
+
 def row_proofs(row, rj, S, ld, res):
     n = S['n']
     P = []
@@ -426,7 +480,15 @@ def row_proofs(row, rj, S, ld, res):
     gwmax = gw.get('max') or {}
     kept_last = S['kept'][-1] if S['kept'] else None
     # task #23 (Agent 1, 11-23 06:23): the second f10 pair (f10a2, f10b2) gets the same proofs as f10a/f10b
-    r = {'f10a2': 'f10a', 'f10b2': 'f10b'}.get(row, row)
+    # session 3 (M3, RUNPLANS.md): new ids get the proofs of the row they repeat: f10a3/f10aL, f10b3/f10bL (third quiet
+    # pair, controlled-load pair), s4bLV = w6gA's cvar set with a 1800 s cap (G5: 0 K, 0 F), s4b07r = row 7 re-run beside
+    # s4bV0, s4bQ5 = s4b18 at quantum 500 us, s4bN16 = the ready-N measurement (split 16 on the W7 title scene, row 11's
+    # proofs: init line, failed=0, splits > 0; read K and KB per list from the per-frame line, READY-N.md)
+    # post-window (M3, 11-25): s4b07f / s4bV0f = s4b07r / s4bV0 on devoff4bv (C1 verify-only fix; M10
+    # c1-verify-fix-rating.md S2, Agent 12 RATIONALE.md L86-118): the same proofs plus POSTWIN below
+    r = {'f10a2': 'f10a', 'f10b2': 'f10b', 'f10a3': 'f10a', 'f10b3': 'f10b', 'f10aL': 'f10a', 'f10bL': 'f10b',
+         's4bLV': 'w6gA', 's4b07r': 's4b07', 's4bQ5': 's4b18', 's4bN16': 's4b11', 's4bN4': 's4b11',
+         's4b07f': 's4b07', 's4bV0f': 's4bV0'}.get(row, row)
     if r in ('s4b01', 's4bL0'):
         it = {k: n[k] for k in ITEM_FAMS if n[k]}
         s4 = {k: n[k] for k in S4A_FAMS if n[k]}
@@ -480,6 +542,19 @@ def row_proofs(row, rj, S, ld, res):
         chk(n['c1_first'] == 0 and n['c1_kept'] == 0, 'no kept line (first %d, kept %d)' % (n['c1_first'], n['c1_kept']))
         chk(bool(ld) and ld['NEW'] == 0 and ld['MORE'] == 0, 'no other NEW key (NEW %s MORE %s beside C1)' % (
             ld and ld['NEW'], ld and ld['MORE']))
+    elif r == 's4bV0':
+        # session 3: C1-OFF verify control (Agent 12 22:15: row 7 + keep_watch=false); Agent 12 predicts F > 0
+        chk(n['c1_init_on'] == 0 and n['c1_first'] == 0 and n['c1_kept'] == 0,
+            'keep-watch off: init-on x%d, first kept x%d, kept x%d' % (n['c1_init_on'], n['c1_first'], n['c1_kept']))
+        fl = (S['first']['c1_verify_f'] or ['-'])[0][-100:]
+        # M10 review S1 (01:58): verify must be armed, or F = 0 / K = 0 prove nothing (as s4b04/s4b07/w6gA, L451)
+        chk(n['c1_verify_on'] == 1, 'C1 verify armed: "C1 verify: on. Hashing CPU uploads ..." x%d (without it F = 0 proves '
+            'nothing: INCONCLUSIVE)' % n['c1_verify_on'])
+        chk(None, 'K lines %d; F lines %d (Agent 12 predicts F > 0; F = 0 refutes it; compare s4b07r '
+            'over the same marks) %s' % (n['k'], n['c1_verify_f'], fl))
+        chk(n['recovered_stale'] == 0 and n['unhandled_phys'] == 0,
+            'gate D zero lines: "Recovered stale physical page protection" %d, "Unhandled guest physical write fault" %d' % (
+                n['recovered_stale'], n['unhandled_phys']))
     if r.startswith('s4b08') or r in P2_ROWS:
         ms = res.get('memexport') or {}
         chk(n['slow_frame'] > 0, 'slow-frame lines %d' % n['slow_frame'])
@@ -502,6 +577,9 @@ def row_proofs(row, rj, S, ld, res):
     if r in ('s4b10', 's4b11', 's4b12', 's4b13', 's4b15', 's4b16', 's4b25'):
         chk(n['split_init'] == 1, 'init "d3d12_submit_split_kb: splitting submissions at N KB" x%d: %s' % (
             n['split_init'], (S['first']['split_init'] or ['-'])[0][-120:]))
+        if row in ('s4bN16', 's4bN4'):  # M10 review N4: the init line names this row's N
+            kb = row[4:]
+            chk(('at %s KB' % kb) in (S['first']['split_init'] or [''])[0], 'init line says "at %s KB"' % kb)
         if sp or r != 's4b25':
             chk(bool(sp) and spmax.get('failed', 0) == 0, 'failed=0 in every d3d12_submit_split line (max %s over %s lines)' % (
                 spmax.get('failed'), sp.get('lines', 0)))
@@ -538,9 +616,10 @@ def row_proofs(row, rj, S, ld, res):
             n['gpu_wait_backoff'], (S['first']['gpu_wait_backoff'] or ['-'])[0][-110:]))
     elif r == 's4b18':
         on1 = (S['first']['gpu_wait_on'] or ['-'])[0]
-        chk(n['gpu_wait_on'] == 1 and n['gpu_wait_backoff'] == 1 and 'quantum 250 us' in on1 and 'GetData hook built' in on1,
-            'one "GPU wait back-off: ON (quantum 250 us, ...); ...; GetData hook built." line (ON x%d, back-off lines x%d): %s' % (
-                n['gpu_wait_on'], n['gpu_wait_backoff'], on1[-110:]))
+        q = 'quantum %d us' % (500 if row == 's4bQ5' else 250)
+        chk(n['gpu_wait_on'] == 1 and n['gpu_wait_backoff'] == 1 and q in on1 and 'GetData hook built' in on1,
+            'one "GPU wait back-off: ON (%s, ...); ...; GetData hook built." line (ON x%d, back-off lines x%d): %s' % (
+                q, n['gpu_wait_on'], n['gpu_wait_backoff'], on1[-110:]))
         chk(gwmax.get('sleep_fail', 0) == 0, 'sleep_fail = 0 (max %s over %s stats lines)' % (gwmax.get('sleep_fail'), gw.get('lines', 0)))
         chk(n['stuck_lock'] == 0, 'no STUCK-LOCK (%d)' % n['stuck_lock'])
     elif r in ('s4b19', 's4b20', 'f10a'):
@@ -587,6 +666,86 @@ def row_proofs(row, rj, S, ld, res):
         chk(n['protect_failed'] == 0 and n['recovered_stale'] == 0 and n['unhandled_phys'] == 0,
             'G8 bad lines: Protect failed %d, Recovered stale %d, Unhandled guest physical write fault %d' % (
                 n['protect_failed'], n['recovered_stale'], n['unhandled_phys']))
+    pw = POSTWIN.get(row)
+    if pw:
+        # post-window rows (M3, 11-25): bin identity from the run dir's own copies (run-game copies the bin's files into
+        # the run dir; run.json run_dir / bin_dir), then the positive controls that make a 0 count mean something
+        rd = (rj or {}).get('run_dir') or ''
+        bd = os.path.normpath((rj or {}).get('bin_dir') or '')
+        chk(os.path.basename(bd).lower() == pw['bin'].lower(), 'bin dir %s (want build\\agent2\\%s)' % (bd or '-', pw['bin']))
+        for fn, want in sorted(pw['sha'].items()):
+            got = sha16(os.path.join(rd, fn))
+            chk(got == want, 'bin: run-dir %s sha256 %s, want %s (%s MANIFEST)' % (fn, got, want, pw['bin']))
+        marks = COVER['marks'] or []
+        if row in ('s4b07f', 's4bV0f'):
+            chk(n['c1_verify_on'] == 1, 'positive control: \"C1 verify: on.\" x%d (RATIONALE L104: x1; else INCOMPLETE)' % (
+                n['c1_verify_on']))
+            chk('story-load' in marks, 'positive control: the route reaches story-load (RATIONALE L104; else INCOMPLETE): '
+                'marks ..%s' % (','.join(marks[-3:]) or '-'))
+        if row == 's4b07f':
+            chk(kept_last is not None and kept_last >= 32768, 'positive control: last "kept so far" %s >= 32768 (row 7 '
+                'level, RATIONALE L104; else INCOMPLETE)' % kept_last)
+            chk(None, 'reading (RATIONALE L107-118): K %d, F %d; compare the F of s4bV0f, s4b07r F 51 and s4bV0 F 70 (devoff4b, '
+                'quiet host, 11-25)' % (n['k'], n['c1_verify_f']))
+        elif row == 's4bV0f':
+            chk(None, 'reading: F %d on the fixed bin (s4bV0 on devoff4b: F 70): F 0 = the fix removed the race; F > 0 = a '
+                'non-race source (file-read path / real miss, RATIONALE L68-70), compare pages with s4b07f' % n['c1_verify_f'])
+        elif row.startswith('s33') and row in S33X:
+            # #33 rows 2-7 + (d) (TESTPLAN section 2): the cvars the row needs, the INFO/WARN line counts of its mode,
+            # the seed, the (d) and debug-layer controls; the kit / s33_fields / diagd_report runs in postcheck are the
+            # measurements
+            x = S33X[row]
+            c = {'nw': 0, 'info': 0, 'ign': 0, 'rad': 0}
+            for fn in os.listdir(rd) if os.path.isdir(rd) else []:
+                if re.match(r'game(\.\d+)?\.log$', fn):
+                    with open(os.path.join(rd, fn), encoding='utf-8', errors='replace') as f:
+                        for ln in f:
+                            if 'd3d12_pipeline_creation_no_wait' in ln:
+                                c['nw'] += 1
+                                c['info'] += 'd3d12_pipeline_creation_no_wait: not waiting' in ln
+                                c['ign'] += 'd3d12_pipeline_creation_no_wait ignored' in ln
+                            c['rad'] += 'resolve after drop:' in ln
+            for k, v in sorted(x['cvars'].items()):
+                chk(cv.get(k) == v, 'cvar %s=%s (run.json: %s)' % (k, v, cv.get(k) or '-'))
+            if x['mode'] == 'off':
+                chk(c['nw'] == 0 and not cv.get('d3d12_pipeline_creation_no_wait'),
+                    'cvar off: no \"d3d12_pipeline_creation_no_wait\" text (x%d), cvar not set' % c['nw'])
+            elif x['mode'] == 'on':
+                chk(c['info'] == 1 and c['ign'] == 0, 'INFO \"d3d12_pipeline_creation_no_wait: not waiting ...\" x%d (want 1), '
+                    '\"ignored\" WARN x%d (want 0) (TESTPLAN row 2)' % (c['info'], c['ign']))
+            else:
+                chk(c['ign'] == 1 and c['info'] == 0, '\"d3d12_pipeline_creation_no_wait ignored\" WARN x%d (want 1), INFO x%d '
+                    '(want 0) (TESTPLAN row 6)' % (c['ign'], c['info']))
+            if x.get('diag'):
+                chk(None, 'reading (d): \"resolve after drop:\" lines %d (diagd_report.py is the measurement; 0 in offd = no '
+                    'drop was followed by a resolve)' % c['rad'])
+            else:
+                chk(c['rad'] == 0, 'no (d) \"resolve after drop:\" text on a (d)-free bin (x%d)' % c['rad'])
+            if x.get('seed'):
+                sx = (rj or {}).get('seed_xenos') or {}
+                src = os.path.normpath(str(sx.get('source_dir') or '')) if isinstance(sx, dict) else ''
+                want = os.path.join(S33_SEED, 'user', 'cache', 'shaders', 'shareable')
+                chk(src.lower().endswith(want.lower()), 'seeded from %s (run.json seed_xenos.source_dir: %s)' % (want, src or '-'))
+            else:
+                chk(not (rj or {}).get('seed_xenos'), 'cold: no seed_xenos in run.json')
+            chk((rj or {}).get('close_method') == 'wm_close', 'closed via WM_CLOSE (%s)' % (rj or {}).get('close_method'))
+            chk(n['slow_frame'] > 0, 'slow-frame lines %d (slow_frame_log_ms=1)' % n['slow_frame'])
+            chk(not (rj or {}).get('wer_seen') and not (rj or {}).get('dumps'), 'no WER, no dump (wer_seen %s, dumps %s)' % (
+                (rj or {}).get('wer_seen'), len((rj or {}).get('dumps') or [])))
+        elif row.startswith('s33'):
+            # #33 row 1 (M6 TESTPLAN.md section 2): cvar off must be the old code path; the kit (RUN-S33-LOGDIFF.cmd) is
+            # the row's gate, these are the cheap proofs
+            nw = 0
+            for fn in os.listdir(rd) if os.path.isdir(rd) else []:
+                if re.match(r'game(\.\d+)?\.log$', fn):
+                    with open(os.path.join(rd, fn), encoding='utf-8', errors='replace') as f:
+                        nw += sum(1 for ln in f if 'd3d12_pipeline_creation_no_wait' in ln)
+            chk(nw == 0, 'no \"d3d12_pipeline_creation_no_wait\" text in game*.log (x%d; TESTPLAN row 1a)' % nw)
+            chk(not cv.get('d3d12_pipeline_creation_no_wait'), 'cvar d3d12_pipeline_creation_no_wait not set (run.json: %s)' % (
+                cv.get('d3d12_pipeline_creation_no_wait') or '-'))
+            chk((rj or {}).get('close_method') == 'wm_close', 'closed via WM_CLOSE (%s)' % (rj or {}).get('close_method'))
+            if row.endswith('sf'):
+                chk(n['slow_frame'] > 0, 'slow-frame lines %d (slow_frame_log_ms=1)' % n['slow_frame'])
     return P
 
 
@@ -778,14 +937,21 @@ def main():
             misses.append('logdiff MORE %d' % ld['MORE'])
         if ld['FLAG']:
             misses.append('logdiff FLAG %d' % ld['FLAG'])
+        short = (S33X.get(row) or {}).get('short')   # #33 rows 4/6: run ends before its 540 s base (S33X)
         if same_scn and ld['GONE_unexpected']:
-            misses.append('logdiff GONE %d beyond Toypad/u-diag lines' % ld['GONE_unexpected'])
+            if short:
+                say('  note: logdiff GONE %d beyond Toypad/u-diag lines (short row: not a BASE item)' % ld['GONE_unexpected'])
+            else:
+                misses.append('logdiff GONE %d beyond Toypad/u-diag lines' % ld['GONE_unexpected'])
         if rc not in (0, None):
             misses.append('logdiff rc %s' % rc)
         if same_scn and scn == 'A':
             bst, cst = steps_of(brj), st
             if bst and cst and (cst[0] or 0) < (bst[0] or 0) - 2:
-                misses.append('attract route steps %s/%s vs base %s/%s' % (cst + bst))
+                if short:
+                    say('  note: attract route steps %s/%s vs base %s/%s (short row: not a BASE item)' % (cst + bst))
+                else:
+                    misses.append('attract route steps %s/%s vs base %s/%s' % (cst + bst))
     if rj.get('exit_code') != 0:
         misses.append('exit %s' % rj.get('exit_code'))
     if (rj.get('close_method') or '') != 'wm_close':

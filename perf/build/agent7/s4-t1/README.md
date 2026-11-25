@@ -13,6 +13,8 @@ S4b sources native4b is built from). Diff revision 2 is from 22:48.
 | [FUNCTIONAL-ROWS.md](FUNCTIONAL-ROWS.md) | rows F1/F3/W1 with commands and pass rules, and the must-prove map with minutes |
 | [matrix-s4t1-f1.json](matrix-s4t1-f1.json), [matrix-s4t1-f3.json](matrix-s4t1-f3.json) | row matrices (placeholders `<NATIVE4B>`, `<NATIVE4B-S4T1>`) |
 | [matrix-w8b-draft.json](matrix-w8b-draft.json) | W8b draft: n0 / th3 / th3cp x4 plus a cold run (Agent 8 owns the final copy) |
+| [matrix-s4t1-w1.json](matrix-s4t1-w1.json) | W1 = W8b pre-flight: the W8b arms x1, no cold run, N-d cvars (M7, 2026-11-25) |
+| [THREADED-PROOFS-TODO.md](THREADED-PROOFS-TODO.md) | what the threaded-mode proofs still need (M7, 2026-11-25) |
 | [queue-s4t1.jsonl](queue-s4t1.jsonl) | Agent 3 queue rows s4t1-f1, s4t1-f3, s4t1-w1 |
 | [check_rows.py](check_rows.py) → [check_rows.out.txt](check_rows.out.txt) | static check of the matrices, the queue, the keys and the hashes |
 | [check/DIFF-REVIEW.md](check/DIFF-REVIEW.md) | independent read-only review: no BLOCKER; S1 is fixed in revision 2; NITs N1-N6 |

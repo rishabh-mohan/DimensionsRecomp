@@ -1,0 +1,17 @@
+--- a/build-final.py (rated 740E59450887B338)
++++ b/build-final.py (current 5BE1F221800137BD)
+@@ -192,9 +192,12 @@
+     lg = a.leg
+     if not a.dry_run:
+         check('fsyntax RESULT: PASS (b/fsyntax/fsyntax.txt)', result_pass(os.path.join(B, 'fsyntax', 'fsyntax.txt')))
+-        check('leg output dir is new (b/%s/link-on)' % lg, not os.path.exists(os.path.join(top, 'link-on')))
++        # a --dry-run relink creates the out dirs (command/rsp text only); a real output file means "not new"
++        check('leg output is new (b/%s/link-on/%s)' % (lg, L['out']),
++              not os.path.exists(os.path.join(top, 'link-on', L['out'])))
+         if a.leg in ('rt', 'gpu', 'xe', 'nat'):
+-            check('CTL output dir is new (b/%s/link-ctl)' % lg, not os.path.exists(os.path.join(top, 'link-ctl')))
++            check('CTL output is new (b/%s/link-ctl/%s)' % (lg, L['out']),
++                  not os.path.exists(os.path.join(top, 'link-ctl', L['out'])))
+     if a.jobs > 8:
+         check('--jobs <= 8', False)
+     if FAILS:

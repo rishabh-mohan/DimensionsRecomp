@@ -1,0 +1,9 @@
+r19_gate build\agent3\runs\20261122-210059-s4b-L0-off-level row e: game.log
+           row e: lines with d3d12_async_submit 0, d3d12_submit_split 0 (split init 0, split counter 0, async init 0, async counter 0), watchdog 0
+FAIL       #18 init line exactly once (0)
+FAIL       async init line exactly once (0)
+           soak_check: lines: async init 0, async counter 0, split counter 0, split init 0
+PASS       soak_check: no 'staying off' / 'failed to create the submit thread' line
+INCOMPLETE soak_check: async init line present (no d3d12_async_submit line at all)
+INCOMPLETE at least 2 async counter lines (found 0)  [no async counter line: no split was due at this N]
+RESULT: FAIL (2 failed, 2 incomplete, 0 flags)

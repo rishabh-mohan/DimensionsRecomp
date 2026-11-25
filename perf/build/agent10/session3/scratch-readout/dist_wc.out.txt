@@ -1,0 +1,25 @@
+kept runs 36
+| arm | n | p1 | p5 | p10 | p25 | p50 | p75 | p90 | p95 | p99 | mean | mean-p50 | <1.0ms | <1.5ms | >3.0ms | >4.0ms | cover |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| win3 | 9 | 0.497 | 0.568 | 0.649 | 1.219 | 2.116 | 2.587 | 3.228 | 3.634 | 4.195 | 2.047 | -0.069 | 20.8% | 27.1% | 15.1% | 2.0% | 1.0000 |
+| c1np | 9 | 0.613 | 0.709 | 0.808 | 1.077 | 2.099 | 2.725 | 3.710 | 4.100 | 4.983 | 2.122 | +0.023 | 19.8% | 36.0% | 20.0% | 6.3% | 1.0000 |
+| p2fc | 9 | 0.612 | 0.708 | 0.808 | 1.077 | 2.103 | 2.725 | 3.696 | 4.099 | 4.980 | 2.118 | +0.015 | 19.8% | 36.3% | 19.8% | 6.2% | 1.0000 |
+| s0 | 9 | 0.973 | 1.066 | 1.146 | 1.362 | 2.009 | 2.838 | 3.563 | 4.147 | 4.954 | 2.213 | +0.204 | 1.9% | 33.0% | 19.8% | 6.3% | 1.0000 |
+
+fps definitions per arm (median of runs): frames/window_s | 1000/mean_ft | frames.json mean_fps
+  win3: 490.0 | 490.0 | 490.0 ; arm mean of fps_json 488.4
+  c1np: 472.9 | 472.9 | 472.9 ; arm mean of fps_json 471.1
+  p2fc: 472.9 | 472.9 | 472.9 ; arm mean of fps_json 472.2
+  s0: 454.8 | 454.8 | 454.8 ; arm mean of fps_json 451.9
+
+time decomposition: ms per frame contributed by frames above 3 ms, per arm (mean over frames)
+  win3: total 2.047 ms/f; from frames <=2.5 ms 1.147; 2.5-3.5 0.640; >3.5 0.260
+  c1np: total 2.122 ms/f; from frames <=2.5 ms 0.965; 2.5-3.5 0.611; >3.5 0.547
+  p2fc: total 2.118 ms/f; from frames <=2.5 ms 0.968; 2.5-3.5 0.610; >3.5 0.539
+  s0: total 2.213 ms/f; from frames <=2.5 ms 0.982; 2.5-3.5 0.782; >3.5 0.449
+
+within-arm fps residual vs eff MHz: r = 0.42, slope +0.54 %fps per 100 MHz over 36 runs
+  win3 eff MHz mean 2243 range 2156-2326
+  c1np eff MHz mean 2103 range 2000-2146
+  p2fc eff MHz mean 2095 range 1898-2172
+  s0 eff MHz mean 2019 range 1939-2053

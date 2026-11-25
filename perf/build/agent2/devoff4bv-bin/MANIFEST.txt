@@ -1,0 +1,25 @@
+# build\agent2\devoff4bv-bin - Agent 2 (board run 2 task #1). devoff4bv: devoff4b-bin with only rexgpu-xenos.dll rebuilt with the C1 verify-only fix (build/agent12/session3/c1-verify-fix/c1-verify-fix.diff sha256 66B9254E2E13334E41C872BFEC16B5F380FD61656C6D2DF5FC414D4B4267BDBA; rating build/agent10/session3/c1-verify-fix-rating.md) [M2 successor, build/agent2/session3/build-bin.py]
+# staged 2026-11-25 02:43:40 from build\agent2\devoff4b-bin (MANIFEST sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA); every file copied with mtime = now; replaced: rexgpu-xenos.dll <- build\agent2\s33\devoff4bv\link-on\rexgpu-xenos.dll.
+# Source: fresh overlay build/agent2/s33/devoff4bv/sdk = copy of snap1 rexglue-sdk/src/graphics (5350b1d; shared_memory.cpp blob 59a636d7, sha256 A4A31038 before) + the patch (git -c core.autocrlf=false apply, 1 Applied cleanly, 0 Skipped); after F38B47CB == agent12 new/. Only shared_memory.cpp.obj recompiled (snap1-sdk ccdb, Release, source passed with / like ninja, -fmacro-prefix-map overlay->snap1 so __FILE__ strings match); rexgpu-xenos.dll relinked into s33/devoff4bv/link-on; snap1-sdk/install not touched.
+# prep: PASS patch sha256 build\agent12\session3\c1-verify-fix\c1-verify-fix.diff: 66B9254E2E13334E41C872BFEC16B5F380FD61656C6D2DF5FC414D4B4267BDBA
+# prep: before src/graphics/shared_memory.cpp A4A31038ABDFF94A CRLF 0
+# prep: after  src/graphics/shared_memory.cpp F38B47CB411BEEB884071DB8C09096BFA4DD7D313B6103CF9BF4B31B4EB20E67 CRLF 0
+# control: PASS compare rexgpu-xenos.dll vs build\agent2\devoff4b-bin\rexgpu-xenos.dll: identical except 1 TimeDateStamp field(s) (6b069fb7 vs 6b03a0ae; COFF header at 0x80, included)
+# ON object shared_memory.cpp.obj exit 0 1.0 s obj 126436 B F3A4CE53AF2D6EB5 (log 1220 B)
+# times: ctl compile 1.7 s, ctl link 1.4 s, on compile 1.7 s, on link 1.4 s
+# files: name, size, mtime, sha256, source
+FiraSans-Regular.ttf	456996	2026-11-25 02:43:39	C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23	build\agent2\snap1\DimensionsRecomp\rexlego\res\FiraSans-Regular.ttf
+TracyClient.dll	233472	2026-11-25 02:43:39	85044850B6C663B5CE8722285D13070381C33C9ABC49D06B3E59BA0277F8FF4E	build\agent2\snap1-sdk\install\bin\TracyClient.dll
+achievement_unlocked.wav	191018	2026-11-25 02:43:39	A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5	build\agent2\snap1-off\achievement_unlocked.wav
+legodimensions.exe	170350080	2026-11-25 02:43:39	DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83	build\agent2\snap1-off\legodimensions.exe
+legodimensions.map	39181442	2026-11-25 02:43:39	52155274A978A946870446A1C8F573EC381A486D50636AF13DA8920E4DC18EA5	build\agent2\snap1-off\legodimensions.map
+rexgpu-xenos.dll	3425792	2026-11-25 02:43:39	82A0DE742AAAAE440FC9FED2BE61EB1EE55154001B1732D144BBB8D9F27C7302	build\agent2\s33\devoff4bv\link-on\rexgpu-xenos.dll
+rexruntime.dll	10909184	2026-11-25 02:43:40	A33801D1538D61759D35FD137EBC9F5EAD636D7D26E9A79DC3B4994A22CB9F12	build\agent2\snap1-off\rexruntime.dll
+# checks:
+#   PASS staged copy identical: FiraSans-Regular.ttf
+#   PASS staged copy identical: TracyClient.dll
+#   PASS staged copy identical: achievement_unlocked.wav
+#   PASS staged copy identical: legodimensions.exe
+#   PASS staged copy identical: legodimensions.map
+#   PASS staged copy identical: rexgpu-xenos.dll (replaced: base E3CB99CFDEA95E66 -> 82A0DE742AAAAE44)
+#   PASS staged copy identical: rexruntime.dll

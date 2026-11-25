@@ -127,7 +127,7 @@ $WAIT_LF = '01D9F8F3464C8614'     # S4c's new rexlego/src/gpu_wait_backoff.cpp, 
 $WAIT_CRLF = '34D281E006FB5FBE'   # the same text in CRLF form (Agent 9's s4c/HASHES.txt, info)
 $ARCHIVE = '1C5B1767B8F6871D7E11DAAE59733E0CE8FA86362E95BECF7E03BC3EB67092EC'  # shader_archive.cpp in the s35 lookups
 $SHADERS_S4A = '9567FE3F3B63637D' # shaders.cpp at the S4a level (#2 miss cache)
-$PINS = @{ '335ff2d47268f3a1' = 'native3d (S3d)'; '81d1c3a71be3c096' = 'nativeB (S3d + batch-nolr)'; '5e3ff55de10f4f64' = 'native4 (S4a)' }
+$PINS = @{ '335ff2d47268f3a1' = 'native3d (S3d)'; '81d1c3a71be3c096' = 'nativeB (S3d + batch-nolr)'; '5e3ff55de10f4f64' = 'native4 (S4a)'; '9b40acbbef4c57b3' = 'native4b (S4b + S4c)' }
 $PACK_HASHES = @('0x75A4D1ABA62F7594', '0xACAF01F01E1C03D2', '0xCCD7655302B54D80', '0xE81FD692C3AB35E1')
 
 $S35 = Abs 'build/agent4/s35/run-071627'
@@ -370,7 +370,10 @@ else {
     }
     else { Mark 'WARN' ('the generated input list has memory_watch.cpp: {0}, CMakeLists.txt: {1}; the expected fingerprint needs both' -f $mwListed, $cmlListed) }
     if ($applied -and $fpTxt -and $fpNow -eq $fpTxt) {
-        if ($PINS.ContainsKey($fpTxt)) { Mark 'FAIL' ('built fingerprint {0} is an old pin ({1}) although C1 and S4c are in the tree' -f $fpTxt, $PINS[$fpTxt]) }
+        # M4, S3T-4 (2026-11-25): keyed on the pack state. Only "pack configured but still an old fingerprint" FAILs.
+        # Without the pack, snap1-on builds the pinned native4b fingerprint, which is expected (REPIN.md section 4.2 step 1).
+        if ($PINS.ContainsKey($fpTxt) -and $cacheState -eq 'pack') { Mark 'FAIL' ('built fingerprint {0} is an old pin ({1}) although the s35 pack is configured: the pack build must give a new fingerprint' -f $fpTxt, $PINS[$fpTxt]) }
+        elseif ($PINS.ContainsKey($fpTxt)) { Mark 'ok' ('built fingerprint {0} is a pin ({1}); no pack configured (cache state {2}), so that is expected' -f $fpTxt, $PINS[$fpTxt], $cacheState) }
         else { Mark 'ok' ('built fingerprint {0} is new: not 5e3ff55de10f4f64 (native4) or another old pin' -f $fpTxt) }
     }
 }
@@ -387,7 +390,7 @@ foreach ($pr in @(@('src\gpu_native\memory_watch.cpp.obj', $tMw), @('out\native-
 # ---------------------------------------------------------------------------------------------------------------
 Say ''
 Say '[5] staged bins: MANIFEST fingerprints (read-only)'
-$oldBins = @('build/agent2/native3d-bin', 'build/agent2/nativeB-bin', 'build/agent2/native4-bin')
+$oldBins = @('build/agent2/native3d-bin', 'build/agent2/nativeB-bin', 'build/agent2/native4-bin', 'build/agent2/native4b-bin')
 $oldBinsA = @($oldBins | ForEach-Object { (Abs $_).ToLower() })
 $bins = @($oldBins)
 if ($BinDir) { $bins += $BinDir }

@@ -1,0 +1,435 @@
+{
+ "run": "20261125-093804-r19d-w7-title-async-n",
+ "row": "s4b25",
+ "kind": "off",
+ "scenario": "I180",
+ "runjson": {
+  "exit_code": 0,
+  "exit_code_hex": "0x00000000",
+  "dumps": [],
+  "crash_events": [],
+  "wer_seen": false,
+  "close_method": "wm_close",
+  "close_seconds": 0.5,
+  "elapsed_s": 180.53,
+  "seconds_requested": 180,
+  "cvars": {
+   "d3d12_submit_split_kb": "4",
+   "d3d12_async_submit": "true",
+   "framerate_limit": "0"
+  },
+  "exited_early": false,
+  "env_extra": {},
+  "steps": null
+ },
+ "summary": {
+  "verdict": "RUNNING",
+  "first_frame_s": 4.0,
+  "levels": {
+   "info": 92,
+   "warning": 40
+  },
+  "unknown_cvars": [],
+  "errors": []
+ },
+ "log_files": [
+  "game.log"
+ ],
+ "families": {
+  "c1_any": 0,
+  "c1_init_on": 0,
+  "c1_init_blocked": 0,
+  "c1_init_nohold": 0,
+  "c1_first": 0,
+  "c1_kept": 0,
+  "c1_blocked": 0,
+  "c1_verify_on": 0,
+  "c1_verify_f": 0,
+  "recovered_stale": 0,
+  "unhandled_phys": 0,
+  "protect_failed": 0,
+  "split_init": 1,
+  "split": 18,
+  "deferred_counters": 0,
+  "gpu_wait": 0,
+  "gpu_wait_stats": 0,
+  "gpu_wait_backoff": 0,
+  "gpu_wait_on": 0,
+  "memexport": 0,
+  "slow_frame": 0,
+  "s4_upload_hash": 0,
+  "precise_wait": 0,
+  "miss_cache": 0,
+  "stuck_lock": 0,
+  "minidump": 0,
+  "fatal": 0,
+  "clean_exit": 1,
+  "debug_layer": 0,
+  "dred": 0,
+  "d3d12_msg": 0,
+  "k": 0,
+  "c1_other": 0
+ },
+ "levels": {
+  "info": 92,
+  "warning": 40
+ },
+ "lines": {
+  "split_init": {
+   "first": [
+    "[2026-11-25 09:38:05.388] [info] [gpu] [t12860] d3d12_submit_split_kb: splitting submissions at 4 KB of deferred commands"
+   ],
+   "last": []
+  },
+  "split": {
+   "first": [
+    "[2026-11-25 09:38:08.598] [info] [gpu] [t12860] d3d12_submit_split: frame=2 submission=3 splits=0 failed=0 held_query=0 held_scratch=0 held_pipelines=1",
+    "[2026-11-25 09:38:18.600] [info] [gpu] [t12860] d3d12_submit_split: frame=4406 submission=10962 splits=6449 failed=0 held_query=0 held_scratch=0 held_pipelines=174",
+    "[2026-11-25 09:38:28.601] [info] [gpu] [t12860] d3d12_submit_split: frame=8898 submission=22733 splits=13534 failed=0 held_query=0 held_scratch=0 held_pipelines=174"
+   ],
+   "last": [
+    "[2026-11-25 09:40:38.624] [info] [gpu] [t12860] d3d12_submit_split: frame=47552 submission=149890 splits=88416 failed=0 held_query=0 held_scratch=0 held_pipelines=174",
+    "[2026-11-25 09:40:48.624] [info] [gpu] [t12860] d3d12_submit_split: frame=51338 submission=162130 splits=95989 failed=0 held_query=0 held_scratch=0 held_pipelines=174",
+    "[2026-11-25 09:40:58.624] [info] [gpu] [t12860] d3d12_submit_split: frame=55267 submission=174728 splits=103846 failed=0 held_query=0 held_scratch=0 held_pipelines=174"
+   ]
+  }
+ },
+ "split": {
+  "lines": 18,
+  "first_ts": "09:38:08.598",
+  "last_ts": "09:40:58.624",
+  "first": {
+   "frame": 2,
+   "submission": 3,
+   "splits": 0,
+   "failed": 0,
+   "held_query": 0,
+   "held_scratch": 0,
+   "held_pipelines": 1
+  },
+  "last": {
+   "frame": 55267,
+   "submission": 174728,
+   "splits": 103846,
+   "failed": 0,
+   "held_query": 0,
+   "held_scratch": 0,
+   "held_pipelines": 174
+  },
+  "max": {
+   "frame": 55267,
+   "submission": 174728,
+   "splits": 103846,
+   "failed": 0,
+   "held_query": 0,
+   "held_scratch": 0,
+   "held_pipelines": 174
+  },
+  "sum": {
+   "frame": 499807,
+   "submission": 1517334,
+   "splits": 892670,
+   "failed": 0,
+   "held_query": 0,
+   "held_scratch": 0,
+   "held_pipelines": 2959
+  },
+  "monotonic": {
+   "frame": true,
+   "submission": true,
+   "splits": true,
+   "failed": true,
+   "held_query": true,
+   "held_scratch": true,
+   "held_pipelines": true
+  },
+  "per_frame": {
+   "submission": 3.1616,
+   "splits": 1.8791,
+   "failed": 0.0,
+   "held_query": 0.0,
+   "held_scratch": 0.0,
+   "held_pipelines": 0.0031
+  },
+  "frames": 55265
+ },
+ "frame_rows": 57701,
+ "logdiff": {
+  "bases": [
+   "20261125-091043-r19r25-s4b25-title-split-n"
+  ],
+  "base_scenario": "I180",
+  "NEW": 0,
+  "NEW_allowed": 0,
+  "MORE": 0,
+  "MORE_allowed": 0,
+  "GONE": 20,
+  "GONE_unexpected": 0,
+  "FLAG": 0,
+  "NEW_info_other": 0,
+  "NEW_info_allowed": 3,
+  "rc": 0,
+  "new": [],
+  "new_allowed": [],
+  "more": [],
+  "gone_unexpected": [],
+  "flag": [],
+  "new_info_other": [],
+  "new_info_allowed": [
+   "NEW build\\agent3\\runs\\20261125-093804-r19d-w7-title-async-n\\game.log x5 [info] [gpu] d#d#_async_submit: frame=# submission=# chunks=# queued_max=# full_waits=# full_wait_us=# drains_waited=# drain_wait_us=# worker_us=#",
+   "NEW build\\agent3\\runs\\20261125-093804-r19d-w7-title-async-n\\game.log x13 [info] [gpu] d#d#_async_submit: frame=# submission=# chunks=# queued_max=# full_waits=# full_wait_us=# drains_waited=# drain_wait_us=# worker_us=#h",
+   "NEW build\\agent3\\runs\\20261125-093804-r19d-w7-title-async-n\\game.log x1 [info] [gpu] d#d#_async_submit: submitting splits on the submit thread (# slots)"
+  ]
+ },
+ "scenes": {
+  "base": "20261125-091043-r19r25-s4b25-title-split-n",
+  "missing_in_cand": [],
+  "extra_in_cand": [],
+  "cand_major": {
+   "226/1022": 147.2,
+   "219/226": 14.9,
+   "218/222": 14.0
+  },
+  "base_major": {
+   "226/1022": 148.2,
+   "219/226": 14.9,
+   "218/222": 13.4
+  }
+ },
+ "threads": {
+  "window_s": 146.4,
+  "window": [
+   20.0,
+   166.4
+  ],
+  "by_name": {
+   "(unnamed)": {
+    "pct": 21.23,
+    "threads": 33
+   },
+   "rex::thread::TimerQueue": {
+    "pct": 27.83,
+    "threads": 1
+   },
+   "DeviceHotplugThread": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "D3D Background Thread 0": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "D3D Background Thread 1": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "D3D Background Thread 2": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "D3D Background Thread 3": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "0x16c00001": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "0xc0550001": {
+    "pct": 6.56,
+    "threads": 1
+   },
+   "XMA Decoder (F8000010)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "Audio Worker (F8000014)": {
+    "pct": 1.52,
+    "threads": 1
+   },
+   "GPU Commands (F8000018)": {
+    "pct": 68.81,
+    "threads": 1
+   },
+   "GPU VSync (F800001C)": {
+    "pct": 2.75,
+    "threads": 1
+   },
+   "SDL_joystick": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "D3D12 Pipelines": {
+    "pct": 0.02,
+    "threads": 9
+   },
+   "D3D12 Submit": {
+    "pct": 25.8,
+    "threads": 1
+   },
+   "Kernel Dispatch (F8000028)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "Main XThread (F800002C)": {
+    "pct": 87.93,
+    "threads": 1
+   },
+   "D3D12 Storage writer": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread8750 (F8000070)": {
+    "pct": 1.41,
+    "threads": 1
+   },
+   "XThread9B00 (F80000F4)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread5594 (F80000FC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread82A4 (F8000104)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread4234 (F800010C)": {
+    "pct": 3.37,
+    "threads": 1
+   },
+   "XThread5B18 (F8000114)": {
+    "pct": 7.69,
+    "threads": 1
+   },
+   "XThread7178 (F8000120)": {
+    "pct": 0.04,
+    "threads": 1
+   },
+   "XThread7FCC (F8000124)": {
+    "pct": 0.11,
+    "threads": 1
+   },
+   "XThread94F4 (F800012C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread3E08 (F8000140)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThreadB348 (F8000144)": {
+    "pct": 10.71,
+    "threads": 1
+   },
+   "SDLWASAPIMgmt": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "SDLAudioP19": {
+    "pct": 0.77,
+    "threads": 1
+   },
+   "XThreadB74C (F8000164)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread653C (F800016C)": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "XThread7B4C (F8000188)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread3BE8 (F8000190)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThreadA420 (F8000198)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread5080 (F80001A8)": {
+    "pct": 24.62,
+    "threads": 1
+   },
+   "XThread93E4 (F80001BC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThreadA9E8 (F800026C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread67AC (F800029C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread9A8C (F80002A4)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread5DE0 (F80002AC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread02FC (F80002CC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread8534 (F8000320)": {
+    "pct": 0.0,
+    "threads": 1
+   }
+  },
+  "ticks": {
+   "30172": {
+    "name": "rex::thread::TimerQueue",
+    "samples": 90,
+    "steps": 89,
+    "non_rising": 0,
+    "non_rising_at_s": [],
+    "step_s_median": 2.0,
+    "span_s": [
+     -3.6,
+     174.4
+    ]
+   }
+  }
+ },
+ "slow_state": {
+  "rows": 178,
+  "onset_s": null,
+  "slow_pct": 0.0,
+  "e_eff_mhz_median": 1768,
+  "cpu_util_pct_median": 67.5,
+  "slow": false
+ },
+ "hang_cpu": [],
+ "host_quiet": {
+  "rows": 6,
+  "busy_rows": 0
+ },
+ "toypad": {
+  "confirms": 0,
+  "result": ""
+ },
+ "proofs": [
+  {
+   "ok": true,
+   "text": "init \"d3d12_submit_split_kb: splitting submissions at N KB\" x1: 2026-11-25 09:38:05.388] [info] [gpu] [t12860] d3d12_submit_split_kb: splitting submissions at 4 KB of deferred commands"
+  },
+  {
+   "ok": true,
+   "text": "failed=0 in every d3d12_submit_split line (max 0 over 18 lines)"
+  },
+  {
+   "ok": null,
+   "text": "per frame: submission 3.1616, splits 1.8791 (frames 55265; fields monotonic {'frame': True, 'submission': True, 'splits': True, 'failed': True, 'held_query': True, 'held_scratch': True, 'held_pipelines': True})"
+  }
+ ],
+ "base_misses": [],
+ "hint": "PASS?"
+}

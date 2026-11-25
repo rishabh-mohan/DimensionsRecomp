@@ -9,6 +9,15 @@
 // once); the stop file is checked after a notification and once per tick (fallback without the notification: waits of
 // <= 250 ms, check at every wake). The power scheme / overlay RPCs (slow: up to ~1 s per call) run on one background
 // thread; rows carry its latest completed values.
+// Per-process attribution (2026-11-25, session 3). Every row: nongame_cores = busy logical-processor seconds per second of
+// the whole machine (GetSystemTimes: kernel + user - idle, so DPC / interrupt time is included) minus game_cores (
+// GetProcessTimes of the game handle) - two O(1) calls. Every ProcEvery-th row: one NtQuerySystemInformation(
+// SystemProcessInformation) call returns create time, user+kernel CPU time and I/O transfer counts of every process; the
+// difference to the previous snapshot gives proc_nongame_cores (sum over non-game processes, Idle excluded),
+// nongame_io_MBps and the top 5 non-game processes by CPU and top 3 by I/O bytes. That call walks every thread of the
+// machine (~11 ms CPU for ~330 processes / ~7500 threads on the test machine), hence the ProcEvery knob. disk_MBps is the
+// PDH \PhysicalDisk(_Total)\Disk Bytes/sec counter (physical disk; the process I/O counts include cached and
+// device/network I/O).
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,7 +31,8 @@ public static class LdSys
 {
     public const string Header = "t_s,epoch_s,wall,idle_s,fg_pid,fg_game,game_alive,input_desktop,screensaver," +
         "cpu_util_pct,cpu_perf_pct,base_mhz,eff_mhz,p_eff_mhz,e_eff_mhz,p_util_pct,e_util_pct," +
-        "tz_passive_min_pct,tz_temp_max_c,ac,batt_saver,batt_pct,scheme,overlay";
+        "tz_passive_min_pct,tz_temp_max_c,ac,batt_saver,batt_pct,scheme,overlay," +
+        "nongame_cores,game_cores,proc_nongame_cores,nongame_io_MBps,disk_MBps,top_cpu,top_io";
 
     // ---- results, read by sys-csv.ps1 after Init / Run ----
     public static bool GameGone;          // the game pid was not running at Init (-> header only, reason game_exit)
@@ -66,15 +76,16 @@ public static class LdSys
     // test machine, ~40 % of the whole collect). Same counter instance, same values.
     const uint PDH_FMT = 0x00000200u | 0x00008000u;          // PDH_FMT_DOUBLE | PDH_FMT_NOCAP100 (perf/utility go > 100)
     const uint PDH_MORE_DATA = 0x800007D2u;
-    const int C_UTIL_ALL = 0, C_PERF_ALL = 1, C_FREQ_ALL = 2, C_TZ_PASSIVE = 3, C_TZ_TEMP = 4, NC = 5;
+    const int C_UTIL_ALL = 0, C_PERF_ALL = 1, C_FREQ_ALL = 2, C_TZ_PASSIVE = 3, C_TZ_TEMP = 4, C_DISK = 5, NC = 6;
     const string TOTAL = "_Total";
-    static readonly string[] CNames = { "util", "perf", "freq", "tz_passive", "tz_temp" };
+    static readonly string[] CNames = { "util", "perf", "freq", "tz_passive", "tz_temp", "disk" };
     static readonly string[] CPaths = {
         @"\Processor Information(*)\% Processor Utility",
         @"\Processor Information(*)\% Processor Performance",
         @"\Processor Information(*)\Processor Frequency",
         @"\Thermal Zone Information(*)\% Passive Limit",
-        @"\Thermal Zone Information(*)\Temperature" };
+        @"\Thermal Zone Information(*)\Temperature",
+        @"\PhysicalDisk(*)\Disk Bytes/sec" };
     static IntPtr query = IntPtr.Zero;
     static readonly IntPtr[] counters = new IntPtr[NC];
     static IntPtr arrBuf = IntPtr.Zero;
@@ -159,8 +170,8 @@ public static class LdSys
     static long sampleTicks, sampleMaxTicks, firstSampleTicks, qAfterFirst;
     static double cpuAfterFirst;
     // Per-part wall time of Sample (diagnostics for the "timing" line of sys-csv.ps1). The first sample is kept apart.
-    const int P_COLLECT = 0, P_USER = 1, P_DESK = 2, P_PDH = 3, P_PWR = 4, P_WRITE = 5, NP = 6;
-    static readonly string[] PNames = { "collect", "user", "desk", "pdh", "pwr", "write" };
+    const int P_COLLECT = 0, P_USER = 1, P_DESK = 2, P_PDH = 3, P_PWR = 4, P_WRITE = 5, P_PROC = 6, NP = 7;
+    static readonly string[] PNames = { "collect", "user", "desk", "pdh", "pwr", "write", "proc" };
     static readonly long[] partTicks = new long[NP], partMax = new long[NP], partFirst = new long[NP];
     static readonly long[] partCyc = new long[NP], partCycFirst = new long[NP];     // sampling-thread cycles per part
     static ulong markCyc, pcAfterFirst;
@@ -346,6 +357,173 @@ public static class LdSys
             sampler / cycPerPct, poller / cycPerPct, other / cycPerPct, nOther, gone / cycPerPct);
     }
 
+    // ---- per-process CPU / I/O attribution. One NtQuerySystemInformation(SystemProcessInformation) call per snapshot
+    // (read-only, no handle to any process) gives every process's create time, user+kernel time and Read/WriteTransferCount;
+    // the snapshot is diffed against the previous one (keyed by pid + create time, so a reused pid is a new process). A
+    // process created since the previous snapshot counts with all of its CPU / I/O; a process that exited between two
+    // snapshots loses its last interval (not visible). Idle (pid 0) is skipped; the driver itself counts as non-game.
+    // DPC / interrupt time is not charged to any process, so proc_nongame_cores <= nongame_cores (GetSystemTimes based).
+    // Cost: the call walks every thread of the machine (~11 ms CPU per call for ~330 processes on the test machine, ~10x
+    // the rest of a row), hence ProcEvery (default 5). ----
+    public static int ProcEvery = 5;          // snapshot every N ticks (0 = off: the per-process cells stay blank); set before Init
+    public static string ProcInfo = "";       // start-line note: "every=1 procs=312 buf_kb=1024 base_ms=1.2" / "off" / "failed:0x..."
+    public static long ProcSnaps;             // snapshots that produced rates
+    public static long ProcFails;
+    public static int ProcCount;              // processes in the last snapshot
+    public static int ProcBytes;              // bytes returned by the last snapshot call (processes + their thread records)
+    static long procCalls, procSysTicks, procSysCyc, procSysCycMax;
+    // syscall-only cost of the snapshots (all calls incl. the baseline): "proc_sys_ms=<wall mean> proc_sys_cpu_ms=<mean>/<max> proc_kb=<n>"
+    public static string ProcStats()
+    {
+        double f = 1000.0 / Stopwatch.Frequency, cy = TscMhz > 0 ? 1.0 / (TscMhz * 1000.0) : 0.0;
+        long n = procCalls;
+        return string.Format(Inv, "proc_sys_ms={0:0.00} proc_sys_cpu_ms={1:0.00}/{2:0.00} proc_kb={3}",
+            n > 0 ? procSysTicks * f / n : 0.0, n > 0 ? procSysCyc * cy / n : 0.0, procSysCycMax * cy, ProcBytes / 1024);
+    }
+    [DllImport("ntdll.dll")] static extern int NtQuerySystemInformation(int infoClass, IntPtr info, int length, out int returned);
+    const int SYSTEM_PROCESS_INFORMATION = 5;
+    const int STATUS_INFO_LENGTH_MISMATCH = unchecked((int)0xC0000004);
+    // SYSTEM_PROCESS_INFORMATION offsets (x64 / x86): CreateTime 0x20, UserTime 0x28, KernelTime 0x30, ImageName 0x38
+    // (UNICODE_STRING: Length u16, Buffer @0x40 / 0x3C), UniqueProcessId 0x50 / 0x44, ReadTransferCount 0xE8 / 0xA0,
+    // WriteTransferCount 0xF0 / 0xA8.
+    static readonly bool X64 = IntPtr.Size == 8;
+    const int O_CREATE = 0x20, O_USER = 0x28, O_KERNEL = 0x30, O_NAMELEN = 0x38;
+    static readonly int O_NAMEBUF = X64 ? 0x40 : 0x3C, O_PID = X64 ? 0x50 : 0x44, O_RTC = X64 ? 0xE8 : 0xA0, O_WTC = X64 ? 0xF0 : 0xA8;
+    sealed class ProcEnt { public long Pid, Create, Cpu, Io, Gen; public string Name; }
+    static readonly Dictionary<long, ProcEnt> procs = new Dictionary<long, ProcEnt>(512);
+    static readonly List<long> procDead = new List<long>(64);
+    static IntPtr procBuf = IntPtr.Zero;
+    static int procBufSize;
+    static long procGen, procPrevQpc, procPrevFt;
+    const int TOP_CPU = 5, TOP_IO = 3;
+    static readonly ProcEnt[] topCpu = new ProcEnt[TOP_CPU], topIo = new ProcEnt[TOP_IO];
+    static readonly double[] topCpuV = new double[TOP_CPU], topIoV = new double[TOP_IO];
+    static double pNongame = double.NaN, pNongameIo = double.NaN;   // last snapshot's values (NaN = blank)
+
+    // ---- every row, O(1): machine busy LP-seconds per second (GetSystemTimes; kernel includes idle) and game CPU
+    // (GetProcessTimes of the game handle; still valid after the game exited) -> sNongame = busy - game. ----
+    [DllImport("kernel32.dll")] static extern bool GetSystemTimes(out long idle, out long kernel, out long user);
+    static long sysPrevBusy, sysPrevGame, sysPrevQpc;
+    static bool sysHave;
+    static double sBusy = double.NaN, sGame = double.NaN, sNongame = double.NaN;
+    static void SysCores()
+    {
+        sBusy = sGame = sNongame = double.NaN;
+        long idle, kern, user, c, e, gk = 0, gu = 0;
+        long q = Stopwatch.GetTimestamp();
+        if (!GetSystemTimes(out idle, out kern, out user)) { NoteOnce("systimes", "GetSystemTimes failed (nongame_cores / game_cores blank)"); sysHave = false; return; }
+        bool g = hGame != IntPtr.Zero && GetProcessTimes(hGame, out c, out e, out gk, out gu);
+        if (!g) { gk = 0; gu = 0; NoteOnce("gametimes", "GetProcessTimes(game) failed (nongame_cores / game_cores blank)"); }
+        long busy = kern + user - idle, game = gk + gu;
+        if (sysHave && g && q > sysPrevQpc)
+        {
+            double dt = (q - sysPrevQpc) / (double)Stopwatch.Frequency * 1e7;
+            sBusy = Math.Max(0, busy - sysPrevBusy) / dt;
+            sGame = Math.Max(0, game - sysPrevGame) / dt;
+            sNongame = Math.Max(0.0, sBusy - sGame);
+        }
+        sysPrevBusy = busy; sysPrevGame = game; sysPrevQpc = q; sysHave = g;
+    }
+
+    static void TopIns(ProcEnt[] top, double[] val, ProcEnt e, double v)
+    {
+        int n = top.Length;
+        if (top[n - 1] != null && v <= val[n - 1]) return;
+        int i = n - 1;
+        while (i > 0 && (top[i - 1] == null || v > val[i - 1])) { top[i] = top[i - 1]; val[i] = val[i - 1]; i--; }
+        top[i] = e; val[i] = v;
+    }
+
+    static string ProcName(int off, long pid)
+    {
+        int len = (ushort)Marshal.ReadInt16(procBuf, off + O_NAMELEN);
+        IntPtr p = Marshal.ReadIntPtr(procBuf, off + O_NAMEBUF);
+        string s = len > 0 && p != IntPtr.Zero ? Clean(Marshal.PtrToStringUni(p, len / 2)) : "";
+        s = s.Replace(':', '_').Replace(';', '_').Replace(' ', '_');
+        return s.Length > 0 ? s : "pid" + pid.ToString(Inv);
+    }
+
+    // One snapshot. Returns true when it produced rates (a previous snapshot exists); the p* fields / tops are set then.
+    static bool ProcSnap()
+    {
+        long q = Stopwatch.GetTimestamp(), ft = DateTime.UtcNow.ToFileTimeUtc();   // before the call: see the create-time rule
+        int ret = 0, st = 0;
+        ulong sc0 = ThreadCyc(); long sq0 = Stopwatch.GetTimestamp();
+        for (int attempt = 0; attempt < 4; attempt++)
+        {
+            if (procBuf == IntPtr.Zero) { procBufSize = Math.Max(procBufSize, 1 << 20); procBuf = Marshal.AllocHGlobal(procBufSize); }
+            st = NtQuerySystemInformation(SYSTEM_PROCESS_INFORMATION, procBuf, procBufSize, out ret);
+            if (st != STATUS_INFO_LENGTH_MISMATCH) break;
+            Marshal.FreeHGlobal(procBuf); procBuf = IntPtr.Zero;
+            procBufSize = Math.Max(ret, procBufSize) + (256 << 10);
+        }
+        long sdq = Stopwatch.GetTimestamp() - sq0, sdc = (long)(ThreadCyc() - sc0);
+        procCalls++; procSysTicks += sdq; procSysCyc += sdc; if (sdc > procSysCycMax) procSysCycMax = sdc; ProcBytes = ret;
+        pNongame = pNongameIo = double.NaN;
+        if (st != 0)
+        {
+            ProcFails++;
+            NoteOnce("proc:" + st.ToString("X8", Inv), "NtQuerySystemInformation(SystemProcessInformation) returned 0x" + st.ToString("X8", Inv) + " (per-process cells blank)");
+            procPrevQpc = 0; procPrevFt = 0;                       // next good snapshot is a new baseline
+            return false;
+        }
+        long gen = ++procGen;
+        double dtS = procPrevQpc > 0 ? (q - procPrevQpc) / (double)Stopwatch.Frequency : 0;
+        bool rates = dtS > 0;
+        Array.Clear(topCpu, 0, TOP_CPU); Array.Clear(topIo, 0, TOP_IO);
+        double ng = 0, ngIo = 0;
+        int off = 0, count = 0;
+        while (off >= 0 && off + (X64 ? 0x100 : 0xB8) <= ret)
+        {
+            long pid = Marshal.ReadIntPtr(procBuf, off + O_PID).ToInt64();
+            if (pid != 0)
+            {
+                count++;
+                long create = Marshal.ReadInt64(procBuf, off + O_CREATE);
+                long cpu = Marshal.ReadInt64(procBuf, off + O_USER) + Marshal.ReadInt64(procBuf, off + O_KERNEL);
+                long io = Marshal.ReadInt64(procBuf, off + O_RTC) + Marshal.ReadInt64(procBuf, off + O_WTC);
+                long dCpu = 0, dIo = 0;
+                ProcEnt e;
+                if (procs.TryGetValue(pid, out e) && e.Create == create) { dCpu = cpu - e.Cpu; dIo = io - e.Io; }
+                else
+                {
+                    if (e == null) { e = new ProcEnt(); e.Pid = pid; procs[pid] = e; }
+                    e.Create = create; e.Name = ProcName(off, pid);
+                    if (procPrevFt > 0 && create >= procPrevFt) { dCpu = cpu; dIo = io; }   // started since the last snapshot
+                }
+                e.Cpu = cpu; e.Io = io; e.Gen = gen;
+                if (rates && pid != gamePid)
+                {
+                    double cores = dCpu > 0 ? dCpu / 1e7 / dtS : 0.0, iob = dIo > 0 ? dIo / dtS : 0.0;
+                    ng += cores; ngIo += iob;
+                    if (cores > 0) TopIns(topCpu, topCpuV, e, cores);
+                    if (iob > 0) TopIns(topIo, topIoV, e, iob);
+                }
+            }
+            int next = Marshal.ReadInt32(procBuf, off);
+            if (next <= 0) break;
+            off += next;
+        }
+        procDead.Clear();
+        foreach (KeyValuePair<long, ProcEnt> kv in procs) if (kv.Value.Gen != gen) procDead.Add(kv.Key);
+        for (int i = 0; i < procDead.Count; i++) procs.Remove(procDead[i]);
+        ProcCount = count;
+        procPrevQpc = q; procPrevFt = ft;
+        if (!rates) return false;
+        pNongame = ng; pNongameIo = ngIo / 1e6;
+        ProcSnaps++;
+        return true;
+    }
+
+    static void AppendTop(ProcEnt[] top, double[] val, double scale, string fmt)
+    {
+        for (int i = 0; i < top.Length && top[i] != null; i++)
+        {
+            if (i > 0) sb.Append(';');
+            sb.Append(top[i].Name).Append(':').Append(top[i].Pid.ToString(Inv)).Append(':').Append((val[i] * scale).ToString(fmt, Inv));
+        }
+    }
+
     // ---- Init: game handle, power poller start, CPU sets, PDH query (+ one collect so the first row has rates) ----
     public static void Init(int pid, int intervalMs)
     {
@@ -447,6 +625,21 @@ public static class LdSys
         }
         Failed = string.Join(" ", failed.ToArray());
         IPart(ip, "reads", ref it);
+
+        // per-process baseline snapshot (the first row then has rates over Init -> first tick)
+        ProcSnaps = 0; ProcFails = 0; procPrevQpc = 0; procPrevFt = 0; procs.Clear();
+        procCalls = 0; procSysTicks = 0; procSysCyc = 0; procSysCycMax = 0;
+        sysHave = false;
+        try { SysCores(); } catch (Exception ex) { NoteOnce("sys-x", "GetSystemTimes baseline: " + ex.Message); }
+        if (ProcEvery > 0)
+        {
+            long pb = Stopwatch.GetTimestamp();
+            try { ProcSnap(); } catch (Exception ex) { ProcFails++; NoteOnce("proc-x", "per-process snapshot: " + ex.Message); }
+            double pbMs = (Stopwatch.GetTimestamp() - pb) * 1000.0 / Stopwatch.Frequency;
+            ProcInfo = ProcFails > 0 ? "failed" : string.Format(Inv, "every={0} procs={1} buf_kb={2} base_ms={3:0.0}", ProcEvery, ProcCount, procBufSize / 1024, pbMs);
+        }
+        else ProcInfo = "off";
+        IPart(ip, "proc_base", ref it);
 
         textBuf = Marshal.AllocHGlobal(1024);
         try { OwnDesktop = ObjName(GetProcessWindowStation()) + "\\" + ObjName(GetThreadDesktop(GetCurrentThreadId())); } catch { OwnDesktop = "?"; }
@@ -678,7 +871,7 @@ public static class LdSys
         // CPU: the "_Total" instances, then the P/E means over the per-logical-processor instances.
         double util = double.NaN, perf = double.NaN, bas = double.NaN;
         double pEff = 0, eEff = 0, pUtil = 0, eUtil = 0; int npEff = 0, neEff = 0, npUtil = 0, neUtil = 0;
-        double tzPassive = double.NaN, tzTemp = double.NaN;
+        double tzPassive = double.NaN, tzTemp = double.NaN, diskBps = double.NaN;
         try
         {
             freqBy.Clear();
@@ -707,6 +900,8 @@ public static class LdSys
             for (int i = 0; i < n; i++) if (double.IsNaN(tzPassive) || vals[i] < tzPassive) tzPassive = vals[i];
             n = ReadArray(counters[C_TZ_TEMP]);
             for (int i = 0; i < n; i++) if (vals[i] > 0 && (double.IsNaN(tzTemp) || vals[i] > tzTemp)) tzTemp = vals[i];
+            n = ReadArray(counters[C_DISK]);
+            for (int i = 0; i < n; i++) if (names[i] == TOTAL) diskBps = vals[i];
         }
         catch (Exception ex) { NoteOnce("pdh-x", "PDH read: " + ex.Message); }
         Num(util, "0.00"); sb.Append(',');
@@ -744,6 +939,26 @@ public static class LdSys
             schemeV = null; overlayV = null;
         }
         sb.Append(schemeV ?? "").Append(',').Append(overlayV ?? "");
+
+        // per-process attribution: machine/game cores every row; the process snapshot every ProcEvery-th row (blank cells
+        // on the other rows / on failure)
+        try { SysCores(); } catch (Exception ex) { sNongame = sGame = double.NaN; NoteOnce("sys-x", "GetSystemTimes: " + ex.Message); }
+        bool procRow = false;
+        if (ProcEvery > 0 && Rows % ProcEvery == 0)
+        {
+            try { procRow = ProcSnap(); } catch (Exception ex) { ProcFails++; procRow = false; NoteOnce("proc-x", "per-process snapshot: " + ex.Message); }
+        }
+        sb.Append(',');
+        Num(sNongame, "0.000"); sb.Append(','); Num(sGame, "0.000"); sb.Append(',');
+        if (procRow) { Num(pNongame, "0.000"); sb.Append(','); Num(pNongameIo, "0.00"); }
+        else sb.Append(',');
+        sb.Append(',');
+        Num(double.IsNaN(diskBps) ? double.NaN : diskBps / 1e6, "0.00");
+        sb.Append(',');
+        if (procRow) AppendTop(topCpu, topCpuV, 1.0, "0.000");
+        sb.Append(',');
+        if (procRow) AppendTop(topIo, topIoV, 1e-6, "0.00");
+        t = Mark(P_PROC, t);
 
         sb.Append("\r\n");
         w.Write(sb.ToString());
@@ -929,5 +1144,6 @@ public static class LdSys
         hGame = IntPtr.Zero;
         if (arrBuf != IntPtr.Zero) { Marshal.FreeHGlobal(arrBuf); arrBuf = IntPtr.Zero; arrBufSize = 0; }
         if (textBuf != IntPtr.Zero) { Marshal.FreeHGlobal(textBuf); textBuf = IntPtr.Zero; }
+        if (procBuf != IntPtr.Zero) { Marshal.FreeHGlobal(procBuf); procBuf = IntPtr.Zero; }
     }
 }

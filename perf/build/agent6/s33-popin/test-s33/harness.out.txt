@@ -1,0 +1,121 @@
+W6 logdiff kit (Agent 6, task #16): <workspace>\build\agent6\s33-popin\test-s33\out-harness\staging
+expect build\agent6\s33-popin\expect-s33.json (reference offsf); matrix.json build\agent6\s33-popin\harness-s33.json
+runs 14 in 13 arms: offsf=1; base=1; basesf=1; gasync=1; gbindful=1; gthr0=1; off=1; offd=1; offwarm=1; ond=1; onsf=1; onstop=2; onwarm=1
+HARNESS MODE, functional only: valid_timing not checked; status from exit_code/exited_early/close_method/wer_seen; slow state skipped; logdiff on the staging copies in build\agent6\s33-popin\test-s33\out-harness\staging
+  0001-base-r1 <- build\agent6\s33-popin\test-s33\harness\20261125-010000-s33-base
+  0002-basesf-r1 <- build\agent6\s33-popin\test-s33\harness\20261125-010100-s33-basesf
+  0003-gasync-r1 <- build\agent6\s33-popin\test-s33\harness\20261125-010200-s33-gasync
+  0004-gbindful-r1 <- build\agent6\s33-popin\test-s33\harness\20261125-010300-s33-gbindful
+  0005-gthr0-r1 <- build\agent6\s33-popin\test-s33\harness\20261125-010400-s33-gthr0
+  0006-off-r1 <- build\agent6\s33-popin\test-s33\harness\20261125-010500-s33-off
+  0007-offd-r1 <- build\agent6\s33-popin\test-s33\harness\20261125-010600-s33-offd
+  0008-offsf-r1 <- build\agent6\s33-popin\test-s33\harness\20261125-010700-s33-offsf
+  0009-offwarm-r1 <- build\agent6\s33-popin\test-s33\harness\20261125-010800-s33-offwarm
+  0010-ond-r1 <- build\agent6\s33-popin\test-s33\harness\20261125-010900-s33-ond
+  0011-onsf-r1 <- build\agent6\s33-popin\test-s33\harness\20261125-011000-s33-onsf
+  0012-onstop-r1 <- build\agent6\s33-popin\test-s33\harness\20261125-011100-s33-onstop
+  0013-onwarm-r1 <- build\agent6\s33-popin\test-s33\harness\20261125-011200-s33-onwarm
+  0014-onstop-r2 <- build\agent6\s33-popin\test-s33\harness\20261125-011300-s33-onstop-2
+
+Per arm. stuck = STUCK-LOCK episodes (sites; IN = in the measured window); recov/unh/pfail = Recovered stale protection / Unhandled write fault / Protect failed lines per run; W/E/C = warning/error/critical lines per run; slow = slow runs/runs, mean slow_pct, mean onset s; logdiff vs offsf = gate FAIL findings/NEW/MORE/GONE/ONLY keys
+  arm        runs verdict stuck                  dumps recov      unh        pfail      W/E/C                      slow                   logdiff F/N/M/G/O
+  offsf      1    PASS    0                      0     [0]        [0]        [0]        40/0/0                     0/0 -% -s              (reference)
+  base       1    NOTE    0                      0     [0]        [0]        [0]        40/0/0                     0/0 -% -s              0/0/0/1/0
+  basesf     1    NOTE    0                      0     [0]        [0]        [0]        40/0/0                     0/0 -% -s              0/0/0/1/1
+  gasync     1    PASS    0                      0     [0]        [0]        [0]        41/0/0                     0/0 -% -s              0/1/0/0/1
+  gbindful   1    PASS    0                      0     [0]        [0]        [0]        41/0/0                     0/0 -% -s              0/1/0/0/1
+  gthr0      1    PASS    0                      0     [0]        [0]        [0]        41/0/0                     0/0 -% -s              0/1/0/0/1
+  off        1    NOTE    0                      0     [0]        [0]        [0]        40/0/0                     0/0 -% -s              0/0/0/1/0
+  offd       1    PASS    0                      0     [0]        [0]        [0]        40/0/0                     0/0 -% -s              0/0/0/0/1
+  offwarm    1    PASS    0                      0     [0]        [0]        [0]        40/0/0                     0/0 -% -s              0/0/0/0/0
+  ond        1    PASS    0                      0     [0]        [0]        [0]        40/0/0                     0/0 -% -s              0/0/0/0/2
+  onsf       1    PASS    0                      0     [0]        [0]        [0]        40/0/0                     0/0 -% -s              0/0/0/0/1
+  onstop     2    PASS    0                      0     [0, 0]     [0, 0]     [0, 0]     40/0/0 40/0/0              0/0 -% -s              0/0/0/0/1
+  onwarm     1    PASS    0                      0     [0]        [0]        [0]        40/0/0                     0/0 -% -s              0/0/0/0/1
+
+Per run. exit = run.json exit code; close = WM_CLOSE posted/clean; seq = log ends with the clean-exit lines; stuck = episodes; slow = onset s / slow_pct / span s (sys.csv rows); nogrowth = perf.csv max no-growth s in the window; free = GB at start
+  run                arm      verdict status exit  close     seq  W/E/C     stuck dmp  slow                 nogrowth free  lines
+  0001-base-r1       base     PASS    OK     0     wm_close  ok   40/0/0    0     0    -                    -        -     106
+  0002-basesf-r1     basesf   PASS    OK     0     wm_close  ok   40/0/0    0     0    -                    -        -     109
+  0003-gasync-r1     gasync   PASS    OK     0     wm_close  ok   41/0/0    0     0    -                    -        -     110
+  0004-gbindful-r1   gbindful PASS    OK     0     wm_close  ok   41/0/0    0     0    -                    -        -     110
+  0005-gthr0-r1      gthr0    PASS    OK     0     wm_close  ok   41/0/0    0     0    -                    -        -     110
+  0006-off-r1        off      PASS    OK     0     wm_close  ok   40/0/0    0     0    -                    -        -     106
+  0007-offd-r1       offd     PASS    OK     0     wm_close  ok   40/0/0    0     0    -                    -        -     111
+  0008-offsf-r1      offsf    PASS    OK     0     wm_close  ok   40/0/0    0     0    -                    -        -     109
+  0009-offwarm-r1    offwarm  PASS    OK     0     wm_close  ok   40/0/0    0     0    -                    -        -     109
+  0010-ond-r1        ond      PASS    OK     0     wm_close  ok   40/0/0    0     0    -                    -        -     112
+  0011-onsf-r1       onsf     PASS    OK     0     wm_close  ok   40/0/0    0     0    -                    -        -     110
+  0012-onstop-r1     onstop   PASS    OK     0     wm_close  ok   40/0/0    0     0    -                    -        -     110
+  0013-onwarm-r1     onwarm   PASS    OK     0     wm_close  ok   40/0/0    0     0    -                    -        -     110
+  0014-onstop-r2     onstop   PASS    OK     0     wm_close  ok   40/0/0    0     0    -                    -        -     110
+
+STUCK-LOCK episodes: 0 (H1 = owner parked in sub_83FAF180, the L1 fence-wait poll; finding 10)
+
+watchdog runs: 0
+Execution complete race runs: 0
+
+Reasons, FAIL first (per arm: its runs, then its logdiff findings; INFO does not change a verdict)
+  NOTE base     logdiff GONE: [info] [gpu] slow frame ##: # ms | gpu-thread idle # | host-gpu wait # (#x) | shader translate # (#x) | pipeline create # (#x), new # | texture load # (#x) | readback #x # KB, # stalled | cpu-write in
+  NOTE basesf   logdiff GONE: [info] [gpu] slow frame ##: # ms | gpu-thread idle # | host-gpu wait # (#x) | shader translate # (#x) | pipeline create # (#x), new # | texture load # (#x) | readback #x # KB, # stalled | cpu-write in
+  NOTE off      logdiff GONE: [info] [gpu] slow frame ##: # ms | gpu-thread idle # | host-gpu wait # (#x) | shader translate # (#x) | pipeline create # (#x), new # | texture load # (#x) | readback #x # KB, # stalled | cpu-write in
+  INFO offsf    0008-offsf-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)
+  INFO base     0001-base-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)
+  INFO basesf   0002-basesf-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)
+  INFO gasync   0003-gasync-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)
+  INFO gbindful 0004-gbindful-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)
+  INFO gthr0    0005-gthr0-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)
+  INFO off      0006-off-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)
+  INFO offd     0007-offd-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)
+  INFO offwarm  0009-offwarm-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)
+  INFO ond      0010-ond-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)
+  INFO onsf     0011-onsf-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)
+  INFO onstop   0012-onstop-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)
+  INFO onstop   0014-onstop-r2: slow state skipped (harness run: run.json has no ff_signal_epoch_s)
+  INFO onwarm   0013-onwarm-r1: slow state skipped (harness run: no sys.csv)
+
+Counts per arm (lines containing each expect count text; one number per run, run-dir order)
+  STUCK-LOCK                                                   offsf=[0]; base=[0]; basesf=[0]; gasync=[0]; gbindful=[0]; gthr0=[0]; off=[0]; offd=[0]; offwarm=[0]; ond=[0]; onsf=[0]; onstop=[0, 0]; onwarm=[0]
+  still not acquired after                                     offsf=[0]; base=[0]; basesf=[0]; gasync=[0]; gbindful=[0]; gthr0=[0]; off=[0]; offd=[0]; offwarm=[0]; ond=[0]; onsf=[0]; onstop=[0, 0]; onwarm=[0]
+  Minidump written to                                          offsf=[0]; base=[0]; basesf=[0]; gasync=[0]; gbindful=[0]; gthr0=[0]; off=[0]; offd=[0]; offwarm=[0]; ond=[0]; onsf=[0]; onstop=[0, 0]; onwarm=[0]
+  Recovered stale physical page protection                     offsf=[0]; base=[0]; basesf=[0]; gasync=[0]; gbindful=[0]; gthr0=[0]; off=[0]; offd=[0]; offwarm=[0]; ond=[0]; onsf=[0]; onstop=[0, 0]; onwarm=[0]
+  Unhandled guest physical write fault                         offsf=[0]; base=[0]; basesf=[0]; gasync=[0]; gbindful=[0]; gthr0=[0]; off=[0]; offd=[0]; offwarm=[0]; ond=[0]; onsf=[0]; onstop=[0, 0]; onwarm=[0]
+  PhysicalHeap::Protect failed                                 offsf=[0]; base=[0]; basesf=[0]; gasync=[0]; gbindful=[0]; gthr0=[0]; off=[0]; offd=[0]; offwarm=[0]; ond=[0]; onsf=[0]; onstop=[0, 0]; onwarm=[0]
+  BaseHeap::Protect failed                                     offsf=[0]; base=[0]; basesf=[0]; gasync=[0]; gbindful=[0]; gthr0=[0]; off=[0]; offd=[0]; offwarm=[0]; ond=[0]; onsf=[0]; onstop=[0, 0]; onwarm=[0]
+  d3d12_pipeline_creation_no_wait                              offsf=[0]; base=[0]; basesf=[0]; gasync=[1]; gbindful=[1]; gthr0=[1]; off=[0]; offd=[0]; offwarm=[0]; ond=[1]; onsf=[1]; onstop=[1, 1]; onwarm=[1]
+  slow frame #                                                 offsf=[3]; base=[0]; basesf=[3]; gasync=[3]; gbindful=[3]; gthr0=[3]; off=[0]; offd=[3]; offwarm=[3]; ond=[3]; onsf=[3]; onstop=[3, 3]; onwarm=[3]
+  dropped draws                                                offsf=[3]; base=[0]; basesf=[0]; gasync=[3]; gbindful=[3]; gthr0=[3]; off=[0]; offd=[3]; offwarm=[3]; ond=[3]; onsf=[3]; onstop=[3, 3]; onwarm=[3]
+  forced pipeline waits                                        offsf=[3]; base=[0]; basesf=[0]; gasync=[3]; gbindful=[3]; gthr0=[3]; off=[0]; offd=[3]; offwarm=[3]; ond=[3]; onsf=[3]; onstop=[3, 3]; onwarm=[3]
+  resolve after drop:                                          offsf=[0]; base=[0]; basesf=[0]; gasync=[0]; gbindful=[0]; gthr0=[0]; off=[0]; offd=[2]; offwarm=[0]; ond=[2]; onsf=[0]; onstop=[0, 0]; onwarm=[0]
+  [NtCreateFile] FAILED                                        offsf=[35]; base=[35]; basesf=[35]; gasync=[35]; gbindful=[35]; gthr0=[35]; off=[35]; offd=[35]; offwarm=[35]; ond=[35]; onsf=[35]; onstop=[35, 35]; onwarm=[35]
+  Reserving the guest memory arena                             offsf=[1]; base=[1]; basesf=[1]; gasync=[1]; gbindful=[1]; gthr0=[1]; off=[1]; offd=[1]; offwarm=[1]; ond=[1]; onsf=[1]; onstop=[1, 1]; onwarm=[1]
+  Title terminated                                             offsf=[1]; base=[1]; basesf=[1]; gasync=[1]; gbindful=[1]; gthr0=[1]; off=[1]; offd=[1]; offwarm=[1]; ond=[1]; onsf=[1]; onstop=[1, 1]; onwarm=[1]
+
+ONLY keys per arm vs offsf (any level, not Toypad; in no offsf run), from w4b_logdiff
+  base: 0
+  basesf: 1
+    [info] [gpu] slow frame ##: # ms | gpu-thread idle # | host-gpu wait # (#x) | shader translate # (#x) | pipeline create # (#x), new # | texture load # (#x) | readback #x # KB, # stalled | cpu-write invalidations #x # KB 
+  gasync: 1
+    [warning] [gpu] d#d#_pipeline_creation_no_wait ignored: it needs async_shader_compilation, pipeline creation threads and bindless resources
+  gbindful: 1
+    [warning] [gpu] d#d#_pipeline_creation_no_wait ignored: it needs async_shader_compilation, pipeline creation threads and bindless resources
+  gthr0: 1
+    [warning] [gpu] d#d#_pipeline_creation_no_wait ignored: it needs async_shader_compilation, pipeline creation threads and bindless resources
+  off: 0
+  offd: 1
+    [info] [gpu] resolve after drop: dest #h after # skipped draws (pipeline in creation) | resolves #, skipped draws #
+  offwarm: 0
+  ond: 2
+    [info] [gpu] d#d#_pipeline_creation_no_wait: not waiting for pipeline creation at the end of submissions; draws stay skipped until their pipeline is ready
+    [info] [gpu] resolve after drop: dest #h after # skipped draws (pipeline in creation) | resolves #, skipped draws #
+  onsf: 1
+    [info] [gpu] d#d#_pipeline_creation_no_wait: not waiting for pipeline creation at the end of submissions; draws stay skipped until their pipeline is ready
+  onstop: 1
+    [info] [gpu] d#d#_pipeline_creation_no_wait: not waiting for pipeline creation at the end of submissions; draws stay skipped until their pipeline is ready
+  onwarm: 1
+    [info] [gpu] d#d#_pipeline_creation_no_wait: not waiting for pipeline creation at the end of submissions; draws stay skipped until their pipeline is ready
+
+w4b_logdiff: exit 0 in 0.4 s -> build\agent6\s33-popin\test-s33\out-harness\logdiff (log build\agent6\s33-popin\test-s33\out-harness\logdiff.log)
+w4b_extra: exit 0 in 0.3 s -> build\agent6\s33-popin\test-s33\out-harness\extra.txt (log build\agent6\s33-popin\test-s33\out-harness\extra.log)
+verdict: no FAIL; runtime 0.9 s; output build\agent6\s33-popin\test-s33\out-harness
+w6_kit exit 0 (0 = no FAIL, 1 = at least one FAIL, 2 = usage error)

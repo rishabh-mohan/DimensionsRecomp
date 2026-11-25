@@ -1,0 +1,49 @@
+NOTE  run <workspace>\build\agent8\matrix\20261125-0315\runs\0319-win3-r1 (matrix); logs ['game.log'], 144 lines
+NOTE  elapsed 114.64 s (end-start)
+NOTE  cvars {'framerate_limit': '0', 'shared_memory_single_hold_rearm': 'true', 'physical_protect_hold_global_lock': 'true', 'physical_protect_keep_watch': 'true', 'physical_protect_keep_watch_verify': 'false', 'host_timer_resolution_ms': '1', 'host_timer_throttling_optout': 'true', 'precise_guest_sleep': 'true', 'wait_timeout_round_up': 'true', 'cs_spin': 'true', 'spinlock_pause_spin': 'true', 'clock_lockfree': 'true', 'tls_bounds_fix': 'true', 'timer_queue_precise_wait': 'true'}; env (LEGO_*) {'LEGO_GPU_WAIT_BACKOFF_US': '500', 'LEGO_GPU_WAIT_SPIN_US': '30'}
+PASS  exit_code 0 (0x00000000)
+PASS  exited_early False
+PASS  WER False
+PASS  dialogs []
+PASS  crash_events None
+PASS  dumps 0 in dir, run.json None
+PASS  close wm_close
+PASS  "Title terminated" x1 (clean exit)
+PASS  bad string "Recovered stale physical page protection" x0
+PASS  bad string "Unhandled guest physical write fault" x0
+PASS  bad string "PhysicalHeap::Protect failed" x0
+PASS  bad string "BaseHeap::Protect failed" x0
+PASS  bad string "is not a plain number" x0
+PASS  bad string "C1 verify: on" x0
+PASS  bad string "STUCK-LOCK" x0
+PASS  bad string "REX_FATAL" x0
+PASS  bad string "Minidump written to" x0
+PASS  bad string "still not acquired after" x0
+FAIL  run.json bin_dir <workspace>\build\agent2\devoff4b-bin (want build/agent2/devfinal-bin)
+PASS  devfinal-bin MANIFEST F9C2BE722E5B3517 = BIN-PINS F9C2BE722E5B3517
+FAIL  run-dir MANIFEST.txt copy = pin
+FAIL  run-dir exe = pin
+FAIL  run-dir legodimensions.exe DFBE1D43B28861A6 (pin 545D28B9DDEAD51E)
+FAIL  run-dir rexruntime.dll A33801D1538D6175 (pin C5BC627BB2E83CF2)
+FAIL  run-dir rexgpu-xenos.dll E3CB99CFDEA95E66 (pin CB3A2CC967A9BE81)
+FAIL  cvars only framerate_limit=0: {'framerate_limit': '0', 'shared_memory_single_hold_rearm': 'true', 'physical_protect_hold_global_lock': 'true', 'physical_protect_keep_watch': 'true', 'physical_protect_keep_watch_verify': 'false', 'host_timer_resolution_ms': '1', 'host_timer_throttling_optout': 'true', 'precise_guest_sleep': 'true', 'wait_timeout_round_up': 'true', 'cs_spin': 'true', 'spinlock_pause_spin': 'true', 'clock_lockfree': 'true', 'tls_bounds_fix': 'true', 'timer_queue_precise_wait': 'true'}
+FAIL  env has no LEGO_GPU_WAIT_*: {'LEGO_GPU_WAIT_BACKOFF_US': '500', 'LEGO_GPU_WAIT_SPIN_US': '30'}
+PASS  check-defaults.py D9936C56C5E04B98 (rated D9936C56C5E04B98)
+NOTE  check-defaults --mode xenos exit 1; RESULT FAIL (15)
+NOTE    check-defaults FAIL 'Final defaults:' lines: 0 (want 1)
+NOTE    check-defaults FAIL 'Final defaults (GPU):' lines: 0 (want 1)
+NOTE    check-defaults FAIL physical_protect_hold_global_lock: missing from the Final defaults lines
+NOTE    check-defaults FAIL physical_protect_keep_watch: missing from the Final defaults lines
+NOTE    check-defaults FAIL host_timer_resolution_ms: missing from the Final defaults lines
+NOTE    check-defaults FAIL host_timer_throttling_optout: missing from the Final defaults lines
+NOTE    check-defaults FAIL precise_guest_sleep: missing from the Final defaults lines
+NOTE    check-defaults FAIL wait_timeout_round_up: missing from the Final defaults lines
+NOTE    check-defaults FAIL cs_spin: missing from the Final defaults lines
+NOTE    check-defaults FAIL spinlock_pause_spin: missing from the Final defaults lines
+NOTE    check-defaults FAIL clock_lockfree: missing from the Final defaults lines
+NOTE    check-defaults FAIL tls_bounds_fix: missing from the Final defaults lines
+NOTE    check-defaults FAIL timer_queue_precise_wait: missing from the Final defaults lines
+NOTE    check-defaults FAIL shared_memory_single_hold_rearm: missing from the Final defaults lines
+NOTE    check-defaults FAIL physical_protect_keep_watch_verify: missing from the Final defaults lines
+FAIL  check-defaults --mode xenos PASS
+F-GATE F1 0319-win3-r1: FAIL

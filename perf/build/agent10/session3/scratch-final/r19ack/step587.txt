@@ -1,0 +1,96 @@
+﻿Created At: 2026-11-25T06:52:42-06:00
+Completed At: 2026-11-25T06:52:44-06:00
+Created At: 2026-11-25T06:52:42-06:00
+Completed At: 2026-11-25T06:52:44-06:00
+Showing lines 1-91 of 91
+1: #!/usr/bin/env python3
+2: """r19_path.py - the two by-machine decisions of the #19 chain (M10 r19-rows-mp-rating C1/C2) (M7, r19prep).
+3: 
+4: Read-only, stdlib only. Run from WS at Below Normal.
+5:   python -B build/agent7/session3/r19prep/r19_path.py path <r19r10 r19_gate --json>
+6:       prints r19-pathN  (r19_gate --row i --n 4 PASS on r19r10: the menus route splits at N)
+7:              r19-path16 (C2: no FAIL, and the only INCOMPLETE is 'splits > 0 in the last split line')
+8:              STOP       (anything else: write neither marker, report)
+9:   python -B build/agent7/session3/r19prep/r19_path.py noop <r19d r19_gate --json> <r19r25 run dir>
+10:       prints NO-OP OK (C1 points 1 and 3: fails [], flags [], incomplete == only the 'no split was due at this N' entry,
+11:              and r19r25 has 0 'd3d12_submit_split:' counter lines) or STOP. C1 point 2 (s4b_check clean, run valid)
+12:              stays with M3.
+13:   python -B build/agent7/session3/r19prep/r19_path.py bin
+14:       prints READY-R19 OK when devoff4b-r19-bin MANIFEST.txt is 1EBF1163, its rexgpu-xenos.dll is 5DCDD8CB and has the 3
+15:              #19 needles (ROWS-R19 0.1), and devoff4b-bin's rexgpu-xenos.dll (E3CB99CF) has none; else STOP.
+16: Exit 0 for r19-pathN / r19-path16 / NO-OP OK / READY-R19 OK, 1 for STOP.
+17: """
+18: import hashlib
+19: import json
+20: import os
+21: import sys
+22: 
+23: NOSPLIT_I = 'splits > 0 in the last split line'
+24: NOSPLIT_D = 'no async counter line: no split was due at this N'
+25: NEEDLES = [b'd3d12_async_submit: needs d3d12_submit_split_kb above 0, staying off',
+26:            b'd3d12_async_submit: submitting splits on the submit thread ({} slots)',
+27:            b'd3d12_async_submit: frame={} submission={} chunks={} queued_max={}']
+28: 
+29: 
+30: def bins():
+31:     def rd(p):
+32:         with open(p, 'rb') as fh:
+33:             return fh.read()
+34:     sha = lambda b: hashlib.sha256(b).hexdigest().upper()[:8]  # noqa: E731
+35:     man = sha(rd(os.path.join('build', 'agent2', 'devoff4b-r19-bin', 'MANIFEST.txt')))
+36:     on = rd(os.path.join('build', 'agent2', 'devoff4b-r19-bin', 'rexgpu-xenos.dll'))
+37:     off = rd(os.path.join('build', 'agent2', 'devoff4b-bin', 'rexgpu-xenos.dll'))
+38:     got = (man, sha(on), [x in on for x in NEEDLES], sha(off), [x in off for x in NEEDLES])
+39:     ok = got == ('1EBF1163', '5DCDD8CB', [True] * 3, 'E3CB99CF', [False] * 3)
+40:     return ('READY-R19 OK ' if ok else 'STOP (bin identity) ') + repr(got)
+41: 
+42: 
+43: def load(p):
+44:     with open(p, 'r', encoding='ascii') as fh:
+45:         return json.load(fh)
+46: 
+47: 
+48: def path(j):
+49:     if j.get('verdict') == 'PASS':
+50:         return 'r19-pathN'
+51:     inc = j.get('incomplete') or []
+52:     if not j.get('fails') and len(inc) == 1 and inc[0].startswith(NOSPLIT_I):
+53:         return 'r19-path16'
+54:     return 'STOP'
+55: 
+56: 
+57: def split_counter_lines(run):
+58:     n = 0
+59:     for fn in os.listdir(run):
+60:         if fn == 'game.log' or (fn.startswith('game.') and fn.endswith('.log')):
+61:             with open(os.path.join(run, fn), 'r', encoding='utf-8', errors='replace') as fh:
+62:                 n += sum(1 for ln in fh if 'd3d12_submit_split:' in ln)
+63:     return n
+64: 
+65: 
+66: def noop(j, r25):
+67:     inc = j.get('incomplete') or []
+68:     ok = not j.get('fails') and not j.get('flags') and len(inc) == 1 and NOSPLIT_D in inc[0]
+69:     if not ok:
+70:         return 'STOP (row d is not the pure no-op shape: fails %s, flags %s, incomplete %s)' % (
+71:             j.get('fails'), j.get('flags'), inc)
+72:     n = split_counter_lines(r25)
+73:     return 'NO-OP OK' if n == 0 else 'STOP (r19r25 has %d split counter lines: discrepancy, report)' % n
+74: 
+75: 
+76: def main(argv):
+77:     if len(argv) == 2 and argv[0] == 'path':
+78:         out = path(load(argv[1]))
+79:     elif len(argv) == 3 and argv[0] == 'noop':
+80:         out = noop(load(argv[1]), argv[2])
+81:     elif argv == ['bin']:
+82:         out = bins()
+83:     else:
+84:         print(__doc__)
+85:         return 2
+86:     print(out)
+87:     return 1 if out.startswith('STOP') else 0
+88: 
+89: 
+90: if __name__ == '__main__':
+91:     sys.exit(main(sys.argv[1:]))

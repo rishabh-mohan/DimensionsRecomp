@@ -1,0 +1,128 @@
+SDK HEAD and blobs (read-only):
+  ok   live SDK HEAD = 5350b1d (got 5350b1de9927)
+  ok   include/rex/graphics/d3d12/pipeline_cache.h: worktree blob = 5350b1d blob 7e81db3b1402
+  ok   include/rex/graphics/d3d12/pipeline_cache.h: blob read, LF only
+  ok   src/graphics/d3d12/command_processor.cpp: worktree blob = 5350b1d blob 6f21eb6f220a
+  ok   src/graphics/d3d12/command_processor.cpp: blob read, LF only
+  ok   src/graphics/d3d12/pipeline_cache.cpp: worktree blob = 5350b1d blob 55e9f02ef54b
+  ok   src/graphics/d3d12/pipeline_cache.cpp: blob read, LF only
+  ok   src/graphics/frame_stats.h: worktree blob = 5350b1d blob 8c169b418cb5
+  ok   src/graphics/frame_stats.h: blob read, LF only
+
+nohunk5: s33-popin-nohunk5.patch, 10725 bytes, sha256 57CFA8ADF1E9007954063A87F406056BB137E2D2D8F2484940BD4E1ABF3704AF
+  ok   no git repo above the scratch copy (rev-parse rc 128)
+  $ git apply --check --verbose <patch>  (cwd scratch/nohunk5) -> exit 0
+      Checking patch include/rex/graphics/d3d12/pipeline_cache.h...
+      Checking patch src/graphics/d3d12/command_processor.cpp...
+      Checking patch src/graphics/d3d12/pipeline_cache.cpp...
+      Checking patch src/graphics/frame_stats.h...
+  ok   check exit 0
+  ok   check: no 'Skipped patch'
+  ok   check: no offsets or fuzz
+  ok   check: 4 'Checking patch' lines
+  $ git apply --verbose <patch>  (cwd scratch/nohunk5) -> exit 0
+      Checking patch include/rex/graphics/d3d12/pipeline_cache.h...
+      Checking patch src/graphics/d3d12/command_processor.cpp...
+      Checking patch src/graphics/d3d12/pipeline_cache.cpp...
+      Checking patch src/graphics/frame_stats.h...
+      Applied patch include/rex/graphics/d3d12/pipeline_cache.h cleanly.
+      Applied patch src/graphics/d3d12/command_processor.cpp cleanly.
+      Applied patch src/graphics/d3d12/pipeline_cache.cpp cleanly.
+      Applied patch src/graphics/frame_stats.h cleanly.
+  ok   apply exit 0
+  ok   apply: no 'Skipped patch'
+  ok   apply: no offsets or fuzz
+  ok   apply: 4 'Checking patch' lines
+  $ git apply -R --check --verbose <patch>  (cwd scratch/nohunk5) -> exit 0
+      Checking patch src/graphics/frame_stats.h...
+      Checking patch src/graphics/d3d12/pipeline_cache.cpp...
+      Checking patch src/graphics/d3d12/command_processor.cpp...
+      Checking patch include/rex/graphics/d3d12/pipeline_cache.h...
+  ok   reverse check exit 0
+  ok   reverse check: no 'Skipped patch'
+  ok   reverse check: no offsets or fuzz
+  ok   reverse check: 4 'Checking patch' lines
+  ok   include/rex/graphics/d3d12/pipeline_cache.h changed (sha256 0BAF28BE633759CD)
+  ok   include/rex/graphics/d3d12/pipeline_cache.h: result is LF only
+  ok   src/graphics/d3d12/command_processor.cpp changed (sha256 00EA93D3E9115B01)
+  ok   src/graphics/d3d12/command_processor.cpp: result is LF only
+  ok   src/graphics/d3d12/pipeline_cache.cpp changed (sha256 C4CB51CC6D2A6429)
+  ok   src/graphics/d3d12/pipeline_cache.cpp: result is LF only
+  ok   src/graphics/frame_stats.h changed (sha256 9F3C4F9DC58DCA5D)
+  ok   src/graphics/frame_stats.h: result is LF only
+  numstat:
+      13	0	include/rex/graphics/d3d12/pipeline_cache.h
+      24	4	src/graphics/d3d12/command_processor.cpp
+      65	19	src/graphics/d3d12/pipeline_cache.cpp
+      2	0	src/graphics/frame_stats.h
+
+full: s33-popin.patch, 11003 bytes, sha256 0D23024484CCDEE1B15AF3EB79DC28759F9D422E78536F4766C83C2071CC2EFD
+  ok   no git repo above the scratch copy (rev-parse rc 128)
+  $ git apply --check --verbose <patch>  (cwd scratch/full) -> exit 0
+      Checking patch include/rex/graphics/d3d12/pipeline_cache.h...
+      Checking patch src/graphics/d3d12/command_processor.cpp...
+      Checking patch src/graphics/d3d12/pipeline_cache.cpp...
+      Checking patch src/graphics/frame_stats.h...
+  ok   check exit 0
+  ok   check: no 'Skipped patch'
+  ok   check: no offsets or fuzz
+  ok   check: 4 'Checking patch' lines
+  $ git apply --verbose <patch>  (cwd scratch/full) -> exit 0
+      Checking patch include/rex/graphics/d3d12/pipeline_cache.h...
+      Checking patch src/graphics/d3d12/command_processor.cpp...
+      Checking patch src/graphics/d3d12/pipeline_cache.cpp...
+      Checking patch src/graphics/frame_stats.h...
+      Applied patch include/rex/graphics/d3d12/pipeline_cache.h cleanly.
+      Applied patch src/graphics/d3d12/command_processor.cpp cleanly.
+      Applied patch src/graphics/d3d12/pipeline_cache.cpp cleanly.
+      Applied patch src/graphics/frame_stats.h cleanly.
+  ok   apply exit 0
+  ok   apply: no 'Skipped patch'
+  ok   apply: no offsets or fuzz
+  ok   apply: 4 'Checking patch' lines
+  $ git apply -R --check --verbose <patch>  (cwd scratch/full) -> exit 0
+      Checking patch src/graphics/frame_stats.h...
+      Checking patch src/graphics/d3d12/pipeline_cache.cpp...
+      Checking patch src/graphics/d3d12/command_processor.cpp...
+      Checking patch include/rex/graphics/d3d12/pipeline_cache.h...
+  ok   reverse check exit 0
+  ok   reverse check: no 'Skipped patch'
+  ok   reverse check: no offsets or fuzz
+  ok   reverse check: 4 'Checking patch' lines
+  ok   include/rex/graphics/d3d12/pipeline_cache.h changed (sha256 CB5BDBB9BD68A6BF)
+  ok   include/rex/graphics/d3d12/pipeline_cache.h: result is LF only
+  ok   src/graphics/d3d12/command_processor.cpp changed (sha256 50DA6EE97DA29735)
+  ok   src/graphics/d3d12/command_processor.cpp: result is LF only
+  ok   src/graphics/d3d12/pipeline_cache.cpp changed (sha256 C4CB51CC6D2A6429)
+  ok   src/graphics/d3d12/pipeline_cache.cpp: result is LF only
+  ok   src/graphics/frame_stats.h changed (sha256 9F3C4F9DC58DCA5D)
+  ok   src/graphics/frame_stats.h: result is LF only
+  numstat:
+      10	0	include/rex/graphics/d3d12/pipeline_cache.h
+      28	5	src/graphics/d3d12/command_processor.cpp
+      65	19	src/graphics/d3d12/pipeline_cache.cpp
+      2	0	src/graphics/frame_stats.h
+
+nohunk5 result vs full-patch result (expect: only N1's 3 lines and hunk #5):
+    --- full/include/rex/graphics/d3d12/pipeline_cache.h
+    +++ nohunk5/include/rex/graphics/d3d12/pipeline_cache.h
+    @@ -70,0 +71,3 @@
+    +  // Call it only from the thread that drives pipeline creation: the GPU thread,
+    +  // or the thread acting for it while the command processor is paused. Never
+    +  // from two threads at once: the completion event has one waiter.
+  ok   include/rex/graphics/d3d12/pipeline_cache.h: only the 3 N1 comment lines differ
+    --- full/src/graphics/d3d12/command_processor.cpp
+    +++ nohunk5/src/graphics/d3d12/command_processor.cpp
+    @@ -4391,4 +4391 @@
+    -  // With d3d12_pipeline_creation_no_wait, EndSubmission never waits for
+    -  // pipelines in creation.
+    -  return !submission_open_ || pipeline_cache_->IsCreationNoWait() ||
+    -         !pipeline_cache_->IsCreatingPipelines();
+    +  return !submission_open_ || !pipeline_cache_->IsCreatingPipelines();
+  ok   src/graphics/d3d12/command_processor.cpp: only hunk #5 differs (4 '-' + 1 '+')
+  ok   src/graphics/d3d12/command_processor.cpp: CanEndSubmissionImmediately is byte-identical to 5350b1d
+  ok   src/graphics/d3d12/pipeline_cache.cpp: identical
+  ok   src/graphics/frame_stats.h: identical
+
+result: PASS
+  ok   live SDK src/include still clean afterwards

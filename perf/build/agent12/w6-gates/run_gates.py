@@ -13,9 +13,11 @@ Below Normal. It stops (exit 4) while perf-notes/WINDOW-HOLD.txt exists, unless 
 Nothing is W6-specific. The arms, their bins, cvars and env come from matrix.json; the planned arms and run count come
 from plan.txt; the runs come from results.csv. A gate whose switch no run arm sets is n/a: G4 needs
 shared_memory_single_hold_rearm=true in a run arm, and G5-G7 need physical_protect_keep_watch=true.
-The launcher's window log (bench/agent5/launch/status/window-<id>-<HHmm>.log) is found from --status (default:
-that dir, if it exists) by (1) an END line whose out dir is this dir, (2) a runner-<tag>.txt naming this dir, or
-(3) a START line within 3 min of the dir's YYYYMMDD-HHMM. Its END line feeds G3, and its quiet-gate line feeds G12,
+The launcher's window log (window-<id>-<HHmm>.log) is found from --status (default: both launcher status dirs
+that exist, night bench/agent5/launch/status and day bench/agent5/day/status (N6); the report names the one used)
+by (1) an END line whose out dir is this dir, (2) a runner-<tag>.txt naming this dir, or
+(3) a START line within 3 min of the dir's YYYYMMDD-HHMM. A match in both dirs at the same strength is ambiguous:
+no window log (CHECK); give --status or --window-log. Its END line feeds G3, and its quiet-gate line feeds G12,
 unless --gate-log or --gate is given.
 
 Gates (the numbers in W6-GATES.md v2):
@@ -83,6 +85,8 @@ import w6_env_record as envrec  # noqa: E402
 
 HOLD = os.path.join(REPO, "perf-notes", "WINDOW-HOLD.txt")
 STATUS_DIR = os.path.join(REPO, "bench", "agent5", "launch", "status")
+DAY_STATUS_DIR = os.path.join(REPO, "bench", "agent5", "day", "status")  # N6: day windows log here
+STATUS_DIRS = (STATUS_DIR, DAY_STATUS_DIR)
 STATUS_RANK = ["FAIL", "ERROR", "CHECK", "PARTIAL", "NO DATA", "NO WINDOW", "NOT RECORDED", "PENDING",
                "MANUAL", "CODE", "PASS", "n/a"]
 SOFT = {"ERROR", "CHECK", "PARTIAL", "NO DATA", "NO WINDOW", "NOT RECORDED", "PENDING"}
@@ -201,6 +205,26 @@ def env_norm(x):
     return OrderedDict((k.upper(), v) for k, v in kv_norm(x).items())
 
 
+RUN_TOKEN = re.compile(r"<run>", re.I)  # matrix.json env placeholder: the runner puts the run's own dir there
+
+
+def env_match(got, want, run_dir):
+    """G9 env check. A '<run>' in the arm's value stands for this run's dir: expand it, compare as paths (case and
+    slashes don't matter). With no run dir the placeholder can't be proven, so it doesn't match."""
+    if set(got) != set(want):
+        return False
+    for k, v in want.items():
+        if RUN_TOKEN.search(v):
+            if not run_dir:
+                return False
+            exp = RUN_TOKEN.sub(lambda _: run_dir, v)
+            if os.path.normcase(os.path.normpath(got[k])) != os.path.normcase(os.path.normpath(exp)):
+                return False
+        elif got[k] != v:
+            return False
+    return True
+
+
 def fmt_kv(d):
     return ", ".join(f"{k}={v}" for k, v in d.items()) or "-"
 
@@ -312,6 +336,27 @@ def find_window_log(status_dir, mdir):
         if best:
             return best[1], f"its START line at {best[2]} is {best[0]:.0f} s from the out dir's time"
     return None, f"no window log in {status_dir} names this out dir"
+
+
+def find_window_log_any(status_dirs, mdir):
+    """N6: find_window_log over several status dirs (night and day). A match by END line or runner file beats a
+    START-time match; two dirs matching at the same strength is ambiguous, so no window log (the gate says CHECK)."""
+    dirs = [d for d in status_dirs if d and os.path.isdir(d)]
+    if not dirs:
+        return None, "no status dir (" + ", ".join(os.path.relpath(d, REPO) for d in status_dirs) + " don't exist)"
+    hits, misses = [], []
+    for d in dirs:
+        p, how = find_window_log(d, mdir)
+        (hits if p else misses).append((p, how, d))
+    strong = [h for h in hits if "START line" not in h[1]]
+    pick = strong or hits
+    if len(pick) == 1:
+        p, how, d = pick[0]
+        return p, f"{how}; found in {os.path.relpath(d, REPO)}"
+    if len(pick) > 1:
+        return None, "ambiguous: " + "; ".join(f"{os.path.relpath(p, REPO)} ({how})" for p, how, _ in pick) + \
+            " (give --status or --window-log)"
+    return None, "no window log names this out dir in " + ", ".join(os.path.relpath(d, REPO) for d in dirs)
 
 
 def count_lines(path):
@@ -524,9 +569,10 @@ class Kit:
         if a.window_log:
             self.window_log, self.window_how = a.window_log, "given with --window-log"
         else:
-            sd = a.status or (STATUS_DIR if os.path.isdir(STATUS_DIR) else None)
-            self.window_log, self.window_how = find_window_log(sd, self.mdir) if sd else (
-                None, f"not searched ({os.path.relpath(STATUS_DIR, REPO)} doesn't exist; give --status or --window-log)")
+            if a.status:
+                self.window_log, self.window_how = find_window_log(a.status, self.mdir)
+            else:  # N6: night and day launcher folders
+                self.window_log, self.window_how = find_window_log_any(STATUS_DIRS, self.mdir)
         self.window_end, self.window_end_other = None, []
         if self.window_log:
             for m in end_lines(self.window_log):
@@ -963,8 +1009,10 @@ class Kit:
                     if any(y.startswith(f"--{k}=") for y in args):
                         probs.append(f"args set --{k}, which the arm doesn't")
                 env = env_norm(rj.get("env_set"))
-                if dict(env) != dict(x["env"]):
-                    probs.append(f"env_set {fmt_kv(env)} is not the arm's {fmt_kv(x['env'])}")
+                if not env_match(env, x["env"], r["run_dir"]):
+                    probs.append(f"env_set {fmt_kv(env)} is not the arm's {fmt_kv(x['env'])}"
+                                 + (f" (<run> = {r['run_dir'] or 'no run dir'})"
+                                    if any(RUN_TOKEN.search(v) for v in x["env"].values()) else ""))
                 toml = kv_norm(rj.get("toml_set"))
                 if dict(toml) != dict(x["toml"]):
                     probs.append(f"toml_set {fmt_kv(toml)} is not the arm's {fmt_kv(x['toml'])}")
@@ -975,6 +1023,8 @@ class Kit:
                 ok += 1
         g.d("hands off, no dev console during the window: procedural (C1 v3 latches keep_watch and "
             "hold_global_lock at init; other cvars are read live)")
+        if any(RUN_TOKEN.search(v) for i in self.run_arms for v in self.arms[i]["env"].values()):
+            g.d("env values with <run> are compared as paths, with <run> = the run's own dir")
         g.key = f"{ok}/{len(self.runs)} runs: params.cvar, args, env_set and toml_set = the arm's"
         return g
 
@@ -1526,6 +1576,13 @@ def selftest():
                                                        "about 07:30): x"])
         p, how = find_window_log(s4, md)
         ok(p is None, "no window log: a dry-run START doesn't count")
+        p, how = find_window_log_any((os.path.join(tmp, "none"), s3, s2), md)
+        ok(p and p.endswith("window-W7-0700.log") and "found in" in how,
+           "N6: two status dirs, a runner-file match beats a START-time match")
+        p, how = find_window_log_any((s1, s2), md)
+        ok(p is None and how.startswith("ambiguous"), "N6: two status dirs matching alike are ambiguous")
+        p, how = find_window_log_any((os.path.join(tmp, "none"), s4), md)
+        ok(p is None and "no window log" in how, "N6: no match in any status dir")
         plan = os.path.join(tmp, "plan.txt")
         write(plan, ["=== timing matrix: t ===", "arms:",
                      "       s0: bin build/agent2/b; frames perf; x3; warm-up 55 s; group w6 (ref); cvars framerate_limit=0",
@@ -1577,6 +1634,17 @@ def selftest():
     ok(kv_norm(["A=True", " b = 1 ", "--c=x"]) == {"a": "true", "b": "1", "c": "x"}, "kv_norm on a list")
     ok(kv_norm({"A": True, "n": 0}) == {"a": "true", "n": "0"}, "kv_norm on a dict")
     ok(env_norm({"rex_timer_wait_blocking": 1}) == {"REX_TIMER_WAIT_BLOCKING": "1"}, "env_norm")
+    rd1, rd2 = r"C:\m\0359\runs\0400-n0-r1", r"C:\m\0359\runs\0402-mc-r1"
+    want = env_norm({"LEGO_NATIVE_FRAME_METRICS": r"<run>\native-frames.csv", "LEGO_NATIVE_SHADER_MISS_CACHE": "1"})
+    got = env_norm({"lego_native_shader_miss_cache": "1", "LEGO_NATIVE_FRAME_METRICS": rd1 + r"\native-frames.csv"})
+    ok(env_match(got, want, rd1) and env_match(got, want, rd1.lower().replace("\\", "/") + "/"),
+       "<run> env: the run's own dir matches (case, slashes, trailing slash ignored)")
+    ok(not env_match(got, want, rd2), "<run> env: another run's dir fails")
+    ok(not env_match(got, want, ""), "<run> env: no run dir fails")
+    ok(not env_match(env_norm({"LEGO_NATIVE_FRAME_METRICS": rd1 + r"\native-frames.csv"}), want, rd1),
+       "<run> env: a missing key fails")
+    ok(not env_match(env_norm({"A": "1"}), env_norm({"A": "2"}), rd1) and env_match(env_norm({"A": "1"}),
+       env_norm({"a": "1"}), ""), "plain env: exact value compare, as before")
     ok(forbidden({"slow_frame_log_ms": "1"}) and not forbidden({"slow_frame_log_ms": "0"})
        and forbidden({"shared_memory_upload_hash_log": "true"}) and not forbidden({"framerate_limit": "0"}),
        "timing-forbidden switches")
@@ -1622,7 +1690,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description="W6 gate kit: every W6 gate (G1-G12) on a finished matrix dir.")
     ap.add_argument("matrix_dir", nargs="?", help="a run-matrix output dir (matrix.json, plan.txt, results.csv, runs/)")
     ap.add_argument("--status", metavar="DIR", help="the launcher's status dir to search for the window log "
-                                                     "(default bench/agent5/launch/status, if it exists)")
+                                                     "(default: bench/agent5/launch/status and bench/agent5/day/status, those that exist)")
     ap.add_argument("--window-log", metavar="FILE", help="the launcher's window-<id>-<HHmm>.log (skips the search)")
     ap.add_argument("--gate-log", metavar="FILE", help="the quiet-gate log for G12 (default: the window log)")
     ap.add_argument("--gate", choices=("strict", "relaxed"), help="set G12's gate by hand")

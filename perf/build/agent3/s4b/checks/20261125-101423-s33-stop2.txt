@@ -1,0 +1,51 @@
+# s4b_check s33stop2 20261125-101423-s33-stop2 (off, scenario A)
+run.json: exit 0 (0x00000000) dumps 0 crash_events 0 wer False; close wm_close 1.26 s; elapsed 206.37 of 205 s; cvars {"slow_frame_log_ms": "1", "d3d12_pipeline_creation_no_wait": "true"}; env -; steps 37/91
+summary: verdict RUNNING; first frame 5.0 s; levels {"info": 9100, "warning": 142}; unknown cvars []; errors 0
+log files game.log; levels {"info": 9100, "warning": 142}
+families: c1_any=0 k=0 c1_verify_on=0 c1_verify_f=0 c1_other=0 recovered_stale=0 unhandled_phys=0 protect_failed=0 split_init=0 split=0 deferred_counters=0 gpu_wait=0 memexport=9036 slow_frame=9036 s4_upload_hash=0 precise_wait=0 miss_cache=0 stuck_lock=0 minidump=0 fatal=0 debug_layer=0 dred=0 d3d12_msg=0 clean_exit=1
+  memexport: [2026-11-25 10:14:27.859] [info] [gpu] [t43800] slow frame #2: 17.9 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.1 (2x), new 3 | texture load 1.5 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | m
+  memexport: [2026-11-25 10:14:27.863] [info] [gpu] [t43800] slow frame #3: 4.3 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | me
+  memexport: [2026-11-25 10:14:27.879] [info] [gpu] [t43800] slow frame #4: 16.1 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 1x 4 KB (on memexport pages 0x 0 KB) | m
+  memexport: ... (9030 more)
+  memexport: [2026-11-25 10:17:49.257] [info] [gpu] [t43800] slow frame #9035: 50.9 ms | gpu-thread idle 0.0 | host-gpu wait 14.0 (6x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.3 (43x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 6x 13816 KB (on memexport pages
+  memexport: [2026-11-25 10:17:49.343] [info] [gpu] [t43800] slow frame #9036: 85.6 ms | gpu-thread idle 0.0 | host-gpu wait 35.2 (28x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.3 (43x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 7x 4176 KB (on memexport pages
+  memexport: [2026-11-25 10:17:49.441] [info] [gpu] [t43800] slow frame #9037: 97.8 ms | gpu-thread idle 0.0 | host-gpu wait 46.1 (27x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.3 (43x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 5x 13748 KB (on memexport page
+  slow_frame: [2026-11-25 10:14:27.859] [info] [gpu] [t43800] slow frame #2: 17.9 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.1 (2x), new 3 | texture load 1.5 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | m
+  slow_frame: [2026-11-25 10:14:27.863] [info] [gpu] [t43800] slow frame #3: 4.3 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 0x 0 KB (on memexport pages 0x 0 KB) | me
+  slow_frame: [2026-11-25 10:14:27.879] [info] [gpu] [t43800] slow frame #4: 16.1 ms | gpu-thread idle 0.0 | host-gpu wait 0.0 (0x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.0 (1x) | readback 0x 0 KB, 0 stalled | cpu-write invalidations 1x 4 KB (on memexport pages 0x 0 KB) | m
+  slow_frame: ... (9030 more)
+  slow_frame: [2026-11-25 10:17:49.257] [info] [gpu] [t43800] slow frame #9035: 50.9 ms | gpu-thread idle 0.0 | host-gpu wait 14.0 (6x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.3 (43x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 6x 13816 KB (on memexport pages
+  slow_frame: [2026-11-25 10:17:49.343] [info] [gpu] [t43800] slow frame #9036: 85.6 ms | gpu-thread idle 0.0 | host-gpu wait 35.2 (28x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.3 (43x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 7x 4176 KB (on memexport pages
+  slow_frame: [2026-11-25 10:17:49.441] [info] [gpu] [t43800] slow frame #9037: 97.8 ms | gpu-thread idle 0.0 | host-gpu wait 46.1 (27x) | shader translate 0.0 (0x) | pipeline create 0.0 (0x), new 0 | texture load 0.3 (43x) | readback 25x 2048 KB, 0 stalled | cpu-write invalidations 5x 13748 KB (on memexport page
+memexport full-buffer: {"lines": 9036, "last_total": 0, "max_total": 0, "sum_x": 0, "lines_x_gt0": 0}
+last slow-frame line (tail): ...rite invalidations 5x 13748 KB (on memexport pages 2x 9896 KB) | memexport syncs 27 (312 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0) | dropped draws 0 | forced pipeline waits 0.0 (0x)
+frames (perf.csv rows) 9037; slow_frame per frame 1.000
+logdiff base 20261125-071741-s33-offsf: 2 logs joined -> build\agent3\s4b\checks\joined\20261125-071741-s33-offsf
+logdiff vs 20261125-071741-s33-offsf (base scenario A): NEW 0 (+0 allowed) MORE 0 (+0 allowed) GONE 124 (0 unexpected) FLAG 0; NEW at info 1 other, 0 allowed; rc 0
+  info NEW build\agent3\runs\20261125-101423-s33-stop2\game.log x1 [info] [gpu] d#d#_pipeline_creation_no_wait: not waiting for pipeline creation at the end of submissions; draws stay skipped until their pipeline is ready
+levels cand {"info": 9100, "warning": 142} vs 20261125-071741-s33-offsf {"info": 23429, "warning": 142}
+scenes (>= 2 s) base: 766/110956:158s 226/1022:30s 220/534:28s 218/222:17s 219/226:15s 790/31625:10s 220/528:6s 788/31613:4s 8127/762167:4s 8019/1043795:2s
+scenes (>= 2 s) cand: 226/1022:31s 220/534:21s 218/222:17s 219/226:15s 790/31625:6s 788/31613:4s 8127/762167:4s 220/528:3s 594/2813:3s 8019/1043795:2s
+  missing in cand: ['766/110956']; extra in cand: -
+  note: attract/idle scenes missing in cand (timing after the route; not a BASE item): ['766/110956']
+route marks first-frame..after-a2: 5, 0 differ; all marks: 11 differ
+  cand marks: first-frame=218/222 title=226/1022 after-start=226/1022 after-a1=220/534 after-a2=220/534 idle-10=218/222 idle-20=838/31668 idle-30=793/32617 idle-40=788/31613 idle-50=8019/1043795 idle-60=5194/879213 idle-70=2268/419716 idle-80=5134/1358256 idle-90=1514/334317 idle-100=2526/941849 idle-110=1139/320198 idle-120=8127/762167
+  note: attract route steps 37/91 vs base 91/91 (short row: not a BASE item)
+threads (% of one core, window [20.0, 191.3] s from the first frame, 171.3 s): XThread7FE8 (F80001A8) x1 90.2 | GPU Commands (F8000018) x1 45.7 | Main XThread (F800002C) x1 26.8 | XThread145C (F80000F4) x1 21.5 | rex::thread::TimerQueue x1 21.4 | (unnamed) x32 11.5 | XThread59BC (F8000144) x1 7.7 | XThread4834 (F8000114) x1 5.3 | D3D12 Pipelines x9 4.4 | 0xc0550001 x1 3.6
+  TimerQueue ticks (tid 42260): 103 samples over [-4.7, 199.3] s, cycles non-rising in 0 of 102 steps 
+sys.csv slow state: {"rows": 203, "onset_s": null, "slow_pct": 0.0, "e_eff_mhz_median": 2014, "cpu_util_pct_median": 64.9, "slow": false}
+hangs: 0 STUCK-LOCK event(s); hostload rows during the run: {"rows": 6, "busy_rows": 0}; toypad: {"confirms": 0, "result": ""}
+PROOF ok   bin dir <workspace>\build\agent2\devoff4b-s33-bin (want build\agent2\devoff4b-s33-bin)
+PROOF ok   bin: run-dir legodimensions.exe sha256 DFBE1D43B28861A6, want DFBE1D43B28861A6 (devoff4b-s33-bin MANIFEST)
+PROOF ok   bin: run-dir rexgpu-xenos.dll sha256 0B57BBD5D7B96CBD, want 0B57BBD5D7B96CBD (devoff4b-s33-bin MANIFEST)
+PROOF ok   bin: run-dir rexruntime.dll sha256 A33801D1538D6175, want A33801D1538D6175 (devoff4b-s33-bin MANIFEST)
+PROOF ok   cvar d3d12_pipeline_creation_no_wait=true (run.json: true)
+PROOF ok   cvar slow_frame_log_ms=1 (run.json: 1)
+PROOF ok   INFO "d3d12_pipeline_creation_no_wait: not waiting ..." x1 (want 1), "ignored" WARN x0 (want 0) (TESTPLAN row 2)
+PROOF ok   no (d) "resolve after drop:" text on a (d)-free bin (x0)
+PROOF ok   cold: no seed_xenos in run.json
+PROOF ok   closed via WM_CLOSE (wm_close)
+PROOF ok   slow-frame lines 9036 (slow_frame_log_ms=1)
+PROOF ok   no WER, no dump (wer_seen False, dumps 0)
+BASE items missed: none
+VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s33stop2)

@@ -1,0 +1,209 @@
+﻿$ python -B build\agent7\session3\mp\mp2_same_frames.py --dir build\agent8\matrix\20261123-0313 --ref-arm s0 --arms p2,p2f,p2fc --json build\agent7\session3\mp\offline-mp2-0313-dir.json
+mp2_same_frames build\agent8\matrix\20261123-0313 (logdiff: <workspace>\build\agent10\bgate\logdiff.py)
+PASS       ref runs: 5 (need 2: n0-r1 vs n0-r2 = noise): 0315-s0-r1, 0329-s0-r2, 0335-s0-r3, 0341-s0-r4, 0348-s0-r5
+           ref 0315-s0-r1: light share 0.97460 (frames.json share_lt_light (light_ms 4.5)); draw_calls p10/p50/p90 226/226/226 mean 226 n 20868; perf.csv rows 27180..48047 (frames.json window)
+           ref 0329-s0-r2: light share 0.96370 (frames.json share_lt_light (light_ms 4.5)); draw_calls p10/p50/p90 226/226/226 mean 226 n 19097; perf.csv rows 24540..43636 (frames.json window)
+           ref 0335-s0-r3: light share 0.96360 (frames.json share_lt_light (light_ms 4.5)); draw_calls p10/p50/p90 226/226/226 mean 226 n 19185; perf.csv rows 24480..43664 (frames.json window)
+           ref 0341-s0-r4: light share 0.96450 (frames.json share_lt_light (light_ms 4.5)); draw_calls p10/p50/p90 226/226/226 mean 226 n 19252; perf.csv rows 24540..43791 (frames.json window)
+           ref 0348-s0-r5: light share 0.96460 (frames.json share_lt_light (light_ms 4.5)); draw_calls p10/p50/p90 226/226/226 mean 226 n 19279; perf.csv rows 24240..43518 (frames.json window)
+           noise band (ref runs 0315-s0-r1, 0329-s0-r2, 0335-s0-r3, 0341-s0-r4, 0348-s0-r5): light share [0.96360, 0.97460] (--ls-pad 0); draw_calls p10 [226, 226], p50 [226, 226], p90 [226, 226] (--dc-pad 0); --spread-k 0
+PASS       p2: candidate runs found: 5
+PASS       p2 0317-p2-r1 LS: light share 0.97010 inside [0.96360, 0.97460]
+PASS       p2 0317-p2-r1 DC: draw_calls p10 226 inside [226, 226]
+PASS       p2 0317-p2-r1 DC: draw_calls p50 226 inside [226, 226]
+PASS       p2 0317-p2-r1 DC: draw_calls p90 226 inside [226, 226]
+           p2 0317-p2-r1: draw_calls mean 226 n 19711; perf.csv rows 25800..45510 (frames.json window)
+PASS       p2 0317-p2-r1 LOG: no NEW key at >= warning (0)
+PASS       p2 0317-p2-r1 LOG: no GONE key at >= warning outside the noise (0)
+PASS       p2 0317-p2-r1 LOG: no MORE key at >= warning outside the noise (0)
+PASS       p2 0317-p2-r1 LOG: fail markers no higher than the ref max
+PASS       p2 0317-p2-r1 LOG: clean-exit line present
+           p2 0317-p2-r1 LOG info (>= info, < warning): NEW 16; x1 [info] [core] Toypad[Read ] #B #C # # # # # # #F FE AB C# FB #F # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # E# # #F CE #A C# # F# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #F # AD C# D# # C# # FD # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # A# FE F# # C# EB #E D# #B # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # B# #B #F F# D# DA # # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # CD F# # # # FE #C # E# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # FE #E #A #B AD # #E # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # #A BE # #D # # D# BD BC #F # # # # # # # # # # # # # # # # # #  | ... (8 more)
+           p2 0317-p2-r1 LOG info: GONE 0
+           p2 0317-p2-r1 LOG info: MORE 0
+PASS       p2 0323-p2-r2 LS: light share 0.96910 inside [0.96360, 0.97460]
+PASS       p2 0323-p2-r2 DC: draw_calls p10 226 inside [226, 226]
+PASS       p2 0323-p2-r2 DC: draw_calls p50 226 inside [226, 226]
+PASS       p2 0323-p2-r2 DC: draw_calls p90 226 inside [226, 226]
+           p2 0323-p2-r2: draw_calls mean 226 n 19279; perf.csv rows 24600..43878 (frames.json window)
+PASS       p2 0323-p2-r2 LOG: no NEW key at >= warning (0)
+PASS       p2 0323-p2-r2 LOG: no GONE key at >= warning outside the noise (0)
+PASS       p2 0323-p2-r2 LOG: no MORE key at >= warning outside the noise (0)
+PASS       p2 0323-p2-r2 LOG: fail markers no higher than the ref max
+PASS       p2 0323-p2-r2 LOG: clean-exit line present
+           p2 0323-p2-r2 LOG info (>= info, < warning): NEW 16; x1 [info] [core] Toypad[Read ] #B #C # # # # # # # # # # A# #F # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # # #D DC # C# BB #F # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # #B # # DB #F #B A# F# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # #F C# ED # # # # F# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # B# AF A# BC #F # # #C # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #B B# #A # #D #A #A # #E # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #E # AB B# D# CB #F # CB # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # #A # DD # # EC # F# C# # # # # # # # # # # # # # # # # # # #  | ... (8 more)
+           p2 0323-p2-r2 LOG info: GONE 0
+           p2 0323-p2-r2 LOG info: MORE 0
+PASS       p2 0337-p2-r3 LS: light share 0.96430 inside [0.96360, 0.97460]
+PASS       p2 0337-p2-r3 DC: draw_calls p10 226 inside [226, 226]
+PASS       p2 0337-p2-r3 DC: draw_calls p50 226 inside [226, 226]
+PASS       p2 0337-p2-r3 DC: draw_calls p90 226 inside [226, 226]
+           p2 0337-p2-r3: draw_calls mean 226 n 19195; perf.csv rows 24420..43614 (frames.json window)
+PASS       p2 0337-p2-r3 LOG: no NEW key at >= warning (0)
+PASS       p2 0337-p2-r3 LOG: no GONE key at >= warning outside the noise (0)
+PASS       p2 0337-p2-r3 LOG: no MORE key at >= warning outside the noise (0)
+PASS       p2 0337-p2-r3 LOG: fail markers no higher than the ref max
+PASS       p2 0337-p2-r3 LOG: clean-exit line present
+           p2 0337-p2-r3 LOG info (>= info, < warning): NEW 16; x1 [info] [core] Toypad[Read ] #B #C # # # # # #F C# F# # #E #C D# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # # A# ED F# # # B# #C # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # #D BB E# # #F E# E# DC # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # A# # #A #F # #F #B # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #B #D FD # # #F # #E C# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #D #D # FE #B BB # B# # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # C# # #B # #C # # # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # #A F# E# F# E# # # # F# EF # # # # # # # # # # # # # # # # # #  | ... (8 more)
+           p2 0337-p2-r3 LOG info: GONE 0
+           p2 0337-p2-r3 LOG info: MORE 0
+FAIL       p2 0343-p2-r4 LS: light share 0.96220 NOT inside [0.96360, 0.97460] (outside by 0.00140 = 0.13 x the ref spread 0.01100)
+PASS       p2 0343-p2-r4 DC: draw_calls p10 226 inside [226, 226]
+PASS       p2 0343-p2-r4 DC: draw_calls p50 226 inside [226, 226]
+PASS       p2 0343-p2-r4 DC: draw_calls p90 226 inside [226, 226]
+           p2 0343-p2-r4: draw_calls mean 226 n 19263; perf.csv rows 24540..43802 (frames.json window)
+PASS       p2 0343-p2-r4 LOG: no NEW key at >= warning (0)
+PASS       p2 0343-p2-r4 LOG: no GONE key at >= warning outside the noise (0)
+PASS       p2 0343-p2-r4 LOG: no MORE key at >= warning outside the noise (0)
+PASS       p2 0343-p2-r4 LOG: fail markers no higher than the ref max
+PASS       p2 0343-p2-r4 LOG: clean-exit line present
+           p2 0343-p2-r4 LOG info (>= info, < warning): NEW 16; x1 [info] [core] Toypad[Read ] #B #C # # # # BD A# B# D# #F AC DC # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #A A# # # # A# B# # B# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #D #D # #C C# BE # B# D# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #D E# #B B# # #E #E D# # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # BB # #E #B A# EE # D# FD # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # F# # #E # #B C# D# # #E # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # F# DB # C# # #F # DE A# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # #A #C # #B #B #F # C# FE #F # # # # # # # # # # # # # # # # # #  | ... (8 more)
+           p2 0343-p2-r4 LOG info: GONE 0
+           p2 0343-p2-r4 LOG info: MORE 0
+FAIL       p2 0350-p2-r5 LS: light share 0.95750 NOT inside [0.96360, 0.97460] (outside by 0.00610 = 0.55 x the ref spread 0.01100)
+PASS       p2 0350-p2-r5 DC: draw_calls p10 226 inside [226, 226]
+PASS       p2 0350-p2-r5 DC: draw_calls p50 226 inside [226, 226]
+PASS       p2 0350-p2-r5 DC: draw_calls p90 226 inside [226, 226]
+           p2 0350-p2-r5: draw_calls mean 226 n 18775; perf.csv rows 24420..43194 (frames.json window)
+PASS       p2 0350-p2-r5 LOG: no NEW key at >= warning (0)
+PASS       p2 0350-p2-r5 LOG: no GONE key at >= warning outside the noise (0)
+PASS       p2 0350-p2-r5 LOG: no MORE key at >= warning outside the noise (0)
+PASS       p2 0350-p2-r5 LOG: fail markers no higher than the ref max
+PASS       p2 0350-p2-r5 LOG: clean-exit line present
+           p2 0350-p2-r5 LOG info (>= info, < warning): NEW 16; x1 [info] [core] Toypad[Read ] #B #C # # # # #F B# DD EF # # # FB # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # A# # C# FC # C# #E # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #E # #A # #A #F # #E # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #E # DC C# C# #C F# #E #A # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # A# #D #D F# # #F # # E# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # BC #C #A D# # # # #D # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # E# FB # E# CC # FC B# # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # #A #B A# #D # A# # CC #B # # # # # # # # # # # # # # # # # # #  | ... (8 more)
+           p2 0350-p2-r5 LOG info: GONE 0
+           p2 0350-p2-r5 LOG info: MORE 0
+PASS       p2f: candidate runs found: 5
+PASS       p2f 0319-p2f-r1 LS: light share 0.97110 inside [0.96360, 0.97460]
+PASS       p2f 0319-p2f-r1 DC: draw_calls p10 226 inside [226, 226]
+PASS       p2f 0319-p2f-r1 DC: draw_calls p50 226 inside [226, 226]
+PASS       p2f 0319-p2f-r1 DC: draw_calls p90 226 inside [226, 226]
+           p2f 0319-p2f-r1: draw_calls mean 226 n 19387; perf.csv rows 25260..44646 (frames.json window)
+PASS       p2f 0319-p2f-r1 LOG: no NEW key at >= warning (0)
+PASS       p2f 0319-p2f-r1 LOG: no GONE key at >= warning outside the noise (0)
+PASS       p2f 0319-p2f-r1 LOG: no MORE key at >= warning outside the noise (0)
+PASS       p2f 0319-p2f-r1 LOG: fail markers no higher than the ref max
+PASS       p2f 0319-p2f-r1 LOG: clean-exit line present
+           p2f 0319-p2f-r1 LOG info (>= info, < warning): NEW 16; x1 [info] [core] Toypad[Read ] #B #C # # # # # B# #C # # # #E #B # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # #B FD # # # #A # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # DB A# # # E# # # #C # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #E # # #F # # # # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #F BE ED B# # C# # BA # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # CB # # A# #F C# #D # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # ED # #B #C # #D # F# # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # #A #B #E # #A BB F# F# # #E # # # # # # # # # # # # # # # # # #  | ... (8 more)
+           p2f 0319-p2f-r1 LOG info: GONE 0
+           p2f 0319-p2f-r1 LOG info: MORE 0
+PASS       p2f 0325-p2f-r2 LS: light share 0.96830 inside [0.96360, 0.97460]
+PASS       p2f 0325-p2f-r2 DC: draw_calls p10 226 inside [226, 226]
+PASS       p2f 0325-p2f-r2 DC: draw_calls p50 226 inside [226, 226]
+PASS       p2f 0325-p2f-r2 DC: draw_calls p90 226 inside [226, 226]
+           p2f 0325-p2f-r2: draw_calls mean 226 n 19297; perf.csv rows 24420..43716 (frames.json window)
+PASS       p2f 0325-p2f-r2 LOG: no NEW key at >= warning (0)
+PASS       p2f 0325-p2f-r2 LOG: no GONE key at >= warning outside the noise (0)
+PASS       p2f 0325-p2f-r2 LOG: no MORE key at >= warning outside the noise (0)
+PASS       p2f 0325-p2f-r2 LOG: fail markers no higher than the ref max
+PASS       p2f 0325-p2f-r2 LOG: clean-exit line present
+           p2f 0325-p2f-r2 LOG info (>= info, < warning): NEW 16; x1 [info] [core] Toypad[Read ] #B #C # # # # # # # E# # FB BB C# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # BA # #E E# #A CB # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #B # #C #D # A# # #F #D # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # A# # # #A # #D #B # #E # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # AE F# #E # # #B A# A# A# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # BC #C C# #C # CE B# # #D # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # DB A# # DB # FF FB E# #C # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # #A # #D F# # F# FB D# # #D # # # # # # # # # # # # # # # # # #  | ... (8 more)
+           p2f 0325-p2f-r2 LOG info: GONE 0
+           p2f 0325-p2f-r2 LOG info: MORE 0
+PASS       p2f 0331-p2f-r3 LS: light share 0.96940 inside [0.96360, 0.97460]
+PASS       p2f 0331-p2f-r3 DC: draw_calls p10 226 inside [226, 226]
+PASS       p2f 0331-p2f-r3 DC: draw_calls p50 226 inside [226, 226]
+PASS       p2f 0331-p2f-r3 DC: draw_calls p90 226 inside [226, 226]
+           p2f 0331-p2f-r3: draw_calls mean 226 n 19296; perf.csv rows 24540..43835 (frames.json window)
+PASS       p2f 0331-p2f-r3 LOG: no NEW key at >= warning (0)
+PASS       p2f 0331-p2f-r3 LOG: no GONE key at >= warning outside the noise (0)
+PASS       p2f 0331-p2f-r3 LOG: no MORE key at >= warning outside the noise (0)
+PASS       p2f 0331-p2f-r3 LOG: fail markers no higher than the ref max
+PASS       p2f 0331-p2f-r3 LOG: clean-exit line present
+           p2f 0331-p2f-r3 LOG info (>= info, < warning): NEW 16; x1 [info] [core] Toypad[Read ] #B #C # # # # # # # D# #E #D # B# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #C #B # # # #F #D # E# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # A# # #A F# DB # # EA A# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # B# B# #A DB # C# # #E # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # C# # # BF # # # # CC # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # CE ED #D #D DB EC B# # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # E# # D# #B C# #A #B D# E# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # #A # #D # #B #E # # # DC # # # # # # # # # # # # # # # # # #  | ... (8 more)
+           p2f 0331-p2f-r3 LOG info: GONE 0
+           p2f 0331-p2f-r3 LOG info: MORE 0
+PASS       p2f 0345-p2f-r4 LS: light share 0.97260 inside [0.96360, 0.97460]
+PASS       p2f 0345-p2f-r4 DC: draw_calls p10 226 inside [226, 226]
+PASS       p2f 0345-p2f-r4 DC: draw_calls p50 226 inside [226, 226]
+PASS       p2f 0345-p2f-r4 DC: draw_calls p90 226 inside [226, 226]
+           p2f 0345-p2f-r4: draw_calls mean 226 n 19327; perf.csv rows 24600..43926 (frames.json window)
+PASS       p2f 0345-p2f-r4 LOG: no NEW key at >= warning (0)
+PASS       p2f 0345-p2f-r4 LOG: no GONE key at >= warning outside the noise (0)
+PASS       p2f 0345-p2f-r4 LOG: no MORE key at >= warning outside the noise (0)
+PASS       p2f 0345-p2f-r4 LOG: fail markers no higher than the ref max
+PASS       p2f 0345-p2f-r4 LOG: clean-exit line present
+           p2f 0345-p2f-r4 LOG info (>= info, < warning): NEW 16; x1 [info] [core] Toypad[Read ] #B #C # # # # # # # # # CC # #B # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #D B# CA #E #B F# # D# # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #D CA EE EE # # DE # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #E # # A# # # C# #E # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # C# A# BA # C# #E #B #E A# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # F# # # # # # D# #A # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # FC BB # # B# # D# #D #E # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # #A E# FE #E # # # #B # #C # # # # # # # # # # # # # # # # # #  | ... (8 more)
+           p2f 0345-p2f-r4 LOG info: GONE 1; (ref 1/1/1/1/1) [info] [core] Execution complete
+           p2f 0345-p2f-r4 LOG info: MORE 0
+PASS       p2f 0352-p2f-r5 LS: light share 0.96810 inside [0.96360, 0.97460]
+PASS       p2f 0352-p2f-r5 DC: draw_calls p10 226 inside [226, 226]
+PASS       p2f 0352-p2f-r5 DC: draw_calls p50 226 inside [226, 226]
+PASS       p2f 0352-p2f-r5 DC: draw_calls p90 226 inside [226, 226]
+           p2f 0352-p2f-r5: draw_calls mean 226 n 19258; perf.csv rows 24480..43737 (frames.json window)
+PASS       p2f 0352-p2f-r5 LOG: no NEW key at >= warning (0)
+PASS       p2f 0352-p2f-r5 LOG: no GONE key at >= warning outside the noise (0)
+PASS       p2f 0352-p2f-r5 LOG: no MORE key at >= warning outside the noise (0)
+PASS       p2f 0352-p2f-r5 LOG: fail markers no higher than the ref max
+PASS       p2f 0352-p2f-r5 LOG: clean-exit line present
+           p2f 0352-p2f-r5 LOG info (>= info, < warning): NEW 16; x1 [info] [core] Toypad[Read ] #B #C # # # # # # #C AC #B A# A# # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # F# # # #D # #F EC #E # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #A # # FF #F B# # C# #C # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #C # # B# C# DA # # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #D # E# D# B# BF E# # D# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # A# # # EF E# E# # #C # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # B# # D# # # B# A# #F #D # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # #A # A# #E F# #F #C # B# # # # # # # # # # # # # # # # # # # #  | ... (8 more)
+           p2f 0352-p2f-r5 LOG info: GONE 0
+           p2f 0352-p2f-r5 LOG info: MORE 0
+PASS       p2fc: candidate runs found: 5
+FAIL       p2fc 0321-p2fc-r1 LS: light share 0.97760 NOT inside [0.96360, 0.97460] (outside by 0.00300 = 0.27 x the ref spread 0.01100)
+PASS       p2fc 0321-p2fc-r1 DC: draw_calls p10 226 inside [226, 226]
+PASS       p2fc 0321-p2fc-r1 DC: draw_calls p50 226 inside [226, 226]
+PASS       p2fc 0321-p2fc-r1 DC: draw_calls p90 226 inside [226, 226]
+           p2fc 0321-p2fc-r1: draw_calls mean 226 n 23564; perf.csv rows 28920..52483 (frames.json window)
+PASS       p2fc 0321-p2fc-r1 LOG: no NEW key at >= warning (0)
+PASS       p2fc 0321-p2fc-r1 LOG: no GONE key at >= warning outside the noise (0)
+PASS       p2fc 0321-p2fc-r1 LOG: no MORE key at >= warning outside the noise (0)
+PASS       p2fc 0321-p2fc-r1 LOG: fail markers no higher than the ref max
+PASS       p2fc 0321-p2fc-r1 LOG: clean-exit line present
+           p2fc 0321-p2fc-r1 LOG info (>= info, < warning): NEW 23; x1 [info] [core] Toypad[Read ] #B #C # # # # # # #F D# F# # # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # #C #B BD AE # C# # #D # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # FC # #A #E AC #F AC # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # BA # # # #F # E# # #C # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # D# # B# EE D# # # # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # D# B# A# # D# #E # # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # F# #B # B# DC C# #E #A B# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # #A EE #E #F D# # # B# # B# # # # # # # # # # # # # # # # # # #  | ... (15 more)
+           p2fc 0321-p2fc-r1 LOG info: GONE 0
+           p2fc 0321-p2fc-r1 LOG info: MORE 0
+FAIL       p2fc 0327-p2fc-r2 LS: light share 0.97910 NOT inside [0.96360, 0.97460] (outside by 0.00450 = 0.41 x the ref spread 0.01100)
+PASS       p2fc 0327-p2fc-r2 DC: draw_calls p10 226 inside [226, 226]
+PASS       p2fc 0327-p2fc-r2 DC: draw_calls p50 226 inside [226, 226]
+PASS       p2fc 0327-p2fc-r2 DC: draw_calls p90 226 inside [226, 226]
+           p2fc 0327-p2fc-r2: draw_calls mean 226 n 23514; perf.csv rows 28740..52253 (frames.json window)
+PASS       p2fc 0327-p2fc-r2 LOG: no NEW key at >= warning (0)
+PASS       p2fc 0327-p2fc-r2 LOG: no GONE key at >= warning outside the noise (0)
+PASS       p2fc 0327-p2fc-r2 LOG: no MORE key at >= warning outside the noise (0)
+PASS       p2fc 0327-p2fc-r2 LOG: fail markers no higher than the ref max
+PASS       p2fc 0327-p2fc-r2 LOG: clean-exit line present
+           p2fc 0327-p2fc-r2 LOG info (>= info, < warning): NEW 23; x1 [info] [core] Toypad[Read ] #B #C # # # # # # # F# #C B# # #C # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # EE #C # #A # #B # A# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #A FF # # #C B# #E B# #C # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # AA # #B #F EC A# # D# #D # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # AA DA # A# C# # #A # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # D# # # # # #E D# # AA # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # E# # # #E DB E# ED # BF # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # #A #A #C # F# B# #E #C #D DC # # # # # # # # # # # # # # # # # #  | ... (15 more)
+           p2fc 0327-p2fc-r2 LOG info: GONE 0
+           p2fc 0327-p2fc-r2 LOG info: MORE 0
+FAIL       p2fc 0333-p2fc-r3 LS: light share 0.97740 NOT inside [0.96360, 0.97460] (outside by 0.00280 = 0.25 x the ref spread 0.01100)
+PASS       p2fc 0333-p2fc-r3 DC: draw_calls p10 226 inside [226, 226]
+PASS       p2fc 0333-p2fc-r3 DC: draw_calls p50 226 inside [226, 226]
+PASS       p2fc 0333-p2fc-r3 DC: draw_calls p90 226 inside [226, 226]
+           p2fc 0333-p2fc-r3: draw_calls mean 226 n 23403; perf.csv rows 28740..52142 (frames.json window)
+PASS       p2fc 0333-p2fc-r3 LOG: no NEW key at >= warning (0)
+PASS       p2fc 0333-p2fc-r3 LOG: no GONE key at >= warning outside the noise (0)
+PASS       p2fc 0333-p2fc-r3 LOG: no MORE key at >= warning outside the noise (0)
+PASS       p2fc 0333-p2fc-r3 LOG: fail markers no higher than the ref max
+PASS       p2fc 0333-p2fc-r3 LOG: clean-exit line present
+           p2fc 0333-p2fc-r3 LOG info (>= info, < warning): NEW 23; x1 [info] [core] Toypad[Read ] #B #C # # # # # # B# DE C# # # B# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # # #C # B# # E# DE E# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # #B # # EE D# #E F# E# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # EC #A # #F C# #C # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #B # B# # DE #F # # E# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #C # # CF F# #A #F # FC # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # B# C# #C AC FD #E # BE # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # #A CF # # # BA AE CF #E E# # # # # # # # # # # # # # # # # # #  | ... (15 more)
+           p2fc 0333-p2fc-r3 LOG info: GONE 0
+           p2fc 0333-p2fc-r3 LOG info: MORE 0
+FAIL       p2fc 0339-p2fc-r4 LS: light share 0.97470 NOT inside [0.96360, 0.97460] (outside by 0.00010 = 0.01 x the ref spread 0.01100)
+PASS       p2fc 0339-p2fc-r4 DC: draw_calls p10 226 inside [226, 226]
+PASS       p2fc 0339-p2fc-r4 DC: draw_calls p50 226 inside [226, 226]
+PASS       p2fc 0339-p2fc-r4 DC: draw_calls p90 226 inside [226, 226]
+           p2fc 0339-p2fc-r4: draw_calls mean 226 n 22576; perf.csv rows 28680..51255 (frames.json window)
+PASS       p2fc 0339-p2fc-r4 LOG: no NEW key at >= warning (0)
+PASS       p2fc 0339-p2fc-r4 LOG: no GONE key at >= warning outside the noise (0)
+PASS       p2fc 0339-p2fc-r4 LOG: no MORE key at >= warning outside the noise (0)
+PASS       p2fc 0339-p2fc-r4 LOG: fail markers no higher than the ref max
+PASS       p2fc 0339-p2fc-r4 LOG: clean-exit line present
+           p2fc 0339-p2fc-r4 LOG info (>= info, < warning): NEW 23; x1 [info] [core] Toypad[Read ] #B #C # # # # A# E# D# # #A #B B# FF # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #F EB E# # D# # E# #B #F # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # A# # # A# A# #E #B F# #C # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # B# D# FA # FE # #F D# BB # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # C# #A #B #E # #C #C B# # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # CB D# EF # E# D# #D B# D# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # D# # # CB #A # #D CF # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # #A #B C# D# #D AE #B DC #C # # # # # # # # # # # # # # # # # # #  | ... (15 more)
+           p2fc 0339-p2fc-r4 LOG info: GONE 0
+           p2fc 0339-p2fc-r4 LOG info: MORE 0
+FAIL       p2fc 0354-p2fc-r5 LS: light share 0.98150 NOT inside [0.96360, 0.97460] (outside by 0.00690 = 0.63 x the ref spread 0.01100)
+PASS       p2fc 0354-p2fc-r5 DC: draw_calls p10 226 inside [226, 226]
+PASS       p2fc 0354-p2fc-r5 DC: draw_calls p50 226 inside [226, 226]
+PASS       p2fc 0354-p2fc-r5 DC: draw_calls p90 226 inside [226, 226]
+           p2fc 0354-p2fc-r5: draw_calls mean 226 n 23492; perf.csv rows 28800..52291 (frames.json window)
+PASS       p2fc 0354-p2fc-r5 LOG: no NEW key at >= warning (0)
+PASS       p2fc 0354-p2fc-r5 LOG: no GONE key at >= warning outside the noise (0)
+PASS       p2fc 0354-p2fc-r5 LOG: no MORE key at >= warning outside the noise (0)
+PASS       p2fc 0354-p2fc-r5 LOG: fail markers no higher than the ref max
+PASS       p2fc 0354-p2fc-r5 LOG: clean-exit line present
+           p2fc 0354-p2fc-r5 LOG info (>= info, < warning): NEW 23; x1 [info] [core] Toypad[Read ] #B #C # # # # # # B# # ED # # E# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # # AD E# #A #A E# # B# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # #F # # D# #A # # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #D # A# #E #A # # #E #E # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # A# #D FA E# BD # # E# F# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # C# #E C# # # # # #D E# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # FF # F# #D F# B# # DC D# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # #A CB EA #A # # #B #E E# # # # # # # # # # # # # # # # # # # #  | ... (15 more)
+           p2fc 0354-p2fc-r5 LOG info: GONE 0
+           p2fc 0354-p2fc-r5 LOG info: MORE 0
+RESULT: FAIL (7 failed, 0 incomplete)
+[exit code 1]

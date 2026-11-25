@@ -1,0 +1,20 @@
+﻿arm ON  run <workspace>\build\agent3\session3\s33-rows\row3\runs\20261125-151247-s33-row3-on
+FF  15:12:51.171 (first slow-frame line)
+A3D 15:14:22.773 (FF+91.60 s)
+screenshot schedule (wall clock; for manual 'computer-cli screenshot', save as shots\ON-<n>.png):
+   1 w01-first3d-load   burst 15:14:22.2 .. 15:14:27.2  A3D-0.5  first 3D frame (A3D+0, 21 new pipelines; ON drops 38-39 in 4-5 frames) and the load transition (A3D+2.2..3.5, 23 new). Needs the pre-roll ring: A3D is only seen in the log ~1 s late.
+   2 w02-drop576        burst 15:14:46.7 .. 15:14:49.7  A3D+24.0  one new pipeline used by 576 draws: OFF drops 576 in 1 frame, ON 1152-1728 in 2-3 frames (A3D+24.9..26.1).
+   3 w03-drop75         burst 15:14:52.4 .. 15:14:54.7  A3D+29.7  75 draws dropped in 1-2 frames (A3D+30.2..31.5), 4 new.
+   4 w04-shot12k        burst 15:15:09.0 .. 15:15:12.2  A3D+46.3  the 12.4k-draw shot (TESTPLAN row 3): 67-75 new pipelines; OFF stalls 0.9 s, ON drops 176-182 in 2-3 frames (A3D+47.0..48.9).
+   5 w05-burst57        burst 15:15:19.4 .. 15:15:24.7  A3D+56.7  the densest ON drop clusters: 233-275 in 6-8 frames (A3D+57.2..58.0) and 70 in 4-5 frames (A3D+60.0..61.6), 31-40 new.
+   6 w06-drop93         burst 15:15:55.7 .. 15:15:57.7  A3D+93.0  20-24 dropped in 1 frame (A3D+93.4..94.5).
+   7 w07-drop104        burst 15:16:05.9 .. 15:16:08.1  A3D+103.2  one pipeline: OFF 154 in 1 frame, ON 462 in 3 frames (A3D+103.7..104.9).
+   8 w08-drop145        burst 15:16:47.0 .. 15:16:49.2  A3D+144.3  20 (OFF, 1 frame) / 52 (ON, 3 frames) (A3D+144.7..146.0).
+   9 w09-drop182        burst 15:17:24.0 .. 15:17:25.3  A3D+181.3  ON 56-61 in 7-8 frames (A3D+181.7..181.8), 9 new; OFF below the top 10.
+  10 s10-still12        still 15:14:34.7 .. 15:14:35.4  A3D+12.0  persistence check: no drops near
+  11 s11-still40        still 15:15:02.7 .. 15:15:03.4  A3D+40.0  persistence check
+  12 s12-still75        still 15:15:37.7 .. 15:15:38.4  A3D+75.0  persistence check
+  13 s13-still130       still 15:16:32.7 .. 15:16:33.4  A3D+130.0  persistence check
+  14 s14-still220       still 15:18:02.7 .. 15:18:03.4  A3D+220.0  persistence check
+  15 s15-still300       still 15:19:22.7 .. 15:19:23.4  A3D+300.0  persistence check: the static end scene (marks idle-210..end = 766/110956 in every run)
+  16 s16-still340       still 15:20:02.7 .. 15:20:03.4  A3D+340.0  persistence check: last still (runs end ~A3D+357..376)

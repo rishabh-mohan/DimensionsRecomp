@@ -1,0 +1,130 @@
+# build-final (M2) 2026-11-25 07:29:09 gpu
+tools that ran (sha256/16): build-final.py 5BE1F221800137BD, recompile.py 855BCC79148E2DA8, relink.py F3C6EEAF332AB213, stage-variant.py D2BD1C6358FC19C1, verify-bins.py 80FF4C5F581C4B1B, prep-final.py 83F732CA9CEB301F, fsyntax.py 66C7D74022A068DA, pe-check.py F4368C32076AAA3E, mapcheck-s4c.py F8CB7B495F74D978
+PASS prep-final RESULT: PASS (b/prep.txt)
+PASS shared DLL before == E3CB99CF
+PASS fsyntax RESULT: PASS (b/fsyntax/fsyntax.txt)
+PASS leg output is new (b/gpu/link-on/rexgpu-xenos.dll)
+PASS CTL output is new (b/gpu/link-ctl/rexgpu-xenos.dll)
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\recompile.py --ccdb <workspace>\build\agent2\snap1-sdk\compile_commands.json --obj-filter /Release/ --jobs 8 --priority normal --fwd-src --list <workspace>\build\agent2\final\b\gpu\list-ctl.tsv --log-dir <workspace>\build\agent2\final\b\gpu\log-ctl
+    priority normal, jobs 8, include-first: -
+    1 TU(s); defines: -; commands in build\agent2\final\b\gpu\log-ctl\recompile-commands.txt
+      shared_memory.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\shared_memory.cpp (A4A31038ABDFF94A) -> build\agent2\final\b\gpu\obj-ctl\shared_memory.cpp.obj
+    PASS shared_memory.cpp.obj exit 0 1.0 s obj 126357 B C5779D701D76F305 (log 1271 B)
+    wall 1.5 s, 0 failure(s)
+CTL recompile: exit 0, 1.7 s
+PASS CTL recompile
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\relink.py --ninja <workspace>\build\agent2\snap1-sdk\build-Release.ninja --target <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.dll --priority normal --replace-file <workspace>\build\agent2\final\b\gpu\replace-ctl.txt --out-dir <workspace>\build\agent2\final\b\gpu\link-ctl --compare <workspace>\build\agent2\devoff4b-bin\rexgpu-xenos.dll
+    parsed 4 file(s), 3437 edges, 260 rules; edges making the target: 1
+    edge: <workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/out/win-amd64/Release/rexgpu-xenos.dll (rule CXX_SHARED_LIBRARY_LINKER__rexgpu-xenos_Release, from build\agent2\snap1-sdk\CMakeFiles\impl-Release.ninja), 37 explicit inputs, 5 implicit
+    replace input 16: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/shared_memory.cpp.obj -> <workspace>\build\agent2\final\b\gpu\obj-ctl\shared_memory.cpp.obj (126357 B, C5779D701D76F305)
+    priority normal, link flags added: -
+      TARGET_FILE: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.dll
+        -> <workspace>\build\agent2\final\b\gpu\link-ctl\rexgpu-xenos.dll
+      TARGET_IMPLIB: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.lib
+        -> <workspace>\build\agent2\final\b\gpu\link-ctl\rexgpu-xenos.lib
+      TARGET_PDB: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.pdb
+        -> <workspace>\build\agent2\final\b\gpu\link-ctl\rexgpu-xenos.pdb
+    NOTE unresolved (empty) variables: ARCH_FLAGS, LINK_FLAGS, LINK_PATH, MANIFESTS
+    command (4739 chars) and rsp (0 chars) written to build\agent2\final\b\gpu\link-ctl
+    PASS outputs: every output path in the command is inside build\agent2\final\b\gpu\link-ctl
+    link exit 0, 1.0 s (log build\agent2\final\b\gpu\link-ctl\relink.log)
+      rexgpu-xenos.dll 3425792 B 5B0E66D0F29BD583F4078BDE900B72B422FE05A7FB94389DF9D638DD52A1CC44
+      rexgpu-xenos.lib 2124 B 841EDFD459DAE28D03720DF49A7F098A5AABD968866625978E8D270EEE0D1EA0
+    PASS compare rexgpu-xenos.dll vs build\agent2\devoff4b-bin\rexgpu-xenos.dll: identical except 1 TimeDateStamp field(s) (6b06e2a7 vs 6b03a0ae; COFF header at 0x80, included)
+CTL relink: exit 0, 1.4 s
+PASS D1 CTL rexgpu-xenos.dll == devoff4b-bin\rexgpu-xenos.dll except TimeDateStamp (else STOP): PASS compare rexgpu-xenos.dll vs build\agent2\devoff4b-bin\rexgpu-xenos.dll: identical except 1 TimeDateStamp field(s) (6b06e2a7 vs 6b03a0ae; COFF header at 0x80, included)
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\recompile.py --ccdb <workspace>\build\agent2\snap1-sdk\compile_commands.json --obj-filter /Release/ --jobs 8 --priority normal --fwd-src --list <workspace>\build\agent2\final\b\gpu\list-on.tsv --log-dir <workspace>\build\agent2\final\b\gpu\log-on --flag=-fmacro-prefix-map=<workspace>/build/agent2/final/b/DimensionsRecomp/rexglue-sdk=<workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk
+    priority normal, jobs 8, include-first: -
+    1 TU(s); defines: -; commands in build\agent2\final\b\gpu\log-on\recompile-commands.txt
+      shared_memory.cpp: build\agent2\final\b\DimensionsRecomp\rexglue-sdk\src\graphics\shared_memory.cpp (E2465A155E22C20B) -> build\agent2\final\b\gpu\obj-on\shared_memory.cpp.obj
+    PASS shared_memory.cpp.obj exit 0 1.0 s obj 137607 B 4D7E83533F8D292A (log 1277 B)
+    wall 1.5 s, 0 failure(s)
+ON recompile: exit 0, 1.7 s
+PASS ON recompile
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\relink.py --ninja <workspace>\build\agent2\snap1-sdk\build-Release.ninja --target <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.dll --priority normal --replace-file <workspace>\build\agent2\final\b\gpu\replace-on.txt --out-dir <workspace>\build\agent2\final\b\gpu\link-on
+    parsed 4 file(s), 3437 edges, 260 rules; edges making the target: 1
+    edge: <workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/out/win-amd64/Release/rexgpu-xenos.dll (rule CXX_SHARED_LIBRARY_LINKER__rexgpu-xenos_Release, from build\agent2\snap1-sdk\CMakeFiles\impl-Release.ninja), 37 explicit inputs, 5 implicit
+    replace input 16: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/shared_memory.cpp.obj -> <workspace>\build\agent2\final\b\gpu\obj-on\shared_memory.cpp.obj (137607 B, 4D7E83533F8D292A)
+    priority normal, link flags added: -
+      TARGET_FILE: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.dll
+        -> <workspace>\build\agent2\final\b\gpu\link-on\rexgpu-xenos.dll
+      TARGET_IMPLIB: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.lib
+        -> <workspace>\build\agent2\final\b\gpu\link-on\rexgpu-xenos.lib
+      TARGET_PDB: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.pdb
+        -> <workspace>\build\agent2\final\b\gpu\link-on\rexgpu-xenos.pdb
+    NOTE unresolved (empty) variables: ARCH_FLAGS, LINK_FLAGS, LINK_PATH, MANIFESTS
+    command (4735 chars) and rsp (0 chars) written to build\agent2\final\b\gpu\link-on
+    PASS outputs: every output path in the command is inside build\agent2\final\b\gpu\link-on
+    link exit 0, 1.0 s (log build\agent2\final\b\gpu\link-on\relink.log)
+      rexgpu-xenos.dll 3429376 B CB3A2CC967A9BE81ED0F321C6C839DD6260876337924DC71BF6D3293275817F6
+      rexgpu-xenos.lib 2124 B 841EDFD459DAE28D03720DF49A7F098A5AABD968866625978E8D270EEE0D1EA0
+ON relink: exit 0, 1.4 s
+PASS ON relink
+PASS no pch/error text in log-ctl/shared_memory.cpp.obj.log: <workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/src/graphics/shared_memory.cpp:327:62: warning: unused parameter 'offset_allocations' [-Wunused-parameter] |   327 | bool SharedMemory::AllocateSparseHostGpuMemoryRange(uint32_t offset_allocati
+PASS no pch/error text in log-on/shared_memory.cpp.obj.log: <workspace>/build/agent2/final/b/DimensionsRecomp/rexglue-sdk/src/graphics/shared_memory.cpp:340:62: warning: unused parameter 'offset_allocations' [-Wunused-parameter] |   340 | bool SharedMemory::AllocateSparseHostGpuMemoryRange(uint32_t offset_alloca
+ON rexgpu-xenos.dll 3429376 B CB3A2CC967A9BE81ED0F321C6C839DD6260876337924DC71BF6D3293275817F6
+PASS ON output differs from the reference
+PASS needle in ON: Final defaults (GPU): {} {}
+PASS needle NOT in reference: Final defaults (GPU): {} {}
+PASS no overlay path bytes (agent2/final/b/) in rexgpu-xenos.dll
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\final\pe-check.py --new <workspace>\build\agent2\final\b\gpu\link-on\rexgpu-xenos.dll --ref <workspace>\build\agent2\devoff4b-bin\rexgpu-xenos.dll --allow-add rexruntime.dll!GetFlagByName --allow-add rexruntime.dll!GetFlagSource --ref-count rexruntime.dll=115 --added-exported-by rexruntime.dll=<workspace>\build\agent2\devoff4b-bin\rexruntime.dll
+    PASS exports equal (4 new, 4 ref): added []; removed []
+    imports: new api-ms-win-crt-convert-l1-1-0.dll 2, api-ms-win-crt-environment-l1-1-0.dll 1, api-ms-win-crt-filesystem-l1-1-0.dll 6, api-ms-win-crt-heap-l1-1-0.dll 4, api-ms-win-crt-locale-l1-1-0.dll 2, api-ms-win-crt-math-l1-1-0.dll 12, api-ms-win-crt-runtime-l1-1-0.dll 15, api-ms-win-crt-stdio-l1-1-0.dll 21, api-ms-win-crt-string-l1-1-0.dll 3, api-ms-win-crt-time-l1-1-0.dll 6, kernel32.dll 45, msvcp140.dll 60, ole32.dll 1, rexruntime.dll 117, vcruntime140.dll 15
+    imports: ref api-ms-win-crt-convert-l1-1-0.dll 2, api-ms-win-crt-environment-l1-1-0.dll 1, api-ms-win-crt-filesystem-l1-1-0.dll 6, api-ms-win-crt-heap-l1-1-0.dll 4, api-ms-win-crt-locale-l1-1-0.dll 2, api-ms-win-crt-math-l1-1-0.dll 12, api-ms-win-crt-runtime-l1-1-0.dll 15, api-ms-win-crt-stdio-l1-1-0.dll 21, api-ms-win-crt-string-l1-1-0.dll 3, api-ms-win-crt-time-l1-1-0.dll 6, kernel32.dll 45, msvcp140.dll 60, ole32.dll 1, rexruntime.dll 115, vcruntime140.dll 15
+    PASS ref imports 115 name(s) from rexruntime.dll (expect 115)
+    PASS same imported DLL set: added []; removed []
+    PASS imports from api-ms-win-crt-convert-l1-1-0.dll unchanged (2): added []; removed []
+    PASS imports from api-ms-win-crt-environment-l1-1-0.dll unchanged (1): added []; removed []
+    PASS imports from api-ms-win-crt-filesystem-l1-1-0.dll unchanged (6): added []; removed []
+    PASS imports from api-ms-win-crt-heap-l1-1-0.dll unchanged (4): added []; removed []
+    PASS imports from api-ms-win-crt-locale-l1-1-0.dll unchanged (2): added []; removed []
+    PASS imports from api-ms-win-crt-math-l1-1-0.dll unchanged (12): added []; removed []
+    PASS imports from api-ms-win-crt-runtime-l1-1-0.dll unchanged (15): added []; removed []
+    PASS imports from api-ms-win-crt-stdio-l1-1-0.dll unchanged (21): added []; removed []
+    PASS imports from api-ms-win-crt-string-l1-1-0.dll unchanged (3): added []; removed []
+    PASS imports from api-ms-win-crt-time-l1-1-0.dll unchanged (6): added []; removed []
+    PASS imports from kernel32.dll unchanged (45): added []; removed []
+    PASS imports from msvcp140.dll unchanged (60): added []; removed []
+    PASS imports from ole32.dll unchanged (1): added []; removed []
+      allowed add rexruntime.dll!GetFlagByName -> ['?GetFlagByName@cvar@rex@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$basic_string_view@DU?$char_traits@D@std@@@4@@Z']
+      allowed add rexruntime.dll!GetFlagSource -> ['?GetFlagSource@cvar@rex@@YA?AW4Source@12@V?$basic_string_view@DU?$char_traits@D@std@@@std@@@Z']
+    PASS imports from rexruntime.dll == ref 115 + exactly 2 allowed (GetFlagByName, GetFlagSource): added ['?GetFlagByName@cvar@rex@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$basic_string_view@DU?$char_traits@D@std@@@4@@Z', '?GetFlagSource@cvar@rex@@YA?AW4Source@12@V?$basic_string_view@DU?$char_traits@D@std@@@std@@@Z']; removed []
+    PASS added rexruntime.dll imports are exports of <workspace>\build\agent2\devoff4b-bin\rexruntime.dll: []
+    PASS imports from vcruntime140.dll unchanged (15): added []; removed []
+    RESULT: PASS
+pe-check: exit 0, 0.1 s
+PASS D5 pe-check rexgpu-xenos.dll vs devoff4b-bin\rexgpu-xenos.dll
+PASS shared DLL after == E3CB99CF
+notes:
+  tools that ran (sha256/16): build-final.py 5BE1F221800137BD, recompile.py 855BCC79148E2DA8, relink.py F3C6EEAF332AB213, stage-variant.py D2BD1C6358FC19C1, verify-bins.py 80FF4C5F581C4B1B, prep-final.py 83F732CA9CEB301F, fsyntax.py 66C7D74022A068DA, pe-check.py F4368C32076AAA3E, mapcheck-s4c.py F8CB7B495F74D978
+  prep: diff sha256 955543F5E2E5F4F44A57CD380FF8D8AC6828E1C0C1372612441AB2AA4E88C657
+  prep: PASS snap1 before rexglue-sdk/src/core/clock.cpp A07EE16C9C5CC4BE
+  prep: PASS snap1 before rexglue-sdk/src/core/timer_queue.cpp 015C04A22DACC592
+  prep: PASS snap1 before rexglue-sdk/src/graphics/shared_memory.cpp A4A31038ABDFF94A
+  prep: PASS snap1 before rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp 8DF708B87A945F07
+  prep: PASS snap1 before rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp 6E20D417F0ED93A5
+  prep: PASS snap1 before rexglue-sdk/src/system/runtime.cpp 306B692BC091A56F
+  prep: PASS snap1 before rexglue-sdk/src/system/xmemory.cpp BCA5E1CF63686E73
+  prep: PASS snap1 before rexglue-sdk/src/system/xobject.cpp 189CA288893B1A36
+  prep: PASS snap1 before rexglue-sdk/src/system/xthread.cpp FAEF9B99C893F684
+  prep: PASS snap1 before rexlego/src/gpu_native/shaders.cpp 9567FE3F3B63637D
+  prep: PASS snap1 before rexlego/src/gpu_wait_backoff.cpp 01D9F8F3464C8614
+  prep: PASS after rexglue-sdk/src/core/clock.cpp EAE926AC812F7EFD == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/core/timer_queue.cpp EF70211E5D248A94 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/graphics/shared_memory.cpp E2465A155E22C20B == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp CEB5529AC853D5A8 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp 7CA55716E7092199 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/runtime.cpp A997D0059A69FF99 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/xmemory.cpp 3745C04AAC8AF75D == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/xobject.cpp 691A34BB64E11EA2 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/xthread.cpp 3B50A95E76B10377 == table and == final/work/new
+  prep: PASS after rexlego/src/gpu_native/shaders.cpp 4B8250E976A38401 == table and == final/work/new
+  prep: PASS after rexlego/src/gpu_wait_backoff.cpp 74115EEA26C4AEB2 == table and == final/work/new
+  prep: gen-on native-gpu-build.txt: LEGO Dimensions native GPU 1616ce65e973c583
+  CTL: PASS compare rexgpu-xenos.dll vs build\agent2\devoff4b-bin\rexgpu-xenos.dll: identical except 1 TimeDateStamp field(s) (6b06e2a7 vs 6b03a0ae; COFF header at 0x80, included)
+  ON object shared_memory.cpp.obj exit 0 1.0 s obj 137607 B 4D7E83533F8D292A (log 1277 B)
+  ON rexgpu-xenos.dll CB3A2CC967A9BE81ED0F321C6C839DD6260876337924DC71BF6D3293275817F6
+  needles: ON has ['Final defaults (GPU): {} {}']; reference lacks them; ON lacks -
+  D5 pe-check vs devoff4b-bin\rexgpu-xenos.dll: PASS
+  times: CTL recompile 1.7 s, CTL relink 1.4 s, ON recompile 1.7 s, ON relink 1.4 s, pe-check 0.1 s
+RESULT: PASS (total 6.4 s)

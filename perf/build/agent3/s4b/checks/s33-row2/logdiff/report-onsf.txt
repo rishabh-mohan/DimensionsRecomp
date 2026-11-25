@@ -1,0 +1,13 @@
+== arm onsf (1 runs) vs offsf (1 runs)
+  runs\0002-onsf-r1: exit=0 close=wm_close early=False wer=False dumps=0 exit_line=1 stuck=0 | 24805 lines game.2.log 5242487+game.1.log 5242655+game.log 237382, 2026-11-25 09:59:33.768..2026-11-25 10:07:15.822 (462 s) | levels info=24655 raw=8 warning=142 | Toypad R/W 64/173 (8.3/22.5 per min)
+gate_logdiff FAIL findings (B = arm run, A = each base run): none
+  note A: 2 log files (rotated at 5 MB) [1]
+  note B: 3 log files (rotated at 5 MB) [1]
+NEW warning/error/critical keys (in an arm run, in no base run): 0
+MORE (arm run count > base max + max(5, base max)): 0
+GONE (in every base run, missing from an arm run; any level): 0
+Toypad (base: runs\0001-offsf-r1 {'info Write': 162, 'info Read': 64})
+  runs\0002-onsf-r1: {'info Write': 173, 'info Read': 64}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+ONLY in onsf (any level, not Toypad; in no base run): 1 keys
+  1/1 runs, counts [1], also in -  [info] [gpu] d#d#_pipeline_creation_no_wait: not waiting for pipeline creation at the end of submissions; draws stay skipped until their pipeline is ready
+      e.g. [2026-11-25 09:59:34.662] [info] [gpu] [t21676] d3d12_pipeline_creation_no_wait: not waiting for pipeline creation at the end of submissions; draws stay skipped until their pipeline is ready

@@ -1,0 +1,22 @@
+test-day s3dry at 01:19:47; run-day.ps1 B67EBD6C; launcher-ctl.ps1 6DDE3150; return time for most tests 04:19 (end 2026-11-25 04:04); user desktop: False
+PASS  d-return-1  25:00, now+30 min and now+15 h refused, nothing started (exit 1)
+PASS  d-return-2  now+3 h, answer N: nothing started (exit 1)
+PASS  d-return-3  now+80 min refused, then now+100 min (02:59) accepted: end 2026-11-25 02:44 (exit 0)
+PASS  d-return-4  now+3 h (04:19), answer Y: -StopAt = return - 15 min = 2026-11-25 04:04; power check shown (exit 0)
+PASS  d-return-5  test hooks without -DryRunTag are refused (exit 1)
+PASS  d-stale-1  old STOP file, answer N: kept, nothing started (exit 1)
+PASS  d-stale-2  old STOP file, answer Y: deleted, then the day session (exit 0)
+PASS  d-none  no launcher: 'nothing to stop', no STOP file written (exit 0)
+PASS  d-unknown-1  RUN-DAY with a launcher in an unknown state asks first; N: no STOP, nothing started (exit 1)
+PASS  d-unknown-2  STOP-LAUNCHER with an unknown state does not say 'nothing is lost' and asks; N: nothing written (exit 1)
+PASS  d-between  waiting launcher stopped by RUN-DAY's STOP (no question), ended exit 0, STOP consumed, -StopAt 2026-11-25 04:04 (ctl exit 0)
+PASS  d-stop-n  answer N: no STOP file, launcher still running (exit 1)
+PASS  d-stop-y  answer Y: STOP with the reason line, launcher ended exit 0 (ctl exit 0)
+PASS  d-dl  -StopAt 01:32 (12 min): the 7-min GO is refused for the end time; launcher exit 0
+PASS  d-window-0  run-day.ps1 -StopAt 04:19 accepted the GO and runs the (fake) window; pins.txt has run-day.ps1 + RUN-DAY.cmd (child pid 40380)
+PASS  d-window-1  RUN-DAY during a window says so and asks; N: no STOP, window keeps running (exit 1)
+PASS  d-window-2  STOP-LAUNCHER during a window warns the numbers are lost; N: nothing written (exit 1)
+PASS  d-window-3  Y: window killed (runner + child 40380), launcher ended, STOP consumed, -StopAt 2026-11-25 04:04 (ctl exit 0)
+PASS  real-files  perf-notes GO/HOLD/STOP and bench\agent5\launch unchanged (WINDOW-GO.txt=False | WINDOW-HOLD.txt=False | WINDOW-STOP.txt=False | launch=144301031)
+PASS  leftovers  processes left from the tests: 0 
+20/20 PASS; summary <workspace>\build\agent5\day-draft\results\summary-s3dry-012200.txt

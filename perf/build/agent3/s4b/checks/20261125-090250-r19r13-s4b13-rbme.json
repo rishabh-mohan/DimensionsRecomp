@@ -1,0 +1,493 @@
+{
+ "run": "20261125-090250-r19r13-s4b13-rbme",
+ "row": "r19r13",
+ "kind": "off",
+ "scenario": "M",
+ "runjson": {
+  "exit_code": 0,
+  "exit_code_hex": "0x00000000",
+  "dumps": [],
+  "crash_events": [],
+  "wer_seen": false,
+  "close_method": "wm_close",
+  "close_seconds": 0.88,
+  "elapsed_s": 213.99,
+  "seconds_requested": 420,
+  "cvars": {
+   "d3d12_submit_split_kb": "4",
+   "d3d12_readback_memexport": "true"
+  },
+  "exited_early": false,
+  "env_extra": {},
+  "steps": "54/54"
+ },
+ "summary": {
+  "verdict": "RUNNING",
+  "first_frame_s": 7.0,
+  "levels": {
+   "info": 85,
+   "warning": 142
+  },
+  "unknown_cvars": [],
+  "errors": []
+ },
+ "log_files": [
+  "game.log"
+ ],
+ "families": {
+  "c1_any": 0,
+  "c1_init_on": 0,
+  "c1_init_blocked": 0,
+  "c1_init_nohold": 0,
+  "c1_first": 0,
+  "c1_kept": 0,
+  "c1_blocked": 0,
+  "c1_verify_on": 0,
+  "c1_verify_f": 0,
+  "recovered_stale": 0,
+  "unhandled_phys": 0,
+  "protect_failed": 0,
+  "split_init": 1,
+  "split": 21,
+  "deferred_counters": 0,
+  "gpu_wait": 0,
+  "gpu_wait_stats": 0,
+  "gpu_wait_backoff": 0,
+  "gpu_wait_on": 0,
+  "memexport": 0,
+  "slow_frame": 0,
+  "s4_upload_hash": 0,
+  "precise_wait": 0,
+  "miss_cache": 0,
+  "stuck_lock": 0,
+  "minidump": 0,
+  "fatal": 0,
+  "clean_exit": 1,
+  "debug_layer": 0,
+  "dred": 0,
+  "d3d12_msg": 0,
+  "k": 0,
+  "c1_other": 0
+ },
+ "levels": {
+  "info": 85,
+  "warning": 142
+ },
+ "lines": {
+  "split_init": {
+   "first": [
+    "[2026-11-25 09:02:52.431] [info] [gpu] [t15980] d3d12_submit_split_kb: splitting submissions at 4 KB of deferred commands"
+   ],
+   "last": []
+  },
+  "split": {
+   "first": [
+    "[2026-11-25 09:02:56.116] [info] [gpu] [t15980] d3d12_submit_split: frame=2 submission=3 splits=0 failed=0 held_query=0 held_scratch=0 held_pipelines=1",
+    "[2026-11-25 09:03:06.129] [info] [gpu] [t15980] d3d12_submit_split: frame=594 submission=1481 splits=885 failed=0 held_query=0 held_scratch=0 held_pipelines=174",
+    "[2026-11-25 09:03:16.129] [info] [gpu] [t15980] d3d12_submit_split: frame=1194 submission=3016 splits=1819 failed=0 held_query=0 held_scratch=0 held_pipelines=174"
+   ],
+   "last": [
+    "[2026-11-25 09:05:56.168] [info] [gpu] [t15980] d3d12_submit_split: frame=7786 submission=204135 splits=155448 failed=0 held_query=1 held_scratch=0 held_pipelines=22839",
+    "[2026-11-25 09:06:06.168] [info] [gpu] [t15980] d3d12_submit_split: frame=7916 submission=229074 splits=179715 failed=0 held_query=1 held_scratch=0 held_pipelines=28800",
+    "[2026-11-25 09:06:16.168] [info] [gpu] [t15980] d3d12_submit_split: frame=8183 submission=249546 splits=196341 failed=0 held_query=1 held_scratch=0 held_pipelines=30024"
+   ]
+  }
+ },
+ "split": {
+  "lines": 21,
+  "first_ts": "09:02:56.116",
+  "last_ts": "09:06:16.168",
+  "first": {
+   "frame": 2,
+   "submission": 3,
+   "splits": 0,
+   "failed": 0,
+   "held_query": 0,
+   "held_scratch": 0,
+   "held_pipelines": 1
+  },
+  "last": {
+   "frame": 8183,
+   "submission": 249546,
+   "splits": 196341,
+   "failed": 0,
+   "held_query": 1,
+   "held_scratch": 0,
+   "held_pipelines": 30024
+  },
+  "max": {
+   "frame": 8183,
+   "submission": 249546,
+   "splits": 196341,
+   "failed": 0,
+   "held_query": 1,
+   "held_scratch": 0,
+   "held_pipelines": 30024
+  },
+  "sum": {
+   "frame": 105640,
+   "submission": 1665976,
+   "splits": 1284947,
+   "failed": 0,
+   "held_query": 12,
+   "held_scratch": 0,
+   "held_pipelines": 161657
+  },
+  "monotonic": {
+   "frame": true,
+   "submission": true,
+   "splits": true,
+   "failed": true,
+   "held_query": true,
+   "held_scratch": true,
+   "held_pipelines": true
+  },
+  "per_frame": {
+   "submission": 30.5028,
+   "splits": 23.9996,
+   "failed": 0.0,
+   "held_query": 0.0001,
+   "held_scratch": 0.0,
+   "held_pipelines": 3.6698
+  },
+  "frames": 8181
+ },
+ "frame_rows": 8400,
+ "logdiff": {
+  "bases": [
+   "20261122-205356-s4b-01-off"
+  ],
+  "base_scenario": "M",
+  "NEW": 0,
+  "NEW_allowed": 0,
+  "MORE": 0,
+  "MORE_allowed": 0,
+  "GONE": 5,
+  "GONE_unexpected": 0,
+  "FLAG": 0,
+  "NEW_info_other": 2,
+  "NEW_info_allowed": 0,
+  "rc": 0,
+  "new": [],
+  "new_allowed": [],
+  "more": [],
+  "gone_unexpected": [],
+  "flag": [],
+  "new_info_other": [
+   "NEW build\\agent3\\runs\\20261125-090250-r19r13-s4b13-rbme\\game.log x21 [info] [gpu] d#d#_submit_split: frame=# submission=# splits=# failed=# held_query=# held_scratch=# held_pipelines=#",
+   "NEW build\\agent3\\runs\\20261125-090250-r19r13-s4b13-rbme\\game.log x1 [info] [gpu] d#d#_submit_split_kb: splitting submissions at # KB of deferred commands"
+  ],
+  "new_info_allowed": []
+ },
+ "scenes": {
+  "base": "20261122-205356-s4b-01-off",
+  "missing_in_cand": [
+   "839/31674"
+  ],
+  "extra_in_cand": [
+   "788/31613",
+   "790/31625",
+   "841/31696"
+  ],
+  "cand_major": {
+   "226/1022": 30.3,
+   "220/534": 18.2,
+   "218/222": 16.8,
+   "219/226": 14.9,
+   "790/31625": 5.1,
+   "220/528": 4.4,
+   "841/31696": 3.3,
+   "8019/1043795": 2.4,
+   "788/31613": 2.3
+  },
+  "base_major": {
+   "220/534": 71.4,
+   "226/1022": 30.3,
+   "218/222": 22.6,
+   "220/528": 16.6,
+   "219/226": 14.9,
+   "594/2813": 3.1,
+   "8019/1043795": 2.4,
+   "839/31674": 2.2
+  }
+ },
+ "front_end_scenes": {
+  "218/222": 16.8,
+  "226/1022": 30.3,
+  "220/528": 4.4,
+  "220/534": 18.2,
+  "219/226": 14.9
+ },
+ "marks": {
+  "prefix": 9,
+  "prefix_diff": [
+   [
+    "after-a1",
+    "220/528",
+    "220/534"
+   ],
+   [
+    "after-a3",
+    "220/534",
+    "839/31674"
+   ],
+   [
+    "down-1",
+    "220/534",
+    "843/33114"
+   ],
+   [
+    "down-2",
+    "220/534",
+    "796/34115"
+   ],
+   [
+    "up-2",
+    "220/534",
+    "790/31625"
+   ]
+  ],
+  "all_diff": 18,
+  "cand": {
+   "first-frame": "218/222",
+   "title": "226/1022",
+   "after-start": "226/1022",
+   "after-a1": "220/534",
+   "after-a2": "220/534",
+   "after-a3": "839/31674",
+   "down-1": "843/33114",
+   "down-2": "796/34115",
+   "up-2": "790/31625",
+   "back-1": "790/31625",
+   "back-2": "790/43673",
+   "back-3": "2840/522446",
+   "idle-10": "4385/821295",
+   "idle-20": "7594/1124013",
+   "idle-30": "1328/264468",
+   "idle-40": "1200/753454",
+   "idle-50": "2208/745820",
+   "idle-60": "1201/335698",
+   "idle-70": "8119/762359",
+   "idle-80": "2860/1242214",
+   "idle-90": "1972/1160990",
+   "end": "1972/1160990"
+  }
+ },
+ "threads": {
+  "window_s": 175.4,
+  "window": [
+   20.0,
+   195.4
+  ],
+  "by_name": {
+   "(unnamed)": {
+    "pct": 11.06,
+    "threads": 31
+   },
+   "rex::thread::TimerQueue": {
+    "pct": 22.37,
+    "threads": 1
+   },
+   "DeviceHotplugThread": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "D3D Background Thread 0": {
+    "pct": 0.09,
+    "threads": 1
+   },
+   "D3D Background Thread 1": {
+    "pct": 0.06,
+    "threads": 1
+   },
+   "D3D Background Thread 2": {
+    "pct": 0.04,
+    "threads": 1
+   },
+   "D3D Background Thread 3": {
+    "pct": 0.06,
+    "threads": 1
+   },
+   "0x16c00001": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "0xc0550001": {
+    "pct": 3.8,
+    "threads": 1
+   },
+   "XMA Decoder (F8000010)": {
+    "pct": 0.94,
+    "threads": 1
+   },
+   "Audio Worker (F8000014)": {
+    "pct": 1.05,
+    "threads": 1
+   },
+   "GPU Commands (F8000018)": {
+    "pct": 55.8,
+    "threads": 1
+   },
+   "GPU VSync (F800001C)": {
+    "pct": 2.25,
+    "threads": 1
+   },
+   "D3D12 Pipelines": {
+    "pct": 4.64,
+    "threads": 9
+   },
+   "Kernel Dispatch (F8000028)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "Main XThread (F800002C)": {
+    "pct": 20.92,
+    "threads": 1
+   },
+   "D3D12 Storage writer": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread9CB8 (F8000070)": {
+    "pct": 0.69,
+    "threads": 1
+   },
+   "XThread7828 (F80000F4)": {
+    "pct": 19.0,
+    "threads": 1
+   },
+   "XThread6FF8 (F80000FC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread3FF8 (F8000104)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread5F4C (F800010C)": {
+    "pct": 2.45,
+    "threads": 1
+   },
+   "XThread5C20 (F8000114)": {
+    "pct": 5.3,
+    "threads": 1
+   },
+   "XThread98C4 (F8000120)": {
+    "pct": 0.03,
+    "threads": 1
+   },
+   "XThread84F4 (F8000124)": {
+    "pct": 0.38,
+    "threads": 1
+   },
+   "XThread4AF0 (F8000128)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread145C (F8000140)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread739C (F8000144)": {
+    "pct": 7.92,
+    "threads": 1
+   },
+   "SDLWASAPIMgmt": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "SDLAudioP19": {
+    "pct": 0.25,
+    "threads": 1
+   },
+   "XThread7C88 (F8000164)": {
+    "pct": 0.03,
+    "threads": 1
+   },
+   "XThread80EC (F800016C)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread507C (F8000188)": {
+    "pct": 0.12,
+    "threads": 1
+   },
+   "XThread8758 (F8000190)": {
+    "pct": 0.8,
+    "threads": 1
+   },
+   "XThread5C5C (F8000198)": {
+    "pct": 0.82,
+    "threads": 1
+   },
+   "XThread1DF8 (F80001A8)": {
+    "pct": 91.45,
+    "threads": 1
+   },
+   "XThread80A8 (F80001BC)": {
+    "pct": 0.4,
+    "threads": 1
+   },
+   "XThread0584 (F800026C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread8960 (F80002B4)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread8250 (F80002BC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread7C24 (F80002C4)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread0F54 (F80002D4)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread73E4 (F800031C)": {
+    "pct": 0.0,
+    "threads": 1
+   }
+  },
+  "ticks": {
+   "42652": {
+    "name": "rex::thread::TimerQueue",
+    "samples": 107,
+    "steps": 106,
+    "non_rising": 0,
+    "non_rising_at_s": [],
+    "step_s_median": 2.0,
+    "span_s": [
+     -6.6,
+     205.4
+    ]
+   }
+  }
+ },
+ "slow_state": {
+  "rows": 208,
+  "onset_s": null,
+  "slow_pct": 0.0,
+  "e_eff_mhz_median": 1845,
+  "cpu_util_pct_median": 62.8,
+  "slow": false
+ },
+ "hang_cpu": [],
+ "host_quiet": {
+  "rows": 7,
+  "busy_rows": 0
+ },
+ "toypad": {
+  "confirms": 0,
+  "result": ""
+ },
+ "proofs": [],
+ "base_misses": [
+  "marks differ before up-2: after-a1 220/528->220/534 after-a3 220/534->839/31674 down-1 220/534->843/33114 down-2 220/534->796/34115 up-2 220/534->790/31625"
+ ],
+ "hint": "LOOK"
+}

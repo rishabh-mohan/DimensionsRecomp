@@ -14,6 +14,7 @@ import argparse, os, subprocess, sys, time
 R = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 HOLD = os.path.join(R, 'perf-notes', 'WINDOW-HOLD.txt')
 BELOW_NORMAL = 0x00004000
+PRIO = {'idle': 0x00000040, 'belownormal': BELOW_NORMAL}
 
 
 def kill(p):
@@ -29,6 +30,7 @@ def main():
     ap.add_argument('--cwd', required=True)
     ap.add_argument('--log', required=True)
     ap.add_argument('--timeout', type=float, default=0.0)
+    ap.add_argument('--priority', choices=sorted(PRIO), default='idle')  # session 3: Idle by default
     ap.add_argument('cmd', nargs=argparse.REMAINDER)
     a = ap.parse_args()
     cmd = a.cmd[1:] if a.cmd and a.cmd[0] == '--' else a.cmd
@@ -48,8 +50,9 @@ def main():
         lf.write(('# holdrun %s  cwd %s\n# cmd: %s\n' % (time.strftime('%Y-%m-%d %H:%M:%S'), os.path.abspath(a.cwd),
                                                          subprocess.list2cmdline(cmd))).encode('utf-8'))
         lf.flush()
-        p = subprocess.Popen(cmd, cwd=a.cwd, stdout=lf, stderr=subprocess.STDOUT, creationflags=BELOW_NORMAL)
-        print('started pid %d at %s (Below Normal); log %s' % (p.pid, time.strftime('%H:%M:%S'), os.path.relpath(log, R)))
+        p = subprocess.Popen(cmd, cwd=a.cwd, stdout=lf, stderr=subprocess.STDOUT, creationflags=PRIO[a.priority])
+        print('started pid %d at %s (%s); log %s' % (p.pid, time.strftime('%H:%M:%S'), a.priority,
+                                                    os.path.relpath(log, R)))
         sys.stdout.flush()
         while p.poll() is None:
             if os.path.exists(HOLD):

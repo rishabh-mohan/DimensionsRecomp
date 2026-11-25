@@ -1,0 +1,215 @@
+# build-final (M2) 2026-11-25 07:28:07 rt
+tools that ran (sha256/16): build-final.py 5BE1F221800137BD, recompile.py 855BCC79148E2DA8, relink.py F3C6EEAF332AB213, stage-variant.py D2BD1C6358FC19C1, verify-bins.py 80FF4C5F581C4B1B, prep-final.py 83F732CA9CEB301F, fsyntax.py 66C7D74022A068DA, pe-check.py F4368C32076AAA3E, mapcheck-s4c.py F8CB7B495F74D978
+PASS prep-final RESULT: PASS (b/prep.txt)
+PASS shared DLL before == E3CB99CF
+PASS fsyntax RESULT: PASS (b/fsyntax/fsyntax.txt)
+PASS leg output is new (b/rt/link-on/rexruntime.dll)
+PASS CTL output is new (b/rt/link-ctl/rexruntime.dll)
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\recompile.py --ccdb <workspace>\build\agent2\snap1-sdk\compile_commands.json --obj-filter /Release/ --jobs 8 --priority normal --fwd-src --list <workspace>\build\agent2\final\b\rt\list-ctl.tsv --log-dir <workspace>\build\agent2\final\b\rt\log-ctl
+    priority normal, jobs 8, include-first: -
+    8 TU(s); defines: -; commands in build\agent2\final\b\rt\log-ctl\recompile-commands.txt
+      clock.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\core\clock.cpp (A07EE16C9C5CC4BE) -> build\agent2\final\b\rt\obj-ctl\clock.cpp.obj
+      timer_queue.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\core\timer_queue.cpp (015C04A22DACC592) -> build\agent2\final\b\rt\obj-ctl\timer_queue.cpp.obj
+      xboxkrnl_rtl.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\kernel\xboxkrnl\xboxkrnl_rtl.cpp (8DF708B87A945F07) -> build\agent2\final\b\rt\obj-ctl\xboxkrnl_rtl.cpp.obj
+      xboxkrnl_threading.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\kernel\xboxkrnl\xboxkrnl_threading.cpp (6E20D417F0ED93A5) -> build\agent2\final\b\rt\obj-ctl\xboxkrnl_threading.cpp.obj
+      runtime.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\runtime.cpp (306B692BC091A56F) -> build\agent2\final\b\rt\obj-ctl\runtime.cpp.obj
+      xmemory.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\xmemory.cpp (BCA5E1CF63686E73) -> build\agent2\final\b\rt\obj-ctl\xmemory.cpp.obj
+      xobject.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\xobject.cpp (189CA288893B1A36) -> build\agent2\final\b\rt\obj-ctl\xobject.cpp.obj
+      xthread.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\xthread.cpp (FAEF9B99C893F684) -> build\agent2\final\b\rt\obj-ctl\xthread.cpp.obj
+    PASS clock.cpp.obj exit 0 3.1 s obj 74473 B 79D8781AE2D83105
+    PASS timer_queue.cpp.obj exit 0 3.6 s obj 115587 B 9D71FE7454B807F1 (log 1363 B)
+    PASS xboxkrnl_rtl.cpp.obj exit 0 3.1 s obj 304339 B 76716B80ECB4405B (log 599 B)
+    PASS xboxkrnl_threading.cpp.obj exit 0 3.6 s obj 456759 B CE58BD2A67D4F5EA (log 2219 B)
+    PASS runtime.cpp.obj exit 0 2.1 s obj 306023 B 928F7740F39FDEAF
+    PASS xmemory.cpp.obj exit 0 3.0 s obj 392019 B 8BD34E69C1926327 (log 432 B)
+    PASS xobject.cpp.obj exit 0 1.5 s obj 65905 B AC5A79A712482EBA (log 2660 B)
+    PASS xthread.cpp.obj exit 0 2.0 s obj 206041 B FE8DBB4257E0F5A0 (log 371 B)
+    wall 4.1 s, 0 failure(s)
+CTL recompile: exit 0, 4.3 s
+PASS CTL recompile
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\relink.py --ninja <workspace>\build\agent2\snap1-sdk\build-Release.ninja --target <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexruntime.dll --priority normal --replace-file <workspace>\build\agent2\final\b\rt\replace-ctl.txt --out-dir <workspace>\build\agent2\final\b\rt\link-ctl --compare <workspace>\build\agent2\devoff4b-bin\rexruntime.dll
+    parsed 4 file(s), 3437 edges, 260 rules; edges making the target: 1
+    edge: <workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/out/win-amd64/Release/rexruntime.dll (rule CXX_SHARED_LIBRARY_LINKER__rexruntime_Release, from build\agent2\snap1-sdk\CMakeFiles\impl-Release.ninja), 210 explicit inputs, 14 implicit
+    replace input 4: src/core/CMakeFiles/rexcore.dir/Release/clock.cpp.obj -> <workspace>\build\agent2\final\b\rt\obj-ctl\clock.cpp.obj (74473 B, 79D8781AE2D83105)
+    replace input 16: src/core/CMakeFiles/rexcore.dir/Release/timer_queue.cpp.obj -> <workspace>\build\agent2\final\b\rt\obj-ctl\timer_queue.cpp.obj (115587 B, 9D71FE7454B807F1)
+    replace input 198: src/system/CMakeFiles/rexruntime.dir/Release/__/kernel/xboxkrnl/xboxkrnl_rtl.cpp.obj -> <workspace>\build\agent2\final\b\rt\obj-ctl\xboxkrnl_rtl.cpp.obj (304339 B, 76716B80ECB4405B)
+    replace input 200: src/system/CMakeFiles/rexruntime.dir/Release/__/kernel/xboxkrnl/xboxkrnl_threading.cpp.obj -> <workspace>\build\agent2\final\b\rt\obj-ctl\xboxkrnl_threading.cpp.obj (456759 B, CE58BD2A67D4F5EA)
+    replace input 116: src/system/CMakeFiles/rexruntime.dir/Release/runtime.cpp.obj -> <workspace>\build\agent2\final\b\rt\obj-ctl\runtime.cpp.obj (306023 B, 928F7740F39FDEAF)
+    replace input 121: src/system/CMakeFiles/rexruntime.dir/Release/xmemory.cpp.obj -> <workspace>\build\agent2\final\b\rt\obj-ctl\xmemory.cpp.obj (392019 B, 8BD34E69C1926327)
+    replace input 135: src/system/CMakeFiles/rexruntime.dir/Release/xobject.cpp.obj -> <workspace>\build\agent2\final\b\rt\obj-ctl\xobject.cpp.obj (65905 B, AC5A79A712482EBA)
+    replace input 124: src/system/CMakeFiles/rexruntime.dir/Release/xthread.cpp.obj -> <workspace>\build\agent2\final\b\rt\obj-ctl\xthread.cpp.obj (206041 B, FE8DBB4257E0F5A0)
+    priority normal, link flags added: -
+      PRE_LINK: C:\WINDOWS\system32\cmd.exe /C ""C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E __create_def <workspace>\build\agent2\snap1-sdk\src\system\CMakeFiles\rexruntime.dir\Release\
+        -> cd .
+      TARGET_FILE: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexruntime.dll
+        -> <workspace>\build\agent2\final\b\rt\link-ctl\rexruntime.dll
+      TARGET_IMPLIB: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexruntime.lib
+        -> <workspace>\build\agent2\final\b\rt\link-ctl\rexruntime.lib
+      TARGET_PDB: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexruntime.pdb
+        -> <workspace>\build\agent2\final\b\rt\link-ctl\rexruntime.pdb
+      RSP_FILE: CMakeFiles\rexruntime.Release.rsp
+        -> <workspace>\build\agent2\final\b\rt\link-ctl\rexruntime.Release.rsp
+    NOTE unresolved (empty) variables: ARCH_FLAGS, LINK_PATH, MANIFESTS
+    NOTE /DEF input: src\system\CMakeFiles\rexruntime.dir\Release\exports.def
+    command (871 chars) and rsp (17430 chars) written to build\agent2\final\b\rt\link-ctl
+    PASS outputs: every output path in the command is inside build\agent2\final\b\rt\link-ctl
+    link exit 0, 1.0 s (log build\agent2\final\b\rt\link-ctl\relink.log)
+      rexruntime.Release.rsp 17430 B 9CA2F9984B398D96DC36F95513DB8CB36ED571264FD1E089757F08047A66E2C0
+      rexruntime.dll 10909184 B B0496C4099253175689F8F5DA676B421F4684BC5BFE1FEEC392B9BC65627EDE2
+      rexruntime.lib 5689702 B 7D55858ACC62914F21F6FC60AADC36DDE05824C12FF61C22683D68E2A3242957
+    PASS compare rexruntime.dll vs build\agent2\devoff4b-bin\rexruntime.dll: identical except 1 TimeDateStamp field(s) (6b06e26b vs 6b03a0ab; COFF header at 0x80, included)
+CTL relink: exit 0, 1.5 s
+PASS D1 CTL rexruntime.dll == devoff4b-bin\rexruntime.dll except TimeDateStamp (else STOP): PASS compare rexruntime.dll vs build\agent2\devoff4b-bin\rexruntime.dll: identical except 1 TimeDateStamp field(s) (6b06e26b vs 6b03a0ab; COFF header at 0x80, included)
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\recompile.py --ccdb <workspace>\build\agent2\snap1-sdk\compile_commands.json --obj-filter /Release/ --jobs 8 --priority normal --fwd-src --list <workspace>\build\agent2\final\b\rt\list-on.tsv --log-dir <workspace>\build\agent2\final\b\rt\log-on --flag=-fmacro-prefix-map=<workspace>/build/agent2/final/b/DimensionsRecomp/rexglue-sdk=<workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk
+    priority normal, jobs 8, include-first: -
+    8 TU(s); defines: -; commands in build\agent2\final\b\rt\log-on\recompile-commands.txt
+      clock.cpp: build\agent2\final\b\DimensionsRecomp\rexglue-sdk\src\core\clock.cpp (EAE926AC812F7EFD) -> build\agent2\final\b\rt\obj-on\clock.cpp.obj
+      timer_queue.cpp: build\agent2\final\b\DimensionsRecomp\rexglue-sdk\src\core\timer_queue.cpp (EF70211E5D248A94) -> build\agent2\final\b\rt\obj-on\timer_queue.cpp.obj
+      xboxkrnl_rtl.cpp: build\agent2\final\b\DimensionsRecomp\rexglue-sdk\src\kernel\xboxkrnl\xboxkrnl_rtl.cpp (CEB5529AC853D5A8) -> build\agent2\final\b\rt\obj-on\xboxkrnl_rtl.cpp.obj
+      xboxkrnl_threading.cpp: build\agent2\final\b\DimensionsRecomp\rexglue-sdk\src\kernel\xboxkrnl\xboxkrnl_threading.cpp (7CA55716E7092199) -> build\agent2\final\b\rt\obj-on\xboxkrnl_threading.cpp.obj
+      runtime.cpp: build\agent2\final\b\DimensionsRecomp\rexglue-sdk\src\system\runtime.cpp (A997D0059A69FF99) -> build\agent2\final\b\rt\obj-on\runtime.cpp.obj
+      xmemory.cpp: build\agent2\final\b\DimensionsRecomp\rexglue-sdk\src\system\xmemory.cpp (3745C04AAC8AF75D) -> build\agent2\final\b\rt\obj-on\xmemory.cpp.obj
+      xobject.cpp: build\agent2\final\b\DimensionsRecomp\rexglue-sdk\src\system\xobject.cpp (691A34BB64E11EA2) -> build\agent2\final\b\rt\obj-on\xobject.cpp.obj
+      xthread.cpp: build\agent2\final\b\DimensionsRecomp\rexglue-sdk\src\system\xthread.cpp (3B50A95E76B10377) -> build\agent2\final\b\rt\obj-on\xthread.cpp.obj
+    PASS clock.cpp.obj exit 0 3.1 s obj 74457 B D55D32741A6619E2
+    PASS timer_queue.cpp.obj exit 0 3.6 s obj 115587 B B044D7C18ADE69E1 (log 1365 B)
+    PASS xboxkrnl_rtl.cpp.obj exit 0 2.6 s obj 304339 B EDBBAFF25BE8F646 (log 603 B)
+    PASS xboxkrnl_threading.cpp.obj exit 0 3.6 s obj 456759 B E810C71048E9A16C (log 2231 B)
+    PASS runtime.cpp.obj exit 0 2.0 s obj 319352 B 3D8709DF07B1490E
+    PASS xmemory.cpp.obj exit 0 2.5 s obj 392019 B 2901E15AC96E8702 (log 434 B)
+    PASS xobject.cpp.obj exit 0 1.5 s obj 65905 B 29E9664860CB02C4 (log 2674 B)
+    PASS xthread.cpp.obj exit 0 2.0 s obj 206025 B FBB6CFD85D833C7A (log 373 B)
+    wall 4.1 s, 0 failure(s)
+ON recompile: exit 0, 4.3 s
+PASS ON recompile
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\relink.py --ninja <workspace>\build\agent2\snap1-sdk\build-Release.ninja --target <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexruntime.dll --priority normal --replace-file <workspace>\build\agent2\final\b\rt\replace-on.txt --out-dir <workspace>\build\agent2\final\b\rt\link-on
+    parsed 4 file(s), 3437 edges, 260 rules; edges making the target: 1
+    edge: <workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/out/win-amd64/Release/rexruntime.dll (rule CXX_SHARED_LIBRARY_LINKER__rexruntime_Release, from build\agent2\snap1-sdk\CMakeFiles\impl-Release.ninja), 210 explicit inputs, 14 implicit
+    replace input 4: src/core/CMakeFiles/rexcore.dir/Release/clock.cpp.obj -> <workspace>\build\agent2\final\b\rt\obj-on\clock.cpp.obj (74457 B, D55D32741A6619E2)
+    replace input 16: src/core/CMakeFiles/rexcore.dir/Release/timer_queue.cpp.obj -> <workspace>\build\agent2\final\b\rt\obj-on\timer_queue.cpp.obj (115587 B, B044D7C18ADE69E1)
+    replace input 198: src/system/CMakeFiles/rexruntime.dir/Release/__/kernel/xboxkrnl/xboxkrnl_rtl.cpp.obj -> <workspace>\build\agent2\final\b\rt\obj-on\xboxkrnl_rtl.cpp.obj (304339 B, EDBBAFF25BE8F646)
+    replace input 200: src/system/CMakeFiles/rexruntime.dir/Release/__/kernel/xboxkrnl/xboxkrnl_threading.cpp.obj -> <workspace>\build\agent2\final\b\rt\obj-on\xboxkrnl_threading.cpp.obj (456759 B, E810C71048E9A16C)
+    replace input 116: src/system/CMakeFiles/rexruntime.dir/Release/runtime.cpp.obj -> <workspace>\build\agent2\final\b\rt\obj-on\runtime.cpp.obj (319352 B, 3D8709DF07B1490E)
+    replace input 121: src/system/CMakeFiles/rexruntime.dir/Release/xmemory.cpp.obj -> <workspace>\build\agent2\final\b\rt\obj-on\xmemory.cpp.obj (392019 B, 2901E15AC96E8702)
+    replace input 135: src/system/CMakeFiles/rexruntime.dir/Release/xobject.cpp.obj -> <workspace>\build\agent2\final\b\rt\obj-on\xobject.cpp.obj (65905 B, 29E9664860CB02C4)
+    replace input 124: src/system/CMakeFiles/rexruntime.dir/Release/xthread.cpp.obj -> <workspace>\build\agent2\final\b\rt\obj-on\xthread.cpp.obj (206025 B, FBB6CFD85D833C7A)
+    priority normal, link flags added: -
+      PRE_LINK: C:\WINDOWS\system32\cmd.exe /C ""C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E __create_def <workspace>\build\agent2\snap1-sdk\src\system\CMakeFiles\rexruntime.dir\Release\
+        -> cd .
+      TARGET_FILE: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexruntime.dll
+        -> <workspace>\build\agent2\final\b\rt\link-on\rexruntime.dll
+      TARGET_IMPLIB: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexruntime.lib
+        -> <workspace>\build\agent2\final\b\rt\link-on\rexruntime.lib
+      TARGET_PDB: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexruntime.pdb
+        -> <workspace>\build\agent2\final\b\rt\link-on\rexruntime.pdb
+      RSP_FILE: CMakeFiles\rexruntime.Release.rsp
+        -> <workspace>\build\agent2\final\b\rt\link-on\rexruntime.Release.rsp
+    NOTE unresolved (empty) variables: ARCH_FLAGS, LINK_PATH, MANIFESTS
+    NOTE /DEF input: src\system\CMakeFiles\rexruntime.dir\Release\exports.def
+    command (867 chars) and rsp (17422 chars) written to build\agent2\final\b\rt\link-on
+    PASS outputs: every output path in the command is inside build\agent2\final\b\rt\link-on
+    link exit 0, 1.0 s (log build\agent2\final\b\rt\link-on\relink.log)
+      rexruntime.Release.rsp 17422 B DAE30547375453E1F9BCB01179297F05E3B00E16C2377332BA3F3AC14B3AB948
+      rexruntime.dll 10911744 B C5BC627BB2E83CF27794213BE134DA41D9AB1834E74DCE2E924F7FD7BC577372
+      rexruntime.lib 5689702 B 7D55858ACC62914F21F6FC60AADC36DDE05824C12FF61C22683D68E2A3242957
+ON relink: exit 0, 1.4 s
+PASS ON relink
+PASS no pch/error text in log-ctl/clock.cpp.obj.log
+PASS no pch/error text in log-ctl/runtime.cpp.obj.log
+PASS no pch/error text in log-ctl/timer_queue.cpp.obj.log: <workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp:59:20: warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS
+PASS no pch/error text in log-ctl/xboxkrnl_rtl.cpp.obj.log: <workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp:142:12: warning: variable 'len1' set but not used [-Wunused-but-set-variable] |   142 |   uint32_t len1 = string_1_len; |       |            ^ | C:/Users/<user>/
+PASS no pch/error text in log-ctl/xboxkrnl_threading.cpp.obj.log: <workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp:1426:40: warning: suggest braces around initialization of subobject [-Wmissing-braces] |  1426 |   alignas(8) X_SLIST_HEADER old_hdr = {0}; |       |   
+PASS no pch/error text in log-ctl/xmemory.cpp.obj.log: <workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/src/system/xmemory.cpp:2529:76: warning: unused parameter 'global_lock_locked_once' [-Wunused-parameter] |  2529 | bool PhysicalHeap::TriggerCallbacks(std::unique_lock<std::recursive_mutex> glo
+PASS no pch/error text in log-ctl/xobject.cpp.obj.log: <workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/src/system/xobject.cpp:112:7: warning: field 'type_' will be initialized after field 'pointer_ref_count_' [-Wreorder-ctor] |   112 |       type_(type), |       |       ^~~~~~~~~~~ |       |       p
+PASS no pch/error text in log-ctl/xthread.cpp.obj.log: <workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/src/system/xthread.cpp:1069:34: warning: unused parameter 'processor_mode' [-Wunused-parameter] |  1069 | X_STATUS XThread::Delay(uint32_t processor_mode, uint32_t alertable, uint64_t interval)
+PASS no pch/error text in log-on/clock.cpp.obj.log
+PASS no pch/error text in log-on/runtime.cpp.obj.log
+PASS no pch/error text in log-on/timer_queue.cpp.obj.log: <workspace>/build/agent2/final/b/DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp:59:20: warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNIN
+PASS no pch/error text in log-on/xboxkrnl_rtl.cpp.obj.log: <workspace>/build/agent2/final/b/DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp:142:12: warning: variable 'len1' set but not used [-Wunused-but-set-variable] |   142 |   uint32_t len1 = string_1_len; |       |            ^ | C:/Users/<user>
+PASS no pch/error text in log-on/xboxkrnl_threading.cpp.obj.log: <workspace>/build/agent2/final/b/DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp:1426:40: warning: suggest braces around initialization of subobject [-Wmissing-braces] |  1426 |   alignas(8) X_SLIST_HEADER old_hdr = {0}; |       | 
+PASS no pch/error text in log-on/xmemory.cpp.obj.log: <workspace>/build/agent2/final/b/DimensionsRecomp/rexglue-sdk/src/system/xmemory.cpp:2529:76: warning: unused parameter 'global_lock_locked_once' [-Wunused-parameter] |  2529 | bool PhysicalHeap::TriggerCallbacks(std::unique_lock<std::recursive_mutex> g
+PASS no pch/error text in log-on/xobject.cpp.obj.log: <workspace>/build/agent2/final/b/DimensionsRecomp/rexglue-sdk/src/system/xobject.cpp:112:7: warning: field 'type_' will be initialized after field 'pointer_ref_count_' [-Wreorder-ctor] |   112 |       type_(type), |       |       ^~~~~~~~~~~ |       |      
+PASS no pch/error text in log-on/xthread.cpp.obj.log: <workspace>/build/agent2/final/b/DimensionsRecomp/rexglue-sdk/src/system/xthread.cpp:1069:34: warning: unused parameter 'processor_mode' [-Wunused-parameter] |  1069 | X_STATUS XThread::Delay(uint32_t processor_mode, uint32_t alertable, uint64_t interva
+ON rexruntime.dll 10911744 B C5BC627BB2E83CF27794213BE134DA41D9AB1834E74DCE2E924F7FD7BC577372
+PASS ON output differs from the reference
+PASS needle in ON: Final defaults:{}
+PASS needle NOT in reference: Final defaults:{}
+PASS no overlay path bytes (agent2/final/b/) in rexruntime.dll
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\final\pe-check.py --new <workspace>\build\agent2\final\b\rt\link-on\rexruntime.dll --ref <workspace>\build\agent2\devoff4b-bin\rexruntime.dll
+    PASS exports equal (10467 new, 10467 ref): added []; removed []
+    imports: new advapi32.dll 6, api-ms-win-crt-convert-l1-1-0.dll 14, api-ms-win-crt-environment-l1-1-0.dll 2, api-ms-win-crt-filesystem-l1-1-0.dll 6, api-ms-win-crt-heap-l1-1-0.dll 8, api-ms-win-crt-locale-l1-1-0.dll 2, api-ms-win-crt-math-l1-1-0.dll 51, api-ms-win-crt-runtime-l1-1-0.dll 21, api-ms-win-crt-stdio-l1-1-0.dll 33, api-ms-win-crt-string-l1-1-0.dll 25, api-ms-win-crt-time-l1-1-0.dll 11, api-ms-win-crt-utility-l1-1-0.dll 3, bcrypt.dll 6, dxgi.dll 1, gdi32.dll 22, hid.dll 5, imm32.dll 11, kernel32.dll 201, msvcp140.dll 105, msvcp140_atomic_wait.dll 2, ole32.dll 11, setupapi.dll 10, shell32.dll 9, user32.dll 131, vcruntime140.dll 22, vcruntime140_1.dll 1, version.dll 3, winmm.dll 2, ws2_32.dll 22
+    imports: ref advapi32.dll 6, api-ms-win-crt-convert-l1-1-0.dll 14, api-ms-win-crt-environment-l1-1-0.dll 2, api-ms-win-crt-filesystem-l1-1-0.dll 6, api-ms-win-crt-heap-l1-1-0.dll 8, api-ms-win-crt-locale-l1-1-0.dll 2, api-ms-win-crt-math-l1-1-0.dll 51, api-ms-win-crt-runtime-l1-1-0.dll 21, api-ms-win-crt-stdio-l1-1-0.dll 33, api-ms-win-crt-string-l1-1-0.dll 25, api-ms-win-crt-time-l1-1-0.dll 11, api-ms-win-crt-utility-l1-1-0.dll 3, bcrypt.dll 6, dxgi.dll 1, gdi32.dll 22, hid.dll 5, imm32.dll 11, kernel32.dll 201, msvcp140.dll 105, msvcp140_atomic_wait.dll 2, ole32.dll 11, setupapi.dll 10, shell32.dll 9, user32.dll 131, vcruntime140.dll 22, vcruntime140_1.dll 1, version.dll 3, winmm.dll 2, ws2_32.dll 22
+    PASS same imported DLL set: added []; removed []
+    PASS imports from advapi32.dll unchanged (6): added []; removed []
+    PASS imports from api-ms-win-crt-convert-l1-1-0.dll unchanged (14): added []; removed []
+    PASS imports from api-ms-win-crt-environment-l1-1-0.dll unchanged (2): added []; removed []
+    PASS imports from api-ms-win-crt-filesystem-l1-1-0.dll unchanged (6): added []; removed []
+    PASS imports from api-ms-win-crt-heap-l1-1-0.dll unchanged (8): added []; removed []
+    PASS imports from api-ms-win-crt-locale-l1-1-0.dll unchanged (2): added []; removed []
+    PASS imports from api-ms-win-crt-math-l1-1-0.dll unchanged (51): added []; removed []
+    PASS imports from api-ms-win-crt-runtime-l1-1-0.dll unchanged (21): added []; removed []
+    PASS imports from api-ms-win-crt-stdio-l1-1-0.dll unchanged (33): added []; removed []
+    PASS imports from api-ms-win-crt-string-l1-1-0.dll unchanged (25): added []; removed []
+    PASS imports from api-ms-win-crt-time-l1-1-0.dll unchanged (11): added []; removed []
+    PASS imports from api-ms-win-crt-utility-l1-1-0.dll unchanged (3): added []; removed []
+    PASS imports from bcrypt.dll unchanged (6): added []; removed []
+    PASS imports from dxgi.dll unchanged (1): added []; removed []
+    PASS imports from gdi32.dll unchanged (22): added []; removed []
+    PASS imports from hid.dll unchanged (5): added []; removed []
+    PASS imports from imm32.dll unchanged (11): added []; removed []
+    PASS imports from kernel32.dll unchanged (201): added []; removed []
+    PASS imports from msvcp140.dll unchanged (105): added []; removed []
+    PASS imports from msvcp140_atomic_wait.dll unchanged (2): added []; removed []
+    PASS imports from ole32.dll unchanged (11): added []; removed []
+    PASS imports from setupapi.dll unchanged (10): added []; removed []
+    PASS imports from shell32.dll unchanged (9): added []; removed []
+    PASS imports from user32.dll unchanged (131): added []; removed []
+    PASS imports from vcruntime140.dll unchanged (22): added []; removed []
+    PASS imports from vcruntime140_1.dll unchanged (1): added []; removed []
+    PASS imports from version.dll unchanged (3): added []; removed []
+    PASS imports from winmm.dll unchanged (2): added []; removed []
+    PASS imports from ws2_32.dll unchanged (22): added []; removed []
+    RESULT: PASS
+pe-check: exit 0, 0.1 s
+PASS D5 pe-check rexruntime.dll vs devoff4b-bin\rexruntime.dll
+PASS shared DLL after == E3CB99CF
+notes:
+  tools that ran (sha256/16): build-final.py 5BE1F221800137BD, recompile.py 855BCC79148E2DA8, relink.py F3C6EEAF332AB213, stage-variant.py D2BD1C6358FC19C1, verify-bins.py 80FF4C5F581C4B1B, prep-final.py 83F732CA9CEB301F, fsyntax.py 66C7D74022A068DA, pe-check.py F4368C32076AAA3E, mapcheck-s4c.py F8CB7B495F74D978
+  prep: diff sha256 955543F5E2E5F4F44A57CD380FF8D8AC6828E1C0C1372612441AB2AA4E88C657
+  prep: PASS snap1 before rexglue-sdk/src/core/clock.cpp A07EE16C9C5CC4BE
+  prep: PASS snap1 before rexglue-sdk/src/core/timer_queue.cpp 015C04A22DACC592
+  prep: PASS snap1 before rexglue-sdk/src/graphics/shared_memory.cpp A4A31038ABDFF94A
+  prep: PASS snap1 before rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp 8DF708B87A945F07
+  prep: PASS snap1 before rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp 6E20D417F0ED93A5
+  prep: PASS snap1 before rexglue-sdk/src/system/runtime.cpp 306B692BC091A56F
+  prep: PASS snap1 before rexglue-sdk/src/system/xmemory.cpp BCA5E1CF63686E73
+  prep: PASS snap1 before rexglue-sdk/src/system/xobject.cpp 189CA288893B1A36
+  prep: PASS snap1 before rexglue-sdk/src/system/xthread.cpp FAEF9B99C893F684
+  prep: PASS snap1 before rexlego/src/gpu_native/shaders.cpp 9567FE3F3B63637D
+  prep: PASS snap1 before rexlego/src/gpu_wait_backoff.cpp 01D9F8F3464C8614
+  prep: PASS after rexglue-sdk/src/core/clock.cpp EAE926AC812F7EFD == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/core/timer_queue.cpp EF70211E5D248A94 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/graphics/shared_memory.cpp E2465A155E22C20B == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp CEB5529AC853D5A8 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp 7CA55716E7092199 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/runtime.cpp A997D0059A69FF99 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/xmemory.cpp 3745C04AAC8AF75D == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/xobject.cpp 691A34BB64E11EA2 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/xthread.cpp 3B50A95E76B10377 == table and == final/work/new
+  prep: PASS after rexlego/src/gpu_native/shaders.cpp 4B8250E976A38401 == table and == final/work/new
+  prep: PASS after rexlego/src/gpu_wait_backoff.cpp 74115EEA26C4AEB2 == table and == final/work/new
+  prep: gen-on native-gpu-build.txt: LEGO Dimensions native GPU 1616ce65e973c583
+  CTL: PASS compare rexruntime.dll vs build\agent2\devoff4b-bin\rexruntime.dll: identical except 1 TimeDateStamp field(s) (6b06e26b vs 6b03a0ab; COFF header at 0x80, included)
+  ON object clock.cpp.obj exit 0 3.1 s obj 74457 B D55D32741A6619E2
+  ON object timer_queue.cpp.obj exit 0 3.6 s obj 115587 B B044D7C18ADE69E1 (log 1365 B)
+  ON object xboxkrnl_rtl.cpp.obj exit 0 2.6 s obj 304339 B EDBBAFF25BE8F646 (log 603 B)
+  ON object xboxkrnl_threading.cpp.obj exit 0 3.6 s obj 456759 B E810C71048E9A16C (log 2231 B)
+  ON object runtime.cpp.obj exit 0 2.0 s obj 319352 B 3D8709DF07B1490E
+  ON object xmemory.cpp.obj exit 0 2.5 s obj 392019 B 2901E15AC96E8702 (log 434 B)
+  ON object xobject.cpp.obj exit 0 1.5 s obj 65905 B 29E9664860CB02C4 (log 2674 B)
+  ON object xthread.cpp.obj exit 0 2.0 s obj 206025 B FBB6CFD85D833C7A (log 373 B)
+  ON rexruntime.dll C5BC627BB2E83CF27794213BE134DA41D9AB1834E74DCE2E924F7FD7BC577372
+  needles: ON has ['Final defaults:{}']; reference lacks them; ON lacks -
+  D5 pe-check vs devoff4b-bin\rexruntime.dll: PASS
+  times: CTL recompile 4.3 s, CTL relink 1.5 s, ON recompile 4.3 s, ON relink 1.4 s, pe-check 0.1 s
+RESULT: PASS (total 11.7 s)

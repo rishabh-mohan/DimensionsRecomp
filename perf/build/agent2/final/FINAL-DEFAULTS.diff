@@ -1,0 +1,350 @@
+diff --git a/DimensionsRecomp/rexglue-sdk/src/core/clock.cpp b/DimensionsRecomp/rexglue-sdk/src/core/clock.cpp
+--- a/DimensionsRecomp/rexglue-sdk/src/core/clock.cpp
++++ b/DimensionsRecomp/rexglue-sdk/src/core/clock.cpp
+@@ -23,7 +23,7 @@ REXCVAR_DEFINE_BOOL(clock_no_scaling, false, "Clock",
+ 
+ REXCVAR_DEFINE_BOOL(clock_source_raw, false, "Clock", "Use raw clock source without scaling");
+ 
+-REXCVAR_DEFINE_BOOL(clock_lockfree, false, "Clock",
++REXCVAR_DEFINE_BOOL(clock_lockfree, true, "Clock",
+                     "Read the guest clock without taking a lock (applied when the guest clock "
+                     "rate is set, at startup)");
+ 
+diff --git a/DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp b/DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp
+--- a/DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp
++++ b/DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp
+@@ -26,9 +26,9 @@
+ #include <rex/thread.h>
+ #include <rex/thread/timer_queue.h>
+ 
+-// Default off (behavior changes ship off until rated SAFE). perf-notes/agent11-kernel.md,
++// Default on (final build: WC win3 arm; false = the old phased spin). perf-notes/agent11-kernel.md,
+ // "S3 TimerQueue" (task #10), has the measurements and the tests.
+-REXCVAR_DEFINE_BOOL(timer_queue_precise_wait, false, "Runtime",
++REXCVAR_DEFINE_BOOL(timer_queue_precise_wait, true, "Runtime",
+                     "Host timer thread: sleep until the next timer is due (a condition variable, "
+                     "then high-resolution sleeps). Off: the phased spin wait, which keeps a core "
+                     "about half busy with the 1 ms KeTimeStampBundle timer")
+diff --git a/DimensionsRecomp/rexglue-sdk/src/graphics/shared_memory.cpp b/DimensionsRecomp/rexglue-sdk/src/graphics/shared_memory.cpp
+--- a/DimensionsRecomp/rexglue-sdk/src/graphics/shared_memory.cpp
++++ b/DimensionsRecomp/rexglue-sdk/src/graphics/shared_memory.cpp
+@@ -24,14 +24,14 @@
+ #include <rex/math.h>
+ #include <rex/memory.h>
+ 
+-// S4 P2 (default off). When on, MakeRangeValid holds the global critical region
++// S4 P2 (default on, final build). When on, MakeRangeValid holds the global critical region
+ // once over the valid-bit update and the write-watch re-arm, and
+ // RangeWrittenByGpu holds it once over FireWatches and MakeRangeValid. The inner
+ // acquires (the scope in MakeRangeValid, FireWatches, EnableAccessCallbacks in
+ // each view) become recursive re-entries, so G is released, and a waiter woken,
+ // once per call instead of 4 (MakeRangeValid) or 5 (RangeWrittenByGpu) times.
+ // Off: one cvar load and one untaken branch per call; the original code runs.
+-REXCVAR_DEFINE_BOOL(shared_memory_single_hold_rearm, false, "GPU",
++REXCVAR_DEFINE_BOOL(shared_memory_single_hold_rearm, true, "GPU",
+                     "Hold the global lock once across a shared memory range's valid-bit "
+                     "update and its write-watch re-arm (fewer lock releases and waiter "
+                     "wakes on the GPU thread)");
+@@ -47,6 +47,16 @@ REXCVAR_DEFINE_BOOL(physical_protect_keep_watch_verify, false, "GPU",
+ 
+ namespace rex::graphics {
+ 
++namespace {
++// Final build (build/agent2/final): "name=value(source)" for the startup defaults line.
++std::string FinalDefault(const char* name) {
++  static constexpr const char* kSources[] = {"default", "config", "env", "cmdline", "runtime"};
++  const auto source = static_cast<size_t>(cvar::GetFlagSource(name));
++  return fmt::format("{}={}({})", name, cvar::GetFlagByName(name),
++                     source < std::size(kSources) ? kSources[source] : "?");
++}
++}  // namespace
++
+ SharedMemory::SharedMemory(memory::Memory& memory) : memory_(memory) {
+   page_size_log2_ = rex::log2_ceil(uint32_t(rex::memory::page_size()));
+   // Allocated up front: it is read from game threads without a lock.
+@@ -66,6 +76,9 @@ void SharedMemory::InitializeCommon() {
+   // S4 C1: with SharedMemory's keep-watch guard (condition 3, verify mode's K check).
+   memory_invalidation_callback_handle_ = memory_.RegisterPhysicalMemoryInvalidationCallback(
+       MemoryInvalidationCallbackThunk, this, MemoryKeepWatchGuardThunk);
++
++  REXGPU_INFO("Final defaults (GPU): {} {}", FinalDefault("shared_memory_single_hold_rearm"),
++              FinalDefault("physical_protect_keep_watch_verify"));
+ }
+ 
+ void SharedMemory::InitializeSparseHostGpuMemory(uint32_t granularity_log2) {
+diff --git a/DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp b/DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp
+--- a/DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp
++++ b/DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp
+@@ -48,7 +48,7 @@ REXCVAR_DEFINE_UINT32(
+     "with nothing at all in the log.");
+ 
+ REXCVAR_DEFINE_BOOL(
+-    cs_spin, false, "Kernel",
++    cs_spin, true, "Kernel",
+     "Spin briefly before a contended guest critical section (RtlEnterCriticalSection) blocks in "
+     "the kernel: a CPU pause loop that retries the lock only when it reads free, for up to "
+     "cs_spin_ns or the guest's own spin count, whichever is longer. false restores the original "
+diff --git a/DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp b/DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp
+--- a/DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp
++++ b/DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp
+@@ -46,7 +46,7 @@
+ #include <rex/thread/mutex.h>
+ 
+ REXCVAR_DEFINE_BOOL(
+-    spinlock_pause_spin, false, "Kernel",
++    spinlock_pause_spin, true, "Kernel",
+     "Guest kernel spinlocks (KfAcquireSpinLock, KeAcquireSpinLockAtRaisedIrql, and the kernel's "
+     "own APC and reader/writer-lock spinlocks) wait in a CPU pause loop that retries only when "
+     "the lock reads free, and yield the thread only after 10 us of waiting. false restores the "
+diff --git a/DimensionsRecomp/rexglue-sdk/src/system/runtime.cpp b/DimensionsRecomp/rexglue-sdk/src/system/runtime.cpp
+--- a/DimensionsRecomp/rexglue-sdk/src/system/runtime.cpp
++++ b/DimensionsRecomp/rexglue-sdk/src/system/runtime.cpp
+@@ -35,11 +35,11 @@ REXCVAR_DEFINE_STRING(update_data_root, "", "Runtime", "Override update data pat
+ REXCVAR_DEFINE_STRING(cache_root, "", "Runtime", "Override shader cache path");
+ REXCVAR_DEFINE_STRING(metadata_root, "", "Runtime", "Override metadata path");
+ 
+-// Default off (session-2 batch rule); 1 / true is the recommended setting.
+-REXCVAR_DEFINE_UINT32(host_timer_resolution_ms, 0, "Runtime",
++// Default 1 / true (final build: WC win3 arm); 0 / false restore the old behaviour.
++REXCVAR_DEFINE_UINT32(host_timer_resolution_ms, 1, "Runtime",
+                       "Host timer resolution to request at startup, in ms (0 = OS default; "
+                       "1 recommended)");
+-REXCVAR_DEFINE_BOOL(host_timer_throttling_optout, false, "Runtime",
++REXCVAR_DEFINE_BOOL(host_timer_throttling_optout, true, "Runtime",
+                     "Keep the host timer resolution while the window is minimized or occluded");
+ 
+ REXCVAR_DECLARE(std::string, perf_log_csv);
+@@ -52,6 +52,31 @@ Runtime* Runtime::instance_ = nullptr;
+ // The runtime that applied the host timing settings; it restores them.
+ static Runtime* host_timing_owner_ = nullptr;
+ 
++// Final build (build/agent2/final): one startup line with the value and source of each
++// rexruntime switch whose default the final build changed, so a log shows whether a
++// launch ran the shipped defaults. rexgpu-xenos logs its two in SharedMemory.
++static void LogFinalDefaults() {
++  static constexpr const char* kNames[] = {
++      "physical_protect_hold_global_lock", "physical_protect_keep_watch",
++      "host_timer_resolution_ms",          "host_timer_throttling_optout",
++      "precise_guest_sleep",               "wait_timeout_round_up",
++      "cs_spin",                           "spinlock_pause_spin",
++      "clock_lockfree",                    "tls_bounds_fix",
++      "timer_queue_precise_wait"};
++  static constexpr const char* kSources[] = {"default", "config", "env", "cmdline", "runtime"};
++  std::string line;
++  for (const char* name : kNames) {
++    if (!cvar::GetFlagInfo(name)) {
++      line += fmt::format(" {}=unregistered", name);
++      continue;
++    }
++    const auto source = static_cast<size_t>(cvar::GetFlagSource(name));
++    line += fmt::format(" {}={}({})", name, cvar::GetFlagByName(name),
++                        source < std::size(kSources) ? kSources[source] : "?");
++  }
++  REXSYS_INFO("Final defaults:{}", line);
++}
++
+ Runtime* Runtime::instance() {
+   return instance_;
+ }
+@@ -143,6 +168,7 @@ X_STATUS Runtime::Setup(RuntimeConfig config) {
+     timing.keep_timer_resolution_in_background = REXCVAR_GET(host_timer_throttling_optout);
+     thread::ConfigureHostTiming(timing);
+     host_timing_owner_ = this;
++    LogFinalDefaults();
+   }
+ 
+   // Create memory system first
+diff --git a/DimensionsRecomp/rexglue-sdk/src/system/xmemory.cpp b/DimensionsRecomp/rexglue-sdk/src/system/xmemory.cpp
+--- a/DimensionsRecomp/rexglue-sdk/src/system/xmemory.cpp
++++ b/DimensionsRecomp/rexglue-sdk/src/system/xmemory.cpp
+@@ -42,17 +42,17 @@ REXCVAR_DEFINE_BOOL(protect_on_release, false, "Memory",
+ 
+ REXCVAR_DEFINE_BOOL(scribble_heap, false, "Memory", "Scribble 0xCD into all allocated heap memory");
+ 
+-// S4.7 fix (i), default off: see PhysicalHeap::Protect.
+-REXCVAR_DEFINE_BOOL(physical_protect_hold_global_lock, false, "Memory",
++// S4.7 fix (i), default on (final build): see PhysicalHeap::Protect.
++REXCVAR_DEFINE_BOOL(physical_protect_hold_global_lock, true, "Memory",
+                     "Hold the global lock across both host protects in PhysicalHeap::Protect")
+     .lifecycle(rex::cvar::Lifecycle::kInitOnly);
+ 
+-// S4 C1 (default off): keep the write watches on physical write protects that change
++// S4 C1 (default on, final build): keep the write watches on physical write protects that change
+ // no page's access. Engages only with physical_protect_hold_global_lock on; see
+ // PhysicalHeap::ProtectKeepWatch. Both cvars are init-only (C1 v2), so the settings
+ // overlay can't turn C1 on mid-run over page state from before fix (i) was on, and
+ // Memory::Initialize latches both (C1 v3), so no later set reaches the protect path.
+-REXCVAR_DEFINE_BOOL(physical_protect_keep_watch, false, "Memory",
++REXCVAR_DEFINE_BOOL(physical_protect_keep_watch, true, "Memory",
+                     "Keep the write watches on physical write protects that leave every "
+                     "page's access unchanged (needs physical_protect_hold_global_lock)")
+     .lifecycle(rex::cvar::Lifecycle::kInitOnly);
+diff --git a/DimensionsRecomp/rexglue-sdk/src/system/xobject.cpp b/DimensionsRecomp/rexglue-sdk/src/system/xobject.cpp
+--- a/DimensionsRecomp/rexglue-sdk/src/system/xobject.cpp
++++ b/DimensionsRecomp/rexglue-sdk/src/system/xobject.cpp
+@@ -32,7 +32,7 @@
+ #include <rex/system/xsymboliclink.h>
+ #include <rex/system/xthread.h>
+ 
+-REXCVAR_DEFINE_BOOL(wait_timeout_round_up, false, "Kernel",
++REXCVAR_DEFINE_BOOL(wait_timeout_round_up, true, "Kernel",
+                     "Timed waits: round timeouts up to whole ms instead of truncating them, and "
+                     "honour absolute timeouts instead of polling");
+ 
+diff --git a/DimensionsRecomp/rexglue-sdk/src/system/xthread.cpp b/DimensionsRecomp/rexglue-sdk/src/system/xthread.cpp
+--- a/DimensionsRecomp/rexglue-sdk/src/system/xthread.cpp
++++ b/DimensionsRecomp/rexglue-sdk/src/system/xthread.cpp
+@@ -52,11 +52,11 @@ REXCVAR_DEFINE_BOOL(ignore_thread_priorities, true, "Kernel",
+ REXCVAR_DEFINE_BOOL(ignore_thread_affinities, true, "Kernel",
+                     "Ignores game-specified thread affinities");
+ 
+-REXCVAR_DEFINE_BOOL(precise_guest_sleep, false, "Kernel",
++REXCVAR_DEFINE_BOOL(precise_guest_sleep, true, "Kernel",
+                     "KeDelayExecutionThread: sleep the exact time (rounded up) on a "
+                     "high-resolution timer and honour absolute times");
+ 
+-REXCVAR_DEFINE_BOOL(tls_bounds_fix, false, "Kernel",
++REXCVAR_DEFINE_BOOL(tls_bounds_fix, true, "Kernel",
+                     "Thread TLS: allocate whole groups of 4 slots (as the process slot bitmap "
+                     "does) and reject slot indices past the end of the slot area");
+ 
+diff --git a/DimensionsRecomp/rexlego/src/gpu_wait_backoff.cpp b/DimensionsRecomp/rexlego/src/gpu_wait_backoff.cpp
+--- a/DimensionsRecomp/rexlego/src/gpu_wait_backoff.cpp
++++ b/DimensionsRecomp/rexlego/src/gpu_wait_backoff.cpp
+@@ -15,12 +15,17 @@
+ //   (L1's timeout reads KTHREAD+0x58, which the SDK never writes; L2 has none). So only poll timing changes.
+ //
+ // Switches (environment, read once on first use)
+-//   LEGO_GPU_WAIT_BACKOFF_US=<Q>  unset or empty = OFF (default): every hook calls the original at once.
++//   LEGO_GPU_WAIT_BACKOFF_US=<Q>  unset or empty = the build default, LEGO_GPU_WAIT_BACKOFF_DEFAULT_US (500: ON
++//                                 at Q = 500, the W9 read-out's pick; a negative build value means OFF).
++//                                 off (any case) = OFF, explicitly: every hook calls the original at once, and
++//                                 one "GPU wait back-off: OFF (...)" line is logged (unless stats prints its line).
+ //                                 Q = 0: pause phase, then SwitchToThread on every later poll (Agent 6's (e)).
+ //                                 Q > 0: pause phase, one SwitchToThread, then a Q us sleep per poll. Max 2000.
+ //   LEGO_GPU_WAIT_SPIN_US=<S>     pause phase of a stalled wait before the first yield. Default 30, max 200.
+ //                                 Q and S take decimal digits only; a larger value clamps to the max. Anything
+-//                                 else ("-5", "+5", " 5", "5us") logs a warning and is ignored: Q stays OFF, S 30.
++//                                 else ("-5", "+5", " 5", "5us") logs a warning and is ignored: Q is OFF, S 30.
++//                                 Bins built before the default changed read "off" the same way (a warning, OFF),
++//                                 so an off arm that sets it is OFF on old and new bins alike.
+ //   LEGO_GPU_WAIT_STATS=1         probe P1 counters (S4.1.4), one log line per 5 s. Works with the back-off OFF.
+ //                                 Profiling runs only; a STATS run never counts as a timing run.
+ //
+@@ -69,6 +74,12 @@
+ #define LEGO_GPU_WAIT_HOOK_GETDATA 0
+ #endif
+ 
++// Q when LEGO_GPU_WAIT_BACKOFF_US is unset or empty. 500 = ON at 500 us (W9 read-out); negative = OFF, the
++// default before Session 3. Set it per build with -DLEGO_GPU_WAIT_BACKOFF_DEFAULT_US=<n> (no CMake change needed).
++#ifndef LEGO_GPU_WAIT_BACKOFF_DEFAULT_US
++#define LEGO_GPU_WAIT_BACKOFF_DEFAULT_US 500
++#endif
++
+ extern "C" void __imp__sub_83FBF7D0(PPCContext& __restrict ctx, uint8_t* base);
+ extern "C" void __imp__sub_83FAF180(PPCContext& __restrict ctx, uint8_t* base);
+ #if LEGO_GPU_WAIT_HOOK_GETDATA
+@@ -88,6 +99,8 @@ constexpr uint32_t kLrGetDataTry = 0x82BDD000u;   // sub_82BDCFB8: the one try (
+ constexpr uint32_t kLrGetDataLoop = 0x82BDD028u;  // sub_82BDCFB8: the blocking loop (bl at 0x82BDD024)
+ constexpr uint32_t kGetDataNotReady = 1;          // S_FALSE
+ constexpr uint32_t kTimerWaitCapMs = 20;          // safety bound on one timer wait (Q is at most 2 ms)
++constexpr int kDefaultQuantumUs = LEGO_GPU_WAIT_BACKOFF_DEFAULT_US;
++static_assert(kDefaultQuantumUs <= 2000, "LEGO_GPU_WAIT_BACKOFF_DEFAULT_US is at most 2000 (negative = OFF)");
+ 
+ inline int64_t Qpc() {
+   LARGE_INTEGER t;
+@@ -97,7 +110,7 @@ inline int64_t Qpc() {
+ 
+ // ---- Config ----
+ struct Config {
+-  bool on = false;          // LEGO_GPU_WAIT_BACKOFF_US is set and valid
++  bool on = false;          // LEGO_GPU_WAIT_BACKOFF_US is valid, or unset with a build default >= 0
+   bool stats = false;       // LEGO_GPU_WAIT_STATS=1
+   uint32_t quantum_us = 0;  // Q
+   uint32_t spin_us = 30;    // S
+@@ -116,12 +129,25 @@ bool ParseUs(const char* s, uint32_t max, uint32_t* out) {
+   return true;
+ }
+ 
++// The explicit OFF value of LEGO_GPU_WAIT_BACKOFF_US: "off" in any case, nothing else.
++bool IsOff(const char* s) {
++  return s && (s[0] == 'o' || s[0] == 'O') && (s[1] == 'f' || s[1] == 'F') && (s[2] == 'f' || s[2] == 'F') &&
++         s[3] == '\0';
++}
++
+ const Config& Cfg() {
+   // Magic static: read once, thread-safe, on the first hooked call (after logging is up).
+   static const Config cfg = [] {
+     Config c;
+     const char* q = std::getenv("LEGO_GPU_WAIT_BACKOFF_US");
+-    c.on = ParseUs(q, 2000, &c.quantum_us);
++    const bool q_set = q && *q;
++    const bool q_off = IsOff(q);
++    if (!q_set) {
++      c.on = kDefaultQuantumUs >= 0;  // the build default
++      c.quantum_us = c.on ? static_cast<uint32_t>(kDefaultQuantumUs) : 0u;
++    } else if (!q_off) {
++      c.on = ParseUs(q, 2000, &c.quantum_us);
++    }
+     const char* sp = std::getenv("LEGO_GPU_WAIT_SPIN_US");
+     uint32_t s = 0;
+     const bool spin_ok = ParseUs(sp, 200, &s);
+@@ -131,7 +157,7 @@ const Config& Cfg() {
+     LARGE_INTEGER f;
+     if (QueryPerformanceFrequency(&f) && f.QuadPart > 0) c.qpf = f.QuadPart;
+     c.spin_ticks = c.qpf * c.spin_us / 1000000;
+-    if (q && *q && !c.on) {
++    if (q_set && !q_off && !c.on) {
+       REXLOG_WARN("GPU wait back-off: LEGO_GPU_WAIT_BACKOFF_US=\"{}\" is not a plain number; back-off stays OFF.", q);
+     }
+     if (sp && *sp && !spin_ok) {
+@@ -142,6 +168,8 @@ const Config& Cfg() {
+       REXLOG_INFO("GPU wait back-off: {} (quantum {} us, spin {} us); stats {}; GetData hook {}.",
+                   c.on ? "ON" : "OFF", c.quantum_us, c.spin_us, c.stats ? "ON" : "OFF",
+                   LEGO_GPU_WAIT_HOOK_GETDATA ? "built" : "not built (native GPU build)");
++    } else if (q_off) {
++      REXLOG_INFO("GPU wait back-off: OFF (LEGO_GPU_WAIT_BACKOFF_US={}).", q);
+     }
+     return c;
+   }();
+diff --git a/DimensionsRecomp/rexlego/src/gpu_native/shaders.cpp b/DimensionsRecomp/rexlego/src/gpu_native/shaders.cpp
+--- a/DimensionsRecomp/rexlego/src/gpu_native/shaders.cpp
++++ b/DimensionsRecomp/rexlego/src/gpu_native/shaders.cpp
+@@ -206,7 +206,7 @@ void CaptureMissingPlacementShader(u32 guest_address, u32 container_address,
+       capture.size(), stage, hash, "placement-containers");
+ }
+ 
+-// LEGO_NATIVE_SHADER_MISS_CACHE=1 (default OFF): remember a placement shader that missed the AOT index, so its
++// LEGO_NATIVE_SHADER_MISS_CACHE (default ON): remember a placement shader that missed the AOT index, so its
+ // later binds skip ReadableGuestSpan and FindShaderByMicrocode. An entry replays the miss (warning counter and
+ // line included) only while the pack generation is unchanged and a CPU write stamp, armed before the lookup,
+ // proves unchanged every byte the lookup could read. Capture runs (LEGO_DUMP_MISSING_SHADERS) keep the full path.
+@@ -219,9 +219,26 @@ bool ShaderMissEnvironmentSet(const char* name, bool zero_disables) {
+   return result;
+ }
+ 
++// LEGO_NATIVE_SHADER_MISS_CACHE unset or empty = the build default, LEGO_NATIVE_SHADER_MISS_CACHE_DEFAULT (1 = ON;
++// OFF bins build with -DLEGO_NATIVE_SHADER_MISS_CACHE_DEFAULT=0); "0" = OFF; any other value = ON.
++#ifndef LEGO_NATIVE_SHADER_MISS_CACHE_DEFAULT
++#define LEGO_NATIVE_SHADER_MISS_CACHE_DEFAULT 1
++#endif
++
+ bool ShaderMissCacheEnabled() {
+-  static const bool enabled = ShaderMissEnvironmentSet("LEGO_NATIVE_SHADER_MISS_CACHE", true) &&
+-                              !ShaderMissEnvironmentSet("LEGO_DUMP_MISSING_SHADERS", false);
++  static const bool enabled = [] {
++    char* value = nullptr;
++    size_t length = 0;
++    _dupenv_s(&value, &length, "LEGO_NATIVE_SHADER_MISS_CACHE");
++    const bool set = value && length > 1;
++    const bool requested = set ? std::strcmp(value, "0") != 0 : LEGO_NATIVE_SHADER_MISS_CACHE_DEFAULT != 0;
++    std::free(value);
++    const bool capture = ShaderMissEnvironmentSet("LEGO_DUMP_MISSING_SHADERS", false);
++    REXLOG_INFO("Native GPU: shader miss cache {} ({}{})", requested && !capture ? "ON" : "OFF",
++                set ? "LEGO_NATIVE_SHADER_MISS_CACHE set" : "build default",
++                capture ? "; LEGO_DUMP_MISSING_SHADERS keeps the full path" : "");
++    return requested && !capture;
++  }();
+   return enabled;
+ }
+ 

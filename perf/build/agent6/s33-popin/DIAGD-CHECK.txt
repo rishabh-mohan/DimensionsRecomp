@@ -1,0 +1,34 @@
+  ok   nohunk5 patch sha256 57CFA8ADF1E90079
+  ok   blob include/rex/graphics/d3d12/pipeline_cache.h read from 5350b1d
+  ok   blob src/graphics/d3d12/command_processor.cpp read from 5350b1d
+  ok   blob src/graphics/d3d12/pipeline_cache.cpp read from 5350b1d
+  ok   blob src/graphics/frame_stats.h read from 5350b1d
+  ok   nohunk5 on 5350b1d: no git repo above diagd-build
+  ok   nohunk5 on 5350b1d: git apply --check --verbose s33-popin-nohunk5.patch -> exit 0
+  ok   nohunk5 on 5350b1d: git apply --verbose s33-popin-nohunk5.patch -> exit 0
+  ok   nohunk5 on 5350b1d: git apply -R --check --verbose s33-popin-nohunk5.patch -> exit 0
+  ok   anchor found once (1): '                    "readback_resolve_max_kb value for a tit'
+  ok   anchor found once (1): 'std::atomic<uint64_t> memexport_full_buffer_draws{0};'
+  ok   anchor found once (1): '    if (skip_draw) {'
+  ok   anchor found once (1): '    resolved = IssueCopy_ReadbackResolvePath();'
+  ok   nohunk5 result is LF only
+wrote s33-diagd-on-nohunk5.patch: 4580 bytes, 103 lines, sha256 6CF9377E9F09322B88C5870D2F3A9F62AA92FFED9D7C04EB9463C870A4CD746F
+wrote s33-popin-nohunk5-diagd.patch: 14388 bytes, 302 lines, sha256 797E614284B642267CCB1539AADBC5AD79362467FDD51F13143DBCA287C6DAC0
+  ok   stacked step 1 (nohunk5): no git repo above diagd-stacked
+  ok   stacked step 1 (nohunk5): git apply --check --verbose s33-popin-nohunk5.patch -> exit 0
+  ok   stacked step 1 (nohunk5): git apply --verbose s33-popin-nohunk5.patch -> exit 0
+  ok   stacked step 1 (nohunk5): git apply -R --check --verbose s33-popin-nohunk5.patch -> exit 0
+  ok   stacked step 2 (diag d): no git repo above diagd-stacked
+  ok   stacked step 2 (diag d): git apply --check --verbose s33-diagd-on-nohunk5.patch -> exit 0
+  ok   stacked step 2 (diag d): git apply --verbose s33-diagd-on-nohunk5.patch -> exit 0
+  ok   stacked step 2 (diag d): git apply -R --check --verbose s33-diagd-on-nohunk5.patch -> exit 0
+  ok   combined: no git repo above diagd-combined
+  ok   combined: git apply --check --verbose s33-popin-nohunk5-diagd.patch -> exit 0
+  ok   combined: git apply --verbose s33-popin-nohunk5-diagd.patch -> exit 0
+  ok   combined: git apply -R --check --verbose s33-popin-nohunk5-diagd.patch -> exit 0
+  ok   include/rex/graphics/d3d12/pipeline_cache.h: stacked = combined = generated (sha256 0BAF28BE633759CD)
+  ok   src/graphics/d3d12/command_processor.cpp: stacked = combined = generated (sha256 97257A204152DF1B)
+  ok   src/graphics/d3d12/pipeline_cache.cpp: stacked = combined = generated (sha256 C4CB51CC6D2A6429)
+  ok   src/graphics/frame_stats.h: stacked = combined = generated (sha256 9F3C4F9DC58DCA5D)
+  ok   live SDK src/include still clean
+result: PASS

@@ -1,0 +1,106 @@
+{
+ "params": {
+  "dir": null,
+  "ref_arm": "n0q",
+  "comp": null,
+  "noise_arm": null,
+  "ref": [
+   "build\\agent3\\runs\\20261122-045945-bgate-long-native3d",
+   "build\\agent3\\runs\\20261122-050343-bgate-long-nativeB"
+  ],
+  "cand": [
+   "build\\agent3\\runs\\20261122-135155-s4a-r5-off-native4",
+   "build\\agent3\\runs\\20261122-141355-s4a-r5-off-native4"
+  ],
+  "tol": 0.05,
+  "normal_priority": false
+ },
+ "runs": {
+  "20261122-045945-bgate-long-native3d": {
+   "run": "build\\agent3\\runs\\20261122-045945-bgate-long-native3d",
+   "name": "20261122-045945-bgate-long-native3d",
+   "files": [
+    "build\\agent3\\runs\\20261122-045945-bgate-long-native3d\\game.log"
+   ],
+   "unsupported": 0,
+   "failed": 16,
+   "created": 16,
+   "unsupported_ex": [],
+   "lines": 0
+  },
+  "20261122-050343-bgate-long-nativeB": {
+   "run": "build\\agent3\\runs\\20261122-050343-bgate-long-nativeB",
+   "name": "20261122-050343-bgate-long-nativeB",
+   "files": [
+    "build\\agent3\\runs\\20261122-050343-bgate-long-nativeB\\game.log"
+   ],
+   "unsupported": 0,
+   "failed": 16,
+   "created": 16,
+   "unsupported_ex": [],
+   "lines": 0
+  },
+  "20261122-135155-s4a-r5-off-native4": {
+   "run": "build\\agent3\\runs\\20261122-135155-s4a-r5-off-native4",
+   "name": "20261122-135155-s4a-r5-off-native4",
+   "files": [
+    "build\\agent3\\runs\\20261122-135155-s4a-r5-off-native4\\game.log"
+   ],
+   "unsupported": 0,
+   "failed": 0,
+   "created": 0,
+   "unsupported_ex": [],
+   "lines": 0
+  },
+  "20261122-141355-s4a-r5-off-native4": {
+   "run": "build\\agent3\\runs\\20261122-141355-s4a-r5-off-native4",
+   "name": "20261122-141355-s4a-r5-off-native4",
+   "files": [
+    "build\\agent3\\runs\\20261122-141355-s4a-r5-off-native4\\game.log"
+   ],
+   "unsupported": 0,
+   "failed": 16,
+   "created": 16,
+   "unsupported_ex": [],
+   "lines": 0
+  }
+ },
+ "noise": null,
+ "comparisons": [
+  {
+   "label": "cand vs ref",
+   "pairs": [],
+   "per_cand": {}
+  }
+ ],
+ "verdict": "INCOMPLETE",
+ "checks": [
+  "PASS       ref runs: 2 (need 2): 20261122-045945-bgate-long-native3d, 20261122-050343-bgate-long-nativeB",
+  "           20261122-045945-bgate-long-native3d: 0 trace lines, 0 slots, zero-sample share -, frames -..-, unsupported 0, failed-draw invalidations 16, created-query lines 16",
+  "INCOMPLETE Q1 20261122-045945-bgate-long-native3d: has query trace lines (0) - UNCLEAR: 16 created-query lines but no trace line: LEGO_NATIVE_QUERY_TRACE_FROM not set, or no query result reached the guest (failed-draw invalidations 16)",
+  "PASS       Q2 20261122-045945-bgate-long-native3d: 0 'unsupported query' lines (0)",
+  "           20261122-050343-bgate-long-nativeB: 0 trace lines, 0 slots, zero-sample share -, frames -..-, unsupported 0, failed-draw invalidations 16, created-query lines 16",
+  "INCOMPLETE Q1 20261122-050343-bgate-long-nativeB: has query trace lines (0) - UNCLEAR: 16 created-query lines but no trace line: LEGO_NATIVE_QUERY_TRACE_FROM not set, or no query result reached the guest (failed-draw invalidations 16)",
+  "PASS       Q2 20261122-050343-bgate-long-nativeB: 0 'unsupported query' lines (0)",
+  "           20261122-135155-s4a-r5-off-native4: 0 trace lines, 0 slots, zero-sample share -, frames -..-, unsupported 0, failed-draw invalidations 0, created-query lines 0",
+  "INCOMPLETE Q1 20261122-135155-s4a-r5-off-native4: has query trace lines (0) - UNCLEAR: the route created no hardware query (created-query lines 0); needs a route that issues queries",
+  "PASS       Q2 20261122-135155-s4a-r5-off-native4: 0 'unsupported query' lines (0)",
+  "           20261122-141355-s4a-r5-off-native4: 0 trace lines, 0 slots, zero-sample share -, frames -..-, unsupported 0, failed-draw invalidations 16, created-query lines 16",
+  "INCOMPLETE Q1 20261122-141355-s4a-r5-off-native4: has query trace lines (0) - UNCLEAR: 16 created-query lines but no trace line: LEGO_NATIVE_QUERY_TRACE_FROM not set, or no query result reached the guest (failed-draw invalidations 16)",
+  "PASS       Q2 20261122-141355-s4a-r5-off-native4: 0 'unsupported query' lines (0)",
+  "INCOMPLETE Q3 noise pair: needs 2 noise-arm runs with trace lines",
+  "PASS       cand vs ref: candidate runs found: 2",
+  "PASS       cand vs ref: comparison runs found: 2",
+  "PASS       Q4 cand vs ref 20261122-135155-s4a-r5-off-native4: failed-draw invalidations 0 <= max(2 x ref max, ref max + 4) = 32",
+  "PASS       Q4 cand vs ref 20261122-141355-s4a-r5-off-native4: failed-draw invalidations 16 <= max(2 x ref max, ref max + 4) = 32"
+ ],
+ "fails": [],
+ "incomplete": [
+  "Q1 20261122-045945-bgate-long-native3d: has query trace lines (0) - UNCLEAR: 16 created-query lines but no trace line: LEGO_NATIVE_QUERY_TRACE_FROM not set, or no query result reached the guest (failed-draw invalidations 16)",
+  "Q1 20261122-050343-bgate-long-nativeB: has query trace lines (0) - UNCLEAR: 16 created-query lines but no trace line: LEGO_NATIVE_QUERY_TRACE_FROM not set, or no query result reached the guest (failed-draw invalidations 16)",
+  "Q1 20261122-135155-s4a-r5-off-native4: has query trace lines (0) - UNCLEAR: the route created no hardware query (created-query lines 0); needs a route that issues queries",
+  "Q1 20261122-141355-s4a-r5-off-native4: has query trace lines (0) - UNCLEAR: 16 created-query lines but no trace line: LEGO_NATIVE_QUERY_TRACE_FROM not set, or no query result reached the guest (failed-draw invalidations 16)",
+  "Q3 noise pair: needs 2 noise-arm runs with trace lines"
+ ],
+ "dir": null
+}

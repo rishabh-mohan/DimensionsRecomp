@@ -1,0 +1,31 @@
+queue row: {"id": "cg26b0", "est": 265, "needs": ["build\\agent3\\s4b\\ready-s4b-off", "build\\agent3\\session3\\go-quiet"], "args": ["-BinDir", "build\\agent2\\devoff4b-cg26-bin", "-Seconds", "420", "-Tag", "cg26b0-boot-menus", "-InputScript", "harness\\routes\\b-gate-menus-long.txt"], "note": "Overseer 01:41: first functional boot of M2 CG26 bin, = s4b01 (20261122-205356-s4b-01-off) args on the new bin, default switches, no cache seeding. Gate: exit 0, no STUCK-LOCK, no back-off init line, logdiff vs s4b01 NEW 0. W10 depends on it."}
+ok   exit_code 0 (0x00000000), close wm_close, elapsed 217.39 s of 420
+ok   wer_seen False
+ok   crash_events []
+ok   exited_early False
+ok   bin_dir <workspace>\build\agent2\devoff4b-cg26-bin (queued build\agent2\devoff4b-cg26-bin)
+ok   run exe sha256 45952D171D6204A1 = run.json and in <workspace>\build\agent2\devoff4b-cg26-bin\MANIFEST.txt
+ok   cvars {} (queued {})
+ok   env {} (queued {})
+ok   input script <workspace>\harness\routes\b-gate-menus-long.txt (queued harness\routes\b-gate-menus-long.txt)
+     logs 1 (213 lines); counts: Recovered stale physical page protection=0; Unhandled guest physical write fault=0; PhysicalHeap::Protect failed=0; STUCK-LOCK=0; REX_FATAL=0; C1 keep-watch: on (with=0; C1 keep-watch: on, but=0; blocked for this process=0; C1 verify: on.=0; C1 verify K:=0; C1 verify F:=0; GPU wait back-off: ON=0; d3d12_submit_split_kb: splitting=0; d3d12_submit_split: =0
+ok   C4 "Recovered stale physical page protection" x0
+ok   C4 "Unhandled guest physical write fault" x0
+ok   C4 "PhysicalHeap::Protect failed" x0
+ok   C4 "REX_FATAL" x0
+ok   C4 "C1 keep-watch: on, but" x0
+ok   C4 "blocked for this process" x0
+ok   C3 keep-watch init x0 (keep_watch=False)
+ok   C3 "C1 verify: on." x0 (verify=False)
+ok   C3 back-off init x0 (env set False)
+ok   C3 split init x0 (split cvar False)
+     STUCK-LOCK lines 0 (C5: see f10 output / by hand)
+ok   C6 dumps in dir [], run.json dumps []
+     C7 steps 54/54 last done timeouts 0; marks ['idle-50', 'idle-60', 'idle-70', 'idle-80', 'idle-90', 'end']
+--- cg26b0.check.txt (20 lines)
+    missing in cand: -; extra in cand: ['790/31625', '839/31684', '841/31696']
+  BASE items missed: marks differ before up-2: after-a1 220/528->220/534 after-a3 220/534->218/222 down-1 220/534->644/2868 down-2 220/534->839/31674 up-2 220/534->840/31690
+  VERDICT HINT LOOK: 1 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row cg26b0)
+--- cg26b0.f10.txt: not present
+--- cg26b0.p2c.txt: not present
+COMMON: OK (0 problems)

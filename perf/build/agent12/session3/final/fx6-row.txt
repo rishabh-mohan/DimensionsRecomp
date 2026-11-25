@@ -1,0 +1,30 @@
+queue row: {"id": "fx6", "est": 270, "needs": ["build\\agent3\\s4b\\ready-s4b-off", "build\\agent3\\final-fx\\go-fx", "build\\agent3\\final-fx\\fx-ok-fx5w"], "args": ["-BinDir", "build\\agent2\\nativefinal-off-bin", "-Seconds", "240", "-Tag", "fx6-nativefinaloff-plain", "-Cvar", "native_settings_frontend=false;native_fps_limit=0;framerate_limit=0"], "note": "FINAL F6 on nativefinal-off-bin (Overseer 07:44): plain launch (env unset), W8a cvars; expect 'Native GPU: shader miss cache OFF (build default)'. Gate final_gate v2 F6 (ROW_BIN nativefinal-off-bin)."}
+ok   exit_code 0 (0x00000000), close wm_close, elapsed 240.54 s of 240
+ok   wer_seen False
+ok   crash_events []
+ok   exited_early False
+ok   bin_dir <workspace>\build\agent2\nativefinal-off-bin (queued build\agent2\nativefinal-off-bin)
+ok   run exe sha256 4ADF630E6899C407 = run.json and in <workspace>\build\agent2\nativefinal-off-bin\MANIFEST.txt
+ok   cvars {'native_settings_frontend': 'false', 'native_fps_limit': '0', 'framerate_limit': '0'} (queued {'native_settings_frontend': 'false', 'native_fps_limit': '0', 'framerate_limit': '0'})
+ok   env {} (queued {})
+ok   input script None (queued None)
+     logs 1 (497 lines); counts: Recovered stale physical page protection=0; Unhandled guest physical write fault=0; PhysicalHeap::Protect failed=0; STUCK-LOCK=0; REX_FATAL=0; C1 keep-watch: on (with=0; C1 keep-watch: on, but=0; blocked for this process=0; C1 verify: on.=0; C1 verify K:=0; C1 verify F:=0; GPU wait back-off: ON=0; d3d12_submit_split_kb: splitting=0; d3d12_submit_split: =0; Host timer resolution set=0; TimerQueue: precise wait=0
+ok   C4 "Recovered stale physical page protection" x0
+ok   C4 "Unhandled guest physical write fault" x0
+ok   C4 "PhysicalHeap::Protect failed" x0
+ok   C4 "REX_FATAL" x0
+ok   C4 "C1 keep-watch: on, but" x0
+ok   C4 "blocked for this process" x0
+     C3 init lines skipped: FINAL bin nativefinal-off-bin -> run final_gate.py <run> <F1..F7>
+ok   C3 "C1 verify: on." x0 (verify=False)
+ok   C3 split init x0 (split cvar False)
+     STUCK-LOCK lines 0 (C5: see f10 output / by hand)
+ok   C6 dumps in dir [], run.json dumps []
+     C7 steps None/None last None timeouts None; marks []
+--- fx6.check.txt (20 lines)
+    missing in cand: ['2', '3649', '40', '41', '57', '58', '59']; extra in cand: -
+  BASE items missed: none (base scenario differs: scenes/marks/GONE not judged)
+  VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row fx6)
+--- fx6.f10.txt: not present
+--- fx6.p2c.txt: not present
+COMMON: OK (0 problems)

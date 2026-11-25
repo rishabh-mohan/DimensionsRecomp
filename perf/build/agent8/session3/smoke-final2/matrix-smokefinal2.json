@@ -1,0 +1,34 @@
+{
+  "title": "SMOKE-FINAL2 route smoke (M8, session 3): untimed functional check of the final2 bin pair on the CF1/CF2 route. d2 = build/agent2/devfinal2-bin (Xenos ship, DEFAULT ARM), n2 = build/agent2/nativefinal2-bin (native, new SDK DLLs, DEFAULT ARM). 1 run each, -Quick, no timing claims",
+  "reference": "d2",
+  "warmup_s": 55,
+  "warmup_from": "firstframe",
+  "measure_s": 50,
+  "repeats": 1,
+  "order": "fixed",
+  "settle_s": 5,
+  "cooldown_s": 5,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "cold_run": false,
+  "sys_csv": true,
+  "min_window_after_ff_s": 60,
+  "cold_warmup_s": 55,
+  "cold_measure_s": 30,
+  "quick": { "warmup_s": 10, "measure_s": 20, "settle_s": 5, "cooldown_s": 5, "repeats": 1, "min_window_after_ff_s": 20, "cold_warmup_s": 5, "cold_measure_s": 10 },
+  "notes": [
+    "Overseer brief 22:18Z option (2): run directly (not via the day launcher): run-matrix.ps1 -Matrix <this file> -Quick -NoCold -NoPrompt -OutDir build\\agent8\\matrix\\<stamp>-smokefinal2. -PlanOnly first.",
+    "Arms copy the default arms of CF1 (ship) and CF2 (nf) exactly, only the bin changes: d2 = CF1 ship's route cvar framerate_limit=0, no env; n2 = CF2 nf's route cvars native_settings_frontend=false, native_fps_limit=0, framerate_limit=0 and LEGO_NATIVE_FRAME_METRICS=<run>\\native-frames.csv (a metrics file only). No LEGO_GPU_WAIT_* or LEGO_NATIVE_SHADER_MISS_CACHE: plain defaults (final2 BIN-PINS D7: default arms need none).",
+    "Pass (SMOKE-FINAL2.md): status OK, exit 0, no WER/dump; check-defaults --mode xenos (d2) / --mode native (n2) PASS; 0 game.log lines with d3d12_pipeline_creation_no_wait; d2 perf.csv reaches draw_calls >= 600; n2 first-3D proxy (new Native GPU shader/surface lines after the front end) plus route completion.",
+    "Bins: build/agent2/final2/BIN-PINS.md 33F74799: devfinal2-bin MANIFEST sha256 4A4A13EDFBFF6A5F..., nativefinal2-bin MANIFEST sha256 4E5E2620F38F7D09..."
+  ],
+  "arms": [
+    { "id": "d2", "group": "smoke", "ref": true, "repeats": 1, "bin": "build/agent2/devfinal2-bin", "frames": "perf",
+      "cvars": ["framerate_limit=0"], "env": {},
+      "driver": "drivers/thread-cpu.ps1", "note": "DEFAULT ARM: devfinal2 plain launch (CF1 ship route). Proof: check-defaults --mode xenos" },
+    { "id": "n2", "group": "smoke", "repeats": 1, "frames": "native", "bin": "build/agent2/nativefinal2-bin",
+      "cvars": ["native_settings_frontend=false", "native_fps_limit=0", "framerate_limit=0"],
+      "env": { "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv" },
+      "driver": "drivers/thread-cpu.ps1", "note": "DEFAULT ARM: nativefinal2 plain launch (CF2 nf route). Proof: check-defaults --mode native" }
+  ]
+}

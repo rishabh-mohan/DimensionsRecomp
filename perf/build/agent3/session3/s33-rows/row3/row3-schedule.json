@@ -1,0 +1,26 @@
+{
+  "about": "#33 row 3 screenshot schedule (M3). Times are seconds after A3D = the first 3D frame = the first slow-frame line with 'new >= 15' more than 60 s after FF (FF = the first slow-frame line). Picked from moments.txt (offsf/onsf/offd/ond/stop5): the drop clusters sit at the same A3D offsets within +-1.3 s in all five runs, while A3D itself moves by 16 s against FF (FF+82 in onsf/ond, FF+98..101 in offsf/offd/stop5). burst = capture continuously at up to max_fps; still = 3 captures 0.3 s apart (persistence check).",
+  "anchor": "first-3d",
+  "preroll_from_ff_s": 70,
+  "a3d_fallback_ff_s": 150,
+  "a3d_estimate_ff_s": 90,
+  "max_fps": 15,
+  "windows": [
+    {"name": "w01-first3d-load", "kind": "burst", "from": -0.5, "to": 4.5, "note": "first 3D frame (A3D+0, 21 new pipelines; ON drops 38-39 in 4-5 frames) and the load transition (A3D+2.2..3.5, 23 new). Needs the pre-roll ring: A3D is only seen in the log ~1 s late."},
+    {"name": "w02-drop576", "kind": "burst", "from": 24.0, "to": 27.0, "note": "one new pipeline used by 576 draws: OFF drops 576 in 1 frame, ON 1152-1728 in 2-3 frames (A3D+24.9..26.1)."},
+    {"name": "w03-drop75", "kind": "burst", "from": 29.7, "to": 32.0, "note": "75 draws dropped in 1-2 frames (A3D+30.2..31.5), 4 new."},
+    {"name": "w04-shot12k", "kind": "burst", "from": 46.3, "to": 49.5, "note": "the 12.4k-draw shot (TESTPLAN row 3): 67-75 new pipelines; OFF stalls 0.9 s, ON drops 176-182 in 2-3 frames (A3D+47.0..48.9)."},
+    {"name": "w05-burst57", "kind": "burst", "from": 56.7, "to": 62.0, "note": "the densest ON drop clusters: 233-275 in 6-8 frames (A3D+57.2..58.0) and 70 in 4-5 frames (A3D+60.0..61.6), 31-40 new."},
+    {"name": "w06-drop93", "kind": "burst", "from": 93.0, "to": 95.0, "note": "20-24 dropped in 1 frame (A3D+93.4..94.5)."},
+    {"name": "w07-drop104", "kind": "burst", "from": 103.2, "to": 105.4, "note": "one pipeline: OFF 154 in 1 frame, ON 462 in 3 frames (A3D+103.7..104.9)."},
+    {"name": "w08-drop145", "kind": "burst", "from": 144.3, "to": 146.5, "note": "20 (OFF, 1 frame) / 52 (ON, 3 frames) (A3D+144.7..146.0)."},
+    {"name": "w09-drop182", "kind": "burst", "from": 181.3, "to": 182.6, "note": "ON 56-61 in 7-8 frames (A3D+181.7..181.8), 9 new; OFF below the top 10."},
+    {"name": "s10-still12", "kind": "still", "from": 12.0, "note": "persistence check: no drops near"},
+    {"name": "s11-still40", "kind": "still", "from": 40.0, "note": "persistence check"},
+    {"name": "s12-still75", "kind": "still", "from": 75.0, "note": "persistence check"},
+    {"name": "s13-still130", "kind": "still", "from": 130.0, "note": "persistence check"},
+    {"name": "s14-still220", "kind": "still", "from": 220.0, "note": "persistence check"},
+    {"name": "s15-still300", "kind": "still", "from": 300.0, "note": "persistence check: the static end scene (marks idle-210..end = 766/110956 in every run)"},
+    {"name": "s16-still340", "kind": "still", "from": 340.0, "note": "persistence check: last still (runs end ~A3D+357..376)"}
+  ]
+}

@@ -1,0 +1,66 @@
+# logdiff: 1 baseline logs, 1 candidate logs, min level warning
+## per log (lines by level; fail markers; clean-exit)
+BASE build\agent3\runs\20261122-210059-s4b-L0-off-level\game.log | 21:01:02..21:08:37 | info=442 warning=144 | no fail markers | clean-exit=1
+CAND build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log | 09:46:15..09:53:01 | info=554 warning=144 | no fail markers | clean-exit=1
+## NEW keys (level >= warning; in a candidate log, in no baseline log)
+## MORE keys (level >= warning; candidate count > baseline max + max(5, baseline max))
+## GONE keys (any level; in every baseline log, missing from a candidate log)
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Read ] #B #C # # # # AD #C # # #F # FD # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Read ] #B #C # # # #A # E# # BD #F D# #C C# # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Read ] #B #C # # # #A D# #A FC D# D# FF # #F # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Read ] #B #C # # # A# # F# # # # # #D FE # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Read ] #B #C # # # C# # D# BB F# # # # EB # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Read ] #B #C # # # E# E# AB # # #B # #B # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Read ] #B #D # #A # # # E# # #A #D # # A# #D # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Read ] #B #D # #A #B # E# FA # A# #A #C #C #D D# # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Read ] #B #D # #A #E # # #A B# # #F # # #C A# # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# # # # # # #D A# D# C# AA BD E# EC # #A FD # # #B E# # # AA # #C BE BE 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# # # #E # # # # # #E # # # # # #E # # # # #B # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# # # #E # # # # # #E # # # # # #E # # # # D# # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# # # #E # # # # # #E # # # # # #E # # # # DD # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# # # #E # # # # # #E # # # # # #E # # # # EF # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# # # #E # # #E # # #E # # #E # # #E # # #E # #B # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# # # #E # # #E # # #E # # #E # # #E # # #E # DD # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# # # #E # # #E # # #E # # #E # # #E # # #E # EF # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# # # #E # FF # # # #E # FF # # # #E # FF # # BC # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# # # #E # FF # # # #E # FF # # # #E # FF # # DB # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# # # #E # FF # # # #E # FF # # # #E # FF # # ED # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# # # #E # FF #E # # #E # FF #E # # #E # FF #E # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# # # #E # FF #E # # #E # FF #E # # #E # FF #E # #D # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# # # #E # FF #E # # #E # FF #E # # #E # FF #E # DF # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# # # #E # FF #E # # #E # FF #E # # #E # FF #E # EB # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# # # #E # FF #E # # #E # FF #E # # #E # FF #E # ED # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# #A # #E # # # # # #E # # # # # #E # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# #A # #E # # # # # #E # # # # # #E # # # # F# # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# #A # #E # # #E # # #E # # #E # # #E # # #E # E# # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# #B # #E # FF # # # #E # FF # # # #E # FF # # #F # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# #B # #E # FF # # # #E # FF # # # #E # FF # # EF # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# #C # #E # # # # # #E # # # # # #E # # # # E# # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# #C # #E # FF # # # #E # FF # # # #E # FF # # A# # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# #C # #E # FF # # # #E # FF # # # #E # FF # # C# # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# #D # #E # FF # # # #E # FF # # # #E # FF # # E# # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# #D # #E # FF #E # # #E # FF #E # # #E # FF #E # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# #D # #E # FF #E # # #E # FF #E # # #E # FF #E # F# # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# #E # #E # # #E # # #E # # #E # # #E # # #E # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# #E # #E # # #E # # #E # # #E # # #E # # #E # F# # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# #E # #E # FF # # # #E # FF # # # #E # FF # # #A # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # C# #F # #E # FF #E # # #E # FF #E # # #E # FF #E # E# # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # D# # # # #B # # # # # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # D# # # #A # # # # # # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # D# #A # #A # # # # # # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # D# #C # # #F # # # # # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # D# #D # #A # # # # # # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # # D# #F # # # # # # # # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # #A B# # # # # #E DC BD # FD #C # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # #A B# # # # # B# # #D # B# # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # #A B# # # # A# # #E #E #B # #A # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # #A B# # # #B #A #E # #C E# #E # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # #A B# # # D# #F D# # #A FF #B #F # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # #A B# # #A E# # B# #B # #F # #C # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # #A D# # #B AC F# F# # # B# #A # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # #A D# #B # # # DB #E #A # B# #F # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # #A D# #E # #A #F # # # D# # #E # # # # # # # # # # # # # # # # # 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # #E C# # # FE # # # FE # # # FE # # # # # # AA BD E# #C # # # # # #A 
+GONE build\agent3\runs\20261125-094615-r19e-level-soak-async-n\game.log [info] [core] Toypad[Write] #B # # #E C# # # FF FF FF # FF FF FF # FF FF FF #D # # # AA BD E# #C # # # # # #A 
+## MARKER CHECK (fail marker above the baseline max per log; clean-exit missing)
+# NEW total 0, marker flags 0

@@ -1,0 +1,170 @@
+# check_queue_fx <workspace>\build\agent3\final-fx\queue-final-fx.jsonl (sha 72DF558A)
+  ok   ids in order ['fx1', 'fx3', 'fx2', 'fx4', 'fx5', 'fx6', 'fx7']
+  ok   ids unique in the draft
+  ok   no id already in the live queue []
+  ok   no id already in queue-state (would count as done) []
+  ok   build\agent3\s4b\ready-s4b-off exists
+  ok   marker build\agent3\final-fx\go-fx absent before install
+  ok   marker build\agent3\final-fx\go-fx-opt absent before install
+  ok   marker build\agent3\final-fx\fx-ok-fx1 absent before install
+  ok   marker build\agent3\final-fx\fx-ok-fx3 absent before install
+  ok   marker build\agent3\final-fx\fx-ok-fx2 absent before install
+  ok   marker build\agent3\final-fx\fx-ok-fx4 absent before install
+  ok   marker build\agent3\final-fx\fx-ok-fx5 absent before install
+  ok   marker build\agent3\final-fx\fx-ok-fx6 absent before install
+  ok   marker build\agent3\final-fx\fx-ok-fx7 absent before install
+  ok   marker build\agent3\final-fx\fx-ok-fx5w absent before install
+  ok   devfinal-bin MANIFEST F9C2BE722E5B3517 = BIN-PINS F9C2BE722E5B3517
+  ok   devfinal-bin has no cache/ (D7: first native launch is cold)
+  ok   devfinal-off-bin MANIFEST 3F4B7BEBD887319A = BIN-PINS 3F4B7BEBD887319A
+  ok   devfinal-off-bin has no cache/ (D7: first native launch is cold)
+  ok   nativefinal-bin MANIFEST D7C7B7060519A495 = BIN-PINS D7C7B7060519A495
+  ok   nativefinal-bin has no cache/ (D7: first native launch is cold)
+  ok   nativefinal-off-bin MANIFEST 0C67CBD6918822EC = BIN-PINS 0C67CBD6918822EC
+  ok   nativefinal-off-bin has no cache/ (D7: first native launch is cold)
+  ok   fx1 needs ['build\\agent3\\s4b\\ready-s4b-off', 'build\\agent3\\final-fx\\go-fx']
+  ok   fx1 need under build\agent3: build\agent3\s4b\ready-s4b-off
+  ok   fx1 need under build\agent3: build\agent3\final-fx\go-fx
+  ok   fx1 toypad False
+  ok   fx1 -BinDir build\agent2\devfinal-bin
+  ok   fx1 cvars = spec (1 keys)
+  ok   fx1 env = spec {}
+  ok   fx1 -Seconds 240
+  ok   fx1 input script None
+  ok   fx1 est 270 >= Seconds + 30
+  ok   fx1 tag fx1-devfinal-plain
+  ok   fx1 no other switch ['-BinDir', '-Cvar', '-Seconds', '-Tag']
+  ok   fx1 run-game -DryRun exit 0, new dirs ['20261125-080828-fx1-devfinal-plain']
+  ok   fx1 dry run.json bin_dir <workspace>\build\agent2\devfinal-bin
+  ok   fx1 dry run.json cvars = spec (1)
+  ok   fx1 dry run.json env (LEGO_*, no metrics) {}
+  ok   fx1 dry exe_sha256 = devfinal-bin exe 545D28B9DDEAD51E
+  ok   fx3 needs ['build\\agent3\\s4b\\ready-s4b-off', 'build\\agent3\\final-fx\\go-fx', 'build\\agent3\\final-fx\\fx-ok-fx1']
+  ok   fx3 need under build\agent3: build\agent3\s4b\ready-s4b-off
+  ok   fx3 need under build\agent3: build\agent3\final-fx\go-fx
+  ok   fx3 need under build\agent3: build\agent3\final-fx\fx-ok-fx1
+  ok   fx3 toypad False
+  ok   fx3 -BinDir build\agent2\devfinal-off-bin
+  ok   fx3 cvars = spec (13 keys)
+  ok   fx3 env = spec {'LEGO_GPU_WAIT_BACKOFF_US': 'off'}
+  ok   fx3 -Seconds 240
+  ok   fx3 input script None
+  ok   fx3 est 270 >= Seconds + 30
+  ok   fx3 tag fx3-devfinaloff-offset
+  ok   fx3 no other switch ['-BinDir', '-Cvar', '-Env', '-Seconds', '-Tag']
+  ok   fx3 run-game -DryRun exit 0, new dirs ['20261125-080829-fx3-devfinaloff-offset']
+  ok   fx3 dry run.json bin_dir <workspace>\build\agent2\devfinal-off-bin
+  ok   fx3 dry run.json cvars = spec (13)
+  ok   fx3 dry run.json env (LEGO_*, no metrics) {'LEGO_GPU_WAIT_BACKOFF_US': 'off'}
+  ok   fx3 dry exe_sha256 = devfinal-off-bin exe DB263913A67710B6
+  ok   fx2 needs ['build\\agent3\\s4b\\ready-s4b-off', 'build\\agent3\\final-fx\\go-fx', 'build\\agent3\\final-fx\\fx-ok-fx3']
+  ok   fx2 need under build\agent3: build\agent3\s4b\ready-s4b-off
+  ok   fx2 need under build\agent3: build\agent3\final-fx\go-fx
+  ok   fx2 need under build\agent3: build\agent3\final-fx\fx-ok-fx3
+  ok   fx2 toypad True
+  ok   fx2 -BinDir build\agent2\devfinal-bin
+  ok   fx2 cvars = spec (1 keys)
+  ok   fx2 env = spec {}
+  ok   fx2 -Seconds 840
+  ok   fx2 input script build\agent3\final-fx\level-l-tail.txt
+  ok   fx2 est 870 >= Seconds + 30
+  ok   fx2 tag fx2-devfinal-level
+  ok   fx2 no other switch ['-BinDir', '-Cvar', '-InputScript', '-Seconds', '-Tag']
+  ok   fx2 run-game -DryRun exit 0, new dirs ['20261125-080831-fx2-devfinal-level']
+  ok   fx2 dry run.json bin_dir <workspace>\build\agent2\devfinal-bin
+  ok   fx2 dry run.json cvars = spec (1)
+  ok   fx2 dry run.json env (LEGO_*, no metrics) {}
+  ok   fx2 dry exe_sha256 = devfinal-bin exe 545D28B9DDEAD51E
+  ok   fx2 input script loaded: 121 steps, sha BE08A790
+  ok   fx4 needs ['build\\agent3\\s4b\\ready-s4b-off', 'build\\agent3\\final-fx\\go-fx', 'build\\agent3\\final-fx\\go-fx-opt', 'build\\agent3\\final-fx\\fx-ok-fx1']
+  ok   fx4 need under build\agent3: build\agent3\s4b\ready-s4b-off
+  ok   fx4 need under build\agent3: build\agent3\final-fx\go-fx
+  ok   fx4 need under build\agent3: build\agent3\final-fx\go-fx-opt
+  ok   fx4 need under build\agent3: build\agent3\final-fx\fx-ok-fx1
+  ok   fx4 toypad False
+  ok   fx4 -BinDir build\agent2\devfinal-bin
+  ok   fx4 cvars = spec (1 keys)
+  ok   fx4 env = spec {'LEGO_GPU_WAIT_BACKOFF_US': '500'}
+  ok   fx4 -Seconds 240
+  ok   fx4 input script None
+  ok   fx4 est 270 >= Seconds + 30
+  ok   fx4 tag fx4-devfinal-env500
+  ok   fx4 no other switch ['-BinDir', '-Cvar', '-Env', '-Seconds', '-Tag']
+  ok   fx4 run-game -DryRun exit 0, new dirs ['20261125-080832-fx4-devfinal-env500']
+  ok   fx4 dry run.json bin_dir <workspace>\build\agent2\devfinal-bin
+  ok   fx4 dry run.json cvars = spec (1)
+  ok   fx4 dry run.json env (LEGO_*, no metrics) {'LEGO_GPU_WAIT_BACKOFF_US': '500'}
+  ok   fx4 dry exe_sha256 = devfinal-bin exe 545D28B9DDEAD51E
+  ok   fx5 needs ['build\\agent3\\s4b\\ready-s4b-off', 'build\\agent3\\final-fx\\go-fx', 'build\\agent3\\final-fx\\fx-ok-fx2', 'build\\agent3\\final-fx\\matrix-fx5.json']
+  ok   fx5 need under build\agent3: build\agent3\s4b\ready-s4b-off
+  ok   fx5 need under build\agent3: build\agent3\final-fx\go-fx
+  ok   fx5 need under build\agent3: build\agent3\final-fx\fx-ok-fx2
+  ok   fx5 need under build\agent3: build\agent3\final-fx\matrix-fx5.json
+  ok   fx5 toypad False
+  ok   fx5 matrix row build\agent3\final-fx\matrix-fx5.json ['-NoCold']
+  ok   fx5 est 480 >= 420 (PlanOnly says ~5 min)
+  ok   matrix arms in order fx5, fx5w: ['fx5', 'fx5w']
+  ok   matrix order fixed / repeats 1 / cold_run false: fixed 1 False
+  ok   matrix W8a window: 55 s warm-up from the first frame, 50 s, floor 60 s
+  ok   fx5 bin build/agent2/nativefinal-bin
+  ok   fx5 cvars = W8a ['native_settings_frontend=false', 'native_fps_limit=0', 'framerate_limit=0']
+  ok   fx5 env only LEGO_NATIVE_FRAME_METRICS (plain launch): ['LEGO_NATIVE_FRAME_METRICS']
+  ok   fx5 frames native, repeats 1
+  ok   fx5w bin build/agent2/nativefinal-bin
+  ok   fx5w cvars = W8a ['native_settings_frontend=false', 'native_fps_limit=0', 'framerate_limit=0']
+  ok   fx5w env only LEGO_NATIVE_FRAME_METRICS (plain launch): ['LEGO_NATIVE_FRAME_METRICS']
+  ok   fx5w frames native, repeats 1
+  ok   fx5 = ref, no seed (first launch)
+  ok   fx5w seed_cache fx5, both files (native-pso.bin + native-pso-recipes.bin)
+  ok   fx6 needs ['build\\agent3\\s4b\\ready-s4b-off', 'build\\agent3\\final-fx\\go-fx', 'build\\agent3\\final-fx\\fx-ok-fx5w']
+  ok   fx6 need under build\agent3: build\agent3\s4b\ready-s4b-off
+  ok   fx6 need under build\agent3: build\agent3\final-fx\go-fx
+  ok   fx6 need under build\agent3: build\agent3\final-fx\fx-ok-fx5w
+  ok   fx6 toypad False
+  ok   fx6 -BinDir build\agent2\nativefinal-off-bin
+  ok   fx6 cvars = spec (3 keys)
+  ok   fx6 env = spec {}
+  ok   fx6 -Seconds 240
+  ok   fx6 input script None
+  ok   fx6 est 270 >= Seconds + 30
+  ok   fx6 tag fx6-nativefinaloff-plain
+  ok   fx6 no other switch ['-BinDir', '-Cvar', '-Seconds', '-Tag']
+  ok   fx6 run-game -DryRun exit 0, new dirs ['20261125-080833-fx6-nativefinaloff-plain']
+  ok   fx6 dry run.json bin_dir <workspace>\build\agent2\nativefinal-off-bin
+  ok   fx6 dry run.json cvars = spec (3)
+  ok   fx6 dry run.json env (LEGO_*, no metrics) {}
+  ok   fx6 dry exe_sha256 = nativefinal-off-bin exe 4ADF630E6899C407
+  ok   fx7 needs ['build\\agent3\\s4b\\ready-s4b-off', 'build\\agent3\\final-fx\\go-fx', 'build\\agent3\\final-fx\\fx-ok-fx6']
+  ok   fx7 need under build\agent3: build\agent3\s4b\ready-s4b-off
+  ok   fx7 need under build\agent3: build\agent3\final-fx\go-fx
+  ok   fx7 need under build\agent3: build\agent3\final-fx\fx-ok-fx6
+  ok   fx7 toypad True
+  ok   fx7 -BinDir build\agent2\nativefinal-bin
+  ok   fx7 cvars = spec (3 keys)
+  ok   fx7 env = spec {}
+  ok   fx7 -Seconds 840
+  ok   fx7 input script build\agent3\final-fx\level-l-tail.txt
+  ok   fx7 est 870 >= Seconds + 30
+  ok   fx7 tag fx7-nativefinal-level
+  ok   fx7 no other switch ['-BinDir', '-Cvar', '-InputScript', '-Seconds', '-Tag']
+  ok   fx7 run-game -DryRun exit 0, new dirs ['20261125-080835-fx7-nativefinal-level']
+  ok   fx7 dry run.json bin_dir <workspace>\build\agent2\nativefinal-bin
+  ok   fx7 dry run.json cvars = spec (3)
+  ok   fx7 dry run.json env (LEGO_*, no metrics) {}
+  ok   fx7 dry exe_sha256 = nativefinal-bin exe 5C21941DAF9DF36B
+  ok   fx7 input script loaded: 121 steps, sha BE08A790
+  ok   level-l.txt sha 6F9E6009 (6F9E6009 = s4bV0f/s4b07f route)
+  ok   level-l-tail = level-l lines 13-130 unchanged (118 lines) + tail
+  ok   tail steps ['sleep 180', 'mark tail', 'stop']
+  ok   route has mark vortex (final_gate F2/F7)
+  ok   route file name has "level" (final_gate F2/F7)
+  ok   final_gate.py sha 73F946E7 = rated 73F946E7
+  ok   final_gate ROW_BIN[F1] devfinal-bin = fx1 bin devfinal-bin
+  ok   final_gate ROW_BIN[F2] devfinal-bin = fx2 bin devfinal-bin
+  ok   final_gate ROW_BIN[F3] devfinal-off-bin = fx3 bin devfinal-off-bin
+  ok   final_gate ROW_BIN[F4] devfinal-bin = fx4 bin devfinal-bin
+  ok   final_gate ROW_BIN[F6] nativefinal-off-bin = fx6 bin nativefinal-off-bin
+  ok   final_gate ROW_BIN[F7] nativefinal-bin = fx7 bin nativefinal-bin
+  ok   final_gate ROW_BIN F5/F5w nativefinal-bin/nativefinal-bin = matrix bin nativefinal-bin
+core rows est 3030 s = 50 min of queue time (optional rows +270 s)
+ALL CHECKS PASS (167 ok)

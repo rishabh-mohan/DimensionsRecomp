@@ -1,0 +1,13 @@
+PASS exactly one back-off line: 1
+PASS it is ON, quantum 500 us, spin 30 us, stats ON: GPU wait back-off: ON (quantum 500 us, spin 30 us); stats ON; GetData hook built.
+PASS stats lines present: 41
+PASS every stats line has every field: 0 unparsed
+PASS sleep_fail == 0 on every line: all 41 lines 0
+PASS sleeps happened (Q > 0 path exercised): 168907
+totals: sleep 168907, sleep_sum_ms 178397.91, sleep_fail 0, yield 9744, pause 197160, l1_waits 12206, l1_polls 374863, l2_waits 16
+mean sleep 1.056 ms per sleep (Q = 0.5 ms; timer granularity adds the rest)
+PASS no STUCK-LOCK: 0
+PASS run.json env Q 500, stats 1, no spin override: {'LEGO_GPU_WAIT_BACKOFF_US': '500', 'LEGO_GPU_WAIT_STATS': '1'}
+PASS exit code 0, not exited early: (0, False)
+bin_dir <workspace>\build\agent2\devoff4b-bin
+RESULT: PASS (0 FAIL)

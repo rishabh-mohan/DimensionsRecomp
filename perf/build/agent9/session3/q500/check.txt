@@ -1,0 +1,16 @@
+PASS live == base (b0bd3b4 blob, HASHES.txt 01D9F8F3): 01D9F8F3464C8614
+PASS base\gpu_wait_backoff.cpp is LF-only: 18177 B
+PASS new\gpu_wait_backoff.cpp is LF-only: 19865 B
+PASS git diff --no-index ran (exit 1 = differences)
+diff build\agent9\session3\q500\q500-default.diff  5615 B  +33/-5  sha256 28F0D1DE76F824F0E65B1B056A7D405F9CEBD918B06910B93759A059D25E2611
+PASS WS root is not inside a git repo (git apply = plain patch there): fatal: not a git repository (or any of the parent directories): .git
+PASS apply --check vs the live tree from WS root (no write): Checking patch DimensionsRecomp/rexlego/src/gpu_wait_backoff.cpp...
+PASS live tree untouched by --check
+PASS scratch is not inside a git repo
+PASS apply on scratch copy: Checking patch DimensionsRecomp/rexlego/src/gpu_wait_backoff.cpp... | Applied patch DimensionsRecomp/rexlego/src/gpu_wait_backoff.cpp cleanly.
+PASS scratch result == new/ byte for byte: 74115EEA26C4AEB2 vs 74115EEA26C4AEB2
+PASS reverse apply on scratch: Checking patch DimensionsRecomp/rexlego/src/gpu_wait_backoff.cpp... | Applied patch DimensionsRecomp/rexlego/src/gpu_wait_backoff.cpp cleanly.
+PASS reverse result == base/ byte for byte
+base 01D9F8F3464C861401C3BE98F797938619C5DD85B1AEA166B6D9CED053FA19DD
+new  74115EEA26C4AEB263275AED08CCD986682E27A29BE68990C873AEB0C527017F
+RESULT: PASS (0 FAIL)

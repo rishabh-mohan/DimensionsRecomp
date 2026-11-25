@@ -1,0 +1,104 @@
+{
+ "title": "NEGATIVE TEST ONLY (E5.1, make_test_s33.py): arms of matrix-s33-draft.json on copies of night runs",
+ "reference": "offsf",
+ "arms": [
+  {
+   "id": "base",
+   "bin": "build/agent2/devoff4b-bin",
+   "cvars": [
+    "framerate_limit=0"
+   ],
+   "env": {}
+  },
+  {
+   "id": "basesf",
+   "bin": "build/agent2/devoff4b-bin",
+   "cvars": [
+    "framerate_limit=0",
+    "slow_frame_log_ms=17"
+   ],
+   "env": {}
+  },
+  {
+   "id": "gasync",
+   "bin": "build/agent2/devoff4b-s33-bin",
+   "cvars": [
+    "framerate_limit=0",
+    "slow_frame_log_ms=17",
+    "d3d12_pipeline_creation_no_wait=true",
+    "async_shader_compilation=false"
+   ],
+   "env": {}
+  },
+  {
+   "id": "gbindful",
+   "bin": "build/agent2/devoff4b-s33-bin",
+   "cvars": [
+    "framerate_limit=0",
+    "slow_frame_log_ms=17",
+    "d3d12_pipeline_creation_no_wait=true",
+    "d3d12_bindless=false"
+   ],
+   "env": {}
+  },
+  {
+   "id": "gthr0",
+   "bin": "build/agent2/devoff4b-s33-bin",
+   "cvars": [
+    "framerate_limit=0",
+    "slow_frame_log_ms=17",
+    "d3d12_pipeline_creation_no_wait=true",
+    "d3d12_pipeline_creation_threads=0"
+   ],
+   "env": {}
+  },
+  {
+   "id": "off",
+   "bin": "build/agent2/devoff4b-s33-bin",
+   "cvars": [
+    "framerate_limit=0"
+   ],
+   "env": {}
+  },
+  {
+   "id": "offd",
+   "bin": "build/agent2/devoff4b-s33d-bin",
+   "cvars": [
+    "framerate_limit=0",
+    "slow_frame_log_ms=17",
+    "d3d12_resolve_after_drop_log=true"
+   ],
+   "env": {}
+  },
+  {
+   "id": "offsf",
+   "bin": "build/agent2/devoff4b-s33-bin",
+   "cvars": [
+    "framerate_limit=0",
+    "slow_frame_log_ms=17"
+   ],
+   "env": {}
+  },
+  {
+   "id": "ond",
+   "bin": "build/agent2/devoff4b-s33d-bin",
+   "cvars": [
+    "framerate_limit=0",
+    "slow_frame_log_ms=17",
+    "d3d12_pipeline_creation_no_wait=true",
+    "d3d12_resolve_after_drop_log=true"
+   ],
+   "env": {}
+  },
+  {
+   "id": "onsf",
+   "bin": "build/agent2/devoff4b-s33-bin",
+   "cvars": [
+    "framerate_limit=0",
+    "slow_frame_log_ms=17",
+    "d3d12_pipeline_creation_no_wait=true"
+   ],
+   "env": {}
+  }
+ ]
+}

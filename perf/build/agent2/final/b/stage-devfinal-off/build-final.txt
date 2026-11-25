@@ -1,0 +1,109 @@
+# build-final (M2) 2026-11-25 07:32:09 devfinal-off
+tools that ran (sha256/16): build-final.py 5BE1F221800137BD, recompile.py 855BCC79148E2DA8, relink.py F3C6EEAF332AB213, stage-variant.py D2BD1C6358FC19C1, verify-bins.py 80FF4C5F581C4B1B, prep-final.py 83F732CA9CEB301F, fsyntax.py 66C7D74022A068DA, pe-check.py F4368C32076AAA3E, mapcheck-s4c.py F8CB7B495F74D978
+PASS prep-final RESULT: PASS (b/prep.txt)
+PASS shared DLL before == E3CB99CF
+PASS bin dir is new (build\agent2\devfinal-off-bin)
+PASS leg rt RESULT: PASS
+PASS rexruntime.dll exists (final\b\rt\link-on\rexruntime.dll)
+PASS leg gpu RESULT: PASS
+PASS rexgpu-xenos.dll exists (final\b\gpu\link-on\rexgpu-xenos.dll)
+PASS leg xeoff RESULT: PASS
+PASS legodimensions.exe exists (final\b\xeoff\link-on\legodimensions.exe)
+PASS leg xeoff RESULT: PASS
+PASS legodimensions.map exists (final\b\xeoff\link-on\legodimensions.map)
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\stage-variant.py --base <workspace>\build\agent2\devoff4b-bin --out <workspace>\build\agent2\devfinal-off-bin --title FINAL defaults Xenos OFF bin (as devfinal, gpu_wait_backoff.cpp with -DLEGO_GPU_WAIT_BACKOFF_DEFAULT_US=-1) [M2, build/agent2/final/build-final.py] --replace rexruntime.dll=<workspace>\build\agent2\final\b\rt\link-on\rexruntime.dll --replace rexgpu-xenos.dll=<workspace>\build\agent2\final\b\gpu\link-on\rexgpu-xenos.dll --replace legodimensions.exe=<workspace>\build\agent2\final\b\xeoff\link-on\legodimensions.exe --replace legodimensions.map=<workspace>\build\agent2\final\b\xeoff\link-on\legodimensions.map --note tools that ran (sha256/16): build-final.py 5BE1F221800137BD, recompile.py 855BCC79148E2DA8, relink.py F3C6EEAF332AB213, stage-variant.py D2BD1C6358FC19C1, verify-bins.py 80FF4C5F581C4B1B, prep-final.py 83F732CA9CEB301F, fsyntax.py 66C7D74022A068DA, pe-check.py F4368C32076AAA3E, mapcheck-s4c.py F8CB7B495F74D978 --note prep: diff sha256 955543F5E2E5F4F44A57CD380FF8D8AC6828E1C0C1372612441AB2AA4E88C657 --note prep: PASS snap1 before rexglue-sdk/src/core/clock.cpp A07EE16C9C5CC4BE --note prep: PASS snap1 before rexglue-sdk/src/core/timer_queue.cpp 015C04A22DACC592 --note prep: PASS snap1 before rexglue-sdk/src/graphics/shared_memory.cpp A4A31038ABDFF94A --note prep: PASS snap1 before rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp 8DF708B87A945F07 --note prep: PASS snap1 before rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp 6E20D417F0ED93A5 --note prep: PASS snap1 before rexglue-sdk/src/system/runtime.cpp 306B692BC091A56F --note prep: PASS snap1 before rexglue-sdk/src/system/xmemory.cpp BCA5E1CF63686E73 --note prep: PASS snap1 before rexglue-sdk/src/system/xobject.cpp 189CA288893B1A36 --note prep: PASS snap1 before rexglue-sdk/src/system/xthread.cpp FAEF9B99C893F684 --note prep: PASS snap1 before rexlego/src/gpu_native/shaders.cpp 9567FE3F3B63637D --note prep: PASS snap1 before rexlego/src/gpu_wait_backoff.cpp 01D9F8F3464C8614 --note prep: PASS after rexglue-sdk/src/core/clock.cpp EAE926AC812F7EFD == table and == final/work/new --note prep: PASS after rexglue-sdk/src/core/timer_queue.cpp EF70211E5D248A94 == table and == final/work/new --note prep: PASS after rexglue-sdk/src/graphics/shared_memory.cpp E2465A155E22C20B == table and == final/work/new --note prep: PASS after rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp CEB5529AC853D5A8 == table and == final/work/new --note prep: PASS after rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp 7CA55716E7092199 == table and == final/work/new --note prep: PASS after rexglue-sdk/src/system/runtime.cpp A997D0059A69FF99 == table and == final/work/new --note prep: PASS after rexglue-sdk/src/system/xmemory.cpp 3745C04AAC8AF75D == table and == final/work/new --note prep: PASS after rexglue-sdk/src/system/xobject.cpp 691A34BB64E11EA2 == table and == final/work/new --note prep: PASS after rexglue-sdk/src/system/xthread.cpp 3B50A95E76B10377 == table and == final/work/new --note prep: PASS after rexlego/src/gpu_native/shaders.cpp 4B8250E976A38401 == table and == final/work/new --note prep: PASS after rexlego/src/gpu_wait_backoff.cpp 74115EEA26C4AEB2 == table and == final/work/new --note prep: gen-on native-gpu-build.txt: LEGO Dimensions native GPU 1616ce65e973c583 --note rt: CTL: PASS compare rexruntime.dll vs build\agent2\devoff4b-bin\rexruntime.dll: identical except 1 TimeDateStamp field(s) (6b06e26b vs 6b03a0ab; COFF header at 0x80, included) --note rt: ON object clock.cpp.obj exit 0 3.1 s obj 74457 B D55D32741A6619E2 --note rt: ON object timer_queue.cpp.obj exit 0 3.6 s obj 115587 B B044D7C18ADE69E1 (log 1365 B) --note rt: ON object xboxkrnl_rtl.cpp.obj exit 0 2.6 s obj 304339 B EDBBAFF25BE8F646 (log 603 B) --note rt: ON object xboxkrnl_threading.cpp.obj exit 0 3.6 s obj 456759 B E810C71048E9A16C (log 2231 B) --note rt: ON object runtime.cpp.obj exit 0 2.0 s obj 319352 B 3D8709DF07B1490E --note rt: ON object xmemory.cpp.obj exit 0 2.5 s obj 392019 B 2901E15AC96E8702 (log 434 B) --note rt: ON object xobject.cpp.obj exit 0 1.5 s obj 65905 B 29E9664860CB02C4 (log 2674 B) --note rt: ON object xthread.cpp.obj exit 0 2.0 s obj 206025 B FBB6CFD85D833C7A (log 373 B) --note rt: ON rexruntime.dll C5BC627BB2E83CF27794213BE134DA41D9AB1834E74DCE2E924F7FD7BC577372 --note rt: needles: ON has ['Final defaults:{}']; reference lacks them; ON lacks - --note rt: D5 pe-check vs devoff4b-bin\rexruntime.dll: PASS --note rt: times: CTL recompile 4.3 s, CTL relink 1.5 s, ON recompile 4.3 s, ON relink 1.4 s, pe-check 0.1 s --note gpu: CTL: PASS compare rexgpu-xenos.dll vs build\agent2\devoff4b-bin\rexgpu-xenos.dll: identical except 1 TimeDateStamp field(s) (6b06e2a7 vs 6b03a0ae; COFF header at 0x80, included) --note gpu: ON object shared_memory.cpp.obj exit 0 1.0 s obj 137607 B 4D7E83533F8D292A (log 1277 B) --note gpu: ON rexgpu-xenos.dll CB3A2CC967A9BE81ED0F321C6C839DD6260876337924DC71BF6D3293275817F6 --note gpu: needles: ON has ['Final defaults (GPU): {} {}']; reference lacks them; ON lacks - --note gpu: D5 pe-check vs devoff4b-bin\rexgpu-xenos.dll: PASS --note gpu: times: CTL recompile 1.7 s, CTL relink 1.4 s, ON recompile 1.7 s, ON relink 1.4 s, pe-check 0.1 s --note xeoff: CTL: PASS compare legodimensions.exe vs build\agent2\devoff4b-bin\legodimensions.exe: identical except 1 TimeDateStamp field(s) (6b06e2b7 vs 6b03a981; COFF header at 0x80, included) (leg xe) --note xeoff: CTL: PASS map legodimensions.map vs build\agent2\devoff4b-bin\legodimensions.map: equal except the Timestamp line (363354 lines) (leg xe) --note xeoff: ON object gpu_wait_backoff.cpp.obj exit 0 2.5 s obj 58093 B 4BAFB7C9B5DC5C6E (log 3940 B) --note xeoff: ON defines: -DLEGO_GPU_WAIT_BACKOFF_DEFAULT_US=-1 --note xeoff: ON legodimensions.exe DB263913A67710B6EBF10E7C7ED5000FB95FB586CB4A0E5F15BAE39FC9442799 --note xeoff: needles: ON has ['GPU wait back-off: OFF (LEGO_GPU_WAIT_BACKOFF_US=']; reference lacks them; ON lacks ['Native GPU: shader miss cache {} ({}{})'] --note xeoff: D5 pe-check vs devoff4b-bin\legodimensions.exe: PASS --note xeoff: mapcheck --mode s4c vs devoff4-bin\legodimensions.map: PASS --note xeoff: times: ON recompile 3.2 s, ON relink 1.4 s, pe-check 0.2 s, mapcheck 2.8 s --note OFF bin: gpu_wait_backoff.cpp compiled with -DLEGO_GPU_WAIT_BACKOFF_DEFAULT_US=-1 (q500 rating condition 3); empty env = back-off OFF. SDK cvars have no OFF define: OFF arms set the 12 old values (DEFAULTS-TABLE.md)
+    base build\agent2\devoff4b-bin: 7 files match its MANIFEST (sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA)
+      FiraSans-Regular.ttf <- build\agent2\devoff4b-bin\FiraSans-Regular.ttf
+      TracyClient.dll <- build\agent2\devoff4b-bin\TracyClient.dll
+      achievement_unlocked.wav <- build\agent2\devoff4b-bin\achievement_unlocked.wav
+      legodimensions.exe <- build\agent2\final\b\xeoff\link-on\legodimensions.exe  (REPLACED)
+      legodimensions.map <- build\agent2\final\b\xeoff\link-on\legodimensions.map  (REPLACED)
+      rexgpu-xenos.dll <- build\agent2\final\b\gpu\link-on\rexgpu-xenos.dll  (REPLACED)
+      rexruntime.dll <- build\agent2\final\b\rt\link-on\rexruntime.dll  (REPLACED)
+    FiraSans-Regular.ttf	456996	2026-11-25 07:32:10	C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23	build\agent2\snap1\DimensionsRecomp\rexlego\res\FiraSans-Regular.ttf
+    TracyClient.dll	233472	2026-11-25 07:32:10	85044850B6C663B5CE8722285D13070381C33C9ABC49D06B3E59BA0277F8FF4E	build\agent2\snap1-sdk\install\bin\TracyClient.dll
+    achievement_unlocked.wav	191018	2026-11-25 07:32:10	A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5	build\agent2\snap1-off\achievement_unlocked.wav
+    legodimensions.exe	170350080	2026-11-25 07:32:10	DB263913A67710B6EBF10E7C7ED5000FB95FB586CB4A0E5F15BAE39FC9442799	build\agent2\final\b\xeoff\link-on\legodimensions.exe
+    legodimensions.map	39181726	2026-11-25 07:32:10	A7891CD914648898803725BD7437050ADD38BA66711FADBEEFC2A6AAF688EB9F	build\agent2\final\b\xeoff\link-on\legodimensions.map
+    rexgpu-xenos.dll	3429376	2026-11-25 07:32:10	CB3A2CC967A9BE81ED0F321C6C839DD6260876337924DC71BF6D3293275817F6	build\agent2\final\b\gpu\link-on\rexgpu-xenos.dll
+    rexruntime.dll	10911744	2026-11-25 07:32:10	C5BC627BB2E83CF27794213BE134DA41D9AB1834E74DCE2E924F7FD7BC577372	build\agent2\final\b\rt\link-on\rexruntime.dll
+    staged build\agent2\devfinal-off-bin in 0.5 s; MANIFEST.txt sha256 3F4B7BEBD887319A80CB4E689007D227176AA6586112242C0AA357D3AF9FE09D
+stage: exit 0, 0.8 s
+PASS stage devfinal-off-bin (atomic)
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\session3\verify-bins.py <workspace>\build\agent2\devfinal-off-bin <workspace>\build\agent2\devoff4b-bin <workspace>\build\agent2\devoff4b-cg26-bin <workspace>\build\agent2\native4b-bin
+    # verify-bins 2026-11-25 07:32:10
+    PASS <workspace>\build\agent2\devfinal-off-bin: 7 rows, 7 files, 0 FAIL; MANIFEST sha256 3F4B7BEBD887319A80CB4E689007D227176AA6586112242C0AA357D3AF9FE09D
+    PASS <workspace>\build\agent2\devoff4b-bin: 7 rows, 7 files, 0 FAIL; MANIFEST sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA
+    PASS <workspace>\build\agent2\devoff4b-cg26-bin: 7 rows, 7 files, 0 FAIL; MANIFEST sha256 917AE86E6C0CC9B370901397EF8FD72F65449E5EC9594D14D9902215BBBC1D5C
+    PASS <workspace>\build\agent2\native4b-bin: 8 rows, 8 files, 0 FAIL; MANIFEST sha256 B63769FE46CC04592F2BEDAF04A51C362000325D3291BC4D7489369C2160B817
+    RESULT: 0 FAIL
+verify: exit 0, 0.9 s
+PASS D6 verify-bins new + devoff4b, devoff4b-cg26, native4b: 0 FAIL
+PASS D6 shared DLL after == E3CB99CF
+  FiraSans-Regular.ttf C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23
+  MANIFEST.txt 3F4B7BEBD887319A80CB4E689007D227176AA6586112242C0AA357D3AF9FE09D
+  TracyClient.dll 85044850B6C663B5CE8722285D13070381C33C9ABC49D06B3E59BA0277F8FF4E
+  achievement_unlocked.wav A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5
+  legodimensions.exe DB263913A67710B6EBF10E7C7ED5000FB95FB586CB4A0E5F15BAE39FC9442799
+  legodimensions.map A7891CD914648898803725BD7437050ADD38BA66711FADBEEFC2A6AAF688EB9F
+  rexgpu-xenos.dll CB3A2CC967A9BE81ED0F321C6C839DD6260876337924DC71BF6D3293275817F6
+  rexruntime.dll C5BC627BB2E83CF27794213BE134DA41D9AB1834E74DCE2E924F7FD7BC577372
+  MANIFEST.txt sha256 3F4B7BEBD887319A80CB4E689007D227176AA6586112242C0AA357D3AF9FE09D
+PASS TracyClient.dll == devoff4b-bin
+PASS no cache/ in the bin
+notes:
+  tools that ran (sha256/16): build-final.py 5BE1F221800137BD, recompile.py 855BCC79148E2DA8, relink.py F3C6EEAF332AB213, stage-variant.py D2BD1C6358FC19C1, verify-bins.py 80FF4C5F581C4B1B, prep-final.py 83F732CA9CEB301F, fsyntax.py 66C7D74022A068DA, pe-check.py F4368C32076AAA3E, mapcheck-s4c.py F8CB7B495F74D978
+  prep: diff sha256 955543F5E2E5F4F44A57CD380FF8D8AC6828E1C0C1372612441AB2AA4E88C657
+  prep: PASS snap1 before rexglue-sdk/src/core/clock.cpp A07EE16C9C5CC4BE
+  prep: PASS snap1 before rexglue-sdk/src/core/timer_queue.cpp 015C04A22DACC592
+  prep: PASS snap1 before rexglue-sdk/src/graphics/shared_memory.cpp A4A31038ABDFF94A
+  prep: PASS snap1 before rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp 8DF708B87A945F07
+  prep: PASS snap1 before rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp 6E20D417F0ED93A5
+  prep: PASS snap1 before rexglue-sdk/src/system/runtime.cpp 306B692BC091A56F
+  prep: PASS snap1 before rexglue-sdk/src/system/xmemory.cpp BCA5E1CF63686E73
+  prep: PASS snap1 before rexglue-sdk/src/system/xobject.cpp 189CA288893B1A36
+  prep: PASS snap1 before rexglue-sdk/src/system/xthread.cpp FAEF9B99C893F684
+  prep: PASS snap1 before rexlego/src/gpu_native/shaders.cpp 9567FE3F3B63637D
+  prep: PASS snap1 before rexlego/src/gpu_wait_backoff.cpp 01D9F8F3464C8614
+  prep: PASS after rexglue-sdk/src/core/clock.cpp EAE926AC812F7EFD == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/core/timer_queue.cpp EF70211E5D248A94 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/graphics/shared_memory.cpp E2465A155E22C20B == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp CEB5529AC853D5A8 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp 7CA55716E7092199 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/runtime.cpp A997D0059A69FF99 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/xmemory.cpp 3745C04AAC8AF75D == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/xobject.cpp 691A34BB64E11EA2 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/xthread.cpp 3B50A95E76B10377 == table and == final/work/new
+  prep: PASS after rexlego/src/gpu_native/shaders.cpp 4B8250E976A38401 == table and == final/work/new
+  prep: PASS after rexlego/src/gpu_wait_backoff.cpp 74115EEA26C4AEB2 == table and == final/work/new
+  prep: gen-on native-gpu-build.txt: LEGO Dimensions native GPU 1616ce65e973c583
+  rt: CTL: PASS compare rexruntime.dll vs build\agent2\devoff4b-bin\rexruntime.dll: identical except 1 TimeDateStamp field(s) (6b06e26b vs 6b03a0ab; COFF header at 0x80, included)
+  rt: ON object clock.cpp.obj exit 0 3.1 s obj 74457 B D55D32741A6619E2
+  rt: ON object timer_queue.cpp.obj exit 0 3.6 s obj 115587 B B044D7C18ADE69E1 (log 1365 B)
+  rt: ON object xboxkrnl_rtl.cpp.obj exit 0 2.6 s obj 304339 B EDBBAFF25BE8F646 (log 603 B)
+  rt: ON object xboxkrnl_threading.cpp.obj exit 0 3.6 s obj 456759 B E810C71048E9A16C (log 2231 B)
+  rt: ON object runtime.cpp.obj exit 0 2.0 s obj 319352 B 3D8709DF07B1490E
+  rt: ON object xmemory.cpp.obj exit 0 2.5 s obj 392019 B 2901E15AC96E8702 (log 434 B)
+  rt: ON object xobject.cpp.obj exit 0 1.5 s obj 65905 B 29E9664860CB02C4 (log 2674 B)
+  rt: ON object xthread.cpp.obj exit 0 2.0 s obj 206025 B FBB6CFD85D833C7A (log 373 B)
+  rt: ON rexruntime.dll C5BC627BB2E83CF27794213BE134DA41D9AB1834E74DCE2E924F7FD7BC577372
+  rt: needles: ON has ['Final defaults:{}']; reference lacks them; ON lacks -
+  rt: D5 pe-check vs devoff4b-bin\rexruntime.dll: PASS
+  rt: times: CTL recompile 4.3 s, CTL relink 1.5 s, ON recompile 4.3 s, ON relink 1.4 s, pe-check 0.1 s
+  gpu: CTL: PASS compare rexgpu-xenos.dll vs build\agent2\devoff4b-bin\rexgpu-xenos.dll: identical except 1 TimeDateStamp field(s) (6b06e2a7 vs 6b03a0ae; COFF header at 0x80, included)
+  gpu: ON object shared_memory.cpp.obj exit 0 1.0 s obj 137607 B 4D7E83533F8D292A (log 1277 B)
+  gpu: ON rexgpu-xenos.dll CB3A2CC967A9BE81ED0F321C6C839DD6260876337924DC71BF6D3293275817F6
+  gpu: needles: ON has ['Final defaults (GPU): {} {}']; reference lacks them; ON lacks -
+  gpu: D5 pe-check vs devoff4b-bin\rexgpu-xenos.dll: PASS
+  gpu: times: CTL recompile 1.7 s, CTL relink 1.4 s, ON recompile 1.7 s, ON relink 1.4 s, pe-check 0.1 s
+  xeoff: CTL: PASS compare legodimensions.exe vs build\agent2\devoff4b-bin\legodimensions.exe: identical except 1 TimeDateStamp field(s) (6b06e2b7 vs 6b03a981; COFF header at 0x80, included) (leg xe)
+  xeoff: CTL: PASS map legodimensions.map vs build\agent2\devoff4b-bin\legodimensions.map: equal except the Timestamp line (363354 lines) (leg xe)
+  xeoff: ON object gpu_wait_backoff.cpp.obj exit 0 2.5 s obj 58093 B 4BAFB7C9B5DC5C6E (log 3940 B)
+  xeoff: ON defines: -DLEGO_GPU_WAIT_BACKOFF_DEFAULT_US=-1
+  xeoff: ON legodimensions.exe DB263913A67710B6EBF10E7C7ED5000FB95FB586CB4A0E5F15BAE39FC9442799
+  xeoff: needles: ON has ['GPU wait back-off: OFF (LEGO_GPU_WAIT_BACKOFF_US=']; reference lacks them; ON lacks ['Native GPU: shader miss cache {} ({}{})']
+  xeoff: D5 pe-check vs devoff4b-bin\legodimensions.exe: PASS
+  xeoff: mapcheck --mode s4c vs devoff4-bin\legodimensions.map: PASS
+  xeoff: times: ON recompile 3.2 s, ON relink 1.4 s, pe-check 0.2 s, mapcheck 2.8 s
+  OFF bin: gpu_wait_backoff.cpp compiled with -DLEGO_GPU_WAIT_BACKOFF_DEFAULT_US=-1 (q500 rating condition 3); empty env = back-off OFF. SDK cvars have no OFF define: OFF arms set the 12 old values (DEFAULTS-TABLE.md)
+RESULT: PASS (total 1.8 s)

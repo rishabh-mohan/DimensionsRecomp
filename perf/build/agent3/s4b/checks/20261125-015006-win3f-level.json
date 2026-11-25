@@ -1,0 +1,425 @@
+{
+ "run": "20261125-015006-win3f-level",
+ "row": "win3f",
+ "kind": "off",
+ "scenario": "level-l.txt",
+ "runjson": {
+  "exit_code": 0,
+  "exit_code_hex": "0x00000000",
+  "dumps": [],
+  "crash_events": [],
+  "wer_seen": false,
+  "close_method": "wm_close",
+  "close_seconds": 1.49,
+  "elapsed_s": 419.78,
+  "seconds_requested": 600,
+  "cvars": {
+   "framerate_limit": "0",
+   "shared_memory_single_hold_rearm": "true",
+   "physical_protect_hold_global_lock": "true",
+   "physical_protect_keep_watch": "true",
+   "physical_protect_keep_watch_verify": "false",
+   "host_timer_resolution_ms": "1",
+   "host_timer_throttling_optout": "true",
+   "precise_guest_sleep": "true",
+   "wait_timeout_round_up": "true",
+   "cs_spin": "true",
+   "spinlock_pause_spin": "true",
+   "clock_lockfree": "true",
+   "tls_bounds_fix": "true",
+   "timer_queue_precise_wait": "true"
+  },
+  "exited_early": false,
+  "env_extra": {
+   "LEGO_GPU_WAIT_BACKOFF_US": "500",
+   "LEGO_GPU_WAIT_SPIN_US": "30"
+  },
+  "steps": "119/119"
+ },
+ "summary": {
+  "verdict": "RUNNING",
+  "first_frame_s": 6.0,
+  "levels": {
+   "info": 527,
+   "warning": 144
+  },
+  "unknown_cvars": [],
+  "errors": []
+ },
+ "log_files": [
+  "game.log"
+ ],
+ "families": {
+  "c1_any": 52,
+  "c1_init_on": 1,
+  "c1_init_blocked": 0,
+  "c1_init_nohold": 0,
+  "c1_first": 1,
+  "c1_kept": 50,
+  "c1_blocked": 0,
+  "c1_verify_on": 0,
+  "c1_verify_f": 0,
+  "recovered_stale": 0,
+  "unhandled_phys": 0,
+  "protect_failed": 0,
+  "split_init": 0,
+  "split": 0,
+  "deferred_counters": 0,
+  "gpu_wait": 1,
+  "gpu_wait_stats": 0,
+  "gpu_wait_backoff": 1,
+  "gpu_wait_on": 1,
+  "memexport": 0,
+  "slow_frame": 0,
+  "s4_upload_hash": 0,
+  "precise_wait": 1,
+  "miss_cache": 0,
+  "stuck_lock": 0,
+  "minidump": 0,
+  "fatal": 0,
+  "clean_exit": 1,
+  "debug_layer": 0,
+  "dred": 0,
+  "d3d12_msg": 0,
+  "k": 0,
+  "c1_other": 0
+ },
+ "levels": {
+  "info": 527,
+  "warning": 144
+ },
+ "lines": {
+  "c1_any": {
+   "first": [
+    "[2026-11-25 01:50:07.961] [info] [sys] [t30560] C1 keep-watch: on (with physical_protect_hold_global_lock)",
+    "[2026-11-25 01:50:09.456] [info] [sys] [t15144] C1 keep-watch: first kept protect at ED19F000, 299892736 bytes",
+    "[2026-11-25 01:50:09.457] [info] [sys] [t15144] C1 keep-watch: 2 protects kept so far"
+   ],
+   "last": [
+    "[2026-11-25 01:56:00.379] [info] [sys] [t15144] C1 keep-watch: 151552 protects kept so far",
+    "[2026-11-25 01:56:33.211] [info] [sys] [t15144] C1 keep-watch: 155648 protects kept so far",
+    "[2026-11-25 01:57:04.197] [info] [sys] [t15144] C1 keep-watch: 159744 protects kept so far"
+   ]
+  },
+  "gpu_wait": {
+   "first": [
+    "[2026-11-25 01:50:09.459] [info] [core] [t15144] GPU wait back-off: ON (quantum 500 us, spin 30 us); stats OFF; GetData hook built."
+   ],
+   "last": []
+  },
+  "precise_wait": {
+   "first": [
+    "[2026-11-25 01:50:07.979] [info] [core] [t30560] TimerQueue: precise wait (timer_queue_precise_wait)"
+   ],
+   "last": []
+  }
+ },
+ "c1_kept_last": 159744,
+ "frame_rows": 48945,
+ "logdiff": {
+  "bases": [
+   "20261122-210059-s4b-L0-off-level"
+  ],
+  "base_scenario": "level-l.txt",
+  "NEW": 0,
+  "NEW_allowed": 0,
+  "MORE": 0,
+  "MORE_allowed": 0,
+  "GONE": 53,
+  "GONE_unexpected": 0,
+  "FLAG": 0,
+  "NEW_info_other": 3,
+  "NEW_info_allowed": 3,
+  "rc": 0,
+  "new": [],
+  "new_allowed": [],
+  "more": [],
+  "gone_unexpected": [],
+  "flag": [],
+  "new_info_other": [
+   "NEW build\\agent3\\runs\\20261125-015006-win3f-level\\game.log x50 [info] [sys] C# keep-watch: # protects kept so far",
+   "NEW build\\agent3\\runs\\20261125-015006-win3f-level\\game.log x1 [info] [sys] C# keep-watch: first kept protect at #h, #h bytes",
+   "NEW build\\agent3\\runs\\20261125-015006-win3f-level\\game.log x1 [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)"
+  ],
+  "new_info_allowed": [
+   "NEW build\\agent3\\runs\\20261125-015006-win3f-level\\game.log x1 [info] [core] GPU wait back-off: ON (quantum # us, spin # us); stats OFF; GetData hook built.",
+   "NEW build\\agent3\\runs\\20261125-015006-win3f-level\\game.log x1 [info] [core] Host timer resolution set to # ms (background opt-out on)",
+   "NEW build\\agent3\\runs\\20261125-015006-win3f-level\\game.log x1 [info] [core] TimerQueue: precise wait (timer_queue_precise_wait)"
+  ]
+ },
+ "scenes": {
+  "base": "20261122-210059-s4b-L0-off-level",
+  "missing_in_cand": [],
+  "extra_in_cand": [
+   "785/123950",
+   "8178/762238"
+  ],
+  "cand_major": {
+   "785/123950": 63.1,
+   "220/534": 59.1,
+   "226/1022": 25.1,
+   "218/222": 22.2,
+   "219/226": 14.9,
+   "220/528": 8.8,
+   "594/2813": 3.3,
+   "788/31613": 3.1,
+   "8178/762238": 2.6,
+   "841/31696": 2.6,
+   "790/31625": 2.2
+  },
+  "base_major": {
+   "220/534": 81.5,
+   "218/222": 25.7,
+   "226/1022": 23.8,
+   "220/528": 17.3,
+   "219/226": 14.9,
+   "594/2813": 3.6,
+   "788/31613": 2.6,
+   "841/31696": 2.6,
+   "790/31625": 2.2
+  }
+ },
+ "marks": {
+  "prefix": 4,
+  "prefix_diff": [],
+  "all_diff": 7,
+  "cand": {
+   "first-frame": "218/222",
+   "title": "226/1022",
+   "pads-white": "220/528",
+   "tags-placed": "220/528",
+   "m01": "220/534",
+   "m02": "220/534",
+   "m03": "220/534",
+   "m04": "220/534",
+   "m05": "220/534",
+   "m06": "220/534",
+   "m07": "220/534",
+   "m08": "220/534",
+   "m09": "220/534",
+   "m10": "220/534",
+   "story-load": "218/222",
+   "vortex": "4111/621813",
+   "v-idle": "769/112844",
+   "v-start": "789/112412",
+   "v-start-a": "785/123950",
+   "settled": "785/123950",
+   "end": "785/123950"
+  }
+ },
+ "threads": {
+  "window_s": 382.3,
+  "window": [
+   20.0,
+   402.3
+  ],
+  "by_name": {
+   "(unnamed)": {
+    "pct": 16.36,
+    "threads": 36
+   },
+   "rex::thread::TimerQueue": {
+    "pct": 2.17,
+    "threads": 1
+   },
+   "DeviceHotplugThread": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "D3D Background Thread 0": {
+    "pct": 0.38,
+    "threads": 1
+   },
+   "D3D Background Thread 1": {
+    "pct": 0.44,
+    "threads": 1
+   },
+   "D3D Background Thread 2": {
+    "pct": 0.47,
+    "threads": 1
+   },
+   "D3D Background Thread 3": {
+    "pct": 0.43,
+    "threads": 1
+   },
+   "0x16c00001": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "0xc0550001": {
+    "pct": 5.64,
+    "threads": 1
+   },
+   "XMA Decoder (F8000010)": {
+    "pct": 0.94,
+    "threads": 1
+   },
+   "Audio Worker (F8000014)": {
+    "pct": 2.17,
+    "threads": 1
+   },
+   "GPU Commands (F8000018)": {
+    "pct": 54.92,
+    "threads": 1
+   },
+   "GPU VSync (F800001C)": {
+    "pct": 2.87,
+    "threads": 1
+   },
+   "D3D12 Pipelines": {
+    "pct": 2.87,
+    "threads": 9
+   },
+   "Kernel Dispatch (F8000028)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "Main XThread (F800002C)": {
+    "pct": 57.12,
+    "threads": 1
+   },
+   "D3D12 Storage writer": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThreadB4DC (F8000070)": {
+    "pct": 1.16,
+    "threads": 1
+   },
+   "XThread97A4 (F80000F4)": {
+    "pct": 21.86,
+    "threads": 1
+   },
+   "XThread7464 (F80000FC)": {
+    "pct": 0.16,
+    "threads": 1
+   },
+   "XThread9F58 (F8000104)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread7FE0 (F800010C)": {
+    "pct": 3.49,
+    "threads": 1
+   },
+   "XThreadAE34 (F8000114)": {
+    "pct": 7.7,
+    "threads": 1
+   },
+   "XThread58D8 (F8000120)": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "XThread95DC (F8000124)": {
+    "pct": 0.34,
+    "threads": 1
+   },
+   "XThread677C (F800012C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread8FCC (F8000140)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread1DCC (F8000144)": {
+    "pct": 10.23,
+    "threads": 1
+   },
+   "SDLWASAPIMgmt": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "SDLAudioP19": {
+    "pct": 0.98,
+    "threads": 1
+   },
+   "XThread8124 (F8000164)": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "XThreadA5D4 (F800016C)": {
+    "pct": 0.03,
+    "threads": 1
+   },
+   "XThread9D34 (F8000188)": {
+    "pct": 0.12,
+    "threads": 1
+   },
+   "XThread6C78 (F8000190)": {
+    "pct": 1.01,
+    "threads": 1
+   },
+   "XThreadAA70 (F8000198)": {
+    "pct": 0.99,
+    "threads": 1
+   },
+   "XThread9BEC (F80001A8)": {
+    "pct": 15.94,
+    "threads": 1
+   },
+   "XThread0C9C (F80001BC)": {
+    "pct": 0.4,
+    "threads": 1
+   },
+   "XThread6BE8 (F800026C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThreadA620 (F800029C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread97A8 (F80002A4)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThreadB14C (F80002AC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThreadB72C (F80002B8)": {
+    "pct": 0.03,
+    "threads": 1
+   },
+   "XThread4D84 (F8000300)": {
+    "pct": 0.02,
+    "threads": 1
+   }
+  },
+  "ticks": {
+   "31824": {
+    "name": "rex::thread::TimerQueue",
+    "samples": 210,
+    "steps": 209,
+    "non_rising": 0,
+    "non_rising_at_s": [],
+    "step_s_median": 2.0,
+    "span_s": [
+     -5.7,
+     412.3
+    ]
+   }
+  }
+ },
+ "slow_state": {
+  "rows": 414,
+  "onset_s": null,
+  "slow_pct": 0.0,
+  "e_eff_mhz_median": 1574,
+  "cpu_util_pct_median": 72.3,
+  "slow": false
+ },
+ "hang_cpu": [],
+ "host_quiet": {
+  "rows": 13,
+  "busy_rows": 0
+ },
+ "toypad": {
+  "confirms": 3,
+  "result": "listener=True trigger=True placed=True load-confirms=3/3 then=off remove-confirms=0"
+ },
+ "proofs": [],
+ "base_misses": [],
+ "hint": "PASS?"
+}

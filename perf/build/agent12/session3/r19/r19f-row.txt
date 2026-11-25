@@ -1,0 +1,33 @@
+queue row: {"id": "r19f", "est": 265, "needs": ["build\\agent3\\s4b\\ready-r19", "build\\agent3\\s4b\\ready-N", "build\\agent3\\session3\\go-quiet", "build\\agent3\\session3\\go-r19on", "build\\agent3\\session3\\r19-ok-d", "build\\agent3\\session3\\r19-pathN"], "unless": "build\\agent3\\session3\\r19-path16", "args": ["-BinDir", "build\\agent2\\devoff4b-r19-bin", "-Seconds", "420", "-Tag", "r19f-rbme-async-n", "-InputScript", "harness\\routes\\b-gate-menus-long.txt", "-Cvar", "d3d12_submit_split_kb=<N>;d3d12_readback_memexport=true;d3d12_async_submit=true"], "note": "#19 row f (path N): memexport readback drain vs r19r13; r19_gate --row f --n 4 --bin devoff4b-r19-bin. Path 16: dropped, M3 writes r19-ok-f \"held no-op (C2)\"; then no ON use may set d3d12_readback_memexport. Hang = FAIL. Gate: r19prep\\LAUNCH-R19.md."}
+BAD  cvars {'d3d12_submit_split_kb': '4', 'd3d12_readback_memexport': 'true', 'd3d12_async_submit': 'true'} (queued {'d3d12_submit_split_kb': '<N>', 'd3d12_readback_memexport': 'true', 'd3d12_async_submit': 'true'})
+ok   exit_code 0 (0x00000000), close wm_close, elapsed 212.83 s of 420
+ok   wer_seen False
+ok   crash_events []
+ok   exited_early False
+ok   bin_dir <workspace>\build\agent2\devoff4b-r19-bin (queued build\agent2\devoff4b-r19-bin)
+ok   run exe sha256 DFBE1D43B28861A6 = run.json and in <workspace>\build\agent2\devoff4b-r19-bin\MANIFEST.txt
+ok   env {} (queued {})
+ok   input script <workspace>\harness\routes\b-gate-menus-long.txt (queued harness\routes\b-gate-menus-long.txt)
+     logs 1 (261 lines); counts: Recovered stale physical page protection=0; Unhandled guest physical write fault=0; PhysicalHeap::Protect failed=0; STUCK-LOCK=0; REX_FATAL=0; C1 keep-watch: on (with=0; C1 keep-watch: on, but=0; blocked for this process=0; C1 verify: on.=0; C1 verify K:=0; C1 verify F:=0; GPU wait back-off: ON=0; d3d12_submit_split_kb: splitting=1; d3d12_submit_split: =21; Host timer resolution set=0; TimerQueue: precise wait=0
+ok   C4 "Recovered stale physical page protection" x0
+ok   C4 "Unhandled guest physical write fault" x0
+ok   C4 "PhysicalHeap::Protect failed" x0
+ok   C4 "REX_FATAL" x0
+ok   C4 "C1 keep-watch: on, but" x0
+ok   C4 "blocked for this process" x0
+ok   C3 keep-watch init x0 (keep_watch=False)
+ok   C3 "C1 verify: on." x0 (verify=False)
+ok   C3 split init x1 (split cvar True)
+ok   C3 back-off init x0 (env set False)
+ok   C3 host timer line x0 (cvar False)
+ok   C3 precise-wait line x0 (cvar False)
+     STUCK-LOCK lines 0 (C5: see f10 output / by hand)
+ok   C6 dumps in dir [], run.json dumps []
+     C7 steps 54/54 last done timeouts 0; marks ['idle-50', 'idle-60', 'idle-70', 'idle-80', 'idle-90', 'end']
+--- r19f.check.txt (35 lines)
+    missing in cand: ['839/31674']; extra in cand: ['788/31613', '790/31625', '8127/762167', '841/31696']
+  BASE items missed: marks differ before up-2: after-a1 220/528->220/534 down-1 220/534->218/222 down-2 220/534->218/222 up-2 220/534->645/3156
+  VERDICT HINT LOOK: 1 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row r19f)
+--- r19f.f10.txt: not present
+--- r19f.p2c.txt: not present
+COMMON: PROBLEMS (1 problems)

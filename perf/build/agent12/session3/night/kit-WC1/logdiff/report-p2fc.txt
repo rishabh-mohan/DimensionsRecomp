@@ -1,0 +1,21 @@
+== arm p2fc (4 runs) vs s0 (4 runs)
+  runs\0323-p2fc-r1: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 140 lines game.log 15176, 2026-11-25 03:23:44.902..2026-11-25 03:25:40.196 (115 s) | levels info=92 raw=8 warning=40 | Toypad R/W 12/12 (6.2/6.2 per min)
+  runs\0329-p2fc-r2: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 140 lines game.log 15175, 2026-11-25 03:29:58.585..2026-11-25 03:31:53.886 (115 s) | levels info=92 raw=8 warning=40 | Toypad R/W 12/12 (6.2/6.2 per min)
+  runs\0336-p2fc-r3: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 140 lines game.log 15176, 2026-11-25 03:36:09.429..2026-11-25 03:38:04.788 (115 s) | levels info=92 raw=8 warning=40 | Toypad R/W 12/12 (6.2/6.2 per min)
+  runs\0342-p2fc-r4: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 140 lines game.log 15164, 2026-11-25 03:42:19.355..2026-11-25 03:44:13.891 (115 s) | levels info=92 raw=8 warning=40 | Toypad R/W 12/12 (6.3/6.3 per min)
+gate_logdiff FAIL findings (B = arm run, A = each base run): none
+NEW warning/error/critical keys (in an arm run, in no base run): 0
+MORE (arm run count > base max + max(5, base max)): 0
+GONE (in every base run, missing from an arm run; any level): 0
+Toypad (base: runs\0317-s0-r1 {'info Write': 12, 'info Read': 12}; runs\0332-s0-r2 {'info Write': 12, 'info Read': 12}; runs\0338-s0-r3 {'info Write': 12, 'info Read': 12}; runs\0344-s0-r4 {'info Write': 12, 'info Read': 12})
+  runs\0323-p2fc-r1: {'info Write': 12, 'info Read': 12}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\0329-p2fc-r2: {'info Write': 12, 'info Read': 12}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\0336-p2fc-r3: {'info Write': 12, 'info Read': 12}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\0342-p2fc-r4: {'info Write': 12, 'info Read': 12}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+ONLY in p2fc (any level, not Toypad; in no base run): 3 keys
+  4/4 runs, counts [36, 36, 36, 36], also in ['c1np', 'win3']  [info] [sys] C# keep-watch: # protects kept so far
+      e.g. [2026-11-25 03:23:45.942] [info] [sys] [t30112] C1 keep-watch: 2 protects kept so far
+  4/4 runs, counts [1, 1, 1, 1], also in ['c1np', 'win3']  [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)
+      e.g. [2026-11-25 03:23:45.242] [info] [sys] [t32528] C1 keep-watch: on (with physical_protect_hold_global_lock)
+  4/4 runs, counts [1, 1, 1, 1], also in ['c1np', 'win3']  [info] [sys] C# keep-watch: first kept protect at #h, #h bytes
+      e.g. [2026-11-25 03:23:45.941] [info] [sys] [t30112] C1 keep-watch: first kept protect at ED19F000, 299892736 bytes

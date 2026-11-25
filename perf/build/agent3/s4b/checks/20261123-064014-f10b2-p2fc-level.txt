@@ -1,4 +1,4 @@
-# s4b_check f10b2 20261123-064014-f10b2-p2fc-level (off, scenario level-l.txt)
+# s4b_check s4bV0 20261123-064014-f10b2-p2fc-level (off, scenario level-l.txt)
 run.json: exit 0 (0x00000000) dumps 0 crash_events 0 wer False; close wm_close 1.11 s; elapsed 429.34 of 600 s; cvars {"framerate_limit": "0", "shared_memory_single_hold_rearm": "true", "physical_protect_hold_global_lock": "true", "physical_protect_keep_watch": "true", "physical_protect_keep_watch_verify": "false", "slow_frame_log_ms": "1"}; env -; steps 119/119
 summary: verdict RUNNING; first frame 7.0 s; levels {"info": 40429, "warning": 144}; unknown cvars []; errors 0
 log files game.2.log,game.1.log,game.log; levels {"info": 40429, "warning": 144}
@@ -29,11 +29,11 @@ memexport full-buffer: {"lines": 39936, "last_total": 0, "max_total": 0, "sum_x"
 last slow-frame line (tail): ...ture load 0.3 (34x) | readback 23x 2300 KB, 0 stalled | cpu-write invalidations 2x 8 KB (on memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)
 frames (perf.csv rows) 39961; slow_frame per frame 0.999
 logdiff cand: 3 logs joined -> build\agent3\s4b\checks\joined\20261123-064014-f10b2-p2fc-level
-logdiff vs 20261122-210059-s4b-L0-off-level (base scenario level-l.txt): NEW 0 (+0 allowed) MORE 0 (+0 allowed) GONE 57 (0 unexpected) FLAG 0; NEW at info 3 other, 1 allowed; rc 0
+logdiff vs 20261122-210059-s4b-L0-off-level (base scenario level-l.txt): NEW 0 (+0 allowed) MORE 0 (+0 allowed) GONE 57 (0 unexpected) FLAG 0; NEW at info 4 other, 0 allowed; rc 0
+  info NEW build\agent3\s4b\checks\joined\20261123-064014-f10b2-p2fc-level\game.log x39936 [info] [gpu] slow frame ##: # ms | gpu-thread idle # | host-gpu wait # (#x) | shader translate # (#x) | pipeline create # (#x), new # | texture load # (#x) | readback #x # KB, 
   info NEW build\agent3\s4b\checks\joined\20261123-064014-f10b2-p2fc-level\game.log x43 [info] [sys] C# keep-watch: # protects kept so far
   info NEW build\agent3\s4b\checks\joined\20261123-064014-f10b2-p2fc-level\game.log x1 [info] [sys] C# keep-watch: first kept protect at #h, #h bytes
   info NEW build\agent3\s4b\checks\joined\20261123-064014-f10b2-p2fc-level\game.log x1 [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)
-  info allowed NEW build\agent3\s4b\checks\joined\20261123-064014-f10b2-p2fc-level\game.log x39936 [info] [gpu] slow frame ##: # ms | gpu-thread idle # | host-gpu wait # (#x) | shader translate # (#x) | pipeline create # (#x), new # | texture load # (#x) 
 levels cand {"info": 40429, "warning": 144} vs 20261122-210059-s4b-L0-off-level {"info": 442, "warning": 144}
 scenes (>= 2 s) base: 220/534:82s 218/222:26s 226/1022:24s 220/528:17s 219/226:15s 594/2813:4s 788/31613:3s 841/31696:3s 790/31625:2s
 scenes (>= 2 s) cand: 220/534:64s 785/123950:29s 218/222:25s 226/1022:21s 219/226:15s 220/528:13s 594/2813:3s 788/31613:3s 839/31674:2s
@@ -45,21 +45,9 @@ threads (% of one core, window [20.0, 411.3] s from the first frame, 391.3 s): X
   TimerQueue ticks (tid 23484): 214 samples over [-6.7, 419.3] s, cycles non-rising in 0 of 213 steps 
 sys.csv slow state: {"rows": 421, "onset_s": null, "slow_pct": 0.0, "e_eff_mhz_median": 1509, "cpu_util_pct_median": 73.4, "slow": false}
 hangs: 0 STUCK-LOCK event(s); hostload rows during the run: {"rows": 13, "busy_rows": 0}; toypad: {"confirms": 3, "result": "listener=True trigger=True placed=True load-confirms=3/3 then=off remove-confirms=0"}
-PROOF ok   init "C1 keep-watch: on (with physical_protect_hold_global_lock)" x1
-PROOF ok   "first kept protect" x1 (gate D / positive control)
-PROOF ok   kept count: last "kept so far" = 131072 (43 such lines)
-PROOF ok   verify off (keep_watch_verify=false): "C1 verify: on" x0, K lines 0
-PROOF ok   kept count rises through the level load (last mark end): first 2 -> last 131072 (43 "kept so far" lines)
+PROOF MISS keep-watch off: init-on x1, first kept x1, kept x43
+PROOF MISS C1 verify armed: "C1 verify: on. Hashing CPU uploads ..." x0 (without it F = 0 proves nothing: INCONCLUSIVE)
+PROOF note K lines 0; F lines 0 (Agent 12 predicts F > 0; F = 0 refutes it; compare s4b07r over the same marks) -
 PROOF ok   gate D zero lines: "Recovered stale physical page protection" 0, "Unhandled guest physical write fault" 0
-PROOF ok   no blocked/no-hold C1 line (0/0/0)
-PROOF ok   slow-frame lines 39936
-PROOF ok   the last slow-frame line ends with the memexport suffix: ...n memexport pages 0x 0 KB) | memexport syncs 0 (0 KB), on demand 0 (0 KB) | memexport full-buffer 0x (total 0)
-PROOF ok   P2 COUNTER: memexport full-buffer total (last line) = 0; max 0; sum Nx 0; lines with Nx > 0: 0 -> closes P2 memexport gate
-PROOF ok   f10 f10b cvars in run.json (6 expected, w6gB's set): all as planned
-PROOF ok   tags placed: 3 game.log LOAD lines (3 needed); sidecar: listener=True trigger=True placed=True load-confirms=3/3 then=off remove-confirms=0
-PROOF ok   L route reached the level: through the level load (last mark end)
-PROOF note FINDING 10 (Agent 6 direct test): STUCK-LOCK events 0
-PROOF ok   quiet host: hostload.csv rows with clang/cl/ninja/link during the run: 0 of 13
-PROOF ok   G8 bad lines: Protect failed 0, Recovered stale 0, Unhandled guest physical write fault 0
 BASE items missed: none
-VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row f10b2)
+VERDICT HINT LOOK: 0 BASE misses, 2 proof misses (apply QUEUE.md "passes if" for row s4bV0)

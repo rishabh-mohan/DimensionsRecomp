@@ -1,0 +1,103 @@
+diff --git a/src/graphics/d3d12/command_processor.cpp b/src/graphics/d3d12/command_processor.cpp
+--- a/src/graphics/d3d12/command_processor.cpp
++++ b/src/graphics/d3d12/command_processor.cpp
+@@ -85,6 +85,16 @@
+                     "readback_resolve_max_kb value for a title)")
+     .lifecycle(rex::cvar::Lifecycle::kHotReload);
+ 
++// #33 diagnostic (d) (Agent 10 S2): log resolves that follow draws skipped while
++// their pipeline was in creation. A render-to-texture pass that loses draws and
++// is resolved only once stays wrong until it's drawn again; these lines measure
++// how often that can happen, with d3d12_pipeline_creation_no_wait on or off.
++REXCVAR_DEFINE_BOOL(d3d12_resolve_after_drop_log, false, "GPU/D3D12",
++                    "Log resolves issued after draws were skipped for a pipeline in "
++                    "creation, and when each such resolve target is next resolved with "
++                    "no skipped draws (diagnostic for d3d12_pipeline_creation_no_wait)")
++    .lifecycle(rex::cvar::Lifecycle::kRequiresRestart);
++
+ // Draws whose pixel shader is on this list are dropped. The use case is a
+ // post-process pass a player wants gone (depth of field, say): the title has
+ // no switch for it, but every pass is one full-screen draw with its own pixel
+@@ -251,6 +261,60 @@
+ // of shared memory as written by the GPU. Counted (relaxed) on the command
+ // thread; ReportSlowFrame takes the count each frame and prints it.
+ std::atomic<uint64_t> memexport_full_buffer_draws{0};
++
++// Diagnostic (d) state. Only touched on the command thread (IssueDraw,
++// IssueCopy), and only while d3d12_resolve_after_drop_log is set. Skipped draws
++// aren't matched to render targets: every skipped draw since the last resolve
++// counts against the next one (an upper bound on the exposure).
++struct ResolveAfterDrop {
++  uint64_t drops_since_resolve = 0;
++  uint64_t resolves = 0;
++  uint64_t after_drop = 0;
++  uint64_t healed = 0;
++  uint64_t lines = 0;
++  // Resolve destination base -> the resolve ordinal that last followed drops.
++  std::unordered_map<uint32_t, uint64_t> tainted;
++};
++ResolveAfterDrop resolve_after_drop;
++constexpr uint64_t kResolveAfterDropMaxLines = 4096;
++
++// A resolve to dest_base was just recorded. copies: it writes memory (it isn't
++// clear-only).
++void NoteResolveAfterDrop(uint32_t dest_base, bool copies) {
++  ResolveAfterDrop& d = resolve_after_drop;
++  ++d.resolves;
++  const uint64_t drops = d.drops_since_resolve;
++  d.drops_since_resolve = 0;
++  if (!copies) {
++    return;
++  }
++  if (drops) {
++    ++d.after_drop;
++    const bool first = d.tainted.insert_or_assign(dest_base, d.resolves).second;
++    if (d.lines < kResolveAfterDropMaxLines) {
++      ++d.lines;
++      REXGPU_INFO(
++          "resolve after drop: dest {:08X} after {} skipped draws ({}) | resolves {}, "
++          "after drops {}, healed {}, tainted {}",
++          dest_base, drops, first ? "new" : "again", d.resolves, d.after_drop, d.healed,
++          d.tainted.size());
++    }
++  } else if (d.tainted.erase(dest_base)) {
++    ++d.healed;
++    if (d.lines < kResolveAfterDropMaxLines) {
++      ++d.lines;
++      REXGPU_INFO(
++          "resolve after drop: dest {:08X} resolved clean again | resolves {}, "
++          "after drops {}, healed {}, tainted {}",
++          dest_base, d.resolves, d.after_drop, d.healed, d.tainted.size());
++    }
++  }
++  if (d.lines == kResolveAfterDropMaxLines) {
++    ++d.lines;
++    REXGPU_INFO("resolve after drop: {} lines logged, no more from here on",
++                kResolveAfterDropMaxLines);
++  }
++}
+ 
+ // Called on every swap from the command thread: if the frame that just ended
+ // took longer than slow_frame_log_ms, log what the command thread spent it on.
+@@ -2775,6 +2839,9 @@
+     }
+     if (skip_draw) {
+       frame_stats::Add(frame_stats::kDroppedDraw, 0);
++      if (REXCVAR_GET(d3d12_resolve_after_drop_log)) {
++        ++resolve_after_drop.drops_since_resolve;
++      }
+       return true;
+     }
+   }
+@@ -3739,6 +3806,11 @@
+                                              written_address, written_length);
+   } else {
+     resolved = IssueCopy_ReadbackResolvePath();
++  }
++  if (resolved && REXCVAR_GET(d3d12_resolve_after_drop_log)) {
++    NoteResolveAfterDrop(register_file_->values[XE_GPU_REG_RB_COPY_DEST_BASE],
++                         register_file_->Get<reg::RB_COPY_CONTROL>().copy_command !=
++                             xenos::CopyCommand::kNull);
+   }
+   if (submit_split_bytes_ && resolved) {
+     // S4 #18: the resolve, its barriers and any readback are fully recorded

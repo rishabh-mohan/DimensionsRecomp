@@ -1,0 +1,148 @@
+diff --git "a/<workspace>\\build\\agent12\\session3\\final_gate.py.v2-9DCC72EE" "b/<workspace>\\build\\agent12\\session3\\final_gate.py"
+index 2827984..f64f646 100644
+--- a/final_gate.py
++++ b/final_gate.py
+@@ -12,6 +12,8 @@ chain until the Overseer rules (M10 final-gate-rating AE8EB2A5 G4). Each run dir
+ row_gate.py alone is never a gate on a FINAL bin (G2).
+ v2 (M10 S1-S3, N1, N5, N6): automatic miss-cache HOLD/FAIL for F5w/F6/F7, F2 xenos HOLD, OFF bins for F3/F6,
+ elapsed recorded, tmp name = parent_dir__run_dir__pathsha8, F5w loaded vs saved NOTE.
++v3 (Overseer 13:55Z): F2/F7 route = a known level route (script_sha256); wait_log timeouts only on that route's by-design
++lines (count = listed lines), steps n/n and stopped_by_script; any other timeout FAILs.
+ """
+ import datetime, glob, hashlib, json, os, re, subprocess, sys
+ 
+@@ -45,6 +47,17 @@ L_MC_OFF_BUILD = 'Native GPU: shader miss cache OFF (build default)'  # nativefi
+ L_MC_ANY = 'Native GPU: shader miss cache '
+ MC_ABSENT = 'miss cache ON (build default) line: 0 (want 1)'  # check-defaults native-old FAIL text, line absent
+ L_EXIT = 'Title terminated'
++# Level routes F2/F7 may use (script_sha256 -> by-design wait_log timeout lines in THAT file). level-l lines 55 (amber
++# fade, 60 s) and 58-116 even (press-A-until-orange, 5 s each) time out by design; how many do varies by run (27-31 over
++# 20 level-l runs, 22-25 Nov). level-l-tail = level-l lines 13-130 at line - 7 (+ sleep 180 / mark tail), so the same
++# waits sit 7 lines earlier. Any timeout outside the set (e.g. line 22, the tags wait; 117, the 240 s orange wait) FAILs.
++_LL = [55] + list(range(58, 117, 2))
++ROUTE_TIMEOUTS = {
++    '6F9E600963440B451B591899A17DAD9A5941A8930AA502B597155CBB636F9A63': ('level-l.txt', set(_LL)),
++    'BE08A7908005B3B6113BE199274C1D0E9F4D76B7C2116FA1B860B27F00184ABC': ('level-l-tail.txt', {n - 7 for n in _LL}),
++}
++ROUTE_FILES = {'level-l.txt': os.path.join(REPO, 'build', 'agent3', 'toypad', 'routes', 'level-l.txt'),
++               'level-l-tail.txt': os.path.join(REPO, 'build', 'agent3', 'final-fx', 'level-l-tail.txt')}
+ 
+ 
+ def sha(path):
+@@ -152,6 +165,28 @@ def elapsed(rj):
+         return None, 'absent'
+ 
+ 
++def route_timeouts(isr):
++    """F2/F7 (Overseer 13:55Z): the route must be a known level route (script_sha256) and every wait_log timeout must be
++    one of that route's by-design lines; the count must match the listed lines. Returns [(level, text)]."""
++    out = []
++    rs = str(isr.get('script_sha256') or '').upper()
++    known = ROUTE_TIMEOUTS.get(rs)
++    out.append(('PASS' if known else 'FAIL', f'route script_sha256 {rs[:8] or None} = ' + (known[0] if known else 'unknown route')))
++    raw = isr.get('timeout_lines')
++    tl = [int(x) for x in (raw.split() if isinstance(raw, str) else (raw or []))]
++    n = isr.get('timeouts') or 0
++    out.append(('PASS' if n == len(tl) else 'FAIL', f'timeouts {n} = timeout_lines count {len(tl)}'))
++    if known:
++        extra = sorted(set(tl) - known[1])
++        out.append(('PASS' if not extra else 'FAIL',
++                    f'timeouts on by-design wait lines only: {len(tl)} of {len(known[1])} by-design' +
++                    (f'; NOT by design: {extra}' if extra else '')))
++        if not extra and len(tl) != len(known[1]):
++            out.append(('NOTE', f'{len(known[1]) - len(tl)} by-design waits did not time out '
++                                f'(lines {sorted(known[1] - set(tl))}); normal on level-l (27-31 seen)'))
++    return out
++
++
+ def gate(run, row, ref=None, first=None, pair=None, _selftest_nobin=False):
+     """_selftest_nobin: selftest fixtures only (not reachable from the CLI) - skips the run-dir file hash /
+     exe fingerprint checks, which need real staged binaries; recorded as NOTE 'skipped (selftest)'."""
+@@ -285,8 +320,10 @@ def gate(run, row, ref=None, first=None, pair=None, _selftest_nobin=False):
+             marks = [m.group(1) for m in (re.search(r',mark,([^,\s]+)', l) for l in open(ic, encoding='utf-8', errors='replace')) if m]
+         P('level' in os.path.basename(str(isr.get('script') or '')), f'route {isr.get("script")}')
+         P('vortex' in marks, f'vortex mark reached (marks {marks[-4:]})')
+-        P(isr.get('steps_done') == isr.get('steps_total') and not isr.get('timeouts'),
+-          f'route steps {isr.get("steps_done")}/{isr.get("steps_total")}, timeouts {isr.get("timeouts")}')
++        P(isr.get('steps_done') is not None and isr.get('steps_done') == isr.get('steps_total') and isr.get('stopped_by_script') is True,
++          f'route steps {isr.get("steps_done")}/{isr.get("steps_total")}, stopped_by_script {isr.get("stopped_by_script")}')
++        for l, t in route_timeouts(isr):
++            res.append((l, t))
+         tp = sum(1 for l in lines if 'Toypad' in l)
+         P(tp > 0, f'Toypad lines {tp}')
+ 
+@@ -403,7 +440,11 @@ def selftest():
+     xen = ['Final defaults: ' + ' '.join(f'{k}={v[0]}(default)' for k, v in cdm.RUNTIME_KEYS.items()),
+            'Final defaults (GPU): ' + ' '.join(f'{k}={v[0]}(default)' for k, v in cdm.GPU_KEYS.items()),
+            cdm.L_TIMER, cdm.L_C1, cdm.L_TQ, cdm.L_BO_ON]
+-    route = {'elapsed_s': 600.0, 'input_script': {'script': r'C:\r\level-l.txt', 'steps_done': 9, 'steps_total': 9, 'timeouts': 0}}
++    TAIL = 'BE08A7908005B3B6113BE199274C1D0E9F4D76B7C2116FA1B860B27F00184ABC'
++    tail_tl = sorted(ROUTE_TIMEOUTS[TAIL][1])
++    route = {'elapsed_s': 600.0, 'input_script': {'script': r'C:\r\level-l-tail.txt', 'script_sha256': TAIL, 'steps_done': 121,
++                                                  'steps_total': 121, 'stopped_by_script': True, 'timeouts': 31,
++                                                  'timeout_lines': ' '.join(map(str, tail_tl))}}
+     r = gate(fx('f1', 'devfinal-bin', xen, {'framerate_limit': 0}), 'F1', _selftest_nobin=True)
+     T(verdict(r) == 'PASS' and lv(r, 'PASS', 'check-defaults --mode xenos PASS') and lv(r, 'NOTE', 'elapsed 30.0 s'), 'fx F1 positive -> PASS')
+     r = gate(fx('f1-gw', 'devfinal-bin', xen, {'framerate_limit': 0}, {'LEGO_GPU_WAIT_BACKOFF_US': '500'}), 'F1', _selftest_nobin=True)
+@@ -447,6 +488,61 @@ def selftest():
+     r = gate(f5, 'F5', ref=f5, _selftest_nobin=True)
+     T(verdict(r) == 'PASS', 'fx F5 first launch -> PASS')
+     T(os.path.exists(os.path.join(TMP, tmp_name(f5))) and tmp_name(f5).startswith('selftest-fx__f5__'), 'N5 joined log named selftest-fx__f5__<hash>')
++    # v3: F3 positive on devfinal-off-bin (S3)
++    off = ['Final defaults: ' + ' '.join(f'{k}={v[1]}(cvar)' for k, v in cdm.RUNTIME_KEYS.items()),
++           'Final defaults (GPU): ' + ' '.join(f'{k}={v[1]}(cvar)' for k, v in cdm.GPU_KEYS.items()), cdm.L_BO_OFF]
++    f3cv = dict(OFF_SET, framerate_limit='0')
++    r = gate(fx('f3', 'devfinal-off-bin', off, f3cv, {'LEGO_GPU_WAIT_BACKOFF_US': 'off'}), 'F3', _selftest_nobin=True)
++    T(verdict(r) == 'PASS' and lv(r, 'PASS', 'check-defaults --mode off PASS'), 'fx F3 devfinal-off-bin + 12 old values + BACKOFF_US=off -> PASS')
++    r = gate(fx('f3-on', 'devfinal-bin', off, f3cv, {'LEGO_GPU_WAIT_BACKOFF_US': 'off'}), 'F3', _selftest_nobin=True)
++    T(verdict(r) == 'FAIL' and lv(r, 'FAIL', 'bin_dir'), 'fx F3 on devfinal-bin -> FAIL (bin)')
++    # v3: F2/F7 route timeouts (Overseer 13:55Z)
++    rf = {k: open(p, encoding='utf-8').read().splitlines() for k, p in ROUTE_FILES.items()}
++    T(all(sha(ROUTE_FILES[n]) == s for s, (n, _) in ROUTE_TIMEOUTS.items()), 'route files on disk = ROUTE_TIMEOUTS shas')
++    T(all(rf['level-l.txt'][n - 1] == rf['level-l-tail.txt'][n - 8] and rf['level-l.txt'][n - 1].startswith('wait_log') for n in _LL)
++      and rf['level-l.txt'][116] == rf['level-l-tail.txt'][109] and 109 + 1 not in ROUTE_TIMEOUTS[TAIL][1],
++      'tail by-design lines = level-l lines - 7 (same wait_log text); the 240 s orange wait is not in the set')
++    rt = lambda **kw: route_timeouts(dict(route['input_script'], **kw))
++    T(all(l == 'PASS' for l, _ in rt()), 'route_timeouts: tail, 31 by-design -> PASS')
++    r = rt(timeouts=29, timeout_lines=' '.join(map(str, tail_tl[2:])))
++    T(all(l != 'FAIL' for l, _ in r) and any(l == 'NOTE' and '2 by-design waits' in t for l, t in r), 'route_timeouts: tail, 29 of 31 -> PASS + NOTE')
++    T(any(l == 'FAIL' and 'NOT by design: [110]' in t for l, t in rt(timeouts=32, timeout_lines=' '.join(map(str, tail_tl + [110])))),
++      'route_timeouts: extra timeout on the 240 s orange wait -> FAIL')
++    T(any(l == 'FAIL' and 'NOT by design' in t for l, t in rt(timeout_lines=' '.join(map(str, sorted(ROUTE_TIMEOUTS[
++        '6F9E600963440B451B591899A17DAD9A5941A8930AA502B597155CBB636F9A63'][1]))))),
++      'route_timeouts: level-l numbering on the tail route -> FAIL')
++    T(any(l == 'FAIL' and 'timeout_lines count' in t for l, t in rt(timeouts=30)), 'route_timeouts: count != listed lines -> FAIL')
++    T(any(l == 'FAIL' and 'unknown route' in t for l, t in rt(script_sha256='00' * 32)), 'route_timeouts: unknown route sha -> FAIL')
++    r = gate(fx('f2-x', 'devfinal-bin', f2 + [cdm.L_TQ], {'framerate_limit': 0},
++                extra=dict(route, input_script=dict(route['input_script'], timeouts=32, timeout_lines=' '.join(map(str, tail_tl + [15])))),
++                marks=['vortex']), 'F2', _selftest_nobin=True)
++    T(verdict(r) == 'FAIL' and lv(r, 'FAIL', 'NOT by design: [15]'), 'fx F2 with an extra (non-design) timeout -> FAIL')
++    r = gate(fx('f2-steps', 'devfinal-bin', f2 + [cdm.L_TQ], {'framerate_limit': 0},
++                extra=dict(route, input_script=dict(route['input_script'], steps_done=120, stopped_by_script=False)),
++                marks=['vortex']), 'F2', _selftest_nobin=True)
++    T(verdict(r) == 'FAIL' and lv(r, 'FAIL', 'route steps 120/121'), 'fx F2 steps 120/121, not stopped by script -> FAIL')
++    r = gate(fx('f2-ok', 'devfinal-bin', f2 + [cdm.L_TQ], {'framerate_limit': 0}, extra=route, marks=['vortex']), 'F2', _selftest_nobin=True)
++    T(verdict(r) == 'PASS', 'fx F2 tail route, 31 by-design timeouts, xenos PASS -> PASS')
++    # real level-l runs (old bins): route/timeout items and the common checks except bin
++    ar = os.path.join(REPO, 'build', 'agent3', 'runs')
++    common = ('exit_code', 'exited_early', 'WER', 'dialogs', 'crash_events', 'dumps', 'close', '"Title terminated"', 'bad string')
++    for d in ('20261125-062932-s4b-V0f-c1off-verify-level-vfix', '20261125-063859-s4b-07f-c1v-level-vfix'):
++        if os.path.isdir(os.path.join(ar, d)):
++            r = gate(os.path.join(ar, d), 'F2', _selftest_nobin=True)
++            rr = [(l, t) for l, t in r if t.startswith(('route', 'timeouts', 'vortex', 'Toypad'))]
++            cm = [(l, t) for l, t in r if t.startswith(common)]
++            T(len(rr) == 7 and all(l == 'PASS' for l, _ in rr), f'{d[16:24]} as F2: route name/sha, steps, 31 timeouts by design, vortex, Toypad PASS')
++            bad_cm = [t for l, t in cm if l != 'PASS']  # these rows ran physical_protect_keep_watch_verify=true by design
++            T(len(cm) == 18 and bad_cm == ['bad string "C1 verify: on" x1'],
++              f'{d[16:24]} as F2: common checks (exit .. bad strings) PASS except "C1 verify: on" (verify=1 row): {bad_cm}')
++            T(lv(r, 'FAIL', 'bin_dir'), f'{d[16:24]} as F2: bin FAIL (old bin)')
++    d = os.path.join(ar, '20261122-222313-w6-gateB-p2fc-level')
++    if os.path.isdir(d):
++        T(lv(gate(d, 'F2', _selftest_nobin=True), 'FAIL', 'NOT by design: [22]'), 'w6-gateB (timeout on line 22) as F2 -> timeout FAIL')
++    d = os.path.join(ar, '20261125-025738-cg26L-level')
++    if os.path.isdir(d):
++        r = route_timeouts(json.load(open(os.path.join(d, 'run.json'), encoding='utf-8-sig'))['input_script'])
++        T(all(l != 'FAIL' for l, _ in r) and any(l == 'NOTE' for l, _ in r), 'cg26L (27 of 31 timeouts) -> timeouts PASS + NOTE')
+     # negative controls on real old-bin runs: must FAIL closed
+     w8 = os.path.join(REPO, 'build', 'agent8', 'matrix', '20261125-0359', 'runs')
+     n0 = os.path.join(w8, '0400-n0-r1')

@@ -1,0 +1,17 @@
+== arm q250 (4 runs) vs off (4 runs)
+  runs\0409-q250-r1: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 103 lines game.log 11841, 2026-11-23 04:09:12.160..2026-11-23 04:11:08.355 (116 s) | levels info=55 raw=8 warning=40 | Toypad R/W 12/12 (6.2/6.2 per min)
+  runs\0417-q250-r2: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 99 lines game.log 11198, 2026-11-23 04:17:26.963..2026-11-23 04:19:22.076 (115 s) | levels info=51 raw=8 warning=40 | Toypad R/W 10/10 (5.2/5.2 per min)
+  runs\0425-q250-r3: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 99 lines game.log 11199, 2026-11-23 04:25:41.749..2026-11-23 04:27:36.755 (115 s) | levels info=51 raw=8 warning=40 | Toypad R/W 10/10 (5.2/5.2 per min)
+  runs\0433-q250-r4: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 103 lines game.log 11843, 2026-11-23 04:33:55.524..2026-11-23 04:35:50.485 (115 s) | levels info=55 raw=8 warning=40 | Toypad R/W 12/12 (6.3/6.3 per min)
+gate_logdiff FAIL findings (B = arm run, A = each base run): none
+NEW warning/error/critical keys (in an arm run, in no base run): 0
+MORE (arm run count > base max + max(5, base max)): 0
+GONE (in every base run, missing from an arm run; any level): 0
+Toypad (base: runs\0403-off-r1 {'info Write': 10, 'info Read': 10}; runs\0421-off-r2 {'info Write': 12, 'info Read': 12}; runs\0429-off-r3 {'info Write': 10, 'info Read': 10}; runs\0438-off-r4 {'info Write': 10, 'info Read': 10})
+  runs\0409-q250-r1: {'info Write': 12, 'info Read': 12}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\0417-q250-r2: {'info Write': 10, 'info Read': 10}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\0425-q250-r3: {'info Write': 10, 'info Read': 10}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\0433-q250-r4: {'info Write': 12, 'info Read': 12}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+ONLY in q250 (any level, not Toypad; in no base run): 1 keys
+  4/4 runs, counts [1, 1, 1, 1], also in ['q0', 'q125', 'q500']  [info] [core] GPU wait back-off: ON (quantum # us, spin # us); stats OFF; GetData hook built.
+      e.g. [2026-11-23 04:09:13.879] [info] [core] [t12376] GPU wait back-off: ON (quantum 250 us, spin 30 us); stats OFF; GetData hook built.

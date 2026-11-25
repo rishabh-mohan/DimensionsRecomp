@@ -1,0 +1,46 @@
+queue row: {"id": "s33gthr0", "est": 330, "needs": ["build\\agent3\\s4b\\ready-s4b-off", "build\\agent3\\session3\\go-s33r", "build\\agent3\\session3\\go-s33gthr0"], "args": ["-BinDir", "build\\agent2\\devoff4b-s33-bin", "-Seconds", "300", "-GpuLog", "-Tag", "s33-gthr0", "-InputScript", "harness\\routes\\attract-long.txt", "-Cvar", "slow_frame_log_ms=1;d3d12_pipeline_creation_no_wait=true;d3d12_pipeline_creation_threads=0"], "note": "#33 row 6 gate arm: threads=0 -> one \"ignored\" WARN, no INFO line. Gate go-s33gthr0. Postcheck: s4b_check (gate, short), RUN-S33-LOGDIFF."}
+ok   exit_code 0 (0x00000000), close wm_close, elapsed 300.86 s of 300
+ok   wer_seen False
+ok   crash_events []
+ok   exited_early False
+ok   bin_dir <workspace>\build\agent2\devoff4b-s33-bin (queued build\agent2\devoff4b-s33-bin)
+ok   run exe sha256 DFBE1D43B28861A6 = run.json and in <workspace>\build\agent2\devoff4b-s33-bin\MANIFEST.txt
+ok   cvars {'slow_frame_log_ms': '1', 'd3d12_pipeline_creation_no_wait': 'true', 'd3d12_pipeline_creation_threads': '0'} (queued {'slow_frame_log_ms': '1', 'd3d12_pipeline_creation_no_wait': 'true', 'd3d12_pipeline_creation_threads': '0'})
+ok   env {} (queued {})
+ok   input script <workspace>\harness\routes\attract-long.txt (queued harness\routes\attract-long.txt)
+     logs 2 (13291 lines); counts: Recovered stale physical page protection=0; Unhandled guest physical write fault=0; PhysicalHeap::Protect failed=0; STUCK-LOCK=0; REX_FATAL=0; C1 keep-watch: on (with=0; C1 keep-watch: on, but=0; blocked for this process=0; C1 verify: on.=0; C1 verify K:=0; C1 verify F:=0; GPU wait back-off: ON=0; d3d12_submit_split_kb: splitting=0; d3d12_submit_split: =0; Host timer resolution set=0; TimerQueue: precise wait=0
+ok   C4 "Recovered stale physical page protection" x0
+ok   C4 "Unhandled guest physical write fault" x0
+ok   C4 "PhysicalHeap::Protect failed" x0
+ok   C4 "REX_FATAL" x0
+ok   C4 "C1 keep-watch: on, but" x0
+ok   C4 "blocked for this process" x0
+ok   C3 keep-watch init x0 (keep_watch=False)
+ok   C3 "C1 verify: on." x0 (verify=False)
+ok   C3 split init x0 (split cvar False)
+ok   C3 back-off init x0 (env set False)
+ok   C3 host timer line x0 (cvar False)
+ok   C3 precise-wait line x0 (cvar False)
+     STUCK-LOCK lines 0 (C5: see f10 output / by hand)
+ok   C6 dumps in dir [], run.json dumps []
+     C7 steps 55/91 last halted timeouts 0; marks ['idle-160', 'idle-170', 'idle-180', 'idle-190', 'idle-200', 'idle-210']
+--- s33gthr0.check.txt (54 lines)
+    missing in cand: ['766/110956']; extra in cand: -
+  PROOF ok   bin dir <workspace>\build\agent2\devoff4b-s33-bin (want build\agent2\devoff4b-s33-bin)
+  PROOF ok   bin: run-dir legodimensions.exe sha256 DFBE1D43B28861A6, want DFBE1D43B28861A6 (devoff4b-s33-bin MANIFEST)
+  PROOF ok   bin: run-dir rexgpu-xenos.dll sha256 0B57BBD5D7B96CBD, want 0B57BBD5D7B96CBD (devoff4b-s33-bin MANIFEST)
+  PROOF ok   bin: run-dir rexruntime.dll sha256 A33801D1538D6175, want A33801D1538D6175 (devoff4b-s33-bin MANIFEST)
+  PROOF ok   cvar d3d12_pipeline_creation_no_wait=true (run.json: true)
+  PROOF ok   cvar d3d12_pipeline_creation_threads=0 (run.json: 0)
+  PROOF ok   cvar slow_frame_log_ms=1 (run.json: 1)
+  PROOF ok   "d3d12_pipeline_creation_no_wait ignored" WARN x1 (want 1), INFO x0 (want 0) (TESTPLAN row 6)
+  PROOF ok   no (d) "resolve after drop:" text on a (d)-free bin (x0)
+  PROOF ok   cold: no seed_xenos in run.json
+  PROOF ok   closed via WM_CLOSE (wm_close)
+  PROOF ok   slow-frame lines 13004 (slow_frame_log_ms=1)
+  PROOF ok   no WER, no dump (wer_seen False, dumps 0)
+  BASE items missed: logdiff NEW 1
+  VERDICT HINT LOOK: 1 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s33gthr0)
+--- s33gthr0.f10.txt: not present
+--- s33gthr0.p2c.txt: not present
+COMMON: OK (0 problems)

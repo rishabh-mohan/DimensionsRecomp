@@ -6,6 +6,8 @@ Written by Agent 2 on 2026-11-23 at 06:35, for board task #28 part (2). Every pa
 
 **Update 2026-11-23 07:49 (board task #31, after Agent 10's N4 in `build/agent10/t27/r33-popin.md` L137-141):** #21 is rated; #33 and #34 are staged together and rated, and #33's stale placeholder cvar name is replaced by the real one; codegen B's formal read-out says drop; #19 is still not rated. Changed: §1 rows CG26 arm B, codegen B, B4, #21, #19, #33 and #34; §2a rows codegen B, #21, #19, #33 and #34; §5 items 1, 3, 4 and 5; §6 (a table of the new sources). Each new fact cites its source path. All other lines are as of 06:35, and the annex predates this update.
 
+**Update 2026-11-25 01:35 (session 3, M2 = Agent 2's successor, task S3T-2):** the game HEAD is now c9e215f ("perf: S4 sprint notes"), whose parent is b0bd3b4; outside `perf/` it changes only `.gitignore` (+4 lines), so the code baseline is unchanged. SDK HEAD and the gitlink are still 5350b1d. Every apply check of this file was re-run against the live trees and snap1: all results unchanged, 0 "Skipped patch" (`build/agent2/session3/apply-check-s3.py` -> `build/agent2/session3/apply-check-0121.txt`). One source hash changed: `build/agent10/t27/r21-s4t1.md` is now `7736004D2DFC1B46...` (Agent 10's 07:49 follow-up; the 06:32 rating was C2DB5124..., see section 6). New staged copy: `build/agent2/session3/s33-popin-no5.patch` = the rated #33 diff (0D230244...) without hunk #5 (`build/agent6/s33-popin/DESIGN.md` section 8), sha256 `4061ED2DB7BBB64D7ECFA024F3F3379444493D085F8A6FB0CB51B1D25AE67E76`, +101/-23 in the same 4 files; it applies to HEAD. Method changes: the workspace root is no longer inside any git work tree (so the enclosing-repo "Skipped patch" trap below no longer applies at the root, but `-C <repo>` is still right), and for applies into a non-repo tree (snap1, overlays) use `git -c core.autocrlf=false apply`, because the global `core.autocrlf=true` writes CRLF (M7, relayed 11-25 01:28). Nothing else in this file was changed.
+
 ## 0. Baseline and method
 
 - **Baseline ("HEAD" below):** `DimensionsRecomp` b0bd3b4 with `rexglue-sdk` 5350b1d, on `perf/opt`.
@@ -150,7 +152,7 @@ Sources added by tasks #31 (`Get-FileHash` at 07:49) and #34 (at 10:15); read-on
 
 | file | sha256 | note |
 |---|---|---|
-| `build/agent10/t27/r21-s4t1.md` | `C2DB5124DA84A7EAA3C318106CA4D549A049D4427B8D5959234E55F72717DA50` | the #21 rating (06:32) |
+| `build/agent10/t27/r21-s4t1.md` | `C2DB5124DA84A7EAA3C318106CA4D549A049D4427B8D5959234E55F72717DA50` | the #21 rating (06:32); since 07:49 (follow-up) `7736004D2DFC1B46...` (M2, 11-25) |
 | `build/agent10/t27/r33-popin.md` | `ACF0BDB5A526236232A41D2A87FF2AACC17C00BE9ED35D3A227CCA238A0862B0` | the #33/#34 rating (07:34, with an adoption note at L162 added 07:44); its L9-11 list the hashes it rated |
 | `build/agent6/s33-popin/s33-popin.patch` | `0D23024484CCDEE1B15AF3EB79DC28759F9D422E78536F4766C83C2071CC2EFD` | the rated patch (06:28), unchanged |
 | `build/agent6/s33-popin/DESIGN.md` | `B2E33FE8B99F4041DD880D8A41F735F93FF220B0767DE78937AE131B57BAB318` | written 07:40:47. Agent 10 rated 611B62F5…; Agent 6 has since recorded the rating, docs only (§8 builds without hunk #5, §9 item 5 is S2, §10). This is the version Agent 10 checked at 07:44 (r33-popin.md L162). |

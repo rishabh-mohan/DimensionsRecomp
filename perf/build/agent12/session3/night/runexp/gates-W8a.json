@@ -1,0 +1,565 @@
+{
+ "tool": "run_gates.py",
+ "matrix_dir": "<workspace>\\build\\agent8\\matrix\\20261125-0359",
+ "title": "Window 8a (Agent 8, run-2 task #7 follow-up): #2 shader miss cache on native4b (S4b + S4c native, every switch OFF). n0 (miss cache OFF) vs mc (LEGO_NATIVE_SHADER_MISS_CACHE=1), native frames, 6 round-robin rounds",
+ "reference": "n0",
+ "plan": {
+  "found": true,
+  "estimate": 15,
+  "estimate_cold": 1,
+  "cold": [
+   "n0"
+  ],
+  "rounds": 7,
+  "sys_csv": true
+ },
+ "plan_arms": {
+  "n0": {
+   "bin": "build/agent2/native4b-bin",
+   "repeats": 7
+  },
+  "mc": {
+   "bin": "build/agent2/native4b-bin",
+   "repeats": 7
+  }
+ },
+ "run_arms": [
+  "n0",
+  "mc"
+ ],
+ "p2_arms": [],
+ "kw_arms": [],
+ "window_log": "<workspace>\\bench\\agent5\\launch\\status\\window-W8a-0356.log",
+ "window_how": "its END line names this out dir; found in bench\\agent5\\launch\\status",
+ "gate_log": "<workspace>\\bench\\agent5\\launch\\status\\window-W8a-0356.log",
+ "gate_how": "the launcher's window log",
+ "gates": [
+  {
+   "id": "G1",
+   "name": "every switch rated",
+   "status": "MANUAL",
+   "key": "2 arms; switches beyond the common set (framerate_limit=0, native_fps_limit=0, native_settings_frontend=false): n0 0+1 env, mc 0+2 env",
+   "details": [
+    "n0 (ref): bin build/agent2/native4b-bin; beyond the common set: -; env LEGO_NATIVE_FRAME_METRICS=<run>\\native-frames.csv",
+    "mc: bin build/agent2/native4b-bin; beyond the common set: -; env LEGO_NATIVE_FRAME_METRICS=<run>\\native-frames.csv, LEGO_NATIVE_SHADER_MISS_CACHE=1",
+    "switches this kit has no rule for (rate them by hand; G10 knows no log line for them): native_fps_limit, native_settings_frontend",
+    "rate every switch above against W6-GATES.md G1 (Agent 10's b2r ratings): the kit only lists them"
+   ]
+  },
+  {
+   "id": "G2",
+   "name": "one bin per arm, as built",
+   "status": "PASS",
+   "key": "15/15 runs on their arm's bin (MANIFEST + exe/dll SHA-256); 1 bin; one bin required (--one-bin)",
+   "details": [
+    "bin build/agent2/native4b-bin: arms n0, mc; MANIFEST.txt sha256 B63769FE46CC0459; TracyClient.dll 233472 B, amd_fidelityfx_dx12.dll 6675664 B, legodimensions.exe 315811328 B, rexgpu-xenos.dll 3425792 B, rexruntime.dll 10909184 B; legodimensions.exe sha256 DC6484C224585E54"
+   ]
+  },
+  {
+   "id": "G3",
+   "name": "every planned run completed",
+   "status": "PASS",
+   "key": "15/15 runs OK, exit 0x00000000, wm_close, runner exit 0; plan.txt 15 runs (1 cold); arms 2/2 as planned; launcher END exit 0",
+   "details": [
+    "plan.txt: n0 x7+1 cold, mc x7; results.csv: n0 x7+1 cold, mc x7",
+    "launcher END: runner exit 0 (all runs OK) after 30.5 min (<workspace>\\bench\\agent5\\launch\\status\\window-W8a-0356.log)"
+   ]
+  },
+  {
+   "id": "G4",
+   "name": "P2's fallback never runs",
+   "status": "n/a",
+   "key": "no run arm sets shared_memory_single_hold_rearm=true",
+   "details": []
+  },
+  {
+   "id": "G5",
+   "name": "C1 verify on gate A",
+   "status": "n/a",
+   "key": "no run arm sets physical_protect_keep_watch=true",
+   "details": []
+  },
+  {
+   "id": "G6",
+   "name": "keep only under G",
+   "status": "n/a",
+   "key": "no run arm sets physical_protect_keep_watch=true",
+   "details": []
+  },
+  {
+   "id": "G7",
+   "name": "inert on native",
+   "status": "n/a",
+   "key": "no run arm sets physical_protect_keep_watch=true",
+   "details": []
+  },
+  {
+   "id": "G8",
+   "name": "nothing stale, no new errors",
+   "status": "PASS",
+   "key": "stale/fault/Protect-failed lines in 0/15 runs; logdiff vs n0 (x8): FAIL findings in 0, NEW messages in 0/15 runs (0 kinds)",
+   "details": [
+    "logdiff reference: n0 x8 merged (3901 log lines, 10 warning/error kinds); 15/15 runs have a game*.log to compare",
+    "by hand: the frame hash or screenshot matches the reference arm at the same point (W6-GATES G8)"
+   ]
+  },
+  {
+   "id": "G9",
+   "name": "launch-only switches as planned",
+   "status": "PASS",
+   "key": "15/15 runs: params.cvar, args, env_set and toml_set = the arm's",
+   "details": [
+    "hands off, no dev console during the window: procedural (C1 v3 latches keep_watch and hold_global_lock at init; other cvars are read live)",
+    "env values with <run> are compared as paths, with <run> = the run's own dir"
+   ]
+  },
+  {
+   "id": "G10",
+   "name": "per-run validity",
+   "status": "CHECK",
+   "key": "14/14 scored runs valid; proof lines ok in 15/15 runs; free RAM >= 6 GB in 15/15; slow state 0/14 scored (info); no proof line known for 2 switch(es): native_fps_limit, native_settings_frontend, check by hand",
+   "details": [
+    "proof lines n0: none (8 runs)",
+    "  n0: env LEGO_NATIVE_FRAME_METRICS=<run>\\native-frames.csv: run.json env_set (G9) is the proof",
+    "  n0: no proof line known for native_settings_frontend, native_fps_limit: check by hand",
+    "proof lines mc: none (7 runs)",
+    "  mc: env LEGO_NATIVE_FRAME_METRICS=<run>\\native-frames.csv, LEGO_NATIVE_SHADER_MISS_CACHE=1: run.json env_set (G9) is the proof",
+    "  mc: no proof line known for native_settings_frontend, native_fps_limit: check by hand",
+    "slow state (info; E-cores < 800 MHz for >= 3 samples overlapping the window): 0/14 scored runs; slow samples in the window: none"
+   ]
+  },
+  {
+   "id": "G11",
+   "name": "power overlay",
+   "status": "PASS",
+   "key": "overlay best_performance in 15/15 runs, no change inside any window; scheme Balanced; AC 1; saver 0",
+   "details": [
+    "power overlay: best_performance in 15/15 runs, no change inside any window (differs from W5's best_efficiency: don't compare absolute numbers with W5)",
+    "scheme: Balanced x15; AC: 1 x15; battery saver: 0 x15",
+    "launcher: plan| note     sys_csv: drivers/sys-csv.ps1 logs the system state every 1 s (sys.csv, sys.json). Input during the window, the game losing the foreground, battery, battery saver, a power-plan change, a non-default input desktop or a screensaver exclude a run from summary.md (it stays in results.csv, under 'Flagged runs').",
+    "launcher: 2026-11-25 03:59:06 power scheme at the start: Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)"
+   ]
+  },
+  {
+   "id": "G12",
+   "name": "quiet gate",
+   "status": "PASS",
+   "key": "STRICT at 03:59:05 [window-W8a-0356.log]; MsMpEng 0.09/0.02/0.01, OfficeClickToRun 0.00/0.00/0.00, CrossDeviceService 0.03/0.03/0.02; non-game load 3.33-4.66 cores (median 3.64), 1 flagged",
+   "details": [
+    "non-game load: 3.33-4.66 cores (median 3.64) in 14 scored runs; unscored/cold 4.04",
+    "non-game load flag (scored runs above the median 3.64 + 1.0 cores): #4 mc r2 4.66",
+    "quiet gate: STRICT: <workspace>\\bench\\agent5\\launch\\status\\window-W8a-0356.log: '03:59:05 quiet gate: STRICT (MsMpEng 0.09/0.02/0.01, OfficeClickToRun 0.00/0.00/0.00, CrossDeviceService 0.03/0.03/0.02)' at 03:59:05; the window started at 03:59, 0 min later"
+   ]
+  }
+ ],
+ "record": "RECORD: overlay best_performance (15/15, no change); quiet gate STRICT; non-game load 3.33-4.66 cores",
+ "exit": 3,
+ "runs": [
+  {
+   "seq": 1,
+   "arm": "n0",
+   "rep": "0",
+   "scored": false,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261125-0359\\runs\\0359-cold-n0",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 30,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 2,
+   "arm": "n0",
+   "rep": "1",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261125-0359\\runs\\0400-n0-r1",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 3,
+   "arm": "mc",
+   "rep": "1",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261125-0359\\runs\\0402-mc-r1",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 4,
+   "arm": "mc",
+   "rep": "2",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261125-0359\\runs\\0404-mc-r2",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 5,
+   "arm": "n0",
+   "rep": "2",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261125-0359\\runs\\0407-n0-r2",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 6,
+   "arm": "n0",
+   "rep": "3",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261125-0359\\runs\\0409-n0-r3",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 7,
+   "arm": "mc",
+   "rep": "3",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261125-0359\\runs\\0411-mc-r3",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 8,
+   "arm": "mc",
+   "rep": "4",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261125-0359\\runs\\0413-mc-r4",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 9,
+   "arm": "n0",
+   "rep": "4",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261125-0359\\runs\\0415-n0-r4",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 10,
+   "arm": "n0",
+   "rep": "5",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261125-0359\\runs\\0417-n0-r5",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 11,
+   "arm": "mc",
+   "rep": "5",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261125-0359\\runs\\0419-mc-r5",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 12,
+   "arm": "mc",
+   "rep": "6",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261125-0359\\runs\\0421-mc-r6",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 13,
+   "arm": "n0",
+   "rep": "6",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261125-0359\\runs\\0423-n0-r6",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 14,
+   "arm": "n0",
+   "rep": "7",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261125-0359\\runs\\0425-n0-r7",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 15,
+   "arm": "mc",
+   "rep": "7",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261125-0359\\runs\\0427-mc-r7",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  }
+ ],
+ "sides": []
+}

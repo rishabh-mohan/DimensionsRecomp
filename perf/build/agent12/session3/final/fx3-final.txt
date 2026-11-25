@@ -1,0 +1,34 @@
+NOTE  run <workspace>\build\agent3\runs\20261125-081420-fx3-devfinaloff-offset (harness); logs ['game.log'], 113 lines
+NOTE  elapsed 240.76 s (elapsed_s)
+NOTE  cvars {'framerate_limit': '0', 'shared_memory_single_hold_rearm': 'false', 'physical_protect_hold_global_lock': 'false', 'physical_protect_keep_watch': 'false', 'host_timer_resolution_ms': '0', 'host_timer_throttling_optout': 'false', 'precise_guest_sleep': 'false', 'wait_timeout_round_up': 'false', 'cs_spin': 'false', 'spinlock_pause_spin': 'false', 'clock_lockfree': 'false', 'tls_bounds_fix': 'false', 'timer_queue_precise_wait': 'false'}; env (LEGO_*) {'LEGO_GPU_WAIT_BACKOFF_US': 'off'}
+PASS  exit_code 0 (0x00000000)
+PASS  exited_early False
+PASS  WER False
+PASS  dialogs None
+PASS  crash_events []
+PASS  dumps 0 in dir, run.json []
+PASS  close wm_close
+PASS  "Title terminated" x1 (clean exit)
+PASS  bad string "Recovered stale physical page protection" x0
+PASS  bad string "Unhandled guest physical write fault" x0
+PASS  bad string "PhysicalHeap::Protect failed" x0
+PASS  bad string "BaseHeap::Protect failed" x0
+PASS  bad string "is not a plain number" x0
+PASS  bad string "C1 verify: on" x0
+PASS  bad string "STUCK-LOCK" x0
+PASS  bad string "REX_FATAL" x0
+PASS  bad string "Minidump written to" x0
+PASS  bad string "still not acquired after" x0
+PASS  run.json bin_dir <workspace>\build\agent2\devfinal-off-bin (want build/agent2/devfinal-off-bin)
+PASS  devfinal-off-bin MANIFEST 3F4B7BEBD887319A = BIN-PINS 3F4B7BEBD887319A
+PASS  run-dir MANIFEST.txt copy = pin
+PASS  run.json exe_sha256 = pin
+PASS  run-dir legodimensions.exe DB263913A67710B6 (pin DB263913A67710B6)
+PASS  run-dir rexruntime.dll C5BC627BB2E83CF2 (pin C5BC627BB2E83CF2)
+PASS  run-dir rexgpu-xenos.dll CB3A2CC967A9BE81 (pin CB3A2CC967A9BE81)
+PASS  the 12 old values set: all
+PASS  env LEGO_GPU_WAIT_BACKOFF_US=off (want off, lowercase)
+PASS  check-defaults.py D9936C56C5E04B98 (rated D9936C56C5E04B98)
+NOTE  check-defaults --mode off exit 0; RESULT PASS
+PASS  check-defaults --mode off PASS
+F-GATE F3 20261125-081420-fx3-devfinaloff-offset: PASS

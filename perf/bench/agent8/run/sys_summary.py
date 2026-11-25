@@ -2,18 +2,26 @@
 """Summary of a sys.csv written by drivers/sys-csv.ps1 (1 s system-state log). Python 3, stdlib only.
 
   python sys_summary.py --csv RUN\\sys.csv --start-epoch S --end-epoch E [--out RUN\\sys.json] [--interval 1.0]
+                        [--nongame-thr 2.8]
 
 Blocks: "window" = the rows with S <= epoch_s <= E (Unix seconds, the clock of run-timing.ps1 Get-Epoch),
 "run" = every row. Each block: rows, span_s, max_gap_s, idle_min_s, input_events, fg_game_share, game_alive_all,
 desktop_not_default_rows, screensaver_rows, cpu_util_mean, eff_mhz_mean, eff_mhz_min, p_eff_mhz_mean, e_eff_mhz_mean,
 p_util_mean, e_util_mean, tz_passive_min, tz_temp_max_c, and for ac / batt_saver / batt_pct / scheme / overlay
 {"first", "last", "changes": [{t_s, epoch_s, from, to}]} (blank cells are skipped, so blank -> value is no change).
+Per-process keys (trailing sys.csv columns of 2026-11-25; all null when the csv has no such column / no filled cell):
+proc_rows, nongame_cores_mean, nongame_cores_max, nongame_ge_thr_share (share of proc rows with nongame_cores >= the
+threshold), nongame_core_s, game_cores_mean, nongame_io_MBps_mean, nongame_io_MBps_max, disk_MBps_mean, disk_MBps_max,
+top_cpu_procs [{proc "name:pid", core_s, cores_mean, rows}] and top_io_procs [{proc, MB, MBps_mean, rows}] (summed from
+the per-row top 5 CPU / top 3 I/O lists, each row weighted by its snapshot interval = t_s since the previous proc row;
+a lower bound for a process that is not always in the per-row list).
 input_events counts samples with idle_s < (t_s - previous t_s) - 0.05 (input since the previous sample; the previous
 sample is the previous row of the file). The first window row counts only if its input time epoch_s - idle_s is at or
 after S (input just before the window start is not "during the window").
 flags (window): input_during_window, not_foreground (fg_game_share < 0.99), on_battery, battery_saver, power_change
 (scheme / overlay / ac changed), thermal_passive (tz_passive_min < 100), desktop_not_default, screensaver, sample_gaps
-(max_gap_s > 2.5 x interval), short_window (rows < 0.8 x (E - S) / interval).
+(max_gap_s > 2.5 x interval), short_window (rows < 0.8 x (E - S) / interval), nongame_load (nongame_cores_mean >=
+--nongame-thr; never set without per-process data).
 Blank cells are None; a last line without a newline (driver killed mid-write) is dropped (file.truncated_last_line).
 Exit 0 with a summary (also for a header-only csv: rows 0, short_window); exit 1 and {"error": ...} (in --out too)
 when the csv is missing, empty, has no complete header line or no t_s / epoch_s column. One "SYS ..." line on stdout.
@@ -28,10 +36,15 @@ import sys
 COLUMNS = ["t_s", "epoch_s", "wall", "idle_s", "fg_pid", "fg_game", "game_alive", "input_desktop", "screensaver",
            "cpu_util_pct", "cpu_perf_pct", "base_mhz", "eff_mhz", "p_eff_mhz", "e_eff_mhz", "p_util_pct", "e_util_pct",
            "tz_passive_min_pct", "tz_temp_max_c", "ac", "batt_saver", "batt_pct", "scheme", "overlay"]
-TEXT = {"wall", "input_desktop", "scheme", "overlay"}
+# trailing per-process columns (sys-csv.ps1 / LdSys.cs of 2026-11-25); older files lack them -> the proc fields are null
+PROC_COLUMNS = ["nongame_cores", "game_cores", "proc_nongame_cores", "nongame_io_MBps", "disk_MBps", "top_cpu", "top_io"]
+ALL_COLUMNS = COLUMNS + PROC_COLUMNS
+TEXT = {"wall", "input_desktop", "scheme", "overlay", "top_cpu", "top_io"}
 TRACKED = ["ac", "batt_saver", "batt_pct", "scheme", "overlay"]
 FLAG_NAMES = ["input_during_window", "not_foreground", "on_battery", "battery_saver", "power_change",
-              "thermal_passive", "desktop_not_default", "screensaver", "sample_gaps", "short_window"]
+              "thermal_passive", "desktop_not_default", "screensaver", "sample_gaps", "short_window", "nongame_load"]
+NONGAME_THR = 2.8
+TOP_N = 5
 
 
 class CsvError(Exception):
@@ -56,7 +69,8 @@ def load(path):
         raise CsvError("no such file: %s" % path)
     with open(path, "rb") as f:
         data = f.read()
-    info = dict(bytes=len(data), header_ok=False, rows=0, bad_rows=0, truncated_last_line=False, missing_columns=[])
+    info = dict(bytes=len(data), header_ok=False, rows=0, bad_rows=0, truncated_last_line=False, missing_columns=[],
+                proc_columns=False)
     if not data.strip():
         raise CsvError("empty csv: %s" % path)
     text = data.decode("utf-8-sig", "replace")
@@ -67,11 +81,12 @@ def load(path):
     if not lines or not lines[0].strip():
         raise CsvError("no complete header line in %s" % path)
     header = [h.strip() for h in next(csv.reader([lines[0]]))]
-    info["header_ok"] = header == COLUMNS
+    info["header_ok"] = header == COLUMNS or header == ALL_COLUMNS
     info["missing_columns"] = [c for c in COLUMNS if c not in header]
+    info["proc_columns"] = all(c in header for c in PROC_COLUMNS)
     if "t_s" not in header or "epoch_s" not in header:
         raise CsvError("not a sys.csv (no t_s / epoch_s column): %s" % path)
-    idx = {c: header.index(c) for c in COLUMNS if c in header}
+    idx = {c: header.index(c) for c in ALL_COLUMNS if c in header}
     rows = []
     for fields in csv.reader(lines[1:]):
         if not fields or (len(fields) == 1 and not fields[0].strip()):
@@ -79,7 +94,7 @@ def load(path):
         if len(fields) != len(header):
             info["bad_rows"] += 1
             continue
-        r = {c: None for c in COLUMNS}
+        r = {c: None for c in ALL_COLUMNS}
         for c, i in idx.items():
             v = fields[i]
             r[c] = (v.strip() or None) if c in TEXT else num(v)
@@ -89,6 +104,14 @@ def load(path):
         r["_i"] = len(rows)
         rows.append(r)
     info["rows"] = len(rows)
+    # snapshot interval of each per-process row: t_s since the previous row with proc data (None for the first one)
+    prev = None
+    for r in rows:
+        r["_pdt"] = None
+        if r["proc_nongame_cores"] is not None:
+            if prev is not None and r["t_s"] > prev:
+                r["_pdt"] = r["t_s"] - prev
+            prev = r["t_s"]
     return rows, info
 
 
@@ -115,7 +138,7 @@ def tracked(rows, col):
     return {"first": first, "last": last, "changes": changes}
 
 
-def block(rows, all_rows, win_start=None):
+def block(rows, all_rows, win_start=None, interval=1.0, thr=NONGAME_THR):
     n = len(rows)
     b = {"rows": n,
          "first_epoch_s": rows[0]["epoch_s"] if n else None,
@@ -156,10 +179,64 @@ def block(rows, all_rows, win_start=None):
     b["tz_temp_max_c"] = max(tzt) if tzt else None
     for c in TRACKED:
         b[c] = tracked(rows, c)
+    b.update(proc_block(rows, interval, thr))
     return b
 
 
-def flags_for(w, wrows, start, end, interval):
+def parse_top(s):
+    """'name:pid:value;...' -> [(name:pid, value)] (bad items skipped)."""
+    out = []
+    if not s:
+        return out
+    for item in s.split(";"):
+        parts = item.rsplit(":", 2)
+        if len(parts) != 3:
+            continue
+        try:
+            out.append(("%s:%s" % (parts[0], parts[1]), float(parts[2])))
+        except ValueError:
+            continue
+    return out
+
+
+def top_sum(rows, col, interval, key, rate_key):
+    acc = {}
+    for r in rows:
+        dt = r["_pdt"] if r["_pdt"] is not None else interval
+        for proc, v in parse_top(r[col]):
+            a = acc.setdefault(proc, [0.0, 0])
+            a[0] += v * dt
+            a[1] += 1
+    span = sum((r["_pdt"] if r["_pdt"] is not None else interval) for r in rows)
+    items = sorted(acc.items(), key=lambda kv: -kv[1][0])[:TOP_N]
+    return [{"proc": p, key: round(a[0], 3), rate_key: round(a[0] / span, 3) if span > 0 else None, "rows": a[1]}
+            for p, a in items]
+
+
+def proc_block(rows, interval, thr):
+    """Per-process keys; all None when no row has the data (old sys.csv)."""
+    b = {}
+    ng = vals(rows, "nongame_cores")
+    b["nongame_rows"] = len(ng) if ng else None
+    b["nongame_cores_mean"] = mean(ng, 3)
+    b["nongame_cores_max"] = max(ng) if ng else None
+    b["nongame_ge_thr_share"] = round(sum(1 for v in ng if v >= thr) / len(ng), 4) if ng else None
+    b["game_cores_mean"] = mean(vals(rows, "game_cores"), 3)
+    disk = vals(rows, "disk_MBps")
+    b["disk_MBps_mean"] = mean(disk, 2)
+    b["disk_MBps_max"] = max(disk) if disk else None
+    pr = [r for r in rows if r["proc_nongame_cores"] is not None]
+    b["proc_rows"] = len(pr) if pr else None
+    b["proc_nongame_cores_mean"] = mean(vals(pr, "proc_nongame_cores"), 3)
+    io = vals(pr, "nongame_io_MBps")
+    b["nongame_io_MBps_mean"] = mean(io, 2)
+    b["nongame_io_MBps_max"] = max(io) if io else None
+    b["top_cpu_procs"] = top_sum(pr, "top_cpu", interval, "core_s", "cores_mean") if pr else None
+    b["top_io_procs"] = top_sum(pr, "top_io", interval, "MB", "MBps_mean") if pr else None
+    return b
+
+
+def flags_for(w, wrows, start, end, interval, thr=NONGAME_THR):
     f = []
     if w["input_events"] > 0:
         f.append("input_during_window")
@@ -181,6 +258,8 @@ def flags_for(w, wrows, start, end, interval):
         f.append("sample_gaps")
     if w["rows"] < 0.8 * (end - start) / interval:
         f.append("short_window")
+    if w["nongame_cores_mean"] is not None and w["nongame_cores_mean"] >= thr:
+        f.append("nongame_load")
     return f
 
 
@@ -200,7 +279,7 @@ def line(res):
     share = None if w["fg_game_share"] is None else w["fg_game_share"] * 100.0
     sch = w["scheme"]["last"] if w["rows"] else r["scheme"]["last"]
     ovl = w["overlay"]["last"] if w["rows"] else r["overlay"]["last"]
-    return ("SYS window %d rows/%s s (run %d rows/%s s): fg_game %s, input_events %d, idle_min %s, eff %s MHz "
+    s = ("SYS window %d rows/%s s (run %d rows/%s s): fg_game %s, input_events %d, idle_min %s, eff %s MHz "
             "(min %s; P %s / E %s), util %s (P %s / E %s), tz_passive_min %s, temp_max %s, ac %s, saver %s, batt %s, "
             "scheme '%s', overlay %s, game_alive_all %s; flags: %s" % (
                 w["rows"], fmt(w["span_s"], 1), r["rows"], fmt(r["span_s"], 1), fmt(share, 1, "%"), w["input_events"],
@@ -210,6 +289,16 @@ def line(res):
                 fmt(w["ac"]["last"]), fmt(w["batt_saver"]["last"]), fmt(w["batt_pct"]["last"], 0, "%"),
                 sch if sch is not None else "-", ovl if ovl is not None else "-", w["game_alive_all"],
                 ", ".join(res["flags"]) if res["flags"] else "none"))
+    if w.get("nongame_cores_mean") is None:      # old sys.csv (no per-process columns): the line stays as before
+        return s
+    top = w["top_cpu_procs"][0] if w.get("top_cpu_procs") else None
+    tio = w["top_io_procs"][0] if w.get("top_io_procs") else None
+    return s + ("; nongame %s cores (max %s, >= %s in %s of rows), game %s, disk %s MB/s (max %s), top cpu %s, top io %s" % (
+        fmt(w["nongame_cores_mean"], 2), fmt(w["nongame_cores_max"], 2), fmt(res.get("nongame_thr"), 1),
+        fmt(None if w["nongame_ge_thr_share"] is None else w["nongame_ge_thr_share"] * 100.0, 1, "%"),
+        fmt(w["game_cores_mean"], 2), fmt(w["disk_MBps_mean"], 1), fmt(w["disk_MBps_max"], 1),
+        "%s %s cores" % (top["proc"], fmt(top["cores_mean"], 2)) if top else "-",
+        "%s %s MB/s" % (tio["proc"], fmt(tio["MBps_mean"], 2)) if tio else "-"))
 
 
 def write_json(path, obj):
@@ -234,8 +323,11 @@ def main():
     ap.add_argument("--end-epoch", type=float, required=True)
     ap.add_argument("--out", default=None)
     ap.add_argument("--interval", type=float, default=1.0)
+    ap.add_argument("--nongame-thr", type=float, default=NONGAME_THR,
+                    help="nongame_load flag when the window mean nongame_cores >= this (default %(default)s)")
     a = ap.parse_args()
     interval = a.interval if a.interval > 0 else 1.0
+    thr = a.nongame_thr
     csv_path = os.path.abspath(a.csv)
     try:
         rows, info = load(csv_path)
@@ -248,10 +340,11 @@ def main():
         print("SYS error: %s" % e)
         return 1
     wrows = [r for r in rows if a.start_epoch <= r["epoch_s"] <= a.end_epoch]
-    w = block(wrows, rows, a.start_epoch)
-    run = block(rows, rows)
+    w = block(wrows, rows, a.start_epoch, interval, thr)
+    run = block(rows, rows, None, interval, thr)
     res = {"csv": csv_path, "window_start_epoch": a.start_epoch, "window_end_epoch": a.end_epoch,
-           "interval_s": interval, "flags": flags_for(w, wrows, a.start_epoch, a.end_epoch, interval),
+           "interval_s": interval, "nongame_thr": thr,
+           "flags": flags_for(w, wrows, a.start_epoch, a.end_epoch, interval, thr),
            "window": w, "run": run, "file": info}
     text = line(res)
     res["summary"] = text

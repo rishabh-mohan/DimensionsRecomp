@@ -1,0 +1,62 @@
+diff --git a/final/fsyntax.py b/final2/fsyntax2.py
+index 3a04c10..aff23eb 100644
+--- a/final/fsyntax.py
++++ b/final2/fsyntax2.py
+@@ -1,23 +1,24 @@
+ #!/usr/bin/env python3
+-# fsyntax.py (M2, 2026-11-25): step 1 of BUILD-STEPS.md (D4 of rating C20B6FDB). `clang -fsyntax-only` of every
+-# FINAL-DEFAULTS TU with its own ccdb flags, before any real compile. Writes only build/agent2/final/b/fsyntax/.
++# fsyntax2.py (M2, 2026-11-25): final2 step 1, a copy of final/fsyntax.py (66C7D740). `clang -fsyntax-only` of every
++# final2 ON TU with its own ccdb flags, before any real compile. Writes only build/agent2/final2/b/fsyntax/.
+ #
+-#   python build/agent2/final/fsyntax.py [--jobs 8] [--dry-run]
++#   python build/agent2/final2/fsyntax2.py [--jobs 8] [--dry-run]
+ #
+-# Needs prep-final.py's b/<leg>/list-on.tsv. For each set it runs `recompile.py --dry-run` (which builds the exact ON
++# Needs prep-final2.py's b/<leg>/list-on.tsv. For each set it runs `recompile.py --dry-run` (which builds the exact ON
+ # command lines into b/fsyntax/<set>/recompile-commands.txt and compiles nothing), then reruns each command with the
+ # `-o <obj>` pair removed and `-fsyntax-only` added after the compiler. recompile.py already refuses -MF/-MD/-MMD/
+-# -MT/-MQ, and this script re-checks that, so no file is written anywhere. Sets:
+-#   rt (8 SDK TUs) and gpu (shared_memory.cpp): snap1-sdk ccdb, /Release/ entries;
+-#   xe (gpu_wait_backoff.cpp, snap1-off flags) and xeoff (+ -DLEGO_GPU_WAIT_BACKOFF_DEFAULT_US=-1);
+-#   nat (shaders.cpp + the 3 header users, snap1-on flags, -I b/nat/gen-on first) and natoff
+-#   (+ -DLEGO_NATIVE_SHADER_MISS_CACHE_DEFAULT=0).
++# -MT/-MQ, and this script re-checks that, so no file is written anywhere. Sets (final2: no xeoff/natoff):
++#   rt (8 SDK TUs): snap1-sdk ccdb, /Release/ entries;
++#   gpu (10 TUs: shared_memory.cpp, command_processor.cpp + 8 d3d12/*.cpp, the #33 header users): snap1-sdk ccdb,
++#       /Release/, -I b/DimensionsRecomp/rexglue-sdk/include first (the #33 pipeline_cache.h);
++#   xe (gpu_wait_backoff.cpp, snap1-off flags);
++#   nat (shaders.cpp + the 3 header users, snap1-on flags, -I b/nat/gen-on first).
+ # PASS = every command exits 0. Diagnostics (warnings) are listed per TU; logs in b/fsyntax/<set>/<tu>.log.
+ import argparse, os, re, subprocess, sys, time
+ 
+ R = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..'))
+ A2 = os.path.join(R, 'build', 'agent2')
+-B = os.path.join(A2, 'final', 'b')
++B = os.path.join(A2, 'final2', 'b')
+ OV = os.path.join(B, 'DimensionsRecomp')
+ SNAP = os.path.join(A2, 'snap1', 'DimensionsRecomp')
+ HOLD = os.path.join(R, 'perf-notes', 'WINDOW-HOLD.txt')
+@@ -32,19 +33,15 @@ def pm(sub):
+ 
+ SETS = [
+     ('rt', 'rt', ['--ccdb', SDK_CCDB, '--obj-filter', '/Release/', pm('rexglue-sdk')]),
+-    ('gpu', 'gpu', ['--ccdb', SDK_CCDB, '--obj-filter', '/Release/', pm('rexglue-sdk')]),
++    ('gpu', 'gpu', ['--ccdb', SDK_CCDB, '--obj-filter', '/Release/', pm('rexglue-sdk'),
++                    '--include-first', os.path.join(OV, 'rexglue-sdk', 'include')]),
+     ('xe', 'xe', ['--ccdb', os.path.join(A2, 'snap1-off', 'compile_commands.json'), pm('rexlego')]),
+-    ('xeoff', 'xeoff', ['--ccdb', os.path.join(A2, 'snap1-off', 'compile_commands.json'), pm('rexlego'),
+-                        '--define', 'LEGO_GPU_WAIT_BACKOFF_DEFAULT_US=-1']),
+     ('nat', 'nat', ['--ccdb', os.path.join(A2, 'snap1-on', 'compile_commands.json'), pm('rexlego'),
+                     '--include-first', os.path.join(B, 'nat', 'gen-on')]),
+-    ('natoff', 'natoff', ['--ccdb', os.path.join(A2, 'snap1-on', 'compile_commands.json'), pm('rexlego'),
+-                          '--include-first', os.path.join(B, 'nat', 'gen-on'),
+-                          '--define', 'LEGO_NATIVE_SHADER_MISS_CACHE_DEFAULT=0']),
+ ]
+ 
+ 
+-WANT_N = {'rt': 8, 'gpu': 1, 'xe': 1, 'xeoff': 1, 'nat': 4, 'natoff': 4}  # = 19 (final-build-rating S1)
++WANT_N = {'rt': 8, 'gpu': 10, 'xe': 1, 'nat': 4}  # = 23
+ 
+ 
+ def main():

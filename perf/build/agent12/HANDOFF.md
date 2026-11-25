@@ -178,7 +178,7 @@ These are small, and none blocks W7-W10.
      - 4 HOLD;
      - 5 `--expect` mismatch;
      - 6 kit crash.
-   - Then grep the window log in `bench/agent5/launch/status/` for the kill lines, and apply any waivers by hand.
+   - Then grep the window log in `bench/agent5/launch/status/` (night windows) or `bench/agent5/day/status/` (day windows) for the kill lines, and apply any waivers by hand.
 5. Check file integrity against `build/agent12/w6-gates/HASHES.txt` (06:08) with Get-FileHash.
 
 ## Key files

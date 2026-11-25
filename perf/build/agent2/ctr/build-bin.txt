@@ -1,0 +1,81 @@
+# build-bin 2026-11-25 02:46:05  build\agent2\ctr -> build/agent2/devoff4b-ctr-bin
+tools (sha256/16): build-bin.py 828A15DEAAA4CA0D, recompile.py 855BCC79148E2DA8, relink.py F3C6EEAF332AB213, stage-variant.py D2BD1C6358FC19C1, verify-bins.py 80FF4C5F581C4B1B, prep-s33.py A311E35401ABE799
+PASS shared DLL before (build\agent2\snap1-sdk\install\bin\rexgpu-xenos.dll)
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\relink.py --ninja <workspace>\build\agent2\snap1-sdk\build-Release.ninja --target <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.dll --priority normal --replace src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/deferred_command_list.cpp.obj=<workspace>\build\agent2\ctr\obj-ctl\deferred_command_list.cpp.obj --out-dir <workspace>\build\agent2\ctr\link-ctl --compare <workspace>\build\agent2\devoff4b-bin\rexgpu-xenos.dll
+    parsed 4 file(s), 3437 edges, 260 rules; edges making the target: 1
+    edge: <workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/out/win-amd64/Release/rexgpu-xenos.dll (rule CXX_SHARED_LIBRARY_LINKER__rexgpu-xenos_Release, from build\agent2\snap1-sdk\CMakeFiles\impl-Release.ninja), 37 explicit inputs, 5 implicit
+    replace input 35: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/deferred_command_list.cpp.obj -> <workspace>\build\agent2\ctr\obj-ctl\deferred_command_list.cpp.obj (24112 B, E049CA08653ED0FC)
+    priority normal, link flags added: -
+      TARGET_FILE: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.dll
+        -> <workspace>\build\agent2\ctr\link-ctl\rexgpu-xenos.dll
+      TARGET_IMPLIB: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.lib
+        -> <workspace>\build\agent2\ctr\link-ctl\rexgpu-xenos.lib
+      TARGET_PDB: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.pdb
+        -> <workspace>\build\agent2\ctr\link-ctl\rexgpu-xenos.pdb
+    NOTE unresolved (empty) variables: ARCH_FLAGS, LINK_FLAGS, LINK_PATH, MANIFESTS
+    command (4701 chars) and rsp (0 chars) written to build\agent2\ctr\link-ctl
+    PASS outputs: every output path in the command is inside build\agent2\ctr\link-ctl
+    link exit 0, 1.0 s (log build\agent2\ctr\link-ctl\relink.log)
+      rexgpu-xenos.dll 3425792 B 6CEA28C33199FDBDC4E3A458EF942F706302069A5FF13B54D59D8F42C4300CDA
+      rexgpu-xenos.lib 2124 B 841EDFD459DAE28D03720DF49A7F098A5AABD968866625978E8D270EEE0D1EA0
+    PASS compare rexgpu-xenos.dll vs build\agent2\devoff4b-bin\rexgpu-xenos.dll: identical except 1 TimeDateStamp field(s) (6b06a04e vs 6b03a0ae; COFF header at 0x80, included)
+CTL relink: exit 0, 1.4 s
+PASS CTL relink == devoff4b-bin rexgpu-xenos.dll except timestamps: PASS compare rexgpu-xenos.dll vs build\agent2\devoff4b-bin\rexgpu-xenos.dll: identical except 1 TimeDateStamp field(s) (6b06a04e vs 6b03a0ae; COFF header at 0x80, included)
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\relink.py --ninja <workspace>\build\agent2\snap1-sdk\build-Release.ninja --target <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.dll --priority normal --replace src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/deferred_command_list.cpp.obj=<workspace>\build\agent2\ctr\obj-on\deferred_command_list.cpp.obj --out-dir <workspace>\build\agent2\ctr\link-on
+    parsed 4 file(s), 3437 edges, 260 rules; edges making the target: 1
+    edge: <workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/out/win-amd64/Release/rexgpu-xenos.dll (rule CXX_SHARED_LIBRARY_LINKER__rexgpu-xenos_Release, from build\agent2\snap1-sdk\CMakeFiles\impl-Release.ninja), 37 explicit inputs, 5 implicit
+    replace input 35: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/deferred_command_list.cpp.obj -> <workspace>\build\agent2\ctr\obj-on\deferred_command_list.cpp.obj (54820 B, 904BFA74AA91659A)
+    priority normal, link flags added: -
+      TARGET_FILE: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.dll
+        -> <workspace>\build\agent2\ctr\link-on\rexgpu-xenos.dll
+      TARGET_IMPLIB: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.lib
+        -> <workspace>\build\agent2\ctr\link-on\rexgpu-xenos.lib
+      TARGET_PDB: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.pdb
+        -> <workspace>\build\agent2\ctr\link-on\rexgpu-xenos.pdb
+    NOTE unresolved (empty) variables: ARCH_FLAGS, LINK_FLAGS, LINK_PATH, MANIFESTS
+    command (4697 chars) and rsp (0 chars) written to build\agent2\ctr\link-on
+    PASS outputs: every output path in the command is inside build\agent2\ctr\link-on
+    link exit 0, 1.0 s (log build\agent2\ctr\link-on\relink.log)
+      rexgpu-xenos.dll 3436544 B FACCF87FC0F7187CF1A2867A4DE20350F19041A39B9DCEFA6E7C5038CDEAF8AD
+      rexgpu-xenos.lib 2124 B 841EDFD459DAE28D03720DF49A7F098A5AABD968866625978E8D270EEE0D1EA0
+ON relink: exit 0, 1.4 s
+PASS ON relink
+PASS ON DLL differs from the shared E3CB99CF: FACCF87FC0F7187CF1A2867A4DE20350F19041A39B9DCEFA6E7C5038CDEAF8AD
+PASS needle in ON DLL: deferred_counters:
+PASS needle NOT in devoff4b-bin DLL: deferred_counters:
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\stage-variant.py --base <workspace>\build\agent2\devoff4b-bin --out <workspace>\build\agent2\devoff4b-ctr-bin --replace rexgpu-xenos.dll=<workspace>\build\agent2\ctr\link-on\rexgpu-xenos.dll --title devoff4b-ctr: devoff4b-bin with only rexgpu-xenos.dll relinked with d3d12/deferred_command_list.cpp.obj compiled from the snap1 (5350b1d) source with -DREX_D3D12_DEFERRED_COUNTERS=1 (deferred command list counters; plan build/agent2/session3/BUILD-PLANS.md (b)) [M2 successor, build/agent2/session3/build-bin.py] --note Method: predecessor's objects build/agent2/ctr/obj-ctl and obj-on (recompile.py with snap1-sdk ccdb, Release, 11-25 01:36; ON adds --define REX_D3D12_DEFERRED_COUNTERS=1); relinked by M2 successor 02:46 at normal priority with all cores; control relink proves the objects/method (== devoff4b DLL except TimeDateStamp); snap1-sdk/install not touched. --note tools (sha256/16): build-bin.py 828A15DEAAA4CA0D, recompile.py 855BCC79148E2DA8, relink.py F3C6EEAF332AB213, stage-variant.py D2BD1C6358FC19C1, verify-bins.py 80FF4C5F581C4B1B, prep-s33.py A311E35401ABE799 --note CTR object obj-ctl/deferred_command_list.cpp.obj E049CA08653ED0FC (compiled 11-25 01:36 by the predecessor; ON with -DREX_D3D12_DEFERRED_COUNTERS=1, snap1 source) --note CTR object obj-on/deferred_command_list.cpp.obj 904BFA74AA91659A (compiled 11-25 01:36 by the predecessor; ON with -DREX_D3D12_DEFERRED_COUNTERS=1, snap1 source) --note control: PASS compare rexgpu-xenos.dll vs build\agent2\devoff4b-bin\rexgpu-xenos.dll: identical except 1 TimeDateStamp field(s) (6b06a04e vs 6b03a0ae; COFF header at 0x80, included) --note needles: ON has ['deferred_counters:']; ON lacks -; devoff4b-bin DLL lacks ['deferred_counters:'] --note times: ctl link 1.4 s, on link 1.4 s
+    base build\agent2\devoff4b-bin: 7 files match its MANIFEST (sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA)
+      FiraSans-Regular.ttf <- build\agent2\devoff4b-bin\FiraSans-Regular.ttf
+      TracyClient.dll <- build\agent2\devoff4b-bin\TracyClient.dll
+      achievement_unlocked.wav <- build\agent2\devoff4b-bin\achievement_unlocked.wav
+      legodimensions.exe <- build\agent2\devoff4b-bin\legodimensions.exe
+      legodimensions.map <- build\agent2\devoff4b-bin\legodimensions.map
+      rexgpu-xenos.dll <- build\agent2\ctr\link-on\rexgpu-xenos.dll  (REPLACED)
+      rexruntime.dll <- build\agent2\devoff4b-bin\rexruntime.dll
+    FiraSans-Regular.ttf	456996	2026-11-25 02:46:08	C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23	build\agent2\snap1\DimensionsRecomp\rexlego\res\FiraSans-Regular.ttf
+    TracyClient.dll	233472	2026-11-25 02:46:08	85044850B6C663B5CE8722285D13070381C33C9ABC49D06B3E59BA0277F8FF4E	build\agent2\snap1-sdk\install\bin\TracyClient.dll
+    achievement_unlocked.wav	191018	2026-11-25 02:46:08	A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5	build\agent2\snap1-off\achievement_unlocked.wav
+    legodimensions.exe	170350080	2026-11-25 02:46:09	DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83	build\agent2\snap1-off\legodimensions.exe
+    legodimensions.map	39181442	2026-11-25 02:46:09	52155274A978A946870446A1C8F573EC381A486D50636AF13DA8920E4DC18EA5	build\agent2\snap1-off\legodimensions.map
+    rexgpu-xenos.dll	3436544	2026-11-25 02:46:09	FACCF87FC0F7187CF1A2867A4DE20350F19041A39B9DCEFA6E7C5038CDEAF8AD	build\agent2\ctr\link-on\rexgpu-xenos.dll
+    rexruntime.dll	10909184	2026-11-25 02:46:09	A33801D1538D61759D35FD137EBC9F5EAD636D7D26E9A79DC3B4994A22CB9F12	build\agent2\snap1-off\rexruntime.dll
+    staged build\agent2\devoff4b-ctr-bin in 0.5 s; MANIFEST.txt sha256 A5367CB53856F7726CA3C6B081E2A6E2EE9380707CC1CFB9067DAF7D6225F310
+stage: exit 0, 0.8 s
+PASS stage devoff4b-ctr-bin
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\session3\verify-bins.py <workspace>\build\agent2\devoff4b-ctr-bin <workspace>\build\agent2\devoff4b-bin <workspace>\build\agent2\devoff4b-cg26-bin <workspace>\build\agent2\native4b-bin
+    # verify-bins 2026-11-25 02:46:09
+    PASS <workspace>\build\agent2\devoff4b-ctr-bin: 7 rows, 7 files, 0 FAIL; MANIFEST sha256 A5367CB53856F7726CA3C6B081E2A6E2EE9380707CC1CFB9067DAF7D6225F310
+    PASS <workspace>\build\agent2\devoff4b-bin: 7 rows, 7 files, 0 FAIL; MANIFEST sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA
+    PASS <workspace>\build\agent2\devoff4b-cg26-bin: 7 rows, 7 files, 0 FAIL; MANIFEST sha256 917AE86E6C0CC9B370901397EF8FD72F65449E5EC9594D14D9902215BBBC1D5C
+    PASS <workspace>\build\agent2\native4b-bin: 8 rows, 8 files, 0 FAIL; MANIFEST sha256 B63769FE46CC04592F2BEDAF04A51C362000325D3291BC4D7489369C2160B817
+    RESULT: 0 FAIL
+verify: exit 0, 0.8 s
+PASS verify-bins new + shared bins 0 FAIL
+PASS shared DLL after (build\agent2\snap1-sdk\install\bin\rexgpu-xenos.dll)
+  devoff4b-ctr-bin/legodimensions.exe DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83
+  devoff4b-ctr-bin/rexruntime.dll A33801D1538D61759D35FD137EBC9F5EAD636D7D26E9A79DC3B4994A22CB9F12
+  devoff4b-ctr-bin/rexgpu-xenos.dll FACCF87FC0F7187CF1A2867A4DE20350F19041A39B9DCEFA6E7C5038CDEAF8AD
+PASS exe == devoff4b-bin
+PASS rexruntime == devoff4b-bin
+PASS no cache/ in the bin
+RESULT: PASS (total 4.8 s)

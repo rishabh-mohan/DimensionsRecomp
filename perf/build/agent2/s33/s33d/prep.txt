@@ -1,0 +1,68 @@
+# prep-s33 (M2 session 3) 2026-11-25 02:35:03  tag s33d
+PASS patch sha256 build\agent6\s33-popin\s33-popin-nohunk5-diagd.patch: 797E614284B642267CCB1539AADBC5AD79362467FDD51F13143DBCA287C6DAC0
+patch files (4): include/rex/graphics/d3d12/pipeline_cache.h, src/graphics/d3d12/command_processor.cpp, src/graphics/d3d12/pipeline_cache.cpp, src/graphics/frame_stats.h
+PASS patch path allowed include/rex/graphics/d3d12/pipeline_cache.h
+PASS before-file exists include/rex/graphics/d3d12/pipeline_cache.h
+PASS patch path allowed src/graphics/d3d12/command_processor.cpp
+PASS before-file exists src/graphics/d3d12/command_processor.cpp
+PASS patch path allowed src/graphics/d3d12/pipeline_cache.cpp
+PASS before-file exists src/graphics/d3d12/pipeline_cache.cpp
+PASS patch path allowed src/graphics/frame_stats.h
+PASS before-file exists src/graphics/frame_stats.h
+affected Release objects (10):
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/command_processor.cpp.obj
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/command_processor.cpp.obj
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/deferred_command_list.cpp.obj
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/graphics_system.cpp.obj
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/pipeline_cache.cpp.obj
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/primitive_processor.cpp.obj
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/render_target_cache.cpp.obj
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/shared_memory.cpp.obj
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/texture_cache.cpp.obj
+    src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/shared_memory.cpp.obj
+PASS affected objects found
+PASS source exists src/graphics/command_processor.cpp
+PASS source exists src/graphics/d3d12/command_processor.cpp
+PASS source exists src/graphics/d3d12/deferred_command_list.cpp
+PASS source exists src/graphics/d3d12/graphics_system.cpp
+PASS source exists src/graphics/d3d12/pipeline_cache.cpp
+PASS source exists src/graphics/d3d12/primitive_processor.cpp
+PASS source exists src/graphics/d3d12/render_target_cache.cpp
+PASS source exists src/graphics/d3d12/shared_memory.cpp
+PASS source exists src/graphics/d3d12/texture_cache.cpp
+PASS source exists src/graphics/shared_memory.cpp
+PASS overlay copy of src/graphics equals snap1 (272 files)
+before include/rex/graphics/d3d12/pipeline_cache.h 9322AD374BF4BBEC CRLF 0
+before src/graphics/d3d12/command_processor.cpp 027204B53A271D69 CRLF 0
+before src/graphics/d3d12/pipeline_cache.cpp DA77744302CFC149 CRLF 0
+before src/graphics/frame_stats.h EFA82A7C20F6BF37 CRLF 0
+git apply --check exit 0:
+Checking patch include/rex/graphics/d3d12/pipeline_cache.h...
+Checking patch src/graphics/d3d12/command_processor.cpp...
+Checking patch src/graphics/d3d12/pipeline_cache.cpp...
+Checking patch src/graphics/frame_stats.h...
+PASS git apply --check: exit 0, 4 Checking lines, 0 Skipped: exit 0, checking 4, skipped 0
+git apply (apply) exit 0:
+Checking patch include/rex/graphics/d3d12/pipeline_cache.h...
+Checking patch src/graphics/d3d12/command_processor.cpp...
+Checking patch src/graphics/d3d12/pipeline_cache.cpp...
+Checking patch src/graphics/frame_stats.h...
+Applied patch include/rex/graphics/d3d12/pipeline_cache.h cleanly.
+Applied patch src/graphics/d3d12/command_processor.cpp cleanly.
+Applied patch src/graphics/d3d12/pipeline_cache.cpp cleanly.
+Applied patch src/graphics/frame_stats.h cleanly.
+PASS git apply (apply): exit 0, 4 Checking lines, 0 Skipped: exit 0, checking 4, skipped 0
+after  include/rex/graphics/d3d12/pipeline_cache.h 0BAF28BE633759CD0F9A1A3672CD86D2D75DDE78EC4662DA8D4B5ED9514CF81F CRLF 0
+PASS changed include/rex/graphics/d3d12/pipeline_cache.h
+PASS no CRLF introduced include/rex/graphics/d3d12/pipeline_cache.h
+after  src/graphics/d3d12/command_processor.cpp 97257A204152DF1BE26C60197146DBC63D0E07D8B7D57B5C1E1DE2C115EDF49D CRLF 0
+PASS changed src/graphics/d3d12/command_processor.cpp
+PASS no CRLF introduced src/graphics/d3d12/command_processor.cpp
+after  src/graphics/d3d12/pipeline_cache.cpp C4CB51CC6D2A6429637115F605FF10279FCE59AEDCF8BBC6E2195F92615C86C6 CRLF 0
+PASS changed src/graphics/d3d12/pipeline_cache.cpp
+PASS no CRLF introduced src/graphics/d3d12/pipeline_cache.cpp
+after  src/graphics/frame_stats.h 9F3C4F9DC58DCA5DF1AB946056ED565C706BC336E652C854132E53FE5B048970 CRLF 0
+PASS changed src/graphics/frame_stats.h
+PASS no CRLF introduced src/graphics/frame_stats.h
+wrote list-on.tsv, list-ctl.tsv, replace-on.txt, replace-ctl.txt (10 rows each)
+RESULT: PASS

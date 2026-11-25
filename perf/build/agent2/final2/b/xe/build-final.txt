@@ -1,0 +1,180 @@
+# build-final2 (M2) 2026-11-25 16:10:53 xe
+tools that ran (sha256/16): build-final2.py 80C11DCCD4B41D7C, recompile.py 855BCC79148E2DA8, relink.py F3C6EEAF332AB213, stage-variant.py D2BD1C6358FC19C1, verify-bins.py 80FF4C5F581C4B1B, prep-final2.py 4B20F22AB773A736, fsyntax2.py 3FC03399AB003398, pe-check.py F4368C32076AAA3E, mapcheck-s4c.py F8CB7B495F74D978
+PASS prep-final2 RESULT: PASS (b/prep.txt)
+PASS shared DLL before == E3CB99CF
+PASS fsyntax2 RESULT: PASS (b/fsyntax/fsyntax.txt)
+PASS leg output is new (b/xe/link-on/legodimensions.exe)
+PASS CTL output is new (b/xe/link-ctl/legodimensions.exe)
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\recompile.py --ccdb <workspace>\build\agent2\snap1-off\compile_commands.json --jobs 8 --priority normal --fwd-src --list <workspace>\build\agent2\final2\b\xe\list-ctl.tsv --log-dir <workspace>\build\agent2\final2\b\xe\log-ctl
+    priority normal, jobs 8, include-first: -
+    1 TU(s); defines: -; commands in build\agent2\final2\b\xe\log-ctl\recompile-commands.txt
+      gpu_wait_backoff.cpp: build\agent2\snap1\DimensionsRecomp\rexlego\src\gpu_wait_backoff.cpp (01D9F8F3464C8614) -> build\agent2\final2\b\xe\obj-ctl\gpu_wait_backoff.cpp.obj
+    PASS gpu_wait_backoff.cpp.obj exit 0 2.5 s obj 57007 B 15FCC5EAD4804B9B (log 3934 B)
+    wall 3.0 s, 0 failure(s)
+CTL recompile: exit 0, 3.1 s
+PASS CTL recompile
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\relink.py --ninja <workspace>\build\agent2\snap1-off\build.ninja --target legodimensions.exe --priority normal --replace-file <workspace>\build\agent2\final2\b\xe\replace-ctl.txt --out-dir <workspace>\build\agent2\final2\b\xe\link-ctl --compare <workspace>\build\agent2\devoff4b-bin\legodimensions.exe --compare-map <workspace>\build\agent2\devoff4b-bin\legodimensions.map
+    parsed 2 file(s), 495 edges, 14 rules; edges making the target: 1
+    edge: legodimensions.exe (rule CXX_EXECUTABLE_LINKER__legodimensions_Release, from build\agent2\snap1-off\build.ninja), 477 explicit inputs, 4 implicit
+    replace input 473: CMakeFiles/legodimensions.dir/src/gpu_wait_backoff.cpp.obj -> <workspace>\build\agent2\final2\b\xe\obj-ctl\gpu_wait_backoff.cpp.obj (57007 B, 15FCC5EAD4804B9B)
+    priority normal, link flags added: -
+      LINK_FLAGS: -Xlinker /subsystem:windows  -Xlinker /MAP:legodimensions.map
+        -> -Xlinker /subsystem:windows  -Xlinker /MAP:<workspace>\build\agent2\final2\b\xe\link-ctl\legodimensions.map
+      POST_BUILD: C:\WINDOWS\system32\cmd.exe /C "cd /D <workspace>\build\agent2\snap1-off && "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_if_different C:/Users/<user>/.vscode/projects
+        -> cd .
+      TARGET_FILE: legodimensions.exe
+        -> <workspace>\build\agent2\final2\b\xe\link-ctl\legodimensions.exe
+      TARGET_IMPLIB: legodimensions.lib
+        -> <workspace>\build\agent2\final2\b\xe\link-ctl\legodimensions.lib
+      TARGET_PDB: legodimensions.pdb
+        -> <workspace>\build\agent2\final2\b\xe\link-ctl\legodimensions.pdb
+      RSP_FILE: CMakeFiles\legodimensions.rsp
+        -> <workspace>\build\agent2\final2\b\xe\link-ctl\legodimensions.rsp
+    NOTE unresolved (empty) variables: LINK_PATH, MANIFESTS
+    command (943 chars) and rsp (42195 chars) written to build\agent2\final2\b\xe\link-ctl
+    PASS outputs: every output path in the command is inside build\agent2\final2\b\xe\link-ctl
+    link exit 0, 3.0 s (log build\agent2\final2\b\xe\link-ctl\relink.log)
+      legodimensions.exe 170350080 B C7EEBBC2A2D6F003A0B3B0B05D9B7CC2CEC028298AB8382F45EC82433C3BC72C
+      legodimensions.lib 1720 B 061A6540C0F9A706DCCB6955658CC1C2E1F35CA3CCFA6925795A4FD6792140EF
+      legodimensions.map 39181442 B 2A4AD36609DDB8AF5960BD8E4D126F47E73717C5C21C2F96AF6C16EFEAFCE59E
+      legodimensions.rsp 42195 B 0245BCDA5E629DF3E583F5F20EEF8651ACC8913BF6BEFC1AB8578FC9F27AE7DC
+    PASS compare legodimensions.exe vs build\agent2\devoff4b-bin\legodimensions.exe: identical except 1 TimeDateStamp field(s) (6b075cf0 vs 6b03a981; COFF header at 0x80, included)
+    PASS map legodimensions.map vs build\agent2\devoff4b-bin\legodimensions.map: equal except the Timestamp line (363354 lines)
+CTL relink: exit 0, 4.5 s
+PASS D1 CTL legodimensions.exe == devoff4b-bin\legodimensions.exe except TimeDateStamp + map (else STOP): PASS compare legodimensions.exe vs build\agent2\devoff4b-bin\legodimensions.exe: identical except 1 TimeDateStamp field(s) (6b075cf0 vs 6b03a981; COFF header at 0x80, included); PASS map legodimensions.map vs build\agent2\devoff4b-bin\legodimensions.map: equal except the Timestamp line (363354 lines)
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\recompile.py --ccdb <workspace>\build\agent2\snap1-off\compile_commands.json --jobs 8 --priority normal --fwd-src --list <workspace>\build\agent2\final2\b\xe\list-on.tsv --log-dir <workspace>\build\agent2\final2\b\xe\log-on --flag=-fmacro-prefix-map=<workspace>/build/agent2/final2/b/DimensionsRecomp/rexlego=<workspace>/build/agent2/snap1/DimensionsRecomp/rexlego
+    priority normal, jobs 8, include-first: -
+    1 TU(s); defines: -; commands in build\agent2\final2\b\xe\log-on\recompile-commands.txt
+      gpu_wait_backoff.cpp: build\agent2\final2\b\DimensionsRecomp\rexlego\src\gpu_wait_backoff.cpp (74115EEA26C4AEB2) -> build\agent2\final2\b\xe\obj-on\gpu_wait_backoff.cpp.obj
+    PASS gpu_wait_backoff.cpp.obj exit 0 2.5 s obj 58093 B 796CB449FCBEEAC7 (log 3943 B)
+    wall 3.0 s, 0 failure(s)
+ON recompile: exit 0, 3.1 s
+PASS ON recompile
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\relink.py --ninja <workspace>\build\agent2\snap1-off\build.ninja --target legodimensions.exe --priority normal --replace-file <workspace>\build\agent2\final2\b\xe\replace-on.txt --out-dir <workspace>\build\agent2\final2\b\xe\link-on
+    parsed 2 file(s), 495 edges, 14 rules; edges making the target: 1
+    edge: legodimensions.exe (rule CXX_EXECUTABLE_LINKER__legodimensions_Release, from build\agent2\snap1-off\build.ninja), 477 explicit inputs, 4 implicit
+    replace input 473: CMakeFiles/legodimensions.dir/src/gpu_wait_backoff.cpp.obj -> <workspace>\build\agent2\final2\b\xe\obj-on\gpu_wait_backoff.cpp.obj (58093 B, 796CB449FCBEEAC7)
+    priority normal, link flags added: -
+      LINK_FLAGS: -Xlinker /subsystem:windows  -Xlinker /MAP:legodimensions.map
+        -> -Xlinker /subsystem:windows  -Xlinker /MAP:<workspace>\build\agent2\final2\b\xe\link-on\legodimensions.map
+      POST_BUILD: C:\WINDOWS\system32\cmd.exe /C "cd /D <workspace>\build\agent2\snap1-off && "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_if_different C:/Users/<user>/.vscode/projects
+        -> cd .
+      TARGET_FILE: legodimensions.exe
+        -> <workspace>\build\agent2\final2\b\xe\link-on\legodimensions.exe
+      TARGET_IMPLIB: legodimensions.lib
+        -> <workspace>\build\agent2\final2\b\xe\link-on\legodimensions.lib
+      TARGET_PDB: legodimensions.pdb
+        -> <workspace>\build\agent2\final2\b\xe\link-on\legodimensions.pdb
+      RSP_FILE: CMakeFiles\legodimensions.rsp
+        -> <workspace>\build\agent2\final2\b\xe\link-on\legodimensions.rsp
+    NOTE unresolved (empty) variables: LINK_PATH, MANIFESTS
+    command (938 chars) and rsp (42194 chars) written to build\agent2\final2\b\xe\link-on
+    PASS outputs: every output path in the command is inside build\agent2\final2\b\xe\link-on
+    link exit 0, 1.0 s (log build\agent2\final2\b\xe\link-on\relink.log)
+      legodimensions.exe 170350080 B 6C8E281156CCE828A217B870F273021202F953F7230C7C7BA6CC3E4EA7F45581
+      legodimensions.lib 1720 B 061A6540C0F9A706DCCB6955658CC1C2E1F35CA3CCFA6925795A4FD6792140EF
+      legodimensions.map 39181726 B 3F93A71469556D485142F40FF9FF742CC3E9F031A077774C9C24253C872477E6
+      legodimensions.rsp 42194 B D5606790C7BCCF19F037A0D5A2A95366F2A23CD3345F47B89A00E2C28455F307
+ON relink: exit 0, 1.4 s
+PASS ON relink
+PASS no pch/error text in log-ctl/gpu_wait_backoff.cpp.obj.log: <workspace>/build/agent2/snap1/DimensionsRecomp/rexlego/src/gpu_wait_backoff.cpp:123:26: warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. S
+PASS no pch/error text in log-on/gpu_wait_backoff.cpp.obj.log: <workspace>/build/agent2/final2/b/DimensionsRecomp/rexlego/src/gpu_wait_backoff.cpp:142:26: warning: 'getenv' is deprecated: This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS
+ON legodimensions.exe 170350080 B 6C8E281156CCE828A217B870F273021202F953F7230C7C7BA6CC3E4EA7F45581
+PASS ON output differs from the reference
+PASS needle in ON: GPU wait back-off: OFF (LEGO_GPU_WAIT_BACKOFF_US=
+PASS needle NOT in reference: GPU wait back-off: OFF (LEGO_GPU_WAIT_BACKOFF_US=
+PASS needle NOT in ON: Native GPU: shader miss cache {} ({}{})
+PASS no overlay path bytes (agent2/final2/b/) in legodimensions.exe
+PASS no overlay path bytes (agent2/final2/b/) in legodimensions.map
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\final\pe-check.py --new <workspace>\build\agent2\final2\b\xe\link-on\legodimensions.exe --ref <workspace>\build\agent2\devoff4b-bin\legodimensions.exe
+    PASS exports equal (2 new, 2 ref): added []; removed []
+    imports: new api-ms-win-crt-convert-l1-1-0.dll 2, api-ms-win-crt-environment-l1-1-0.dll 1, api-ms-win-crt-filesystem-l1-1-0.dll 6, api-ms-win-crt-heap-l1-1-0.dll 6, api-ms-win-crt-locale-l1-1-0.dll 3, api-ms-win-crt-math-l1-1-0.dll 9, api-ms-win-crt-runtime-l1-1-0.dll 22, api-ms-win-crt-stdio-l1-1-0.dll 26, api-ms-win-crt-string-l1-1-0.dll 7, api-ms-win-crt-time-l1-1-0.dll 6, kernel32.dll 83, msvcp140.dll 84, ole32.dll 2, rexruntime.dll 406, shell32.dll 2, user32.dll 5, vcruntime140.dll 15, vcruntime140_1.dll 1, winmm.dll 1
+    imports: ref api-ms-win-crt-convert-l1-1-0.dll 2, api-ms-win-crt-environment-l1-1-0.dll 1, api-ms-win-crt-filesystem-l1-1-0.dll 6, api-ms-win-crt-heap-l1-1-0.dll 6, api-ms-win-crt-locale-l1-1-0.dll 3, api-ms-win-crt-math-l1-1-0.dll 9, api-ms-win-crt-runtime-l1-1-0.dll 22, api-ms-win-crt-stdio-l1-1-0.dll 26, api-ms-win-crt-string-l1-1-0.dll 7, api-ms-win-crt-time-l1-1-0.dll 6, kernel32.dll 83, msvcp140.dll 84, ole32.dll 2, rexruntime.dll 406, shell32.dll 2, user32.dll 5, vcruntime140.dll 15, vcruntime140_1.dll 1, winmm.dll 1
+    PASS same imported DLL set: added []; removed []
+    PASS imports from api-ms-win-crt-convert-l1-1-0.dll unchanged (2): added []; removed []
+    PASS imports from api-ms-win-crt-environment-l1-1-0.dll unchanged (1): added []; removed []
+    PASS imports from api-ms-win-crt-filesystem-l1-1-0.dll unchanged (6): added []; removed []
+    PASS imports from api-ms-win-crt-heap-l1-1-0.dll unchanged (6): added []; removed []
+    PASS imports from api-ms-win-crt-locale-l1-1-0.dll unchanged (3): added []; removed []
+    PASS imports from api-ms-win-crt-math-l1-1-0.dll unchanged (9): added []; removed []
+    PASS imports from api-ms-win-crt-runtime-l1-1-0.dll unchanged (22): added []; removed []
+    PASS imports from api-ms-win-crt-stdio-l1-1-0.dll unchanged (26): added []; removed []
+    PASS imports from api-ms-win-crt-string-l1-1-0.dll unchanged (7): added []; removed []
+    PASS imports from api-ms-win-crt-time-l1-1-0.dll unchanged (6): added []; removed []
+    PASS imports from kernel32.dll unchanged (83): added []; removed []
+    PASS imports from msvcp140.dll unchanged (84): added []; removed []
+    PASS imports from ole32.dll unchanged (2): added []; removed []
+    PASS imports from rexruntime.dll unchanged (406): added []; removed []
+    PASS imports from shell32.dll unchanged (2): added []; removed []
+    PASS imports from user32.dll unchanged (5): added []; removed []
+    PASS imports from vcruntime140.dll unchanged (15): added []; removed []
+    PASS imports from vcruntime140_1.dll unchanged (1): added []; removed []
+    PASS imports from winmm.dll unchanged (1): added []; removed []
+    RESULT: PASS
+pe-check: exit 0, 0.2 s
+PASS D5 pe-check legodimensions.exe vs devoff4b-bin\legodimensions.exe
+PASS one map in link-on
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\s4b\mapcheck-s4c.py --map <workspace>\build\agent2\final2\b\xe\link-on\legodimensions.map --ref <workspace>\build\agent2\devoff4-bin\legodimensions.map --mode s4c --out <workspace>\build\agent2\final2\b\xe\mapcheck.txt
+    # mapcheck-s4c (Agent 2, run 2 task #1; by name and object, not address)  2026-11-25 16:11:08  mode s4c
+    new: build\agent2\final2\b\xe\link-on\legodimensions.map  39181726 B  mtime 11-25 16:11:05  sha256 3F93A71469556D48
+    ref: build\agent2\devoff4-bin\legodimensions.map  39162310 B  mtime 11-22 13:30:26  sha256 DCC51E2B7A0040E2
+    new: publics 353059; sub_ 164786; __imp__sub_ 164786; hooked 31
+    ref: publics 353031; sub_ 164786; __imp__sub_ 164786; hooked 27
+    PASS sub_ name set equal to ref: 164786 names
+    PASS __imp__sub_ name set equal to ref: 164786 names
+    PASS hooked set = ref hooked (27) + 4 moved = 31: have 31
+    PASS sub_83FBF7D0: sub_ in gpu_wait_backoff.cpp.obj, __imp__ stays in legodimensions_recomp.248.cpp.obj: sub_ in gpu_wait_backoff.cpp.obj, __imp__ in legodimensions_recomp.248.cpp.obj
+    PASS sub_83FAF180: sub_ in gpu_wait_backoff.cpp.obj, __imp__ stays in legodimensions_recomp.107.cpp.obj: sub_ in gpu_wait_backoff.cpp.obj, __imp__ in legodimensions_recomp.107.cpp.obj
+    PASS sub_83FB09E8: sub_ in gpu_wait_backoff.cpp.obj, __imp__ stays in legodimensions_recomp.422.cpp.obj: sub_ in gpu_wait_backoff.cpp.obj, __imp__ in legodimensions_recomp.422.cpp.obj
+    PASS sub_83FC0C10: sub_ in gpu_wait_backoff.cpp.obj, __imp__ stays in legodimensions_recomp.232.cpp.obj: sub_ in gpu_wait_backoff.cpp.obj, __imp__ in legodimensions_recomp.232.cpp.obj
+    PASS the 27 ref-hooked names keep their sub_ and __imp__ objects
+    PASS per-object sub_ sets = ref with the 4 targets moved (448 objects)
+    PASS per-object __imp__sub_ sets = ref (438 objects)
+    PASS unhooked names: sub_ and __imp__ in the same object: 164755 names
+    PASS gpu_wait_backoff.cpp.obj defines exactly the sub_ publics sub_83FBF7D0 sub_83FAF180 sub_83FB09E8 sub_83FC0C10: has sub_83FAF180 sub_83FB09E8 sub_83FBF7D0 sub_83FC0C10
+    gpu_wait_backoff.cpp.obj publics (25): ??$log_@AEAPEBD@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEAPEBD@Z ??$log_@AEAPEBDAEAI@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEAPEBDAEAI@Z ??$log_@AEB_K_K_K_K_K_K_KAEB_K_K_K_K_K_K_K_KN_KNN_K_K_K_K_KNN@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEB_K$$QEA_K4444434444444$$QEAN4554444455@Z ??$log_@PEBDAEAIAEAIPEBDPEBD@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@$$QEAPEBDAEAI433@Z ??_C@_02BFICIOJL@ON?$AA@ ??_C@_03MPPIHBHJ@OFF?$AA@ ??_C@_05HGIDKJIN@built?$AA@ ??_C@_0BE@HDGDEHF@LEGO_GPU_WAIT_STATS?$AA@ ??_C@_0BFD@LKMKECIC@GPU?5wait?5stats?5?$CI5?5s?$CJ?3?5L1?5waits?5?$HL@ ??_C@_0BG@PAIHAKBJ@LEGO_GPU_WAIT_SPIN_US?$AA@ ??_C@_0BJ@MCANBKBA@LEGO_GPU_WAIT_BACKOFF_US?$AA@ ??_C@_0CA@DMJCGMMG@?$CIanonymous?5namespace?$CJ?3?3MaybeLog?$AA@ ??_C@_0DD@PIALDNJM@?$CIanonymous?5namespace?$CJ?3?3Cfg?$CI?$CJ?3?3?$CIl@ ??_C@_0DG@FHIIANKC@GPU?5wait?5back?9off?3?5OFF?5?$CILEGO_GPU@ ??_C@_0EO@NDBJGJPO@GPU?5wait?5back?9off?3?5?$HL?$HN?5?$CIquantum?5?$HL@ ??_C@_0FH@CCGGAFBH@GPU?5wait?5back?9off?3?5LEGO_GPU_WAIT@ ??_C@_0FM@KPGJMCDC@GPU?5wait?5back?9off?3?5LEGO_GPU_WAIT@ ??_C@_0IC@KBOOFBCB@C?3?2Users?2<user>?2?4vscode?2projects?2@ __real@408f400000000000 __xmm@00000000000000004530000043300000 __xmm@45300000000000004330000000000000 sub_83FAF180 sub_83FB09E8 sub_83FBF7D0 sub_83FC0C10
+    hooked by sub_ object (new map):
+      crash_guards.cpp.obj                  2  sub_82A35B90 sub_83C01C08
+      gpu_wait_backoff.cpp.obj              4  sub_83FAF180 sub_83FB09E8 sub_83FBF7D0 sub_83FC0C10
+      main_menu_extras.cpp.obj              3  sub_82F03C40 sub_82FBE7A8 sub_82FE4A80
+      name_trace.cpp.obj                    5  sub_82A3D980 sub_83470AF8 sub_834B8168 sub_836F5AD0 sub_83715F00
+      native_atomics.cpp.obj                3  sub_82A2A0E8 sub_82A2A138 sub_82A2A160
+      native_constants.cpp.obj              1  sub_82B7ABF0
+      native_lock_elide.cpp.obj             7  sub_82A2CAB0 sub_82A2CC20 sub_82A34E28 sub_82A34FE8 sub_82A35D28 sub_82A4CA18 sub_83F99CB8
+      native_markers.cpp.obj                2  sub_82A3E238 sub_82A3E2B8
+      native_memops.cpp.obj                 2  sub_83E45090 sub_83E46040
+      scene_distance.cpp.obj                2  sub_82C6F428 sub_83A11F50
+    RESULT: PASS  (31 hooked; 2.0 s)
+mapcheck: exit 0, 2.2 s
+PASS mapcheck --mode s4c vs devoff4-bin\legodimensions.map (hooked aliases by name/object; s4c = 31)
+PASS shared DLL after == E3CB99CF
+notes:
+  tools that ran (sha256/16): build-final2.py 80C11DCCD4B41D7C, recompile.py 855BCC79148E2DA8, relink.py F3C6EEAF332AB213, stage-variant.py D2BD1C6358FC19C1, verify-bins.py 80FF4C5F581C4B1B, prep-final2.py 4B20F22AB773A736, fsyntax2.py 3FC03399AB003398, pe-check.py F4368C32076AAA3E, mapcheck-s4c.py F8CB7B495F74D978
+  prep: commits: sdk a7e79c09135f160f63bfaf8634f4e3b9cb760a75 (base 5350b1de99276b7a7be701bf00914f1ee58ce9bc), super 2de88ce9d1992aea3d0daa721ef5ac6c62f7d568 (base c9e215f2e5c42836ec00fd35abd933989daa6880)
+  prep: blob rexglue-sdk/include/rex/graphics/d3d12/pipeline_cache.h 0BAF28BE633759CD0F9A1A3672CD86D2D75DDE78EC4662DA8D4B5ED9514CF81F 18427 B -> overlay LF 0BAF28BE633759CD0F9A1A3672CD86D2D75DDE78EC4662DA8D4B5ED9514CF81F
+  prep: blob rexglue-sdk/src/core/clock.cpp EAE926AC812F7EFDDAAFC63894CD88E069162CB260855532C8A38FA898026B52 12066 B -> overlay LF EAE926AC812F7EFDDAAFC63894CD88E069162CB260855532C8A38FA898026B52
+  prep: blob rexglue-sdk/src/core/timer_queue.cpp EF70211E5D248A94CFC2BD3E544B0A66528386C4A08BE4995EE4ACACE76D6323 16100 B -> overlay LF EF70211E5D248A94CFC2BD3E544B0A66528386C4A08BE4995EE4ACACE76D6323
+  prep: blob rexglue-sdk/src/graphics/d3d12/command_processor.cpp 00EA93D3E9115B01FE6C45A28C39CAB72FF53716A11090602B9FBAD05F28E0FA 274916 B -> overlay LF 00EA93D3E9115B01FE6C45A28C39CAB72FF53716A11090602B9FBAD05F28E0FA
+  prep: blob rexglue-sdk/src/graphics/d3d12/pipeline_cache.cpp C4CB51CC6D2A6429637115F605FF10279FCE59AEDCF8BBC6E2195F92615C86C6 163833 B -> overlay LF C4CB51CC6D2A6429637115F605FF10279FCE59AEDCF8BBC6E2195F92615C86C6
+  prep: blob rexglue-sdk/src/graphics/frame_stats.h 9F3C4F9DC58DCA5DF1AB946056ED565C706BC336E652C854132E53FE5B048970 2720 B -> overlay LF 9F3C4F9DC58DCA5DF1AB946056ED565C706BC336E652C854132E53FE5B048970
+  prep: blob rexglue-sdk/src/graphics/shared_memory.cpp E2465A155E22C20BD4376F7252D0C5EE3AC23214511F182064A858DBB3C90A9A 33359 B -> overlay LF E2465A155E22C20BD4376F7252D0C5EE3AC23214511F182064A858DBB3C90A9A
+  prep: blob rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp CEB5529AC853D5A8A0215DE51A1D2616AC9A7B98D54F4D826EEDAA08E5ADE5D0 37328 B -> overlay LF CEB5529AC853D5A8A0215DE51A1D2616AC9A7B98D54F4D826EEDAA08E5ADE5D0
+  prep: blob rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp 7CA55716E7092199DBCAA54FAFA918F0E96B4AD7364BD0E21C1EA1C8D1EC3C3A 58366 B -> overlay LF 7CA55716E7092199DBCAA54FAFA918F0E96B4AD7364BD0E21C1EA1C8D1EC3C3A
+  prep: blob rexglue-sdk/src/system/runtime.cpp A997D0059A69FF99E3485E38E7F3323316A9B425C1F1DFE3E3B7CAF7EC43DC10 16875 B -> overlay LF A997D0059A69FF99E3485E38E7F3323316A9B425C1F1DFE3E3B7CAF7EC43DC10
+  prep: blob rexglue-sdk/src/system/xmemory.cpp 3745C04AAC8AF75D8FDFC218FB3ADD31980D19336F9D8FDDC29BDCBBEA431363 121132 B -> overlay LF 3745C04AAC8AF75D8FDFC218FB3ADD31980D19336F9D8FDDC29BDCBBEA431363
+  prep: blob rexglue-sdk/src/system/xobject.cpp 691A34BB64E11EA2500BFB6989E3C15DE55D1D074E209B7399B358FCDBF3F52C 18981 B -> overlay LF 691A34BB64E11EA2500BFB6989E3C15DE55D1D074E209B7399B358FCDBF3F52C
+  prep: blob rexglue-sdk/src/system/xthread.cpp 3B50A95E76B1037754BEDC02E92768434A52CCFE5F2799CC6D353B038046B29F 57423 B -> overlay LF 3B50A95E76B1037754BEDC02E92768434A52CCFE5F2799CC6D353B038046B29F
+  prep: blob rexlego/src/gpu_native/shaders.cpp 88D8CC7F92CA8D8587B7C4A09B3B3D6C1F90FFB7E1DCCE75B31956E3AA0C0EF6 50962 B -> overlay CRLF 4B8250E976A384010915FA66C6E2279397C83A3DE05DCF2CFAC5FD452E85EEFD
+  prep: blob rexlego/src/gpu_wait_backoff.cpp 74115EEA26C4AEB263275AED08CCD986682E27A29BE68990C873AEB0C527017F 19865 B -> overlay LF 74115EEA26C4AEB263275AED08CCD986682E27A29BE68990C873AEB0C527017F
+  prep: PASS default OFF: committed pipeline_cache.cpp has REXCVAR_DEFINE_BOOL(d3d12_pipeline_creation_no_wait, false,
+  prep: PASS default q500: committed gpu_wait_backoff.cpp has #define LEGO_GPU_WAIT_BACKOFF_DEFAULT_US 500
+  prep: gen-on native-gpu-build.txt: LEGO Dimensions native GPU 1616ce65e973c583
+  CTL: PASS compare legodimensions.exe vs build\agent2\devoff4b-bin\legodimensions.exe: identical except 1 TimeDateStamp field(s) (6b075cf0 vs 6b03a981; COFF header at 0x80, included)
+  CTL: PASS map legodimensions.map vs build\agent2\devoff4b-bin\legodimensions.map: equal except the Timestamp line (363354 lines)
+  ON object gpu_wait_backoff.cpp.obj exit 0 2.5 s obj 58093 B 796CB449FCBEEAC7 (log 3943 B)
+  ON legodimensions.exe 6C8E281156CCE828A217B870F273021202F953F7230C7C7BA6CC3E4EA7F45581
+  needles: ON has ['GPU wait back-off: OFF (LEGO_GPU_WAIT_BACKOFF_US=']; reference lacks them; ON lacks ['Native GPU: shader miss cache {} ({}{})']
+  D5 pe-check vs devoff4b-bin\legodimensions.exe: PASS
+  mapcheck --mode s4c vs devoff4-bin\legodimensions.map: PASS
+  times: CTL recompile 3.1 s, CTL relink 4.5 s, ON recompile 3.1 s, ON relink 1.4 s, pe-check 0.2 s, mapcheck 2.2 s
+RESULT: PASS (total 17.2 s)

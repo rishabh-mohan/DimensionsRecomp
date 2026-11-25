@@ -1,0 +1,29 @@
+# s4b_check s33base 20261125-064824-s33-base (off, scenario A)
+run.json: exit 0 (0x00000000) dumps 0 crash_events 0 wer False; close wm_close 0.71 s; elapsed 462.83 of 540 s; cvars {}; env -; steps 91/91
+summary: verdict RUNNING; first frame 5.0 s; levels {"info": 746, "warning": 142}; unknown cvars []; errors 0
+log files game.log; levels {"info": 746, "warning": 142}
+families: c1_any=0 k=0 c1_verify_on=0 c1_verify_f=0 c1_other=0 recovered_stale=0 unhandled_phys=0 protect_failed=0 split_init=0 split=0 deferred_counters=0 gpu_wait=0 memexport=0 slow_frame=0 s4_upload_hash=0 precise_wait=0 miss_cache=0 stuck_lock=0 minidump=0 fatal=0 debug_layer=0 dred=0 d3d12_msg=0 clean_exit=1
+frames (perf.csv rows) 22217; slow_frame per frame 0.000
+logdiff base 20261122-140637-s4a-udiag-attract: 4 logs joined -> build\agent3\s4b\checks\joined\20261122-140637-s4a-udiag-attract
+logdiff vs 20261122-140637-s4a-udiag-attract (base scenario A): NEW 0 (+0 allowed) MORE 0 (+0 allowed) GONE 17 (1 unexpected) FLAG 0; NEW at info 0 other, 0 allowed; rc 0
+  GONE build\agent3\runs\20261125-064824-s33-base\game.log [warning] [krnl] __imp__XNetLogonGetTitleID STUB
+levels cand {"info": 746, "warning": 142} vs 20261122-140637-s4a-udiag-attract {"info": 57905, "warning": 143}
+scenes (>= 2 s) base: 220/534:62s 226/1022:28s 218/222:25s 219/226:15s 220/528:12s 766/110956:12s 594/2813:4s 788/31613:4s 8019/1043795:2s 839/31674:2s
+scenes (>= 2 s) cand: 766/110956:152s 226/1022:31s 220/534:21s 218/222:16s 219/226:15s 790/31625:10s 220/528:8s 788/31613:4s 8127/762167:4s 8019/1043795:2s
+  missing in cand: ['839/31674']; extra in cand: ['8127/762167']
+  note: attract/idle scenes missing in cand (timing after the route; not a BASE item): ['839/31674']
+route marks first-frame..after-a2: 5, 0 differ; all marks: 30 differ
+  cand marks: first-frame=218/222 title=226/1022 after-start=226/1022 after-a1=220/528 after-a2=220/534 idle-10=220/534 idle-20=839/31674 idle-30=790/31625 idle-40=788/31613 idle-50=1392/564530 idle-60=9823/1356267 idle-70=2268/420442 idle-80=5159/1436326 idle-90=2955/544985 idle-100=1139/329690 idle-110=8403/1069967 idle-120=8077/762077 idle-130=2852/1239942 idle-140=2423/1126816 idle-150=2950/1183838 idle-160=1459/877008 idle-170=1822/1030061 idle-180=1306/911804 idle-190=4533/634935 idle-200=687/46123 idle-210=775/128785 idle-220=767/111244 idle-230=766/110956 idle-240=766/110956 idle-250=766/110956 idle-260=766/110956 idle-270=766/110956 idle-280=766/110956 idle-290=766/110956 idle-300=766/110956 idle-310=766/110956 idle-320=766/110956 idle-330=766/110956 idle-340=766/110956 idle-350=766/110956 idle-360=766/110956 idle-370=766/110956 idle-380=766/110956 end=766/110956
+threads (% of one core, window [20.0, 447.4] s from the first frame, 427.4 s): XThread8668 (F80001A8) x1 90.6 | GPU Commands (F8000018) x1 47.9 | Main XThread (F800002C) x1 33.8 | rex::thread::TimerQueue x1 26.2 | (unnamed) x37 12.9 | XThread1F90 (F80000F4) x1 8.8 | XThreadA074 (F8000144) x1 7.7 | XThread6CA0 (F8000114) x1 6.3 | 0xc0550001 x1 4.5 | XThread4EAC (F800010C) x1 2.8
+  TimerQueue ticks (tid 39264): 231 samples over [-4.6, 455.4] s, cycles non-rising in 0 of 230 steps 
+sys.csv slow state: {"rows": 458, "onset_s": null, "slow_pct": 0.0, "e_eff_mhz_median": 1788, "cpu_util_pct_median": 64.2, "slow": false}
+hangs: 0 STUCK-LOCK event(s); hostload rows during the run: {"rows": 14, "busy_rows": 0}; toypad: {"confirms": 0, "result": ""}
+PROOF ok   bin dir <workspace>\build\agent2\devoff4b-bin (want build\agent2\devoff4b-bin)
+PROOF ok   bin: run-dir legodimensions.exe sha256 DFBE1D43B28861A6, want DFBE1D43B28861A6 (devoff4b-bin MANIFEST)
+PROOF ok   bin: run-dir rexgpu-xenos.dll sha256 E3CB99CFDEA95E66, want E3CB99CFDEA95E66 (devoff4b-bin MANIFEST)
+PROOF ok   bin: run-dir rexruntime.dll sha256 A33801D1538D6175, want A33801D1538D6175 (devoff4b-bin MANIFEST)
+PROOF ok   no "d3d12_pipeline_creation_no_wait" text in game*.log (x0; TESTPLAN row 1a)
+PROOF ok   cvar d3d12_pipeline_creation_no_wait not set (run.json: -)
+PROOF ok   closed via WM_CLOSE (wm_close)
+BASE items missed: logdiff GONE 1 beyond Toypad/u-diag lines
+VERDICT HINT LOOK: 1 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s33base)

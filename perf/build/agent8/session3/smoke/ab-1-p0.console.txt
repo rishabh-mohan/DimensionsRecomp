@@ -1,0 +1,92 @@
+=== timing matrix: M8 session 3 smoke: functional check of the installed runner improvements (warmup_runs, new results.csv columns, 31-column sys.csv sampler). Hidden desktop, -Quick, never scored (m8-runner-rating.md C08604D8, C4/C5). ===
+matrix   <workspace>\build\agent8\session3\smoke\matrix-smoke.json   [-Quick: short settle/menu/warm-up/window, FUNCTIONAL ONLY]
+note     Run: run-matrix.ps1 -Matrix <this> -Quick -NoPrompt -OutDir build\agent8\session3\smoke\out-<HHmm>. Plan: cold-s0, warm1-s0b, s0-r1, s0b-r1 (4 runs). Both arms are the same bin and settings; s0b exists only so that round 1 has two arms and the warm-up arm choice is exercised.
+note     Functional only: hidden desktop, quick timings. No number from this matrix is a timing result.
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order roundrobin; close timeout 60 s; cooldown 5 s
+floor    every window >= 20 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+       s0: bin build/agent2/devoff4b-bin; frames perf; x1; warm-up 15 s (raised from 10 s for the floor); window 30 s; group smoke (ref); cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         devoff4b, every switch OFF
+round 1  s0
+order    s0
+estimate 1 runs (0 cold), about 2 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-IDAFWVQGHOKI6XCZAAJQ22AYWL -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   15.87 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/devoff4b-bin : ok (MANIFEST.txt)
+screensaver none
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   1 runs, about 2 min: done around 07:42
+!!! These runs will be FUNCTIONAL ONLY (see above): their numbers are not timing results.
+out dir: <workspace>\build\agent8\session3\smoke\ab-1-p0
+keep-awake ON (SetThreadExecutionState continuous+system+display until the matrix ends)
+
+=== [1/1] round 1: arm s0 (group smoke) rep 1 | matrix done around 07:42 ===
+    devoff4b, every switch OFF
+note: warm-up raised from 10 s to 15 s (settle + menu + warm-up >= 20 s after the first frame)
+=== run-timing [TIMING] ===
+run dir: <workspace>\build\agent8\session3\smoke\ab-1-p0\runs\0740-s0-r1
+args: --log_file=<workspace>\build\agent8\session3\smoke\ab-1-p0\runs\0740-s0-r1\game.log --perf_log_csv=<workspace>\build\agent8\session3\smoke\ab-1-p0\runs\0740-s0-r1\perf.csv --native_settings_load=false --discord_rpc=false --audio_mute=true --pause_when_unfocused=false --framerate_limit=0
+env: 
+toml: 
+frames: perf.csv; desktop WinSta0\exebox-IDAFWVQGHOKI6XCZAAJQ22AYWL -> FUNCTIONAL ONLY (not the interactive desktop)
+warm-up from the first frame (boot timeout 240 s): settle 5 s, warm-up 15 s, window 30 s
+free RAM 15.86 GB
+started pid 39104 at 07:40:54.036
+sys.csv sampler started: pid 35024
+first frame signal (perf.csv 19966 B > header 315 B) at 5.02 s
+warm-up starts at 10.01 s
+t=10.01 s settle cpu=2.16 cores ws=687 MB commit=1150 MB perf.csv=126848 B log=83 [warm-up start]
+t=20.01 s warmup cpu=1.20 cores ws=692 MB commit=1161 MB perf.csv=309605 B log=83
+driver started: pid 40984 <workspace>\bench\agent8\run\drivers\thread-cpu.ps1
+t=25.04 s warmup cpu=2.35 cores ws=695 MB commit=1169 MB perf.csv=391231 B log=83 [measure start; driver]
+t=30.01 s measure cpu=2.02 cores ws=695 MB commit=1169 MB perf.csv=469958 B log=83
+t=40.01 s measure cpu=1.97 cores ws=723 MB commit=1198 MB perf.csv=624510 B log=87
+t=50.01 s measure cpu=2.61 cores ws=723 MB commit=1198 MB perf.csv=779985 B log=87
+t=55.01 s measure cpu=1.13 cores ws=723 MB commit=1198 MB perf.csv=803026 B log=87 [measure end]
+waiting for the driver (pid 40984, up to 120 s)
+driver: exit 0
+close: posted=3 exit seen after 0.77 s killed=False exit=0x00000000
+sys.csv sampler: exit 0
+
+=== run-timing summary [TIMING] status OK ===
+run      <workspace>\build\agent8\session3\smoke\ab-1-p0\runs\0740-s0-r1
+bin      <workspace>\build\agent2\devoff4b-bin; tag s0-r1; warm-up 15 s from firstframe; window 30 s; frames perf.csv; logical CPUs 12
+cvars    framerate_limit=0
+env      
+toml     
+boot     first frame signal at 5.02 s; warm-up started at 10.01 s (settle 5 s)
+floor    first-frame signal to the start mark 20.04 s (floor 20 s; warm-up raised from 10 s to 15 s (settle + menu + warm-up >= 20 s after the first frame)); runner ticks skipped 0 (0 in the window); build-tool checks 9
+phase    INSTALL lines 35, INSTALL*.DAT fails 34 (game.log 9778 B); window share < 4.5 ms 0.890; normal phase
+timing   FUNCTIONAL ONLY: desktop WinSta0\exebox-IDAFWVQGHOKI6XCZAAJQ22AYWL is not WinSta0\Default
+sys      SYS window 30 rows/29.0 s (run 60 rows/58.4 s): fg_game 0.0%, input_events 0, idle_min 21986.7 s, eff 2052 MHz (min 1186; P 1954 / E 2104), util 93.7% (P 90.5 / E 95.2), tz_passive_min -, temp_max -, ac 1, saver 0, batt 100%, scheme 'Balanced', overlay best_performance, game_alive_all True; flags: not_foreground, nongame_load; nongame 6.78 cores (max 11.33, >= 2.8 in 100.0% of rows), game 2.13, disk 24.5 MB/s (max 216.0), top cpu -, top io -
+sampler  pid 35024 exit 0; 
+flags    no excluding flag; info: light_share_high, never_foreground, nongame_load
+frames   8684 frames over 30.027 s (summed frame times) = 289.21 fps mean
+frame ms median 2.647  p95 5.783  p99 14.308  p99.9 105.128  max 953.491  >33 ms 33  >100 ms 12  (nearest-rank)
+window   perf.csv rows 8340..17023: start = rows on disk at the start mark (391231 B), end by seconds; 0 zero rows left out
+align    rows on disk by the end mark: 8640 (803026 B) vs 8684 by the seconds cut: -44 rows; wall between marks 29.960 s. Each mark lags the true frame by the unflushed rows (perf.csv: 0-59, 60-row flush), so expect |diff| <= 59 plus jitter.
+process  window cpu mean 2.15 cores, max 2.94 cores (1 s samples, 30); peak working set 723 MB, peak commit 1198 MB (window samples); lifetime peaks 723 / 1198 MB
+driver   <workspace>\bench\agent8\run\drivers\thread-cpu.ps1: exit 0; output driver.out.txt / driver.err.txt
+close    WM_CLOSE posted to 3 window(s) at 2026-11-25 07:41:52.818, exit seen after 0.77 s, killed False, exit 0x00000000
+--> s0-r1 : OK  median 2.647 ms  p99 14.308 ms  >33 33  >100 12  cpu 2.151  wm_close 0.8 s
+    not timing: desktop WinSta0\exebox-IDAFWVQGHOKI6XCZAAJQ22AYWL is not WinSta0\Default
+    first frame to window 20 s; light share 0.889912482726854; info flags: light_share_high never_foreground nongame_load
+keep-awake released
+
+=== matrix summary (<workspace>\build\agent8\session3\smoke\ab-1-p0) ===
+FUNCTIONAL ONLY: 1 of 1 runs not valid timing (-Quick)
+
+group arm ok  valid flagged median min  max  spread p99  
+----- --- --  ----- ------- ------ ---  ---  ------ ---  
+smoke s0  1/1     0       0 2.65   2.65 2.65 0      14.31
+
+
+
+results: <workspace>\build\agent8\session3\smoke\ab-1-p0\results.csv
+summary: <workspace>\build\agent8\session3\smoke\ab-1-p0\summary.md

@@ -1,0 +1,72 @@
+# build-final (M2) 2026-11-25 07:27:49 rt DRY RUN
+tools that ran (sha256/16): build-final.py 740E59450887B338, recompile.py 855BCC79148E2DA8, relink.py F3C6EEAF332AB213, stage-variant.py D2BD1C6358FC19C1, verify-bins.py 80FF4C5F581C4B1B, prep-final.py 83F732CA9CEB301F, fsyntax.py 66C7D74022A068DA, pe-check.py F4368C32076AAA3E, mapcheck-s4c.py F8CB7B495F74D978
+PASS prep-final RESULT: PASS (b/prep.txt)
+PASS shared DLL before == E3CB99CF
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\recompile.py --ccdb <workspace>\build\agent2\snap1-sdk\compile_commands.json --obj-filter /Release/ --jobs 8 --priority normal --fwd-src --list <workspace>\build\agent2\final\b\rt\list-ctl.tsv --log-dir <workspace>\build\agent2\final\b\rt\log-ctl --dry-run
+    priority normal, jobs 8, include-first: -
+    8 TU(s); defines: -; commands in build\agent2\final\b\rt\log-ctl\recompile-commands.txt
+      clock.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\core\clock.cpp (A07EE16C9C5CC4BE) -> build\agent2\final\b\rt\obj-ctl\clock.cpp.obj
+      timer_queue.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\core\timer_queue.cpp (015C04A22DACC592) -> build\agent2\final\b\rt\obj-ctl\timer_queue.cpp.obj
+      xboxkrnl_rtl.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\kernel\xboxkrnl\xboxkrnl_rtl.cpp (8DF708B87A945F07) -> build\agent2\final\b\rt\obj-ctl\xboxkrnl_rtl.cpp.obj
+      xboxkrnl_threading.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\kernel\xboxkrnl\xboxkrnl_threading.cpp (6E20D417F0ED93A5) -> build\agent2\final\b\rt\obj-ctl\xboxkrnl_threading.cpp.obj
+      runtime.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\runtime.cpp (306B692BC091A56F) -> build\agent2\final\b\rt\obj-ctl\runtime.cpp.obj
+      xmemory.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\xmemory.cpp (BCA5E1CF63686E73) -> build\agent2\final\b\rt\obj-ctl\xmemory.cpp.obj
+      xobject.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\xobject.cpp (189CA288893B1A36) -> build\agent2\final\b\rt\obj-ctl\xobject.cpp.obj
+      xthread.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\system\xthread.cpp (FAEF9B99C893F684) -> build\agent2\final\b\rt\obj-ctl\xthread.cpp.obj
+    dry run: nothing compiled
+CTL recompile: exit 0, 0.2 s
+PASS CTL recompile
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\relink.py --ninja <workspace>\build\agent2\snap1-sdk\build-Release.ninja --target <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexruntime.dll --priority normal --replace-file <workspace>\build\agent2\final\b\rt\replace-ctl.txt --out-dir <workspace>\build\agent2\final\b\rt\link-ctl --compare <workspace>\build\agent2\devoff4b-bin\rexruntime.dll --dry-run
+    parsed 4 file(s), 3437 edges, 260 rules; edges making the target: 1
+    edge: <workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/out/win-amd64/Release/rexruntime.dll (rule CXX_SHARED_LIBRARY_LINKER__rexruntime_Release, from build\agent2\snap1-sdk\CMakeFiles\impl-Release.ninja), 210 explicit inputs, 14 implicit
+    FAIL: replacement <workspace>\build\agent2\final\b\rt\obj-ctl\clock.cpp.obj does not exist
+CTL relink: exit 2, 0.4 s
+FAIL CTL relink dry run
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\recompile.py --ccdb <workspace>\build\agent2\snap1-sdk\compile_commands.json --obj-filter /Release/ --jobs 8 --priority normal --fwd-src --list <workspace>\build\agent2\final\b\rt\list-on.tsv --log-dir <workspace>\build\agent2\final\b\rt\log-on --flag=-fmacro-prefix-map=<workspace>/build/agent2/final/b/DimensionsRecomp/rexglue-sdk=<workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk --dry-run
+    priority normal, jobs 8, include-first: -
+    8 TU(s); defines: -; commands in build\agent2\final\b\rt\log-on\recompile-commands.txt
+      clock.cpp: build\agent2\final\b\DimensionsRecomp\rexglue-sdk\src\core\clock.cpp (EAE926AC812F7EFD) -> build\agent2\final\b\rt\obj-on\clock.cpp.obj
+      timer_queue.cpp: build\agent2\final\b\DimensionsRecomp\rexglue-sdk\src\core\timer_queue.cpp (EF70211E5D248A94) -> build\agent2\final\b\rt\obj-on\timer_queue.cpp.obj
+      xboxkrnl_rtl.cpp: build\agent2\final\b\DimensionsRecomp\rexglue-sdk\src\kernel\xboxkrnl\xboxkrnl_rtl.cpp (CEB5529AC853D5A8) -> build\agent2\final\b\rt\obj-on\xboxkrnl_rtl.cpp.obj
+      xboxkrnl_threading.cpp: build\agent2\final\b\DimensionsRecomp\rexglue-sdk\src\kernel\xboxkrnl\xboxkrnl_threading.cpp (7CA55716E7092199) -> build\agent2\final\b\rt\obj-on\xboxkrnl_threading.cpp.obj
+      runtime.cpp: build\agent2\final\b\DimensionsRecomp\rexglue-sdk\src\system\runtime.cpp (A997D0059A69FF99) -> build\agent2\final\b\rt\obj-on\runtime.cpp.obj
+      xmemory.cpp: build\agent2\final\b\DimensionsRecomp\rexglue-sdk\src\system\xmemory.cpp (3745C04AAC8AF75D) -> build\agent2\final\b\rt\obj-on\xmemory.cpp.obj
+      xobject.cpp: build\agent2\final\b\DimensionsRecomp\rexglue-sdk\src\system\xobject.cpp (691A34BB64E11EA2) -> build\agent2\final\b\rt\obj-on\xobject.cpp.obj
+      xthread.cpp: build\agent2\final\b\DimensionsRecomp\rexglue-sdk\src\system\xthread.cpp (3B50A95E76B10377) -> build\agent2\final\b\rt\obj-on\xthread.cpp.obj
+    dry run: nothing compiled
+ON recompile: exit 0, 0.2 s
+PASS ON recompile
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\relink.py --ninja <workspace>\build\agent2\snap1-sdk\build-Release.ninja --target <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexruntime.dll --priority normal --replace-file <workspace>\build\agent2\final\b\rt\replace-on.txt --out-dir <workspace>\build\agent2\final\b\rt\link-on --dry-run
+    parsed 4 file(s), 3437 edges, 260 rules; edges making the target: 1
+    edge: <workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/out/win-amd64/Release/rexruntime.dll (rule CXX_SHARED_LIBRARY_LINKER__rexruntime_Release, from build\agent2\snap1-sdk\CMakeFiles\impl-Release.ninja), 210 explicit inputs, 14 implicit
+    FAIL: replacement <workspace>\build\agent2\final\b\rt\obj-on\clock.cpp.obj does not exist
+ON relink: exit 2, 0.4 s
+FAIL ON relink dry run
+dry run: stopping before the gates
+notes:
+  tools that ran (sha256/16): build-final.py 740E59450887B338, recompile.py 855BCC79148E2DA8, relink.py F3C6EEAF332AB213, stage-variant.py D2BD1C6358FC19C1, verify-bins.py 80FF4C5F581C4B1B, prep-final.py 83F732CA9CEB301F, fsyntax.py 66C7D74022A068DA, pe-check.py F4368C32076AAA3E, mapcheck-s4c.py F8CB7B495F74D978
+  prep: diff sha256 955543F5E2E5F4F44A57CD380FF8D8AC6828E1C0C1372612441AB2AA4E88C657
+  prep: PASS snap1 before rexglue-sdk/src/core/clock.cpp A07EE16C9C5CC4BE
+  prep: PASS snap1 before rexglue-sdk/src/core/timer_queue.cpp 015C04A22DACC592
+  prep: PASS snap1 before rexglue-sdk/src/graphics/shared_memory.cpp A4A31038ABDFF94A
+  prep: PASS snap1 before rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp 8DF708B87A945F07
+  prep: PASS snap1 before rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp 6E20D417F0ED93A5
+  prep: PASS snap1 before rexglue-sdk/src/system/runtime.cpp 306B692BC091A56F
+  prep: PASS snap1 before rexglue-sdk/src/system/xmemory.cpp BCA5E1CF63686E73
+  prep: PASS snap1 before rexglue-sdk/src/system/xobject.cpp 189CA288893B1A36
+  prep: PASS snap1 before rexglue-sdk/src/system/xthread.cpp FAEF9B99C893F684
+  prep: PASS snap1 before rexlego/src/gpu_native/shaders.cpp 9567FE3F3B63637D
+  prep: PASS snap1 before rexlego/src/gpu_wait_backoff.cpp 01D9F8F3464C8614
+  prep: PASS after rexglue-sdk/src/core/clock.cpp EAE926AC812F7EFD == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/core/timer_queue.cpp EF70211E5D248A94 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/graphics/shared_memory.cpp E2465A155E22C20B == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp CEB5529AC853D5A8 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp 7CA55716E7092199 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/runtime.cpp A997D0059A69FF99 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/xmemory.cpp 3745C04AAC8AF75D == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/xobject.cpp 691A34BB64E11EA2 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/xthread.cpp 3B50A95E76B10377 == table and == final/work/new
+  prep: PASS after rexlego/src/gpu_native/shaders.cpp 4B8250E976A38401 == table and == final/work/new
+  prep: PASS after rexlego/src/gpu_wait_backoff.cpp 74115EEA26C4AEB2 == table and == final/work/new
+  prep: gen-on native-gpu-build.txt: LEGO Dimensions native GPU 1616ce65e973c583
+RESULT: FAIL (CTL relink dry run; ON relink dry run) (total 1.1 s) DRY RUN

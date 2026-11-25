@@ -1,0 +1,27 @@
+== arm win3 (4 runs) vs s0 (4 runs)
+  runs\0554-win3-r1: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 144 lines game.log 15611, 2026-11-25 05:54:50.990..2026-11-25 05:56:45.111 (114 s) | levels info=96 raw=8 warning=40 | Toypad R/W 12/12 (6.3/6.3 per min)
+  runs\0601-win3-r2: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 144 lines game.log 15611, 2026-11-25 06:01:01.513..2026-11-25 06:02:55.788 (114 s) | levels info=96 raw=8 warning=40 | Toypad R/W 12/12 (6.3/6.3 per min)
+  runs\0615-win3-r3: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 144 lines game.log 15605, 2026-11-25 06:15:26.887..2026-11-25 06:17:20.989 (114 s) | levels info=96 raw=8 warning=40 | Toypad R/W 12/12 (6.3/6.3 per min)
+  runs\0621-win3-r4: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 144 lines game.log 15558, 2026-11-25 06:21:39.244..2026-11-25 06:23:34.514 (115 s) | levels info=96 raw=8 warning=40 | Toypad R/W 12/12 (6.2/6.2 per min)
+gate_logdiff FAIL findings (B = arm run, A = each base run): none
+NEW warning/error/critical keys (in an arm run, in no base run): 0
+MORE (arm run count > base max + max(5, base max)): 0
+GONE (in every base run, missing from an arm run; any level): 0
+Toypad (base: runs\0552-s0-r1 {'info Write': 14, 'info Read': 14}; runs\0607-s0-r2 {'info Write': 12, 'info Read': 12}; runs\0613-s0-r3 {'info Write': 14, 'info Read': 14}; runs\0619-s0-r4 {'info Write': 12, 'info Read': 12})
+  runs\0554-win3-r1: {'info Write': 12, 'info Read': 12}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\0601-win3-r2: {'info Write': 12, 'info Read': 12}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\0615-win3-r3: {'info Write': 12, 'info Read': 12}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\0621-win3-r4: {'info Write': 12, 'info Read': 12}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+ONLY in win3 (any level, not Toypad; in no base run): 6 keys
+  4/4 runs, counts [37, 37, 37, 37], also in ['c1np', 'p2fc']  [info] [sys] C# keep-watch: # protects kept so far
+      e.g. [2026-11-25 05:54:52.041] [info] [sys] [t18440] C1 keep-watch: 2 protects kept so far
+  4/4 runs, counts [1, 1, 1, 1], also in -  [info] [core] Host timer resolution set to # ms (background opt-out on)
+      e.g. [2026-11-25 05:54:51.331] [info] [core] [t43172] Host timer resolution set to 1 ms (background opt-out on)
+  4/4 runs, counts [1, 1, 1, 1], also in ['c1np', 'p2fc']  [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)
+      e.g. [2026-11-25 05:54:51.332] [info] [sys] [t43172] C1 keep-watch: on (with physical_protect_hold_global_lock)
+  4/4 runs, counts [1, 1, 1, 1], also in -  [info] [core] TimerQueue: precise wait (timer_queue_precise_wait)
+      e.g. [2026-11-25 05:54:51.339] [info] [core] [t43172] TimerQueue: precise wait (timer_queue_precise_wait)
+  4/4 runs, counts [1, 1, 1, 1], also in ['c1np', 'p2fc']  [info] [sys] C# keep-watch: first kept protect at #h, #h bytes
+      e.g. [2026-11-25 05:54:52.041] [info] [sys] [t18440] C1 keep-watch: first kept protect at ED19F000, 299892736 bytes
+  4/4 runs, counts [1, 1, 1, 1], also in -  [info] [core] GPU wait back-off: ON (quantum # us, spin # us); stats OFF; GetData hook built.
+      e.g. [2026-11-25 05:54:52.043] [info] [core] [t18440] GPU wait back-off: ON (quantum 500 us, spin 30 us); stats OFF; GetData hook built.

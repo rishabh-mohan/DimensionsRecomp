@@ -1,0 +1,62 @@
+# build-final (M2) 2026-11-25 07:31:39 nativefinal DRY RUN
+tools that ran (sha256/16): build-final.py 5BE1F221800137BD, recompile.py 855BCC79148E2DA8, relink.py F3C6EEAF332AB213, stage-variant.py D2BD1C6358FC19C1, verify-bins.py 80FF4C5F581C4B1B, prep-final.py 83F732CA9CEB301F, fsyntax.py 66C7D74022A068DA, pe-check.py F4368C32076AAA3E, mapcheck-s4c.py F8CB7B495F74D978
+PASS prep-final RESULT: PASS (b/prep.txt)
+PASS shared DLL before == E3CB99CF
+PASS bin dir is new (build\agent2\nativefinal-bin)
+PASS leg nat RESULT: PASS
+PASS legodimensions.exe exists (final\b\nat\link-on\legodimensions.exe)
+PASS leg nat RESULT: PASS
+PASS legodimensions.map exists (final\b\nat\link-on\legodimensions.map)
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\stage-variant.py --base <workspace>\build\agent2\native4b-bin --out <workspace>\build\agent2\nativefinal-bin --title FINAL native bin N-A (native4b + shaders.cpp miss cache default ON, fingerprint 1616ce65e973c583; old snap1-sdk DLLs) [M2, build/agent2/final/build-final.py] --replace legodimensions.exe=<workspace>\build\agent2\final\b\nat\link-on\legodimensions.exe --replace legodimensions.map=<workspace>\build\agent2\final\b\nat\link-on\legodimensions.map --note tools that ran (sha256/16): build-final.py 5BE1F221800137BD, recompile.py 855BCC79148E2DA8, relink.py F3C6EEAF332AB213, stage-variant.py D2BD1C6358FC19C1, verify-bins.py 80FF4C5F581C4B1B, prep-final.py 83F732CA9CEB301F, fsyntax.py 66C7D74022A068DA, pe-check.py F4368C32076AAA3E, mapcheck-s4c.py F8CB7B495F74D978 --note prep: diff sha256 955543F5E2E5F4F44A57CD380FF8D8AC6828E1C0C1372612441AB2AA4E88C657 --note prep: PASS snap1 before rexglue-sdk/src/core/clock.cpp A07EE16C9C5CC4BE --note prep: PASS snap1 before rexglue-sdk/src/core/timer_queue.cpp 015C04A22DACC592 --note prep: PASS snap1 before rexglue-sdk/src/graphics/shared_memory.cpp A4A31038ABDFF94A --note prep: PASS snap1 before rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp 8DF708B87A945F07 --note prep: PASS snap1 before rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp 6E20D417F0ED93A5 --note prep: PASS snap1 before rexglue-sdk/src/system/runtime.cpp 306B692BC091A56F --note prep: PASS snap1 before rexglue-sdk/src/system/xmemory.cpp BCA5E1CF63686E73 --note prep: PASS snap1 before rexglue-sdk/src/system/xobject.cpp 189CA288893B1A36 --note prep: PASS snap1 before rexglue-sdk/src/system/xthread.cpp FAEF9B99C893F684 --note prep: PASS snap1 before rexlego/src/gpu_native/shaders.cpp 9567FE3F3B63637D --note prep: PASS snap1 before rexlego/src/gpu_wait_backoff.cpp 01D9F8F3464C8614 --note prep: PASS after rexglue-sdk/src/core/clock.cpp EAE926AC812F7EFD == table and == final/work/new --note prep: PASS after rexglue-sdk/src/core/timer_queue.cpp EF70211E5D248A94 == table and == final/work/new --note prep: PASS after rexglue-sdk/src/graphics/shared_memory.cpp E2465A155E22C20B == table and == final/work/new --note prep: PASS after rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp CEB5529AC853D5A8 == table and == final/work/new --note prep: PASS after rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp 7CA55716E7092199 == table and == final/work/new --note prep: PASS after rexglue-sdk/src/system/runtime.cpp A997D0059A69FF99 == table and == final/work/new --note prep: PASS after rexglue-sdk/src/system/xmemory.cpp 3745C04AAC8AF75D == table and == final/work/new --note prep: PASS after rexglue-sdk/src/system/xobject.cpp 691A34BB64E11EA2 == table and == final/work/new --note prep: PASS after rexglue-sdk/src/system/xthread.cpp 3B50A95E76B10377 == table and == final/work/new --note prep: PASS after rexlego/src/gpu_native/shaders.cpp 4B8250E976A38401 == table and == final/work/new --note prep: PASS after rexlego/src/gpu_wait_backoff.cpp 74115EEA26C4AEB2 == table and == final/work/new --note prep: gen-on native-gpu-build.txt: LEGO Dimensions native GPU 1616ce65e973c583 --note nat: CTL: PASS compare legodimensions.exe vs build\agent2\native4b-bin\legodimensions.exe: identical except 1 TimeDateStamp field(s) (6b06e2db vs 6b03c395; COFF header at 0x80, included) --note nat: CTL: PASS map legodimensions.map vs build\agent2\native4b-bin\legodimensions.map: equal except the Timestamp line (385473 lines) --note nat: ON object device.cpp.obj exit 0 6.6 s obj 994839 B DA2C5FA04C81DF51 (log 37369 B) --note nat: ON object pipeline_library.cpp.obj exit 0 6.0 s obj 713424 B 370205FEF82E5B8D (log 8339 B) --note nat: ON object shader_archive.cpp.obj exit 0 4.0 s obj 244690 B 0968F20E4A6AFD36 --note nat: ON object shaders.cpp.obj exit 0 5.5 s obj 514407 B 233152B5136923D2 (log 2724 B) --note nat: ON legodimensions.exe 5C21941DAF9DF36B7B098B5A825B4BB5F66615827AD0C9C75E1DAD94D63963A9 --note nat: needles: ON has ['Native GPU: shader miss cache {} ({}{})', '1616ce65e973c583']; reference lacks them; ON lacks ['9b40acbbef4c57b3', 'GPU wait back-off: OFF (LEGO_GPU_WAIT_BACKOFF_US='] --note nat: D5 pe-check vs native4b-bin\legodimensions.exe: PASS --note nat: mapcheck --mode same vs native4b-bin\legodimensions.map: PASS --note nat: times: CTL recompile 8.7 s, CTL relink 4.5 s, ON recompile 7.2 s, ON relink 2.5 s, pe-check 0.4 s, mapcheck 2.3 s --note native-gpu-build.txt (b/nat/gen-on, not staged: native4b-bin has none): LEGO Dimensions native GPU 1616ce65e973c583 --note N-A: rexruntime.dll / rexgpu-xenos.dll / TracyClient.dll are native4b-bin's (old snap1-sdk) --dry-run
+    base build\agent2\native4b-bin: 8 files match its MANIFEST (sha256 B63769FE46CC04592F2BEDAF04A51C362000325D3291BC4D7489369C2160B817)
+      FiraSans-Regular.ttf <- build\agent2\native4b-bin\FiraSans-Regular.ttf
+      TracyClient.dll <- build\agent2\native4b-bin\TracyClient.dll
+      achievement_unlocked.wav <- build\agent2\native4b-bin\achievement_unlocked.wav
+      amd_fidelityfx_dx12.dll <- build\agent2\native4b-bin\amd_fidelityfx_dx12.dll
+      legodimensions.exe <- build\agent2\final\b\nat\link-on\legodimensions.exe  (REPLACED)
+      legodimensions.map <- build\agent2\final\b\nat\link-on\legodimensions.map  (REPLACED)
+      rexgpu-xenos.dll <- build\agent2\native4b-bin\rexgpu-xenos.dll
+      rexruntime.dll <- build\agent2\native4b-bin\rexruntime.dll
+    dry run: nothing staged
+stage: exit 0, 0.4 s
+PASS stage dry run
+notes:
+  tools that ran (sha256/16): build-final.py 5BE1F221800137BD, recompile.py 855BCC79148E2DA8, relink.py F3C6EEAF332AB213, stage-variant.py D2BD1C6358FC19C1, verify-bins.py 80FF4C5F581C4B1B, prep-final.py 83F732CA9CEB301F, fsyntax.py 66C7D74022A068DA, pe-check.py F4368C32076AAA3E, mapcheck-s4c.py F8CB7B495F74D978
+  prep: diff sha256 955543F5E2E5F4F44A57CD380FF8D8AC6828E1C0C1372612441AB2AA4E88C657
+  prep: PASS snap1 before rexglue-sdk/src/core/clock.cpp A07EE16C9C5CC4BE
+  prep: PASS snap1 before rexglue-sdk/src/core/timer_queue.cpp 015C04A22DACC592
+  prep: PASS snap1 before rexglue-sdk/src/graphics/shared_memory.cpp A4A31038ABDFF94A
+  prep: PASS snap1 before rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp 8DF708B87A945F07
+  prep: PASS snap1 before rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp 6E20D417F0ED93A5
+  prep: PASS snap1 before rexglue-sdk/src/system/runtime.cpp 306B692BC091A56F
+  prep: PASS snap1 before rexglue-sdk/src/system/xmemory.cpp BCA5E1CF63686E73
+  prep: PASS snap1 before rexglue-sdk/src/system/xobject.cpp 189CA288893B1A36
+  prep: PASS snap1 before rexglue-sdk/src/system/xthread.cpp FAEF9B99C893F684
+  prep: PASS snap1 before rexlego/src/gpu_native/shaders.cpp 9567FE3F3B63637D
+  prep: PASS snap1 before rexlego/src/gpu_wait_backoff.cpp 01D9F8F3464C8614
+  prep: PASS after rexglue-sdk/src/core/clock.cpp EAE926AC812F7EFD == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/core/timer_queue.cpp EF70211E5D248A94 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/graphics/shared_memory.cpp E2465A155E22C20B == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp CEB5529AC853D5A8 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp 7CA55716E7092199 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/runtime.cpp A997D0059A69FF99 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/xmemory.cpp 3745C04AAC8AF75D == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/xobject.cpp 691A34BB64E11EA2 == table and == final/work/new
+  prep: PASS after rexglue-sdk/src/system/xthread.cpp 3B50A95E76B10377 == table and == final/work/new
+  prep: PASS after rexlego/src/gpu_native/shaders.cpp 4B8250E976A38401 == table and == final/work/new
+  prep: PASS after rexlego/src/gpu_wait_backoff.cpp 74115EEA26C4AEB2 == table and == final/work/new
+  prep: gen-on native-gpu-build.txt: LEGO Dimensions native GPU 1616ce65e973c583
+  nat: CTL: PASS compare legodimensions.exe vs build\agent2\native4b-bin\legodimensions.exe: identical except 1 TimeDateStamp field(s) (6b06e2db vs 6b03c395; COFF header at 0x80, included)
+  nat: CTL: PASS map legodimensions.map vs build\agent2\native4b-bin\legodimensions.map: equal except the Timestamp line (385473 lines)
+  nat: ON object device.cpp.obj exit 0 6.6 s obj 994839 B DA2C5FA04C81DF51 (log 37369 B)
+  nat: ON object pipeline_library.cpp.obj exit 0 6.0 s obj 713424 B 370205FEF82E5B8D (log 8339 B)
+  nat: ON object shader_archive.cpp.obj exit 0 4.0 s obj 244690 B 0968F20E4A6AFD36
+  nat: ON object shaders.cpp.obj exit 0 5.5 s obj 514407 B 233152B5136923D2 (log 2724 B)
+  nat: ON legodimensions.exe 5C21941DAF9DF36B7B098B5A825B4BB5F66615827AD0C9C75E1DAD94D63963A9
+  nat: needles: ON has ['Native GPU: shader miss cache {} ({}{})', '1616ce65e973c583']; reference lacks them; ON lacks ['9b40acbbef4c57b3', 'GPU wait back-off: OFF (LEGO_GPU_WAIT_BACKOFF_US=']
+  nat: D5 pe-check vs native4b-bin\legodimensions.exe: PASS
+  nat: mapcheck --mode same vs native4b-bin\legodimensions.map: PASS
+  nat: times: CTL recompile 8.7 s, CTL relink 4.5 s, ON recompile 7.2 s, ON relink 2.5 s, pe-check 0.4 s, mapcheck 2.3 s
+  native-gpu-build.txt (b/nat/gen-on, not staged: native4b-bin has none): LEGO Dimensions native GPU 1616ce65e973c583
+  N-A: rexruntime.dll / rexgpu-xenos.dll / TracyClient.dll are native4b-bin's (old snap1-sdk)
+RESULT: PASS (total 0.4 s) DRY RUN

@@ -1,0 +1,151 @@
+# build-bin 2026-11-25 02:43:53  build\agent2\s33\s33 -> build/agent2/devoff4b-s33-bin
+PASS shared DLL before (build\agent2\snap1-sdk\install\bin\rexgpu-xenos.dll)
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\recompile.py --ccdb <workspace>\build\agent2\snap1-sdk\compile_commands.json --obj-filter /Release/ --jobs 8 --priority normal --fwd-src --list <workspace>\build\agent2\s33\s33\list-ctl.tsv --log-dir <workspace>\build\agent2\s33\s33\log-ctl
+    priority normal, jobs 8, include-first: -
+    10 TU(s); defines: -; commands in build\agent2\s33\s33\log-ctl\recompile-commands.txt
+      command_processor.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\command_processor.cpp (12AE88F631E896BF) -> build\agent2\s33\s33\obj-ctl\command_processor.cpp.obj
+      command_processor.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\d3d12\command_processor.cpp (027204B53A271D69) -> build\agent2\s33\s33\obj-ctl\d3d12__command_processor.cpp.obj
+      deferred_command_list.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\d3d12\deferred_command_list.cpp (30FF57446EFB5D76) -> build\agent2\s33\s33\obj-ctl\d3d12__deferred_command_list.cpp.obj
+      graphics_system.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\d3d12\graphics_system.cpp (419C1FD6928CC73E) -> build\agent2\s33\s33\obj-ctl\d3d12__graphics_system.cpp.obj
+      pipeline_cache.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\d3d12\pipeline_cache.cpp (DA77744302CFC149) -> build\agent2\s33\s33\obj-ctl\d3d12__pipeline_cache.cpp.obj
+      primitive_processor.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\d3d12\primitive_processor.cpp (6C10DCA605AFF1E2) -> build\agent2\s33\s33\obj-ctl\d3d12__primitive_processor.cpp.obj
+      render_target_cache.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\d3d12\render_target_cache.cpp (7BC68F0891B9EC0A) -> build\agent2\s33\s33\obj-ctl\d3d12__render_target_cache.cpp.obj
+      shared_memory.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\d3d12\shared_memory.cpp (2A5ADF13B5E433F1) -> build\agent2\s33\s33\obj-ctl\d3d12__shared_memory.cpp.obj
+      texture_cache.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\d3d12\texture_cache.cpp (949CCF4F4D80975D) -> build\agent2\s33\s33\obj-ctl\d3d12__texture_cache.cpp.obj
+      shared_memory.cpp: build\agent2\snap1\DimensionsRecomp\rexglue-sdk\src\graphics\shared_memory.cpp (A4A31038ABDFF94A) -> build\agent2\s33\s33\obj-ctl\shared_memory.cpp.obj
+    PASS command_processor.cpp.obj exit 0 4.1 s obj 333780 B 8F2710994F1576C7 (log 16796 B)
+    PASS d3d12__command_processor.cpp.obj exit 0 8.2 s obj 808912 B 45D935E988E4E76F (log 12611 B)
+    PASS d3d12__deferred_command_list.cpp.obj exit 0 3.6 s obj 24112 B 348AF5FE135A474F (log 9562 B)
+    PASS d3d12__graphics_system.cpp.obj exit 0 3.6 s obj 20675 B A06830C8FA70D18A (log 9538 B)
+    PASS d3d12__pipeline_cache.cpp.obj exit 0 6.6 s obj 545875 B E7E32989D33185D2 (log 10301 B)
+    PASS d3d12__primitive_processor.cpp.obj exit 0 3.5 s obj 44073 B A75C9F99C879FF81 (log 9554 B)
+    PASS d3d12__render_target_cache.cpp.obj exit 0 7.1 s obj 1159060 B 2F584990E4C1D1D7 (log 9554 B)
+    PASS d3d12__shared_memory.cpp.obj exit 0 4.0 s obj 123723 B 47938EA27CFBA67D (log 9530 B)
+    PASS d3d12__texture_cache.cpp.obj exit 0 3.1 s obj 533234 B C1DDCD7A66A8A781 (log 10663 B)
+    PASS shared_memory.cpp.obj exit 0 1.0 s obj 126357 B C19DB3863BEE3E10 (log 1271 B)
+    wall 8.7 s, 0 failure(s)
+CTL recompile: exit 0, 8.9 s
+PASS CTL recompile
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\relink.py --ninja <workspace>\build\agent2\snap1-sdk\build-Release.ninja --target <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.dll --priority normal --replace-file <workspace>\build\agent2\s33\s33\replace-ctl.txt --out-dir <workspace>\build\agent2\s33\s33\link-ctl --compare <workspace>\build\agent2\devoff4b-bin\rexgpu-xenos.dll
+    parsed 4 file(s), 3437 edges, 260 rules; edges making the target: 1
+    edge: <workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/out/win-amd64/Release/rexgpu-xenos.dll (rule CXX_SHARED_LIBRARY_LINKER__rexgpu-xenos_Release, from build\agent2\snap1-sdk\CMakeFiles\impl-Release.ninja), 37 explicit inputs, 5 implicit
+    replace input 8: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/command_processor.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-ctl\command_processor.cpp.obj (333780 B, 8F2710994F1576C7)
+    replace input 29: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/command_processor.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-ctl\d3d12__command_processor.cpp.obj (808912 B, 45D935E988E4E76F)
+    replace input 35: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/deferred_command_list.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-ctl\d3d12__deferred_command_list.cpp.obj (24112 B, 348AF5FE135A474F)
+    replace input 28: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/graphics_system.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-ctl\d3d12__graphics_system.cpp.obj (20675 B, A06830C8FA70D18A)
+    replace input 36: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/pipeline_cache.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-ctl\d3d12__pipeline_cache.cpp.obj (545875 B, E7E32989D33185D2)
+    replace input 30: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/primitive_processor.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-ctl\d3d12__primitive_processor.cpp.obj (44073 B, A75C9F99C879FF81)
+    replace input 31: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/render_target_cache.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-ctl\d3d12__render_target_cache.cpp.obj (1159060 B, 2F584990E4C1D1D7)
+    replace input 33: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/shared_memory.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-ctl\d3d12__shared_memory.cpp.obj (123723 B, 47938EA27CFBA67D)
+    replace input 34: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/texture_cache.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-ctl\d3d12__texture_cache.cpp.obj (533234 B, C1DDCD7A66A8A781)
+    replace input 16: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/shared_memory.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-ctl\shared_memory.cpp.obj (126357 B, C19DB3863BEE3E10)
+    priority normal, link flags added: -
+      TARGET_FILE: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.dll
+        -> <workspace>\build\agent2\s33\s33\link-ctl\rexgpu-xenos.dll
+      TARGET_IMPLIB: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.lib
+        -> <workspace>\build\agent2\s33\s33\link-ctl\rexgpu-xenos.lib
+      TARGET_PDB: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.pdb
+        -> <workspace>\build\agent2\s33\s33\link-ctl\rexgpu-xenos.pdb
+    NOTE unresolved (empty) variables: ARCH_FLAGS, LINK_FLAGS, LINK_PATH, MANIFESTS
+    command (5100 chars) and rsp (0 chars) written to build\agent2\s33\s33\link-ctl
+    PASS outputs: every output path in the command is inside build\agent2\s33\s33\link-ctl
+    link exit 0, 1.0 s (log build\agent2\s33\s33\link-ctl\relink.log)
+      rexgpu-xenos.dll 3425792 B B539BCF13F341B8CFE7F7BE5FCBFDBC2E9ACC41587E0043B16A2EE4AA0E1CDEE
+      rexgpu-xenos.lib 2124 B 841EDFD459DAE28D03720DF49A7F098A5AABD968866625978E8D270EEE0D1EA0
+    PASS compare rexgpu-xenos.dll vs build\agent2\devoff4b-bin\rexgpu-xenos.dll: identical except 1 TimeDateStamp field(s) (6b069fd2 vs 6b03a0ae; COFF header at 0x80, included)
+CTL relink: exit 0, 1.5 s
+PASS CTL relink == devoff4b-bin rexgpu-xenos.dll except timestamps: PASS compare rexgpu-xenos.dll vs build\agent2\devoff4b-bin\rexgpu-xenos.dll: identical except 1 TimeDateStamp field(s) (6b069fd2 vs 6b03a0ae; COFF header at 0x80, included)
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\recompile.py --ccdb <workspace>\build\agent2\snap1-sdk\compile_commands.json --obj-filter /Release/ --jobs 8 --priority normal --fwd-src --list <workspace>\build\agent2\s33\s33\list-on.tsv --log-dir <workspace>\build\agent2\s33\s33\log-on --include-first <workspace>\build\agent2\s33\s33\sdk\include --flag=-fmacro-prefix-map=<workspace>/build/agent2/s33/s33/sdk=<workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk
+    priority normal, jobs 8, include-first: <workspace>\build\agent2\s33\s33\sdk\include
+    10 TU(s); defines: -; commands in build\agent2\s33\s33\log-on\recompile-commands.txt
+      command_processor.cpp: build\agent2\s33\s33\sdk\src\graphics\command_processor.cpp (12AE88F631E896BF) -> build\agent2\s33\s33\obj-on\command_processor.cpp.obj
+      command_processor.cpp: build\agent2\s33\s33\sdk\src\graphics\d3d12\command_processor.cpp (00EA93D3E9115B01) -> build\agent2\s33\s33\obj-on\d3d12__command_processor.cpp.obj
+      deferred_command_list.cpp: build\agent2\s33\s33\sdk\src\graphics\d3d12\deferred_command_list.cpp (30FF57446EFB5D76) -> build\agent2\s33\s33\obj-on\d3d12__deferred_command_list.cpp.obj
+      graphics_system.cpp: build\agent2\s33\s33\sdk\src\graphics\d3d12\graphics_system.cpp (419C1FD6928CC73E) -> build\agent2\s33\s33\obj-on\d3d12__graphics_system.cpp.obj
+      pipeline_cache.cpp: build\agent2\s33\s33\sdk\src\graphics\d3d12\pipeline_cache.cpp (C4CB51CC6D2A6429) -> build\agent2\s33\s33\obj-on\d3d12__pipeline_cache.cpp.obj
+      primitive_processor.cpp: build\agent2\s33\s33\sdk\src\graphics\d3d12\primitive_processor.cpp (6C10DCA605AFF1E2) -> build\agent2\s33\s33\obj-on\d3d12__primitive_processor.cpp.obj
+      render_target_cache.cpp: build\agent2\s33\s33\sdk\src\graphics\d3d12\render_target_cache.cpp (7BC68F0891B9EC0A) -> build\agent2\s33\s33\obj-on\d3d12__render_target_cache.cpp.obj
+      shared_memory.cpp: build\agent2\s33\s33\sdk\src\graphics\d3d12\shared_memory.cpp (2A5ADF13B5E433F1) -> build\agent2\s33\s33\obj-on\d3d12__shared_memory.cpp.obj
+      texture_cache.cpp: build\agent2\s33\s33\sdk\src\graphics\d3d12\texture_cache.cpp (949CCF4F4D80975D) -> build\agent2\s33\s33\obj-on\d3d12__texture_cache.cpp.obj
+      shared_memory.cpp: build\agent2\s33\s33\sdk\src\graphics\shared_memory.cpp (A4A31038ABDFF94A) -> build\agent2\s33\s33\obj-on\shared_memory.cpp.obj
+    PASS command_processor.cpp.obj exit 0 4.1 s obj 333781 B 4AC3E753E8C0013C (log 15853 B)
+    PASS d3d12__command_processor.cpp.obj exit 0 8.6 s obj 810713 B 2B8FB471641E7F38 (log 12266 B)
+    PASS d3d12__deferred_command_list.cpp.obj exit 0 3.6 s obj 24112 B F2543B060D09CA97 (log 9401 B)
+    PASS d3d12__graphics_system.cpp.obj exit 0 3.6 s obj 20675 B 09668B85BEA14F39 (log 9377 B)
+    PASS d3d12__pipeline_cache.cpp.obj exit 0 7.1 s obj 558680 B 447CF12188C7C5D2 (log 10094 B)
+    PASS d3d12__primitive_processor.cpp.obj exit 0 3.5 s obj 44073 B 3F6DAD9F3D9AED83 (log 9393 B)
+    PASS d3d12__render_target_cache.cpp.obj exit 0 7.6 s obj 1159060 B 62E31BD8138152F7 (log 9393 B)
+    PASS d3d12__shared_memory.cpp.obj exit 0 4.0 s obj 123717 B 4FDB39B57851AC7E (log 9369 B)
+    PASS d3d12__texture_cache.cpp.obj exit 0 3.5 s obj 533234 B 0202C3212CD319A2 (log 10433 B)
+    PASS shared_memory.cpp.obj exit 0 1.5 s obj 126358 B 801CDD5275BE46A5 (log 1202 B)
+    wall 9.1 s, 0 failure(s)
+ON recompile: exit 0, 9.3 s
+PASS ON recompile
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\relink.py --ninja <workspace>\build\agent2\snap1-sdk\build-Release.ninja --target <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.dll --priority normal --replace-file <workspace>\build\agent2\s33\s33\replace-on.txt --out-dir <workspace>\build\agent2\s33\s33\link-on
+    parsed 4 file(s), 3437 edges, 260 rules; edges making the target: 1
+    edge: <workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/out/win-amd64/Release/rexgpu-xenos.dll (rule CXX_SHARED_LIBRARY_LINKER__rexgpu-xenos_Release, from build\agent2\snap1-sdk\CMakeFiles\impl-Release.ninja), 37 explicit inputs, 5 implicit
+    replace input 8: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/command_processor.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-on\command_processor.cpp.obj (333781 B, 4AC3E753E8C0013C)
+    replace input 29: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/command_processor.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-on\d3d12__command_processor.cpp.obj (810713 B, 2B8FB471641E7F38)
+    replace input 35: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/deferred_command_list.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-on\d3d12__deferred_command_list.cpp.obj (24112 B, F2543B060D09CA97)
+    replace input 28: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/graphics_system.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-on\d3d12__graphics_system.cpp.obj (20675 B, 09668B85BEA14F39)
+    replace input 36: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/pipeline_cache.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-on\d3d12__pipeline_cache.cpp.obj (558680 B, 447CF12188C7C5D2)
+    replace input 30: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/primitive_processor.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-on\d3d12__primitive_processor.cpp.obj (44073 B, 3F6DAD9F3D9AED83)
+    replace input 31: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/render_target_cache.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-on\d3d12__render_target_cache.cpp.obj (1159060 B, 62E31BD8138152F7)
+    replace input 33: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/shared_memory.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-on\d3d12__shared_memory.cpp.obj (123717 B, 4FDB39B57851AC7E)
+    replace input 34: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/d3d12/texture_cache.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-on\d3d12__texture_cache.cpp.obj (533234 B, 0202C3212CD319A2)
+    replace input 16: src/graphics/CMakeFiles/rexgpu-xenos.dir/Release/shared_memory.cpp.obj -> <workspace>\build\agent2\s33\s33\obj-on\shared_memory.cpp.obj (126358 B, 801CDD5275BE46A5)
+    priority normal, link flags added: -
+      TARGET_FILE: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.dll
+        -> <workspace>\build\agent2\s33\s33\link-on\rexgpu-xenos.dll
+      TARGET_IMPLIB: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.lib
+        -> <workspace>\build\agent2\s33\s33\link-on\rexgpu-xenos.lib
+      TARGET_PDB: <workspace>\build\agent2\snap1\DimensionsRecomp\rexglue-sdk\out\win-amd64\Release\rexgpu-xenos.pdb
+        -> <workspace>\build\agent2\s33\s33\link-on\rexgpu-xenos.pdb
+    NOTE unresolved (empty) variables: ARCH_FLAGS, LINK_FLAGS, LINK_PATH, MANIFESTS
+    command (5087 chars) and rsp (0 chars) written to build\agent2\s33\s33\link-on
+    PASS outputs: every output path in the command is inside build\agent2\s33\s33\link-on
+    link exit 0, 1.0 s (log build\agent2\s33\s33\link-on\relink.log)
+      rexgpu-xenos.dll 3430912 B 0B57BBD5D7B96CBD4156E9EB700F6E077044EF5FA5E90CA2B99BC082AA2B04E2
+      rexgpu-xenos.lib 2124 B 841EDFD459DAE28D03720DF49A7F098A5AABD968866625978E8D270EEE0D1EA0
+ON relink: exit 0, 1.5 s
+PASS ON relink
+PASS ON DLL differs from the shared E3CB99CF: 0B57BBD5D7B96CBD4156E9EB700F6E077044EF5FA5E90CA2B99BC082AA2B04E2
+PASS needle in ON DLL: d3d12_pipeline_creation_no_wait
+PASS needle NOT in devoff4b-bin DLL: d3d12_pipeline_creation_no_wait
+PASS needle NOT in ON DLL: d3d12_resolve_after_drop_log
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\stage-variant.py --base <workspace>\build\agent2\devoff4b-bin --out <workspace>\build\agent2\devoff4b-s33-bin --replace rexgpu-xenos.dll=<workspace>\build\agent2\s33\s33\link-on\rexgpu-xenos.dll --title devoff4b-s33: devoff4b-bin with only rexgpu-xenos.dll rebuilt with #33 pop-in opt-in, first test patch build/agent6/s33-popin/s33-popin-nohunk5.patch sha256 57CFA8ADF1E9007954063A87F406056BB137E2D2D8F2484940BD4E1ABF3704AF (M6's, NOT M2's 4061ED2D; no hunk #5; cvar d3d12_pipeline_creation_no_wait default false, kRequiresRestart); rating build/agent10/session3/r33-nohunk5-diagd.md [M2 successor, build/agent2/session3/build-bin.py] --note Source: fresh overlay build/agent2/s33/s33/sdk = copy of snap1 rexglue-sdk/src/graphics + include/rex/graphics/d3d12/pipeline_cache.h (5350b1d blobs 7e81db3b pipeline_cache.h, 6f21eb6f d3d12/command_processor.cpp, 55e9f02e d3d12/pipeline_cache.cpp, 8c169b41 frame_stats.h) + the patch (git -c core.autocrlf=false apply, 4 Applied cleanly, 0 Skipped); after-hashes == TESTPLAN section 0. 10 affected TUs (ninja deps) recompiled with snap1-sdk ccdb (Release, --include-first overlay include, source with /, -fmacro-prefix-map overlay->snap1); rexgpu-xenos.dll relinked; snap1-sdk/install not touched. --note prep: PASS patch sha256 build\agent6\s33-popin\s33-popin-nohunk5.patch: 57CFA8ADF1E9007954063A87F406056BB137E2D2D8F2484940BD4E1ABF3704AF --note prep: before include/rex/graphics/d3d12/pipeline_cache.h 9322AD374BF4BBEC CRLF 0 --note prep: before src/graphics/d3d12/command_processor.cpp 027204B53A271D69 CRLF 0 --note prep: before src/graphics/d3d12/pipeline_cache.cpp DA77744302CFC149 CRLF 0 --note prep: before src/graphics/frame_stats.h EFA82A7C20F6BF37 CRLF 0 --note prep: after  include/rex/graphics/d3d12/pipeline_cache.h 0BAF28BE633759CD0F9A1A3672CD86D2D75DDE78EC4662DA8D4B5ED9514CF81F CRLF 0 --note prep: after  src/graphics/d3d12/command_processor.cpp 00EA93D3E9115B01FE6C45A28C39CAB72FF53716A11090602B9FBAD05F28E0FA CRLF 0 --note prep: after  src/graphics/d3d12/pipeline_cache.cpp C4CB51CC6D2A6429637115F605FF10279FCE59AEDCF8BBC6E2195F92615C86C6 CRLF 0 --note prep: after  src/graphics/frame_stats.h 9F3C4F9DC58DCA5DF1AB946056ED565C706BC336E652C854132E53FE5B048970 CRLF 0 --note control: PASS compare rexgpu-xenos.dll vs build\agent2\devoff4b-bin\rexgpu-xenos.dll: identical except 1 TimeDateStamp field(s) (6b069fd2 vs 6b03a0ae; COFF header at 0x80, included) --note ON object command_processor.cpp.obj exit 0 4.1 s obj 333781 B 4AC3E753E8C0013C (log 15853 B) --note ON object d3d12__command_processor.cpp.obj exit 0 8.6 s obj 810713 B 2B8FB471641E7F38 (log 12266 B) --note ON object d3d12__deferred_command_list.cpp.obj exit 0 3.6 s obj 24112 B F2543B060D09CA97 (log 9401 B) --note ON object d3d12__graphics_system.cpp.obj exit 0 3.6 s obj 20675 B 09668B85BEA14F39 (log 9377 B) --note ON object d3d12__pipeline_cache.cpp.obj exit 0 7.1 s obj 558680 B 447CF12188C7C5D2 (log 10094 B) --note ON object d3d12__primitive_processor.cpp.obj exit 0 3.5 s obj 44073 B 3F6DAD9F3D9AED83 (log 9393 B) --note ON object d3d12__render_target_cache.cpp.obj exit 0 7.6 s obj 1159060 B 62E31BD8138152F7 (log 9393 B) --note ON object d3d12__shared_memory.cpp.obj exit 0 4.0 s obj 123717 B 4FDB39B57851AC7E (log 9369 B) --note ON object d3d12__texture_cache.cpp.obj exit 0 3.5 s obj 533234 B 0202C3212CD319A2 (log 10433 B) --note ON object shared_memory.cpp.obj exit 0 1.5 s obj 126358 B 801CDD5275BE46A5 (log 1202 B) --note needles: ON has ['d3d12_pipeline_creation_no_wait']; ON lacks ['d3d12_resolve_after_drop_log']; devoff4b-bin DLL lacks ['d3d12_pipeline_creation_no_wait'] --note times: ctl compile 8.9 s, ctl link 1.5 s, on compile 9.3 s, on link 1.5 s
+    base build\agent2\devoff4b-bin: 7 files match its MANIFEST (sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA)
+      FiraSans-Regular.ttf <- build\agent2\devoff4b-bin\FiraSans-Regular.ttf
+      TracyClient.dll <- build\agent2\devoff4b-bin\TracyClient.dll
+      achievement_unlocked.wav <- build\agent2\devoff4b-bin\achievement_unlocked.wav
+      legodimensions.exe <- build\agent2\devoff4b-bin\legodimensions.exe
+      legodimensions.map <- build\agent2\devoff4b-bin\legodimensions.map
+      rexgpu-xenos.dll <- build\agent2\s33\s33\link-on\rexgpu-xenos.dll  (REPLACED)
+      rexruntime.dll <- build\agent2\devoff4b-bin\rexruntime.dll
+    FiraSans-Regular.ttf	456996	2026-11-25 02:44:14	C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23	build\agent2\snap1\DimensionsRecomp\rexlego\res\FiraSans-Regular.ttf
+    TracyClient.dll	233472	2026-11-25 02:44:14	85044850B6C663B5CE8722285D13070381C33C9ABC49D06B3E59BA0277F8FF4E	build\agent2\snap1-sdk\install\bin\TracyClient.dll
+    achievement_unlocked.wav	191018	2026-11-25 02:44:14	A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5	build\agent2\snap1-off\achievement_unlocked.wav
+    legodimensions.exe	170350080	2026-11-25 02:44:14	DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83	build\agent2\snap1-off\legodimensions.exe
+    legodimensions.map	39181442	2026-11-25 02:44:14	52155274A978A946870446A1C8F573EC381A486D50636AF13DA8920E4DC18EA5	build\agent2\snap1-off\legodimensions.map
+    rexgpu-xenos.dll	3430912	2026-11-25 02:44:14	0B57BBD5D7B96CBD4156E9EB700F6E077044EF5FA5E90CA2B99BC082AA2B04E2	build\agent2\s33\s33\link-on\rexgpu-xenos.dll
+    rexruntime.dll	10909184	2026-11-25 02:44:14	A33801D1538D61759D35FD137EBC9F5EAD636D7D26E9A79DC3B4994A22CB9F12	build\agent2\snap1-off\rexruntime.dll
+    staged build\agent2\devoff4b-s33-bin in 0.5 s; MANIFEST.txt sha256 50CC5BE26AC5216DEE470265C4026EF54F362A98594B7349D4D498C6CC9032A6
+stage: exit 0, 0.8 s
+PASS stage devoff4b-s33-bin
+$ C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent2\session3\verify-bins.py <workspace>\build\agent2\devoff4b-s33-bin <workspace>\build\agent2\devoff4b-bin <workspace>\build\agent2\devoff4b-cg26-bin <workspace>\build\agent2\native4b-bin
+    # verify-bins 2026-11-25 02:44:15
+    PASS <workspace>\build\agent2\devoff4b-s33-bin: 7 rows, 7 files, 0 FAIL; MANIFEST sha256 50CC5BE26AC5216DEE470265C4026EF54F362A98594B7349D4D498C6CC9032A6
+    PASS <workspace>\build\agent2\devoff4b-bin: 7 rows, 7 files, 0 FAIL; MANIFEST sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA
+    PASS <workspace>\build\agent2\devoff4b-cg26-bin: 7 rows, 7 files, 0 FAIL; MANIFEST sha256 917AE86E6C0CC9B370901397EF8FD72F65449E5EC9594D14D9902215BBBC1D5C
+    PASS <workspace>\build\agent2\native4b-bin: 8 rows, 8 files, 0 FAIL; MANIFEST sha256 B63769FE46CC04592F2BEDAF04A51C362000325D3291BC4D7489369C2160B817
+    RESULT: 0 FAIL
+verify: exit 0, 0.9 s
+PASS verify-bins new + shared bins 0 FAIL
+PASS shared DLL after (build\agent2\snap1-sdk\install\bin\rexgpu-xenos.dll)
+  devoff4b-s33-bin/legodimensions.exe DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83
+  devoff4b-s33-bin/rexruntime.dll A33801D1538D61759D35FD137EBC9F5EAD636D7D26E9A79DC3B4994A22CB9F12
+  devoff4b-s33-bin/rexgpu-xenos.dll 0B57BBD5D7B96CBD4156E9EB700F6E077044EF5FA5E90CA2B99BC082AA2B04E2
+PASS exe == devoff4b-bin
+PASS rexruntime == devoff4b-bin
+PASS no cache/ in the bin
+RESULT: PASS (total 23.2 s)

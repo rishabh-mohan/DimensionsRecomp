@@ -1,0 +1,30 @@
+# mapcheck-s4c (Agent 2, run 2 task #1; by name and object, not address)  2026-11-25 01:35:33  mode s4c
+new: build\agent2\cg26\link-on\legodimensions.map  39181442 B  mtime 11-25 01:35:09  sha256 1ECC3480C09D1EBC
+ref: build\agent2\devoff4-bin\legodimensions.map  39162310 B  mtime 11-22 13:30:26  sha256 DCC51E2B7A0040E2
+new: publics 353058; sub_ 164786; __imp__sub_ 164786; hooked 31
+ref: publics 353031; sub_ 164786; __imp__sub_ 164786; hooked 27
+PASS sub_ name set equal to ref: 164786 names
+PASS __imp__sub_ name set equal to ref: 164786 names
+PASS hooked set = ref hooked (27) + 4 moved = 31: have 31
+PASS sub_83FBF7D0: sub_ in gpu_wait_backoff.cpp.obj, __imp__ stays in legodimensions_recomp.248.cpp.obj: sub_ in gpu_wait_backoff.cpp.obj, __imp__ in legodimensions_recomp.248.cpp.obj
+PASS sub_83FAF180: sub_ in gpu_wait_backoff.cpp.obj, __imp__ stays in legodimensions_recomp.107.cpp.obj: sub_ in gpu_wait_backoff.cpp.obj, __imp__ in legodimensions_recomp.107.cpp.obj
+PASS sub_83FB09E8: sub_ in gpu_wait_backoff.cpp.obj, __imp__ stays in legodimensions_recomp.422.cpp.obj: sub_ in gpu_wait_backoff.cpp.obj, __imp__ in legodimensions_recomp.422.cpp.obj
+PASS sub_83FC0C10: sub_ in gpu_wait_backoff.cpp.obj, __imp__ stays in legodimensions_recomp.232.cpp.obj: sub_ in gpu_wait_backoff.cpp.obj, __imp__ in legodimensions_recomp.232.cpp.obj
+PASS the 27 ref-hooked names keep their sub_ and __imp__ objects
+PASS per-object sub_ sets = ref with the 4 targets moved (448 objects)
+PASS per-object __imp__sub_ sets = ref (438 objects)
+PASS unhooked names: sub_ and __imp__ in the same object: 164755 names
+PASS gpu_wait_backoff.cpp.obj defines exactly the sub_ publics sub_83FBF7D0 sub_83FAF180 sub_83FB09E8 sub_83FC0C10: has sub_83FAF180 sub_83FB09E8 sub_83FBF7D0 sub_83FC0C10
+gpu_wait_backoff.cpp.obj publics (24): ??$log_@AEAPEBD@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEAPEBD@Z ??$log_@AEAPEBDAEAI@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEAPEBDAEAI@Z ??$log_@AEB_K_K_K_K_K_K_KAEB_K_K_K_K_K_K_K_KN_KNN_K_K_K_K_KNN@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@AEB_K$$QEA_K4444434444444$$QEAN4554444455@Z ??$log_@PEBDAEAIAEAIPEBDPEBD@logger@spdlog@@IEAAXUsource_loc@1@W4level_enum@level@1@V?$basic_string_view@D@v12@fmt@@$$QEAPEBDAEAI433@Z ??_C@_02BFICIOJL@ON?$AA@ ??_C@_03MPPIHBHJ@OFF?$AA@ ??_C@_05HGIDKJIN@built?$AA@ ??_C@_0BE@HDGDEHF@LEGO_GPU_WAIT_STATS?$AA@ ??_C@_0BFD@LKMKECIC@GPU?5wait?5stats?5?$CI5?5s?$CJ?3?5L1?5waits?5?$HL@ ??_C@_0BG@PAIHAKBJ@LEGO_GPU_WAIT_SPIN_US?$AA@ ??_C@_0BJ@MCANBKBA@LEGO_GPU_WAIT_BACKOFF_US?$AA@ ??_C@_0CA@DMJCGMMG@?$CIanonymous?5namespace?$CJ?3?3MaybeLog?$AA@ ??_C@_0DD@PIALDNJM@?$CIanonymous?5namespace?$CJ?3?3Cfg?$CI?$CJ?3?3?$CIl@ ??_C@_0EO@NDBJGJPO@GPU?5wait?5back?9off?3?5?$HL?$HN?5?$CIquantum?5?$HL@ ??_C@_0FH@CCGGAFBH@GPU?5wait?5back?9off?3?5LEGO_GPU_WAIT@ ??_C@_0FM@KPGJMCDC@GPU?5wait?5back?9off?3?5LEGO_GPU_WAIT@ ??_C@_0IC@KOBONCDG@C?3?1Users?1<user>?1?4vscode?1projects?1@ __real@408f400000000000 __xmm@00000000000000004530000043300000 __xmm@45300000000000004330000000000000 sub_83FAF180 sub_83FB09E8 sub_83FBF7D0 sub_83FC0C10
+hooked by sub_ object (new map):
+  crash_guards.cpp.obj                  2  sub_82A35B90 sub_83C01C08
+  gpu_wait_backoff.cpp.obj              4  sub_83FAF180 sub_83FB09E8 sub_83FBF7D0 sub_83FC0C10
+  main_menu_extras.cpp.obj              3  sub_82F03C40 sub_82FBE7A8 sub_82FE4A80
+  name_trace.cpp.obj                    5  sub_82A3D980 sub_83470AF8 sub_834B8168 sub_836F5AD0 sub_83715F00
+  native_atomics.cpp.obj                3  sub_82A2A0E8 sub_82A2A138 sub_82A2A160
+  native_constants.cpp.obj              1  sub_82B7ABF0
+  native_lock_elide.cpp.obj             7  sub_82A2CAB0 sub_82A2CC20 sub_82A34E28 sub_82A34FE8 sub_82A35D28 sub_82A4CA18 sub_83F99CB8
+  native_markers.cpp.obj                2  sub_82A3E238 sub_82A3E2B8
+  native_memops.cpp.obj                 2  sub_83E45090 sub_83E46040
+  scene_distance.cpp.obj                2  sub_82C6F428 sub_83A11F50
+RESULT: PASS  (31 hooked; 2.4 s)

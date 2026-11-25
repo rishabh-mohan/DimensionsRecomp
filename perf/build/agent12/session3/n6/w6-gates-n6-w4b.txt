@@ -1,0 +1,77 @@
+=== W6 gate kit (run_gates.py): <workspace>\build\agent8\matrix\20261122-1541 ===
+matrix   Window 4 (Agent 8, session 3): B = devoffB (codegen B) vs d0 = devoff2 (primary), then d3 = devoff3; W4b adds d11t = window 3's d11 + REX_TIMER_WAIT_BLOCKING=1
+ref      d0; sys_csv true; plan.txt 17 runs (1 cold)
+arms run d0 x4 (+1 cold), B x4, d3 x4, d11t x4 (17 runs); in matrix.json but not run: d0t
+bins     build/agent2/devoff2-bin: d0, d11t; build/agent2/devoffB-bin: B; build/agent2/devoff3-bin: d3
+switches P2 (shared_memory_single_hold_rearm=true): none; keep-watch (physical_protect_keep_watch=true): none
+launcher window log: none (no window log names this out dir in bench\agent5\launch\status)
+quiet-gate source: - (none (give --gate-log, --status, --window-log or --gate))
+
+--- G1 every switch rated: MANUAL ---
+  d0 (ref): bin build/agent2/devoff2-bin; beyond the common set: -
+  B: bin build/agent2/devoffB-bin; beyond the common set: -
+  d3: bin build/agent2/devoff3-bin; beyond the common set: -
+  d11t: bin build/agent2/devoff2-bin; beyond the common set: host_timer_resolution_ms=1, host_timer_throttling_optout=true, precise_guest_sleep=true, wait_timeout_round_up=true, cs_spin=true, spinlock_pause_spin=true, clock_lockfree=true, tls_bounds_fix=true; env REX_TIMER_WAIT_BLOCKING=1
+  rate every switch above against W6-GATES.md G1 (Agent 10's b2r ratings): the kit only lists them
+
+--- G2 one bin per arm, as built: PASS ---
+  bin build/agent2/devoff2-bin: arms d0, d11t; MANIFEST.txt sha256 B87DC2D2CA22379F; TracyClient.dll 233472 B, legodimensions.exe 170334720 B, rexgpu-xenos.dll 3385344 B, rexruntime.dll 10889728 B; legodimensions.exe sha256 7F0B1C1C84BC66FF
+  bin build/agent2/devoffB-bin: arms B; MANIFEST.txt sha256 8709476FF4778768; TracyClient.dll 233472 B, legodimensions.exe 153588736 B, rexgpu-xenos.dll 3385344 B, rexruntime.dll 10889728 B; legodimensions.exe sha256 C3F8686EBDD83340
+  bin build/agent2/devoff3-bin: arms d3; MANIFEST.txt sha256 B9C5175DA1904235; TracyClient.dll 233472 B, legodimensions.exe 170335232 B, rexgpu-xenos.dll 3385344 B, rexruntime.dll 10889728 B; legodimensions.exe sha256 2522D43605D8A9BF
+
+--- G3 every planned run completed: PASS ---
+  plan.txt: d0 x4+1 cold, B x4, d3 x4, d11t x4; results.csv: d0 x4+1 cold, B x4, d3 x4, d11t x4
+  launcher window log: none (no window log names this out dir in bench\agent5\launch\status)
+
+--- G4 P2's fallback never runs: n/a ---
+
+--- G5 C1 verify on gate A: n/a ---
+
+--- G6 keep only under G: n/a ---
+
+--- G7 inert on native: n/a ---
+
+--- G8 nothing stale, no new errors: PASS ---
+  logdiff reference: d0 x5 merged (482 log lines, 5 warning/error kinds); 17/17 runs have a game*.log to compare
+  by hand: the frame hash or screenshot matches the reference arm at the same point (W6-GATES G8)
+
+--- G9 launch-only switches as planned: PASS ---
+  hands off, no dev console during the window: procedural (C1 v3 latches keep_watch and hold_global_lock at init; other cvars are read live)
+
+--- G10 per-run validity: FAIL ---
+  #6 B r2: not valid timing (build processes: clang++:34584 clang++:36068 clang++:6544) [flags_info light_share_high build_procs_warmup build_procs_window]
+  proof lines d0: none (5 runs)
+  proof lines B: none (4 runs)
+  proof lines d3: none (4 runs)
+  proof lines d11t: timer1ms 1,1,1,1, optout 1,1,1,1 (4 runs)
+    d11t: no log line for precise_guest_sleep, wait_timeout_round_up, cs_spin, spinlock_pause_spin, clock_lockfree, tls_bounds_fix: the recorded cvar list (G9) is the proof
+    d11t: env REX_TIMER_WAIT_BLOCKING=1: run.json env_set (G9) is the proof
+  slow state (info; E-cores < 800 MHz for >= 3 samples overlapping the window): 16/16 scored runs; slow samples in the window: #2 d0 r1 17/49 (longest 26); #3 B r1 16/50 (longest 22); #4 d3 r1 35/50 (longest 40); #5 d11t r1 48/50 (longest 37); #6 B r2 32/50 (longest 32); #7 d3 r2 27/50 (longest 30); #8 d11t r2 48/50 (longest 52); #9 d0 r2 38/50 (longest 43); #10 d3 r3 48/50 (longest 20); #11 d11t r3 48/50 (longest 41); #12 d0 r3 50/50 (longest 86); #13 B r3 50/50 (longest 111); #14 d11t r4 49/50 (longest 44); #15 d0 r4 49/50 (longest 46); #16 B r4 45/50 (longest 45); #17 d3 r4 49/50 (longest 41)
+
+--- G11 power overlay: PASS ---
+  power overlay: best_efficiency in 17/17 runs, no change inside any window
+  scheme: Balanced x17; AC: 1 x17; battery saver: 0 x17
+
+--- G12 quiet gate: NOT RECORDED ---
+  non-game load: 3.07-6.30 cores (median 3.67) in 16 scored runs; unscored/cold 8.46
+  non-game load flag (scored runs above the median 3.67 + 1.0 cores): #2 d0 r1 6.30, #3 B r1 4.98
+  quiet gate: NOT RECORDED (give --gate-log or --gate)
+
+| gate | status | key number |
+|---|---|---|
+| G1 every switch rated | MANUAL | 4 arms; switches beyond the common set (framerate_limit=0): d0 0, B 0, d3 0, d11t 8+1 env |
+| G2 one bin per arm, as built | PASS | 17/17 runs on their arm's bin (MANIFEST + exe/dll SHA-256); 3 bins |
+| G3 every planned run completed | PASS | 17/17 runs OK, exit 0x00000000, wm_close, runner exit 0; plan.txt 17 runs (1 cold); arms 4/4 as planned; no launcher log |
+| G4 P2's fallback never runs | n/a | no run arm sets shared_memory_single_hold_rearm=true |
+| G5 C1 verify on gate A | n/a | no run arm sets physical_protect_keep_watch=true |
+| G6 keep only under G | n/a | no run arm sets physical_protect_keep_watch=true |
+| G7 inert on native | n/a | no run arm sets physical_protect_keep_watch=true |
+| G8 nothing stale, no new errors | PASS | stale/fault/Protect-failed lines in 0/17 runs; logdiff vs d0 (x5): FAIL findings in 0, NEW messages in 0/17 runs (0 kinds) |
+| G9 launch-only switches as planned | PASS | 17/17 runs: params.cvar, args, env_set and toml_set = the arm's |
+| G10 per-run validity | FAIL | 15/16 scored runs valid; proof lines ok in 17/17 runs; free RAM >= 6 GB in 17/17; slow state 16/16 scored (info) |
+| G11 power overlay | PASS | overlay best_efficiency in 17/17 runs, no change inside any window; scheme Balanced; AC 1; saver 0 |
+| G12 quiet gate | NOT RECORDED | no gate log (none (give --gate-log, --status, --window-log or --gate)); non-game load 3.07-6.30 cores (median 3.67), 2 flagged |
+
+RECORD: overlay best_efficiency (17/17, no change); quiet gate NOT RECORDED; non-game load 3.07-6.30 cores
+GATES: G1 MANUAL; G2 PASS; G3 PASS; G4 n/a; G5 n/a; G6 n/a; G7 n/a; G8 PASS; G9 PASS; G10 FAIL; G11 PASS; G12 NOT RECORDED; exit 1
+EXPECT: OK (53/53 checks; fixture-w4b.json)

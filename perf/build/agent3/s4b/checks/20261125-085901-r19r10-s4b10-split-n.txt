@@ -1,0 +1,31 @@
+# s4b_check r19r10 20261125-085901-r19r10-s4b10-split-n (off, scenario M)
+run.json: exit 0 (0x00000000) dumps 0 crash_events 0 wer False; close wm_close 1.05 s; elapsed 214.19 of 420 s; cvars {"d3d12_submit_split_kb": "4"}; env -; steps 54/54
+summary: verdict RUNNING; first frame 7.0 s; levels {"info": 85, "warning": 142}; unknown cvars []; errors 0
+log files game.log; levels {"info": 85, "warning": 142}
+families: c1_any=0 k=0 c1_verify_on=0 c1_verify_f=0 c1_other=0 recovered_stale=0 unhandled_phys=0 protect_failed=0 split_init=1 split=21 deferred_counters=0 gpu_wait=0 memexport=0 slow_frame=0 s4_upload_hash=0 precise_wait=0 miss_cache=0 stuck_lock=0 minidump=0 fatal=0 debug_layer=0 dred=0 d3d12_msg=0 clean_exit=1
+  split_init: [2026-11-25 08:59:03.010] [info] [gpu] [t16956] d3d12_submit_split_kb: splitting submissions at 4 KB of deferred commands
+  split: [2026-11-25 08:59:07.377] [info] [gpu] [t16956] d3d12_submit_split: frame=2 submission=3 splits=0 failed=0 held_query=0 held_scratch=0 held_pipelines=1
+  split: [2026-11-25 08:59:17.392] [info] [gpu] [t16956] d3d12_submit_split: frame=594 submission=1481 splits=885 failed=0 held_query=0 held_scratch=0 held_pipelines=174
+  split: [2026-11-25 08:59:27.393] [info] [gpu] [t16956] d3d12_submit_split: frame=1194 submission=2985 splits=1789 failed=0 held_query=0 held_scratch=0 held_pipelines=174
+  split: ... (15 more)
+  split: [2026-11-25 09:02:07.648] [info] [gpu] [t16956] d3d12_submit_split: frame=7925 submission=176537 splits=145736 failed=0 held_query=1 held_scratch=0 held_pipelines=23757
+  split: [2026-11-25 09:02:17.648] [info] [gpu] [t16956] d3d12_submit_split: frame=8097 submission=199619 splits=168037 failed=0 held_query=1 held_scratch=0 held_pipelines=30430
+  split: [2026-11-25 09:02:27.649] [info] [gpu] [t16956] d3d12_submit_split: frame=8277 submission=214195 splits=181539 failed=0 held_query=1 held_scratch=0 held_pipelines=31658
+split fields: lines 21 (08:59:07.377..09:02:27.649); last {"frame": 8277, "submission": 214195, "splits": 181539, "failed": 0, "held_query": 1, "held_scratch": 0, "held_pipelines": 31658}; max {"frame": 8277, "submission": 214195, "splits": 181539, "failed": 0, "held_query": 1, "held_scratch": 0, "held_pipelines": 31658}; per frame {"submission": 25.8842, "splits": 21.9382, "failed": 0.0, "held_query": 0.0001, "held_scratch": 0.0, "held_pipelines": 3.8256}; monotonic {"frame": true, "submission": true, "splits": true, "failed": true, "held_query": true, "held_scratch": true, "held_pipelines": true}
+frames (perf.csv rows) 8463; slow_frame per frame 0.000
+logdiff vs 20261122-205356-s4b-01-off (base scenario M): NEW 0 (+0 allowed) MORE 0 (+0 allowed) GONE 5 (0 unexpected) FLAG 0; NEW at info 2 other, 0 allowed; rc 0
+  info NEW build\agent3\runs\20261125-085901-r19r10-s4b10-split-n\game.log x21 [info] [gpu] d#d#_submit_split: frame=# submission=# splits=# failed=# held_query=# held_scratch=# held_pipelines=#
+  info NEW build\agent3\runs\20261125-085901-r19r10-s4b10-split-n\game.log x1 [info] [gpu] d#d#_submit_split_kb: splitting submissions at # KB of deferred commands
+levels cand {"info": 85, "warning": 142} vs 20261122-205356-s4b-01-off {"info": 65, "warning": 142}
+scenes (>= 2 s) base: 220/534:71s 226/1022:30s 218/222:23s 220/528:17s 219/226:15s 594/2813:3s 8019/1043795:2s 839/31674:2s
+scenes (>= 2 s) cand: 226/1022:30s 220/534:20s 218/222:19s 219/226:15s 841/31696:5s 790/31625:5s 220/528:4s 8127/762167:4s 8019/1043795:2s 839/31684:2s
+  missing in cand: -; extra in cand: ['790/31625', '8127/762167', '839/31684', '841/31696']
+  front-end scenes in cand (s): 218/222=19.0 226/1022=29.7 220/528=4.1 220/534=19.6 219/226=14.9
+route marks first-frame..up-2: 9, 5 differ: after-a1 220/528->220/534 after-a3 220/534->594/2813 down-1 220/534->838/31668 down-2 220/534->839/31674 up-2 220/534->793/33103; all marks: 18 differ
+  cand marks: first-frame=218/222 title=226/1022 after-start=226/1022 after-a1=220/534 after-a2=220/534 after-a3=594/2813 down-1=838/31668 down-2=839/31674 up-2=793/33103 back-1=790/31625 back-2=788/31613 back-3=2823/366575 idle-10=5272/841370 idle-20=7594/1124013 idle-30=1435/300562 idle-40=5156/1433958 idle-50=1813/639564 idle-60=1191/341670 idle-70=8441/1066391 idle-80=1820/1087753 idle-90=1948/1147830 end=1948/1147830
+threads (% of one core, window [20.0, 195.5] s from the first frame, 175.5 s): XThread9BA8 (F80001A8) x1 89.8 | GPU Commands (F8000018) x1 58.4 | rex::thread::TimerQueue x1 23.9 | Main XThread (F800002C) x1 23.9 | XThread983C (F80000F4) x1 21.7 | (unnamed) x31 11.7 | XThread6688 (F8000144) x1 8.7 | XThread95A8 (F8000114) x1 5.3 | D3D12 Pipelines x9 4.3 | 0xc0550001 x1 3.7
+  TimerQueue ticks (tid 31192): 107 samples over [-6.5, 205.5] s, cycles non-rising in 0 of 106 steps 
+sys.csv slow state: {"rows": 208, "onset_s": null, "slow_pct": 0.0, "e_eff_mhz_median": 1772, "cpu_util_pct_median": 67.3, "slow": false}
+hangs: 0 STUCK-LOCK event(s); hostload rows during the run: {"rows": 7, "busy_rows": 0}; toypad: {"confirms": 0, "result": ""}
+BASE items missed: marks differ before up-2: after-a1 220/528->220/534 after-a3 220/534->594/2813 down-1 220/534->838/31668 down-2 220/534->839/31674 up-2 220/534->793/33103
+VERDICT HINT LOOK: 1 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row r19r10)

@@ -1,0 +1,112 @@
+﻿Created At: 2026-11-25T06:53:11-06:00
+Completed At: 2026-11-25T06:53:12-06:00
+Created At: 2026-11-25T06:53:11-06:00
+Completed At: 2026-11-25T06:53:12-06:00
+Showing lines 1-107 of 107
+1: #!/usr/bin/env python3
+2: """make_live.py - builds r19prep/queue-r19-live.jsonl from ../queue-r19.jsonl (A17F398B, rated by M10) (M7, r19prep).
+3: 
+4: Changes (and nothing else): comment lines dropped (M3's live files are pure JSON lines); rows i, c, g, f get the path
+5: marker r19-pathN + "unless" r19-path16; new rows i16 (after i) and g16 (after g) per M10 C2 with r19-path16 + "unless"
+6: r19-pathN; notes say N=4 (ready-N 03:09) and point to LAUNCH-R19.md. Args, needs order and est of the old rows are
+7: unchanged. Run: python -B build/agent7/session3/r19prep/make_live.py
+8: """
+9: import json
+10: import os
+11: 
+12: HERE = os.path.dirname(os.path.abspath(__file__))
+13: SRC = os.path.join(HERE, '..', 'queue-r19.jsonl')
+14: DST = os.path.join(HERE, 'queue-r19-live.jsonl')
+15: G = 'build\\agent3\\session3\\'
+16: PN, P16 = G + 'r19-pathN', G + 'r19-path16'
+17: L = ' Gate: r19prep\\LAUNCH-R19.md.'
+18: 
+19: NOTES = {
+20:     'r19r11': '#19 ref for rows j and i16 = S4b row 11 (never ran). s4b_check --row s4b11 --base s4b01 --allow-new '
+21:               "'d3d12_submit_split'; r19_gate --row i --n 16 --bin devoff4b-bin: split init 'at 16 KB' x1, failed=0, "
+22:               'splits > 0.' + L,
+23:     'r19r10': '#19 ref for rows i and c = S4b row 10 at N=4 (never ran). PATH DECISION ROW: r19_gate --row i --n 4 '
+24:               'exit 0 -> M3 writes r19-pathN; INCOMPLETE with only the splits>0 entry -> r19-path16 (M10 C2); else '
+25:               'neither (stop).' + L,
+26:     'r19r13': '#19 ref for row f = S4b row 13 at N=4 (never ran). s4b_check --row s4b13 --base s4b01 --allow-new '
+27:               "'d3d12_submit_split'." + L,
+28:     'r19r15': '#19 ref for rows g and g16 = S4b row 15 at N=4 (never ran). s4b_check --row s4b15 (DRED line x>=1, no '
+29:               "debug-layer enable failure); base s4b01 --allow-new 'd3d12_submit_split'." + L,
+30:     'r19r25': '#19 ref for row d = S4b row 25 at N=4 (never ran). s4b_check --row s4b25 --base '
+31:               '20261125-014239-s4b-N16-title-split16. s4bN4 split on the title (101351 splits), so splits are '
+32:               'expected.' + L,
+33:     'r19a': '#19 row a, FIRST run on the #19 bin: OFF identity vs s4b01; r19_gate --row a --bin '
+34:             'build\\agent2\\devoff4b-r19-bin (rexgpu 5DCDD8CB). FAIL -> stop, no r19-ok-a.' + L,
+35:     'r19b': "#19 row b: async on, split 0 -> exactly 1 [warning] 'staying off'. r19_gate --row b --bin "
+36:             'devoff4b-r19-bin.' + L,
+37:     'r19i': '#19 row i (path N): split 4, OFF, vs r19r10; r19_gate --row i --n 4 --bin devoff4b-r19-bin. Last OFF row: '
+38:             'go-r19on only after r19-ok-i.' + L,
+39:     'r19i16': '#19 row i16 (path 16, M10 C2: replaces i when r19r10 shows no split at N): split 16, OFF, vs r19r11; '
+40:               'r19_gate --row i --n 16 --bin devoff4b-r19-bin. PASS -> M3 writes r19-ok-i (slot i, text "i16").' + L,
+41:     'r19c': '#19 row c (path N), first ON row, vs r19r10; r19_gate --row c --n 4 --bin devoff4b-r19-bin. Path 16: '
+42:             'dropped, M3 writes r19-ok-c "held no-op (C2)". Hang = FAIL.' + L,
+43:     'r19g': '#19 row g (path N), debug layer, vs r19r15; s4b_check --row s4b15; r19_gate --row g --n 4 --bin '
+44:             'devoff4b-r19-bin. Hang = FAIL.' + L,
+45:     'r19g16': '#19 row g16 (path 16, M10 C2): debug + split 16 + async vs r19r15 (--allow-new '
+46:               "'d3d12_(async_submit|submit_split)'); s4b_check --row s4b15; r19_gate --row j --n 16 --j1-info --bin "
+47:               'devoff4b-r19-bin. PASS -> M3 writes r19-ok-g (slot g, text "g16"). Hang = FAIL.' + L,
+48:     'r19j': '#19 row j stress (split 16 + async) vs r19r11: r19_gate --row j --n 16 --bin devoff4b-r19-bin; '
+49:             'full_waits = 0 -> INCOMPLETE (stop, Overseer decides). First real-split proof needed by W7.' + L,
+50:     'r19d': '#19 row d = W7 s19 arm, functional only, vs r19r25: r19_gate --row d --n 4 --bin devoff4b-r19-bin. A '
+51:             'no-op marker only under M10 C1 (exact rule in LAUNCH-R19.md). Hang = FAIL.' + L,
+52:     'r19f': '#19 row f (path N): memexport readback drain vs r19r13; r19_gate --row f --n 4 --bin devoff4b-r19-bin. '
+53:             'Path 16: dropped, M3 writes r19-ok-f "held no-op (C2)"; then no ON use may set '
+54:             'd3d12_readback_memexport. Hang = FAIL.' + L,
+55:     'r19e': '#19 row e = 10-min level soak vs s4bL0 (--allow-new d3d12_(async_submit|submit_split)): r19_gate --row e '
+56:             '--n 4 --bin devoff4b-r19-bin. INCOMPLETE ends the chain (C3); W7 needs j + e PASS with real splits.' + L,
+57: }
+58: 
+59: 
+60: def main():
+61:     rows = []
+62:     with open(SRC, 'r', encoding='utf-8') as fh:
+63:         for line in fh:
+64:             s = line.strip()
+65:             if s and not s.startswith('#'):
+66:                 rows.append(json.loads(s))
+67:     out = []
+68:     for r in rows:
+69:         rid = r['id']
+70:         r = dict(r)
+71:         if rid in ('r19i', 'r19c', 'r19g', 'r19f'):
+72:             r['needs'] = r['needs'] + [PN]
+73:             r = with_unless(r, P16)
+74:         r['note'] = NOTES[rid]
+75:         out.append(r)
+76:         if rid == 'r19i':
+77:             out.append(sub16(r, 'r19i16', 'r19i16-split16', 'd3d12_submit_split_kb=16'))
+78:         if rid == 'r19g':
+79:             out.append(sub16(r, 'r19g16', 'r19g16-dbg-async-16',
+80:                              'd3d12_debug=true;d3d12_submit_split_kb=16;d3d12_async_submit=true'))
+81:     with open(DST, 'w', encoding='utf-8', newline='\n') as fh:
+82:         for r in out:
+83:             fh.write(json.dumps(r) + '\n')
+84:     print('wrote %s (%d rows)' % (DST, len(out)))
+85: 
+86: 
+87: def with_unless(r, path):
+88:     # key order id, est, [toypad], needs, unless, args, note
+89:     o = {}
+90:     for k, v in r.items():
+91:         o[k] = v
+92:         if k == 'needs':
+93:             o['unless'] = path
+94:     return o
+95: 
+96: 
+97: def sub16(r, rid, tag, cvar):
+98:     needs = [x for x in r['needs'] if x not in ('build\\agent3\\s4b\\ready-N', PN)] + [P16]
+99:     args = list(r['args'])
+100:     args[args.index('-Tag') + 1] = tag
+101:     args[args.index('-Cvar') + 1] = cvar
+102:     o = {'id': rid, 'est': r['est'], 'needs': needs, 'unless': PN, 'args': args, 'note': NOTES[rid]}
+103:     return o
+104: 
+105: 
+106: if __name__ == '__main__':
+107:     main()

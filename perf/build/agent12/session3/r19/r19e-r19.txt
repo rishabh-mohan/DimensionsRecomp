@@ -1,0 +1,35 @@
+r19_gate build\agent3\runs\20261125-094615-r19e-level-soak-async-n row e: game.log
+           row e: lines with d3d12_async_submit 42, d3d12_submit_split 42 (split init 1, split counter 41, async init 1, async counter 41), watchdog 0
+PASS       #18 init line exactly once (1)
+PASS       #18 init says 'at 4 KB': 12_submit_split_kb: splitting submissions at 4 KB of deferred commands
+PASS       async init line exactly once (1)
+PASS       async init says '(3 slots)'
+           soak_check: lines: async init 1, async counter 41, split counter 41, split init 1
+PASS       soak_check: no 'staying off' / 'failed to create the submit thread' line
+PASS       soak_check: one segment (one SetupContext): 1
+PASS       soak_check: seg 1: async init line L24
+PASS       soak_check: seg 1: every async counter line has the 9 keys
+PASS       soak_check: seg 1: async counters never decrease over 41 lines
+PASS       soak_check: seg 1: queued_max <= 3 (max 3)
+PASS       soak_check: seg 1: chunks > 0 (last line L694: 648929)
+PASS       soak_check: seg 1: every split counter line has the 7 keys
+PASS       soak_check: seg 1: failed = 0 in every split line (41 lines)
+PASS       soak_check: seg 1: split counters never decrease over 41 lines
+PASS       soak_check: seg 1: merged async+split lines: frame and submission never decrease
+PASS       soak_check: seg 1: chunks/splits consistent (every split went async)
+PASS       soak_check: at least 2 async counter lines (found 41)
+PASS       soak_check: held_query > 0 in at least one split line (queries ran)
+           soak_check: rule 5, L39..L694: 58784 frames over 400.1 s
+           soak_check: chunks         delta 648928       per frame 11.0392      per s 1621.86
+           soak_check: submissions    delta 790228       per frame 13.4429      per s 1975.01
+           soak_check: drains_waited  delta 47356        per frame 0.8056       per s 118.36
+           soak_check: drain_wait_us  delta 14888989     per frame 253.2830     per s 37211.87
+           soak_check: full_wait_us   delta 27213887     per frame 462.9472     per s 68015.33
+           soak_check: worker_us      delta 180583201    per frame 3071.9788    per s 451329.37
+           rule 5 per frame: chunks 11.0392, submission 13.4429, drains_waited 0.8056, drain_wait_us 253.2830, full_wait_us 462.9472, worker_us 3071.9788
+PASS       bin identity: build\agent2\devoff4b-r19-bin MANIFEST lists ['legodimensions.exe', 'rexgpu-xenos.dll', 'rexruntime.dll']
+PASS       bin identity: run.json bin_dir <workspace>\build\agent2\devoff4b-r19-bin (want build\agent2\devoff4b-r19-bin)
+PASS       bin identity: run-dir legodimensions.exe DFBE1D43B28861A6 == MANIFEST DFBE1D43B28861A6
+PASS       bin identity: run-dir rexgpu-xenos.dll 5DCDD8CB6DA30F06 == MANIFEST 5DCDD8CB6DA30F06
+PASS       bin identity: run-dir rexruntime.dll A33801D1538D6175 == MANIFEST A33801D1538D6175
+RESULT: PASS (0 failed, 0 incomplete, 0 flags)

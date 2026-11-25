@@ -1,0 +1,104 @@
+﻿diff --git a/build/agent3/s4b/s4b_check.py "b/build\\agent3\\session3\\post-window/s4b_check.py"
+index 29cc74f..604822a 100644
+--- a/build/agent3/s4b/s4b_check.py
++++ "b/build\\agent3\\session3\\post-window/s4b_check.py"
+@@ -16,6 +16,7 @@ The last line is a verdict HINT only; the reader applies QUEUE.md's "passes if"
+ import argparse
+ import csv
+ import datetime
++import hashlib
+ import json
+ import os
+ import re
+@@ -411,6 +412,33 @@ def hang_scan(cand, hostload=HOSTLOAD):
+     return out, quiet, {'confirms': loads, 'result': res_row}
+ 
+ 
++# post-window rows (M3, 11-25): the bin each must run on, as sha256 prefixes (16 hex) of the files the run dir holds.
++# Sources: build/agent2/<bin>/MANIFEST.txt (devoff4bv 353846A3, staged 02:43:40; devoff4b-s33 50CC5BE2, 02:44:14;
++# devoff4b DE11A914). Only rexgpu-xenos.dll differs between the three bins.
++_EXE = 'DFBE1D43B28861A6'
++_RT = 'A33801D1538D6175'
++_GPU = {'devoff4b-bin': 'E3CB99CFDEA95E66', 'devoff4bv-bin': '82A0DE742AAAAE44', 'devoff4b-s33-bin': '0B57BBD5D7B96CBD'}
++
++
++def _pw(bin_name):
++    return {'bin': bin_name, 'sha': {'legodimensions.exe': _EXE, 'rexruntime.dll': _RT, 'rexgpu-xenos.dll': _GPU[bin_name]}}
++
++
++POSTWIN = {'s4bV0f': _pw('devoff4bv-bin'), 's4b07f': _pw('devoff4bv-bin'),
++           's33base': _pw('devoff4b-bin'), 's33basesf': _pw('devoff4b-bin'),
++           's33off': _pw('devoff4b-s33-bin'), 's33offsf': _pw('devoff4b-s33-bin')}
++
++
++def sha16(p):
++    if not os.path.isfile(p):
++        return None
++    h = hashlib.sha256()
++    with open(p, 'rb') as f:
++        for b in iter(lambda: f.read(1 << 20), b''):
++            h.update(b)
++    return h.hexdigest().upper()[:16]
++
++
+ def row_proofs(row, rj, S, ld, res):
+     n = S['n']
+     P = []
+@@ -430,8 +458,11 @@ def row_proofs(row, rj, S, ld, res):
+     # pair, controlled-load pair), s4bLV = w6gA's cvar set with a 1800 s cap (G5: 0 K, 0 F), s4b07r = row 7 re-run beside
+     # s4bV0, s4bQ5 = s4b18 at quantum 500 us, s4bN16 = the ready-N measurement (split 16 on the W7 title scene, row 11's
+     # proofs: init line, failed=0, splits > 0; read K and KB per list from the per-frame line, READY-N.md)
++    # post-window (M3, 11-25): s4b07f / s4bV0f = s4b07r / s4bV0 on devoff4bv (C1 verify-only fix; M10
++    # c1-verify-fix-rating.md S2, Agent 12 RATIONALE.md L86-118): the same proofs plus POSTWIN below
+     r = {'f10a2': 'f10a', 'f10b2': 'f10b', 'f10a3': 'f10a', 'f10b3': 'f10b', 'f10aL': 'f10a', 'f10bL': 'f10b',
+-         's4bLV': 'w6gA', 's4b07r': 's4b07', 's4bQ5': 's4b18', 's4bN16': 's4b11', 's4bN4': 's4b11'}.get(row, row)
++         's4bLV': 'w6gA', 's4b07r': 's4b07', 's4bQ5': 's4b18', 's4bN16': 's4b11', 's4bN4': 's4b11',
++         's4b07f': 's4b07', 's4bV0f': 's4bV0'}.get(row, row)
+     if r in ('s4b01', 's4bL0'):
+         it = {k: n[k] for k in ITEM_FAMS if n[k]}
+         s4 = {k: n[k] for k in S4A_FAMS if n[k]}
+@@ -609,6 +640,44 @@ def row_proofs(row, rj, S, ld, res):
+         chk(n['protect_failed'] == 0 and n['recovered_stale'] == 0 and n['unhandled_phys'] == 0,
+             'G8 bad lines: Protect failed %d, Recovered stale %d, Unhandled guest physical write fault %d' % (
+                 n['protect_failed'], n['recovered_stale'], n['unhandled_phys']))
++    pw = POSTWIN.get(row)
++    if pw:
++        # post-window rows (M3, 11-25): bin identity from the run dir's own copies (run-game copies the bin's files into
++        # the run dir; run.json run_dir / bin_dir), then the positive controls that make a 0 count mean something
++        rd = (rj or {}).get('run_dir') or ''
++        bd = os.path.normpath((rj or {}).get('bin_dir') or '')
++        chk(os.path.basename(bd).lower() == pw['bin'].lower(), 'bin dir %s (want build\\agent2\\%s)' % (bd or '-', pw['bin']))
++        for fn, want in sorted(pw['sha'].items()):
++            got = sha16(os.path.join(rd, fn))
++            chk(got == want, 'bin: run-dir %s sha256 %s, want %s (%s MANIFEST)' % (fn, got, want, pw['bin']))
++        marks = COVER['marks'] or []
++        if row in ('s4b07f', 's4bV0f'):
++            chk(n['c1_verify_on'] == 1, 'positive control: \"C1 verify: on.\" x%d (RATIONALE L104: x1; else INCOMPLETE)' % (
++                n['c1_verify_on']))
++            chk('story-load' in marks, 'positive control: the route reaches story-load (RATIONALE L104; else INCOMPLETE): '
++                'marks ..%s' % (','.join(marks[-3:]) or '-'))
++        if row == 's4b07f':
++            chk(kept_last is not None and kept_last >= 32768, 'positive control: last "kept so far" %s >= 32768 (row 7 '
++                'level, RATIONALE L104; else INCOMPLETE)' % kept_last)
++            chk(None, 'reading (RATIONALE L107-118): K %d, F %d; compare the F of s4bV0f, s4b07r F 51 and s4bV0 F 70 (devoff4b, '
++                'quiet host, 11-25)' % (n['k'], n['c1_verify_f']))
++        elif row == 's4bV0f':
++            chk(None, 'reading: F %d on the fixed bin (s4bV0 on devoff4b: F 70): F 0 = the fix removed the race; F > 0 = a '
++                'non-race source (file-read path / real miss, RATIONALE L68-70), compare pages with s4b07f' % n['c1_verify_f'])
++        elif row.startswith('s33'):
++            # #33 row 1 (M6 TESTPLAN.md section 2): cvar off must be the old code path; the kit (RUN-S33-LOGDIFF.cmd) is
++            # the row's gate, these are the cheap proofs
++            nw = 0
++            for fn in os.listdir(rd) if os.path.isdir(rd) else []:
++                if re.match(r'game(\.\d+)?\.log$', fn):
++                    with open(os.path.join(rd, fn), encoding='utf-8', errors='replace') as f:
++                        nw += sum(1 for ln in f if 'd3d12_pipeline_creation_no_wait' in ln)
++            chk(nw == 0, 'no \"d3d12_pipeline_creation_no_wait\" text in game*.log (x%d; TESTPLAN row 1a)' % nw)
++            chk(not cv.get('d3d12_pipeline_creation_no_wait'), 'cvar d3d12_pipeline_creation_no_wait not set (run.json: %s)' % (
++                cv.get('d3d12_pipeline_creation_no_wait') or '-'))
++            chk((rj or {}).get('close_method') == 'wm_close', 'closed via WM_CLOSE (%s)' % (rj or {}).get('close_method'))
++            if row.endswith('sf'):
++                chk(n['slow_frame'] > 0, 'slow-frame lines %d (slow_frame_log_ms=1)' % n['slow_frame'])
+     return P
+ 
+ 

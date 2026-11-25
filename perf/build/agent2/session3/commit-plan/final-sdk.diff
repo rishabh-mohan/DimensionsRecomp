@@ -1,0 +1,210 @@
+diff --git a/src/core/clock.cpp b/src/core/clock.cpp
+--- a/src/core/clock.cpp
++++ b/src/core/clock.cpp
+@@ -23,7 +23,7 @@ REXCVAR_DEFINE_BOOL(clock_no_scaling, false, "Clock",
+ 
+ REXCVAR_DEFINE_BOOL(clock_source_raw, false, "Clock", "Use raw clock source without scaling");
+ 
+-REXCVAR_DEFINE_BOOL(clock_lockfree, false, "Clock",
++REXCVAR_DEFINE_BOOL(clock_lockfree, true, "Clock",
+                     "Read the guest clock without taking a lock (applied when the guest clock "
+                     "rate is set, at startup)");
+ 
+diff --git a/src/core/timer_queue.cpp b/src/core/timer_queue.cpp
+--- a/src/core/timer_queue.cpp
++++ b/src/core/timer_queue.cpp
+@@ -26,9 +26,9 @@
+ #include <rex/thread.h>
+ #include <rex/thread/timer_queue.h>
+ 
+-// Default off (behavior changes ship off until rated SAFE). perf-notes/agent11-kernel.md,
++// Default on (final build: WC win3 arm; false = the old phased spin). perf-notes/agent11-kernel.md,
+ // "S3 TimerQueue" (task #10), has the measurements and the tests.
+-REXCVAR_DEFINE_BOOL(timer_queue_precise_wait, false, "Runtime",
++REXCVAR_DEFINE_BOOL(timer_queue_precise_wait, true, "Runtime",
+                     "Host timer thread: sleep until the next timer is due (a condition variable, "
+                     "then high-resolution sleeps). Off: the phased spin wait, which keeps a core "
+                     "about half busy with the 1 ms KeTimeStampBundle timer")
+diff --git a/src/graphics/shared_memory.cpp b/src/graphics/shared_memory.cpp
+--- a/src/graphics/shared_memory.cpp
++++ b/src/graphics/shared_memory.cpp
+@@ -24,14 +24,14 @@
+ #include <rex/math.h>
+ #include <rex/memory.h>
+ 
+-// S4 P2 (default off). When on, MakeRangeValid holds the global critical region
++// S4 P2 (default on, final build). When on, MakeRangeValid holds the global critical region
+ // once over the valid-bit update and the write-watch re-arm, and
+ // RangeWrittenByGpu holds it once over FireWatches and MakeRangeValid. The inner
+ // acquires (the scope in MakeRangeValid, FireWatches, EnableAccessCallbacks in
+ // each view) become recursive re-entries, so G is released, and a waiter woken,
+ // once per call instead of 4 (MakeRangeValid) or 5 (RangeWrittenByGpu) times.
+ // Off: one cvar load and one untaken branch per call; the original code runs.
+-REXCVAR_DEFINE_BOOL(shared_memory_single_hold_rearm, false, "GPU",
++REXCVAR_DEFINE_BOOL(shared_memory_single_hold_rearm, true, "GPU",
+                     "Hold the global lock once across a shared memory range's valid-bit "
+                     "update and its write-watch re-arm (fewer lock releases and waiter "
+                     "wakes on the GPU thread)");
+@@ -47,6 +47,16 @@ REXCVAR_DEFINE_BOOL(physical_protect_keep_watch_verify, false, "GPU",
+ 
+ namespace rex::graphics {
+ 
++namespace {
++// Final build (build/agent2/final): "name=value(source)" for the startup defaults line.
++std::string FinalDefault(const char* name) {
++  static constexpr const char* kSources[] = {"default", "config", "env", "cmdline", "runtime"};
++  const auto source = static_cast<size_t>(cvar::GetFlagSource(name));
++  return fmt::format("{}={}({})", name, cvar::GetFlagByName(name),
++                     source < std::size(kSources) ? kSources[source] : "?");
++}
++}  // namespace
++
+ SharedMemory::SharedMemory(memory::Memory& memory) : memory_(memory) {
+   page_size_log2_ = rex::log2_ceil(uint32_t(rex::memory::page_size()));
+   // Allocated up front: it is read from game threads without a lock.
+@@ -66,6 +76,9 @@ void SharedMemory::InitializeCommon() {
+   // S4 C1: with SharedMemory's keep-watch guard (condition 3, verify mode's K check).
+   memory_invalidation_callback_handle_ = memory_.RegisterPhysicalMemoryInvalidationCallback(
+       MemoryInvalidationCallbackThunk, this, MemoryKeepWatchGuardThunk);
++
++  REXGPU_INFO("Final defaults (GPU): {} {}", FinalDefault("shared_memory_single_hold_rearm"),
++              FinalDefault("physical_protect_keep_watch_verify"));
+ }
+ 
+ void SharedMemory::InitializeSparseHostGpuMemory(uint32_t granularity_log2) {
+diff --git a/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp b/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp
+--- a/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp
++++ b/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp
+@@ -48,7 +48,7 @@ REXCVAR_DEFINE_UINT32(
+     "with nothing at all in the log.");
+ 
+ REXCVAR_DEFINE_BOOL(
+-    cs_spin, false, "Kernel",
++    cs_spin, true, "Kernel",
+     "Spin briefly before a contended guest critical section (RtlEnterCriticalSection) blocks in "
+     "the kernel: a CPU pause loop that retries the lock only when it reads free, for up to "
+     "cs_spin_ns or the guest's own spin count, whichever is longer. false restores the original "
+diff --git a/src/kernel/xboxkrnl/xboxkrnl_threading.cpp b/src/kernel/xboxkrnl/xboxkrnl_threading.cpp
+--- a/src/kernel/xboxkrnl/xboxkrnl_threading.cpp
++++ b/src/kernel/xboxkrnl/xboxkrnl_threading.cpp
+@@ -46,7 +46,7 @@
+ #include <rex/thread/mutex.h>
+ 
+ REXCVAR_DEFINE_BOOL(
+-    spinlock_pause_spin, false, "Kernel",
++    spinlock_pause_spin, true, "Kernel",
+     "Guest kernel spinlocks (KfAcquireSpinLock, KeAcquireSpinLockAtRaisedIrql, and the kernel's "
+     "own APC and reader/writer-lock spinlocks) wait in a CPU pause loop that retries only when "
+     "the lock reads free, and yield the thread only after 10 us of waiting. false restores the "
+diff --git a/src/system/runtime.cpp b/src/system/runtime.cpp
+--- a/src/system/runtime.cpp
++++ b/src/system/runtime.cpp
+@@ -35,11 +35,11 @@ REXCVAR_DEFINE_STRING(update_data_root, "", "Runtime", "Override update data pat
+ REXCVAR_DEFINE_STRING(cache_root, "", "Runtime", "Override shader cache path");
+ REXCVAR_DEFINE_STRING(metadata_root, "", "Runtime", "Override metadata path");
+ 
+-// Default off (session-2 batch rule); 1 / true is the recommended setting.
+-REXCVAR_DEFINE_UINT32(host_timer_resolution_ms, 0, "Runtime",
++// Default 1 / true (final build: WC win3 arm); 0 / false restore the old behaviour.
++REXCVAR_DEFINE_UINT32(host_timer_resolution_ms, 1, "Runtime",
+                       "Host timer resolution to request at startup, in ms (0 = OS default; "
+                       "1 recommended)");
+-REXCVAR_DEFINE_BOOL(host_timer_throttling_optout, false, "Runtime",
++REXCVAR_DEFINE_BOOL(host_timer_throttling_optout, true, "Runtime",
+                     "Keep the host timer resolution while the window is minimized or occluded");
+ 
+ REXCVAR_DECLARE(std::string, perf_log_csv);
+@@ -52,6 +52,31 @@ Runtime* Runtime::instance_ = nullptr;
+ // The runtime that applied the host timing settings; it restores them.
+ static Runtime* host_timing_owner_ = nullptr;
+ 
++// Final build (build/agent2/final): one startup line with the value and source of each
++// rexruntime switch whose default the final build changed, so a log shows whether a
++// launch ran the shipped defaults. rexgpu-xenos logs its two in SharedMemory.
++static void LogFinalDefaults() {
++  static constexpr const char* kNames[] = {
++      "physical_protect_hold_global_lock", "physical_protect_keep_watch",
++      "host_timer_resolution_ms",          "host_timer_throttling_optout",
++      "precise_guest_sleep",               "wait_timeout_round_up",
++      "cs_spin",                           "spinlock_pause_spin",
++      "clock_lockfree",                    "tls_bounds_fix",
++      "timer_queue_precise_wait"};
++  static constexpr const char* kSources[] = {"default", "config", "env", "cmdline", "runtime"};
++  std::string line;
++  for (const char* name : kNames) {
++    if (!cvar::GetFlagInfo(name)) {
++      line += fmt::format(" {}=unregistered", name);
++      continue;
++    }
++    const auto source = static_cast<size_t>(cvar::GetFlagSource(name));
++    line += fmt::format(" {}={}({})", name, cvar::GetFlagByName(name),
++                        source < std::size(kSources) ? kSources[source] : "?");
++  }
++  REXSYS_INFO("Final defaults:{}", line);
++}
++
+ Runtime* Runtime::instance() {
+   return instance_;
+ }
+@@ -143,6 +168,7 @@ X_STATUS Runtime::Setup(RuntimeConfig config) {
+     timing.keep_timer_resolution_in_background = REXCVAR_GET(host_timer_throttling_optout);
+     thread::ConfigureHostTiming(timing);
+     host_timing_owner_ = this;
++    LogFinalDefaults();
+   }
+ 
+   // Create memory system first
+diff --git a/src/system/xmemory.cpp b/src/system/xmemory.cpp
+--- a/src/system/xmemory.cpp
++++ b/src/system/xmemory.cpp
+@@ -42,17 +42,17 @@ REXCVAR_DEFINE_BOOL(protect_on_release, false, "Memory",
+ 
+ REXCVAR_DEFINE_BOOL(scribble_heap, false, "Memory", "Scribble 0xCD into all allocated heap memory");
+ 
+-// S4.7 fix (i), default off: see PhysicalHeap::Protect.
+-REXCVAR_DEFINE_BOOL(physical_protect_hold_global_lock, false, "Memory",
++// S4.7 fix (i), default on (final build): see PhysicalHeap::Protect.
++REXCVAR_DEFINE_BOOL(physical_protect_hold_global_lock, true, "Memory",
+                     "Hold the global lock across both host protects in PhysicalHeap::Protect")
+     .lifecycle(rex::cvar::Lifecycle::kInitOnly);
+ 
+-// S4 C1 (default off): keep the write watches on physical write protects that change
++// S4 C1 (default on, final build): keep the write watches on physical write protects that change
+ // no page's access. Engages only with physical_protect_hold_global_lock on; see
+ // PhysicalHeap::ProtectKeepWatch. Both cvars are init-only (C1 v2), so the settings
+ // overlay can't turn C1 on mid-run over page state from before fix (i) was on, and
+ // Memory::Initialize latches both (C1 v3), so no later set reaches the protect path.
+-REXCVAR_DEFINE_BOOL(physical_protect_keep_watch, false, "Memory",
++REXCVAR_DEFINE_BOOL(physical_protect_keep_watch, true, "Memory",
+                     "Keep the write watches on physical write protects that leave every "
+                     "page's access unchanged (needs physical_protect_hold_global_lock)")
+     .lifecycle(rex::cvar::Lifecycle::kInitOnly);
+diff --git a/src/system/xobject.cpp b/src/system/xobject.cpp
+--- a/src/system/xobject.cpp
++++ b/src/system/xobject.cpp
+@@ -32,7 +32,7 @@
+ #include <rex/system/xsymboliclink.h>
+ #include <rex/system/xthread.h>
+ 
+-REXCVAR_DEFINE_BOOL(wait_timeout_round_up, false, "Kernel",
++REXCVAR_DEFINE_BOOL(wait_timeout_round_up, true, "Kernel",
+                     "Timed waits: round timeouts up to whole ms instead of truncating them, and "
+                     "honour absolute timeouts instead of polling");
+ 
+diff --git a/src/system/xthread.cpp b/src/system/xthread.cpp
+--- a/src/system/xthread.cpp
++++ b/src/system/xthread.cpp
+@@ -52,11 +52,11 @@ REXCVAR_DEFINE_BOOL(ignore_thread_priorities, true, "Kernel",
+ REXCVAR_DEFINE_BOOL(ignore_thread_affinities, true, "Kernel",
+                     "Ignores game-specified thread affinities");
+ 
+-REXCVAR_DEFINE_BOOL(precise_guest_sleep, false, "Kernel",
++REXCVAR_DEFINE_BOOL(precise_guest_sleep, true, "Kernel",
+                     "KeDelayExecutionThread: sleep the exact time (rounded up) on a "
+                     "high-resolution timer and honour absolute times");
+ 
+-REXCVAR_DEFINE_BOOL(tls_bounds_fix, false, "Kernel",
++REXCVAR_DEFINE_BOOL(tls_bounds_fix, true, "Kernel",
+                     "Thread TLS: allocate whole groups of 4 slots (as the process slot bitmap "
+                     "does) and reject slot indices past the end of the slot area");
+ 

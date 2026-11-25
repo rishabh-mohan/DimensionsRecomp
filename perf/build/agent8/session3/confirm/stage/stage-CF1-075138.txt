@@ -1,0 +1,71 @@
+Window staging (M8 session 3, build\agent8\session3\confirm\stage-confirm.ps1 = stage-window.ps1 with -Launcher bench\agent5\day\run-day.ps1), 2026-11-25 07:51:38; latest-start line below uses the night rule (07:30); the day launcher instead refuses when now + estimate + slack passes its -StopAt
+mode: TEST (copy in build\agent8\session3\confirm\test\CF1; no bench writes)
+result: OK
+run: only=ship,s0,win3,dfoff repeats=4 -ColdShared; -PlanOnly: 17 runs, about 39 min (runner); expected 17 runs; Agent 7's formula 1.70 + 2.14 x 4 x 4 = 35.9 min
+latest start: the launcher accepts this GO until 06:41 (07:30 - runner estimate 39 min - slack 10 min); started then, it ends about 07:16 by Agent 7's formula
+GO line (TEST: the matrix is not in bench\agent8\run; never write this one to WINDOW-GO.txt): GO CF1 matrix-windowCF1.json D36A40CA5277CC7C3E127E10D5367DD892E43160D7AA834D04E2A936EE63D44F only=ship,s0,win3,dfoff repeats=4
+draft: build\agent8\session3\confirm\matrix-windowCF1.json  sha256 D36A40CA5277CC7C3E127E10D5367DD892E43160D7AA834D04E2A936EE63D44F  7213 bytes
+matrix for the GO: build\agent8\session3\confirm\test\CF1\matrix-windowCF1.json  sha256 D36A40CA5277CC7C3E127E10D5367DD892E43160D7AA834D04E2A936EE63D44F
+launcher: bench\agent5\day\run-day.ps1 sha256 B67EBD6C2C9A378C8897558DD71AD383DCC85015952601F3EDF2FAED415ADC65 (2026-11-23 07:34:09); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/devfinal-bin (arms ship,dfoff): MANIFEST.txt sha256 F9C2BE722E5B3517D1CA7AB1A0F79BA9B7AADF59D4EF0E43384CE307C7084621 (expected F9C2BE722E5B3517); legodimensions.exe 545D28B9DDEAD51E8BCFCB016B3E7646CBB30F395413AE74522AD0B568B67C9E; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 7, FAIL 0
+bin: build/agent2/devoff4b-bin (arms s0,win3): MANIFEST.txt sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA (expected DE11A914079D7DF7); legodimensions.exe DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83; 7 files listed, 1 of 1 checked match (the exe; -VerifyFiles checks every file); check lines PASS 102, FAIL 0
+arm: ship (devfinal; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+arm: s0 (devoff4b; frames perf; cvars framerate_limit=0; env {}; drivers/thread-cpu.ps1)
+arm: win3 (devoff4b; frames perf; cvars framerate_limit=0;shared_memory_single_hold_rearm=true;physical_protect_hold_global_lock=true;physical_protect_keep_watch=true;physical_protect_keep_watch_verify=false;host_timer_resolution_ms=1;host_timer_throttling_optout=true;precise_guest_sleep=true;wait_timeout_round_up=true;cs_spin=true;spinlock_pause_spin=true;clock_lockfree=true;tls_bounds_fix=true;timer_queue_precise_wait=true; env LEGO_GPU_WAIT_BACKOFF_US=500 LEGO_GPU_WAIT_SPIN_US=30; drivers/thread-cpu.ps1)
+arm: dfoff (devfinal; frames perf; cvars framerate_limit=0;shared_memory_single_hold_rearm=false;physical_protect_hold_global_lock=false;physical_protect_keep_watch=false;host_timer_resolution_ms=0;host_timer_throttling_optout=false;precise_guest_sleep=false;wait_timeout_round_up=false;cs_spin=false;spinlock_pause_spin=false;clock_lockfree=false;tls_bounds_fix=false;timer_queue_precise_wait=false; env LEGO_GPU_WAIT_BACKOFF_US=off; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: 33 / 33
+NOTE: build\agent8\session3\confirm\test\CF1\matrix-windowCF1.json already holds this exact file
+NOTE: queue gap: the queue is idle (last line 07:25:26: 07:25:26 idle; waiting for: [f10aL,f10bL]); -PlanOnly at 07:51:39 after 0 s of waiting
+
+--- launcher Get-BinHashes (only= arms)
+545D28B9DDEAD51E8BCFCB016B3E7646CBB30F395413AE74522AD0B568B67C9E  build/agent2/devfinal-bin/legodimensions.exe
+F9C2BE722E5B3517D1CA7AB1A0F79BA9B7AADF59D4EF0E43384CE307C7084621  build/agent2/devfinal-bin/MANIFEST.txt
+DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83  build/agent2/devoff4b-bin/legodimensions.exe
+DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA  build/agent2/devoff4b-bin/MANIFEST.txt
+
+--- run-matrix.ps1 -Matrix build\agent8\session3\confirm\test\CF1\matrix-windowCF1.json -Only ship,s0,win3,dfoff -Repeats 4 -ColdShared -NoPrompt -PlanOnly (launcher Get-Plan)
+=== timing matrix: Window CF1 (M8, session 3): confirmation of the shipped Xenos defaults. ship = build/agent2/devfinal-bin, plain launch (the FINAL defaults = WC win3), DEFAULT ARM, vs s0 = devoff4b-bin with every switch OFF (WC's s0). Optional: win3 (WC's arm on devoff4b, the anchor) and dfoff (devfinal with the D7 OFF set). 6 round-robin rounds, round 1 discarded ===
+matrix   <workspace>\build\agent8\session3\confirm\test\CF1\matrix-windowCF1.json
+note     Default arm (BIN-PINS D7): ship. Reference: s0. GO (primary): 'GO CF1 matrix-windowCF1.json <sha256> only=ship,s0 repeats=6'. The launcher adds -ColdShared: one unscored cold run on the bin of round 1's first arm, which is ship (devfinal-bin, staged without cache/), so the new bin's cold launch is the unscored run and s0 keeps devoff4b's own cache. Then 6 round-robin rounds with the start arm alternating: 1 + 12 = 13 runs. Alternative (WC1 shape with the anchors): 'only=ship,s0,win3,dfoff repeats=4', 1 + 16 = 17 runs (same file and sha256).
+note     Warm-up policy: the read-out drops round 1 (tags *-r1, every arm) as the GPU warm-up, as in WC1/WC2/WC3 (READOUT-NIGHT.md, M10 CONFIRMED 25BF9B1C), and scores rounds 2-6 (5 per arm; with the 4-arm alternative rounds 2-4, 3 per arm). Check gpu.csv that round 2 is on the ~1500 MHz plateau; drop more rounds if not. Verdict with and without round 1.
+note     Question: does the plain FINAL Xenos bin reproduce WC's win3 vs s0 (pooled WC1-WC3, rounds 2-4: fps mean +7.7 % [+6.3, +8.7], p99 -14.8 %, 1 % low -17.0 %, process cores -38.7 % [-40.3, -35.2])? ship vs win3 (alternative only) is an equivalence check: the FINAL build vs the timed cvars/env on devoff4b; dfoff vs s0 is the new-bin parity check (FINAL sources with the old values set).
+note     Bins (build/agent2/final/BIN-PINS.md FE4CD4FF; the launcher hashes them before the first run; no restaging, never copy cache or seeds): devfinal-bin MANIFEST sha256 F9C2BE722E5B3517 (legodimensions.exe 545D28B9DDEAD51E), devoff4b-bin MANIFEST sha256 DE11A914079D7DF7 (legodimensions.exe DFBE1D43B28861A6).
+note     Arms. ship: devfinal, cvars framerate_limit=0 only (the bench's uncapped setting, not a shipped default), env {} (a plain launch). s0: devoff4b, framerate_limit=0, env {} (old bin, every switch OFF by build). win3: WC's win3 exactly (devoff4b, 13 cvars + LEGO_GPU_WAIT_BACKOFF_US=500, LEGO_GPU_WAIT_SPIN_US=30). dfoff: devfinal with the D7 OFF set: the 12 old cvar values (DEFAULTS-TABLE.md L92) + LEGO_GPU_WAIT_BACKOFF_US=off (lowercase).
+note     Proof per run, before any number is read (BIN-PINS D7): run.json env_set + the bin's MANIFEST sha256 + build/agent2/final/check-defaults.py <game.log> --mode: ship -> xenos (every key '(default)', the full back-off ON 500/30 line once, env_set has no LEGO_GPU_WAIT_* key); dfoff -> off (old values, 'GPU wait back-off: OFF (LEGO_GPU_WAIT_BACKOFF_US=off).' once, env_set BACKOFF_US=off); win3 -> legacy (WC's proof lines, env_set 500/30); s0 -> no 'Final defaults' line, no back-off / C1 / precise-wait / 1 ms line, no LEGO_GPU_WAIT_* key. Every arm: none of check-defaults' bad strings. Normal per-run functional check (exit 0, no dump/WER, level reached, K0/F0); a FAIL of a devfinal run voids that arm. STUCK-LOCK by the finding-10 rule, counted per arm.
+note     Read-out: per pair the difference of medians with a bootstrap 95 % CI over the scored rounds; verdict metrics fps mean, p99, the 1 % low and process cores (not median ms: C1's short-frame mode, READOUT-NIGHT S1). A timing claim needs a CI that excludes 0. Flag runs with non-game load >= median + 1 core (M12 gate) and give verdicts with and without them. sys.csv rows are all 31-column (runner 72370A1E); never pool with 24-column rows from before 07:30 2026-11-25.
+note     Window: 5 s settle + 55 s warm-up from the first frame, then 50 s measured (every window >= 60 s after the first frame; the runner flags window_before_floor below 59.5 s); the cold run 55 s warm-up, 30 s window. One frame source: perf.csv (frames perf), uncapped (framerate_limit=0); one driver (drivers/thread-cpu.ps1). Runner flags on every run: --audio_mute=true --pause_when_unfocused=false --native_settings_load=false --discord_rpc=false. sys_csv on.
+note     Scope (READOUT-NIGHT S2): one light route, uncapped, AC power, this laptop. Timing comes only from the user's unlocked, idle desktop through a launcher; agent runs of this matrix (-Quick, hidden desktop) are functional only. Compare within this window only.
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order roundrobin; close timeout 60 s; cooldown 5 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+       ship: bin build/agent2/devfinal-bin; frames perf; x4; warm-up 55 s; window 50 s; group cf1; cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         DEFAULT ARM: devfinal plain launch = the FINAL defaults (WC win3). Proof: check-defaults --mode xenos, env_set without LEGO_GPU_WAIT_* (MANIFEST F9C2BE722E5B3517)
+       s0: bin build/agent2/devoff4b-bin; frames perf; x4; warm-up 55 s; window 50 s; group cf1 (ref); cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         s0 = devoff4b, every switch OFF (WC's s0; MANIFEST DE11A914079D7DF7)
+       win3: bin build/agent2/devoff4b-bin; frames perf; x4; warm-up 55 s; window 50 s; group cf1; cvars framerate_limit=0 shared_memory_single_hold_rearm=true physical_protect_hold_global_lock=true physical_protect_keep_watch=true physical_protect_keep_watch_verify=false host_timer_resolution_ms=1 host_timer_throttling_optout=true precise_guest_sleep=true wait_timeout_round_up=true cs_spin=true spinlock_pause_spin=true clock_lockfree=true tls_bounds_fix=true timer_queue_precise_wait=true; env LEGO_GPU_WAIT_BACKOFF_US=500 LEGO_GPU_WAIT_SPIN_US=30; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         optional anchor: WC's win3 exactly (matrix-windowC.json). Proof: check-defaults --mode legacy, env_set 500/30
+       dfoff: bin build/agent2/devfinal-bin; frames perf; x4; warm-up 55 s; window 50 s; group cf1; cvars framerate_limit=0 shared_memory_single_hold_rearm=false physical_protect_hold_global_lock=false physical_protect_keep_watch=false host_timer_resolution_ms=0 host_timer_throttling_optout=false precise_guest_sleep=false wait_timeout_round_up=false cs_spin=false spinlock_pause_spin=false clock_lockfree=false tls_bounds_fix=false timer_queue_precise_wait=false; env LEGO_GPU_WAIT_BACKOFF_US=off; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         optional parity arm: devfinal with the D7 OFF set (12 old values + BACKOFF_US=off). Proof: check-defaults --mode off
+cold     ship (build/agent2/devfinal-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+         -ColdShared: one cold run for all 2 bin(s); the other bins first launch as scored round-1 runs
+round 1  ship s0 win3 dfoff
+round 2  s0 win3 dfoff ship
+round 3  win3 dfoff ship s0
+round 4  dfoff ship s0 win3
+order    ship s0 win3 dfoff | s0 win3 dfoff ship | win3 dfoff ship s0 | dfoff ship s0 win3
+estimate 17 runs (1 cold), about 39 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-PL7G3HVKSSWPTK7CDHR37USI7R -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   15.8 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/devfinal-bin : ok (MANIFEST.txt)
+bin        build/agent2/devoff4b-bin : ok (MANIFEST.txt)
+screensaver none
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   17 runs, about 39 min: done around 08:30
+!!! These runs will be FUNCTIONAL ONLY (see above): their numbers are not timing results.
+PlanOnly: nothing started.

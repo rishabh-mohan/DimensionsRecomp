@@ -1,0 +1,93 @@
+{
+  "title": "W1 (Agent 7 / M7, S3T-7): W8b pre-flight for #21 LEGO_NATIVE_CHAIN_PRIORITY on native4b+#21, th3 mode, n0 / th3 / th3cp, 1 Quick run each. Boot/log/close only, not timing. Title/attract loop, no input needed",
+  "reference": "n0",
+  "warmup_s": 55,
+  "warmup_from": "firstframe",
+  "measure_s": 60,
+  "repeats": 1,
+  "settle_s": 5,
+  "cooldown_s": 5,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "menu_s": 60,
+  "cold_run": false,
+  "order": "roundrobin",
+  "sys_csv": true,
+  "quick": {
+    "warmup_s": 10,
+    "measure_s": 20,
+    "settle_s": 5,
+    "menu_s": 20,
+    "cooldown_s": 5
+  },
+  "notes": [
+    "PURPOSE: queue row s4t1-w1 = the W8b pre-flight (build/agent7/s4-t1/FUNCTIONAL-ROWS.md section 2 W1). Same arms, env and cvars as matrix-w8b-draft.json, 1 repeat, no cold run, run with -Quick -NoCold (3 runs, about 4-8 min + 2 min checks). Not timing: no p99 / fps read-out from these runs.",
+    "BIN: every arm on <NATIVE4B-S4T1> = native4b (pin fingerprint 9b40acbbef4c57b3) + build/agent7/s4-t1/s4-t1.diff, built by Agent 2 at <= 2 threads, bincheck finds the 3 needles in FUNCTIONAL-ROWS.md. #21 changes the native code, so the new bin gets its own fingerprint and re-pin before W8b timing; record it in the read-out. Replace the placeholder in the copy under build/agent3/s4b/s4t1/.",
+    "CVARS (Agent 10 N-d, build/agent10/t27/r21-s4t1.md): native_settings_frontend=false, native_fps_limit=0, framerate_limit=0 in every arm, as in F1, F3 and W8b, so LimitFrameRate returns at device.cpp:1802 before its clock spin (device.cpp:1817).",
+    "KEYS: env keys only from build/agent8/w8w9/ENV-KEYS-F1.txt (checked by build/agent7/s4-t1/check_rows.py). th3 = n0 + THREADED=1, PREPARE_THREADS=2, FULL_DRAW_PREPARATION=1; th3cp = th3 + LEGO_NATIVE_CHAIN_PRIORITY=3.",
+    "PASS: every arm boots, writes perf.csv, native-frames.csv, sys.csv and headroom.json, and closes cleanly (no kill, close_timeout_s 60); th3cp's game.log shows the #21 mode-3 line; n0 and th3 show no #21 ON line; logdiff shows no new warning type. Any th3/th3cp hang: check F-CA (FUNCTIONAL-ROWS gap 2) first.",
+    "ORDER and HOST (Agent 10 conditions): only after F1 PASS (F1 -> W1 -> W8b); idle host, busy < 0.97, no slow state; throttling opt-out left at its default; no cache or seed copies between bin dirs.",
+    "No LEGO_NATIVE_TIMING, LEGO_NATIVE_STATE_CALLS, trace toggles or debug layer in any arm."
+  ],
+  "arms": [
+    {
+      "id": "n0",
+      "group": "w1",
+      "ref": true,
+      "frames": "perf",
+      "repeats": 1,
+      "bin": "<NATIVE4B-S4T1>",
+      "cvars": [
+        "native_settings_frontend=false",
+        "native_fps_limit=0",
+        "framerate_limit=0"
+      ],
+      "env": {
+        "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv"
+      },
+      "note": "Reference: native defaults, threaded recording off, #21 unset",
+      "driver": "drivers/thread-cpu.ps1"
+    },
+    {
+      "id": "th3",
+      "group": "w1",
+      "frames": "perf",
+      "repeats": 1,
+      "bin": "<NATIVE4B-S4T1>",
+      "cvars": [
+        "native_settings_frontend=false",
+        "native_fps_limit=0",
+        "framerate_limit=0"
+      ],
+      "env": {
+        "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv",
+        "LEGO_NATIVE_THREADED": "1",
+        "LEGO_NATIVE_PREPARE_THREADS": "2",
+        "LEGO_NATIVE_FULL_DRAW_PREPARATION": "1"
+      },
+      "note": "Agent 8's 'th' (th3 mode), #21 unset",
+      "driver": "drivers/thread-cpu.ps1"
+    },
+    {
+      "id": "th3cp",
+      "group": "w1",
+      "frames": "perf",
+      "repeats": 1,
+      "bin": "<NATIVE4B-S4T1>",
+      "cvars": [
+        "native_settings_frontend=false",
+        "native_fps_limit=0",
+        "framerate_limit=0"
+      ],
+      "env": {
+        "LEGO_NATIVE_FRAME_METRICS": "<run>\\native-frames.csv",
+        "LEGO_NATIVE_THREADED": "1",
+        "LEGO_NATIVE_PREPARE_THREADS": "2",
+        "LEGO_NATIVE_FULL_DRAW_PREPARATION": "1",
+        "LEGO_NATIVE_CHAIN_PRIORITY": "3"
+      },
+      "note": "Agent 8's 'thcp': th3 + #21 mode 3 (ABOVE_NORMAL + EcoQoS opt-out on the chain threads)",
+      "driver": "drivers/thread-cpu.ps1"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+P2 counter check: memexport full-buffer fallback (s4-p2c field 'memexport full-buffer Fx (total T)')
+logs, oldest first (5) in build\agent3\runs\20261122-211914-w6-side2-p2fc: game.4.log, game.3.log, game.2.log, game.1.log, game.log
+lines 70199; slow-frame lines 35027: 35027 with the counter field, 0 without
+log time range: 2026-11-22 21:19:16.893 .. 2026-11-22 21:23:35.756
+process 1 (started game.4.log:30): frames #2..#35049 (game.4.log:53 .. game.log:1215); 35027 counter lines, 0 without the field
+  last counter line game.log:1215 at 2026-11-22 21:23:35.559; its log ends 2026-11-22 21:23:35.756, 0.2 s later
+  T = 0: F on logged lines 0, in frames not logged 0
+memexport activity: 5 of 35027 slow-frame lines (first game.3.log:5978): invalidations on memexport pages 0x 0 KB, syncs 5 (1208 KB), on demand 0 (0 KB)
+RESULT: PASS (total 0): the memexport full-buffer fallback never ran, up to the last logged frame

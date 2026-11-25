@@ -1,0 +1,100 @@
+# prep-final (M2) 2026-11-25 07:26:51
+PASS FINAL-DEFAULTS.diff sha256 955543F5E2E5F4F44A57CD380FF8D8AC6828E1C0C1372612441AB2AA4E88C657
+diff sha256 955543F5E2E5F4F44A57CD380FF8D8AC6828E1C0C1372612441AB2AA4E88C657
+PASS diff names exactly the 11 planned files: rexglue-sdk/src/core/clock.cpp, rexglue-sdk/src/core/timer_queue.cpp, rexglue-sdk/src/graphics/shared_memory.cpp, rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp, rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp, rexglue-sdk/src/system/runtime.cpp, rexglue-sdk/src/system/xmemory.cpp, rexglue-sdk/src/system/xobject.cpp, rexglue-sdk/src/system/xthread.cpp, rexlego/src/gpu_wait_backoff.cpp, rexlego/src/gpu_native/shaders.cpp
+PASS shared DLL build\agent2\snap1-sdk\install\bin\rexgpu-xenos.dll == E3CB99CF
+PASS snap1 before rexglue-sdk/src/core/clock.cpp A07EE16C9C5CC4BE
+PASS snap1 before rexglue-sdk/src/core/timer_queue.cpp 015C04A22DACC592
+PASS snap1 before rexglue-sdk/src/graphics/shared_memory.cpp A4A31038ABDFF94A
+PASS snap1 before rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp 8DF708B87A945F07
+PASS snap1 before rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp 6E20D417F0ED93A5
+PASS snap1 before rexglue-sdk/src/system/runtime.cpp 306B692BC091A56F
+PASS snap1 before rexglue-sdk/src/system/xmemory.cpp BCA5E1CF63686E73
+PASS snap1 before rexglue-sdk/src/system/xobject.cpp 189CA288893B1A36
+PASS snap1 before rexglue-sdk/src/system/xthread.cpp FAEF9B99C893F684
+PASS snap1 before rexlego/src/gpu_native/shaders.cpp 9567FE3F3B63637D
+PASS snap1 before rexlego/src/gpu_wait_backoff.cpp 01D9F8F3464C8614
+PASS snap1-off/legodimensions.exe == devoff4b-bin row (DFBE1D43B28861A6)
+PASS snap1-off/legodimensions.map == devoff4b-bin row (52155274A978A946)
+PASS snap1-on/legodimensions.exe == native4b-bin row (DC6484C224585E54)
+PASS snap1-on/legodimensions.map == native4b-bin row (03CBC65FEA77674C)
+PASS ninja -t deps snap1-on exit 0
+objects including native_gpu_build_info.h (3): CMakeFiles/legodimensions.dir/src/gpu_native/device.cpp.obj, CMakeFiles/legodimensions.dir/src/gpu_native/pipeline_library.cpp.obj, CMakeFiles/legodimensions.dir/src/gpu_native/shader_archive.cpp.obj
+native TU set (4): gpu_native/device.cpp, gpu_native/pipeline_library.cpp, gpu_native/shader_archive.cpp, gpu_native/shaders.cpp
+PASS native TU set == the 4 planned (shaders, device, shader_archive, pipeline_library): unexpected: 
+PASS overlay copy equals snap1 (666 files in 5 dirs)
+git apply --check exit 0:
+Checking patch DimensionsRecomp/rexglue-sdk/src/core/clock.cpp...
+Checking patch DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp...
+Checking patch DimensionsRecomp/rexglue-sdk/src/graphics/shared_memory.cpp...
+Checking patch DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp...
+Checking patch DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp...
+Checking patch DimensionsRecomp/rexglue-sdk/src/system/runtime.cpp...
+Checking patch DimensionsRecomp/rexglue-sdk/src/system/xmemory.cpp...
+Checking patch DimensionsRecomp/rexglue-sdk/src/system/xobject.cpp...
+Checking patch DimensionsRecomp/rexglue-sdk/src/system/xthread.cpp...
+Checking patch DimensionsRecomp/rexlego/src/gpu_wait_backoff.cpp...
+Checking patch DimensionsRecomp/rexlego/src/gpu_native/shaders.cpp...
+PASS git apply --check: exit 0, 11 Checking, 0 Skipped: exit 0, 11, 0
+git apply (apply) exit 0:
+Checking patch DimensionsRecomp/rexglue-sdk/src/core/clock.cpp...
+Checking patch DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp...
+Checking patch DimensionsRecomp/rexglue-sdk/src/graphics/shared_memory.cpp...
+Checking patch DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp...
+Checking patch DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp...
+Checking patch DimensionsRecomp/rexglue-sdk/src/system/runtime.cpp...
+Checking patch DimensionsRecomp/rexglue-sdk/src/system/xmemory.cpp...
+Checking patch DimensionsRecomp/rexglue-sdk/src/system/xobject.cpp...
+Checking patch DimensionsRecomp/rexglue-sdk/src/system/xthread.cpp...
+Checking patch DimensionsRecomp/rexlego/src/gpu_wait_backoff.cpp...
+Checking patch DimensionsRecomp/rexlego/src/gpu_native/shaders.cpp...
+Applied patch DimensionsRecomp/rexglue-sdk/src/core/clock.cpp cleanly.
+Applied patch DimensionsRecomp/rexglue-sdk/src/core/timer_queue.cpp cleanly.
+Applied patch DimensionsRecomp/rexglue-sdk/src/graphics/shared_memory.cpp cleanly.
+Applied patch DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp cleanly.
+Applied patch DimensionsRecomp/rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp cleanly.
+Applied patch DimensionsRecomp/rexglue-sdk/src/system/runtime.cpp cleanly.
+Applied patch DimensionsRecomp/rexglue-sdk/src/system/xmemory.cpp cleanly.
+Applied patch DimensionsRecomp/rexglue-sdk/src/system/xobject.cpp cleanly.
+Applied patch DimensionsRecomp/rexglue-sdk/src/system/xthread.cpp cleanly.
+Applied patch DimensionsRecomp/rexlego/src/gpu_wait_backoff.cpp cleanly.
+Applied patch DimensionsRecomp/rexlego/src/gpu_native/shaders.cpp cleanly.
+PASS git apply (apply): exit 0, 11 Checking, 0 Skipped: exit 0, 11, 0
+PASS after rexglue-sdk/src/core/clock.cpp EAE926AC812F7EFD == table and == final/work/new
+PASS line endings kept rexglue-sdk/src/core/clock.cpp (CRLF 0 -> 0)
+PASS after rexglue-sdk/src/core/timer_queue.cpp EF70211E5D248A94 == table and == final/work/new
+PASS line endings kept rexglue-sdk/src/core/timer_queue.cpp (CRLF 0 -> 0)
+PASS after rexglue-sdk/src/graphics/shared_memory.cpp E2465A155E22C20B == table and == final/work/new
+PASS line endings kept rexglue-sdk/src/graphics/shared_memory.cpp (CRLF 0 -> 0)
+PASS after rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp CEB5529AC853D5A8 == table and == final/work/new
+PASS line endings kept rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_rtl.cpp (CRLF 0 -> 0)
+PASS after rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp 7CA55716E7092199 == table and == final/work/new
+PASS line endings kept rexglue-sdk/src/kernel/xboxkrnl/xboxkrnl_threading.cpp (CRLF 0 -> 0)
+PASS after rexglue-sdk/src/system/runtime.cpp A997D0059A69FF99 == table and == final/work/new
+PASS line endings kept rexglue-sdk/src/system/runtime.cpp (CRLF 0 -> 0)
+PASS after rexglue-sdk/src/system/xmemory.cpp 3745C04AAC8AF75D == table and == final/work/new
+PASS line endings kept rexglue-sdk/src/system/xmemory.cpp (CRLF 0 -> 0)
+PASS after rexglue-sdk/src/system/xobject.cpp 691A34BB64E11EA2 == table and == final/work/new
+PASS line endings kept rexglue-sdk/src/system/xobject.cpp (CRLF 0 -> 0)
+PASS after rexglue-sdk/src/system/xthread.cpp 3B50A95E76B10377 == table and == final/work/new
+PASS line endings kept rexglue-sdk/src/system/xthread.cpp (CRLF 0 -> 0)
+PASS after rexlego/src/gpu_native/shaders.cpp 4B8250E976A38401 == table and == final/work/new
+PASS line endings kept rexlego/src/gpu_native/shaders.cpp (CRLF 1131 -> 1148)
+PASS after rexlego/src/gpu_wait_backoff.cpp 74115EEA26C4AEB2 == table and == final/work/new
+PASS line endings kept rexlego/src/gpu_wait_backoff.cpp (CRLF 0 -> 0)
+leg rt: 8 TU(s): core/clock.cpp, core/timer_queue.cpp, kernel/xboxkrnl/xboxkrnl_rtl.cpp, kernel/xboxkrnl/xboxkrnl_threading.cpp, system/runtime.cpp, system/xmemory.cpp, system/xobject.cpp, system/xthread.cpp
+leg gpu: 1 TU(s): graphics/shared_memory.cpp
+leg xe: 1 TU(s): gpu_wait_backoff.cpp
+leg xeoff: 1 TU(s): gpu_wait_backoff.cpp
+leg nat: 4 TU(s): gpu_native/device.cpp, gpu_native/pipeline_library.cpp, gpu_native/shader_archive.cpp, gpu_native/shaders.cpp
+leg natoff: 4 TU(s): gpu_native/device.cpp, gpu_native/pipeline_library.cpp, gpu_native/shader_archive.cpp, gpu_native/shaders.cpp
+PASS fingerprint script: header/txt outputs named once each
+PASS fingerprint script: shaders.cpp input named once: 1
+PASS cmake -P fp-ctl.cmake exit 0
+PASS cmake -P fp-on.cmake exit 0
+PASS gen-ctl header == snap1-on header (byte)
+PASS gen-ctl native-gpu-build.txt == snap1-on (byte)
+PASS gen-on header has 1616ce65e973c583, not 9b40acbbef4c57b3
+PASS gen-on header == snap1-on header with only the fingerprint swapped
+gen-on native-gpu-build.txt: LEGO Dimensions native GPU 1616ce65e973c583
+RESULT: PASS

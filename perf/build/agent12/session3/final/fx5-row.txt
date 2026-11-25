@@ -1,0 +1,30 @@
+queue row: {"id": "fx5", "est": 480, "needs": ["build\\agent3\\s4b\\ready-s4b-off", "build\\agent3\\final-fx\\go-fx", "build\\agent3\\final-fx\\fx-ok-fx2", "build\\agent3\\final-fx\\matrix-fx5.json"], "matrix": "build\\agent3\\final-fx\\matrix-fx5.json", "matrix_args": ["-NoCold"], "args": [], "note": "FINAL F5 + F5w: run-matrix, arms fx5 (first launch) then fx5w (own run dir, seed_cache fx5 = run-timing -SeedCache copies native-pso.bin + native-pso-recipes.bin). W8a route. Gates final_gate F5 --ref n0, F5w --first <fx5 run> --ref n0, + seed check."}
+BAD  bin_dir <workspace>\build\agent2\nativefinal-bin (queued None)
+BAD  run exe sha256 5C21941DAF9DF36B = run.json and in <workspace>\build\agent2\nativefinal-bin\MANIFEST.txt
+ok   exit_code 0 (0x00000000), close None, elapsed None s of None
+ok   wer_seen None
+ok   crash_events None
+ok   exited_early False
+ok   cvars {} (queued {})
+ok   env {} (queued {})
+ok   input script None (queued None)
+     logs 1 (488 lines); counts: Recovered stale physical page protection=0; Unhandled guest physical write fault=0; PhysicalHeap::Protect failed=0; STUCK-LOCK=0; REX_FATAL=0; C1 keep-watch: on (with=0; C1 keep-watch: on, but=0; blocked for this process=0; C1 verify: on.=0; C1 verify K:=0; C1 verify F:=0; GPU wait back-off: ON=0; d3d12_submit_split_kb: splitting=0; d3d12_submit_split: =0; Host timer resolution set=0; TimerQueue: precise wait=0
+ok   C4 "Recovered stale physical page protection" x0
+ok   C4 "Unhandled guest physical write fault" x0
+ok   C4 "PhysicalHeap::Protect failed" x0
+ok   C4 "REX_FATAL" x0
+ok   C4 "C1 keep-watch: on, but" x0
+ok   C4 "blocked for this process" x0
+     C3 init lines skipped: FINAL bin nativefinal-bin -> run final_gate.py <run> <F1..F7>
+ok   C3 "C1 verify: on." x0 (verify=False)
+ok   C3 split init x0 (split cvar False)
+     STUCK-LOCK lines 0 (C5: see f10 output / by hand)
+ok   C6 dumps in dir [], run.json dumps None
+     C7 steps None/None last None timeouts None; marks []
+--- fx5.check.txt (20 lines)
+    missing in cand: -; extra in cand: -
+  BASE items missed: logdiff GONE 2 beyond Toypad/u-diag lines; close None
+  VERDICT HINT LOOK: 2 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row fx5)
+--- fx5.f10.txt: not present
+--- fx5.p2c.txt: not present
+COMMON: PROBLEMS (2 problems)

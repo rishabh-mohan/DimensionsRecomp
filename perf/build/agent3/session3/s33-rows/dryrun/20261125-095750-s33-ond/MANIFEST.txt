@@ -1,0 +1,42 @@
+# build\agent2\devoff4b-s33d-bin - Agent 2 (board run 2 task #1). devoff4b-s33d: devoff4b-bin with only rexgpu-xenos.dll rebuilt with build/agent6/s33-popin/s33-popin-nohunk5-diagd.patch sha256 797E614284B642267CCB1539AADBC5AD79362467FDD51F13143DBCA287C6DAC0 (combined: nohunk5 57CFA8AD + diagnostic (d); cvars d3d12_pipeline_creation_no_wait and d3d12_resolve_after_drop_log default false); rating build/agent10/session3/r33-nohunk5-diagd.md [M2 successor, build/agent2/session3/build-bin.py] [M2 successor, build/agent2/session3/build-bin.py]
+# staged 2026-11-25 02:45:37 from build\agent2\devoff4b-bin (MANIFEST sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA); every file copied with mtime = now; replaced: rexgpu-xenos.dll <- build\agent2\s33\s33d\link-on\rexgpu-xenos.dll.
+# Source: fresh overlay build/agent2/s33/s33d/sdk = copy of snap1 rexglue-sdk/src/graphics + include/rex/graphics/d3d12/pipeline_cache.h (5350b1d blobs 7e81db3b pipeline_cache.h, 6f21eb6f d3d12/command_processor.cpp, 55e9f02e d3d12/pipeline_cache.cpp, 8c169b41 frame_stats.h) + the combined patch (git -c core.autocrlf=false apply, clean); d3d12/command_processor.cpp after 97257A20. 10 affected TUs (ninja deps) recompiled with snap1-sdk ccdb (Release, --include-first overlay include, source with /, -fmacro-prefix-map overlay->snap1); rexgpu-xenos.dll relinked; snap1-sdk/install not touched.
+# tools (sha256/16): build-bin.py 828A15DEAAA4CA0D, recompile.py 855BCC79148E2DA8, relink.py F3C6EEAF332AB213, stage-variant.py D2BD1C6358FC19C1, verify-bins.py 80FF4C5F581C4B1B, prep-s33.py A311E35401ABE799
+# prep: PASS patch sha256 build\agent6\s33-popin\s33-popin-nohunk5-diagd.patch: 797E614284B642267CCB1539AADBC5AD79362467FDD51F13143DBCA287C6DAC0
+# prep: before include/rex/graphics/d3d12/pipeline_cache.h 9322AD374BF4BBEC CRLF 0
+# prep: before src/graphics/d3d12/command_processor.cpp 027204B53A271D69 CRLF 0
+# prep: before src/graphics/d3d12/pipeline_cache.cpp DA77744302CFC149 CRLF 0
+# prep: before src/graphics/frame_stats.h EFA82A7C20F6BF37 CRLF 0
+# prep: after  include/rex/graphics/d3d12/pipeline_cache.h 0BAF28BE633759CD0F9A1A3672CD86D2D75DDE78EC4662DA8D4B5ED9514CF81F CRLF 0
+# prep: after  src/graphics/d3d12/command_processor.cpp 97257A204152DF1BE26C60197146DBC63D0E07D8B7D57B5C1E1DE2C115EDF49D CRLF 0
+# prep: after  src/graphics/d3d12/pipeline_cache.cpp C4CB51CC6D2A6429637115F605FF10279FCE59AEDCF8BBC6E2195F92615C86C6 CRLF 0
+# prep: after  src/graphics/frame_stats.h 9F3C4F9DC58DCA5DF1AB946056ED565C706BC336E652C854132E53FE5B048970 CRLF 0
+# control: PASS compare rexgpu-xenos.dll vs build\agent2\devoff4b-bin\rexgpu-xenos.dll: identical except 1 TimeDateStamp field(s) (6b06a026 vs 6b03a0ae; COFF header at 0x80, included)
+# ON object command_processor.cpp.obj exit 0 4.1 s obj 333781 B 559EACCB23276BCB (log 15894 B)
+# ON object d3d12__command_processor.cpp.obj exit 0 7.6 s obj 850487 B C91BDC761079674D (log 12281 B)
+# ON object d3d12__deferred_command_list.cpp.obj exit 0 3.1 s obj 24112 B 9C162631AB36E468 (log 9408 B)
+# ON object d3d12__graphics_system.cpp.obj exit 0 3.1 s obj 20675 B DD1E1CF4332A54A5 (log 9384 B)
+# ON object d3d12__pipeline_cache.cpp.obj exit 0 6.6 s obj 558680 B 4B5C532A0E0FC467 (log 10103 B)
+# ON object d3d12__primitive_processor.cpp.obj exit 0 3.0 s obj 44073 B F79D0045ECEE5889 (log 9400 B)
+# ON object d3d12__render_target_cache.cpp.obj exit 0 7.1 s obj 1159060 B A96C1426EE51A2B5 (log 9400 B)
+# ON object d3d12__shared_memory.cpp.obj exit 0 3.5 s obj 123717 B 4D603A59EDC89566 (log 9376 B)
+# ON object d3d12__texture_cache.cpp.obj exit 0 3.0 s obj 533234 B E28BBD03238ECA80 (log 10443 B)
+# ON object shared_memory.cpp.obj exit 0 1.5 s obj 126358 B 6F705BF037CA02FA (log 1205 B)
+# needles: ON has ['d3d12_pipeline_creation_no_wait', 'd3d12_resolve_after_drop_log']; ON lacks -; devoff4b-bin DLL lacks ['d3d12_pipeline_creation_no_wait', 'd3d12_resolve_after_drop_log']
+# times: ctl compile 7.8 s, ctl link 1.4 s, on compile 8.3 s, on link 1.4 s
+# files: name, size, mtime, sha256, source
+FiraSans-Regular.ttf	456996	2026-11-25 02:45:37	C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23	build\agent2\snap1\DimensionsRecomp\rexlego\res\FiraSans-Regular.ttf
+TracyClient.dll	233472	2026-11-25 02:45:37	85044850B6C663B5CE8722285D13070381C33C9ABC49D06B3E59BA0277F8FF4E	build\agent2\snap1-sdk\install\bin\TracyClient.dll
+achievement_unlocked.wav	191018	2026-11-25 02:45:37	A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5	build\agent2\snap1-off\achievement_unlocked.wav
+legodimensions.exe	170350080	2026-11-25 02:45:37	DFBE1D43B28861A674663085B576E33B2D7E34D3D63A85CA480FF36CFE264B83	build\agent2\snap1-off\legodimensions.exe
+legodimensions.map	39181442	2026-11-25 02:45:37	52155274A978A946870446A1C8F573EC381A486D50636AF13DA8920E4DC18EA5	build\agent2\snap1-off\legodimensions.map
+rexgpu-xenos.dll	3441152	2026-11-25 02:45:37	962D88D68EFE84A8A4B9478320DB4E27E8CF4A88B76CB4DCFC9646CF7F66D83A	build\agent2\s33\s33d\link-on\rexgpu-xenos.dll
+rexruntime.dll	10909184	2026-11-25 02:45:37	A33801D1538D61759D35FD137EBC9F5EAD636D7D26E9A79DC3B4994A22CB9F12	build\agent2\snap1-off\rexruntime.dll
+# checks:
+#   PASS staged copy identical: FiraSans-Regular.ttf
+#   PASS staged copy identical: TracyClient.dll
+#   PASS staged copy identical: achievement_unlocked.wav
+#   PASS staged copy identical: legodimensions.exe
+#   PASS staged copy identical: legodimensions.map
+#   PASS staged copy identical: rexgpu-xenos.dll (replaced: base E3CB99CFDEA95E66 -> 962D88D68EFE84A8)
+#   PASS staged copy identical: rexruntime.dll

@@ -1,0 +1,82 @@
+diff --git a/bench/agent8/run/drivers/sys-csv.ps1 b/build/agent8/session3/staged/drivers/sys-csv.ps1
+index e981dcc..8dd442f 100644
+--- a/bench/agent8/run/drivers/sys-csv.ps1
++++ b/build/agent8/session3/staged/drivers/sys-csv.ps1
+@@ -3,7 +3,12 @@
+ #   Start-Process powershell -NoNewWindow -PassThru -RedirectStandardOutput <run>\sys.out.txt -RedirectStandardError <run>\sys.err.txt
+ #     -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File',<this file>,'-GamePid',<pid>,'-RunDir',<run>
+ # Params: -GamePid <int> (required), -RunDir <existing dir> (required), -IntervalMs 1000, -MaxSec 3600,
+-#         -StopFile (default <RunDir>\sys.stop), -Out (default <RunDir>\sys.csv).
++#         -StopFile (default <RunDir>\sys.stop), -Out (default <RunDir>\sys.csv),
++#         -ProcEvery 5 (2026-11-25: per-process snapshot every N ticks, 0 = off). New trailing sys.csv columns:
++#         nongame_cores / game_cores (every row: GetSystemTimes busy cores minus the game's GetProcessTimes cores),
++#         proc_nongame_cores, nongame_io_MBps, top_cpu "name:pid:cores;..." (top 5), top_io "name:pid:MBps;..." (top 3)
++#         (snapshot rows only: one NtQuerySystemInformation(SystemProcessInformation) call, ~11 ms CPU), disk_MBps (every
++#         row: PDH \PhysicalDisk(_Total)\Disk Bytes/sec, MB = 1e6 bytes).
+ # The sampling runs inside C# (LdSys.cs, compiled once to build\agent8\cache\LdSys-<sha256[0:8] of LdSys.cs>.dll, then
+ # only loaded): one row per tick on a Stopwatch schedule (tick k due at t0 + k*interval; a tick late by more than one
+ # interval is skipped and counted, no catch-up burst). Between ticks it waits on the game process handle and on a change
+@@ -30,7 +35,8 @@ param(
+     [string]$IntervalMs = '1000',
+     [string]$MaxSec = '3600',
+     [string]$StopFile = '',
+-    [string]$Out = ''
++    [string]$Out = '',
++    [string]$ProcEvery = '5'
+ )
+ $q0 = [Diagnostics.Stopwatch]::GetTimestamp()   # t_s origin = script start (same origin as the +S.SSs of Say)
+ $sw = [Diagnostics.Stopwatch]::StartNew()
+@@ -60,6 +66,8 @@ $ivMs = 0
+ if (-not [int]::TryParse($IntervalMs.Trim(), [Globalization.NumberStyles]::None, $inv, [ref]$ivMs) -or $ivMs -lt 100 -or $ivMs -gt 600000) { Bad "-IntervalMs '$IntervalMs' (100..600000)" }
+ $maxS = 0.0
+ if (-not [double]::TryParse($MaxSec.Trim(), [Globalization.NumberStyles]::Float, $inv, [ref]$maxS) -or -not ($maxS -gt 0) -or $maxS -gt 1e7) { Bad "-MaxSec '$MaxSec' (> 0)" }
++$procN = 0
++if (-not [int]::TryParse($ProcEvery.Trim(), [Globalization.NumberStyles]::None, $inv, [ref]$procN) -or $procN -lt 0 -or $procN -gt 3600) { Bad "-ProcEvery '$ProcEvery' (0..3600)" }
+ $outPath = ''; $stopPath = ''
+ try {
+     $outPath = if ($Out) { Full $Out } else { [IO.Path]::Combine($RunDir, 'sys.csv') }
+@@ -74,7 +82,10 @@ foreach ($f in @($outPath, $stopPath)) {
+ $dllHow = ''; $dllName = ''
+ try {
+     $cs = [IO.Path]::Combine($PSScriptRoot, 'LdSys.cs')
++    # repo root = the nearest ancestor that holds build\agent8 (bench\agent8\run\drivers -> 4 up; also works from a staged copy)
+     $repo = [IO.Path]::GetFullPath([IO.Path]::Combine($PSScriptRoot, '..\..\..\..'))
++    $up = [IO.Directory]::GetParent($PSScriptRoot)
++    while ($up) { if ([IO.Directory]::Exists([IO.Path]::Combine($up.FullName, 'build\agent8'))) { $repo = $up.FullName; break }; $up = $up.Parent }
+     $cacheDir = [IO.Path]::Combine($repo, 'build\agent8\cache')
+     $sha = [Security.Cryptography.SHA256]::Create()
+     try { $hash = $sha.ComputeHash([IO.File]::ReadAllBytes($cs)) } finally { $sha.Dispose() }
+@@ -116,7 +127,7 @@ try {
+ } catch { $stale = ' stale_stop_file=not_removed'; Note "stale stop file not removed: $($_.Exception.Message)" }
+ 
+ # ---- init: game handle, power poller, CPU sets, PDH counters (+ the first collect) ----
+-try { [LdSys]::Init($pidN, $ivMs) } catch {
++try { [LdSys]::ProcEvery = $procN; [LdSys]::Init($pidN, $ivMs) } catch {
+     Say "sys-csv: init failed: $($_.Exception.Message)"; Note "init failed: $($_.Exception.Message)"; exit 1
+ }
+ $L = [LdSys]
+@@ -128,10 +139,10 @@ if ($L::GameGone) {
+         Say "sys-csv: init failed: no PDH counter could be opened ($($L::Failed))"; Note "init failed: no PDH counter could be opened ($($L::Failed))"; exit 1
+     }
+     if ($L::Failed) { Note "counters failed at init: $($L::Failed)" }
+-    Say ([string]::Format($inv, 'sys-csv: start pid={0} interval_ms={1} max_s={2} dll={3}({4}) init_ms={5:0} init_parts_ms=[{6}] P=[{7}] E=[{8}] classes={9} lp_freq=[{10}] tz=[{11}] counters={12}/{13} failed=[{14}] overlay_api={15} game_wait={16} own_desktop={17} input_desktop={18} out={19} stop_file={20}{21}',
++    Say ([string]::Format($inv, 'sys-csv: start pid={0} interval_ms={1} max_s={2} dll={3}({4}) init_ms={5:0} init_parts_ms=[{6}] P=[{7}] E=[{8}] classes={9} lp_freq=[{10}] tz=[{11}] counters={12}/{13} failed=[{14}] overlay_api={15} game_wait={16} own_desktop={17} input_desktop={18} out={19} stop_file={20}{21} proc=[{22}]',
+         $pidN, $ivMs, $maxS, $dllName, $dllHow, $L::InitMs, $L::InitParts, $L::PList, $L::EList, $L::ClassInfo, $L::LpFreq, $L::Zones,
+         $L::CountersOk, $L::CountersTotal, $L::Failed, [int]$L::OverlayApi, $(if ($L::GamePolled) { 'poll' } else { 'handle' }),
+-        $L::OwnDesktop, $L::InputDesktopAtInit, $outPath, $stopPath, $stale))
++        $L::OwnDesktop, $L::InputDesktopAtInit, $outPath, $stopPath, $stale, $L::ProcInfo))
+ }
+ 
+ # ---- the loop (blocking, inside C#) ----
+@@ -144,9 +155,9 @@ try { [LdSys]::Run($outPath, $stopPath, $ivMs, $maxS, $q0) } catch {
+     exit 1
+ }
+ $cpu = $L::OwnCpuS(); $wall = $L::OwnWallS(); $cyc = $L::OwnCpuCycS()
+-Say ([string]::Format($inv, 'sys-csv: timing first_sample_ms={0} sample_ms={1} sample_ms_max={2} sample_cpu_ms={3} parts_first_ms=[{4}] parts_mean_ms=[{5}] parts_max_ms=[{6}] parts_cpu_first_ms=[{7}] parts_cpu_mean_ms=[{8}] {9} stop_watch={10} wakes={11} stop_checks={12} steady_cpu_pct_by_thread=[{13}]',
++Say ([string]::Format($inv, 'sys-csv: timing first_sample_ms={0} sample_ms={1} sample_ms_max={2} sample_cpu_ms={3} parts_first_ms=[{4}] parts_mean_ms=[{5}] parts_max_ms=[{6}] parts_cpu_first_ms=[{7}] parts_cpu_mean_ms=[{8}] {9} stop_watch={10} wakes={11} stop_checks={12} steady_cpu_pct_by_thread=[{13}] proc_snaps={14} proc_fails={15} procs={16} {17}',
+     (F3 $L::FirstSampleMs), (F3 $L::SampleMsMean), (F3 $L::SampleMsMax), $L::SampleCpuMs(), $L::PartsFirstMs(), $L::PartsMeanMs(), $L::PartsMaxMs(),
+-    $L::PartsCpuFirstMs(), $L::PartsCpuMeanMs(), $L::PollStats(), $L::StopWatch, $L::Wakes, $L::StopChecks, $L::SteadyByThread))
++    $L::PartsCpuFirstMs(), $L::PartsCpuMeanMs(), $L::PollStats(), $L::StopWatch, $L::Wakes, $L::StopChecks, $L::SteadyByThread, $L::ProcSnaps, $L::ProcFails, $L::ProcCount, $L::ProcStats()))
+ Say ([string]::Format($inv, 'sys-csv: stop reason={0} rows={1} skipped={2} cpu_s={3} wall_s={4} cpu_pct={5} cpu_cyc_s={6} loop_s={7} loop_cpu_s={8} loop_cpu_pct={9} loop_cyc_cpu_pct={10} steady_cpu_pct={11} tsc_mhz={12} sample_ms={13} sample_ms_max={14} first_row_s={15} first_row_t_s={16}',
+     $L::Reason, $L::Rows, $L::Skipped, (F3 $cpu), (F3 $wall), (F3 $(if ($wall -gt 0) { $cpu / $wall * 100 } else { 0 })), (F3 $cyc),
+     (F3 $L::LoopS), (F3 $L::LoopCpuS), (F3 $(if ($L::LoopS -gt 0) { $L::LoopCpuS / $L::LoopS * 100 } else { 0 })), (F3 $L::LoopCycCpuPct),

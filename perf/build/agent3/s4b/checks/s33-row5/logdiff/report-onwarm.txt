@@ -1,0 +1,13 @@
+== arm onwarm (1 runs) vs offwarm (1 runs)
+  runs\0002-onwarm-r1: exit=0 close=wm_close early=False wer=False dumps=0 exit_line=1 stuck=0 | 23819 lines game.1.log 5242574+game.log 5046357, 2026-11-25 10:31:09.442..2026-11-25 10:38:51.470 (462 s) | levels info=23669 raw=8 warning=142 | Toypad R/W 64/172 (8.3/22.3 per min)
+gate_logdiff FAIL findings (B = arm run, A = each base run): none
+  note A: 2 log files (rotated at 5 MB) [1]
+  note B: 2 log files (rotated at 5 MB) [1]
+NEW warning/error/critical keys (in an arm run, in no base run): 0
+MORE (arm run count > base max + max(5, base max)): 0
+GONE (in every base run, missing from an arm run; any level): 0
+Toypad (base: runs\0001-offwarm-r1 {'info Write': 160, 'info Read': 64})
+  runs\0002-onwarm-r1: {'info Write': 172, 'info Read': 64}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+ONLY in onwarm (any level, not Toypad; in no base run): 1 keys
+  1/1 runs, counts [1], also in -  [info] [gpu] d#d#_pipeline_creation_no_wait: not waiting for pipeline creation at the end of submissions; draws stay skipped until their pipeline is ready
+      e.g. [2026-11-25 10:31:10.305] [info] [gpu] [t15228] d3d12_pipeline_creation_no_wait: not waiting for pipeline creation at the end of submissions; draws stay skipped until their pipeline is ready

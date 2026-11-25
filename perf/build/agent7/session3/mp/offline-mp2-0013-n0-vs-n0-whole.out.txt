@@ -1,0 +1,38 @@
+﻿$ python -B build\agent7\session3\mp\mp2_same_frames.py --ref build\agent8\matrix\20261122-0013\runs\0030-n0-r1 --ref build\agent8\matrix\20261122-0013\runs\0042-n0-r2 --cand build\agent8\matrix\20261122-0013\runs\0054-n0-r3 --cand build\agent8\matrix\20261122-0013\runs\0104-n0-r4 --perf-fallback whole
+mp2_same_frames explicit runs (logdiff: <workspace>\build\agent10\bgate\logdiff.py)
+PASS       ref runs: 2 (need 2: n0-r1 vs n0-r2 = noise): 0030-n0-r1, 0042-n0-r2
+           ref 0030-n0-r1: light share 0.16900 (perf.csv frame_time_us < 4.5 ms over whole perf.csv (--perf-fallback whole; frames.json source native)); draw_calls p10/p50/p90 0/0/0 mean 0 n 27308; whole perf.csv (--perf-fallback whole; frames.json source native)
+           ref 0042-n0-r2: light share 0.15910 (perf.csv frame_time_us < 4.5 ms over whole perf.csv (--perf-fallback whole; frames.json source native)); draw_calls p10/p50/p90 0/0/0 mean 0 n 28277; whole perf.csv (--perf-fallback whole; frames.json source native)
+INCOMPLETE DC proxy vacuous: perf.csv draw_calls is 0 on every ref frame (native route does not feed it); --zero-dc incomplete
+           noise band (ref runs 0030-n0-r1, 0042-n0-r2): light share [0.15910, 0.16900] (--ls-pad 0); draw_calls p10 [0, 0], p50 [0, 0], p90 [0, 0] (--dc-pad 0); --spread-k 0
+PASS       cand: candidate runs found: 2
+           cand 0054-n0-r3: note: draw_calls over the whole perf.csv, not the scored window
+FAIL       cand 0054-n0-r3 LS: light share 0.22616 NOT inside [0.15910, 0.16900] (outside by 0.05716 = 5.78 x the ref spread 0.00989)
+PASS       cand 0054-n0-r3 DC: draw_calls p10 0 inside [0, 0]
+PASS       cand 0054-n0-r3 DC: draw_calls p50 0 inside [0, 0]
+PASS       cand 0054-n0-r3 DC: draw_calls p90 0 inside [0, 0]
+           cand 0054-n0-r3: draw_calls mean 0 n 21043; whole perf.csv (--perf-fallback whole; frames.json source native)
+PASS       cand 0054-n0-r3 LOG: no NEW key at >= warning (0)
+PASS       cand 0054-n0-r3 LOG: no GONE key at >= warning outside the noise (0)
+PASS       cand 0054-n0-r3 LOG: no MORE key at >= warning outside the noise (0)
+PASS       cand 0054-n0-r3 LOG: fail markers no higher than the ref max
+PASS       cand 0054-n0-r3 LOG: clean-exit line present
+           cand 0054-n0-r3 LOG info (>= info, < warning): NEW 8; x1 [info] [core] Toypad[Read ] #B #C # # # # #A D# # # # # # #B # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # # BE # # # E# EA # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #C #C # F# #D EF # F# #C # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # AD # C# F# # E# FD FD # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Write] #B # # #A B# # # A# F# FA F# #F F# #F BF # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Write] #B # # #A B# # # B# # # CA E# # # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Write] #B # # #A B# # #C # AF # CD # ED #D # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Write] #B # # #A B# # C# D# B# # F# #B #B # # # # # # # # # # # # # # # # # # # 
+           cand 0054-n0-r3 LOG info: GONE 0
+           cand 0054-n0-r3 LOG info: MORE 0
+           cand 0104-n0-r4: note: draw_calls over the whole perf.csv, not the scored window
+FAIL       cand 0104-n0-r4 LS: light share 0.24348 NOT inside [0.15910, 0.16900] (outside by 0.07448 = 7.53 x the ref spread 0.00989)
+PASS       cand 0104-n0-r4 DC: draw_calls p10 0 inside [0, 0]
+PASS       cand 0104-n0-r4 DC: draw_calls p50 0 inside [0, 0]
+PASS       cand 0104-n0-r4 DC: draw_calls p90 0 inside [0, 0]
+           cand 0104-n0-r4: draw_calls mean 0 n 17398; whole perf.csv (--perf-fallback whole; frames.json source native)
+PASS       cand 0104-n0-r4 LOG: no NEW key at >= warning (0)
+PASS       cand 0104-n0-r4 LOG: no GONE key at >= warning outside the noise (0)
+PASS       cand 0104-n0-r4 LOG: no MORE key at >= warning outside the noise (0)
+PASS       cand 0104-n0-r4 LOG: fail markers no higher than the ref max
+PASS       cand 0104-n0-r4 LOG: clean-exit line present
+           cand 0104-n0-r4 LOG info (>= info, < warning): NEW 8; x1 [info] [core] Toypad[Read ] #B #C # # # # C# AC # CC FE F# EA D# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # #A FB D# # B# F# # #F #D # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # D# EC #E F# # #E F# #F #F # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Read ] #B #C # # # E# #D DB E# #A #C # #D # # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Write] #B # # #A B# # # # # # AE F# A# BE # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Write] #B # # #A B# # # # # F# #C #D # #C F# # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Write] #B # # #A B# # # # B# # B# # # E# # # # # # # # # # # # # # # # # # #  | x1 [info] [core] Toypad[Write] #B # # #A B# # #B F# B# C# # EA F# # # # # # # # # # # # # # # # # # # # 
+           cand 0104-n0-r4 LOG info: GONE 0
+           cand 0104-n0-r4 LOG info: MORE 0
+RESULT: FAIL (2 failed, 1 incomplete)
+[exit code 1]

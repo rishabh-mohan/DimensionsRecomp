@@ -1,0 +1,71 @@
+﻿diff --git a/build/agent12/w6-gates/run_gates.py.pre-runexp b/build/agent12/w6-gates/run_gates.py
+index 64804c9..1e1c096 100644
+--- a/build/agent12/w6-gates/run_gates.py.pre-runexp
++++ b/build/agent12/w6-gates/run_gates.py
+@@ -205,6 +205,26 @@ def env_norm(x):
+     return OrderedDict((k.upper(), v) for k, v in kv_norm(x).items())
+ 
+ 
++RUN_TOKEN = re.compile(r"<run>", re.I)  # matrix.json env placeholder: the runner puts the run's own dir there
++
++
++def env_match(got, want, run_dir):
++    """G9 env check. A '<run>' in the arm's value stands for this run's dir: expand it, compare as paths (case and
++    slashes don't matter). With no run dir the placeholder can't be proven, so it doesn't match."""
++    if set(got) != set(want):
++        return False
++    for k, v in want.items():
++        if RUN_TOKEN.search(v):
++            if not run_dir:
++                return False
++            exp = RUN_TOKEN.sub(lambda _: run_dir, v)
++            if os.path.normcase(os.path.normpath(got[k])) != os.path.normcase(os.path.normpath(exp)):
++                return False
++        elif got[k] != v:
++            return False
++    return True
++
++
+ def fmt_kv(d):
+     return ", ".join(f"{k}={v}" for k, v in d.items()) or "-"
+ 
+@@ -989,8 +1009,10 @@ class Kit:
+                     if any(y.startswith(f"--{k}=") for y in args):
+                         probs.append(f"args set --{k}, which the arm doesn't")
+                 env = env_norm(rj.get("env_set"))
+-                if dict(env) != dict(x["env"]):
+-                    probs.append(f"env_set {fmt_kv(env)} is not the arm's {fmt_kv(x['env'])}")
++                if not env_match(env, x["env"], r["run_dir"]):
++                    probs.append(f"env_set {fmt_kv(env)} is not the arm's {fmt_kv(x['env'])}"
++                                 + (f" (<run> = {r['run_dir'] or 'no run dir'})"
++                                    if any(RUN_TOKEN.search(v) for v in x["env"].values()) else ""))
+                 toml = kv_norm(rj.get("toml_set"))
+                 if dict(toml) != dict(x["toml"]):
+                     probs.append(f"toml_set {fmt_kv(toml)} is not the arm's {fmt_kv(x['toml'])}")
+@@ -1001,6 +1023,8 @@ class Kit:
+                 ok += 1
+         g.d("hands off, no dev console during the window: procedural (C1 v3 latches keep_watch and "
+             "hold_global_lock at init; other cvars are read live)")
++        if any(RUN_TOKEN.search(v) for i in self.run_arms for v in self.arms[i]["env"].values()):
++            g.d("env values with <run> are compared as paths, with <run> = the run's own dir")
+         g.key = f"{ok}/{len(self.runs)} runs: params.cvar, args, env_set and toml_set = the arm's"
+         return g
+ 
+@@ -1610,6 +1634,17 @@ def selftest():
+     ok(kv_norm(["A=True", " b = 1 ", "--c=x"]) == {"a": "true", "b": "1", "c": "x"}, "kv_norm on a list")
+     ok(kv_norm({"A": True, "n": 0}) == {"a": "true", "n": "0"}, "kv_norm on a dict")
+     ok(env_norm({"rex_timer_wait_blocking": 1}) == {"REX_TIMER_WAIT_BLOCKING": "1"}, "env_norm")
++    rd1, rd2 = r"C:\m\0359\runs\0400-n0-r1", r"C:\m\0359\runs\0402-mc-r1"
++    want = env_norm({"LEGO_NATIVE_FRAME_METRICS": r"<run>\native-frames.csv", "LEGO_NATIVE_SHADER_MISS_CACHE": "1"})
++    got = env_norm({"lego_native_shader_miss_cache": "1", "LEGO_NATIVE_FRAME_METRICS": rd1 + r"\native-frames.csv"})
++    ok(env_match(got, want, rd1) and env_match(got, want, rd1.lower().replace("\\", "/") + "/"),
++       "<run> env: the run's own dir matches (case, slashes, trailing slash ignored)")
++    ok(not env_match(got, want, rd2), "<run> env: another run's dir fails")
++    ok(not env_match(got, want, ""), "<run> env: no run dir fails")
++    ok(not env_match(env_norm({"LEGO_NATIVE_FRAME_METRICS": rd1 + r"\native-frames.csv"}), want, rd1),
++       "<run> env: a missing key fails")
++    ok(not env_match(env_norm({"A": "1"}), env_norm({"A": "2"}), rd1) and env_match(env_norm({"A": "1"}),
++       env_norm({"a": "1"}), ""), "plain env: exact value compare, as before")
+     ok(forbidden({"slow_frame_log_ms": "1"}) and not forbidden({"slow_frame_log_ms": "0"})
+        and forbidden({"shared_memory_upload_hash_log": "true"}) and not forbidden({"framerate_limit": "0"}),
+        "timing-forbidden switches")

@@ -1,0 +1,2287 @@
+{
+ "matrix": "<workspace>\\build\\agent8\\matrix\\20261123-0155",
+ "expect": "<workspace>\\build\\agent6\\wnight\\expect-w5b.json",
+ "matrix_json": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\matrix.json",
+ "reference": "d11",
+ "generated": "2026-11-25T01:38:12",
+ "tools": {
+  "w4b_logdiff": {
+   "rc": 0,
+   "s": 0.3,
+   "out": "<workspace>\\build\\agent6\\wnight\\s3-regress\\out-W5B-20261123-0155\\logdiff",
+   "log": "<workspace>\\build\\agent6\\wnight\\s3-regress\\out-W5B-20261123-0155\\logdiff.log"
+  },
+  "w4b_extra": {
+   "rc": 0,
+   "s": 0.3,
+   "out": "<workspace>\\build\\agent6\\wnight\\s3-regress\\out-W5B-20261123-0155\\extra.txt",
+   "log": "<workspace>\\build\\agent6\\wnight\\s3-regress\\out-W5B-20261123-0155\\extra.log"
+  }
+ },
+ "arms": {
+  "d11": {
+   "runs": [
+    "0157-d11-r1",
+    "0207-d11-r2",
+    "0211-d11-r3",
+    "0215-d11-r4",
+    "0225-d11-r5",
+    "0229-d11-r6"
+   ],
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [
+    "0215-d11-r4: no \"Execution complete\" line, benign hard-exit race (log ends with \"Title terminated; hard-exiting process.\", exit 0): ['Toypad[Read ] 0B 0C 55 09 0A D2 9F C1 04 AE A7 9F E1 73 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ', 'Window closing, shutting down...', 'Title terminated; hard-exiting process.']"
+   ],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "unhandled": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "protect_failed": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "levels": [
+    "40/0/0",
+    "40/0/0",
+    "40/0/0",
+    "40/0/0",
+    "40/0/0",
+    "40/0/0"
+   ],
+   "slow": {
+    "runs": 6,
+    "slow_runs": 0,
+    "mean_slow_pct": 0.0,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "still not acquired after": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "Minidump written to": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "Host timer resolution set to 1 ms": [
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ],
+    "TimerQueue: precise wait (timer_queue_precise_wait)": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     35,
+     35,
+     35,
+     35,
+     35,
+     35
+    ],
+    "Reserving the guest memory arena": [
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ],
+    "Title terminated": [
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ]
+   }
+  },
+  "cold-d11": {
+   "runs": [
+    "0155-cold-d11"
+   ],
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0
+   ],
+   "unhandled": [
+    0
+   ],
+   "protect_failed": [
+    0
+   ],
+   "levels": [
+    "40/0/0"
+   ],
+   "slow": {
+    "runs": 1,
+    "slow_runs": 0,
+    "mean_slow_pct": 0.0,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0
+    ],
+    "still not acquired after": [
+     0
+    ],
+    "Minidump written to": [
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0
+    ],
+    "Host timer resolution set to 1 ms": [
+     1
+    ],
+    "TimerQueue: precise wait (timer_queue_precise_wait)": [
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     35
+    ],
+    "Reserving the guest memory arena": [
+     1
+    ],
+    "Title terminated": [
+     1
+    ]
+   },
+   "logdiff": {
+    "fail": 0,
+    "fail_unexplained": [],
+    "new": 0,
+    "new_err": [],
+    "new_warn": [],
+    "new_warn_named": [],
+    "more": [],
+    "gone": [],
+    "only": 0,
+    "only_unnamed": [],
+    "only_keys": []
+   }
+  },
+  "d11p": {
+   "runs": [
+    "0201-d11p-r1",
+    "0205-d11p-r2",
+    "0209-d11p-r3",
+    "0219-d11p-r4",
+    "0223-d11p-r5",
+    "0227-d11p-r6"
+   ],
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "unhandled": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "protect_failed": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "levels": [
+    "40/0/0",
+    "40/0/0",
+    "40/0/0",
+    "40/0/0",
+    "40/0/0",
+    "40/0/0"
+   ],
+   "slow": {
+    "runs": 6,
+    "slow_runs": 0,
+    "mean_slow_pct": 0.0,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "still not acquired after": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "Minidump written to": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "Host timer resolution set to 1 ms": [
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ],
+    "TimerQueue: precise wait (timer_queue_precise_wait)": [
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ],
+    "[NtCreateFile] FAILED": [
+     35,
+     35,
+     35,
+     35,
+     35,
+     35
+    ],
+    "Reserving the guest memory arena": [
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ],
+    "Title terminated": [
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ]
+   },
+   "logdiff": {
+    "fail": 0,
+    "fail_unexplained": [],
+    "new": 0,
+    "new_err": [],
+    "new_warn": [],
+    "new_warn_named": [],
+    "more": [],
+    "gone": [],
+    "only": 1,
+    "only_unnamed": [],
+    "only_keys": [
+     "[info] [core] TimerQueue: precise wait (timer_queue_precise_wait)"
+    ]
+   }
+  },
+  "d11t": {
+   "runs": [
+    "0159-d11t-r1",
+    "0203-d11t-r2",
+    "0213-d11t-r3",
+    "0217-d11t-r4",
+    "0221-d11t-r5",
+    "0231-d11t-r6"
+   ],
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "unhandled": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "protect_failed": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "levels": [
+    "40/0/0",
+    "40/0/0",
+    "40/0/0",
+    "40/0/0",
+    "40/0/0",
+    "40/0/0"
+   ],
+   "slow": {
+    "runs": 6,
+    "slow_runs": 0,
+    "mean_slow_pct": 0.0,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "still not acquired after": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "Minidump written to": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "Host timer resolution set to 1 ms": [
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ],
+    "TimerQueue: precise wait (timer_queue_precise_wait)": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     35,
+     35,
+     35,
+     35,
+     35,
+     35
+    ],
+    "Reserving the guest memory arena": [
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ],
+    "Title terminated": [
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ]
+   },
+   "logdiff": {
+    "fail": 0,
+    "fail_unexplained": [],
+    "new": 0,
+    "new_err": [],
+    "new_warn": [],
+    "new_warn_named": [],
+    "more": [],
+    "gone": [],
+    "only": 0,
+    "only_unnamed": [],
+    "only_keys": []
+   }
+  }
+ },
+ "watchdog_runs": [],
+ "race_runs": [
+  "0215-d11-r4"
+ ],
+ "mode": "matrix",
+ "runs": {
+  "0155-cold-d11": {
+   "arm": "cold-d11",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0155-cold-d11",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "watchdog": 0,
+   "race": false,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 90.6399998664856,
+    "rows": 91
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "cold-d11",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.97,
+    "ff": 1795420533.674,
+    "start": "2026-11-23 01:55:29.579",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:56:33.677",
+    "m_end": "2026-11-23 01:57:03.684",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11081
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:55:29.911",
+    "last_ts": "2026-11-23 01:57:03.985"
+   }
+  },
+  "0157-d11-r1": {
+   "arm": "d11",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0157-d11-r1",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "watchdog": 0,
+   "race": false,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.80700016021729,
+    "rows": 113
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "d11-r1",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.98,
+    "ff": 1795420635.363,
+    "start": "2026-11-23 01:57:12.333",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 01:58:15.356",
+    "m_end": "2026-11-23 01:59:05.354",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11805
+     ]
+    ],
+    "lines": 103,
+    "levels": {
+     "info": 55,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:57:12.547",
+    "last_ts": "2026-11-23 01:59:06.869"
+   }
+  },
+  "0159-d11t-r1": {
+   "arm": "d11t",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0159-d11t-r1",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "watchdog": 0,
+   "race": false,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.94199991226196,
+    "rows": 113
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "d11t-r1",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true"
+    },
+    "env": {
+     "REX_TIMER_WAIT_BLOCKING": "1"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14.01,
+    "ff": 1795420758.039,
+    "start": "2026-11-23 01:59:15.006",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 02:00:18.042",
+    "m_end": "2026-11-23 02:01:08.051",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11174
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:59:15.232",
+    "last_ts": "2026-11-23 02:01:09.672"
+   }
+  },
+  "0201-d11p-r1": {
+   "arm": "d11p",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0201-d11p-r1",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "watchdog": 0,
+   "race": false,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.67799997329712,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "d11p-r1",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true",
+     "timer_queue_precise_wait": "true"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.98,
+    "ff": 1795420880.817,
+    "start": "2026-11-23 02:01:17.801",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 02:02:20.826",
+    "m_end": "2026-11-23 02:03:10.832",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11885
+     ]
+    ],
+    "lines": 104,
+    "levels": {
+     "info": 56,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "TimerQueue: precise wait (timer_queue_precise_wait)": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 02:01:18.021",
+    "last_ts": "2026-11-23 02:03:12.196"
+   }
+  },
+  "0203-d11t-r2": {
+   "arm": "d11t",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0203-d11t-r2",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "watchdog": 0,
+   "race": false,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.55900001525879,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "d11t-r2",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true"
+    },
+    "env": {
+     "REX_TIMER_WAIT_BLOCKING": "1"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14,
+    "ff": 1795421003.33,
+    "start": "2026-11-23 02:03:20.303",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 02:04:23.333",
+    "m_end": "2026-11-23 02:05:13.327",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11126
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 02:03:20.527",
+    "last_ts": "2026-11-23 02:05:14.609"
+   }
+  },
+  "0205-d11p-r2": {
+   "arm": "d11p",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0205-d11p-r2",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "watchdog": 0,
+   "race": false,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.78600001335144,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "d11p-r2",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true",
+     "timer_queue_precise_wait": "true"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 14.05,
+    "ff": 1795421125.735,
+    "start": "2026-11-23 02:05:22.697",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 02:06:25.728",
+    "m_end": "2026-11-23 02:07:15.736",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11241
+     ]
+    ],
+    "lines": 100,
+    "levels": {
+     "info": 52,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "TimerQueue: precise wait (timer_queue_precise_wait)": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 02:05:22.916",
+    "last_ts": "2026-11-23 02:07:17.201"
+   }
+  },
+  "0207-d11-r2": {
+   "arm": "d11",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0207-d11-r2",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "watchdog": 0,
+   "race": false,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.66400003433228,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "d11-r2",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.99,
+    "ff": 1795421248.342,
+    "start": "2026-11-23 02:07:25.313",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 02:08:28.341",
+    "m_end": "2026-11-23 02:09:18.355",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11142
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 02:07:25.535",
+    "last_ts": "2026-11-23 02:09:19.705"
+   }
+  },
+  "0209-d11p-r3": {
+   "arm": "d11p",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0209-d11p-r3",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "watchdog": 0,
+   "race": false,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.77699995040894,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "d11p-r3",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true",
+     "timer_queue_precise_wait": "true"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.98,
+    "ff": 1795421370.836,
+    "start": "2026-11-23 02:09:27.813",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 02:10:30.840",
+    "m_end": "2026-11-23 02:11:20.841",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11266
+     ]
+    ],
+    "lines": 100,
+    "levels": {
+     "info": 52,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "TimerQueue: precise wait (timer_queue_precise_wait)": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 02:09:28.033",
+    "last_ts": "2026-11-23 02:11:22.331"
+   }
+  },
+  "0211-d11-r3": {
+   "arm": "d11",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0211-d11-r3",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "watchdog": 0,
+   "race": false,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.64400005340576,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "d11-r3",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.96,
+    "ff": 1795421493.401,
+    "start": "2026-11-23 02:11:30.373",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 02:12:33.410",
+    "m_end": "2026-11-23 02:13:23.412",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11172
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 02:11:30.600",
+    "last_ts": "2026-11-23 02:13:24.749"
+   }
+  },
+  "0213-d11t-r3": {
+   "arm": "d11t",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0213-d11t-r3",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "watchdog": 0,
+   "race": false,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.72800016403198,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "d11t-r3",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true"
+    },
+    "env": {
+     "REX_TIMER_WAIT_BLOCKING": "1"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.99,
+    "ff": 1795421615.876,
+    "start": "2026-11-23 02:13:32.837",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 02:14:35.856",
+    "m_end": "2026-11-23 02:15:25.870",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11818
+     ]
+    ],
+    "lines": 103,
+    "levels": {
+     "info": 55,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 02:13:33.046",
+    "last_ts": "2026-11-23 02:15:27.288"
+   }
+  },
+  "0215-d11-r4": {
+   "arm": "d11",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0215-d11-r4",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [
+    "no \"Execution complete\" line, benign hard-exit race (log ends with \"Title terminated; hard-exiting process.\", exit 0): ['Toypad[Read ] 0B 0C 55 09 0A D2 9F C1 04 AE A7 9F E1 73 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ', 'Window closing, shutting down...', 'Title terminated; hard-exiting process.']"
+   ],
+   "watchdog": 0,
+   "race": true,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.69200015068054,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "d11-r4",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.95,
+    "ff": 1795421738.455,
+    "start": "2026-11-23 02:15:35.425",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 02:16:38.456",
+    "m_end": "2026-11-23 02:17:28.451",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11094
+     ]
+    ],
+    "lines": 98,
+    "levels": {
+     "info": 50,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": false,
+    "other_err": [],
+    "first_ts": "2026-11-23 02:15:35.634",
+    "last_ts": "2026-11-23 02:17:29.855"
+   }
+  },
+  "0217-d11t-r4": {
+   "arm": "d11t",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0217-d11t-r4",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "watchdog": 0,
+   "race": false,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.57200002670288,
+    "rows": 111
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "d11t-r4",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true"
+    },
+    "env": {
+     "REX_TIMER_WAIT_BLOCKING": "1"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.96,
+    "ff": 1795421860.952,
+    "start": "2026-11-23 02:17:37.915",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 02:18:40.953",
+    "m_end": "2026-11-23 02:19:30.946",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11154
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 02:17:38.129",
+    "last_ts": "2026-11-23 02:19:32.228"
+   }
+  },
+  "0219-d11p-r4": {
+   "arm": "d11p",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0219-d11p-r4",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "watchdog": 0,
+   "race": false,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.92999982833862,
+    "rows": 113
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "d11p-r4",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true",
+     "timer_queue_precise_wait": "true"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.91,
+    "ff": 1795421983.39,
+    "start": "2026-11-23 02:19:40.366",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 02:20:43.400",
+    "m_end": "2026-11-23 02:21:33.399",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11884
+     ]
+    ],
+    "lines": 104,
+    "levels": {
+     "info": 56,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "TimerQueue: precise wait (timer_queue_precise_wait)": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 02:19:40.582",
+    "last_ts": "2026-11-23 02:21:34.963"
+   }
+  },
+  "0221-d11t-r5": {
+   "arm": "d11t",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0221-d11t-r5",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "watchdog": 0,
+   "race": false,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.6470000743866,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "d11t-r5",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true"
+    },
+    "env": {
+     "REX_TIMER_WAIT_BLOCKING": "1"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.9,
+    "ff": 1795422107.191,
+    "start": "2026-11-23 02:21:43.151",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 02:22:47.188",
+    "m_end": "2026-11-23 02:23:37.180",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11161
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 02:21:43.375",
+    "last_ts": "2026-11-23 02:23:38.568"
+   }
+  },
+  "0223-d11p-r5": {
+   "arm": "d11p",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0223-d11p-r5",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "watchdog": 0,
+   "race": false,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.88899993896484,
+    "rows": 113
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "d11p-r5",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true",
+     "timer_queue_precise_wait": "true"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.92,
+    "ff": 1795422229.602,
+    "start": "2026-11-23 02:23:46.587",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 02:24:49.627",
+    "m_end": "2026-11-23 02:25:39.617",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11920
+     ]
+    ],
+    "lines": 104,
+    "levels": {
+     "info": 56,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "TimerQueue: precise wait (timer_queue_precise_wait)": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 02:23:46.803",
+    "last_ts": "2026-11-23 02:25:41.171"
+   }
+  },
+  "0225-d11-r5": {
+   "arm": "d11",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0225-d11-r5",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "watchdog": 0,
+   "race": false,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.70300006866455,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "d11-r5",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.92,
+    "ff": 1795422352.347,
+    "start": "2026-11-23 02:25:49.320",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 02:26:52.358",
+    "m_end": "2026-11-23 02:27:42.354",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11131
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 02:25:49.545",
+    "last_ts": "2026-11-23 02:27:43.759"
+   }
+  },
+  "0227-d11p-r6": {
+   "arm": "d11p",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0227-d11p-r6",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "watchdog": 0,
+   "race": false,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.63600015640259,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "d11p-r6",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true",
+     "timer_queue_precise_wait": "true"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.93,
+    "ff": 1795422474.883,
+    "start": "2026-11-23 02:27:51.851",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 02:28:54.882",
+    "m_end": "2026-11-23 02:29:44.881",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11276
+     ]
+    ],
+    "lines": 100,
+    "levels": {
+     "info": 52,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "TimerQueue: precise wait (timer_queue_precise_wait)": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 02:27:52.113",
+    "last_ts": "2026-11-23 02:29:46.198"
+   }
+  },
+  "0229-d11-r6": {
+   "arm": "d11",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0229-d11-r6",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "watchdog": 0,
+   "race": false,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.8420000076294,
+    "rows": 113
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "d11-r6",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true"
+    },
+    "env": {},
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.94,
+    "ff": 1795422597.313,
+    "start": "2026-11-23 02:29:54.290",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 02:30:57.313",
+    "m_end": "2026-11-23 02:31:47.320",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11172
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 02:29:54.508",
+    "last_ts": "2026-11-23 02:31:48.849"
+   }
+  },
+  "0231-d11t-r6": {
+   "arm": "d11t",
+   "dir": "<workspace>\\build\\agent8\\matrix\\20261123-0155\\runs\\0231-d11t-r6",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [],
+   "watchdog": 0,
+   "race": false,
+   "slow": {
+    "onset_s": null,
+    "slow_pct": 0.0,
+    "span_s": 111.7279999256134,
+    "rows": 112
+   },
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "d11t-r6",
+    "status": "OK",
+    "valid_timing": true,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4-bin",
+    "cvars": {
+     "framerate_limit": "0",
+     "host_timer_resolution_ms": "1",
+     "host_timer_throttling_optout": "true",
+     "precise_guest_sleep": "true",
+     "wait_timeout_round_up": "true",
+     "cs_spin": "true",
+     "spinlock_pause_spin": "true",
+     "clock_lockfree": "true",
+     "tls_bounds_fix": "true"
+    },
+    "env": {
+     "REX_TIMER_WAIT_BLOCKING": "1"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": 1,
+    "clean": true,
+    "killed": false,
+    "exited": true,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": false,
+    "flags_excluding": [],
+    "flags": [
+     "light_share_high"
+    ],
+    "free_gb": 13.93,
+    "ff": 1795422719.966,
+    "start": "2026-11-23 02:31:56.936",
+    "nogrowth": 0,
+    "nrw": 0,
+    "m_start": "2026-11-23 02:32:59.966",
+    "m_end": "2026-11-23 02:33:49.959",
+    "runner_error": null
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      11174
+     ]
+    ],
+    "lines": 99,
+    "levels": {
+     "info": 51,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Host timer resolution set to 1 ms": 1,
+     "Host timer resolution set to 1 ms (background opt-out on)": 1,
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 02:31:57.140",
+    "last_ts": "2026-11-23 02:33:51.401"
+   }
+  }
+ }
+}

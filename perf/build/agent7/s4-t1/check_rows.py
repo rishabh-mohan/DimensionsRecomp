@@ -6,7 +6,7 @@ Run (Below Normal):  python -B build/agent7/s4-t1/check_rows.py
 Exit 0 = every check passed.
 
 Checks
-  * the 3 matrices parse and use only run-matrix.ps1's fields (lists parsed live from run-matrix.ps1 L49-55);
+  * the 4 matrices (F1, F3, W8b draft, W1) parse and use only run-matrix.ps1's fields (lists parsed live from run-matrix.ps1 L49-55);
   * timing fields and cvars equal bench/agent4/matrix-native-threaded.json; frames=perf; thread-cpu driver;
   * each arm's env equals its intended set (n0 / th2 / th3 from the template's own arms, + CHAIN_PRIORITY=3,
     + QUERY_TRACE_FROM=0 for F3); exactly one ref arm = "reference";
@@ -105,6 +105,7 @@ EXPECT = {
     'matrix-s4t1-f3.json': ('n0q', False, 2, [('n0q', S4T1, u(N0, QT), 2), ('th3q', S4T1, u(TH3, QT), 2),
                                               ('th3cp3q', S4T1, u(TH3, CP3, QT), 1)]),
     'matrix-w8b-draft.json': ('n0', True, 4, [('n0', S4T1, N0, 4), ('th3', S4T1, TH3, 4), ('th3cp', S4T1, u(TH3, CP3), 4)]),
+    'matrix-s4t1-w1.json': ('n0', False, 1, [('n0', S4T1, N0, 1), ('th3', S4T1, TH3, 1), ('th3cp', S4T1, u(TH3, CP3), 1)]),
 }
 MX = {}
 placeholders = {}
@@ -131,13 +132,19 @@ for name, (ref, cold, rep, arms) in EXPECT.items():
         check(ok, 'arm %-8s bin %-15s x%d env n0+%s%s' % (aid, a['bin'], a['repeats'], extra, (' BAD FIELDS %s' % bad) if bad else ''))
     for tok in re.findall(r'<[A-Z0-9][A-Z0-9-]*>', raw.decode('ascii')):
         placeholders.setdefault(tok, set()).add(name)
-    if name == 'matrix-w8b-draft.json':
+    if name in ('matrix-w8b-draft.json', 'matrix-s4t1-w1.json'):
+        tag = 'W8b' if name == 'matrix-w8b-draft.json' else 'W1'
         keys = sorted({k for a in mx['arms'] for k in a['env']})
-        check(set(keys) <= set(F1), 'W8b env keys all in ENV-KEYS-F1: ' + ', '.join(keys))
+        check(set(keys) <= set(F1), tag + ' env keys all in ENV-KEYS-F1: ' + ', '.join(keys))
         envs = {a['id']: a['env'] for a in mx['arms']}
         check(envs['th3'] == u(envs['n0'], {'LEGO_NATIVE_THREADED': '1', 'LEGO_NATIVE_PREPARE_THREADS': '2',
                                             'LEGO_NATIVE_FULL_DRAW_PREPARATION': '1'}) and envs['th3cp'] == u(envs['th3'], CP3),
-              'W8b th3 = n0 + 3 keys; th3cp = th3 + CHAIN_PRIORITY=3 (ENV-KEYS-F1 th/thcp)')
+              tag + ' th3 = n0 + 3 keys; th3cp = th3 + CHAIN_PRIORITY=3 (ENV-KEYS-F1 th/thcp)')
+    if name == 'matrix-s4t1-w1.json' and 'matrix-w8b-draft.json' in MX:
+        w8 = MX['matrix-w8b-draft.json']
+        same = all(a['env'] == b['env'] and a['cvars'] == b['cvars'] and a['bin'] == b['bin'] and a['id'] == b['id']
+                   for a, b in zip(mx['arms'], w8['arms'])) and len(mx['arms']) == len(w8['arms'])
+        check(same, 'W1 arms = W8b arms (ids, bin, env, cvars); only repeats/cold differ')
 
 
 def runs_for(mx, margs):

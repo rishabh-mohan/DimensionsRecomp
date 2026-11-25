@@ -26,6 +26,13 @@
 # Each run is run-timing.ps1 called in-process; a failed run is recorded and the matrix goes on; Ctrl+C closes the
 # game (run-timing's finally) and still writes the results.
 # Writes <OutDir>\results.csv (one row per run), summary.md, plan.txt, matrix.json (copy), logs\, runs\.
+# Session 3 (M8, staged): warmup_runs N (top level, default 0; -WarmupRuns N overrides, -Quick 0) = N unscored GPU
+# warm-up runs after the cold run(s) and before round 1: full-length runs (same warm-up, window, driver as a scored run)
+# cycling over round 1's arms so that the last one is the arm before round 1's first (scored False, round 0, tag
+# warm<j>-<arm>). Their numbers stay in results.csv (summary.md lists them as 'warm') and never enter the summary.
+# results.csv also has over8 / over10 / over16_7 (frames > 8 / 10 / 16.667 ms, frame_summary.py over_*ms; blank when
+# the run's frames.json predates them), frames_lt_light and light_share at full precision; new columns are appended
+# after the old ones.
 # Exit: 0 all runs OK, 1 some run not OK, 2 matrix/preflight error or cancelled.
 param(
     [string]$Matrix = '',
@@ -37,6 +44,7 @@ param(
     [string]$OutDir = '',
     [switch]$NoCold,
     [switch]$ColdShared,        # one cold run (on round 1's first arm's bin) instead of one per bin; -NoCold wins
+    [int]$WarmupRuns = -1,      # unscored warm-up runs before round 1 (-1 = the matrix's warmup_runs, default 0)
     [switch]$AllowRunningGame   # self-test only: a running legodimensions.exe is a warning instead of an abort
 )
 $ErrorActionPreference = 'Stop'
@@ -48,16 +56,16 @@ $inv = [Globalization.CultureInfo]::InvariantCulture
 
 $TopKeys = @('title', 'reference', 'warmup_s', 'warmup_from', 'measure_s', 'repeats', 'settle_s', 'cooldown_s', 'boot_timeout_s',
              'close_timeout_s', 'menu_s', 'cold_run', 'order', 'sys_csv', 'min_window_after_ff_s', 'cold_warmup_s', 'cold_measure_s',
-             'quick', 'notes', 'arms')
+             'warmup_runs', 'quick', 'notes', 'arms')
 $ArmKeys = @('id', 'group', 'ref', 'repeats', 'frames', 'bin', 'cvars', 'env', 'toml', 'seed_cache', 'seed_recipes_only', 'triggers',
              'menu', 'menu_s', 'driver', 'profile', 'profile_s', 'note')
 $QuickKeys = @('warmup_s', 'measure_s', 'repeats', 'settle_s', 'cooldown_s', 'boot_timeout_s', 'close_timeout_s', 'menu_s', 'profile_s',
-               'min_window_after_ff_s', 'cold_warmup_s', 'cold_measure_s')
+               'min_window_after_ff_s', 'cold_warmup_s', 'cold_measure_s', 'warmup_runs')
 $NumKeys = @('warmup_s', 'measure_s', 'repeats', 'settle_s', 'cooldown_s', 'boot_timeout_s', 'close_timeout_s', 'menu_s', 'profile_s',
-             'min_window_after_ff_s', 'cold_warmup_s', 'cold_measure_s')
+             'min_window_after_ff_s', 'cold_warmup_s', 'cold_measure_s', 'warmup_runs')
 $D = @{ warmup_s = 60; measure_s = 120; repeats = 3; settle_s = 20; cooldown_s = 10; boot_timeout_s = 240; close_timeout_s = 60
-        menu_s = 60; profile_s = 120; min_window_after_ff_s = 60; cold_warmup_s = 10; cold_measure_s = 30 }
-$QD = @{ warmup_s = 10; measure_s = 20; settle_s = 5; menu_s = 20; cooldown_s = 5; min_window_after_ff_s = 0; cold_warmup_s = 5; cold_measure_s = 10 }
+        menu_s = 60; profile_s = 120; min_window_after_ff_s = 60; cold_warmup_s = 10; cold_measure_s = 30; warmup_runs = 0 }
+$QD = @{ warmup_s = 10; measure_s = 20; settle_s = 5; menu_s = 20; cooldown_s = 5; min_window_after_ff_s = 0; cold_warmup_s = 5; cold_measure_s = 10; warmup_runs = 0 }
 # Estimate per run (Agent 8, window 3 runs, 23:45-00:30): warm boot to the first-frame signal ~12 s, first boot of a
 # build ~25 s, close ~5 s (WM_CLOSE exit seen within ~1-3 s), post-processing ~5 s.
 $Est = @{ boot_warm_s = 12; boot_cold_s = 25; close_s = 5; post_s = 5 }
@@ -126,7 +134,8 @@ function Read-Matrix([string]$Path) {
     $ord = [string](Get-P $mx 'order' 'roundrobin'); if (@('roundrobin', 'fixed') -notcontains $ord) { $E.Add("order must be roundrobin or fixed, not '$ord'") }
     $cr = Get-P $mx 'cold_run'; if ($null -ne $cr -and $cr -isnot [bool]) { $E.Add('cold_run must be true or false') }
     $sc0 = Get-P $mx 'sys_csv'; if ($null -ne $sc0 -and $sc0 -isnot [bool]) { $E.Add('sys_csv must be true or false') }
-    foreach ($k in @('min_window_after_ff_s', 'cold_warmup_s', 'cold_measure_s')) { $v = Get-P $mx $k; if ((Test-Num $v) -and $v -lt 0) { $E.Add("$k must be >= 0") } }
+    foreach ($k in @('min_window_after_ff_s', 'cold_warmup_s', 'cold_measure_s', 'warmup_runs')) { $v = Get-P $mx $k; if ((Test-Num $v) -and $v -lt 0) { $E.Add("$k must be >= 0") } }
+    $wr0 = Get-P $mx 'warmup_runs'; if ((Test-Num $wr0) -and ([double]$wr0 -ne [math]::Floor([double]$wr0) -or $wr0 -gt 20)) { $E.Add('warmup_runs must be a whole number 0-20') }
     $arms = @(Get-P $mx 'arms' @())
     if ($arms.Count -eq 0) { $E.Add('no arms'); return $R }
     $ids = @{}
@@ -217,7 +226,7 @@ function Build-Plan($R, [string[]]$OnlyIds, [bool]$AssumeBins = $false) {
     $mx = $R.mx
     $P = @{ arms = [ordered]@{}; skips = (New-Object System.Collections.Generic.List[string]); errors = (New-Object System.Collections.Generic.List[string])
             rounds = (New-Object System.Collections.Generic.List[object]); runs = (New-Object System.Collections.Generic.List[object]); est_s = 0.0
-            order = [string](Get-P $mx 'order' 'roundrobin'); warmup_from = [string](Get-P $mx 'warmup_from' 'firstframe') }
+            warmup_runs = 0; order = [string](Get-P $mx 'order' 'roundrobin'); warmup_from = [string](Get-P $mx 'warmup_from' 'firstframe') }
     $sel = @($R.arms)
     if ($OnlyIds.Count) {
         foreach ($o in $OnlyIds) { if (-not @($R.arms | Where-Object { $_.id -eq $o }).Count) { $P.errors.Add("-Only: no arm '$o' in this matrix") } }
@@ -282,14 +291,28 @@ function Build-Plan($R, [string[]]$OnlyIds, [bool]$AssumeBins = $false) {
             if ($ColdShared -and $seen.Count) { break }
             $seen[$b] = 1; $seq++
             $e = Get-RunEstimate $mx $P.arms[$id].arm $true
-            $P.runs.Add(@{ seq = $seq; round = 0; id = $id; rep = 0; cold = $true; est_s = $e; tag = "cold-$id" }); $P.est_s += $e
+            $P.runs.Add(@{ seq = $seq; round = 0; id = $id; rep = 0; cold = $true; warm = $false; est_s = $e; tag = "cold-$id" }); $P.est_s += $e
+        }
+    }
+    # Unscored GPU warm-up runs (session 3): full-length runs cycling over round 1's arms, ending with the arm before
+    # round 1's first, so no arm runs twice in a row across the warm-up / round-1 boundary (when round 1 has > 1 arm).
+    $nWarm = if ($WarmupRuns -ge 0) { $WarmupRuns } else { [int](Get-Val $mx $null 'warmup_runs') }
+    $P.warmup_runs = 0
+    if ($nWarm -gt 0 -and $P.rounds.Count) {
+        $r1 = @($P.rounds[0]); $m1 = $r1.Count
+        for ($j = 1; $j -le $nWarm; $j++) {
+            $id = $r1[(($m1 - (($nWarm - $j + 1) % $m1)) % $m1)]
+            $seq++
+            $e = Get-RunEstimate $mx $P.arms[$id].arm $false
+            $P.runs.Add(@{ seq = $seq; round = 0; id = $id; rep = 0; cold = $false; warm = $true; est_s = $e; tag = "warm$j-$id" }); $P.est_s += $e
+            $P.warmup_runs++
         }
     }
     for ($k = 1; $k -le $P.rounds.Count; $k++) {
         foreach ($id in $P.rounds[$k - 1]) {
             $seq++
             $e = Get-RunEstimate $mx $P.arms[$id].arm $false
-            $P.runs.Add(@{ seq = $seq; round = $k; id = $id; rep = $k; cold = $false; est_s = $e; tag = "$id-r$k" }); $P.est_s += $e
+            $P.runs.Add(@{ seq = $seq; round = $k; id = $id; rep = $k; cold = $false; warm = $false; est_s = $e; tag = "$id-r$k" }); $P.est_s += $e
         }
     }
     return $P
@@ -334,9 +357,11 @@ function Get-PlanLines($R, $P) {
             $L.Add("         -ColdShared: one cold run for all $nb bin(s); the other bins first launch as scored round-1 runs")
         }
     }
+    $warmR = @($P.runs | Where-Object { $_.warm })
+    if ($warmR.Count) { $L.Add("warm     $(($warmR | ForEach-Object { $_.id }) -join ' '): $($warmR.Count) unscored GPU warm-up run(s), full length, after the cold run(s) and before round 1") }
     for ($k = 1; $k -le $P.rounds.Count; $k++) { $L.Add("round $k  $($P.rounds[$k - 1] -join ' ')") }
     $L.Add("order    $(if ($P.rounds.Count) { ($P.rounds | ForEach-Object { $_ -join ' ' }) -join ' | ' } else { '(no runnable arms)' })")
-    $L.Add("estimate $($P.runs.Count) runs ($($cold.Count) cold), about $([math]::Ceiling($P.est_s / 60)) min (warm boot $($Est.boot_warm_s) s, cold boot $($Est.boot_cold_s) s, close $($Est.close_s) s per run)")
+    $L.Add("estimate $($P.runs.Count) runs ($($cold.Count) cold$(if ($warmR.Count) { ", $($warmR.Count) warm-up" })), about $([math]::Ceiling($P.est_s / 60)) min (warm boot $($Est.boot_warm_s) s, cold boot $($Est.boot_cold_s) s, close $($Est.close_s) s per run)")
     foreach ($e in $P.errors) { $L.Add("!!! ERROR $e") }
     return , $L
 }
@@ -576,7 +601,7 @@ function Write-Summary {
     $S.Add('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|')
     foreach ($x in $rows) {
         $fl = (@(@($x.flags_excluding, $x.flags_info) | Where-Object { $_ }) -join ' ')
-        $S.Add("| $($x.seq) | $(if ($x.scored -eq 'True') { $x.round } else { 'cold' }) | $($x.arm) | $($x.rep) | $($x.status) | $($x.valid_timing) | $(if ($x.excluded -eq 'True') { 'EXCL' }) | $($x.boot_s) | $($x.ff_to_window_s) | $($x.frames) | $($x.median_ms) | $($x.p99_ms) | $($x.over33) | $($x.over100) | $($x.cpu_cores_mean) | $($x.light_share) | $($x.close) | $fl | $(if ($x.run_dir) { Split-Path -Leaf $x.run_dir }) | $(($x.notes -replace '\|', '/')) |")
+        $S.Add("| $($x.seq) | $(if ($x.scored -eq 'True') { $x.round } elseif ($x.kind -eq 'warm') { 'warm' } else { 'cold' }) | $($x.arm) | $($x.rep) | $($x.status) | $($x.valid_timing) | $(if ($x.excluded -eq 'True') { 'EXCL' }) | $($x.boot_s) | $($x.ff_to_window_s) | $($x.frames) | $($x.median_ms) | $($x.p99_ms) | $($x.over33) | $($x.over100) | $($x.cpu_cores_mean) | $($x.light_share) | $($x.close) | $fl | $(if ($x.run_dir) { Split-Path -Leaf $x.run_dir }) | $(($x.notes -replace '\|', '/')) |")
     }
     $flagRows = @($rows | Where-Object { $_.flags_excluding -or $_.flags_info })
     if ($flagRows.Count) {
@@ -587,7 +612,7 @@ function Write-Summary {
         $S.Add('')
         $S.Add('| # | arm | rep | excluding flags | info flags | run dir |')
         $S.Add('|---|---|---|---|---|---|')
-        foreach ($x in $flagRows) { $S.Add("| $($x.seq) | $($x.arm) | $(if ($x.scored -eq 'True') { $x.rep } else { 'cold' }) | $($x.flags_excluding) | $($x.flags_info) | $(if ($x.run_dir) { Split-Path -Leaf $x.run_dir }) |") }
+        foreach ($x in $flagRows) { $S.Add("| $($x.seq) | $($x.arm) | $(if ($x.scored -eq 'True') { $x.rep } elseif ($x.kind -eq 'warm') { 'warm' } else { 'cold' }) | $($x.flags_excluding) | $($x.flags_info) | $(if ($x.run_dir) { Split-Path -Leaf $x.run_dir }) |") }
     }
     if ($P.skips.Count) { $S.Add(''); $S.Add('## Skipped arms'); $S.Add(''); foreach ($skipLine in $P.skips) { $S.Add("- $skipLine") } }
     $S | Set-Content -LiteralPath (Join-Path $OutDir 'summary.md') -Encoding utf8
@@ -620,19 +645,22 @@ try {
         $ai = $P.arms[$run.id]
         $left = 0.0; foreach ($r2 in $P.runs) { if ($r2.seq -ge $run.seq) { $left += $r2.est_s } }
         Write-Host ''
-        Write-Host ("=== [{0}/{1}] {2}: arm {3}{4} rep {5} | matrix done around {6} ===" -f $i, $P.runs.Count, $(if ($run.cold) { 'COLD run (unscored)' } else { "round $($run.round)" }),
+        Write-Host ("=== [{0}/{1}] {2}: arm {3}{4} rep {5} | matrix done around {6} ===" -f $i, $P.runs.Count, $(if ($run.cold) { 'COLD run (unscored)' } elseif ($run.warm) { 'WARM-UP run (unscored)' } else { "round $($run.round)" }),
                     $run.id, $(if ($ai.group) { " (group $($ai.group))" } else { '' }), $run.rep, (Get-Date).AddSeconds($left).ToString('HH:mm')) -ForegroundColor Cyan
         $note = [string](Get-P $ai.arm 'note' ''); if ($note) { Write-Host "    $note" }
-        $row = [ordered]@{ seq = $run.seq; round = $run.round; arm = $run.id; group = $ai.group; rep = $run.rep; scored = [string](-not $run.cold); status = ''
+        $row = [ordered]@{ seq = $run.seq; round = $run.round; arm = $run.id; group = $ai.group; rep = $run.rep; scored = [string](-not ($run.cold -or $run.warm)); status = ''
                            valid_timing = ''; boot_s = ''; frames = ''; window_s = ''; median_ms = ''; p99_ms = ''; p999_ms = ''; max_ms = ''; over33 = ''; over100 = ''
                            fps_mean = ''; cpu_cores_mean = ''; peak_ws_mb = ''; close = ''; exit_code = ''; frames_source = ''; seed_from = ''; runner_exit = ''
                            excluded = ''; flags_excluding = ''; flags_info = ''; ff_to_window_s = ''; light_share = ''; install_dat_fail = ''; light_phase = ''
                            idle_min_s = ''; fg_share = ''; eff_mhz = ''
-                           run_dir = ''; log = ''; notes = '' }
+                           run_dir = ''; log = ''; notes = ''
+                           kind = $(if ($run.cold) { 'cold' } elseif ($run.warm) { 'warm' } else { 'scored' }); over8 = ''; over10 = ''; over16_7 = ''; frames_lt_light = '' }
         $splat = Get-RunSplat $ai $run
         $skipWhy = $null
         if (-not $run.cold) {
-            if ($ai.seed_arm) {
+            if ($ai.seed_arm -and $run.warm) {
+                # A warm-up run never waits for a seed source arm (none has run yet); it runs unseeded.
+            } elseif ($ai.seed_arm) {
                 $src = @($rows | Where-Object { $_.arm -eq $ai.seed_arm -and @('OK', 'PROFILE') -contains $_.status -and $_.run_dir } | Select-Object -Last 1)
                 if ($src.Count) { $splat.SeedCache = $src[0].run_dir; $row.seed_from = $src[0].run_dir }
                 else { $skipWhy = "seed source arm $($ai.seed_arm) has no completed run in this matrix" }
@@ -679,7 +707,10 @@ try {
             $row.exit_code = [string](Get-P $rj 'exit_code_hex' '')
             # Window-4 flags (run-timing.ps1 header): excluded runs stay in results.csv but leave the summary numbers.
             $lt = Get-P $rj 'light'
-            $row.light_share = N (Get-P $lt 'share_lt_light') 3
+            $row.light_share = N (Get-P $lt 'share_lt_light') 15
+            $fsK = Get-P $fr 'frames_lt_light'
+            if ($null -ne $fsK) { $row.frames_lt_light = N $fsK 0 }
+            $row.over8 = N (Get-P $fr 'over_8ms') 0; $row.over10 = N (Get-P $fr 'over_10ms') 0; $row.over16_7 = N (Get-P $fr 'over_16_7ms') 0
             $row.install_dat_fail = N (Get-P $lt 'install_dat_fail') 0
             $row.light_phase = N (Get-P $lt 'light_phase')
             $row.ff_to_window_s = N (Get-P $rj 'ff_to_window_s') 1
@@ -709,7 +740,7 @@ try {
         }
         $rows.Add($row); Save-Results
         $color = if ($row.status -eq 'OK') { 'Green' } else { 'Red' }
-        Write-Host ("--> {0} {1}: {2}  median {3} ms  p99 {4} ms  >33 {5}  >100 {6}  cpu {7}  {8}" -f $run.tag, $(if ($run.cold) { '(cold)' } else { '' }), $row.status, $row.median_ms,
+        Write-Host ("--> {0} {1}: {2}  median {3} ms  p99 {4} ms  >33 {5}  >100 {6}  cpu {7}  {8}" -f $run.tag, $(if ($run.cold) { '(cold)' } elseif ($run.warm) { '(warm-up)' } else { '' }), $row.status, $row.median_ms,
                     $row.p99_ms, $row.over33, $row.over100, $row.cpu_cores_mean, $row.close) -ForegroundColor $color
         if ($row.notes) { Write-Host "    $($row.notes)" -ForegroundColor $(if ($row.status -eq 'OK') { 'Gray' } else { 'Yellow' }) }
         if ($row.excluded -eq 'True') { Write-Host "    EXCLUDED from the summary numbers (flags: $($row.flags_excluding))" -ForegroundColor Yellow }

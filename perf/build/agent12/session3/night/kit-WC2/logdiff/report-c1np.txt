@@ -1,0 +1,28 @@
+== arm c1np (4 runs) vs s0 (4 runs)
+  runs\0444-c1np-r1: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 140 lines game.log 15176, 2026-11-25 04:44:07.627..2026-11-25 04:46:02.898 (115 s) | levels info=92 raw=8 warning=40 | Toypad R/W 12/12 (6.2/6.2 per min)
+  runs\0450-c1np-r2: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 140 lines game.log 15152, 2026-11-25 04:50:17.513..2026-11-25 04:52:11.730 (114 s) | levels info=92 raw=8 warning=40 | Toypad R/W 12/12 (6.3/6.3 per min)
+  runs\0504-c1np-r3: exit=0 close=? early=False wer=? dumps=0 exit_line=0 stuck=0 | 138 lines game.log 14943, 2026-11-25 05:04:41.875..2026-11-25 05:06:40.199 (118 s) | levels info=89 raw=8 warning=41 | Toypad R/W 12/12 (6.1/6.1 per min)
+  runs\0510-c1np-r4: exit=0 close=? early=False wer=? dumps=0 exit_line=1 stuck=0 | 144 lines game.log 15820, 2026-11-25 05:10:57.313..2026-11-25 05:12:52.542 (115 s) | levels info=96 raw=8 warning=40 | Toypad R/W 14/14 (7.3/7.3 per min)
+gate_logdiff FAIL findings (B = arm run, A = each base run): none
+NEW warning/error/critical keys (in an arm run, in no base run): 1
+  1/4 runs, counts [1]  [warning] [core] Shutdown wedged past the close request; hard-exiting.
+      e.g. [2026-11-25 05:06:40.199] [warning] [core] [t3452] Shutdown wedged past the close request; hard-exiting.
+MORE (arm run count > base max + max(5, base max)): 0
+GONE (in every base run, missing from an arm run; any level): 3
+  missing in 1/4 runs  [info] [core] Window closing, shutting down...
+  missing in 1/4 runs  [info] [core] Execution complete
+  missing in 1/4 runs  [info] [core] Title terminated; hard-exiting process.
+Toypad (base: runs\0448-s0-r1 {'info Write': 12, 'info Read': 12}; runs\0454-s0-r2 {'info Write': 14, 'info Read': 14}; runs\0500-s0-r3 {'info Write': 12, 'info Read': 12}; runs\0506-s0-r4 {'info Write': 12, 'info Read': 12})
+  runs\0444-c1np-r1: {'info Write': 12, 'info Read': 12}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\0450-c1np-r2: {'info Write': 12, 'info Read': 12}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\0504-c1np-r3: {'info Write': 12, 'info Read': 12}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+  runs\0510-c1np-r4: {'info Write': 14, 'info Read': 14}; non-info Toypad -; prefixes not in base -; other Toypad lines not in base -
+ONLY in c1np (any level, not Toypad; in no base run): 4 keys
+  4/4 runs, counts [36, 36, 36, 36], also in ['cold-p2fc', 'p2fc', 'win3']  [info] [sys] C# keep-watch: # protects kept so far
+      e.g. [2026-11-25 04:44:08.712] [info] [sys] [t27256] C1 keep-watch: 2 protects kept so far
+  4/4 runs, counts [1, 1, 1, 1], also in ['cold-p2fc', 'p2fc', 'win3']  [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)
+      e.g. [2026-11-25 04:44:07.965] [info] [sys] [t42652] C1 keep-watch: on (with physical_protect_hold_global_lock)
+  4/4 runs, counts [1, 1, 1, 1], also in ['cold-p2fc', 'p2fc', 'win3']  [info] [sys] C# keep-watch: first kept protect at #h, #h bytes
+      e.g. [2026-11-25 04:44:08.711] [info] [sys] [t27256] C1 keep-watch: first kept protect at ED19F000, 299892736 bytes
+  1/4 runs, counts [1], also in -  [warning] [core] Shutdown wedged past the close request; hard-exiting.
+      e.g. [2026-11-25 05:06:40.199] [warning] [core] [t3452] Shutdown wedged past the close request; hard-exiting.

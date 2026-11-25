@@ -1,0 +1,1122 @@
+{
+ "matrix": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\out-harness-neg\\staging",
+ "expect": "<workspace>\\build\\agent6\\s33-popin\\expect-s33.json",
+ "matrix_json": "<workspace>\\build\\agent6\\s33-popin\\harness-s33.json",
+ "reference": "offsf",
+ "generated": "2026-11-25T01:42:53",
+ "tools": {
+  "w4b_logdiff": {
+   "rc": 0,
+   "s": 0.3,
+   "out": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\out-harness-neg\\logdiff",
+   "log": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\out-harness-neg\\logdiff.log"
+  },
+  "w4b_extra": {
+   "rc": 0,
+   "s": 0.3,
+   "out": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\out-harness-neg\\extra.txt",
+   "log": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\out-harness-neg\\extra.log"
+  }
+ },
+ "arms": {
+  "offsf": {
+   "runs": [
+    "0001-offsf-r1"
+   ],
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [
+    "0001-offsf-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)"
+   ],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0
+   ],
+   "unhandled": [
+    0
+   ],
+   "protect_failed": [
+    0
+   ],
+   "levels": [
+    "40/0/0"
+   ],
+   "slow": {
+    "runs": 0,
+    "slow_runs": 0,
+    "mean_slow_pct": null,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0
+    ],
+    "still not acquired after": [
+     0
+    ],
+    "Minidump written to": [
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0
+    ],
+    "d3d12_pipeline_creation_no_wait": [
+     0
+    ],
+    "slow frame #": [
+     3
+    ],
+    "dropped draws": [
+     3
+    ],
+    "forced pipeline waits": [
+     3
+    ],
+    "resolve after drop:": [
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     35
+    ],
+    "Reserving the guest memory arena": [
+     1
+    ],
+    "Title terminated": [
+     1
+    ]
+   }
+  },
+  "base": {
+   "runs": [
+    "0005-base-r1"
+   ],
+   "verdict": "FAIL",
+   "fail": [
+    "0005-base-r1: cvars differ from the arm: missing/changed [], unlisted s33 keys ['slow_frame_log_ms=1']"
+   ],
+   "note": [
+    "logdiff GONE: [info] [gpu] slow frame ##: # ms | gpu-thread idle # | host-gpu wait # (#x) | shader translate # (#x) | pipeline create # (#x), new # | texture load # (#x) | readback #x # KB, # stalled | cpu-write in"
+   ],
+   "info": [
+    "0005-base-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)"
+   ],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0
+   ],
+   "unhandled": [
+    0
+   ],
+   "protect_failed": [
+    0
+   ],
+   "levels": [
+    "40/0/0"
+   ],
+   "slow": {
+    "runs": 0,
+    "slow_runs": 0,
+    "mean_slow_pct": null,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0
+    ],
+    "still not acquired after": [
+     0
+    ],
+    "Minidump written to": [
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0
+    ],
+    "d3d12_pipeline_creation_no_wait": [
+     0
+    ],
+    "slow frame #": [
+     0
+    ],
+    "dropped draws": [
+     0
+    ],
+    "forced pipeline waits": [
+     0
+    ],
+    "resolve after drop:": [
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     35
+    ],
+    "Reserving the guest memory arena": [
+     1
+    ],
+    "Title terminated": [
+     1
+    ]
+   },
+   "logdiff": {
+    "fail": 0,
+    "fail_unexplained": [],
+    "new": 0,
+    "new_err": [],
+    "new_warn": [],
+    "new_warn_named": [],
+    "more": [],
+    "gone": [
+     "[info] [gpu] slow frame ##: # ms | gpu-thread idle # | host-gpu wait # (#x) | shader translate # (#x) | pipeline create # (#x), new # | texture load # (#x) | readback #x # KB, # stalled | cpu-write invalidations #x # KB (on memexport pages #x # KB) | memexport syncs # (# KB), on demand # (# KB) | memexport full-buffer #x (total #) | dropped draws # | forced pipeline waits # (#x)"
+    ],
+    "only": 0,
+    "only_unnamed": [],
+    "only_keys": []
+   }
+  },
+  "gthr0": {
+   "runs": [
+    "0004-gthr0-r1"
+   ],
+   "verdict": "FAIL",
+   "fail": [
+    "0004-gthr0-r1: cvars differ from the arm: missing/changed [], unlisted s33 keys ['d3d12_bindless=false']"
+   ],
+   "note": [],
+   "info": [
+    "0004-gthr0-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)"
+   ],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0
+   ],
+   "unhandled": [
+    0
+   ],
+   "protect_failed": [
+    0
+   ],
+   "levels": [
+    "41/0/0"
+   ],
+   "slow": {
+    "runs": 0,
+    "slow_runs": 0,
+    "mean_slow_pct": null,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0
+    ],
+    "still not acquired after": [
+     0
+    ],
+    "Minidump written to": [
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0
+    ],
+    "d3d12_pipeline_creation_no_wait": [
+     1
+    ],
+    "slow frame #": [
+     3
+    ],
+    "dropped draws": [
+     3
+    ],
+    "forced pipeline waits": [
+     3
+    ],
+    "resolve after drop:": [
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     35
+    ],
+    "Reserving the guest memory arena": [
+     1
+    ],
+    "Title terminated": [
+     1
+    ]
+   },
+   "logdiff": {
+    "fail": 0,
+    "fail_unexplained": [],
+    "new": 1,
+    "new_err": [],
+    "new_warn": [],
+    "new_warn_named": [
+     "[warning] [gpu] d#d#_pipeline_creation_no_wait ignored: it needs async_shader_compilation, pipeline creation threads and bindless resources"
+    ],
+    "more": [],
+    "gone": [],
+    "only": 1,
+    "only_unnamed": [],
+    "only_keys": [
+     "[warning] [gpu] d#d#_pipeline_creation_no_wait ignored: it needs async_shader_compilation, pipeline creation threads and bindless resources"
+    ]
+   }
+  },
+  "offwarm": {
+   "runs": [
+    "0003-offwarm-r1"
+   ],
+   "verdict": "FAIL",
+   "fail": [
+    "0003-offwarm-r1: forbidden \"d3d12_pipeline_creation_no_wait\" x1"
+   ],
+   "note": [],
+   "info": [
+    "0003-offwarm-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)"
+   ],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0
+   ],
+   "unhandled": [
+    0
+   ],
+   "protect_failed": [
+    0
+   ],
+   "levels": [
+    "40/0/0"
+   ],
+   "slow": {
+    "runs": 0,
+    "slow_runs": 0,
+    "mean_slow_pct": null,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0
+    ],
+    "still not acquired after": [
+     0
+    ],
+    "Minidump written to": [
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0
+    ],
+    "d3d12_pipeline_creation_no_wait": [
+     1
+    ],
+    "slow frame #": [
+     3
+    ],
+    "dropped draws": [
+     3
+    ],
+    "forced pipeline waits": [
+     3
+    ],
+    "resolve after drop:": [
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     35
+    ],
+    "Reserving the guest memory arena": [
+     1
+    ],
+    "Title terminated": [
+     1
+    ]
+   },
+   "logdiff": {
+    "fail": 0,
+    "fail_unexplained": [],
+    "new": 0,
+    "new_err": [],
+    "new_warn": [],
+    "new_warn_named": [],
+    "more": [],
+    "gone": [],
+    "only": 1,
+    "only_unnamed": [],
+    "only_keys": [
+     "[info] [gpu] d#d#_pipeline_creation_no_wait: not waiting for pipeline creation at the end of submissions; draws stay skipped until their pipeline is ready"
+    ]
+   }
+  },
+  "onsf": {
+   "runs": [
+    "0002-onsf-r1"
+   ],
+   "verdict": "FAIL",
+   "fail": [
+    "0002-onsf-r1: missing required \"d3d12_pipeline_creation_no_wait: not waiting for pipeline creation\"",
+    "0002-onsf-r1: \"d3d12_pipeline_creation_no_wait: not waiting for pipeline creation\" x0, expected exactly 1",
+    "0002-onsf-r1: \"d3d12_pipeline_creation_no_wait\" x0, expected exactly 1"
+   ],
+   "note": [],
+   "info": [
+    "0002-onsf-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)"
+   ],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0
+   ],
+   "unhandled": [
+    0
+   ],
+   "protect_failed": [
+    0
+   ],
+   "levels": [
+    "40/0/0"
+   ],
+   "slow": {
+    "runs": 0,
+    "slow_runs": 0,
+    "mean_slow_pct": null,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0
+    ],
+    "still not acquired after": [
+     0
+    ],
+    "Minidump written to": [
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0
+    ],
+    "d3d12_pipeline_creation_no_wait": [
+     0
+    ],
+    "slow frame #": [
+     3
+    ],
+    "dropped draws": [
+     3
+    ],
+    "forced pipeline waits": [
+     3
+    ],
+    "resolve after drop:": [
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     35
+    ],
+    "Reserving the guest memory arena": [
+     1
+    ],
+    "Title terminated": [
+     1
+    ]
+   },
+   "logdiff": {
+    "fail": 0,
+    "fail_unexplained": [],
+    "new": 0,
+    "new_err": [],
+    "new_warn": [],
+    "new_warn_named": [],
+    "more": [],
+    "gone": [],
+    "only": 0,
+    "only_unnamed": [],
+    "only_keys": []
+   }
+  },
+  "onstop": {
+   "runs": [
+    "0006-onstop-r1"
+   ],
+   "verdict": "FAIL",
+   "fail": [
+    "0006-onstop-r1: status BAD, problems ['exit code 1', 'close_method kill']",
+    "0006-onstop-r1: exit code 1 (0x00000001)"
+   ],
+   "note": [],
+   "info": [
+    "0006-onstop-r1: slow state skipped (harness run: run.json has no ff_signal_epoch_s)"
+   ],
+   "stuck": 0,
+   "stuck_sites": {},
+   "stuck_in_window": 0,
+   "minidump": 0,
+   "recovered": [
+    0
+   ],
+   "unhandled": [
+    0
+   ],
+   "protect_failed": [
+    0
+   ],
+   "levels": [
+    "40/0/0"
+   ],
+   "slow": {
+    "runs": 0,
+    "slow_runs": 0,
+    "mean_slow_pct": null,
+    "mean_onset_s": null
+   },
+   "dumps": 0,
+   "counts": {
+    "STUCK-LOCK": [
+     0
+    ],
+    "still not acquired after": [
+     0
+    ],
+    "Minidump written to": [
+     0
+    ],
+    "Recovered stale physical page protection": [
+     0
+    ],
+    "Unhandled guest physical write fault": [
+     0
+    ],
+    "PhysicalHeap::Protect failed": [
+     0
+    ],
+    "BaseHeap::Protect failed": [
+     0
+    ],
+    "d3d12_pipeline_creation_no_wait": [
+     1
+    ],
+    "slow frame #": [
+     3
+    ],
+    "dropped draws": [
+     3
+    ],
+    "forced pipeline waits": [
+     3
+    ],
+    "resolve after drop:": [
+     0
+    ],
+    "[NtCreateFile] FAILED": [
+     35
+    ],
+    "Reserving the guest memory arena": [
+     1
+    ],
+    "Title terminated": [
+     1
+    ]
+   },
+   "logdiff": {
+    "fail": 0,
+    "fail_unexplained": [],
+    "new": 0,
+    "new_err": [],
+    "new_warn": [],
+    "new_warn_named": [],
+    "more": [],
+    "gone": [],
+    "only": 1,
+    "only_unnamed": [],
+    "only_keys": [
+     "[info] [gpu] d#d#_pipeline_creation_no_wait: not waiting for pipeline creation at the end of submissions; draws stay skipped until their pipeline is ready"
+    ]
+   }
+  }
+ },
+ "watchdog_runs": [],
+ "race_runs": [],
+ "mode": "harness",
+ "runs": {
+  "0001-offsf-r1": {
+   "arm": "offsf",
+   "dir": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\harness-neg\\20261125-010000-s33-offsf",
+   "verdict": "PASS",
+   "fail": [],
+   "note": [],
+   "info": [
+    "slow state skipped (harness run: run.json has no ff_signal_epoch_s)"
+   ],
+   "watchdog": 0,
+   "race": false,
+   "slow": null,
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "s33-offsf",
+    "status": "OK",
+    "valid_timing": null,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-s33-bin",
+    "cvars": {
+     "slow_frame_log_ms": "1"
+    },
+    "env": {
+     "LEGO_NATIVE_FRAME_METRICS": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\harness-neg\\20261125-010000-s33-offsf\\frames.csv",
+     "AGENT3_VPAD": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\harness-neg\\20261125-010000-s33-offsf\\vpad-state.bin"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": null,
+    "clean": null,
+    "killed": null,
+    "exited": null,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": null,
+    "flags_excluding": [],
+    "flags": [],
+    "free_gb": null,
+    "ff": null,
+    "start": "2026-11-25T01:00:00-06:00",
+    "nogrowth": null,
+    "nrw": null,
+    "m_start": null,
+    "m_end": null,
+    "runner_error": null,
+    "close_method": "wm_close",
+    "close_s": 1.1,
+    "mode": "FUNCTIONAL ONLY (TEST, make_test_s33.py), NOT FOR TIMING",
+    "h_dumps": []
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      13651
+     ]
+    ],
+    "lines": 109,
+    "levels": {
+     "info": 61,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "slow frame #": 3,
+     "dropped draws": 3,
+     "forced pipeline waits": 3,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:10:36.613",
+    "last_ts": "2026-11-23 01:12:30.917"
+   }
+  },
+  "0002-onsf-r1": {
+   "arm": "onsf",
+   "dir": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\harness-neg\\20261125-010100-s33-onsf",
+   "verdict": "FAIL",
+   "fail": [
+    "missing required \"d3d12_pipeline_creation_no_wait: not waiting for pipeline creation\"",
+    "\"d3d12_pipeline_creation_no_wait: not waiting for pipeline creation\" x0, expected exactly 1",
+    "\"d3d12_pipeline_creation_no_wait\" x0, expected exactly 1"
+   ],
+   "note": [],
+   "info": [
+    "slow state skipped (harness run: run.json has no ff_signal_epoch_s)"
+   ],
+   "watchdog": 0,
+   "race": false,
+   "slow": null,
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "s33-onsf",
+    "status": "OK",
+    "valid_timing": null,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-s33-bin",
+    "cvars": {
+     "slow_frame_log_ms": "1",
+     "d3d12_pipeline_creation_no_wait": "true"
+    },
+    "env": {
+     "LEGO_NATIVE_FRAME_METRICS": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\harness-neg\\20261125-010100-s33-onsf\\frames.csv",
+     "AGENT3_VPAD": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\harness-neg\\20261125-010100-s33-onsf\\vpad-state.bin"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": null,
+    "clean": null,
+    "killed": null,
+    "exited": null,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": null,
+    "flags_excluding": [],
+    "flags": [],
+    "free_gb": null,
+    "ff": null,
+    "start": "2026-11-25T01:01:00-06:00",
+    "nogrowth": null,
+    "nrw": null,
+    "m_start": null,
+    "m_end": null,
+    "runner_error": null,
+    "close_method": "wm_close",
+    "close_s": 1.1,
+    "mode": "FUNCTIONAL ONLY (TEST, make_test_s33.py), NOT FOR TIMING",
+    "h_dumps": []
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      13651
+     ]
+    ],
+    "lines": 109,
+    "levels": {
+     "info": 61,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "slow frame #": 3,
+     "dropped draws": 3,
+     "forced pipeline waits": 3,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:10:36.613",
+    "last_ts": "2026-11-23 01:12:30.917"
+   }
+  },
+  "0003-offwarm-r1": {
+   "arm": "offwarm",
+   "dir": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\harness-neg\\20261125-010200-s33-offwarm",
+   "verdict": "FAIL",
+   "fail": [
+    "forbidden \"d3d12_pipeline_creation_no_wait\" x1"
+   ],
+   "note": [],
+   "info": [
+    "slow state skipped (harness run: run.json has no ff_signal_epoch_s)"
+   ],
+   "watchdog": 0,
+   "race": false,
+   "slow": null,
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "s33-offwarm",
+    "status": "OK",
+    "valid_timing": null,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-s33-bin",
+    "cvars": {
+     "slow_frame_log_ms": "1"
+    },
+    "env": {
+     "LEGO_NATIVE_FRAME_METRICS": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\harness-neg\\20261125-010200-s33-offwarm\\frames.csv",
+     "AGENT3_VPAD": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\harness-neg\\20261125-010200-s33-offwarm\\vpad-state.bin"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": null,
+    "clean": null,
+    "killed": null,
+    "exited": null,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": null,
+    "flags_excluding": [],
+    "flags": [],
+    "free_gb": null,
+    "ff": null,
+    "start": "2026-11-25T01:02:00-06:00",
+    "nogrowth": null,
+    "nrw": null,
+    "m_start": null,
+    "m_end": null,
+    "runner_error": null,
+    "close_method": "wm_close",
+    "close_s": 1.1,
+    "mode": "FUNCTIONAL ONLY (TEST, make_test_s33.py), NOT FOR TIMING",
+    "h_dumps": []
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      13840
+     ]
+    ],
+    "lines": 110,
+    "levels": {
+     "info": 62,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "d3d12_pipeline_creation_no_wait": 1,
+     "d3d12_pipeline_creation_no_wait: not waiting for pipeline creation": 1,
+     "not waiting for pipeline creation": 1,
+     "slow frame #": 3,
+     "dropped draws": 3,
+     "forced pipeline waits": 3,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:10:36.613",
+    "last_ts": "2026-11-23 01:12:30.917"
+   }
+  },
+  "0004-gthr0-r1": {
+   "arm": "gthr0",
+   "dir": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\harness-neg\\20261125-010300-s33-gthr0",
+   "verdict": "FAIL",
+   "fail": [
+    "cvars differ from the arm: missing/changed [], unlisted s33 keys ['d3d12_bindless=false']"
+   ],
+   "note": [],
+   "info": [
+    "slow state skipped (harness run: run.json has no ff_signal_epoch_s)"
+   ],
+   "watchdog": 0,
+   "race": false,
+   "slow": null,
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "s33-gthr0",
+    "status": "OK",
+    "valid_timing": null,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-s33-bin",
+    "cvars": {
+     "slow_frame_log_ms": "1",
+     "d3d12_pipeline_creation_no_wait": "true",
+     "d3d12_pipeline_creation_threads": "0",
+     "d3d12_bindless": "false"
+    },
+    "env": {
+     "LEGO_NATIVE_FRAME_METRICS": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\harness-neg\\20261125-010300-s33-gthr0\\frames.csv",
+     "AGENT3_VPAD": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\harness-neg\\20261125-010300-s33-gthr0\\vpad-state.bin"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": null,
+    "clean": null,
+    "killed": null,
+    "exited": null,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": null,
+    "flags_excluding": [],
+    "flags": [],
+    "free_gb": null,
+    "ff": null,
+    "start": "2026-11-25T01:03:00-06:00",
+    "nogrowth": null,
+    "nrw": null,
+    "m_start": null,
+    "m_end": null,
+    "runner_error": null,
+    "close_method": "wm_close",
+    "close_s": 1.1,
+    "mode": "FUNCTIONAL ONLY (TEST, make_test_s33.py), NOT FOR TIMING",
+    "h_dumps": []
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      13825
+     ]
+    ],
+    "lines": 110,
+    "levels": {
+     "info": 61,
+     "raw": 8,
+     "warning": 41
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "d3d12_pipeline_creation_no_wait": 1,
+     "d3d12_pipeline_creation_no_wait ignored": 1,
+     "slow frame #": 3,
+     "dropped draws": 3,
+     "forced pipeline waits": 3,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:10:36.613",
+    "last_ts": "2026-11-23 01:12:30.917"
+   }
+  },
+  "0005-base-r1": {
+   "arm": "base",
+   "dir": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\harness-neg\\20261125-010400-s33-base",
+   "verdict": "FAIL",
+   "fail": [
+    "cvars differ from the arm: missing/changed [], unlisted s33 keys ['slow_frame_log_ms=1']"
+   ],
+   "note": [],
+   "info": [
+    "slow state skipped (harness run: run.json has no ff_signal_epoch_s)"
+   ],
+   "watchdog": 0,
+   "race": false,
+   "slow": null,
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "s33-base",
+    "status": "OK",
+    "valid_timing": null,
+    "valid_why": [],
+    "problems": [],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-bin",
+    "cvars": {
+     "slow_frame_log_ms": "1"
+    },
+    "env": {
+     "LEGO_NATIVE_FRAME_METRICS": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\harness-neg\\20261125-010400-s33-base\\frames.csv",
+     "AGENT3_VPAD": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\harness-neg\\20261125-010400-s33-base\\vpad-state.bin"
+    },
+    "exit_code": 0,
+    "exit_hex": "0x00000000",
+    "wm_close": null,
+    "clean": null,
+    "killed": null,
+    "exited": null,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": null,
+    "flags_excluding": [],
+    "flags": [],
+    "free_gb": null,
+    "ff": null,
+    "start": "2026-11-25T01:04:00-06:00",
+    "nogrowth": null,
+    "nrw": null,
+    "m_start": null,
+    "m_end": null,
+    "runner_error": null,
+    "close_method": "wm_close",
+    "close_s": 1.1,
+    "mode": "FUNCTIONAL ONLY (TEST, make_test_s33.py), NOT FOR TIMING",
+    "h_dumps": []
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      12352
+     ]
+    ],
+    "lines": 106,
+    "levels": {
+     "info": 58,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:10:36.613",
+    "last_ts": "2026-11-23 01:12:30.917"
+   }
+  },
+  "0006-onstop-r1": {
+   "arm": "onstop",
+   "dir": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\harness-neg\\20261125-010500-s33-onstop",
+   "verdict": "FAIL",
+   "fail": [
+    "status BAD, problems ['exit code 1', 'close_method kill']",
+    "exit code 1 (0x00000001)"
+   ],
+   "note": [],
+   "info": [
+    "slow state skipped (harness run: run.json has no ff_signal_epoch_s)"
+   ],
+   "watchdog": 0,
+   "race": false,
+   "slow": null,
+   "dumps": [],
+   "facts": {
+    "_error": null,
+    "tag": "s33-onstop",
+    "status": "BAD",
+    "valid_timing": null,
+    "valid_why": [],
+    "problems": [
+     "exit code 1",
+     "close_method kill"
+    ],
+    "bin_dir": "<workspace>\\build\\agent2\\devoff4b-s33-bin",
+    "cvars": {
+     "slow_frame_log_ms": "1",
+     "d3d12_pipeline_creation_no_wait": "true"
+    },
+    "env": {
+     "LEGO_NATIVE_FRAME_METRICS": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\harness-neg\\20261125-010500-s33-onstop\\frames.csv",
+     "AGENT3_VPAD": "<workspace>\\build\\agent6\\s33-popin\\test-s33\\harness-neg\\20261125-010500-s33-onstop\\vpad-state.bin"
+    },
+    "exit_code": 1,
+    "exit_hex": "0x00000001",
+    "wm_close": null,
+    "clean": null,
+    "killed": null,
+    "exited": null,
+    "early": false,
+    "wer": false,
+    "dialogs": [],
+    "foreign_dumps": [],
+    "excluded": null,
+    "flags_excluding": [],
+    "flags": [],
+    "free_gb": null,
+    "ff": null,
+    "start": "2026-11-25T01:05:00-06:00",
+    "nogrowth": null,
+    "nrw": null,
+    "m_start": null,
+    "m_end": null,
+    "runner_error": null,
+    "close_method": "kill",
+    "close_s": 60.0,
+    "mode": "FUNCTIONAL ONLY (TEST, make_test_s33.py), NOT FOR TIMING",
+    "h_dumps": []
+   },
+   "log": {
+    "files": [
+     [
+      "game.log",
+      13840
+     ]
+    ],
+    "lines": 110,
+    "levels": {
+     "info": 62,
+     "raw": 8,
+     "warning": 40
+    },
+    "counts": {
+     "Reserving the guest memory arena": 1,
+     "[NtCreateFile] FAILED": 35,
+     "d3d12_pipeline_creation_no_wait": 1,
+     "d3d12_pipeline_creation_no_wait: not waiting for pipeline creation": 1,
+     "not waiting for pipeline creation": 1,
+     "slow frame #": 3,
+     "dropped draws": 3,
+     "forced pipeline waits": 3,
+     "Title terminated": 1
+    },
+    "episodes": [],
+    "exit_seq": true,
+    "other_err": [],
+    "first_ts": "2026-11-23 01:10:36.613",
+    "last_ts": "2026-11-23 01:12:30.917"
+   }
+  }
+ }
+}

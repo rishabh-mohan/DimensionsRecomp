@@ -1,0 +1,33 @@
+# build\agent2\devoff4b-cg26-bin - Agent 2 (board run 2 task #1). CG26: devoff4b with #26 db16cyc_pause ON (arm A, 20 pauses); exe and map relinked with the 10 ON TUs
+# staged 2026-11-25 01:35:52 from build\agent2\devoff4b-bin (MANIFEST sha256 DE11A914079D7DF7080CAA86B05DAE151CEFA017FDE15713CB85FA79F86339FA); every file copied with mtime = now; replaced: legodimensions.exe <- build\agent2\cg26\link-on\legodimensions.exe, legodimensions.map <- build\agent2\cg26\link-on\legodimensions.map.
+# CG26 = devoff4b + #26 db16cyc_pause ON (arm A): cg26 regen with the new-A toml and the new codegen tool (20 pauses in 10 TUs), the 10 ON TUs recompiled with the snap1-off flags (recompile.py), and legodimensions.exe/.map relinked from the snap1-off objects (relink.py --replace-file cg26/replace-on.txt).
+# cg26 codegen tool rexglue.exe sha256 9145166CDBEF5500E6E2607ED80AA6FC94CA1772DE2D3E87FF9E13BEAD87D586
+# cg26 config toml legodimensions_config.toml sha256 11707872E82D8B524D59B2E62DEABBABB90F10E2707CB2825338A920BD4D5FCF
+# cg26 ON TU legodimensions_recomp.107.cpp sha256 1245188F16F9C89EEA8A155AB1C6221D472DB503E8273B7995B70BFF2A4E3B8E
+# cg26 ON TU legodimensions_recomp.116.cpp sha256 D3A7D20F9FF18D9F23C2CD1CB4EF304C23EE619D45BC9F72DBB9B4753B497056
+# cg26 ON TU legodimensions_recomp.125.cpp sha256 8CDF145E9BAF7EDCBA0553C1772AA3B8E03EF5331C50AD4F848BC46FBDD21E50
+# cg26 ON TU legodimensions_recomp.153.cpp sha256 470A3AF1DE47DAD1A0984C764CC67DFD46DF14D4DC0846FF7C593632E319B275
+# cg26 ON TU legodimensions_recomp.169.cpp sha256 AAAE9178569FA12FCD180843D0CC75B6990796A460FE03280E03B2409804E7B7
+# cg26 ON TU legodimensions_recomp.205.cpp sha256 AD51029B69408BC1A95184AB21BF83AB49B6E43967414B521ED70DCFF66AC619
+# cg26 ON TU legodimensions_recomp.284.cpp sha256 632685E3C7060216644BC1996681B4521B755791B56F6883F066BB4D24DDC98F
+# cg26 ON TU legodimensions_recomp.304.cpp sha256 6E8102D39DAC37266AF2A1941D3DAD70BEEE8B399220483B976D9B79E30983E9
+# cg26 ON TU legodimensions_recomp.321.cpp sha256 3754AD8890625636029B60FA8021ACF355E4CCD1EA2C626F48CAC44317EBAA6B
+# cg26 ON TU legodimensions_recomp.432.cpp sha256 FCADF61F01C2D1C3F77B4DEF43DF27D8D4259D726BCD4AD3901655A80293D7B4
+# session 3 (M2, 11-25): regen 01:28-01:30 at Idle; gates build/agent2/cg26/checks/gates-0132.txt PASS (codegen.d prerequisite order differs, set-equal; see NOTE)
+# control relink == snap1-off exe/map except timestamps; links -Xlinker /threads:2; mapcheck s4c vs devoff4-bin PASS (mapcheck-cg26-s4c.txt)
+# files: name, size, mtime, sha256, source
+FiraSans-Regular.ttf	456996	2026-11-25 01:35:51	C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23	build\agent2\snap1\DimensionsRecomp\rexlego\res\FiraSans-Regular.ttf
+TracyClient.dll	233472	2026-11-25 01:35:51	85044850B6C663B5CE8722285D13070381C33C9ABC49D06B3E59BA0277F8FF4E	build\agent2\snap1-sdk\install\bin\TracyClient.dll
+achievement_unlocked.wav	191018	2026-11-25 01:35:51	A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5	build\agent2\snap1-off\achievement_unlocked.wav
+legodimensions.exe	170350080	2026-11-25 01:35:51	45952D171D6204A1C8AC072C97D933E676BEAA654F67D32852E1C630DEE038ED	build\agent2\cg26\link-on\legodimensions.exe
+legodimensions.map	39181442	2026-11-25 01:35:52	1ECC3480C09D1EBC347080873EB7059733223485B4D3208CCA7736A8503D0E2A	build\agent2\cg26\link-on\legodimensions.map
+rexgpu-xenos.dll	3425792	2026-11-25 01:35:52	E3CB99CFDEA95E66EF093BF1B2A500076757FB727E60B046D70EBA01E05C9939	build\agent2\snap1-sdk\install\bin\rexgpu-xenos.dll
+rexruntime.dll	10909184	2026-11-25 01:35:52	A33801D1538D61759D35FD137EBC9F5EAD636D7D26E9A79DC3B4994A22CB9F12	build\agent2\snap1-off\rexruntime.dll
+# checks:
+#   PASS staged copy identical: FiraSans-Regular.ttf
+#   PASS staged copy identical: TracyClient.dll
+#   PASS staged copy identical: achievement_unlocked.wav
+#   PASS staged copy identical: legodimensions.exe (replaced: base DFBE1D43B28861A6 -> 45952D171D6204A1)
+#   PASS staged copy identical: legodimensions.map (replaced: base 52155274A978A946 -> 1ECC3480C09D1EBC)
+#   PASS staged copy identical: rexgpu-xenos.dll
+#   PASS staged copy identical: rexruntime.dll

@@ -1,0 +1,610 @@
+{
+ "tool": "run_gates.py",
+ "matrix_dir": "<workspace>\\build\\agent8\\matrix\\20261122-1756",
+ "title": "Window 5, S3d line (Agent 8's task #10 draft, promoted by Agent 1 at 16:42 after W4b): S4 baseline + timer modes. base = devoff3 (S3d); s0, d11, d11t, d11p = devoff4 (S4a)",
+ "reference": "base",
+ "plan": {
+  "found": true,
+  "estimate": 16,
+  "estimate_cold": 1,
+  "cold": [
+   "base"
+  ],
+  "rounds": 3,
+  "sys_csv": true
+ },
+ "plan_arms": {
+  "base": {
+   "bin": "build/agent2/devoff3-bin",
+   "repeats": 3
+  },
+  "s0": {
+   "bin": "build/agent2/devoff4-bin",
+   "repeats": 3
+  },
+  "d11": {
+   "bin": "build/agent2/devoff4-bin",
+   "repeats": 3
+  },
+  "d11t": {
+   "bin": "build/agent2/devoff4-bin",
+   "repeats": 3
+  },
+  "d11p": {
+   "bin": "build/agent2/devoff4-bin",
+   "repeats": 3
+  }
+ },
+ "run_arms": [
+  "base",
+  "s0",
+  "d11",
+  "d11t",
+  "d11p"
+ ],
+ "p2_arms": [],
+ "kw_arms": [],
+ "window_log": null,
+ "window_how": "no window log names this out dir in bench\\agent5\\launch\\status",
+ "gate_log": "build\\agent1\\w5\\quiet-1731.log",
+ "gate_how": "given with --gate-log",
+ "gates": [
+  {
+   "id": "G1",
+   "name": "every switch rated",
+   "status": "MANUAL",
+   "key": "5 arms; switches beyond the common set (framerate_limit=0): base 0, s0 0, d11 8, d11t 8+1 env, d11p 9",
+   "details": [
+    "base (ref): bin build/agent2/devoff3-bin; beyond the common set: -",
+    "s0: bin build/agent2/devoff4-bin; beyond the common set: -",
+    "d11: bin build/agent2/devoff4-bin; beyond the common set: host_timer_resolution_ms=1, host_timer_throttling_optout=true, precise_guest_sleep=true, wait_timeout_round_up=true, cs_spin=true, spinlock_pause_spin=true, clock_lockfree=true, tls_bounds_fix=true",
+    "d11t: bin build/agent2/devoff4-bin; beyond the common set: host_timer_resolution_ms=1, host_timer_throttling_optout=true, precise_guest_sleep=true, wait_timeout_round_up=true, cs_spin=true, spinlock_pause_spin=true, clock_lockfree=true, tls_bounds_fix=true; env REX_TIMER_WAIT_BLOCKING=1",
+    "d11p: bin build/agent2/devoff4-bin; beyond the common set: host_timer_resolution_ms=1, host_timer_throttling_optout=true, precise_guest_sleep=true, wait_timeout_round_up=true, cs_spin=true, spinlock_pause_spin=true, clock_lockfree=true, tls_bounds_fix=true, timer_queue_precise_wait=true",
+    "rate every switch above against W6-GATES.md G1 (Agent 10's b2r ratings): the kit only lists them"
+   ]
+  },
+  {
+   "id": "G2",
+   "name": "one bin per arm, as built",
+   "status": "PASS",
+   "key": "16/16 runs on their arm's bin (MANIFEST + exe/dll SHA-256); 2 bins",
+   "details": [
+    "bin build/agent2/devoff3-bin: arms base; MANIFEST.txt sha256 B9C5175DA1904235; TracyClient.dll 233472 B, legodimensions.exe 170335232 B, rexgpu-xenos.dll 3385344 B, rexruntime.dll 10889728 B; legodimensions.exe sha256 2522D43605D8A9BF",
+    "bin build/agent2/devoff4-bin: arms s0, d11, d11t, d11p; MANIFEST.txt sha256 16DCC9399239E577; TracyClient.dll 233472 B, legodimensions.exe 170335232 B, rexgpu-xenos.dll 3406848 B, rexruntime.dll 10898432 B; legodimensions.exe sha256 6BE3C713229232B2"
+   ]
+  },
+  {
+   "id": "G3",
+   "name": "every planned run completed",
+   "status": "PASS",
+   "key": "16/16 runs OK, exit 0x00000000, wm_close, runner exit 0; plan.txt 16 runs (1 cold); arms 5/5 as planned; no launcher log",
+   "details": [
+    "plan.txt: base x3+1 cold, s0 x3, d11 x3, d11t x3, d11p x3; results.csv: base x3+1 cold, s0 x3, d11 x3, d11t x3, d11p x3",
+    "launcher window log: none (no window log names this out dir in bench\\agent5\\launch\\status)"
+   ]
+  },
+  {
+   "id": "G4",
+   "name": "P2's fallback never runs",
+   "status": "n/a",
+   "key": "no run arm sets shared_memory_single_hold_rearm=true",
+   "details": []
+  },
+  {
+   "id": "G5",
+   "name": "C1 verify on gate A",
+   "status": "n/a",
+   "key": "no run arm sets physical_protect_keep_watch=true",
+   "details": []
+  },
+  {
+   "id": "G6",
+   "name": "keep only under G",
+   "status": "n/a",
+   "key": "no run arm sets physical_protect_keep_watch=true",
+   "details": []
+  },
+  {
+   "id": "G7",
+   "name": "inert on native",
+   "status": "n/a",
+   "key": "no run arm sets physical_protect_keep_watch=true",
+   "details": []
+  },
+  {
+   "id": "G8",
+   "name": "nothing stale, no new errors",
+   "status": "PASS",
+   "key": "stale/fault/Protect-failed lines in 0/16 runs; logdiff vs base (x4): FAIL findings in 0, NEW messages in 0/16 runs (0 kinds)",
+   "details": [
+    "logdiff reference: base x4 merged (396 log lines, 5 warning/error kinds); 16/16 runs have a game*.log to compare",
+    "by hand: the frame hash or screenshot matches the reference arm at the same point (W6-GATES G8)"
+   ]
+  },
+  {
+   "id": "G9",
+   "name": "launch-only switches as planned",
+   "status": "PASS",
+   "key": "16/16 runs: params.cvar, args, env_set and toml_set = the arm's",
+   "details": [
+    "hands off, no dev console during the window: procedural (C1 v3 latches keep_watch and hold_global_lock at init; other cvars are read live)"
+   ]
+  },
+  {
+   "id": "G10",
+   "name": "per-run validity",
+   "status": "PASS",
+   "key": "15/15 scored runs valid; proof lines ok in 16/16 runs; free RAM >= 6 GB in 16/16; slow state 15/15 scored (info)",
+   "details": [
+    "proof lines base: none (4 runs)",
+    "proof lines s0: none (3 runs)",
+    "proof lines d11: timer1ms 1,1,1, optout 1,1,1 (3 runs)",
+    "  d11: no log line for precise_guest_sleep, wait_timeout_round_up, cs_spin, spinlock_pause_spin, clock_lockfree, tls_bounds_fix: the recorded cvar list (G9) is the proof",
+    "proof lines d11t: timer1ms 1,1,1, optout 1,1,1 (3 runs)",
+    "  d11t: no log line for precise_guest_sleep, wait_timeout_round_up, cs_spin, spinlock_pause_spin, clock_lockfree, tls_bounds_fix: the recorded cvar list (G9) is the proof",
+    "  d11t: env REX_TIMER_WAIT_BLOCKING=1: run.json env_set (G9) is the proof",
+    "proof lines d11p: timer1ms 1,1,1, optout 1,1,1, precise 1,1,1 (3 runs)",
+    "  d11p: no log line for precise_guest_sleep, wait_timeout_round_up, cs_spin, spinlock_pause_spin, clock_lockfree, tls_bounds_fix: the recorded cvar list (G9) is the proof",
+    "slow state (info; E-cores < 800 MHz for >= 3 samples overlapping the window): 15/15 scored runs; slow samples in the window: #2 base r1 13/50 (longest 8); #3 s0 r1 34/50 (longest 41); #4 d11 r1 43/50 (longest 14); #5 d11t r1 47/50 (longest 27); #6 d11p r1 45/51 (longest 33); #7 s0 r2 47/50 (longest 49); #8 d11 r2 43/50 (longest 14); #9 d11t r2 38/50 (longest 16); #10 d11p r2 47/50 (longest 22); #11 base r2 50/50 (longest 67); #12 d11 r3 38/50 (longest 12); #13 d11t r3 50/50 (longest 86); #14 d11p r3 48/50 (longest 53); #15 base r3 36/50 (longest 9); #16 s0 r3 37/50 (longest 12)"
+   ]
+  },
+  {
+   "id": "G11",
+   "name": "power overlay",
+   "status": "PASS",
+   "key": "overlay best_efficiency in 16/16 runs, no change inside any window; scheme Balanced; AC 1; saver 0",
+   "details": [
+    "power overlay: best_efficiency in 16/16 runs, no change inside any window",
+    "scheme: Balanced x16; AC: 1 x16; battery saver: 0 x16"
+   ]
+  },
+  {
+   "id": "G12",
+   "name": "quiet gate",
+   "status": "PASS",
+   "key": "RELAXED (NOT QUIET after 20 min) at 17:51:55 [quiet-1731.log]; Defender 0.77-1.14 cores over 20 one-min samples; non-game load 3.01-4.14 cores (median 3.30), 0 flagged",
+   "details": [
+    "non-game load: 3.01-4.14 cores (median 3.30) in 15 scored runs; unscored/cold 6.05",
+    "non-game load flag (scored runs above the median 3.30 + 1.0 cores): none",
+    "quiet gate: RELAXED: build\\agent1\\w5\\quiet-1731.log: 'NOT QUIET after 20 min' at 17:51:55 (strict limit 0.1 core; 20 one-minute samples, 20 FAIL; Defender 0.77-1.14 cores, last 10: 0.88-0.99; busy 2.76-6.38 CPUs); the window started at 17:56, 4 min later"
+   ]
+  }
+ ],
+ "record": "RECORD: overlay best_efficiency (16/16, no change); quiet gate RELAXED; non-game load 3.01-4.14 cores",
+ "exit": 0,
+ "runs": [
+  {
+   "seq": 1,
+   "arm": "base",
+   "rep": "0",
+   "scored": false,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-1756\\runs\\1756-cold-base",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 30,
+    "slow": 0,
+    "longest": 0,
+    "stretch": false
+   }
+  },
+  {
+   "seq": 2,
+   "arm": "base",
+   "rep": "1",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-1756\\runs\\1757-base-r1",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 13,
+    "longest": 8,
+    "stretch": true
+   }
+  },
+  {
+   "seq": 3,
+   "arm": "s0",
+   "rep": "1",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-1756\\runs\\1800-s0-r1",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 34,
+    "longest": 41,
+    "stretch": true
+   }
+  },
+  {
+   "seq": 4,
+   "arm": "d11",
+   "rep": "1",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-1756\\runs\\1802-d11-r1",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 1,
+    "optout": 1,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 43,
+    "longest": 14,
+    "stretch": true
+   }
+  },
+  {
+   "seq": 5,
+   "arm": "d11t",
+   "rep": "1",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-1756\\runs\\1804-d11t-r1",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 1,
+    "optout": 1,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 47,
+    "longest": 27,
+    "stretch": true
+   }
+  },
+  {
+   "seq": 6,
+   "arm": "d11p",
+   "rep": "1",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-1756\\runs\\1806-d11p-r1",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 1,
+    "optout": 1,
+    "precise": 1,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 51,
+    "slow": 45,
+    "longest": 33,
+    "stretch": true
+   }
+  },
+  {
+   "seq": 7,
+   "arm": "s0",
+   "rep": "2",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-1756\\runs\\1808-s0-r2",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 47,
+    "longest": 49,
+    "stretch": true
+   }
+  },
+  {
+   "seq": 8,
+   "arm": "d11",
+   "rep": "2",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-1756\\runs\\1810-d11-r2",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 1,
+    "optout": 1,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 43,
+    "longest": 14,
+    "stretch": true
+   }
+  },
+  {
+   "seq": 9,
+   "arm": "d11t",
+   "rep": "2",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-1756\\runs\\1813-d11t-r2",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 1,
+    "optout": 1,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 38,
+    "longest": 16,
+    "stretch": true
+   }
+  },
+  {
+   "seq": 10,
+   "arm": "d11p",
+   "rep": "2",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-1756\\runs\\1815-d11p-r2",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 1,
+    "optout": 1,
+    "precise": 1,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 47,
+    "longest": 22,
+    "stretch": true
+   }
+  },
+  {
+   "seq": 11,
+   "arm": "base",
+   "rep": "2",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-1756\\runs\\1817-base-r2",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 50,
+    "longest": 67,
+    "stretch": true
+   }
+  },
+  {
+   "seq": 12,
+   "arm": "d11",
+   "rep": "3",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-1756\\runs\\1819-d11-r3",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 1,
+    "optout": 1,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 38,
+    "longest": 12,
+    "stretch": true
+   }
+  },
+  {
+   "seq": 13,
+   "arm": "d11t",
+   "rep": "3",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-1756\\runs\\1821-d11t-r3",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 1,
+    "optout": 1,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 50,
+    "longest": 86,
+    "stretch": true
+   }
+  },
+  {
+   "seq": 14,
+   "arm": "d11p",
+   "rep": "3",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-1756\\runs\\1823-d11p-r3",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 1,
+    "optout": 1,
+    "precise": 1,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 48,
+    "longest": 53,
+    "stretch": true
+   }
+  },
+  {
+   "seq": 15,
+   "arm": "base",
+   "rep": "3",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-1756\\runs\\1825-base-r3",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 36,
+    "longest": 9,
+    "stretch": true
+   }
+  },
+  {
+   "seq": 16,
+   "arm": "s0",
+   "rep": "3",
+   "scored": true,
+   "run_dir": "<workspace>\\build\\agent8\\matrix\\20261122-1756\\runs\\1827-s0-r3",
+   "logs": 1,
+   "counts": {
+    "timer1ms": 0,
+    "optout": 0,
+    "precise": 0,
+    "kw_on": 0,
+    "kw_nolock": 0,
+    "kw_native": 0,
+    "kw_first": 0,
+    "verify_on": 0,
+    "verify_k": 0,
+    "verify_f": 0
+   },
+   "bad": {},
+   "slow": {
+    "rows": 50,
+    "slow": 37,
+    "longest": 12,
+    "stretch": true
+   }
+  }
+ ],
+ "sides": []
+}

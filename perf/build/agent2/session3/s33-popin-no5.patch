@@ -1,0 +1,208 @@
+diff --git a/include/rex/graphics/d3d12/pipeline_cache.h b/include/rex/graphics/d3d12/pipeline_cache.h
+--- a/include/rex/graphics/d3d12/pipeline_cache.h
++++ b/include/rex/graphics/d3d12/pipeline_cache.h
+@@ -64,7 +64,15 @@ class PipelineCache {
+   void ShutdownShaderStorage();
+ 
+   void EndSubmission();
+   bool IsCreatingPipelines();
++  // Creates the queued pipelines on the calling thread, then waits until the
++  // creation threads have finished the ones they took. EndSubmission does this
++  // unless IsCreationNoWait().
++  void AwaitPipelineCreation();
++  // d3d12_pipeline_creation_no_wait is in effect (latched in Initialize):
++  // EndSubmission doesn't wait for pipelines in creation, so a draw must never
++  // be recorded with a pipeline that isn't created yet.
++  bool IsCreationNoWait() const { return creation_no_wait_; }
+ 
+   // Background shader/pipeline work for the on-screen notice: done / total of
+   // the current burst. The counters reset once a burst is finished, so a new
+@@ -430,6 +438,8 @@ class PipelineCache {
+   // creation_request_cond_ when set.
+   size_t creation_threads_shutdown_from_ = SIZE_MAX;
+   std::vector<std::unique_ptr<rex::thread::Thread>> creation_threads_;
++  // d3d12_pipeline_creation_no_wait in effect. Set in Initialize, then only read.
++  bool creation_no_wait_ = false;
+ };
+ 
+ }  // namespace rex::graphics::d3d12
+diff --git a/src/graphics/d3d12/command_processor.cpp b/src/graphics/d3d12/command_processor.cpp
+--- a/src/graphics/d3d12/command_processor.cpp
++++ b/src/graphics/d3d12/command_processor.cpp
+@@ -293,15 +293,17 @@ void ReportSlowFrame() {
+       "texture load {:.1f} ({}x) | readback {}x {} KB, {} stalled | "
+       "cpu-write invalidations {}x {} KB (on memexport pages {}x {} KB) | "
+       "memexport syncs {} ({} KB), on demand {} ({} KB) | "
+-      "memexport full-buffer {}x (total {})",
++      "memexport full-buffer {}x (total {}) | "
++      "dropped draws {} | forced pipeline waits {:.1f} ({}x)",
+       frame_index, ms(frame_us), ms(s[kCpIdle].us), ms(s[kFenceWait].us), s[kFenceWait].count,
+       ms(s[kShaderTranslate].us), s[kShaderTranslate].count, ms(s[kPipelineCreate].us),
+       s[kPipelineCreate].count, s[kPipelineMiss].count, ms(s[kTextureLoad].us),
+       s[kTextureLoad].count, s[kReadbackResolve].count, s[kReadbackResolve].extra / 1024,
+       s[kReadbackResolve].us, s[kMemoryInvalidate].count, s[kMemoryInvalidate].extra / 1024,
+       s[kMemexportPageInvalidate].count, s[kMemexportPageInvalidate].extra / 1024,
+       s[kMemexportFlush].count, s[kMemexportFlush].extra / 1024, s[kMemexportOnDemand].count,
+-      s[kMemexportOnDemand].extra / 1024, full_buffer, full_buffer_total);
++      s[kMemexportOnDemand].extra / 1024, full_buffer, full_buffer_total, s[kDroppedDraw].count,
++      ms(s[kPipelineAwait].us), s[kPipelineAwait].count);
+ }
+ 
+ uint64_t ParseHashArg(std::string_view args) {
+@@ -2754,9 +2756,27 @@ bool D3D12CommandProcessor::IssueDraw(xenos::PrimitiveType primitive_type, uint32_t index_count,
+           bound_depth_and_color_render_target_formats, &pipeline_handle, &root_signature)) {
+     return false;
+   }
+-  if (REXCVAR_GET(async_shader_compilation) &&
++  // Skip the draw while its pipeline is being created (or if creating it
++  // failed). With d3d12_pipeline_creation_no_wait, EndSubmission doesn't wait
++  // for pipelines in creation, so such a draw must never be recorded, even if
++  // async_shader_compilation has been turned off since.
++  if ((REXCVAR_GET(async_shader_compilation) || pipeline_cache_->IsCreationNoWait()) &&
+       pipeline_cache_->GetD3D12PipelineByHandle(pipeline_handle) == nullptr) {
+-    return true;
++    bool skip_draw = true;
++    if (pipeline_cache_->IsCreationNoWait() && (memexport_used || active_occlusion_query_.valid)) {
++      // Skipping this draw would lose results the guest reads (exported data,
++      // occlusion sample counts), not just pop in: wait for the pipeline, as
++      // EndSubmission does without the no-wait mode.
++      {
++        frame_stats::Scope await_scope(frame_stats::kPipelineAwait);
++        pipeline_cache_->AwaitPipelineCreation();
++      }
++      skip_draw = pipeline_cache_->GetD3D12PipelineByHandle(pipeline_handle) == nullptr;
++    }
++    if (skip_draw) {
++      frame_stats::Add(frame_stats::kDroppedDraw, 0);
++      return true;
++    }
+   }
+ 
+   // Update the textures - this may bind pipelines.
+diff --git a/src/graphics/d3d12/pipeline_cache.cpp b/src/graphics/d3d12/pipeline_cache.cpp
+--- a/src/graphics/d3d12/pipeline_cache.cpp
++++ b/src/graphics/d3d12/pipeline_cache.cpp
+@@ -59,6 +59,20 @@ REXCVAR_DEFINE_INT32(d3d12_pipeline_creation_threads, -1, "GPU/D3D12",
+                      "Number of pipeline creation threads (-1 for auto)")
+     .range(-1, 32)
+     .lifecycle(rex::cvar::Lifecycle::kRequiresRestart);
++
++// With async_shader_compilation, a draw whose pipeline is still being created
++// is skipped, and EndSubmission waits for every pipeline in creation: pop-in
++// lasts one submission, but the wait is a stall. With this on, EndSubmission
++// doesn't wait, and such draws stay skipped until their pipeline is ready
++// (pop-in for a few frames instead). Draws that memexport or run inside an
++// occlusion query still wait (in IssueDraw): skipping them would lose results
++// the guest reads. Read once, in PipelineCache::Initialize.
++REXCVAR_DEFINE_BOOL(d3d12_pipeline_creation_no_wait, false, "GPU/D3D12",
++                    "Don't wait at the end of a submission for pipelines still being created: "
++                    "their draws stay skipped until ready (pop-in for a few frames instead of a "
++                    "stall; memexport and occlusion-query draws still wait). Needs "
++                    "async_shader_compilation, pipeline creation threads and bindless resources")
++    .lifecycle(rex::cvar::Lifecycle::kRequiresRestart);
+ 
+ REXCVAR_DEFINE_BOOL(d3d12_tessellation_wireframe, false, "GPU/D3D12",
+                     "Render tessellation as wireframe");
+@@ -166,6 +180,22 @@ bool PipelineCache::Initialize() {
+       creation_threads_.push_back(std::move(creation_thread));
+     }
+   }
++  // Latched: async_shader_compilation can change at runtime, while the command
++  // processor relies on this staying the same. Bindless only: there a
++  // pipeline's root signature doesn't depend on its pixel shader, so it can't
++  // change while the pipeline is in creation.
++  creation_no_wait_ = REXCVAR_GET(d3d12_pipeline_creation_no_wait) &&
++                      REXCVAR_GET(async_shader_compilation) && !creation_threads_.empty() &&
++                      bindless_resources_used_;
++  if (creation_no_wait_) {
++    REXGPU_INFO(
++        "d3d12_pipeline_creation_no_wait: not waiting for pipeline creation at the end of "
++        "submissions; draws stay skipped until their pipeline is ready");
++  } else if (REXCVAR_GET(d3d12_pipeline_creation_no_wait)) {
++    REXGPU_WARN(
++        "d3d12_pipeline_creation_no_wait ignored: it needs async_shader_compilation, pipeline "
++        "creation threads and bindless resources");
++  }
+   return true;
+ }
+ 
+@@ -749,6 +779,13 @@ void PipelineCache::InitializeShaderStorage(const std::filesystem::path& cache_root,
+ }
+ 
+ void PipelineCache::ShutdownShaderStorage() {
++  if (creation_no_wait_) {
++    // In this mode EndSubmission leaves pipelines in creation. Their workers
++    // may still translate shaders and queue them for the storage closed and
++    // cleared below (and InitializeShaderStorage then changes
++    // shader_storage_index_), so let them finish first.
++    AwaitPipelineCreation();
++  }
+   if (storage_write_thread_) {
+     {
+       std::lock_guard<std::mutex> lock(storage_write_request_lock_);
+@@ -792,25 +829,34 @@ void PipelineCache::EndSubmission() {
+     shader_storage_file_flush_needed_ = false;
+     pipeline_storage_file_flush_needed_ = false;
+   }
+-  if (!creation_threads_.empty()) {
+-    CreateQueuedPipelinesOnProcessorThread();
+-    // Await creation of all queued pipelines.
+-    bool await_creation_completion_event;
+-    {
+-      std::lock_guard<std::mutex> lock(creation_request_lock_);
+-      // Assuming the creation queue is already empty (because the processor
+-      // thread also worked on creating the leftover pipelines), so only check
+-      // if there are threads with pipelines currently being created.
+-      await_creation_completion_event = creation_threads_busy_ != 0;
+-      if (await_creation_completion_event) {
+-        creation_completion_event_->Reset();
+-        creation_completion_set_event_ = true;
+-      }
+-    }
+-    if (await_creation_completion_event) {
+-      creation_request_cond_.notify_one();
+-      rex::thread::Wait(creation_completion_event_.get(), false);
+-    }
++  // With d3d12_pipeline_creation_no_wait, IssueDraw records no draw whose
++  // pipeline isn't created yet, so the submission doesn't need the wait.
++  if (!creation_no_wait_) {
++    AwaitPipelineCreation();
++  }
++}
++
++void PipelineCache::AwaitPipelineCreation() {
++  if (creation_threads_.empty()) {
++    return;
++  }
++  CreateQueuedPipelinesOnProcessorThread();
++  // Await creation of all queued pipelines.
++  bool await_creation_completion_event;
++  {
++    std::lock_guard<std::mutex> lock(creation_request_lock_);
++    // Assuming the creation queue is already empty (because the processor
++    // thread also worked on creating the leftover pipelines), so only check
++    // if there are threads with pipelines currently being created.
++    await_creation_completion_event = creation_threads_busy_ != 0;
++    if (await_creation_completion_event) {
++      creation_completion_event_->Reset();
++      creation_completion_set_event_ = true;
++    }
++  }
++  if (await_creation_completion_event) {
++    creation_request_cond_.notify_one();
++    rex::thread::Wait(creation_completion_event_.get(), false);
+   }
+ }
+ 
+diff --git a/src/graphics/frame_stats.h b/src/graphics/frame_stats.h
+--- a/src/graphics/frame_stats.h
++++ b/src/graphics/frame_stats.h
+@@ -30,6 +30,8 @@ enum Id : uint32_t {
+   kMemexportFlush,     // host-GPU syncs to read memexport results back (bytes in extra)
+   kMemexportPageInvalidate,  // of kMemoryInvalidate, the ones on pages memexport wrote
+   kMemexportOnDemand,  // exports read back on demand instead of synced (bytes in extra)
++  kDroppedDraw,        // draws skipped: pipeline not created yet, or failed (count only)
++  kPipelineAwait,      // pipeline creation waits forced by unskippable draws (no-wait mode)
+   kCount
+ };
+ 

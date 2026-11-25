@@ -1,0 +1,25 @@
+﻿=== timing matrix: M8 session 3 smoke: functional check of the installed runner improvements (warmup_runs, new results.csv columns, 31-column sys.csv sampler). Hidden desktop, -Quick, never scored (m8-runner-rating.md C08604D8, C4/C5). ===
+matrix   <workspace>\build\agent8\session3\smoke\matrix-smoke.json   [-Quick: short settle/menu/warm-up/window, FUNCTIONAL ONLY]
+note     Run: run-matrix.ps1 -Matrix <this> -Quick -NoPrompt -OutDir build\agent8\session3\smoke\out-<HHmm>. Plan: cold-s0, warm1-s0b, s0-r1, s0b-r1 (4 runs). Both arms are the same bin and settings; s0b exists only so that round 1 has two arms and the warm-up arm choice is exercised.
+note     Functional only: hidden desktop, quick timings. No number from this matrix is a timing result.
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order roundrobin; close timeout 60 s; cooldown 5 s
+floor    every window >= 20 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+       s0: bin build/agent2/devoff4b-bin; frames perf; x1; warm-up 15 s (raised from 10 s for the floor); window 30 s; group smoke (ref); cvars framerate_limit=0; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         devoff4b, every switch OFF
+round 1  s0
+order    s0
+estimate 1 runs (0 cold), about 2 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-IDAFWVQGHOKI6XCZAAJQ22AYWL -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   15.87 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/devoff4b-bin : ok (MANIFEST.txt)
+screensaver none
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   1 runs, about 2 min: done around 07:42
+keep-awake ON (SetThreadExecutionState continuous+system+display until the matrix ends)

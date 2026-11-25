@@ -10,8 +10,13 @@ is checked with <arm>'s rules and config. Per run:
   1. Expect rules (--expect, default expect-w6.json next to this file). Each 'require' text must be in the run's
      game*.log set (all rotations), no 'forbid' or 'forbid_all' text may be there, and each 'exact' text must occur
      exactly N times; otherwise FAIL. Texts are substrings of the message part of a line. 'note_all' texts
-     (STUCK-LOCK, Minidump written to) -> NOTE. [warning]/[error]/[critical] line totals vs 'levels' -> NOTE when
-     they differ. Every 'count' text is counted.
+     (STUCK-LOCK, Minidump written to) -> NOTE. [warning]/[error]/[critical] line totals vs 'levels' (an arm's own
+     'levels' overrides the file's) -> NOTE when they differ. Every 'count' text is counted.
+     Shutdown (2026-11-25): a log missing 'Execution complete' that ends with 'Title terminated; hard-exiting
+     process.' with exit code 0 is the benign hard-exit race -> INFO (no effect on the verdict), and so is a logdiff
+     GONE 'Execution complete' key missing only in such runs. A log with 'Shutdown wedged past the close request;
+     hard-exiting.' -> one NOTE 'WATCHDOG: shutdown watchdog fired (3 s after WM_CLOSE)' that also explains the
+     extra warning and the missing clean-exit tail; the summary counts 'watchdog runs: N'.
   2. STUCK-LOCK episodes (a 'still not acquired after' line plus the lines after it): critical section, wait, owner
      tid and lr, owner site, the waiter's first caller, the hang dump, and where the stall fell against run.json's
      measured window. Sites: H1 = the owner's lr is in sub_83FAF180 (the L1 fence-wait poll; finding 10) or at
@@ -31,13 +36,25 @@ is checked with <arm>'s rules and config. Per run:
      <out>/logdiff/. build/agent6/w4b/w4b_extra.py writes the exact-text diff, close fields and per-run counts to
      <out>/extra.txt. Both run as child processes at below-normal priority, one after the other. A gate FAIL finding
      or a NEW error/critical key -> FAIL, unless it is a STUCK episode's own line. NEW warning keys, MORE, GONE, and
-     ONLY keys that no text of the arm's rules matches -> NOTE.
+     ONLY keys that no text of the arm's rules matches -> NOTE (a NEW warning key is excused only by the arm's own
+     'require'/'exact' texts, e.g. an expected gate WARN; 2026-11-25).
 Writes <out>/w6-summary.txt (also printed) and <out>/w6-data.json. The default <out> is build/agent6/w6/out-<folder>.
 Nothing is written into the matrix folder. Exit 0 = no FAIL, 1 = at least one FAIL, 2 = usage error.
+
+Arm ids (expect file, --ref, --run) must be [A-Za-z0-9]+: the run-dir name HHMM-<arm>-rN is split at '-', so a
+hyphenated id would be read as its first part. Any other id is a usage error (exit 2).
+
+Harness mode (2026-11-25): --run ARM=DIR (repeatable) instead of <matrix_dir> (one or the other, exit 2 otherwise)
+checks Agent 3 harness\\run-game.ps1 run dirs. The game*.log rotations and run.json of each are copied to
+<out>/staging/runs/NNNN-<arm>-rK for the logdiff tools (nothing is written into the run dirs). Functional only:
+valid_timing is not checked; status = OK iff exit_code 0, not exited_early, close_method wm_close and not wer_seen.
+The arm's config (bin, cvars, env) comes from --matrix-json (extra arm keys are ignored); only the keys the arm lists
+are compared, plus a FAIL for any of S33_KEYS (the #33 / gate cvars) set in run.json but not listed. Slow state is
+skipped (no ff_signal_epoch_s) -> INFO per run.
 """
 import sys
 sys.dont_write_bytecode = True
-import argparse, csv, datetime, glob, json, os, re, statistics, subprocess, time
+import argparse, csv, datetime, glob, json, os, re, shutil, statistics, subprocess, time
 from collections import Counter, defaultdict
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -49,7 +66,14 @@ LINE_RE = re.compile(r'^\[(?P<ts>\d{4}-\d\d-\d\d [0-9:.]+)\] \[(?P<lvl>[a-z]+)\]
 ROT_RE = re.compile(r'^game(?:\.(\d+))?\.log$', re.I)
 ARM_RE = re.compile(r'^\d{4}-(cold-[A-Za-z0-9]+|[A-Za-z0-9]+)(?:-|$)')
 W4B_ARM_REGEX = r'^runs/\d{4}-(cold-[A-Za-z0-9]+|[A-Za-z0-9]+)(?:-|$)'
+ARM_ID_RE = re.compile(r'^[A-Za-z0-9]+$')
+S33_KEYS = ('d3d12_pipeline_creation_no_wait', 'd3d12_resolve_after_drop_log', 'slow_frame_log_ms',
+            'd3d12_pipeline_creation_threads', 'async_shader_compilation', 'd3d12_bindless')
 EXIT_SEQ = ('Window closing, shutting down', 'Execution complete', 'Title terminated; hard-exiting process')
+# Shutdown lines (rexglue-sdk ui/rex_app.cpp OnClosing; rexlego legodimensions_app.h StartShutdownWatchdog)
+EXEC_DONE, TITLE_EXIT = EXIT_SEQ[1], 'Title terminated; hard-exiting process.'
+WATCHDOG = 'Shutdown wedged past the close request; hard-exiting.'
+WATCHDOG_NOTE = 'WATCHDOG: shutdown watchdog fired (3 s after WM_CLOSE)'
 LEVELS = ('warning', 'error', 'critical')
 BELOW_NORMAL = 0x00004000
 EMHZ, MINROWS, MIN_FREE_GB = 800.0, 3, 6.0
@@ -154,7 +178,7 @@ def site_of(lr, starts):
 
 def scan_log(rd, pats):
     r = dict(files=[], lines=0, levels=Counter(), cnt=Counter(), first_ts=None, last_ts=None, episodes=[],
-             ep_lines=Counter(), other_err=[], other_err_n=0, tail=[], toy=0)
+             ep_lines=Counter(), other_err=[], other_err_n=0, tail=[], toy=0, exec_done=0, watchdog=0)
     cur = None
     for fp in log_files(rd):
         try:
@@ -180,6 +204,8 @@ def scan_log(rd, pats):
                 r['tail'] = (r['tail'] + [msg])[-3:]
                 if 'Toypad' in msg:
                     r['toy'] += 1
+                r['exec_done'] += EXEC_DONE in msg
+                r['watchdog'] += WATCHDOG in msg
                 for p in pats:
                     if p in msg:
                         r['cnt'][p] += 1
@@ -259,7 +285,7 @@ def slow_state(rd, ff):
     return dict(onset_s=onset, slow_pct=100.0 * low / len(s), span_s=s[-1][0], rows=len(s))
 
 
-def run_facts(rd):
+def run_facts(rd, harness=False):
     p = os.path.join(rd, 'run.json')
     if not os.path.exists(p):
         return None
@@ -269,7 +295,7 @@ def run_facts(rd):
     cv = d.get('cvars')
     cvars = kv_norm(cv) if isinstance(cv, (dict, list)) and cv else kv_norm(pr.get('cvar') or [])
     ms, me = d.get('measure_start') or {}, d.get('measure_end') or {}
-    return dict(
+    f = dict(
         _error=d.get('_error'), tag=d.get('tag'), status=d.get('status'), valid_timing=d.get('valid_timing'),
         valid_why=d.get('valid_timing_why') or [], problems=d.get('problems') or [], bin_dir=d.get('bin_dir'),
         cvars=cvars, env=kv_norm(d.get('env_set') or {}),
@@ -281,6 +307,15 @@ def run_facts(rd):
         free_gb=d.get('free_ram_gb_at_start'), ff=d.get('ff_signal_epoch_s'), start=d.get('start'),
         nogrowth=d.get('perf_csv_max_no_growth_window_s'), nrw=d.get('not_responding_window_samples'),
         m_start=ms.get('wall'), m_end=me.get('wall'), runner_error=d.get('runner_error'))
+    if harness:  # Agent 3 harness\run-game.ps1 run.json: no status / valid_timing / ff signal; env, wer_seen, close_method
+        f.update(env=kv_norm(d.get('env') or {}), wer=d.get('wer_seen'), close_method=d.get('close_method'),
+                 close_s=d.get('close_seconds'), mode=d.get('mode'), h_dumps=d.get('dumps') or [], start=d.get('started'))
+        f['problems'] = [x for x, bad in (('exit code %s' % f['exit_code'], str(f['exit_code']) != '0'),
+                                          ('exited early', bool(f['early'])),
+                                          ('close_method %s' % f['close_method'], f['close_method'] != 'wm_close'),
+                                          ('WER seen', bool(f['wer']))) if bad]
+        f['status'] = 'BAD' if f['problems'] else 'OK'
+    return f
 
 
 def matrix_arms(mj):
@@ -323,7 +358,9 @@ def run_tool(args, log_path):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('matrix')
+    ap.add_argument('matrix', nargs='?')
+    ap.add_argument('--run', action='append', default=[], metavar='ARM=DIR',
+                    help='harness mode: an Agent 3 run dir of arm ARM (repeatable; instead of <matrix_dir>)')
     ap.add_argument('--expect', default=DEFAULT_EXPECT)
     ap.add_argument('--ref', help="reference arm (default: the expect file's 'reference')")
     ap.add_argument('--matrix-json', default=None, help='used when the folder has no matrix.json (default: %s)'
@@ -333,19 +370,58 @@ def main():
     ap.add_argument('--top', type=int, default=30)
     a = ap.parse_args()
     t_start = time.time()
-    mdir = os.path.abspath(a.matrix)
-    if not os.path.isdir(os.path.join(mdir, 'runs')):
-        print('no runs/ folder in %s' % mdir)
+    if bool(a.matrix) == bool(a.run):
+        print('give either <matrix_dir> or --run ARM=DIR (repeatable), not both and not neither')
         return 2
+    harness = bool(a.run)
+    hruns = []
+    for x in a.run:
+        arm, sep, d = x.partition('=')
+        if not sep or not ARM_ID_RE.match(arm) or not os.path.isdir(d):
+            print('bad --run %s (want ARM=DIR, ARM [A-Za-z0-9]+, DIR an existing run dir)' % x)
+            return 2
+        hruns.append((arm.lower(), os.path.abspath(d)))
     ex = load_json(a.expect)
     if ex.get('_error'):
         print('expect file: %s' % ex['_error'])
         return 2
     ref = (a.ref or ex.get('reference') or 's0').lower()
-    out = os.path.abspath(a.out or os.path.join(HERE, 'out-' + os.path.basename(mdir.rstrip('\\/'))))
-    if norm_path(out).startswith(norm_path(mdir) + '/') or norm_path(out) == norm_path(mdir):
-        print('refusing to write inside the matrix folder: %s' % out)
+    bad_ids = [str(k) for k in (ex.get('arms') or {}) if not ARM_ID_RE.match(str(k))] + \
+        ([ref] if not ARM_ID_RE.match(ref) else [])
+    if bad_ids:
+        print('arm ids must be [A-Za-z0-9]+ (run dirs HHMM-<arm>-rN are split at "-"): %s' % ', '.join(bad_ids))
         return 2
+    if harness:
+        out = os.path.abspath(a.out or os.path.join(HERE, 'out-harness'))
+        guard = [d for _, d in hruns] + [os.path.join(ROOT, 'build', 'agent3')]
+        if any(norm_path(out) == norm_path(g) or norm_path(out).startswith(norm_path(g) + '/') for g in guard):
+            print('refusing to write inside build/agent3 or a run dir: %s' % out)
+            return 2
+        mdir = os.path.join(out, 'staging')
+        if os.path.isdir(mdir):
+            shutil.rmtree(mdir)
+        rlist, seen = [], Counter()
+        for i, (arm, src) in enumerate(hruns):
+            seen[arm] += 1
+            name = '%04d-%s-r%d' % (i + 1, arm, seen[arm])
+            dst = os.path.join(mdir, 'runs', name)
+            os.makedirs(dst)
+            for fp in log_files(src) + [os.path.join(src, 'run.json')]:
+                if os.path.exists(fp):
+                    shutil.copy2(fp, dst)
+            rlist.append((name, src))
+    else:
+        mdir = os.path.abspath(a.matrix)
+        if not os.path.isdir(os.path.join(mdir, 'runs')):
+            print('no runs/ folder in %s' % mdir)
+            return 2
+        out = os.path.abspath(a.out or os.path.join(HERE, 'out-' + os.path.basename(mdir.rstrip('\\/'))))
+        if norm_path(out).startswith(norm_path(mdir) + '/') or norm_path(out) == norm_path(mdir):
+            print('refusing to write inside the matrix folder: %s' % out)
+            return 2
+        rlist = [(os.path.basename(d), d) for d in sorted(
+            d for d in glob.glob(os.path.join(mdir, 'runs', '*'))
+            if os.path.isdir(d) and (log_files(d) or os.path.exists(os.path.join(d, 'run.json'))))]
     os.makedirs(out, exist_ok=True)
     mj_path = os.path.join(mdir, 'matrix.json')
     if not os.path.exists(mj_path):
@@ -364,18 +440,18 @@ def main():
         if p not in pats:
             pats.append(p)
 
-    rdirs = sorted(d for d in glob.glob(os.path.join(mdir, 'runs', '*'))
-                   if os.path.isdir(d) and (log_files(d) or os.path.exists(os.path.join(d, 'run.json'))))
     runs, arms = {}, defaultdict(list)
-    for rd in rdirs:
-        name = os.path.basename(rd)
+    for name, rd in rlist:
         m = ARM_RE.match(name)
         arm = m.group(1).lower() if m else '?'
         base_arm = arm[5:] if arm.startswith('cold-') else arm
-        R = dict(name=name, arm=arm, rules_arm=base_arm, fail=[], note=[])
+        R = dict(name=name, dir=rd, arm=arm, rules_arm=base_arm, fail=[], note=[], info=[], race=False)
         R['log'] = scan_log(rd, pats)
-        R['facts'] = run_facts(rd)
+        R['facts'] = run_facts(rd, harness)
         R['slow'] = slow_state(rd, (R['facts'] or {}).get('ff'))
+        if harness and R['slow'] is None:
+            R['info'].append('slow state skipped (harness run: %s)' % (
+                'no sys.csv' if not os.path.exists(os.path.join(rd, 'sys.csv')) else 'run.json has no ff_signal_epoch_s'))
         R['dumps'] = sorted(os.path.relpath(x, rd) for x in glob.glob(os.path.join(rd, '**', '*.dmp'), recursive=True))
         runs[name] = R
         arms[arm].append(name)
@@ -402,14 +478,31 @@ def main():
             if L['cnt'][t]:
                 note.append('"%s" x%d' % (t, L['cnt'][t]))
         lv = {k: L['levels'][k] for k in LEVELS}
-        if levels_exp and any(lv[k] != int(levels_exp.get(k, lv[k])) for k in LEVELS):
-            note.append('levels W/E/C %d/%d/%d, expected %s/%s/%s' % (
+        lexp = rl.get('levels') or levels_exp
+        wd, wd_why = L['watchdog'], []
+        if lexp and any(lv[k] != int(lexp.get(k, lv[k])) for k in LEVELS):
+            lv_txt = 'levels W/E/C %d/%d/%d, expected %s/%s/%s' % (
                 lv['warning'], lv['error'], lv['critical'],
-                levels_exp.get('warning', '-'), levels_exp.get('error', '-'), levels_exp.get('critical', '-')))
+                lexp.get('warning', '-'), lexp.get('error', '-'), lexp.get('critical', '-'))
+            if wd and all(lv[k] - (wd if k == 'warning' else 0) == int(lexp.get(k, lv[k])) for k in LEVELS):
+                wd_why.append('%s (+%d = the watchdog warning)' % (lv_txt, wd))
+            else:
+                note.append(lv_txt)
         if L['other_err_n']:
             note.append('%d error/critical line(s) outside STUCK episodes, e.g. %s' % (L['other_err_n'], L['other_err'][0]))
         if L['files'] and not L['exit_seq']:
-            note.append('log does not end with the clean-exit lines: %r' % L['tail'])
+            last = L['tail'][-1] if L['tail'] else ''
+            if wd and WATCHDOG in last:
+                wd_why.append('the log ends with the watchdog line, not the clean-exit lines')
+            elif not L['exec_done'] and TITLE_EXIT in last and str((F or {}).get('exit_code')) == '0':
+                R['race'] = True
+                R['info'].append('no "Execution complete" line, benign hard-exit race (log ends with "%s", exit 0): %r'
+                                 % (TITLE_EXIT, L['tail']))
+            else:
+                note.append('log does not end with the clean-exit lines: %r' % L['tail'])
+        if wd:
+            note.append('%s: "%s" x%d; not a FAIL (exit code and timing are checked on their own)%s' % (
+                WATCHDOG_NOTE, WATCHDOG, wd, ('; explains: ' + '; '.join(wd_why)) if wd_why else ''))
         # STUCK episodes
         ms, me = ts_dt((F or {}).get('m_start')), ts_dt((F or {}).get('m_end'))
         ep_dumps = set()
@@ -417,7 +510,7 @@ def main():
             lr = int(ep['owner_lr'], 16) if ep['owner_lr'] else None
             mp = None
             for cand in (os.path.join(str((F or {}).get('bin_dir') or ''), 'legodimensions.map'),
-                         os.path.join(mdir, 'runs', name, 'legodimensions.map')):
+                         os.path.join(R['dir'], 'legodimensions.map')):
                 if os.path.exists(cand):
                     mp = os.path.abspath(cand)
                     break
@@ -488,8 +581,20 @@ def main():
             except (TypeError, ValueError):
                 pass
             ma = marms.get(R['rules_arm'])
+            if harness and F.get('h_dumps'):
+                note.append('run.json dumps %s' % F['h_dumps'][:3])
             if ma is None:
                 note.append('arm %s not in %s' % (R['rules_arm'], os.path.basename(mj_path)))
+            elif harness:  # only the keys the arm lists, plus the s33 keys it does not list
+                miss = sorted('%s=%s' % kv for kv in ma['cvars'].items() if F['cvars'].get(kv[0]) != kv[1])
+                extra = sorted('%s=%s' % (k, F['cvars'][k]) for k in S33_KEYS if k in F['cvars'] and k not in ma['cvars'])
+                if miss or extra:
+                    fail.append('cvars differ from the arm: missing/changed %s, unlisted s33 keys %s' % (miss, extra))
+                envd = sorted('%s=%s' % kv for kv in ma['env'].items() if F['env'].get(kv[0]) != kv[1])
+                if envd:
+                    fail.append('env missing/changed %s' % envd)
+                if ma['bin'] and not norm_path(F['bin_dir']).endswith(norm_path(ma['bin'])):
+                    fail.append('bin_dir %s, arm bin %s' % (F['bin_dir'], ma['bin']))
             else:
                 if F['cvars'] != ma['cvars']:
                     miss = sorted('%s=%s' % kv for kv in ma['cvars'].items() if F['cvars'].get(kv[0]) != kv[1])
@@ -537,7 +642,7 @@ def main():
         cnt = lambda t: [R['log']['cnt'][t] for R in rr]  # noqa: E731
         slows = [R['slow'] for R in rr if R['slow']]
         slow_runs = [s for s in slows if s['onset_s'] is not None]
-        A = dict(runs=names, verdict='PASS', fail=[], note=[],
+        A = dict(runs=names, verdict='PASS', fail=[], note=[], info=[],
                  stuck=len(ep), stuck_sites=dict(sites), stuck_in_window=sum(1 for e in ep if e['window'] == 'IN'),
                  minidump=sum(cnt('Minidump written to')) if 'Minidump written to' in pats else None,
                  recovered=cnt('Recovered stale physical page protection'),
@@ -568,11 +673,17 @@ def main():
             new = pa.get('new') or []
             new_ec = [x['key'] for x in new if not x['key'].startswith('[warning]') and not (stuck_arm and is_ep(x['key']))]
             new_w = [x['key'] for x in new if x['key'].startswith('[warning]') and not (stuck_arm and is_ep(x['key']))]
+            # a NEW warning key that the arm's own require/exact rules name (e.g. an expected gate WARN) is no NOTE
+            warn_texts = list(rl.get('require') or []) + list((rl.get('exact') or {}).keys())
+            warn_texts = warn_texts + [key_norm(t) for t in warn_texts]
+            new_w_named = [k for k in new_w if any(t in k for t in warn_texts)]
+            new_w = [k for k in new_w if k not in new_w_named]
             only = pa.get('only') or []
             only_unnamed = [x['key'] for x in only if not any(t in x['key'] for t in rule_texts)
                             and not (stuck_arm and is_ep(x['key']))]
             A['logdiff'] = dict(fail=len(g_fail), fail_unexplained=g_unexpl, new=len(new), new_err=new_ec,
-                                new_warn=new_w, more=[x['key'] for x in pa.get('more') or []],
+                                new_warn=new_w, new_warn_named=new_w_named,
+                                more=[x['key'] for x in pa.get('more') or []],
                                 gone=[x['key'] for x in pa.get('gone') or []], only=len(only), only_unnamed=only_unnamed,
                                 only_keys=[x['key'] for x in only])
             for f in g_unexpl:
@@ -580,11 +691,20 @@ def main():
             for k in new_ec:
                 A['fail'].append('logdiff NEW error/critical key: %s' % k[:200])
             for k in new_w:
-                A['note'].append('logdiff NEW warning key: %s' % k[:200])
+                A['note'].append('logdiff NEW warning key: %s%s' % (
+                    k[:200], ' (the shutdown watchdog line, see the run\'s WATCHDOG NOTE)' if WATCHDOG in k else ''))
             for k in A['logdiff']['more']:
                 A['note'].append('logdiff MORE: %s' % k[:200])
-            for k in A['logdiff']['gone']:
-                A['note'].append('logdiff GONE: %s' % k[:200])
+            for x in pa.get('gone') or []:
+                k = x['key']
+                miss = [str(m).replace('\\', '/').split('/')[-1] for m in x.get('missing_in') or []]
+                if miss and EXEC_DONE in k and all((runs.get(m) or {}).get('race') for m in miss):
+                    A['info'].append('logdiff GONE: %s (missing only in the hard-exit race run(s) %s)'
+                                     % (k[:200], ', '.join(miss)))
+                elif miss and all((runs.get(m) or {}).get('log', {}).get('watchdog') for m in miss):
+                    A['note'].append('logdiff GONE: %s (missing only in WATCHDOG run(s) %s)' % (k[:200], ', '.join(miss)))
+                else:
+                    A['note'].append('logdiff GONE: %s' % k[:200])
             for k in only_unnamed:
                 A['note'].append('logdiff ONLY key that no rule names: %s' % k[:200])
         elif ld_data is not None and arm != ref:
@@ -592,6 +712,7 @@ def main():
         for R in rr:
             A['fail'] += ['%s: %s' % (R['name'], x) for x in R['fail']]
             A['note'] += ['%s: %s' % (R['name'], x) for x in R['note']]
+            A['info'] += ['%s: %s' % (R['name'], x) for x in R['info']]
         A['verdict'] = 'FAIL' if A['fail'] else ('NOTE' if A['note'] else 'PASS')
         arm_data[arm] = A
 
@@ -603,6 +724,11 @@ def main():
                                                      os.path.relpath(os.path.abspath(mj_path), ROOT),
                                                      ' (ERROR %s)' % mj['_error'] if mj.get('_error') else ''))
     w('runs %d in %d arms: %s' % (len(runs), len(arms), '; '.join('%s=%d' % (k, len(arms[k])) for k in order if k in arms)))
+    if harness:
+        w('HARNESS MODE, functional only: valid_timing not checked; status from exit_code/exited_early/close_method/'
+          'wer_seen; slow state skipped; logdiff on the staging copies in %s' % os.path.relpath(mdir, ROOT))
+        for name, rd in rlist:
+            w('  %s <- %s' % (name, os.path.relpath(rd, ROOT)))
     absent = sorted(set(rules) - set(x[5:] if x.startswith('cold-') else x for x in arms))
     if absent:
         w('arms in the expect file with no run here: %s' % ', '.join(absent))
@@ -647,7 +773,7 @@ def main():
         sl = ('%s/%.0f/%.0f (%d)' % (fmt(s['onset_s'], '%.0f'), s['slow_pct'], s['span_s'], s['rows'])) if s else '-'
         w('  %-18s %-8s %-7s %-6s %-5s %-9s %-4s %-9s %-5d %-4d %-20s %-8s %-5s %d' % (
             name, R['arm'], R['verdict'], F.get('status'), fmt(F.get('exit_code')),
-            '%s/%s' % (F.get('wm_close'), F.get('clean')), 'ok' if L['exit_seq'] else 'NO',
+            F.get('close_method') if harness else '%s/%s' % (F.get('wm_close'), F.get('clean')), 'ok' if L['exit_seq'] else 'NO',
             '%d/%d/%d' % (L['levels']['warning'], L['levels']['error'], L['levels']['critical']), len(L['episodes']),
             len(R['dumps']), sl, fmt(F.get('nogrowth')), fmt(F.get('free_gb')), L['lines']))
     w('')
@@ -660,9 +786,14 @@ def main():
              e['owner_func'] or 'no map', '<-'.join((e['owner_callers'] or [])[:4]) or '-', e['waiter_lr'],
              e['waiter_func'] or '', e['pm4'], e['stall_start'], e['window'], e['dump']))
     w('')
-    w('Reasons, FAIL first (per arm: its runs, then its logdiff findings)')
+    wd_runs = [n for n in sorted(runs) if runs[n]['log']['watchdog']]
+    race_runs = [n for n in sorted(runs) if runs[n]['race']]
+    w('watchdog runs: %d%s' % (len(wd_runs), (' (%s; NOTE)' % ', '.join(wd_runs)) if wd_runs else ''))
+    w('Execution complete race runs: %d%s' % (len(race_runs), (' (%s; INFO)' % ', '.join(race_runs)) if race_runs else ''))
+    w('')
+    w('Reasons, FAIL first (per arm: its runs, then its logdiff findings; INFO does not change a verdict)')
     nr = 0
-    for kind in ('fail', 'note'):
+    for kind in ('fail', 'note', 'info'):
         for arm in order:
             A = arm_data.get(arm)
             for x in (A or {}).get(kind, []):
@@ -696,7 +827,9 @@ def main():
         fh.write(txt + '\n')
     data = dict(matrix=mdir, expect=os.path.abspath(a.expect), matrix_json=os.path.abspath(mj_path), reference=ref,
                 generated=datetime.datetime.now().isoformat(timespec='seconds'), tools=tools, arms=arm_data,
-                runs={n: dict(arm=R['arm'], verdict=R['verdict'], fail=R['fail'], note=R['note'], slow=R['slow'],
+                watchdog_runs=wd_runs, race_runs=race_runs, mode='harness' if harness else 'matrix',
+                runs={n: dict(arm=R['arm'], dir=R['dir'], verdict=R['verdict'], fail=R['fail'], note=R['note'], info=R['info'],
+                              watchdog=R['log']['watchdog'], race=R['race'], slow=R['slow'],
                               dumps=R['dumps'], facts=R['facts'],
                               log=dict(files=R['log']['files'], lines=R['log']['lines'],
                                        levels=dict(R['log']['levels']), counts=dict(R['log']['cnt']),

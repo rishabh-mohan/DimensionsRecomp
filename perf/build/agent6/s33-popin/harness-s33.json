@@ -1,0 +1,26 @@
+{
+  "title": "#33 pop-in opt-in, harness rows (M6 DRAFT 2026-11-25): cold attract via harness\\run-game.ps1 + harness\\routes\\attract-long.txt. Not a run-matrix.ps1 file; it is the --matrix-json for w6_kit.py harness mode (--run ARM=DIR) and the arm table of TESTPLAN.md",
+  "reference": "offsf",
+  "notes": [
+    "Each arm = one harness\\run-game.ps1 run (FUNCTIONAL ONLY, hidden desktop): -BinDir <bin> -Seconds <seconds> -GpuLog -Tag s33-<id> -RunsRoot build\\agent6\\runs-s33 -InputScript harness\\routes\\attract-long.txt -Cvar '<cvars joined with ;>' [-SeedXenos <dir>]. run.json then holds the cvars dict the kit compares against 'cvars' here (listed keys only; harness\\legodimensions.toml defaults such as framerate_limit = 60 are the same in every arm).",
+    "slow_frame_log_ms=1 in every sf / on / gate / diag arm (not 17 as in matrix-s33-draft.json): at the harness's 60 fps cap most frames take ~16.7 ms, so a 17 ms threshold would hide the dropped-draw tail of ON in fast frames (DESIGN.md section 8: '1 (or 17)'). Counters reset at every swap whether or not the line prints.",
+    "onwarm seeds the Xenos storage (*.xsh, *.xpso) of an offsf run OF THE SAME BIN (user\\cache\\shaders\\shareable of that run dir) through -SeedXenos, the documented warm-storage path; never seeds from another bin. offwarm is its cvar-off twin with the same seed (row 5 compares onwarm with offwarm).",
+    "onstop: 5 runs with -Seconds 203, 205, 207, 209 and 211, so WM_CLOSE lands in or near the 67-miss burst (~H0+21 s, H0 ~launch+180..187 s); each run's log must show pipeline misses within ~2 s before 'Window closing, shutting down' for it to count (TESTPLAN.md row 4).",
+    "Bins: base = build/agent2/devoff4b-bin; patched = build/agent2/devoff4b-s33-bin (provisional); offd/ond = a bin with diagnostic (d): build/agent2/devoff4b-s33d-bin if built separately, else devoff4b-s33-bin."
+  ],
+  "arms": [
+    { "id": "base", "bin": "build/agent2/devoff4b-bin", "cvars": [], "env": {}, "seconds": 540, "note": "row 1a reference (unpatched)" },
+    { "id": "off", "bin": "build/agent2/devoff4b-s33-bin", "cvars": [], "env": {}, "seconds": 540, "note": "row 1a: patched, cvar off, slow-frame log off: must equal base" },
+    { "id": "basesf", "bin": "build/agent2/devoff4b-bin", "cvars": ["slow_frame_log_ms=1"], "env": {}, "seconds": 540, "note": "row 1b reference" },
+    { "id": "offsf", "bin": "build/agent2/devoff4b-s33-bin", "cvars": ["slow_frame_log_ms=1"], "env": {}, "seconds": 540, "note": "row 1b; reference for rows 2 and 6; dropped draws 0 in every line in frames outside submissions with misses" },
+    { "id": "onsf", "bin": "build/agent2/devoff4b-s33-bin", "cvars": ["slow_frame_log_ms=1", "d3d12_pipeline_creation_no_wait=true"], "env": {}, "seconds": 540, "note": "row 2 (and the bin for row 3)" },
+    { "id": "offwarm", "bin": "build/agent2/devoff4b-s33-bin", "cvars": ["slow_frame_log_ms=1"], "env": {}, "seconds": 540, "seed": "offsf", "note": "row 5 reference, warm storage" },
+    { "id": "onwarm", "bin": "build/agent2/devoff4b-s33-bin", "cvars": ["slow_frame_log_ms=1", "d3d12_pipeline_creation_no_wait=true"], "env": {}, "seconds": 540, "seed": "offsf", "note": "row 5" },
+    { "id": "onstop", "bin": "build/agent2/devoff4b-s33-bin", "cvars": ["slow_frame_log_ms=1", "d3d12_pipeline_creation_no_wait=true"], "env": {}, "seconds": [203, 205, 207, 209, 211], "note": "row 4: close during the burst, 5 runs" },
+    { "id": "gthr0", "bin": "build/agent2/devoff4b-s33-bin", "cvars": ["slow_frame_log_ms=1", "d3d12_pipeline_creation_no_wait=true", "d3d12_pipeline_creation_threads=0"], "env": {}, "seconds": 300, "note": "row 6" },
+    { "id": "gasync", "bin": "build/agent2/devoff4b-s33-bin", "cvars": ["slow_frame_log_ms=1", "d3d12_pipeline_creation_no_wait=true", "async_shader_compilation=false"], "env": {}, "seconds": 300, "note": "row 6" },
+    { "id": "gbindful", "bin": "build/agent2/devoff4b-s33-bin", "cvars": ["slow_frame_log_ms=1", "d3d12_pipeline_creation_no_wait=true", "d3d12_bindless=false"], "env": {}, "seconds": 300, "note": "row 6" },
+    { "id": "offd", "bin": "build/agent2/devoff4b-s33d-bin", "cvars": ["slow_frame_log_ms=1", "d3d12_resolve_after_drop_log=true"], "env": {}, "seconds": 540, "note": "diagnostic (d), cvar off: today's one-submission drop exposure" },
+    { "id": "ond", "bin": "build/agent2/devoff4b-s33d-bin", "cvars": ["slow_frame_log_ms=1", "d3d12_pipeline_creation_no_wait=true", "d3d12_resolve_after_drop_log=true"], "env": {}, "seconds": 540, "note": "diagnostic (d), cvar on (Agent 10 S2)" }
+  ]
+}

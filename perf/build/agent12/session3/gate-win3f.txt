@@ -1,0 +1,34 @@
+queue row: {"id": "win3f", "est": 560, "toypad": true, "needs": ["build\\agent3\\s4b\\ready-s4b-off", "build\\agent3\\session3\\go-quiet"], "args": ["-BinDir", "build\\agent2\\devoff4b-bin", "-Seconds", "600", "-Tag", "win3f-level", "-InputScript", "build\\agent3\\toypad\\routes\\level-l.txt", "-Cvar", "framerate_limit=0;shared_memory_single_hold_rearm=true;physical_protect_hold_global_lock=true;physical_protect_keep_watch=true;physical_protect_keep_watch_verify=false;host_timer_resolution_ms=1;host_timer_throttling_optout=true;precise_guest_sleep=true;wait_timeout_round_up=true;cs_spin=true;spinlock_pause_spin=true;clock_lockfree=true;tls_bounds_fix=true;timer_queue_precise_wait=true", "-Env", "LEGO_GPU_WAIT_BACKOFF_US=500;LEGO_GPU_WAIT_SPIN_US=30"], "note": "Overseer 01:47: functional gate for Window C arm win3 (bench\\agent8\\run\\matrix-windowC.json 00E3EE97, cvars/env copied from the json; stats off as in the matrix). M12 gates."}
+ok   exit_code 0 (0x00000000), close wm_close, elapsed 419.78 s of 600
+ok   wer_seen False
+ok   crash_events []
+ok   exited_early False
+ok   bin_dir <workspace>\build\agent2\devoff4b-bin (queued build\agent2\devoff4b-bin)
+ok   run exe sha256 DFBE1D43B28861A6 = run.json and in <workspace>\build\agent2\devoff4b-bin\MANIFEST.txt
+ok   cvars {'framerate_limit': '0', 'shared_memory_single_hold_rearm': 'true', 'physical_protect_hold_global_lock': 'true', 'physical_protect_keep_watch': 'true', 'physical_protect_keep_watch_verify': 'false', 'host_timer_resolution_ms': '1', 'host_timer_throttling_optout': 'true', 'precise_guest_sleep': 'true', 'wait_timeout_round_up': 'true', 'cs_spin': 'true', 'spinlock_pause_spin': 'true', 'clock_lockfree': 'true', 'tls_bounds_fix': 'true', 'timer_queue_precise_wait': 'true'} (queued {'framerate_limit': '0', 'shared_memory_single_hold_rearm': 'true', 'physical_protect_hold_global_lock': 'true', 'physical_protect_keep_watch': 'true', 'physical_protect_keep_watch_verify': 'false', 'host_timer_resolution_ms': '1', 'host_timer_throttling_optout': 'true', 'precise_guest_sleep': 'true', 'wait_timeout_round_up': 'true', 'cs_spin': 'true', 'spinlock_pause_spin': 'true', 'clock_lockfree': 'true', 'tls_bounds_fix': 'true', 'timer_queue_precise_wait': 'true'})
+ok   env {'LEGO_GPU_WAIT_BACKOFF_US': '500', 'LEGO_GPU_WAIT_SPIN_US': '30'} (queued {'LEGO_GPU_WAIT_BACKOFF_US': '500', 'LEGO_GPU_WAIT_SPIN_US': '30'})
+ok   input script <workspace>\build\agent3\toypad\routes\level-l.txt (queued build\agent3\toypad\routes\level-l.txt)
+     logs 1 (679 lines); counts: Recovered stale physical page protection=0; Unhandled guest physical write fault=0; PhysicalHeap::Protect failed=0; STUCK-LOCK=0; REX_FATAL=0; C1 keep-watch: on (with=1; C1 keep-watch: on, but=0; blocked for this process=0; C1 verify: on.=0; C1 verify K:=0; C1 verify F:=0; GPU wait back-off: ON=1; d3d12_submit_split_kb: splitting=0; d3d12_submit_split: =0
+ok   C4 "Recovered stale physical page protection" x0
+ok   C4 "Unhandled guest physical write fault" x0
+ok   C4 "PhysicalHeap::Protect failed" x0
+ok   C4 "REX_FATAL" x0
+ok   C4 "C1 keep-watch: on, but" x0
+ok   C4 "blocked for this process" x0
+ok   C3 keep-watch init x1 (keep_watch=True)
+ok   C3 "C1 verify: on." x0 (verify=False)
+ok   C3 back-off init x1 (env set True)
+ok   C3 split init x0 (split cvar False)
+     STUCK-LOCK lines 0 (C5: see f10 output / by hand)
+ok   C6 dumps in dir [], run.json dumps []
+     C7 steps 119/119 last done timeouts 30; marks ['vortex', 'v-idle', 'v-start', 'v-start-a', 'settled', 'end']
+ok   C7 vortex mark reached
+--- win3f.check.txt (35 lines)
+    missing in cand: -; extra in cand: ['785/123950', '8178/762238']
+  BASE items missed: none
+  VERDICT HINT PASS?: 0 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row win3f)
+--- win3f.f10.txt (2 lines)
+  RESULT: PASS
+--- win3f.p2c.txt (6 lines)
+  RESULT: NO DATA: no slow-frame lines: slow_frame_log_ms was not set, or the log level hides info lines
+COMMON: OK (0 problems)

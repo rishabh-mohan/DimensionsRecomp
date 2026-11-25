@@ -113,3 +113,18 @@ Withdrawn: s33-popin-no5.patch (Agent 10's rating, S1 and N1; Agent 6, 2026-11-2
   - hunk #5 removed.
 - Afterwards the rated patch's sha256 was still 0D230244..., and `git status --porcelain -- src include` in the SDK was empty.
 - Keep the patch LF. The outer repo warns that git would turn LF into CRLF on checkout. If `git apply` fails after a checkout, convert the patch back to LF first.
+
+Session 3 (M6, 2026-11-25 01:19-01:35): s33-popin-nohunk5.patch, the first test patch (S3T-6)
+---------------------------------------------------------------------------------------------
+- Made by `python -B build/agent6/s33-popin/make_nohunk5.py` (exit 0; accepts only the rated patch 0D23024484CCDEE1...).
+  Same edits as the withdrawn no5 copy: hunk #5 dropped (patch L82-93), N1's 3 comment lines in hunk #1, headers
+  +64,18 and +441,8. Output 10725 B, 211 lines, LF, sha256 57CFA8ADF1E9007954063A87F406056BB137E2D2D8F2484940BD4E1ABF3704AF.
+  The withdrawn copy's sha (2442037B...) differs although size, lines and numstat match; that file was deleted on
+  Nov 23, so the byte difference can't be shown (likely the N1 line wrapping). The new file is the one to rate/build.
+- Apply check: `python -B build/agent6/s33-popin/apply_check.py` -> APPLY-CHECK.txt, PASS, exit 0. Scratch copies of
+  the 4 files from `git show 5350b1d:<path>` (live worktree untouched; HEAD 5350b1d, `git status --porcelain -- src
+  include` empty before and after), `git -c core.autocrlf=false apply` check/apply/reverse-check exit 0, 4 "Checking
+  patch" lines, no "Skipped patch", no offsets, LF only; numstat 13/0, 24/4, 65/19, 2/0 (+104/-23).
+  Without `core.autocrlf=false` git writes CRLF outside the SDK repo (system gitconfig autocrlf=true).
+- Diagnostic (d), UNRATED: make_diagd.py -> DIAGD-CHECK.txt PASS. s33-diagd-on-nohunk5.patch (6CF9377E9F09322B...),
+  s33-popin-nohunk5-diagd.patch (797E614284B64226...). Test plan: TESTPLAN.md.

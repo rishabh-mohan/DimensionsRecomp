@@ -1,0 +1,18 @@
+# logdiff: 1 baseline logs, 1 candidate logs, min level warning
+## per log (lines by level; fail markers; clean-exit)
+BASE build\agent3\s4b\checks\joined\20261125-071741-s33-offsf\game.log | 07:17:42..07:25:24 | info=23429 warning=142 | no fail markers | clean-exit=1
+CAND build\agent3\s4b\checks\joined\20261125-095932-s33-onsf\game.log | 09:59:33..10:07:15 | info=24655 warning=142 | no fail markers | clean-exit=1
+## NEW keys (level >= warning; in a candidate log, in no baseline log)
+## MORE keys (level >= warning; candidate count > baseline max + max(5, baseline max))
+## GONE keys (any level; in every baseline log, missing from a candidate log)
+GONE build\agent3\s4b\checks\joined\20261125-095932-s33-onsf\game.log [info] [core] Toypad[Read ] #B #C # # # # # # #B EE ED #C # # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\s4b\checks\joined\20261125-095932-s33-onsf\game.log [info] [core] Toypad[Read ] #B #C # # # #B C# AA # # CC #F E# # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\s4b\checks\joined\20261125-095932-s33-onsf\game.log [info] [core] Toypad[Read ] #B #C # # # FA #A #D AC D# #A #C #E # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\s4b\checks\joined\20261125-095932-s33-onsf\game.log [info] [core] Toypad[Read ] #B #C # # #A F# D# BD # C# D# #D CB B# # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\s4b\checks\joined\20261125-095932-s33-onsf\game.log [info] [core] Toypad[Write] #B # # # C# # # # # # #C BE BE BE BE BE BE BE BE BE BE BE BE BE BE BE BE BE BE BE BE BE 
+GONE build\agent3\s4b\checks\joined\20261125-095932-s33-onsf\game.log [info] [core] Toypad[Write] #B # # #A B# # # C# B# #E D# # #F # # # # # # # # # # # # # # # # # # # 
+GONE build\agent3\s4b\checks\joined\20261125-095932-s33-onsf\game.log [info] [core] Toypad[Write] #B # # #A B# # #A # #A EC #D # # #F C# # # # # # # # # # # # # # # # # # 
+GONE build\agent3\s4b\checks\joined\20261125-095932-s33-onsf\game.log [info] [core] Toypad[Write] #B # # #A B# # CC # # #A CD #F #E #E #C # # # # # # # # # # # # # # # # # 
+GONE build\agent3\s4b\checks\joined\20261125-095932-s33-onsf\game.log [info] [core] Toypad[Write] #B # # #A B# #A B# DD # F# # A# # A# # # # # # # # # # # # # # # # # # # 
+## MARKER CHECK (fail marker above the baseline max per log; clean-exit missing)
+# NEW total 0, marker flags 0

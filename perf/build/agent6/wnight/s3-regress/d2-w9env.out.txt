@@ -1,0 +1,10 @@
+PASS 0001-q0-r1      expect OK                                 got OK
+PASS 0002-cold-q125  expect OK                                 got OK
+PASS 0003-off-r1     expect OK                                 got OK
+PASS 0004-q125-r1    expect env_set                            got MISMATCH: env_set {'LEGO_GPU_WAIT_BACKOFF_US': '250', 'LEGO_GPU_WAIT_SPIN_US': '30'} != matrix {'LEGO_GPU_WAIT_BACKOFF_US': '125', 'LEGO_GPU_WAIT_SPIN_US': '30'}; params.env {'LEGO_GPU_WAIT_BACKOFF_US': '250', 'LEGO_GPU_WAIT_SPIN_US': '30'} != matrix {'LEGO_GPU_WAIT_BACKOFF_US': '125', 'LEGO_GPU_WAIT_SPIN_US': '30'}; quantum 250 != env 125
+PASS 0005-q125-r2    expect quantum 250 != env 125             got MISMATCH: quantum 250 != env 125
+PASS 0006-q0-r2      expect 2 back-off lines                   got MISMATCH: 2 back-off lines (want 1)
+PASS 0007-off-r2     expect 1 back-off lines (want 0)          got MISMATCH: 1 back-off lines (want 0)
+PASS 0008-q0-r3      expect "is not a plain number"            got MISMATCH: 1 "is not a plain number" lines
+PASS 0009-off-r3     expect env_set                            got MISMATCH: env_set {'LEGO_GPU_WAIT_STATS': '1'} != matrix {}; params.env {'LEGO_GPU_WAIT_STATS': '1'} != matrix {}
+RESULT: PASS (0 case(s) failed)

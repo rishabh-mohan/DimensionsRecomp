@@ -1,0 +1,123 @@
+﻿Created At: 2026-11-25T06:52:41-06:00
+Completed At: 2026-11-25T06:52:42-06:00
+Created At: 2026-11-25T06:52:41-06:00
+Completed At: 2026-11-25T06:52:42-06:00
+Showing lines 1-118 of 118
+1: diff --git a/r19prep/orig/r19_gate.py b/r19_gate.py
+2: index d814dd2..ec2596c 100644
+3: --- a/r19prep/orig/r19_gate.py
+4: +++ b/r19_gate.py
+5: @@ -27,8 +27,14 @@ Row rules (OFF rows a, b, i; ON rows c, g, j, d, f, e):
+6:       no async counter line at all -> INCOMPLETE 'no split was due at this N' (row d under fallback A).
+7:    all  'Shutdown wedged past the close request; hard-exiting.' (legodimensions_app.h StartShutdownWatchdog):
+8:       ON rows -> FLAG, OFF rows -> INFO (first sighting was an off run, RESUME L179).
+9: +Options added for the live chain (r19prep/LAUNCH-R19.md):
+10: +  --bin DIR   bin identity (M10 N1): run.json bin_dir is DIR, and the run dir's legodimensions.exe, rexgpu-xenos.dll and
+11: +              rexruntime.dll have the sha256 that DIR/MANIFEST.txt lists. The exe is DFBE1D43 on every bin, so the #19 bin
+12: +              is told apart by rexgpu-xenos.dll. Wrong hash or bin_dir -> FAIL; no run dir/run.json/MANIFEST -> INCOMPLETE.
+13: +  --j1-info   row g16 (M10 C2: 'the j rule set; J1 INCOMPLETE is acceptable'): J1 full_waits = 0 is INFO, not INCOMPLETE.
+14:  """
+15:  import argparse
+16: +import hashlib
+17:  import json
+18:  import os
+19:  import sys
+20: @@ -45,6 +51,52 @@ WATCHDOG = 'Shutdown wedged past the close request; hard-exiting.'
+21:  S2_MSG = 'held_query > 0 in at least one split line'
+22:  J1_MSG = 'row j: full_waits > 0'
+23:  MINLINES_MSG = 'at least '
+24: +BIN_FILES = ('legodimensions.exe', 'rexgpu-xenos.dll', 'rexruntime.dll')
+25: +
+26: +
+27: +def manifest_sha(bin_dir):
+28: +    # MANIFEST.txt file table: name \t size \t mtime \t sha256 \t source
+29: +    out = {}
+30: +    with open(os.path.join(bin_dir, 'MANIFEST.txt'), 'r', encoding='utf-8', errors='replace') as fh:
+31: +        for line in fh:
+32: +            f = line.rstrip('\r\n').split('\t')
+33: +            if len(f) >= 4 and f[0] in BIN_FILES and len(f[3]) == 64:
+34: +                out[f[0]] = f[3].upper()
+35: +    return out
+36: +
+37: +
+38: +def sha256(path):
+39: +    h = hashlib.sha256()
+40: +    with open(path, 'rb') as fh:
+41: +        for b in iter(lambda: fh.read(1 << 20), b''):
+42: +            h.update(b)
+43: +    return h.hexdigest().upper()
+44: +
+45: +
+46: +def bin_check(res, run_dir, bin_dir):
+47: +    if not os.path.isdir(run_dir):
+48: +        res.check(False, 'bin identity: %s is not a run dir' % run_dir, incomplete=True)
+49: +        return
+50: +    try:
+51: +        want = manifest_sha(bin_dir)
+52: +    except OSError as e:
+53: +        res.check(False, 'bin identity: no MANIFEST.txt in %s (%s)' % (bin_dir, e), incomplete=True)
+54: +        return
+55: +    res.check(sorted(want) == sorted(BIN_FILES), 'bin identity: %s MANIFEST lists %s' % (bin_dir, sorted(want)),
+56: +              incomplete=True)
+57: +    try:
+58: +        with open(os.path.join(run_dir, 'run.json'), 'r', encoding='utf-8-sig') as fh:
+59: +            bd = json.load(fh).get('bin_dir') or ''
+60: +    except (OSError, ValueError) as e:
+61: +        res.check(False, 'bin identity: no readable run.json (%s)' % e, incomplete=True)
+62: +        return
+63: +    name = lambda p: os.path.basename(os.path.normpath(p)).lower()  # noqa: E731
+64: +    res.check(name(bd) == name(bin_dir), 'bin identity: run.json bin_dir %s (want %s)' % (bd or '-', bin_dir))
+65: +    for fn in BIN_FILES:
+66: +        p = os.path.join(run_dir, fn)
+67: +        got = sha256(p) if os.path.isfile(p) else None
+68: +        res.check(got is not None and got == want.get(fn), 'bin identity: run-dir %s %s == MANIFEST %s'
+69: +                  % (fn, (got or 'missing')[:16], (want.get(fn) or '-')[:16]))
+70:  
+71:  
+72:  def level_of(line):
+73: @@ -53,7 +105,7 @@ def level_of(line):
+74:      return parts[1] if len(parts) > 2 else ''
+75:  
+76:  
+77: -def gate(lines, row, n=None, min_lines=2, max_queued=3):
+78: +def gate(lines, row, n=None, min_lines=2, max_queued=3, j1_info=False):
+79:      res = sc.Result()
+80:      ev = sc.parse(lines)
+81:      raw = [l.rstrip('\r\n') for l in lines]
+82: @@ -114,6 +166,8 @@ def gate(lines, row, n=None, min_lines=2, max_queued=3):
+83:                  res.info('INFO(S2)   %s  [held_query gates only row e]' % msg)
+84:              elif tag == 'FAIL' and msg.startswith(S2_MSG) and not split_ctr:
+85:                  res.check(False, msg + '  [row e without any split line: nothing to judge]', incomplete=True)
+86: +            elif tag == 'FAIL' and msg.startswith(J1_MSG) and j1_info:
+87: +                res.info('INFO(J1)   %s  [--j1-info: row g16, M10 C2]' % msg)
+88:              elif tag == 'FAIL' and msg.startswith(J1_MSG):
+89:                  res.check(False, msg + '  [J1: FIFO never filled -> INCOMPLETE, not FAIL]', incomplete=True)
+90:              elif tag == 'INCOMPLETE' and msg.startswith(MINLINES_MSG) and not async_ctr:
+91: @@ -141,6 +195,8 @@ def main(argv=None):
+92:      ap.add_argument('--n', help='expected #18 split KB in the init line (the ready-N value; row j: 16)')
+93:      ap.add_argument('--min-lines', type=int, default=2)
+94:      ap.add_argument('--json')
+95: +    ap.add_argument('--bin', help='planned bin dir: check run.json bin_dir and the run-dir exe/dll sha256 vs its MANIFEST')
+96: +    ap.add_argument('--j1-info', action='store_true', help='row g16: J1 full_waits = 0 is INFO, not INCOMPLETE')
+97:      a = ap.parse_args(argv)
+98:      files = sc.log_files(a.path)
+99:      if not files:
+100: @@ -150,13 +206,17 @@ def main(argv=None):
+101:      for p in files:
+102:          with open(p, 'r', encoding='utf-8', errors='replace') as fh:
+103:              lines.extend(fh.readlines())
+104: -    res, flags = gate(lines, a.row, n=a.n, min_lines=a.min_lines)
+105: +    res, flags = gate(lines, a.row, n=a.n, min_lines=a.min_lines, j1_info=a.j1_info)
+106: +    if a.bin:
+107: +        bin_check(res, a.path if os.path.isdir(a.path) else os.path.dirname(os.path.abspath(a.path)), a.bin)
+108:      verdict = 'FAIL' if res.fails else ('INCOMPLETE' if res.incomplete else ('FLAG' if flags else 'PASS'))
+109:      print('r19_gate %s row %s: %s' % (a.path, a.row, ', '.join(os.path.basename(p) for p in files)))
+110:      for ln in res.lines:
+111:          print(ln)
+112:      print('RESULT: %s (%d failed, %d incomplete, %d flags)' % (verdict, len(res.fails), len(res.incomplete), len(flags)))
+113:      if a.json:
+114: +        if os.path.dirname(a.json):
+115: +            os.makedirs(os.path.dirname(a.json), exist_ok=True)
+116:          with open(a.json, 'w', encoding='ascii', newline='\n') as fh:
+117:              json.dump({'path': a.path, 'row': a.row, 'n': a.n, 'files': files, 'verdict': verdict,
+118:                         'checks': res.lines, 'fails': res.fails, 'incomplete': res.incomplete, 'flags': flags},

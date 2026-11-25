@@ -1,0 +1,57 @@
+  ok   msg strips 4 brackets
+  ok   BIN-PINS 4 bins
+  ok   pins nativefinal rexruntime
+  ok   pins devfinal no fidelityfx
+  ok   matrix switches
+  ok   harness switches
+  ok   cd_fails parse
+  ok   rotated logs joined oldest first
+  ok   miss_counts
+  ok   N5 tmp name = parent__run__pathhash (two matrices differ)
+  ok   N1 elapsed (harness / matrix / absent)
+  ok   fx F1 positive -> PASS
+  ok   fx F1 with back-off env -> FAIL
+  ok   fx F1 on devfinal-off-bin -> FAIL (bin)
+  ok   fx F2 xenos miss, clean switches -> HOLD (S2)
+  ok   fx F2 xenos miss with an SDK key -> FAIL, no HOLD
+  ok   fx F7 no miss-cache line, 0 misses -> HOLD (S1)
+  ok   fx F7 no miss-cache line, 1 miss -> FAIL
+  ok   fx F7 with the miss-cache ON line -> PASS
+  ok   fx F7 500 s -> FAIL (590 s floor)
+  ok   fx F6 nativefinal-off, env unset, build-default OFF line -> PASS
+  ok   fx F6 nativefinal-off, env 0, env OFF line -> PASS
+  ok   fx F6 env 0 but build-default line -> FAIL
+  ok   fx F6 on nativefinal-bin (ON line) -> FAIL
+  ok   fx F6 no miss-cache line, 0 misses -> HOLD
+  ok   fx F5w no miss-cache line, 0 misses -> HOLD (S1), N6 equal
+  ok   fx F5w with the miss-cache ON line -> PASS
+  ok   fx F5w without --ref -> HOLD (G4)
+  ok   fx F5 first launch -> PASS
+  ok   N5 joined log named selftest-fx__f5__<hash>
+  ok   fx F3 devfinal-off-bin + 12 old values + BACKOFF_US=off -> PASS
+  ok   fx F3 on devfinal-bin -> FAIL (bin)
+  ok   route files on disk = ROUTE_TIMEOUTS shas
+  ok   tail by-design lines = level-l lines - 7 (same wait_log text); the 240 s orange wait is not in the set
+  ok   route_timeouts: tail, 31 by-design -> PASS
+  ok   route_timeouts: tail, 29 of 31 -> PASS + NOTE
+  ok   route_timeouts: extra timeout on the 240 s orange wait -> FAIL
+  ok   route_timeouts: level-l numbering on the tail route -> FAIL
+  ok   route_timeouts: count != listed lines -> FAIL
+  ok   route_timeouts: unknown route sha -> FAIL
+  ok   fx F2 with an extra (non-design) timeout -> FAIL
+  ok   fx F2 steps 120/121, not stopped by script -> FAIL
+  ok   fx F2 tail route, 31 by-design timeouts, xenos PASS -> PASS
+  ok   s4b-V0f- as F2: route name/sha, steps, 31 timeouts by design, vortex, Toypad PASS
+  ok   s4b-V0f- as F2: common checks (exit .. bad strings) PASS except "C1 verify: on" (verify=1 row): ['bad string "C1 verify: on" x1']
+  ok   s4b-V0f- as F2: bin FAIL (old bin)
+  ok   s4b-07f- as F2: route name/sha, steps, 31 timeouts by design, vortex, Toypad PASS
+  ok   s4b-07f- as F2: common checks (exit .. bad strings) PASS except "C1 verify: on" (verify=1 row): ['bad string "C1 verify: on" x1']
+  ok   s4b-07f- as F2: bin FAIL (old bin)
+  ok   w6-gateB (timeout on line 22) as F2 -> timeout FAIL
+  ok   cg26L (27 of 31 timeouts) -> timeouts PASS + NOTE
+  ok   native4b n0 as F5 -> FAIL (bin, no miss-cache line)
+  ok   n0 vs itself: miss warnings <= ref
+  ok   win3 (devoff4b) as F1 -> FAIL (bin, no Final defaults lines)
+  ok   win3 (devoff4b) as F3 -> FAIL (bin devfinal-off)
+  ok   native4b n0 as F6 -> FAIL (bin nativefinal-off)
+SELFTEST 56/56

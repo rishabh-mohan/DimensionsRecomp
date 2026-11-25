@@ -1,0 +1,52 @@
+ok   rc=0 expect=0  good soak
+      | soak_check <workspace>\build\agent7\s4-r1s2\soak-check\selftest-tmp\good_soak row e: game.log
+      |            lines: async init 1, async counter 60, split counter 60, split init 1
+      | PASS       no 'staying off' / 'failed to create the submit thread' line
+      | PASS       one segment (one SetupContext): 1
+      | PASS       seg 1: async init line L2
+      | PASS       seg 1: every async counter line has the 9 keys
+      | PASS       seg 1: async counters never decrease over 60 lines
+      | PASS       seg 1: queued_max <= 3 (max 3)
+      | PASS       seg 1: chunks > 0 (last line L180: 60687)
+      | PASS       seg 1: every split counter line has the 7 keys
+      | PASS       seg 1: failed = 0 in every split line (60 lines)
+      | PASS       seg 1: split counters never decrease over 60 lines
+      | PASS       seg 1: merged async+split lines: frame and submission never decrease
+      | PASS       seg 1: chunks/splits consistent (every split went async)
+      | PASS       at least 2 async counter lines (found 60)
+      | PASS       held_query > 0 in at least one split line (queries ran)
+      |            rule 5, L3..L180: 35400 frames over 590.0 s
+      |              chunks         delta 60686        per frame 1.7143       per s 102.86
+      |              submissions    delta 96086        per frame 2.7143       per s 162.86
+      |              drains_waited  delta 7080         per frame 0.2000       per s 12.00
+      |              drain_wait_us  delta 283200       per frame 8.0000       per s 480.00
+      |              full_wait_us   delta 0            per frame 0.0000       per s 0.00
+      |              worker_us      delta 5461740      per frame 154.2864     per s 9257.19
+      | RESULT: PASS (0 failed, 0 incomplete)
+ok   rc=0 expect=0  good soak as a file path
+ok   rc=0 expect=0  row j with full waits
+ok   rc=1 expect=1  row j without full waits
+ok   rc=2 expect=2  no log at all
+ok   rc=2 expect=2  log without any #19 line
+ok   rc=1 expect=1  init only, no counter lines
+ok   rc=1 expect=1  async counter decreases
+ok   rc=1 expect=1  drains_waited decreases
+ok   rc=1 expect=1  queued_max = 4
+ok   rc=1 expect=1  chunks = 0 at the end
+ok   rc=1 expect=1  split failed = 1
+ok   rc=1 expect=1  no held_query
+ok   rc=1 expect=1  missing key in an async line
+ok   rc=1 expect=1  missing key in a split line
+ok   rc=1 expect=1  'failed to create the submit thread'
+ok   rc=1 expect=1  'needs d3d12_submit_split_kb above 0'
+ok   rc=1 expect=1  init line missing, no rotation
+ok   rc=2 expect=2  rotated, init in a dropped file
+ok   rc=0 expect=0  rotated, both files kept
+ok   rc=1 expect=1  rotated files in the wrong order (game.log older)
+ok   rc=1 expect=1  second SetupContext (two segments)
+ok   rc=1 expect=1  merged frame order broken
+ok   rc=1 expect=1  chunks/splits inconsistent
+ok   rc=2 expect=2  one async line only (min-lines 2)
+ok   rc=0 expect=0  CRLF log
+
+SELFTEST: PASS (26 of 26 cases as expected)

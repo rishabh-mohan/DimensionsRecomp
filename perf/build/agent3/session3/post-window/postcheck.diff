@@ -1,0 +1,53 @@
+﻿diff --git a/build/agent3/s4b/postcheck.ps1 "b/build\\agent3\\session3\\post-window/postcheck.ps1"
+index ff2cc3d..2667642 100644
+--- a/build/agent3/s4b/postcheck.ps1
++++ "b/build\\agent3\\session3\\post-window/postcheck.ps1"
+@@ -57,6 +57,23 @@ function WC([string]$id, [string]$run, [string]$arm) {
+     & python -B build\agent3\session3\wc_proof.py $run $arm *> (Join-Path $logs "$id.wc.txt")
+     Say "wc $id $arm (exit $LASTEXITCODE): $run"
+ }
++# post-window (M3): #33 row 1a/1b with Agent 6's kit (build\agent6\s33-popin\TESTPLAN.md): RUN-S33-LOGDIFF.cmd, ref = the
++# OFF arm, never --allow-new for no_wait; the sf row also gets s33_fields.py. Writes logs\<id>.s33.txt and
++# checks\s33-row1a|s33-row1b\. Exit codes as the kit's (0 = PASS).
++function S33([string]$id, [string]$bArm, [string]$bRun, [string]$oArm, [string]$oRun) {
++    while (Test-Path -LiteralPath $hold) { Start-Sleep -Seconds 10 }
++    $f = Join-Path $logs "$id.s33.txt"
++    if (-not $bRun) { Say "s33 $id SKIP: no $bArm run"; "SKIP: no $bArm run" | Set-Content -LiteralPath $f; return }
++    $row = if ($oArm -eq 'off') { 's33-row1a' } else { 's33-row1b' }
++    & cmd /c build\agent6\s33-popin\RUN-S33-LOGDIFF.cmd --run "$bArm=$bRun" --run "$oArm=$oRun" --ref $oArm `
++        --matrix-json build\agent6\s33-popin\harness-s33.json --out "build\agent3\s4b\checks\$row" *> $f
++    $x = $LASTEXITCODE
++    if ($oArm -eq 'offsf') {
++        & python -B build\agent6\s33-popin\s33_fields.py --arm "offsf=$oRun" --out (Join-Path $logs "$id.s33fields.txt") *>> $f
++        $x = "$x/fields $LASTEXITCODE"
++    }
++    Say "s33 $id $row (exit $x): $bRun vs $oRun"
++}
+ while ((Get-Date) -lt $end) {
+     if (Test-Path -LiteralPath $hold) { Start-Sleep -Seconds 10; continue }
+     if (Test-Path -LiteralPath $state) {
+@@ -117,12 +134,23 @@ while ((Get-Date) -lt $end) {
+                 '^win3f$' { Check $id @('--cand', $c, '--base', (B 's4bL0' $LX2), '--allow-new', 'C1 keep-watch|GPU wait|TimerQueue|Host timer|precise') }
+                 '^c1npf$' { Check $id @('--cand', $c, '--base', (B 's4bL0' $LX2), '--allow-new', 'C1 keep-watch') }
+                 '^cg26L$' { Check $id @('--cand', $c, '--base', (B 's4bL0' $LX2)) }
++                # post-window (M3, build\agent3\session3\post-window\POSTWIN-PLAN.md): the C1-verify fix pair on
++                # devoff4bv-bin (base s4bL0, as s4bV0/s4b07r) and the #33 identity rows 1a/1b (attract-long, -GpuLog).
++                # s33off/s33offsf are checked against their own base arm; no allow-new for no_wait (TESTPLAN).
++                '^(s4bV0f|s4b07f)$' { Check $id @('--cand', $c, '--base', (B 's4bL0' $LX2), '--allow-new', 'C1 keep-watch|C1 verify') }
++                '^s33base2?$' { Check $id @('--cand', $c, '--base', (B 's4b03' $RA)) }
++                '^s33basesf$' { Check $id @('--cand', $c, '--base', (B 's33base' $RA), '--allow-new', 'slow frame|memexport full-buffer') }
++                '^s33off$' { Check $id @('--cand', $c, '--base', (B 's33base' $RA)) }
++                '^s33offsf$' { Check $id @('--cand', $c, '--base', (B 's33basesf' $RA)) }
+                 default { Check $id @('--cand', $c, '--base', $b1) }
+             }
+             if ($id -match '^(s4b08|s4b23$|w6|f10b(2|3|L)?$|s4bLV$|win3f$)') { P2c $id $c }
+-            if ($id -match '^(f10[ab](2|3|L)?|s4bLV|s4bV0|s4b07r|win3f|c1npf|cg26L)$') { F10 $id $c }
++            if ($id -match '^(f10[ab](2|3|L)?|s4bLV|s4bV0f?|s4b07[rf]|win3f|c1npf|cg26L)$') { F10 $id $c }
+             $wcArm = @{ win3f = 'win3'; c1npf = 'c1np'; cg26b0 = 'cg26'; cg26L = 'cg26' }[$id]
+             if ($wcArm) { WC $id $c $wcArm }
++            # #33 row 1a after s33off, row 1b after s33offsf (both arms' runs needed; else a SKIP line)
++            if ($id -eq 's33off') { S33 $id 'base' (B 's33base' '') 'off' $c }
++            if ($id -eq 's33offsf') { S33 $id 'basesf' (B 's33basesf' '') 'offsf' $c }
+         }
+     }
+     Start-Sleep -Seconds 10

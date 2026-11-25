@@ -1,0 +1,140 @@
+diff --git a/rexlego/src/gpu_wait_backoff.cpp b/rexlego/src/gpu_wait_backoff.cpp
+--- a/rexlego/src/gpu_wait_backoff.cpp
++++ b/rexlego/src/gpu_wait_backoff.cpp
+@@ -15,12 +15,17 @@
+ //   (L1's timeout reads KTHREAD+0x58, which the SDK never writes; L2 has none). So only poll timing changes.
+ //
+ // Switches (environment, read once on first use)
+-//   LEGO_GPU_WAIT_BACKOFF_US=<Q>  unset or empty = OFF (default): every hook calls the original at once.
++//   LEGO_GPU_WAIT_BACKOFF_US=<Q>  unset or empty = the build default, LEGO_GPU_WAIT_BACKOFF_DEFAULT_US (500: ON
++//                                 at Q = 500, the W9 read-out's pick; a negative build value means OFF).
++//                                 off (any case) = OFF, explicitly: every hook calls the original at once, and
++//                                 one "GPU wait back-off: OFF (...)" line is logged (unless stats prints its line).
+ //                                 Q = 0: pause phase, then SwitchToThread on every later poll (Agent 6's (e)).
+ //                                 Q > 0: pause phase, one SwitchToThread, then a Q us sleep per poll. Max 2000.
+ //   LEGO_GPU_WAIT_SPIN_US=<S>     pause phase of a stalled wait before the first yield. Default 30, max 200.
+ //                                 Q and S take decimal digits only; a larger value clamps to the max. Anything
+-//                                 else ("-5", "+5", " 5", "5us") logs a warning and is ignored: Q stays OFF, S 30.
++//                                 else ("-5", "+5", " 5", "5us") logs a warning and is ignored: Q is OFF, S 30.
++//                                 Bins built before the default changed read "off" the same way (a warning, OFF),
++//                                 so an off arm that sets it is OFF on old and new bins alike.
+ //   LEGO_GPU_WAIT_STATS=1         probe P1 counters (S4.1.4), one log line per 5 s. Works with the back-off OFF.
+ //                                 Profiling runs only; a STATS run never counts as a timing run.
+ //
+@@ -69,6 +74,12 @@
+ #define LEGO_GPU_WAIT_HOOK_GETDATA 0
+ #endif
+ 
++// Q when LEGO_GPU_WAIT_BACKOFF_US is unset or empty. 500 = ON at 500 us (W9 read-out); negative = OFF, the
++// default before Session 3. Set it per build with -DLEGO_GPU_WAIT_BACKOFF_DEFAULT_US=<n> (no CMake change needed).
++#ifndef LEGO_GPU_WAIT_BACKOFF_DEFAULT_US
++#define LEGO_GPU_WAIT_BACKOFF_DEFAULT_US 500
++#endif
++
+ extern "C" void __imp__sub_83FBF7D0(PPCContext& __restrict ctx, uint8_t* base);
+ extern "C" void __imp__sub_83FAF180(PPCContext& __restrict ctx, uint8_t* base);
+ #if LEGO_GPU_WAIT_HOOK_GETDATA
+@@ -88,6 +99,8 @@ constexpr uint32_t kLrGetDataTry = 0x82BDD000u;   // sub_82BDCFB8: the one try (
+ constexpr uint32_t kLrGetDataLoop = 0x82BDD028u;  // sub_82BDCFB8: the blocking loop (bl at 0x82BDD024)
+ constexpr uint32_t kGetDataNotReady = 1;          // S_FALSE
+ constexpr uint32_t kTimerWaitCapMs = 20;          // safety bound on one timer wait (Q is at most 2 ms)
++constexpr int kDefaultQuantumUs = LEGO_GPU_WAIT_BACKOFF_DEFAULT_US;
++static_assert(kDefaultQuantumUs <= 2000, "LEGO_GPU_WAIT_BACKOFF_DEFAULT_US is at most 2000 (negative = OFF)");
+ 
+ inline int64_t Qpc() {
+   LARGE_INTEGER t;
+@@ -97,7 +110,7 @@ inline int64_t Qpc() {
+ 
+ // ---- Config ----
+ struct Config {
+-  bool on = false;          // LEGO_GPU_WAIT_BACKOFF_US is set and valid
++  bool on = false;          // LEGO_GPU_WAIT_BACKOFF_US is valid, or unset with a build default >= 0
+   bool stats = false;       // LEGO_GPU_WAIT_STATS=1
+   uint32_t quantum_us = 0;  // Q
+   uint32_t spin_us = 30;    // S
+@@ -116,12 +129,25 @@ bool ParseUs(const char* s, uint32_t max, uint32_t* out) {
+   return true;
+ }
+ 
++// The explicit OFF value of LEGO_GPU_WAIT_BACKOFF_US: "off" in any case, nothing else.
++bool IsOff(const char* s) {
++  return s && (s[0] == 'o' || s[0] == 'O') && (s[1] == 'f' || s[1] == 'F') && (s[2] == 'f' || s[2] == 'F') &&
++         s[3] == '\0';
++}
++
+ const Config& Cfg() {
+   // Magic static: read once, thread-safe, on the first hooked call (after logging is up).
+   static const Config cfg = [] {
+     Config c;
+     const char* q = std::getenv("LEGO_GPU_WAIT_BACKOFF_US");
+-    c.on = ParseUs(q, 2000, &c.quantum_us);
++    const bool q_set = q && *q;
++    const bool q_off = IsOff(q);
++    if (!q_set) {
++      c.on = kDefaultQuantumUs >= 0;  // the build default
++      c.quantum_us = c.on ? static_cast<uint32_t>(kDefaultQuantumUs) : 0u;
++    } else if (!q_off) {
++      c.on = ParseUs(q, 2000, &c.quantum_us);
++    }
+     const char* sp = std::getenv("LEGO_GPU_WAIT_SPIN_US");
+     uint32_t s = 0;
+     const bool spin_ok = ParseUs(sp, 200, &s);
+@@ -131,7 +157,7 @@ const Config& Cfg() {
+     LARGE_INTEGER f;
+     if (QueryPerformanceFrequency(&f) && f.QuadPart > 0) c.qpf = f.QuadPart;
+     c.spin_ticks = c.qpf * c.spin_us / 1000000;
+-    if (q && *q && !c.on) {
++    if (q_set && !q_off && !c.on) {
+       REXLOG_WARN("GPU wait back-off: LEGO_GPU_WAIT_BACKOFF_US=\"{}\" is not a plain number; back-off stays OFF.", q);
+     }
+     if (sp && *sp && !spin_ok) {
+@@ -142,6 +168,8 @@ const Config& Cfg() {
+       REXLOG_INFO("GPU wait back-off: {} (quantum {} us, spin {} us); stats {}; GetData hook {}.",
+                   c.on ? "ON" : "OFF", c.quantum_us, c.spin_us, c.stats ? "ON" : "OFF",
+                   LEGO_GPU_WAIT_HOOK_GETDATA ? "built" : "not built (native GPU build)");
++    } else if (q_off) {
++      REXLOG_INFO("GPU wait back-off: OFF (LEGO_GPU_WAIT_BACKOFF_US={}).", q);
+     }
+     return c;
+   }();
+diff --git a/rexlego/src/gpu_native/shaders.cpp b/rexlego/src/gpu_native/shaders.cpp
+--- a/rexlego/src/gpu_native/shaders.cpp
++++ b/rexlego/src/gpu_native/shaders.cpp
+@@ -206,7 +206,7 @@ void CaptureMissingPlacementShader(u32 guest_address, u32 container_address,
+       capture.size(), stage, hash, "placement-containers");
+ }
+ 
+-// LEGO_NATIVE_SHADER_MISS_CACHE=1 (default OFF): remember a placement shader that missed the AOT index, so its
++// LEGO_NATIVE_SHADER_MISS_CACHE (default ON): remember a placement shader that missed the AOT index, so its
+ // later binds skip ReadableGuestSpan and FindShaderByMicrocode. An entry replays the miss (warning counter and
+ // line included) only while the pack generation is unchanged and a CPU write stamp, armed before the lookup,
+ // proves unchanged every byte the lookup could read. Capture runs (LEGO_DUMP_MISSING_SHADERS) keep the full path.
+@@ -219,9 +219,26 @@ bool ShaderMissEnvironmentSet(const char* name, bool zero_disables) {
+   return result;
+ }
+ 
++// LEGO_NATIVE_SHADER_MISS_CACHE unset or empty = the build default, LEGO_NATIVE_SHADER_MISS_CACHE_DEFAULT (1 = ON;
++// OFF bins build with -DLEGO_NATIVE_SHADER_MISS_CACHE_DEFAULT=0); "0" = OFF; any other value = ON.
++#ifndef LEGO_NATIVE_SHADER_MISS_CACHE_DEFAULT
++#define LEGO_NATIVE_SHADER_MISS_CACHE_DEFAULT 1
++#endif
++
+ bool ShaderMissCacheEnabled() {
+-  static const bool enabled = ShaderMissEnvironmentSet("LEGO_NATIVE_SHADER_MISS_CACHE", true) &&
+-                              !ShaderMissEnvironmentSet("LEGO_DUMP_MISSING_SHADERS", false);
++  static const bool enabled = [] {
++    char* value = nullptr;
++    size_t length = 0;
++    _dupenv_s(&value, &length, "LEGO_NATIVE_SHADER_MISS_CACHE");
++    const bool set = value && length > 1;
++    const bool requested = set ? std::strcmp(value, "0") != 0 : LEGO_NATIVE_SHADER_MISS_CACHE_DEFAULT != 0;
++    std::free(value);
++    const bool capture = ShaderMissEnvironmentSet("LEGO_DUMP_MISSING_SHADERS", false);
++    REXLOG_INFO("Native GPU: shader miss cache {} ({}{})", requested && !capture ? "ON" : "OFF",
++                set ? "LEGO_NATIVE_SHADER_MISS_CACHE set" : "build default",
++                capture ? "; LEGO_DUMP_MISSING_SHADERS keeps the full path" : "");
++    return requested && !capture;
++  }();
+   return enabled;
+ }
+ 

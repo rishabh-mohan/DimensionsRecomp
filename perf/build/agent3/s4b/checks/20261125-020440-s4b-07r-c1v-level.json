@@ -1,0 +1,456 @@
+{
+ "run": "20261125-020440-s4b-07r-c1v-level",
+ "row": "s4b07r",
+ "kind": "off",
+ "scenario": "level-l.txt",
+ "runjson": {
+  "exit_code": 0,
+  "exit_code_hex": "0x00000000",
+  "dumps": [],
+  "crash_events": [],
+  "wer_seen": false,
+  "close_method": "wm_close",
+  "close_seconds": 0.51,
+  "elapsed_s": 565.62,
+  "seconds_requested": 600,
+  "cvars": {
+   "physical_protect_hold_global_lock": "true",
+   "physical_protect_keep_watch": "true",
+   "physical_protect_keep_watch_verify": "true"
+  },
+  "exited_early": false,
+  "env_extra": {},
+  "steps": "119/119"
+ },
+ "summary": {
+  "verdict": "RUNNING",
+  "first_frame_s": 8.0,
+  "levels": {
+   "info": 385,
+   "warning": 195
+  },
+  "unknown_cvars": [],
+  "errors": []
+ },
+ "log_files": [
+  "game.log"
+ ],
+ "families": {
+  "c1_any": 28,
+  "c1_init_on": 1,
+  "c1_init_blocked": 0,
+  "c1_init_nohold": 0,
+  "c1_first": 1,
+  "c1_kept": 26,
+  "c1_blocked": 0,
+  "c1_verify_on": 1,
+  "c1_verify_f": 51,
+  "recovered_stale": 0,
+  "unhandled_phys": 0,
+  "protect_failed": 0,
+  "split_init": 0,
+  "split": 0,
+  "deferred_counters": 0,
+  "gpu_wait": 0,
+  "gpu_wait_stats": 0,
+  "gpu_wait_backoff": 0,
+  "gpu_wait_on": 0,
+  "memexport": 0,
+  "slow_frame": 0,
+  "s4_upload_hash": 0,
+  "precise_wait": 0,
+  "miss_cache": 0,
+  "stuck_lock": 0,
+  "minidump": 0,
+  "fatal": 0,
+  "clean_exit": 1,
+  "debug_layer": 0,
+  "dred": 0,
+  "d3d12_msg": 0,
+  "k": 0,
+  "c1_other": 0
+ },
+ "levels": {
+  "info": 385,
+  "warning": 195
+ },
+ "lines": {
+  "c1_any": {
+   "first": [
+    "[2026-11-25 02:04:41.719] [info] [sys] [t19844] C1 keep-watch: on (with physical_protect_hold_global_lock)",
+    "[2026-11-25 02:04:42.961] [info] [sys] [t36700] C1 keep-watch: first kept protect at ED19F000, 299892736 bytes",
+    "[2026-11-25 02:04:42.962] [info] [sys] [t36700] C1 keep-watch: 2 protects kept so far"
+   ],
+   "last": [
+    "[2026-11-25 02:12:57.571] [info] [sys] [t36700] C1 keep-watch: 53248 protects kept so far",
+    "[2026-11-25 02:13:02.562] [info] [sys] [t22872] C1 keep-watch: 57344 protects kept so far",
+    "[2026-11-25 02:13:27.009] [info] [sys] [t36700] C1 keep-watch: 61440 protects kept so far"
+   ]
+  },
+  "c1_verify_on": {
+   "first": [
+    "[2026-11-25 02:04:45.706] [info] [gpu] [t39688] C1 verify: on. Hashing CPU uploads; K checks keep-watch protects, F checks write faults"
+   ],
+   "last": []
+  },
+  "c1_verify_f": {
+   "first": [
+    "[2026-11-25 02:04:46.971] [warning] [gpu] [t30940] C1 verify F: page 01B9A000 changed since its upload (1 so far)",
+    "[2026-11-25 02:04:51.413] [warning] [gpu] [t30940] C1 verify F: page 01DF1000 changed since its upload (2 so far)",
+    "[2026-11-25 02:04:51.782] [warning] [gpu] [t30940] C1 verify F: page 01E09000 changed since its upload (3 so far)"
+   ],
+   "last": [
+    "[2026-11-25 02:09:06.451] [warning] [gpu] [t30940] C1 verify F: page 020FA000 changed since its upload (49 so far)",
+    "[2026-11-25 02:09:07.326] [warning] [gpu] [t30940] C1 verify F: page 0221D000 changed since its upload (50 so far)",
+    "[2026-11-25 02:09:22.579] [warning] [gpu] [t30940] C1 verify F: page 020BF000 changed since its upload (51 so far)"
+   ]
+  }
+ },
+ "c1_kept_last": 61440,
+ "frame_rows": 10383,
+ "logdiff": {
+  "bases": [
+   "20261122-210059-s4b-L0-off-level"
+  ],
+  "base_scenario": "level-l.txt",
+  "NEW": 1,
+  "NEW_allowed": 0,
+  "MORE": 0,
+  "MORE_allowed": 0,
+  "GONE": 74,
+  "GONE_unexpected": 0,
+  "FLAG": 0,
+  "NEW_info_other": 5,
+  "NEW_info_allowed": 0,
+  "rc": 0,
+  "new": [
+   "NEW build\\agent3\\runs\\20261125-020440-s4b-07r-c1v-level\\game.log x51 [warning] [gpu] C# verify F: page #h changed since its upload (# so far)"
+  ],
+  "new_allowed": [],
+  "more": [],
+  "gone_unexpected": [],
+  "flag": [],
+  "new_info_other": [
+   "NEW build\\agent3\\runs\\20261125-020440-s4b-07r-c1v-level\\game.log x1 [info] [gpu] C# verify: on. Hashing CPU uploads; K checks keep-watch protects, F checks write faults",
+   "NEW build\\agent3\\runs\\20261125-020440-s4b-07r-c1v-level\\game.log x26 [info] [sys] C# keep-watch: # protects kept so far",
+   "NEW build\\agent3\\runs\\20261125-020440-s4b-07r-c1v-level\\game.log x1 [info] [sys] C# keep-watch: first kept protect at #h, #h bytes",
+   "NEW build\\agent3\\runs\\20261125-020440-s4b-07r-c1v-level\\game.log x1 [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)",
+   "NEW build\\agent3\\runs\\20261125-020440-s4b-07r-c1v-level\\game.log x51 [warning] [gpu] C# verify F: page #h changed since its upload (# so far)"
+  ],
+  "new_info_allowed": []
+ },
+ "scenes": {
+  "base": "20261122-210059-s4b-L0-off-level",
+  "missing_in_cand": [
+   "788/31613",
+   "790/31625",
+   "841/31696"
+  ],
+  "extra_in_cand": [],
+  "cand_major": {
+   "220/534": 116.9,
+   "218/222": 99.8,
+   "220/528": 21.6,
+   "219/226": 15.4,
+   "594/2813": 11.0,
+   "226/1022": 6.3
+  },
+  "base_major": {
+   "220/534": 81.5,
+   "218/222": 25.7,
+   "226/1022": 23.8,
+   "220/528": 17.3,
+   "219/226": 14.9,
+   "594/2813": 3.6,
+   "788/31613": 2.6,
+   "841/31696": 2.6,
+   "790/31625": 2.2
+  }
+ },
+ "marks": {
+  "prefix": 4,
+  "prefix_diff": [],
+  "all_diff": 8,
+  "cand": {
+   "first-frame": "218/222",
+   "title": "226/1022",
+   "pads-white": "220/528",
+   "tags-placed": "220/528",
+   "m01": "220/528",
+   "m02": "220/528",
+   "m03": "220/534",
+   "m04": "220/534",
+   "m05": "220/534",
+   "m06": "220/534",
+   "m07": "220/534",
+   "m08": "220/534",
+   "m09": "220/534",
+   "m10": "220/534",
+   "story-load": "220/534",
+   "vortex": "9043/1010092",
+   "v-idle": "770/112300",
+   "v-start": "791/114844",
+   "v-start-a": "789/125742",
+   "settled": "787/124526",
+   "end": "795/126830"
+  }
+ },
+ "threads": {
+  "window_s": 526.5,
+  "window": [
+   20.0,
+   546.5
+  ],
+  "by_name": {
+   "(unnamed)": {
+    "pct": 6.64,
+    "threads": 34
+   },
+   "rex::thread::TimerQueue": {
+    "pct": 18.66,
+    "threads": 1
+   },
+   "DeviceHotplugThread": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "D3D Background Thread 0": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "D3D Background Thread 1": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "D3D Background Thread 2": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "D3D Background Thread 3": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "0x16c00001": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "0xc0550001": {
+    "pct": 2.29,
+    "threads": 1
+   },
+   "XMA Decoder (F8000010)": {
+    "pct": 0.31,
+    "threads": 1
+   },
+   "Audio Worker (F8000014)": {
+    "pct": 0.91,
+    "threads": 1
+   },
+   "GPU Commands (F8000018)": {
+    "pct": 62.78,
+    "threads": 1
+   },
+   "GPU VSync (F800001C)": {
+    "pct": 0.95,
+    "threads": 1
+   },
+   "D3D12 Pipelines": {
+    "pct": 0.79,
+    "threads": 9
+   },
+   "Kernel Dispatch (F8000028)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "Main XThread (F800002C)": {
+    "pct": 13.88,
+    "threads": 1
+   },
+   "D3D12 Storage writer": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread7738 (F8000070)": {
+    "pct": 0.12,
+    "threads": 1
+   },
+   "XThread5958 (F80000F4)": {
+    "pct": 7.64,
+    "threads": 1
+   },
+   "XThread9C14 (F80000FC)": {
+    "pct": 0.09,
+    "threads": 1
+   },
+   "XThread5170 (F8000104)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread9EBC (F800010C)": {
+    "pct": 0.8,
+    "threads": 1
+   },
+   "XThreadACD8 (F8000114)": {
+    "pct": 1.3,
+    "threads": 1
+   },
+   "XThread9210 (F8000120)": {
+    "pct": 0.04,
+    "threads": 1
+   },
+   "XThread8E58 (F8000124)": {
+    "pct": 1.27,
+    "threads": 1
+   },
+   "XThread9FD8 (F8000128)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread5E08 (F8000140)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread9B68 (F8000144)": {
+    "pct": 4.3,
+    "threads": 1
+   },
+   "SDLWASAPIMgmt": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "SDLAudioP19": {
+    "pct": 0.39,
+    "threads": 1
+   },
+   "XThread7E20 (F8000164)": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "XThread4144 (F800016C)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThread6C74 (F8000188)": {
+    "pct": 0.07,
+    "threads": 1
+   },
+   "XThread1EE0 (F8000190)": {
+    "pct": 0.42,
+    "threads": 1
+   },
+   "XThread8AA4 (F8000198)": {
+    "pct": 0.36,
+    "threads": 1
+   },
+   "XThread78DC (F80001A8)": {
+    "pct": 62.05,
+    "threads": 1
+   },
+   "XThreadB054 (F80001BC)": {
+    "pct": 0.17,
+    "threads": 1
+   },
+   "XThread5E64 (F800026C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread7BB4 (F80002BC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread5794 (F80002C4)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread91F8 (F80002CC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread5AC0 (F80002DC)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThreadB3D8 (F800031C)": {
+    "pct": 0.0,
+    "threads": 1
+   }
+  },
+  "ticks": {
+   "28752": {
+    "name": "rex::thread::TimerQueue",
+    "samples": 283,
+    "steps": 282,
+    "non_rising": 0,
+    "non_rising_at_s": [],
+    "step_s_median": 2.0,
+    "span_s": [
+     -7.5,
+     556.5
+    ]
+   }
+  }
+ },
+ "slow_state": {
+  "rows": 558,
+  "onset_s": null,
+  "slow_pct": 0.0,
+  "e_eff_mhz_median": 2606,
+  "cpu_util_pct_median": 66.9,
+  "slow": false
+ },
+ "hang_cpu": [],
+ "host_quiet": {
+  "rows": 18,
+  "busy_rows": 0
+ },
+ "toypad": {
+  "confirms": 3,
+  "result": "listener=True trigger=True placed=True load-confirms=3/3 then=off remove-confirms=0"
+ },
+ "proofs": [
+  {
+   "ok": true,
+   "text": "init \"C1 keep-watch: on (with physical_protect_hold_global_lock)\" x1"
+  },
+  {
+   "ok": true,
+   "text": "\"first kept protect\" x1 (gate D / positive control)"
+  },
+  {
+   "ok": true,
+   "text": "kept count: last \"kept so far\" = 61440 (26 such lines)"
+  },
+  {
+   "ok": true,
+   "text": "C1 verify armed: \"C1 verify: on. Hashing CPU uploads ...\" x1 (without it K = 0 proves nothing)"
+  },
+  {
+   "ok": true,
+   "text": "verify-mismatch (K) lines 0 (gate A / G5, through the level load (last mark end))"
+  },
+  {
+   "ok": null,
+   "text": "C1 verify F lines (write-fault side, not gate A): 51 2:04:46.971] [warning] [gpu] [t30940] C1 verify F: page 01B9A000 changed since its upload (1 so far)"
+  },
+  {
+   "ok": true,
+   "text": "kept count rises through the level load (last mark end): first 2 -> last 61440 (26 \"kept so far\" lines)"
+  },
+  {
+   "ok": true,
+   "text": "gate D zero lines: \"Recovered stale physical page protection\" 0, \"Unhandled guest physical write fault\" 0"
+  },
+  {
+   "ok": true,
+   "text": "no blocked/no-hold C1 line (0/0/0)"
+  },
+  {
+   "ok": true,
+   "text": "G8 bad lines: \"PhysicalHeap::Protect failed\" 0, \"Recovered stale physical page protection\" 0, \"Unhandled guest physical write fault\" 0"
+  }
+ ],
+ "base_misses": [
+  "logdiff NEW 1"
+ ],
+ "hint": "LOOK"
+}

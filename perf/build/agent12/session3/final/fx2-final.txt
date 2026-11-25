@@ -1,0 +1,45 @@
+NOTE  run <workspace>\build\agent3\runs\20261125-082250-fx2-devfinal-level (harness); logs ['game.log'], 1293 lines
+NOTE  elapsed 584.84 s (elapsed_s)
+NOTE  cvars {'framerate_limit': '0'}; env (LEGO_*) {}
+PASS  exit_code 0 (0x00000000)
+PASS  exited_early False
+PASS  WER False
+PASS  dialogs None
+PASS  crash_events []
+PASS  dumps 0 in dir, run.json []
+PASS  close wm_close
+PASS  "Title terminated" x1 (clean exit)
+PASS  bad string "Recovered stale physical page protection" x0
+PASS  bad string "Unhandled guest physical write fault" x0
+PASS  bad string "PhysicalHeap::Protect failed" x0
+PASS  bad string "BaseHeap::Protect failed" x0
+PASS  bad string "is not a plain number" x0
+PASS  bad string "C1 verify: on" x0
+PASS  bad string "STUCK-LOCK" x0
+PASS  bad string "REX_FATAL" x0
+PASS  bad string "Minidump written to" x0
+PASS  bad string "still not acquired after" x0
+PASS  run.json bin_dir <workspace>\build\agent2\devfinal-bin (want build/agent2/devfinal-bin)
+PASS  devfinal-bin MANIFEST F9C2BE722E5B3517 = BIN-PINS F9C2BE722E5B3517
+PASS  run-dir MANIFEST.txt copy = pin
+PASS  run.json exe_sha256 = pin
+PASS  run-dir legodimensions.exe 545D28B9DDEAD51E (pin 545D28B9DDEAD51E)
+PASS  run-dir rexruntime.dll C5BC627BB2E83CF2 (pin C5BC627BB2E83CF2)
+PASS  run-dir rexgpu-xenos.dll CB3A2CC967A9BE81 (pin CB3A2CC967A9BE81)
+PASS  no SDK default key set on the command line/toml: {}
+PASS  framerate_limit=0 (0)
+PASS  env has no LEGO_GPU_WAIT_*: {}
+PASS  check-defaults.py D9936C56C5E04B98 (rated D9936C56C5E04B98)
+NOTE  check-defaults --mode xenos exit 0; RESULT PASS
+PASS  check-defaults --mode xenos PASS
+PASS  "C1 keep-watch: on (with physical_protect_hold_global_lock)" x1
+FAIL  elapsed 584.84 s (elapsed_s; level route, >= 10 min; 590 s floor)
+PASS  route <workspace>\build\agent3\final-fx\level-l-tail.txt
+PASS  vortex mark reached (marks ['v-start-a', 'settled', 'end', 'tail'])
+PASS  route steps 121/121, stopped_by_script True
+PASS  route script_sha256 BE08A790 = level-l-tail.txt
+PASS  timeouts 30 = timeout_lines count 30
+PASS  timeouts on by-design wait lines only: 30 of 31 by-design
+NOTE  1 by-design waits did not time out (lines [48]); normal on level-l (27-31 seen)
+PASS  Toypad lines 1028
+F-GATE F2 20261125-082250-fx2-devfinal-level: FAIL

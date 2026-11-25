@@ -1,0 +1,116 @@
+diff --git a/r19prep/orig/test_r19.py b/test_r19.py
+index 82e7f64..999251c 100644
+--- a/r19prep/orig/test_r19.py
++++ b/test_r19.py
+@@ -62,8 +62,8 @@ def on_log(hq=5, fw=0, qm=2, n=64, extra=None, drop_async=False, wd=False):
+ CASES = []
+ 
+ 
+-def case(name, lines, row, want, n=None):
+-    CASES.append((name, lines, row, want, n))
++def case(name, lines, row, want, n=None, j1=False):
++    CASES.append((name, lines, row, want, n, j1))
+ 
+ 
+ # row a
+@@ -108,15 +108,37 @@ case('e good', on_log(hq=5), 'e', 'PASS', '64')
+ case('e no queries', on_log(hq=0), 'e', 'FAIL', '64')
+ case('e no split at all', on_log(drop_async=True), 'e', 'INCOMPLETE', '64')
+ case('e watchdog -> FLAG', on_log(hq=5, wd=True), 'e', 'FLAG', '64')
++# row g16 = j rules with --j1-info (M10 C2)
++case('g16 fifo never filled, --j1-info', on_log(fw=0, n=16), 'j', 'PASS', '16', j1=True)
++case('g16 queued_max 4, --j1-info', on_log(fw=0, qm=4, n=16), 'j', 'FAIL', '16', j1=True)
++case('g16 no split at all, --j1-info', on_log(drop_async=True, n=16), 'j', 'INCOMPLETE', '16', j1=True)
+ 
+ 
+-def verdict(lines, row, n):
+-    res, flags = g.gate(lines, row, n=n)
++def verdict(lines, row, n, j1=False):
++    res, flags = g.gate(lines, row, n=n, j1_info=j1)
+     return 'FAIL' if res.fails else ('INCOMPLETE' if res.incomplete else ('FLAG' if flags else 'PASS')), res
+ 
+ 
++def bin_cases():
++    # read-only, on a real run (s4bN16, devoff4b-bin): right bin -> PASS, #19 bin -> FAIL (rexgpu + bin_dir)
++    ws = q.WS_DEFAULT
++    run = os.path.join(ws, 'build', 'agent3', 'runs', '20261125-014239-s4b-N16-title-split16')
++    out = []
++    if not os.path.isdir(run):
++        return [('bin: s4bN16 run dir present', False)]
++    for bdir, want_fail in (('devoff4b-bin', 0), ('devoff4b-r19-bin', 2)):
++        res = g.sc.Result()
++        g.bin_check(res, run, os.path.join(ws, 'build', 'agent2', bdir))
++        out.append(('bin: s4bN16 vs %s -> %d FAIL, 0 INCOMPLETE' % (bdir, want_fail),
++                    len(res.fails) == want_fail and not res.incomplete))
++    res = g.sc.Result()
++    g.bin_check(res, os.path.join(run, 'game.log'), os.path.join(ws, 'build', 'agent2', 'devoff4b-bin'))
++    out.append(('bin: a log file, not a run dir -> INCOMPLETE', bool(res.incomplete) and not res.fails))
++    return out
++
++
+ def queue_cases():
+-    rows, errs = q.load_rows(os.path.join(HERE, 'queue-r19.jsonl'))
++    rows, errs = q.load_rows(os.path.join(HERE, 'r19prep', 'queue-r19-live.jsonl'))
+     out = []
+ 
+     def nfail(rs):
+@@ -165,13 +187,48 @@ def queue_cases():
+     out.append(('mut: duplicate id -> FAIL', mut(lambda rs: find(rs, 'r19b').__setitem__('id', 'r19a'))))
+     out.append(('mut: existing id clash -> FAIL',
+                 sum(1 for t, _ in q.check(rows, {'r19e'}) if t == 'FAIL') > 0))
++    # live chain (C2): i16/g16 and the path markers
++    G = 'build\\agent3\\session3\\'
++
++    def swap(a, b):
++        def f(rs):
++            ia = [k for k, (_, r) in enumerate(rs) if r['id'] == a][0]
++            ib = [k for k, (_, r) in enumerate(rs) if r['id'] == b][0]
++            rs[ia], rs[ib] = rs[ib], rs[ia]
++        return f
++    out.append(('mut: i and i16 swapped -> FAIL', mut(swap('r19i', 'r19i16'))))
++    out.append(('mut: unless dropped from i16 -> FAIL', mut(lambda rs: find(rs, 'r19i16').pop('unless'))))
++    out.append(('mut: r19-pathN dropped from c -> FAIL', mut(
++        lambda rs: find(rs, 'r19c')['needs'].remove(G + 'r19-pathN'))))
++    out.append(('mut: j chained on r19-ok-g16 -> FAIL', mut(
++        lambda rs: find(rs, 'r19j')['needs'].__setitem__(-1, G + 'r19-ok-g16'))))
++    out.append(('mut: path marker on d -> FAIL', mut(lambda rs: find(rs, 'r19d')['needs'].append(G + 'r19-path16'))))
++    out.append(('mut: g16 at <N> -> FAIL', mut(lambda rs: find(rs, 'r19g16')['args'].__setitem__(
++        find(rs, 'r19g16')['args'].index('-Cvar') + 1, 'd3d12_debug=true;d3d12_submit_split_kb=<N>;'
++        'd3d12_async_submit=true'))))
+     return out
+ 
+ 
++def path_cases():
++    # r19_path.path (M10 r19prep N1): path16 also needs flags == []
++    sys.path.insert(0, os.path.join(HERE, 'r19prep'))
++    import r19_path as p  # noqa: E402
++    inc = [p.NOSPLIT_I + ' (got 0)']
++    return [
++        ('path: PASS -> r19-pathN', p.path({'verdict': 'PASS', 'fails': [], 'incomplete': [], 'flags': []}) == 'r19-pathN'),
++        ('path: only no-split INCOMPLETE -> r19-path16',
++         p.path({'verdict': 'INCOMPLETE', 'fails': [], 'incomplete': inc, 'flags': []}) == 'r19-path16'),
++        ('path: no-split INCOMPLETE + FLAG -> STOP',
++         p.path({'verdict': 'INCOMPLETE', 'fails': [], 'incomplete': inc, 'flags': ['watchdog line']}) == 'STOP'),
++        ('path: no-split INCOMPLETE + FAIL -> STOP',
++         p.path({'verdict': 'FAIL', 'fails': ['x'], 'incomplete': inc, 'flags': []}) == 'STOP'),
++    ]
++
++
+ def main():
+     n = ok = 0
+-    for name, lines, row, want, nkb in CASES:
+-        got, res = verdict(lines, row, nkb)
++    for name, lines, row, want, nkb, j1 in CASES:
++        got, res = verdict(lines, row, nkb, j1)
+         n += 1
+         good = got == want
+         ok += good
+@@ -179,7 +236,7 @@ def main():
+         if not good:
+             for ln in res.lines:
+                 print('        ' + ln)
+-    for name, good in queue_cases():
++    for name, good in bin_cases() + queue_cases() + path_cases():
+         n += 1
+         ok += bool(good)
+         print('%s  queue %s' % ('ok  ' if good else 'BAD ', name))

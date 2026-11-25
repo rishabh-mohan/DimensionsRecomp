@@ -1,0 +1,480 @@
+{
+ "run": "20261125-063859-s4b-07f-c1v-level-vfix",
+ "row": "s4b07f",
+ "kind": "off",
+ "scenario": "level-l.txt",
+ "runjson": {
+  "exit_code": 0,
+  "exit_code_hex": "0x00000000",
+  "dumps": [],
+  "crash_events": [],
+  "wer_seen": false,
+  "close_method": "wm_close",
+  "close_seconds": 0.39,
+  "elapsed_s": 551.45,
+  "seconds_requested": 600,
+  "cvars": {
+   "physical_protect_hold_global_lock": "true",
+   "physical_protect_keep_watch": "true",
+   "physical_protect_keep_watch_verify": "true"
+  },
+  "exited_early": false,
+  "env_extra": {},
+  "steps": "119/119"
+ },
+ "summary": {
+  "verdict": "RUNNING",
+  "first_frame_s": 8.0,
+  "levels": {
+   "info": 460,
+   "warning": 144
+  },
+  "unknown_cvars": [],
+  "errors": []
+ },
+ "log_files": [
+  "game.log"
+ ],
+ "families": {
+  "c1_any": 29,
+  "c1_init_on": 1,
+  "c1_init_blocked": 0,
+  "c1_init_nohold": 0,
+  "c1_first": 1,
+  "c1_kept": 27,
+  "c1_blocked": 0,
+  "c1_verify_on": 1,
+  "c1_verify_f": 0,
+  "recovered_stale": 0,
+  "unhandled_phys": 0,
+  "protect_failed": 0,
+  "split_init": 0,
+  "split": 0,
+  "deferred_counters": 0,
+  "gpu_wait": 0,
+  "gpu_wait_stats": 0,
+  "gpu_wait_backoff": 0,
+  "gpu_wait_on": 0,
+  "memexport": 0,
+  "slow_frame": 0,
+  "s4_upload_hash": 0,
+  "precise_wait": 0,
+  "miss_cache": 0,
+  "stuck_lock": 0,
+  "minidump": 0,
+  "fatal": 0,
+  "clean_exit": 1,
+  "debug_layer": 0,
+  "dred": 0,
+  "d3d12_msg": 0,
+  "k": 0,
+  "c1_other": 0
+ },
+ "levels": {
+  "info": 460,
+  "warning": 144
+ },
+ "lines": {
+  "c1_any": {
+   "first": [
+    "[2026-11-25 06:39:01.533] [info] [sys] [t32936] C1 keep-watch: on (with physical_protect_hold_global_lock)",
+    "[2026-11-25 06:39:03.472] [info] [sys] [t22180] C1 keep-watch: first kept protect at ED19F000, 299892736 bytes",
+    "[2026-11-25 06:39:03.473] [info] [sys] [t22180] C1 keep-watch: 2 protects kept so far"
+   ],
+   "last": [
+    "[2026-11-25 06:47:04.720] [info] [sys] [t468] C1 keep-watch: 57344 protects kept so far",
+    "[2026-11-25 06:47:08.207] [info] [sys] [t468] C1 keep-watch: 61440 protects kept so far",
+    "[2026-11-25 06:47:48.832] [info] [sys] [t22180] C1 keep-watch: 65536 protects kept so far"
+   ]
+  },
+  "c1_verify_on": {
+   "first": [
+    "[2026-11-25 06:39:06.444] [info] [gpu] [t32900] C1 verify: on. Hashing CPU uploads; K checks keep-watch protects, F checks write faults"
+   ],
+   "last": []
+  }
+ },
+ "c1_kept_last": 65536,
+ "frame_rows": 11600,
+ "logdiff": {
+  "bases": [
+   "20261122-210059-s4b-L0-off-level"
+  ],
+  "base_scenario": "level-l.txt",
+  "NEW": 0,
+  "NEW_allowed": 0,
+  "MORE": 0,
+  "MORE_allowed": 0,
+  "GONE": 71,
+  "GONE_unexpected": 0,
+  "FLAG": 0,
+  "NEW_info_other": 5,
+  "NEW_info_allowed": 0,
+  "rc": 0,
+  "new": [],
+  "new_allowed": [],
+  "more": [],
+  "gone_unexpected": [],
+  "flag": [],
+  "new_info_other": [
+   "NEW build\\agent3\\runs\\20261125-063859-s4b-07f-c1v-level-vfix\\game.log x3 [info] [core] Toypad: pad # mode # lit FA # #E (on # off # count # speed #)",
+   "NEW build\\agent3\\runs\\20261125-063859-s4b-07f-c1v-level-vfix\\game.log x1 [info] [gpu] C# verify: on. Hashing CPU uploads; K checks keep-watch protects, F checks write faults",
+   "NEW build\\agent3\\runs\\20261125-063859-s4b-07f-c1v-level-vfix\\game.log x27 [info] [sys] C# keep-watch: # protects kept so far",
+   "NEW build\\agent3\\runs\\20261125-063859-s4b-07f-c1v-level-vfix\\game.log x1 [info] [sys] C# keep-watch: first kept protect at #h, #h bytes",
+   "NEW build\\agent3\\runs\\20261125-063859-s4b-07f-c1v-level-vfix\\game.log x1 [info] [sys] C# keep-watch: on (with physical_protect_hold_global_lock)"
+  ],
+  "new_info_allowed": []
+ },
+ "scenes": {
+  "base": "20261122-210059-s4b-L0-off-level",
+  "missing_in_cand": [
+   "788/31613",
+   "790/31625",
+   "841/31696"
+  ],
+  "extra_in_cand": [],
+  "cand_major": {
+   "220/534": 111.5,
+   "218/222": 81.3,
+   "220/528": 23.6,
+   "226/1022": 15.6,
+   "219/226": 14.9,
+   "594/2813": 13.1
+  },
+  "base_major": {
+   "220/534": 81.5,
+   "218/222": 25.7,
+   "226/1022": 23.8,
+   "220/528": 17.3,
+   "219/226": 14.9,
+   "594/2813": 3.6,
+   "788/31613": 2.6,
+   "841/31696": 2.6,
+   "790/31625": 2.2
+  }
+ },
+ "marks": {
+  "prefix": 4,
+  "prefix_diff": [
+   [
+    "pads-white",
+    "220/528",
+    "226/1022"
+   ]
+  ],
+  "all_diff": 9,
+  "cand": {
+   "first-frame": "218/222",
+   "title": "226/1022",
+   "pads-white": "226/1022",
+   "tags-placed": "220/528",
+   "m01": "220/528",
+   "m02": "220/528",
+   "m03": "220/534",
+   "m04": "220/534",
+   "m05": "220/534",
+   "m06": "220/534",
+   "m07": "220/534",
+   "m08": "220/534",
+   "m09": "220/534",
+   "m10": "220/534",
+   "story-load": "220/534",
+   "vortex": "4111/622261",
+   "v-idle": "771/113772",
+   "v-start": "794/116284",
+   "v-start-a": "793/129134",
+   "settled": "801/129134",
+   "end": "788/125294"
+  }
+ },
+ "threads": {
+  "window_s": 512.5,
+  "window": [
+   20.0,
+   532.5
+  ],
+  "by_name": {
+   "(unnamed)": {
+    "pct": 6.77,
+    "threads": 37
+   },
+   "rex::thread::TimerQueue": {
+    "pct": 16.13,
+    "threads": 1
+   },
+   "DeviceHotplugThread": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "D3D Background Thread 0": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "D3D Background Thread 1": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "D3D Background Thread 2": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "D3D Background Thread 3": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "0x16c00001": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "0xc0550001": {
+    "pct": 2.25,
+    "threads": 1
+   },
+   "XMA Decoder (F8000010)": {
+    "pct": 0.3,
+    "threads": 1
+   },
+   "Audio Worker (F8000014)": {
+    "pct": 0.8,
+    "threads": 1
+   },
+   "GPU Commands (F8000018)": {
+    "pct": 63.21,
+    "threads": 1
+   },
+   "GPU VSync (F800001C)": {
+    "pct": 0.86,
+    "threads": 1
+   },
+   "D3D12 Pipelines": {
+    "pct": 0.88,
+    "threads": 9
+   },
+   "Kernel Dispatch (F8000028)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "Main XThread (F800002C)": {
+    "pct": 14.25,
+    "threads": 1
+   },
+   "D3D12 Storage writer": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread9334 (F8000070)": {
+    "pct": 0.15,
+    "threads": 1
+   },
+   "XThread01D4 (F80000F4)": {
+    "pct": 7.28,
+    "threads": 1
+   },
+   "XThread4524 (F80000FC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread8F8C (F8000104)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread78EC (F800010C)": {
+    "pct": 0.74,
+    "threads": 1
+   },
+   "XThread841C (F8000114)": {
+    "pct": 1.16,
+    "threads": 1
+   },
+   "XThreadA760 (F8000120)": {
+    "pct": 0.03,
+    "threads": 1
+   },
+   "XThread77A8 (F8000128)": {
+    "pct": 1.8,
+    "threads": 1
+   },
+   "XThread4E70 (F800012C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThreadAA74 (F8000140)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread684C (F8000144)": {
+    "pct": 4.23,
+    "threads": 1
+   },
+   "SDLWASAPIMgmt": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "SDLAudioP19": {
+    "pct": 0.28,
+    "threads": 1
+   },
+   "XThread5648 (F8000164)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread75F8 (F800016C)": {
+    "pct": 0.02,
+    "threads": 1
+   },
+   "XThread810C (F8000188)": {
+    "pct": 0.08,
+    "threads": 1
+   },
+   "XThread9054 (F8000190)": {
+    "pct": 0.42,
+    "threads": 1
+   },
+   "XThread34BC (F8000198)": {
+    "pct": 0.4,
+    "threads": 1
+   },
+   "XThread6F18 (F80001A8)": {
+    "pct": 62.66,
+    "threads": 1
+   },
+   "XThreadA1A0 (F80001BC)": {
+    "pct": 0.13,
+    "threads": 1
+   },
+   "XThreadA090 (F800026C)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread4598 (F80002B4)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThread4BDC (F80002BC)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThreadB2CC (F80002C4)": {
+    "pct": 0.0,
+    "threads": 1
+   },
+   "XThreadB324 (F80002D8)": {
+    "pct": 0.01,
+    "threads": 1
+   },
+   "XThreadAF58 (F800033C)": {
+    "pct": 0.01,
+    "threads": 1
+   }
+  },
+  "ticks": {
+   "29784": {
+    "name": "rex::thread::TimerQueue",
+    "samples": 276,
+    "steps": 275,
+    "non_rising": 0,
+    "non_rising_at_s": [],
+    "step_s_median": 2.0,
+    "span_s": [
+     -7.5,
+     542.5
+    ]
+   }
+  }
+ },
+ "slow_state": {
+  "rows": 544,
+  "onset_s": null,
+  "slow_pct": 0.0,
+  "e_eff_mhz_median": 2870,
+  "cpu_util_pct_median": 69.8,
+  "slow": false
+ },
+ "hang_cpu": [],
+ "host_quiet": {
+  "rows": 34,
+  "busy_rows": 0
+ },
+ "toypad": {
+  "confirms": 3,
+  "result": "listener=True trigger=True placed=True load-confirms=3/3 then=off remove-confirms=0"
+ },
+ "proofs": [
+  {
+   "ok": true,
+   "text": "init \"C1 keep-watch: on (with physical_protect_hold_global_lock)\" x1"
+  },
+  {
+   "ok": true,
+   "text": "\"first kept protect\" x1 (gate D / positive control)"
+  },
+  {
+   "ok": true,
+   "text": "kept count: last \"kept so far\" = 65536 (27 such lines)"
+  },
+  {
+   "ok": true,
+   "text": "C1 verify armed: \"C1 verify: on. Hashing CPU uploads ...\" x1 (without it K = 0 proves nothing)"
+  },
+  {
+   "ok": true,
+   "text": "verify-mismatch (K) lines 0 (gate A / G5, through the level load (last mark end))"
+  },
+  {
+   "ok": null,
+   "text": "C1 verify F lines (write-fault side, not gate A): 0 -"
+  },
+  {
+   "ok": true,
+   "text": "kept count rises through the level load (last mark end): first 2 -> last 65536 (27 \"kept so far\" lines)"
+  },
+  {
+   "ok": true,
+   "text": "gate D zero lines: \"Recovered stale physical page protection\" 0, \"Unhandled guest physical write fault\" 0"
+  },
+  {
+   "ok": true,
+   "text": "no blocked/no-hold C1 line (0/0/0)"
+  },
+  {
+   "ok": true,
+   "text": "G8 bad lines: \"PhysicalHeap::Protect failed\" 0, \"Recovered stale physical page protection\" 0, \"Unhandled guest physical write fault\" 0"
+  },
+  {
+   "ok": true,
+   "text": "bin dir <workspace>\\build\\agent2\\devoff4bv-bin (want build\\agent2\\devoff4bv-bin)"
+  },
+  {
+   "ok": true,
+   "text": "bin: run-dir legodimensions.exe sha256 DFBE1D43B28861A6, want DFBE1D43B28861A6 (devoff4bv-bin MANIFEST)"
+  },
+  {
+   "ok": true,
+   "text": "bin: run-dir rexgpu-xenos.dll sha256 82A0DE742AAAAE44, want 82A0DE742AAAAE44 (devoff4bv-bin MANIFEST)"
+  },
+  {
+   "ok": true,
+   "text": "bin: run-dir rexruntime.dll sha256 A33801D1538D6175, want A33801D1538D6175 (devoff4bv-bin MANIFEST)"
+  },
+  {
+   "ok": true,
+   "text": "positive control: \"C1 verify: on.\" x1 (RATIONALE L104: x1; else INCOMPLETE)"
+  },
+  {
+   "ok": true,
+   "text": "positive control: the route reaches story-load (RATIONALE L104; else INCOMPLETE): marks ..v-start-a,settled,end"
+  },
+  {
+   "ok": true,
+   "text": "positive control: last \"kept so far\" 65536 >= 32768 (row 7 level, RATIONALE L104; else INCOMPLETE)"
+  },
+  {
+   "ok": null,
+   "text": "reading (RATIONALE L107-118): K 0, F 0; compare the F of s4bV0f, s4b07r F 51 and s4bV0 F 70 (devoff4b, quiet host, 11-25)"
+  }
+ ],
+ "base_misses": [
+  "marks differ before up-2: pads-white 220/528->226/1022"
+ ],
+ "hint": "LOOK"
+}

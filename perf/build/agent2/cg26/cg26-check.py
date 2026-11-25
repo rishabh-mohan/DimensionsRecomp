@@ -86,6 +86,19 @@ def main():
                            lambda s: s.replace('\\', '/').lower()):
                     if tn.replace(f_(pre_n).encode(), f_(pre_p).encode()) == tp:
                         ok = True
+            if not ok:
+                # M2 session 3 (11-25): the S4b tool writes the depfile prerequisites in a different order (manifest
+                # before config). A depfile is a set; compare target + sorted prerequisites after the path swap.
+                def depset(b_):
+                    ls = [x.strip().rstrip('\\').strip() for x in b_.decode('utf-8', 'replace').splitlines()]
+                    ls = [x for x in ls if x]
+                    return (ls[0], sorted(ls[1:])) if ls else None
+                for f_ in (lambda s: s.replace('\\', '/'),):
+                    pn, pp = f_(os.path.join(R, 'build', 'agent2', 'cg26')), f_(os.path.join(R, 'build', 'agent2', 'snap1'))
+                    if depset(tn.replace(pn.encode(), pp.encode())) == depset(tp):
+                        ok = True
+                        say('NOTE %s: same target and prerequisites after the tree-path swap; prerequisite ORDER '
+                              'differs (set compare, M2 11-25)' % r)
             check('%s differs by the tree path only' % r, ok, '' if ok else '%d vs %d B' % (len(tn), len(tp)))
             continue
         check('%s unchanged' % r, False, 'differs')

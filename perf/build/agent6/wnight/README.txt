@@ -83,3 +83,15 @@ FILES
 - make_test_s4b17.py [--neg]: builds the W9 test folders test-s4b17\ and test-s4b17-neg\ (copies only).
 - test-*.out.txt: test outputs. out-*\: kit outputs.
 - scan_a3_runs.py: one line per Agent 3 run.json (used to pick the test runs).
+
+2026-11-25 (task s3, E5.1 for M6): the kit changed (A race INFO, B WATCHDOG NOTE, per-arm levels, alnum arm ids,
+harness mode --run); details and test results in build\agent6\w6\README.txt "2026-11-25 CHANGES".
+- The wrappers here now set KITROOT before any shift; before, options after the folder broke the kit path (exit 2).
+- Night re-run vs the stored outputs: build\agent6\wnight\s3-regress\DIFF.txt (only the A/B differences).
+  RESULTS.md "The Execution complete race" says 6 runs but names 5; the re-run finds exactly those 5.
+- New: build\agent6\s33-popin\RUN-S33-LOGDIFF.cmd (#33 pop-in, expect-s33.json, reference offsf).
+    RUN-S33-LOGDIFF.cmd build\agent8\matrix\<folder> [options]   -> build\agent6\s33-popin\out-<folder>\
+      (matrix fallback build\agent6\s33-popin\matrix-s33-draft.json)
+    RUN-S33-LOGDIFF.cmd --run offsf=<dir> --run onsf=<dir> [--ref offsf] [--out <dir>]   (harness mode)
+      (cvars from build\agent6\s33-popin\harness-s33.json; default out build\agent6\s33-popin\out-harness\)
+  Exit 0/1/2/3 as above.

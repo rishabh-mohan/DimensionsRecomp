@@ -1,0 +1,61 @@
+Window staging (Agent 8, run-2 task #7, build\agent8\w-followup\stage-window.ps1), 2026-11-25 01:44:45
+mode: PROMOTE (copied to bench\agent8\run)
+result: OK
+run: only=n0,mc repeats=7 -ColdShared; -PlanOnly: 15 runs, about 35 min (runner); expected 15 runs; Agent 7's formula 1.70 + 2.14 x 2 x 7 = 31.7 min
+latest start: the launcher accepts this GO before 06:45 (no start at or after it; 07:30 - 35 - 10 min would allow 06:45); started at 06:45 it ends about 07:16 by Agent 7's formula
+GO line: GO W8a matrix-window8a.json A06E5E3AAEE25B079532DE8BFC9134D7462B5F842ECB9FADA19B6FD8DD8A475E only=n0,mc repeats=7
+draft: build\agent8\w-followup\matrix-window8a.json  sha256 A06E5E3AAEE25B079532DE8BFC9134D7462B5F842ECB9FADA19B6FD8DD8A475E  4406 bytes
+matrix for the GO: bench\agent8\run\matrix-window8a.json  sha256 A06E5E3AAEE25B079532DE8BFC9134D7462B5F842ECB9FADA19B6FD8DD8A475E
+launcher: bench\agent5\launch\run-night.ps1 sha256 565D30D40DC5025AD63FD9B9F606724BABC167BC81FCB6FBEB6362B603977112 (2026-11-23 06:14:32); checked by its own functions: Get-PinFiles, Test-Pinned, Parse-Go, Get-P, Resolve-Driver, Test-Matrix, Get-RunnerArgs, Get-BinHashes, Get-MatrixWarnings, Get-Plan; env keys 11; drivers thread-cpu.ps1, pso-stats-at-end.ps1, io-counters.ps1; slack 10 min; no start at or after 06:45
+bin: build/agent2/native4b-bin (arms n0,mc): MANIFEST.txt sha256 B63769FE46CC04592F2BEDAF04A51C362000325D3291BC4D7489369C2160B817 (expected B63769FE46CC0459); legodimensions.exe DC6484C224585E54190078A2225EA85848BFF36AAC5B3FC5B66F17235B59DD65; 8 files listed, 8 of 8 checked match; check lines PASS 124, FAIL 0
+arm: n0 (native4b; frames native; cvars native_settings_frontend=false;native_fps_limit=0;framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv; drivers/thread-cpu.ps1)
+arm: mc (native4b; frames native; cvars native_settings_frontend=false;native_fps_limit=0;framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv LEGO_NATIVE_SHADER_MISS_CACHE=1; drivers/thread-cpu.ps1)
+matrix folders before/after -PlanOnly: 28 / 28
+NOTE: queue gap: a queue game runs (LAUNCH 01:45:54, 21 s ago); -PlanOnly at 01:46:14 after 67 s of waiting
+
+--- launcher Get-BinHashes (only= arms)
+DC6484C224585E54190078A2225EA85848BFF36AAC5B3FC5B66F17235B59DD65  build/agent2/native4b-bin/legodimensions.exe
+B63769FE46CC04592F2BEDAF04A51C362000325D3291BC4D7489369C2160B817  build/agent2/native4b-bin/MANIFEST.txt
+
+--- run-matrix.ps1 -Matrix bench\agent8\run\matrix-window8a.json -Only n0,mc -Repeats 7 -ColdShared -NoPrompt -PlanOnly (launcher Get-Plan)
+=== timing matrix: Window 8a (Agent 8, run-2 task #7 follow-up): #2 shader miss cache on native4b (S4b + S4c native, every switch OFF). n0 (miss cache OFF) vs mc (LEGO_NATIVE_SHADER_MISS_CACHE=1), native frames, 6 round-robin rounds ===
+matrix   <workspace>\bench\agent8\run\matrix-window8a.json
+note     Follow-up window proposed by Agent 8 (run-2 task #7) on 2026-11-22 for the 01:00-06:45 slot; Agent 1 picks. Staged and checked with build/agent8/w-followup/stage-window.ps1. GO: 'GO W8a matrix-window8a.json <sha256> only=n0,mc repeats=6': one unscored cold run (native4b), then 6 round-robin rounds with the start arm alternating: 1 + 12 = 13 runs.
+note     W8a (S4-DRAFT L373: native S4a with #2 ON; Agent 1, 21:15: on native4b after the re-pin). Both arms use one bin, so the pair isolates #2 (rexlego gpu_native/shaders.cpp; env var, unset = OFF). Metric: render-thread ms/f and fps on native (native-frames.csv), plus p99, the 1 % low and process CPU. S4-DRAFT row 2's estimate: about 2-2.5 ms/f of render thread in the foreground, up to ~6 ms/f in the slow state.
+note     Gates before the GO: native4b-bin staged with Agent 4's pin record (fingerprint 9b40acbbef4c57b3); the re-pin rows rpb0 and rpm4 PASS (build/agent4/repin/REPIN.md 3a and 3b); s4b02 (native4b OFF, menus) PASS; and #2 ON on native4b: either an r6-style traced ON/OFF pair (shader_miss_cache_insert rows for VS AC449538 and PS AC448F28 in events.tsv, logdiff NEW 0 / MORE 0) or Agent 1 accepts Agent 3's r6 on native4 (PASS, Agent 4's verdict) as its cover.
+note     No trace in a timed arm: a trace turns off buffer/texture reuse and some draw fast paths (Agent 4). Without the trace #2 ON adds no game.log line, so mc's ON proof is LEGO_NATIVE_SHADER_MISS_CACHE=1 in run.json env_set, which n0 must not have. Both arms set LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv (the native frame source; the runner expands <run> per run). cvars as the n-rows (build/agent4/repin/matrix-repin-native4b.json): native_settings_frontend=false, native_fps_limit=0, framerate_limit=0.
+note     Window: 5 s settle + 55 s warm-up from the first frame, then 50 s measured, so every window starts >= 60 s after the first frame (min_window_after_ff_s 60, Agent 1's floor); the runner flags window_before_floor (excluded) below 59.5 s. The cold run: 55 s warm-up, 30 s window. One frame source for every arm: native-frames.csv (frames native), uncapped; the same driver (drivers/thread-cpu.ps1 -> threads.csv).
+note     sys_csv: drivers/sys-csv.ps1 logs the system state every 1 s (sys.csv, sys.json). Input during the window, the game losing the foreground, battery, battery saver, a power-plan change, a non-default input desktop or a screensaver exclude a run from summary.md (it stays in results.csv, under 'Flagged runs').
+note     Environment: after the 08:29 Windows Update; native numbers compare only with native runs under the same host state. Timing comes only from the user's unlocked desktop (Agent 5's overnight launcher); agent runs of this matrix (-Quick, hidden desktop) are functional only.
+settings warm-up from firstframe (boot timeout 240 s, settle 5 s); order roundrobin; close timeout 60 s; cooldown 5 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+arms:
+       n0: bin build/agent2/native4b-bin; frames native; x7; warm-up 55 s; window 50 s; group w8a (ref); cvars native_settings_frontend=false native_fps_limit=0 framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         native4b (S4b + S4c native), default serial path, #2 OFF: Agent 4's re-pin n0
+       mc: bin build/agent2/native4b-bin; frames native; x7; warm-up 55 s; window 50 s; group w8a; cvars native_settings_frontend=false native_fps_limit=0 framerate_limit=0; env LEGO_NATIVE_FRAME_METRICS=<run>\native-frames.csv LEGO_NATIVE_SHADER_MISS_CACHE=1; driver <workspace>\bench\agent8\run\drivers\thread-cpu.ps1 
+         native4b + #2 miss cache ON (LEGO_NATIVE_SHADER_MISS_CACHE=1, no trace). ON proof: env_set only
+cold     n0 (build/agent2/native4b-bin): unscored, before round 1 (warm-up 55 s, window 30 s)
+         -ColdShared: one cold run for all 1 bin(s); the other bins first launch as scored round-1 runs
+round 1  n0 mc
+round 2  mc n0
+round 3  n0 mc
+round 4  mc n0
+round 5  n0 mc
+round 6  mc n0
+round 7  n0 mc
+order    n0 mc | mc n0 | n0 mc | mc n0 | n0 mc | mc n0 | n0 mc
+estimate 15 runs (1 cold), about 35 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-YKCG2EGLGPTCKF2UI6RSSUJCX5 -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   14.34 GB
+game       legodimensions.exe RUNNING (pid 2384) -> close it first
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/native4b-bin : ok (MANIFEST.txt)
+screensaver none
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   15 runs, about 35 min: done around 02:20
+!!! FATAL: legodimensions.exe is running (pid 2384)
+PlanOnly: nothing started.

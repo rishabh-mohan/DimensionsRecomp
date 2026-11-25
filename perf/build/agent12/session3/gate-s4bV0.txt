@@ -1,0 +1,39 @@
+queue row: {"id": "s4bV0", "est": 560, "toypad": true, "needs": ["build\\agent3\\s4b\\ready-s4b-off", "build\\agent3\\session3\\go-quiet"], "args": ["-BinDir", "build\\agent2\\devoff4b-bin", "-Seconds", "600", "-Tag", "s4b-V0-c1off-verify-level", "-InputScript", "build\\agent3\\toypad\\routes\\level-l.txt", "-Cvar", "physical_protect_hold_global_lock=true;physical_protect_keep_watch=false;physical_protect_keep_watch_verify=true"], "note": "S3T-3 (b): C1-OFF verify control (Agent 12 22:15: row 7 + keep_watch=false); Agent 12 predicts F > 0."}
+ok   exit_code 0 (0x00000000), close wm_close, elapsed 563.7 s of 600
+ok   wer_seen False
+ok   crash_events []
+ok   exited_early False
+ok   bin_dir <workspace>\build\agent2\devoff4b-bin (queued build\agent2\devoff4b-bin)
+ok   run exe sha256 DFBE1D43B28861A6 = run.json and in <workspace>\build\agent2\devoff4b-bin\MANIFEST.txt
+ok   cvars {'physical_protect_hold_global_lock': 'true', 'physical_protect_keep_watch': 'false', 'physical_protect_keep_watch_verify': 'true'} (queued {'physical_protect_hold_global_lock': 'true', 'physical_protect_keep_watch': 'false', 'physical_protect_keep_watch_verify': 'true'})
+ok   env {} (queued {})
+ok   input script <workspace>\build\agent3\toypad\routes\level-l.txt (queued build\agent3\toypad\routes\level-l.txt)
+     logs 1 (581 lines); counts: Recovered stale physical page protection=0; Unhandled guest physical write fault=0; PhysicalHeap::Protect failed=0; STUCK-LOCK=0; REX_FATAL=0; C1 keep-watch: on (with=0; C1 keep-watch: on, but=0; blocked for this process=0; C1 verify: on.=1; C1 verify K:=0; C1 verify F:=70; GPU wait back-off: ON=0; d3d12_submit_split_kb: splitting=0; d3d12_submit_split: =0; Host timer resolution set=0; TimerQueue: precise wait=0
+ok   C4 "Recovered stale physical page protection" x0
+ok   C4 "Unhandled guest physical write fault" x0
+ok   C4 "PhysicalHeap::Protect failed" x0
+ok   C4 "REX_FATAL" x0
+ok   C4 "C1 keep-watch: on, but" x0
+ok   C4 "blocked for this process" x0
+ok   C3 keep-watch init x0 (keep_watch=False)
+ok   C3 "C1 verify: on." x1 (verify=True)
+ok   C3 back-off init x0 (env set False)
+ok   C3 split init x0 (split cvar False)
+ok   C3 host timer line x0 (cvar False)
+ok   C3 precise-wait line x0 (cvar False)
+     STUCK-LOCK lines 0 (C5: see f10 output / by hand)
+ok   C6 dumps in dir [], run.json dumps []
+     C7 steps 119/119 last done timeouts 31; marks ['vortex', 'v-idle', 'v-start', 'v-start-a', 'settled', 'end']
+ok   C7 vortex mark reached
+--- s4bV0.check.txt (35 lines)
+    missing in cand: ['788/31613', '790/31625', '841/31696']; extra in cand: -
+  PROOF ok   keep-watch off: init-on x0, first kept x0, kept x0
+  PROOF ok   C1 verify armed: "C1 verify: on. Hashing CPU uploads ..." x1 (without it F = 0 proves nothing: INCONCLUSIVE)
+  PROOF note K lines 0; F lines 70 (Agent 12 predicts F > 0; F = 0 refutes it; compare s4b07r over the same marks) 2:14:23.055] [warning] [gpu] [t31880] C1 verify F: page 01B61000 changed since its upload (1 so far)
+  PROOF ok   gate D zero lines: "Recovered stale physical page protection" 0, "Unhandled guest physical write fault" 0
+  BASE items missed: marks differ before up-2: pads-white 220/528->226/1022; logdiff NEW 1
+  VERDICT HINT LOOK: 2 BASE misses, 0 proof misses (apply QUEUE.md "passes if" for row s4bV0)
+--- s4bV0.f10.txt (2 lines)
+  RESULT: PASS
+--- s4bV0.p2c.txt: not present
+COMMON: OK (0 problems)

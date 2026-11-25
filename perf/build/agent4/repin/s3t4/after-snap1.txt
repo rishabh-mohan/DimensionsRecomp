@@ -1,0 +1,54 @@
+repin_check.ps1 2026-11-25 01:20:49  DRY RUN: reads only, writes only the report
+  line snap1: tree build\agent2\snap1\DimensionsRecomp, build dir build\agent2\snap1-on, bin dir (none); planned copies: C1 no, pack no
+
+[1] staged S4b + S4c files behind the native fingerprint inputs (sha256 vs the staging records)
+  [ok] C1 rexlego diff  build\agent12\s4-c1\keep-watch-rexlego.diff  4D0C10794188CF45 (record 4D0C10794188CF45; v1, reused by C1 v3; LF only, so git apply fails on the CRLF file: copy the after-file)
+  [ok] C1 after-file    build\agent12\s4-c1\new\game\rexlego\src\gpu_native\memory_watch.cpp  70829846C4F321A9 (record 70829846C4F321A9), 172 CRLF / 0 bare LF, 11-22 07:48:26
+  [ok] C1 before-file   build\agent12\s4-c1\orig\game\rexlego\src\gpu_native\memory_watch.cpp  19AE1606C6DB7273 (record 19AE1606C6DB7273)
+  [ok] C1 v3 SDK diff   build\agent12\s4-c1v3\keep-watch-v3.diff  DECCFE3373C27C3C (record DECCFE3373C27C3C; tonight's C1; SDK only, no native fingerprint input)
+  [info] C1 v2 SDK diff   build\agent12\s4-c1v2\keep-watch-v2.diff  418D3D39947DB146 (record 418D3D39947DB146; not selected tonight)
+  [ok] S4c diff         build\agent9\s4\fence-wait\s4c\s4c-24-30.diff  DC02104EA76E0BF6 (record DC02104EA76E0BF6; #24 + #30, both OFF: CMakeLists.txt 3690D5D7 -> 1BF46D78, plus the new gpu_wait_backoff.cpp)
+  [ok] S4c after-file   build\agent9\s4\fence-wait\s4c\new\rexlego\CMakeLists.txt  1BF46D7878BA9A25 (record 1BF46D7878BA9A25), 52311 B, 907 CRLF / 0 bare LF
+  [ok] S4c new TU       build\agent9\s4\fence-wait\s4c\new\rexlego\src\gpu_wait_backoff.cpp  01D9F8F3464C8614 (record 01D9F8F3464C8614; 34D281E0 in CRLF form; Xenos builds only, not a fingerprint input)
+
+[2] s35 pack bytes (build\agent4\s35\run-071627) against its SHA256SUMS.txt
+  [ok] runtime-cache.cpp         AEA36683202B9753 (SHA256SUMS AEA36683202B9753)
+  [ok] lego-microcode-index.cpp  E4C05782462452C3 (SHA256SUMS E4C05782462452C3)
+  [ok] index-addition.cpp        154242FB07BEDC92 (SHA256SUMS 154242FB07BEDC92)
+
+[3] tree build\agent2\snap1\DimensionsRecomp
+  [ok] memory_watch.cpp 70829846C4F321A9, 8054 B, 172 CRLF / 0 bare LF, 11-22 19:50:19: C1 is applied: the landing hash is met
+  [ok] CMakeLists.txt 1BF46D7878BA9A25, 52311 B, 907 CRLF / 0 bare LF, 11-22 19:50:19: S4c is applied (#24 + #30, both OFF); live 1BF46D7878BA9A25 (same); gpu_wait_backoff on 3 line(s), so #24 is in
+  [ok] src/gpu_wait_backoff.cpp 01D9F8F3464C8614 (the staged text, LF)
+  [ok] fingerprint input list, CMakeLists.txt:604-787: CMakeLists.txt listed, memory_watch.cpp listed, gpu_wait_backoff not listed; so C1 and #24 each change the fingerprint
+  [ok] shader_archive.cpp 1C5B1767B8F6871D = the archive the s35 lookups compiled
+  [info] shaders.cpp 9567FE3F3B63637D (the S4a level, with the #2 miss cache)
+  [ok] lego-microcode-index.cpp 2DB859177B465647, 1652630 B, 11-21 20:55:21: the s35 merge base 2DB85917...13A2, so the merged index can be copied
+
+[4] build dir build\agent2\snap1-on
+  [ok] CMAKE_HOME_DIRECTORY is this tree's rexlego; LEGODIMENSIONS_NATIVE_GPU=ON
+  [ok] LEGO_NATIVE_RUNTIME_PRELINKED_BANK="": empty, so the build re-runs lego_gpu_prelink_runtime, which the pack needs
+  [ok] LEGO_NATIVE_RUNTIME_SHADER_CACHE = build\agent2\snap1\DimensionsRecomp\rexlego\out\native-gpu\stubs\runtime-cache.cpp (E66C9AA34C301C60, 11-21 20:55:22): the stub, no pack
+  [ok] runtime-linked-dxil-cache.cpp 639 B, 11-21 21:08:06: 0 entries, 0 of the 4 pack hashes; no pack, consistent with the stub cache
+  [ok] built fingerprint: native-gpu-build.txt 9b40acbbef4c57b3 (11-22 20:53:53), native_gpu_build_info.h 9b40acbbef4c57b3; the native4b (S4b + S4c) pin
+  [ok] recomputed fingerprint 9b40acbbef4c57b3 from 271 inputs (5.9 s) = built: the build dir is fresh; newest input build\agent2\snap1\DimensionsRecomp\rexlego\CMakeLists.txt (11-22 19:50:19)
+  [ok] expected S4b + S4c fingerprint 9b40acbbef4c57b3: the inputs as they are now, with memory_watch.cpp = the staged 70829846 and CMakeLists.txt = the staged 1BF46D78; the tree recomputes to the same value, so C1 and S4c are the only input changes
+  [ok] built fingerprint 9b40acbbef4c57b3 is a pin (native4b (S4b + S4c)); no pack configured (cache state stub), so that is expected
+  [ok] src\gpu_native\memory_watch.cpp.obj 11-22 22:39:01, source 11-22 19:50:19
+  [ok] out\native-gpu\lego-microcode-index.cpp.obj 11-21 21:43:10, source 11-21 20:55:21
+  [ok] src\gpu_native\runtime_shader_cache.cpp.obj 11-21 21:43:10, source 11-21 20:55:22
+  [ok] src\gpu_native\runtime_linked_shader_cache.cpp.obj 11-21 21:43:10, source 11-21 21:08:06
+
+[5] staged bins: MANIFEST fingerprints (read-only)
+  [info] build/agent2/native3d-bin: MANIFEST 368F9CE650EC56CE, fingerprint 335ff2d47268f3a1
+  [info] build/agent2/nativeB-bin: MANIFEST E5CBF30A6132B00E, fingerprint 81d1c3a71be3c096
+  [info] build/agent2/native4-bin: MANIFEST 00D33D4FFB46776D, fingerprint 5e3ff55de10f4f64
+  [info] build/agent2/native4b-bin: MANIFEST B63769FE46CC0459, fingerprint 9b40acbbef4c57b3
+
+[6] WOULD DO: no copies (add -C1 and/or -Pack to plan them, or they are already done)
+  Not done by this script (Agent 2, after Agent 1's GO):
+    the usual native build of this build dir (it re-runs lego_gpu_prelink_runtime and the fingerprint), staged to a NEW bin folder; native4-bin and the other bins stay untouched
+    then this script again without -Go: [4] must show a fresh fingerprint, and with -Pack all 4 pack hashes in the prelinked cache
+  Rollback: copy the files in the backup folder back (then set their LastWriteTime to now)
+
+SUMMARY: 0 FAIL, 0 WARN; exit 0

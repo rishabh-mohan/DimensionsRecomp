@@ -83,3 +83,38 @@ FILES
 - expected-lines.md: the per-arm expected lines, from Agent 3's runs.
 - Older: log_diff.py, log-diff.txt, src_grep.py, src-grep.txt.
 - Night windows W9 / W5b / W4c (task #19): rules and wrappers for this kit are in build\agent6\wnight\ (see README.txt there).
+
+2026-11-25 CHANGES (task s3, E5.1 for M6). w6_kit.py sha256 before 7BAA4486ADC18C85AA83554DEF61A76953ABCDD49DED652B9BD3CD684331A917
+(copy: build\agent6\wnight\s3-regress\w6_kit.before.py); after: see build\agent6\wnight\s3-regress\SHA256.txt.
+- A. Execution complete race: a run with no "[info] [core] Execution complete" line whose game.log ends with
+  "Title terminated; hard-exiting process." and exit code 0 is INFO, not NOTE (logdiff GONE "Execution complete"
+  limited to such runs is INFO too). Otherwise still NOTE. INFO never changes a verdict.
+  Summary line "Execution complete race runs: N"; w6-data.json race_runs and per-run race/info.
+- B. Shutdown watchdog: a game.log with "Shutdown wedged past the close request; hard-exiting." gets one NOTE
+  "WATCHDOG: shutdown watchdog fired (3 s after WM_CLOSE)", which also explains the 41/0/0 total and the missing tail
+  that come from that one warning line. Not a FAIL. Summary line "watchdog runs: N"; data watchdog_runs, per-run watchdog.
+- Per-arm "levels" in an expect file override the global W/E/C level. A NEW warning key whose text the arm's
+  require/exact rules name is not a NOTE.
+- Arm ids in an expect file (and --ref) must match [A-Za-z0-9]+, else usage error exit 2. The run-dir arm regex
+  reads "1234-off-sf-r1" as arm "off", so hyphenated ids cannot work.
+- Harness mode: --run ARM=DIR (repeatable) instead of <matrix_dir> (both or neither -> exit 2). DIR is an Agent 3
+  harness run dir (run.json with exit_code, exited_early, close_method, wer_seen, dumps, cvars{}, env{}).
+  status OK iff exit_code 0, not exited_early, close_method wm_close, not wer_seen; valid_timing not checked
+  ("functional only"); slow state skipped (INFO). cvars/env/bin are checked against --matrix-json: only the keys the
+  arm lists, plus a FAIL for an unlisted s33 key (d3d12_pipeline_creation_no_wait, d3d12_resolve_after_drop_log,
+  slow_frame_log_ms, d3d12_pipeline_creation_threads, async_shader_compilation, d3d12_bindless). The logdiff tools
+  read a staging copy (game*.log + run.json only) in <out>\staging\runs\NNNN-<arm>-rK; nothing is written into the
+  run dirs. Default --out build\agent6\w6\out-harness. Relative DIRs are relative to the repo root.
+- Wrappers (RUN-W6/W9/W5B/W4C-LOGDIFF.cmd): KITROOT is set before any shift (shift also moved %0, so %~dp0 broke when
+  options followed the folder).
+- #33 pop-in: build\agent6\s33-popin\expect-s33.json + RUN-S33-LOGDIFF.cmd (see the notes in the expect file).
+  Tests: make_test_s33.py, run by build\agent6\wnight\s3-regress\run_test_s33.ps1.
+TESTS 2026-11-25 (all at below-normal priority; outputs in build\agent6\wnight\s3-regress\)
+- 7 night dirs re-run with the wrapper rules (run_regress.ps1: 7/7 exit 0), diff_night.py -> DIFF.txt, exit 0:
+  only A (0009-cold-s0, 0345-p2f-r4, 0429-off-r3, 0215-d11-r4, 0528-d11t-r6: NOTE -> INFO/PASS, their arms
+  NOTE -> PASS) and B (W9 0108 0128-off-r2: one WATCHDOG NOTE, arm off stays NOTE; the only watchdog run).
+- run_d2.ps1 (d2-*.out.txt): test_stuck_parse PASS exit 0; make_synth + kit exit 1 (same verdicts as out-test-synth);
+  W9 test-s4b17 exit 1 and test-s4b17-neg exit 1 (same as stored); make_test_w9env 9/9 exit 0; wrappers without
+  args exit 2. Summaries differ from the stored ones only by the two new header lines, paths and runtimes.
+- run_test_s33.ps1: matrix 0, matrix-neg 1, harness 0, harness-neg 1, hyphen expect id 2, hyphen --run 2,
+  mixed 2, none 2, no args 2; --check RESULT: PASS (test_s33.check.txt).
