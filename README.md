@@ -33,6 +33,55 @@
 
 ---
 
+## This branch: `perf/opt`
+
+> [!IMPORTANT]
+> `perf/opt` is a performance branch on top of the Native GPU 0.2.0 source
+> (`127e04b`). It is not an official release and no installer is built from it.
+> The download buttons above are the upstream releases, not this branch. The
+> runtime changes are in the `rexglue-sdk` submodule, pinned to that fork's
+> `perf/opt` branch.
+
+### What changed
+
+These are the new defaults. Every one of them can still be switched back.
+
+| Area | Change | How to turn it off |
+|---|---|---|
+| Original renderer (SDK) | 12 cvars now default on: `shared_memory_single_hold_rearm`, `physical_protect_hold_global_lock`, `physical_protect_keep_watch`, `host_timer_resolution_ms=1`, `host_timer_throttling_optout`, `precise_guest_sleep`, `wait_timeout_round_up`, `cs_spin`, `spinlock_pause_spin`, `clock_lockfree`, `tls_bounds_fix`, `timer_queue_precise_wait`. At startup the log prints `Final defaults:` lines with each value and where it came from. | Set the cvar back to its old value in `legodimensions.toml` |
+| Original renderer | The render thread backs off while it waits for the GPU (sleeps 500 µs after a 30 µs spin) instead of busy-polling | env `LEGO_GPU_WAIT_BACKOFF_US=off` |
+| Native renderer | Shader miss cache on: a shader that is missing from the precompiled set is remembered, so later binds skip the full lookup. Because the native GPU fingerprint changed, the first launch rebuilds saved pipeline recipes. | env `LEGO_NATIVE_SHADER_MISS_CACHE=0` |
+| New opt-in | `d3d12_pipeline_creation_no_wait` (default **off**): skip a draw until its pipeline is ready instead of stalling the frame on it. You get a few frames of pop-in instead of a hitch. | It is off unless you set it |
+
+Smaller fixes, always on:
+- the warm-boot pipeline fix;
+- native planning skips draws whose vertex shader failed to bind;
+- `pause_safe_order` and `audio_shutdown_detach_worker` default on.
+
+### Measured
+
+| Comparison | fps | p99 frame time | 1 % low frame time | CPU used |
+|---|---|---|---|---|
+| Original renderer, new defaults vs old | **+10.2 %** | **-15.5 %** | **-17.3 %** | **-38.8 %** (about 1 core less) |
+| Native renderer, miss cache on vs off | **+44.2 %** | **-34.1 %** | **-34.3 %** | same |
+
+- **Method:** repeated timed rounds per arm, alternating the arms, with 95 % bootstrap CIs. Every CI in the first row excludes 0. In the native row, all 7 runs with the cache on were faster than all 7 runs with it off.
+- **Caveat:** all the numbers come from one machine, on the title/attract scene with no gameplay input. In-level gains have not been measured yet. That, upscaling and the remaining shader-compile hitches are the next sprint.
+- **Smoke test:** the final binaries were built from the committed source and boot to 3D on both renderers.
+
+### Building it
+
+Follow [README-dev.md](README-dev.md), with three extra steps:
+- **plume:** check out `e0c8871` in `thirdparty/plume`, then run `python tools/gpu-aot/prepare_plume.py`.
+- **simde:** in `rexglue-sdk/`, run `python scripts/prepare_simde.py`.
+- **Check:** run both scripts again with `--check`.
+
+The game is built for `x86-64-v3` (see [Tested on, and size](#tested-on-and-size)).
+
+The full sprint notes, scripts and read-outs are in [`perf/`](perf/README.md).
+
+---
+
 ## Why this exists
 
 I started this to answer one question: can a toys-to-life game be recompiled, and
@@ -408,6 +457,11 @@ As for now, game is playable on Steam Deck through Proton, native port is not co
 > [!TIP]
 > Minimum: a 64-bit CPU with SSE4.2 (Intel Nehalem / AMD Bulldozer, roughly
 2009, and newer) and a Direct3D 12 GPU at feature level 11_0.
+>
+> **On this branch** (and Native GPU 0.2.0) the game is built for `x86-64-v3`
+> by default, so it needs **AVX2** (Intel Haswell / AMD Zen 1, 2013-2017, and
+> newer). Configure with `-DLEGODIMENSIONS_X86_BASELINE=x86-64-v2` to build for
+> the older floor.
 
 > [!NOTE]
 > **Recommended** for a smooth 60 FPS at 1080p:
