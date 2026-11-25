@@ -206,7 +206,7 @@ void CaptureMissingPlacementShader(u32 guest_address, u32 container_address,
       capture.size(), stage, hash, "placement-containers");
 }
 
-// LEGO_NATIVE_SHADER_MISS_CACHE=1 (default OFF): remember a placement shader that missed the AOT index, so its
+// LEGO_NATIVE_SHADER_MISS_CACHE (default ON): remember a placement shader that missed the AOT index, so its
 // later binds skip ReadableGuestSpan and FindShaderByMicrocode. An entry replays the miss (warning counter and
 // line included) only while the pack generation is unchanged and a CPU write stamp, armed before the lookup,
 // proves unchanged every byte the lookup could read. Capture runs (LEGO_DUMP_MISSING_SHADERS) keep the full path.
@@ -219,9 +219,26 @@ bool ShaderMissEnvironmentSet(const char* name, bool zero_disables) {
   return result;
 }
 
+// LEGO_NATIVE_SHADER_MISS_CACHE unset or empty = the build default, LEGO_NATIVE_SHADER_MISS_CACHE_DEFAULT (1 = ON;
+// OFF bins build with -DLEGO_NATIVE_SHADER_MISS_CACHE_DEFAULT=0); "0" = OFF; any other value = ON.
+#ifndef LEGO_NATIVE_SHADER_MISS_CACHE_DEFAULT
+#define LEGO_NATIVE_SHADER_MISS_CACHE_DEFAULT 1
+#endif
+
 bool ShaderMissCacheEnabled() {
-  static const bool enabled = ShaderMissEnvironmentSet("LEGO_NATIVE_SHADER_MISS_CACHE", true) &&
-                              !ShaderMissEnvironmentSet("LEGO_DUMP_MISSING_SHADERS", false);
+  static const bool enabled = [] {
+    char* value = nullptr;
+    size_t length = 0;
+    _dupenv_s(&value, &length, "LEGO_NATIVE_SHADER_MISS_CACHE");
+    const bool set = value && length > 1;
+    const bool requested = set ? std::strcmp(value, "0") != 0 : LEGO_NATIVE_SHADER_MISS_CACHE_DEFAULT != 0;
+    std::free(value);
+    const bool capture = ShaderMissEnvironmentSet("LEGO_DUMP_MISSING_SHADERS", false);
+    REXLOG_INFO("Native GPU: shader miss cache {} ({}{})", requested && !capture ? "ON" : "OFF",
+                set ? "LEGO_NATIVE_SHADER_MISS_CACHE set" : "build default",
+                capture ? "; LEGO_DUMP_MISSING_SHADERS keeps the full path" : "");
+    return requested && !capture;
+  }();
   return enabled;
 }
 
