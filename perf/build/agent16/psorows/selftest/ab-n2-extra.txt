@@ -1,0 +1,253 @@
+pso_post.py mode ab (n2: K = 1..2, no W2); expect fingerprint 39129c4c059be5f0
+  arm prime: <workspace>\build\agent16\psorows\selftest\fixtures\ab-good\prime
+  arm c0-1: <workspace>\build\agent16\psorows\selftest\fixtures\ab-good\c0-1
+  arm c0-2: <workspace>\build\agent16\psorows\selftest\fixtures\ab-good\c0-2
+  arm c1-1: <workspace>\build\agent16\psorows\selftest\fixtures\ab-good\c1-1
+  arm c1-2: <workspace>\build\agent16\psorows\selftest\fixtures\ab-good\c1-2
+  arm w0-1: <workspace>\build\agent16\psorows\selftest\fixtures\ab-good\w0-1
+  arm w0-2: <workspace>\build\agent16\psorows\selftest\fixtures\ab-good\w0-2
+  arm w1-1: <workspace>\build\agent16\psorows\selftest\fixtures\ab-good\w1-1
+  arm w1-2: <workspace>\build\agent16\psorows\selftest\fixtures\ab-good\w1-2
+  frame pacing (fps mean, p99 ms, 1% low fps) from: summary.json frames; hitch50/blockfr/worst from the 'PSO frames:' line of the exit summary
+== per-arm table
+arm    exit  fp        cache   open_B    L    C   F  R    thr  elapsed  present  async  other  posted  ready  afail  skip  waits  tmo  recipes  sum   hitch50  blockfr  worst   fps    p99   1%low  1st_fr_s
+-----  ----  --------  ------  --------  ---  --  -  ---  ---  -------  -------  -----  -----  ------  -----  -----  ----  -----  ---  -------  ----  -------  -------  ------  -----  ----  -----  --------
+prime  ok    39129c4c  new     0         -    -   -  -    -    -        500      0      0      0       0      0      0     0      0    472      exit  220      120      1130.0  100.0  50.0  12.0   5.0     
+c0-1   ok    39129c4c  new     0         -    -   -  -    -    -        500      0      0      0       0      0      0     0      0    472      exit  200      120      1130.0  100.0  90.0  12.0   5.0     
+c0-2   ok    39129c4c  new     0         -    -   -  -    -    -        500      0      0      0       0      0      0     0      0    472      exit  200      120      1130.0  100.0  90.0  12.0   5.0     
+c1-1   ok    39129c4c  new     0         -    -   -  -    -    -        440      60     0      60      60     0      25    4      2    472      exit  60       120      1130.0  100.0  50.0  12.0   5.0     
+c1-2   ok    39129c4c  new     0         -    -   -  -    -    -        440      60     0      60      60     0      25    4      2    472      exit  60       120      1130.0  100.0  50.0  12.0   5.0     
+w0-1   ok    39129c4c  loaded  31457280  400  72  0  472  1    2500     500      0      0      0       0      0      0     0      0    472      exit  80       120      1130.0  100.0  50.0  12.0   5.0     
+w0-2   ok    39129c4c  loaded  31457280  400  72  0  472  1    2500     500      0      0      0       0      0      0     0      0    472      exit  80       120      1130.0  100.0  50.0  12.0   5.0     
+w1-1   ok    39129c4c  loaded  31457280  400  72  0  472  1    2500     440      60     0      60      60     0      25    4      2    472      exit  30       120      1130.0  100.0  50.0  12.0   5.0     
+w1-2   ok    39129c4c  loaded  31457280  400  72  0  472  1    2500     440      60     0      60      60     0      25    4      2    472      exit  30       120      1130.0  100.0  50.0  12.0   5.0     
+== median over K per arm type
+type  n  hitch50  blockfr  worst   fps    p99   1%low  elapsed  compiles  present  async  skip  tmo
+----  -  -------  -------  ------  -----  ----  -----  -------  --------  -------  -----  ----  ---
+c0    2  200.0    120.0    1130.0  100.0  90.0  12.0   -        500.0     500.0    0.0    0.0   0.0
+c1    2  60.0     120.0    1130.0  100.0  50.0  12.0   -        500.0     440.0    60.0   25.0  2.0
+w0    2  80.0     120.0    1130.0  100.0  50.0  12.0   2500.0   500.0     500.0    0.0    0.0   0.0
+w1    2  30.0     120.0    1130.0  100.0  50.0  12.0   2500.0   500.0     440.0    60.0   25.0  2.0
+== delta C1 vs C0 (medians)
+metric    C0      C1      delta   pct 
+--------  ------  ------  ------  ----
+hitch50   200.0   60.0    -140.0  -70%
+blockfr   120.0   120.0   0.0     +0% 
+worst     1130.0  1130.0  0.0     +0% 
+fps       100.0   100.0   0.0     +0% 
+p99       90.0    50.0    -40.0   -44%
+1%low     12.0    12.0    0.0     +0% 
+elapsed   -       -       -       -   
+compiles  500.0   500.0   0.0     +0% 
+present   500.0   440.0   -60.0   -12%
+async     0.0     60.0    60.0    -   
+skip      0.0     25.0    25.0    -   
+tmo       0.0     2.0     2.0     -   
+== delta W0 vs C0 (medians)
+metric    C0      W0      delta   pct 
+--------  ------  ------  ------  ----
+hitch50   200.0   80.0    -120.0  -60%
+blockfr   120.0   120.0   0.0     +0% 
+worst     1130.0  1130.0  0.0     +0% 
+fps       100.0   100.0   0.0     +0% 
+p99       90.0    50.0    -40.0   -44%
+1%low     12.0    12.0    0.0     +0% 
+elapsed   -       2500.0  -       -   
+compiles  500.0   500.0   0.0     +0% 
+present   500.0   500.0   0.0     +0% 
+async     0.0     0.0     0.0     -   
+skip      0.0     0.0     0.0     -   
+tmo       0.0     0.0     0.0     -   
+== delta W1 vs C0 (medians)
+metric    C0      W1      delta   pct 
+--------  ------  ------  ------  ----
+hitch50   200.0   30.0    -170.0  -85%
+blockfr   120.0   120.0   0.0     +0% 
+worst     1130.0  1130.0  0.0     +0% 
+fps       100.0   100.0   0.0     +0% 
+p99       90.0    50.0    -40.0   -44%
+1%low     12.0    12.0    0.0     +0% 
+elapsed   -       2500.0  -       -   
+compiles  500.0   500.0   0.0     +0% 
+present   500.0   440.0   -60.0   -12%
+async     0.0     60.0    60.0    -   
+skip      0.0     25.0    25.0    -   
+tmo       0.0     2.0     2.0     -   
+== delta W2 vs W0: not run (n2)
+== checks
+-- prime
+PASS prime clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS prime route ran: steps 55/91 last halted timeouts 0 error None
+PASS prime fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS prime PSO stats lines: stats-on 1, interval lines 1, summary blocks 2 (request, exit)
+PASS prime PSO summary block: used exit
+INFO prime PSO summary used: reason 'exit' at game.log line 15, 29000 frames over 290.0 s; 2 block(s) in the log
+PASS prime PSO summary reason: 'exit' (want pso-stats.now or exit)
+PASS prime no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS prime no new hard WARN/ERROR types vs baseline: 0 hard
+PASS prime no new WARN/ERROR types vs baseline: 0 new
+PASS prime async off: async-on lines 0
+PASS prime async failed = 0: no PSO async line (0 posted, 0 skipped)
+PASS prime cold confirmed: 'no startup pipeline recipes yet' 1, startup line no, opened 0 bytes, summary cache new (no usable file)
+PASS prime recipes saved: [472]
+PASS prime no cache save after Stop: saves after the Stop line 0, Stop/earlier save present True; Stop hits/misses/stored/saves {'hits': 900, 'misses': 30, 'stored': 30, 'saves': 2}
+PASS prime PSO saves failed = 0: {'written': 2, 'bytes': 41971520, 'failed': 0, 'postponed': 0, 'held_ms': 45.0, 'held_worst_ms': 45.0, 'copy_ms': 40.0, 'alloc_ms': 3.0, 'write_ms': 20.0, 'retries': 0, 'under_lock': 0}
+-- c0-1
+PASS c0-1 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS c0-1 route ran: steps 55/91 last halted timeouts 0 error None
+PASS c0-1 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS c0-1 PSO stats lines: stats-on 1, interval lines 1, summary blocks 2 (request, exit)
+PASS c0-1 PSO summary block: used exit
+INFO c0-1 PSO summary used: reason 'exit' at game.log line 15, 29000 frames over 290.0 s; 2 block(s) in the log
+PASS c0-1 PSO summary reason: 'exit' (want pso-stats.now or exit)
+PASS c0-1 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS c0-1 async off: async-on lines 0
+PASS c0-1 async failed = 0: no PSO async line (0 posted, 0 skipped)
+PASS c0-1 cold confirmed: 'no startup pipeline recipes yet' 1, startup line no, opened 0 bytes, summary cache new (no usable file)
+PASS c0-1 recipes saved: [472]
+PASS c0-1 no cache save after Stop: saves after the Stop line 0, Stop/earlier save present True; Stop hits/misses/stored/saves {'hits': 900, 'misses': 30, 'stored': 30, 'saves': 2}
+PASS c0-1 PSO saves failed = 0: {'written': 2, 'bytes': 41971520, 'failed': 0, 'postponed': 0, 'held_ms': 45.0, 'held_worst_ms': 45.0, 'copy_ms': 40.0, 'alloc_ms': 3.0, 'write_ms': 20.0, 'retries': 0, 'under_lock': 0}
+-- c0-2
+PASS c0-2 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS c0-2 route ran: steps 55/91 last halted timeouts 0 error None
+PASS c0-2 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS c0-2 PSO stats lines: stats-on 1, interval lines 1, summary blocks 2 (request, exit)
+PASS c0-2 PSO summary block: used exit
+INFO c0-2 PSO summary used: reason 'exit' at game.log line 15, 29000 frames over 290.0 s; 2 block(s) in the log
+PASS c0-2 PSO summary reason: 'exit' (want pso-stats.now or exit)
+PASS c0-2 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS c0-2 async off: async-on lines 0
+PASS c0-2 async failed = 0: no PSO async line (0 posted, 0 skipped)
+PASS c0-2 cold confirmed: 'no startup pipeline recipes yet' 1, startup line no, opened 0 bytes, summary cache new (no usable file)
+PASS c0-2 recipes saved: [472]
+PASS c0-2 no cache save after Stop: saves after the Stop line 0, Stop/earlier save present True; Stop hits/misses/stored/saves {'hits': 900, 'misses': 30, 'stored': 30, 'saves': 2}
+PASS c0-2 PSO saves failed = 0: {'written': 2, 'bytes': 41971520, 'failed': 0, 'postponed': 0, 'held_ms': 45.0, 'held_worst_ms': 45.0, 'copy_ms': 40.0, 'alloc_ms': 3.0, 'write_ms': 20.0, 'retries': 0, 'under_lock': 0}
+-- c1-1
+PASS c1-1 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS c1-1 route ran: steps 55/91 last halted timeouts 0 error None
+PASS c1-1 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS c1-1 PSO stats lines: stats-on 1, interval lines 1, summary blocks 2 (request, exit)
+PASS c1-1 PSO summary block: used exit
+INFO c1-1 PSO summary used: reason 'exit' at game.log line 16, 29000 frames over 290.0 s; 2 block(s) in the log
+PASS c1-1 PSO summary reason: 'exit' (want pso-stats.now or exit)
+PASS c1-1 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS c1-1 no new hard WARN/ERROR types vs baseline: 0 hard
+PASS c1-1 no new WARN/ERROR types vs baseline: 0 new
+PASS c1-1 async on: async-on lines 1
+PASS c1-1 async failed = 0: {'posted': 60, 'ready': 60, 'failed': 0, 'skipped': 25, 'waits': 4, 'wait_ms': 6.0, 'timeouts': 2}
+PASS c1-1 async timeouts <= C0 median hitch50: 2 vs 200.0
+PASS c1-1 cold confirmed: 'no startup pipeline recipes yet' 1, startup line no, opened 0 bytes, summary cache new (no usable file)
+PASS c1-1 recipes saved: [472]
+PASS c1-1 no cache save after Stop: saves after the Stop line 0, Stop/earlier save present True; Stop hits/misses/stored/saves {'hits': 900, 'misses': 30, 'stored': 30, 'saves': 2}
+PASS c1-1 PSO saves failed = 0: {'written': 2, 'bytes': 41971520, 'failed': 0, 'postponed': 0, 'held_ms': 45.0, 'held_worst_ms': 45.0, 'copy_ms': 40.0, 'alloc_ms': 3.0, 'write_ms': 20.0, 'retries': 0, 'under_lock': 0}
+-- c1-2
+PASS c1-2 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS c1-2 route ran: steps 55/91 last halted timeouts 0 error None
+PASS c1-2 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS c1-2 PSO stats lines: stats-on 1, interval lines 1, summary blocks 2 (request, exit)
+PASS c1-2 PSO summary block: used exit
+INFO c1-2 PSO summary used: reason 'exit' at game.log line 16, 29000 frames over 290.0 s; 2 block(s) in the log
+PASS c1-2 PSO summary reason: 'exit' (want pso-stats.now or exit)
+PASS c1-2 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS c1-2 no new hard WARN/ERROR types vs baseline: 0 hard
+PASS c1-2 no new WARN/ERROR types vs baseline: 0 new
+PASS c1-2 async on: async-on lines 1
+PASS c1-2 async failed = 0: {'posted': 60, 'ready': 60, 'failed': 0, 'skipped': 25, 'waits': 4, 'wait_ms': 6.0, 'timeouts': 2}
+PASS c1-2 async timeouts <= C0 median hitch50: 2 vs 200.0
+PASS c1-2 cold confirmed: 'no startup pipeline recipes yet' 1, startup line no, opened 0 bytes, summary cache new (no usable file)
+PASS c1-2 recipes saved: [472]
+PASS c1-2 no cache save after Stop: saves after the Stop line 0, Stop/earlier save present True; Stop hits/misses/stored/saves {'hits': 900, 'misses': 30, 'stored': 30, 'saves': 2}
+PASS c1-2 PSO saves failed = 0: {'written': 2, 'bytes': 41971520, 'failed': 0, 'postponed': 0, 'held_ms': 45.0, 'held_worst_ms': 45.0, 'copy_ms': 40.0, 'alloc_ms': 3.0, 'write_ms': 20.0, 'retries': 0, 'under_lock': 0}
+-- w0-1
+PASS w0-1 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS w0-1 route ran: steps 55/91 last halted timeouts 0 error None
+PASS w0-1 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS w0-1 PSO stats lines: stats-on 1, interval lines 1, summary blocks 2 (request, exit)
+PASS w0-1 PSO summary block: used exit
+INFO w0-1 PSO summary used: reason 'exit' at game.log line 16, 29000 frames over 290.0 s; 2 block(s) in the log
+PASS w0-1 PSO summary reason: 'exit' (want pso-stats.now or exit)
+PASS w0-1 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS w0-1 no new hard WARN/ERROR types vs baseline: 0 hard
+PASS w0-1 no new WARN/ERROR types vs baseline: 0 new
+PASS w0-1 async off: async-on lines 0
+PASS w0-1 async failed = 0: no PSO async line (0 posted, 0 skipped)
+PASS w0-1 warm cache accepted: opened 31457280 bytes, rejected 0, recipes ignored 0, summary cache loaded
+PASS w0-1 startup replay: loaded 400 compiled 72 failed 0 resident 472 elapsed_ms 2500
+PASS w0-1 startup failed = 0: failed 0
+PASS w0-1 warm startup failed = 0 (hard): failed 0
+PASS w0-1 no 'uses N threads' line (threads 1): None
+PASS w0-1 recipes saved: [472]
+PASS w0-1 no cache save after Stop: saves after the Stop line 0, Stop/earlier save present True; Stop hits/misses/stored/saves {'hits': 900, 'misses': 30, 'stored': 30, 'saves': 2}
+PASS w0-1 PSO saves failed = 0: {'written': 2, 'bytes': 41971520, 'failed': 0, 'postponed': 0, 'held_ms': 45.0, 'held_worst_ms': 45.0, 'copy_ms': 40.0, 'alloc_ms': 3.0, 'write_ms': 20.0, 'retries': 0, 'under_lock': 0}
+-- w0-2
+PASS w0-2 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS w0-2 route ran: steps 55/91 last halted timeouts 0 error None
+PASS w0-2 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS w0-2 PSO stats lines: stats-on 1, interval lines 1, summary blocks 2 (request, exit)
+PASS w0-2 PSO summary block: used exit
+INFO w0-2 PSO summary used: reason 'exit' at game.log line 16, 29000 frames over 290.0 s; 2 block(s) in the log
+PASS w0-2 PSO summary reason: 'exit' (want pso-stats.now or exit)
+PASS w0-2 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS w0-2 no new hard WARN/ERROR types vs baseline: 0 hard
+PASS w0-2 no new WARN/ERROR types vs baseline: 0 new
+PASS w0-2 async off: async-on lines 0
+PASS w0-2 async failed = 0: no PSO async line (0 posted, 0 skipped)
+PASS w0-2 warm cache accepted: opened 31457280 bytes, rejected 0, recipes ignored 0, summary cache loaded
+PASS w0-2 startup replay: loaded 400 compiled 72 failed 0 resident 472 elapsed_ms 2500
+PASS w0-2 startup failed = 0: failed 0
+PASS w0-2 warm startup failed = 0 (hard): failed 0
+PASS w0-2 no 'uses N threads' line (threads 1): None
+PASS w0-2 recipes saved: [472]
+PASS w0-2 no cache save after Stop: saves after the Stop line 0, Stop/earlier save present True; Stop hits/misses/stored/saves {'hits': 900, 'misses': 30, 'stored': 30, 'saves': 2}
+PASS w0-2 PSO saves failed = 0: {'written': 2, 'bytes': 41971520, 'failed': 0, 'postponed': 0, 'held_ms': 45.0, 'held_worst_ms': 45.0, 'copy_ms': 40.0, 'alloc_ms': 3.0, 'write_ms': 20.0, 'retries': 0, 'under_lock': 0}
+-- w1-1
+PASS w1-1 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS w1-1 route ran: steps 55/91 last halted timeouts 0 error None
+PASS w1-1 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS w1-1 PSO stats lines: stats-on 1, interval lines 1, summary blocks 2 (request, exit)
+PASS w1-1 PSO summary block: used exit
+INFO w1-1 PSO summary used: reason 'exit' at game.log line 17, 29000 frames over 290.0 s; 2 block(s) in the log
+PASS w1-1 PSO summary reason: 'exit' (want pso-stats.now or exit)
+PASS w1-1 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS w1-1 no new hard WARN/ERROR types vs baseline: 0 hard
+PASS w1-1 no new WARN/ERROR types vs baseline: 0 new
+PASS w1-1 async on: async-on lines 1
+PASS w1-1 async failed = 0: {'posted': 60, 'ready': 60, 'failed': 0, 'skipped': 25, 'waits': 4, 'wait_ms': 6.0, 'timeouts': 2}
+PASS w1-1 async timeouts <= C0 median hitch50: 2 vs 200.0
+PASS w1-1 warm cache accepted: opened 31457280 bytes, rejected 0, recipes ignored 0, summary cache loaded
+PASS w1-1 startup replay: loaded 400 compiled 72 failed 0 resident 472 elapsed_ms 2500
+PASS w1-1 startup failed = 0: failed 0
+PASS w1-1 warm startup failed = 0 (hard): failed 0
+PASS w1-1 no 'uses N threads' line (threads 1): None
+PASS w1-1 recipes saved: [472]
+PASS w1-1 no cache save after Stop: saves after the Stop line 0, Stop/earlier save present True; Stop hits/misses/stored/saves {'hits': 900, 'misses': 30, 'stored': 30, 'saves': 2}
+PASS w1-1 PSO saves failed = 0: {'written': 2, 'bytes': 41971520, 'failed': 0, 'postponed': 0, 'held_ms': 45.0, 'held_worst_ms': 45.0, 'copy_ms': 40.0, 'alloc_ms': 3.0, 'write_ms': 20.0, 'retries': 0, 'under_lock': 0}
+-- w1-2
+PASS w1-2 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS w1-2 route ran: steps 55/91 last halted timeouts 0 error None
+PASS w1-2 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS w1-2 PSO stats lines: stats-on 1, interval lines 1, summary blocks 2 (request, exit)
+PASS w1-2 PSO summary block: used exit
+INFO w1-2 PSO summary used: reason 'exit' at game.log line 17, 29000 frames over 290.0 s; 2 block(s) in the log
+PASS w1-2 PSO summary reason: 'exit' (want pso-stats.now or exit)
+PASS w1-2 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS w1-2 no new hard WARN/ERROR types vs baseline: 0 hard
+PASS w1-2 no new WARN/ERROR types vs baseline: 0 new
+PASS w1-2 async on: async-on lines 1
+PASS w1-2 async failed = 0: {'posted': 60, 'ready': 60, 'failed': 0, 'skipped': 25, 'waits': 4, 'wait_ms': 6.0, 'timeouts': 2}
+PASS w1-2 async timeouts <= C0 median hitch50: 2 vs 200.0
+PASS w1-2 warm cache accepted: opened 31457280 bytes, rejected 0, recipes ignored 0, summary cache loaded
+PASS w1-2 startup replay: loaded 400 compiled 72 failed 0 resident 472 elapsed_ms 2500
+PASS w1-2 startup failed = 0: failed 0
+PASS w1-2 warm startup failed = 0 (hard): failed 0
+PASS w1-2 no 'uses N threads' line (threads 1): None
+PASS w1-2 recipes saved: [472]
+PASS w1-2 no cache save after Stop: saves after the Stop line 0, Stop/earlier save present True; Stop hits/misses/stored/saves {'hits': 900, 'misses': 30, 'stored': 30, 'saves': 2}
+PASS w1-2 PSO saves failed = 0: {'written': 2, 'bytes': 41971520, 'failed': 0, 'postponed': 0, 'held_ms': 45.0, 'held_worst_ms': 45.0, 'copy_ms': 40.0, 'alloc_ms': 3.0, 'write_ms': 20.0, 'retries': 0, 'under_lock': 0}
+== section 6 decision lines (INFO only; n is tiny, no statistics)
+INFO #35 seeded boot: W0 hitch50 80.0 vs C0 200.0 (cut 60%, want >= 50%); W0 elapsed_ms 2500.0 (want < ~3000) -> MEETS the #35 rule
+INFO async: C1 hitch50 60.0 vs C0 200.0, p99 50.0 vs 90.0, fps 100.0 vs 100.0 -> C1 beats C0 on both (still needs the functional row and the user's eye review)
+INFO W2 parallel replay: not run (n2)
+INFO extra arm c0-3: present but not expected with --n2; ignored
+INFO extra arm w2-1: present but not expected with --n2; ignored
+RESULT: PASS

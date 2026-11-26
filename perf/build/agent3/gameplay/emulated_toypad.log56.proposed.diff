@@ -1,0 +1,15 @@
+diff --git a/rexglue-sdk/src/input/portal/emulated_toypad.cpp b/rexglue-sdk/src/input/portal/emulated_toypad.cpp
+index 91199ea..cd590c4 100644
+--- a/rexglue-sdk/src/input/portal/emulated_toypad.cpp
++++ b/rexglue-sdk/src/input/portal/emulated_toypad.cpp
+@@ -245,7 +245,9 @@ X_STATUS EmulatedToypad::ReadInternal(std::span<uint8_t> data, int32_t& read_cou
+   read_count = static_cast<int32_t>(count);
+ 
+   static int logged_reads = 0;
+-  if (logged_reads < 64) {
++  // Figure added/removed events (0x56) are rare and are the only game.log proof that a
++  // placement reached the game, so they are logged past the cap.
++  if (logged_reads < 64 || frame[0] == 0x56) {
+     logged_reads++;
+     REXLOG_INFO("Toypad[Read ] {}", ToHex(out.data(), count));
+   }

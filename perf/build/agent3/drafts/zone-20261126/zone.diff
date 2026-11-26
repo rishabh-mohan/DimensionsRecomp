@@ -1,0 +1,791 @@
+diff --git a/a/RUN-EXPLORE.cmd b/b/RUN-EXPLORE.cmd
+index 4f9f303..f04c723 100644
+--- a/a/RUN-EXPLORE.cmd
++++ b/b/RUN-EXPLORE.cmd
+@@ -4,7 +4,9 @@ rem   RUN-EXPLORE.cmd            real run (interactive desktop; ~17-27 min incl.
+ rem   RUN-EXPLORE.cmd dryrun     no game: checks, command lines, run-game -DryRun, self-tests; exit 0 = pass (HEAVY I/O:
+ rem                              copies + hashes the pinned native bins, ~382 MB)
+ rem   RUN-EXPLORE.cmd pincheck   only the kit pin check below; exit 0 = all pins match, 3 = mismatch
+-rem   extra words: allowhidden, xenosonly (explore on xenos instead)
++rem   extra words: allowhidden, xenosonly (explore on xenos instead), zone (prompt sidecar --zone answers the
++rem                zone step from the pad LEDs, first pad 3 command at T0 + 45 s; the v-replace then-mark is off;
++rem                default off)
+ rem Front-end-marker-gated boot, New Game, the story's 3 figure prompts (answered by the prompt sidecar), then 120 s
+ rem observe, single probes, walk/fight probe loop; a screenshot per mark. -Seconds 1500 is a cap (the route stops itself).
+ rem Writes only build\agent3\gameplay\ (runs, shots, post, logs, bin-native). Report: post\gameplay-<stamp>.txt
+@@ -12,8 +14,8 @@ rem Kit pins: every file this kit runs or reads as code/data is sha256-pinned he
+ rem any mismatch refuses with exit 3 before anything starts. Paths are relative to the WS (three levels up).
+ setlocal
+ set "GP=%~dp0"
+-set "GPPIN_01=28F7785BDB47FBDFCA0397BD0139AF5D82BB1EF9D28FFD1298C98CBAD09271BA|build\agent3\gameplay\gameplay-run.ps1"
+-set "GPPIN_02=2950A4471C1271BCDAC132816D89CF3C95812785AF7A569A94850E6A1A3DE068|build\agent3\gameplay\gameplay-watch.ps1"
++set "GPPIN_01=691B70ADA6C5583987CD190BC8D154BAA41C57D204D591D86CB46499E0D5AC24|build\agent3\gameplay\gameplay-run.ps1"
++set "GPPIN_02=4BE7E90E16F08AAA5C7E069442DF8F602E79385FE287A5FA3FD4BD9521A1F776|build\agent3\gameplay\gameplay-watch.ps1"
+ set "GPPIN_03=E33DF65402DF053C0DBA5328632A14A0B6B90831EA0E51B1DD319C98501C8F50|build\agent3\gameplay\gameplay_post.py"
+ set "GPPIN_04=2C1977DE3652DF2496F57C9D4B10D0E73008871F8DF3B516D62DB52D59004D50|build\agent3\gameplay\gen_gameplay_route.py"
+ set "GPPIN_05=CB271440130C47ED8CBE8FAE804BD82F4B82EBA3C8C48C77D920AA563F91831F|build\agent3\gameplay\explore-route.txt"
+@@ -34,8 +36,8 @@ set "GPPIN_19=9F6E6E3B5C7D89FA6D2E7B08CF122C313321F1A9C90EF8295A0FA0C7776552E8|h
+ set "GPPIN_20=AE6C8B0C2A00B70A8427C203B3DD3EB1398F41E2D3EA753FBB3FCB6A039BF8D3|harness\runstats.py"
+ set "GPPIN_21=80FF4C5F581C4B1BC02C8E98039CBA6A62BEB4CE5F0E267885F9DA7F17C9B95E|build\agent2\session3\verify-bins.py"
+ set "GPPIN_22=309DF316B576D2C39715D1C2B6803F34AB92F1FAFC84315D2B65483159AC7B3B|build\agent3\vpad\xinput1_4.dll"
+-set "GPPIN_23=31C33A80A2DC997304B32454750406754B811F6ED640170B1CC4CA613296C504|build\agent3\gameplay\prompt_sidecar.py"
+-set "GPPIN_24=BAA14BFC266D6502995FF7827363FFB5EBD8CC8734EEF37769DE5F00AB12356F|build\agent3\gameplay\selftest_prompt.py"
++set "GPPIN_23=1D9A6EB54B3C300AF0FEB57E266AAD072B272C808CC6087FD47CA2F39A194A4B|build\agent3\gameplay\prompt_sidecar.py"
++set "GPPIN_24=A48065480D3299B5C2AD60A3E1A814B9112F3606B413174370A824F1F13B9547|build\agent3\gameplay\selftest_prompt.py"
+ set "GPPIN_25=3446BA57E1CFD771203F158A13B17B7457A4FE4E70FE12041C5A526454C02D63|build\agent3\toypad\fake_listener.py"
+ set "DRY="
+ set "PINONLY="
+diff --git a/a/RUN-GAMEPLAY.cmd b/b/RUN-GAMEPLAY.cmd
+index 9b794a7..2b4f87b 100644
+--- a/a/RUN-GAMEPLAY.cmd
++++ b/b/RUN-GAMEPLAY.cmd
+@@ -4,14 +4,17 @@ rem   RUN-GAMEPLAY.cmd            real run (interactive desktop; ~2 x 15-25 min,
+ rem   RUN-GAMEPLAY.cmd dryrun     no game: checks, command lines, run-game -DryRun, self-tests; exit 0 = pass (HEAVY I/O:
+ rem                               copies + hashes the pinned native and xenos bins, ~600 MB)
+ rem   RUN-GAMEPLAY.cmd pincheck   only the kit pin check below; exit 0 = all pins match, 3 = mismatch
+-rem   extra words: nativeonly, xenosonly, allowhidden
++rem   extra words: nativeonly, xenosonly, allowhidden, zone (prompt sidecar --zone answers the zone step from
++rem                the pad LEDs, first pad 3 command at T0 + 45 s; the v-replace then-mark is off; default off),
++rem                cand5 (only with nativeonly: native arm = M16 native5pack-bin, copy bin-native5, tag gp5,
++rem                trace-native5, post fp a349d5292f67b127; default off; exit 2 with any other mode word)
+ rem Route = gameplay-route.txt (refined after the exploration run). Writes only build\agent3\gameplay\.
+ rem Kit pins: every file this kit runs or reads as code/data is sha256-pinned here (the waiter pins only this .cmd);
+ rem any mismatch refuses with exit 3 before anything starts. Paths are relative to the WS (three levels up).
+ setlocal
+ set "GP=%~dp0"
+-set "GPPIN_01=28F7785BDB47FBDFCA0397BD0139AF5D82BB1EF9D28FFD1298C98CBAD09271BA|build\agent3\gameplay\gameplay-run.ps1"
+-set "GPPIN_02=2950A4471C1271BCDAC132816D89CF3C95812785AF7A569A94850E6A1A3DE068|build\agent3\gameplay\gameplay-watch.ps1"
++set "GPPIN_01=691B70ADA6C5583987CD190BC8D154BAA41C57D204D591D86CB46499E0D5AC24|build\agent3\gameplay\gameplay-run.ps1"
++set "GPPIN_02=4BE7E90E16F08AAA5C7E069442DF8F602E79385FE287A5FA3FD4BD9521A1F776|build\agent3\gameplay\gameplay-watch.ps1"
+ set "GPPIN_03=E33DF65402DF053C0DBA5328632A14A0B6B90831EA0E51B1DD319C98501C8F50|build\agent3\gameplay\gameplay_post.py"
+ set "GPPIN_04=2C1977DE3652DF2496F57C9D4B10D0E73008871F8DF3B516D62DB52D59004D50|build\agent3\gameplay\gen_gameplay_route.py"
+ set "GPPIN_05=CB271440130C47ED8CBE8FAE804BD82F4B82EBA3C8C48C77D920AA563F91831F|build\agent3\gameplay\explore-route.txt"
+@@ -32,8 +35,8 @@ set "GPPIN_19=9F6E6E3B5C7D89FA6D2E7B08CF122C313321F1A9C90EF8295A0FA0C7776552E8|h
+ set "GPPIN_20=AE6C8B0C2A00B70A8427C203B3DD3EB1398F41E2D3EA753FBB3FCB6A039BF8D3|harness\runstats.py"
+ set "GPPIN_21=80FF4C5F581C4B1BC02C8E98039CBA6A62BEB4CE5F0E267885F9DA7F17C9B95E|build\agent2\session3\verify-bins.py"
+ set "GPPIN_22=309DF316B576D2C39715D1C2B6803F34AB92F1FAFC84315D2B65483159AC7B3B|build\agent3\vpad\xinput1_4.dll"
+-set "GPPIN_23=31C33A80A2DC997304B32454750406754B811F6ED640170B1CC4CA613296C504|build\agent3\gameplay\prompt_sidecar.py"
+-set "GPPIN_24=BAA14BFC266D6502995FF7827363FFB5EBD8CC8734EEF37769DE5F00AB12356F|build\agent3\gameplay\selftest_prompt.py"
++set "GPPIN_23=1D9A6EB54B3C300AF0FEB57E266AAD072B272C808CC6087FD47CA2F39A194A4B|build\agent3\gameplay\prompt_sidecar.py"
++set "GPPIN_24=A48065480D3299B5C2AD60A3E1A814B9112F3606B413174370A824F1F13B9547|build\agent3\gameplay\selftest_prompt.py"
+ set "GPPIN_25=3446BA57E1CFD771203F158A13B17B7457A4FE4E70FE12041C5A526454C02D63|build\agent3\toypad\fake_listener.py"
+ set "DRY="
+ set "PINONLY="
+diff --git a/a/RUN-MANUAL.cmd b/b/RUN-MANUAL.cmd
+index 8dfa6e6..f0f84d7 100644
+--- a/a/RUN-MANUAL.cmd
++++ b/b/RUN-MANUAL.cmd
+@@ -14,8 +14,8 @@ rem Kit pins: every file this kit runs or reads as code/data is sha256-pinned he
+ rem any mismatch refuses with exit 3 before anything starts. Paths are relative to the WS (three levels up).
+ setlocal
+ set "GP=%~dp0"
+-set "GPPIN_01=28F7785BDB47FBDFCA0397BD0139AF5D82BB1EF9D28FFD1298C98CBAD09271BA|build\agent3\gameplay\gameplay-run.ps1"
+-set "GPPIN_02=2950A4471C1271BCDAC132816D89CF3C95812785AF7A569A94850E6A1A3DE068|build\agent3\gameplay\gameplay-watch.ps1"
++set "GPPIN_01=691B70ADA6C5583987CD190BC8D154BAA41C57D204D591D86CB46499E0D5AC24|build\agent3\gameplay\gameplay-run.ps1"
++set "GPPIN_02=4BE7E90E16F08AAA5C7E069442DF8F602E79385FE287A5FA3FD4BD9521A1F776|build\agent3\gameplay\gameplay-watch.ps1"
+ set "GPPIN_03=E33DF65402DF053C0DBA5328632A14A0B6B90831EA0E51B1DD319C98501C8F50|build\agent3\gameplay\gameplay_post.py"
+ set "GPPIN_04=2C1977DE3652DF2496F57C9D4B10D0E73008871F8DF3B516D62DB52D59004D50|build\agent3\gameplay\gen_gameplay_route.py"
+ set "GPPIN_05=CB271440130C47ED8CBE8FAE804BD82F4B82EBA3C8C48C77D920AA563F91831F|build\agent3\gameplay\explore-route.txt"
+@@ -36,8 +36,8 @@ set "GPPIN_19=9F6E6E3B5C7D89FA6D2E7B08CF122C313321F1A9C90EF8295A0FA0C7776552E8|h
+ set "GPPIN_20=AE6C8B0C2A00B70A8427C203B3DD3EB1398F41E2D3EA753FBB3FCB6A039BF8D3|harness\runstats.py"
+ set "GPPIN_21=80FF4C5F581C4B1BC02C8E98039CBA6A62BEB4CE5F0E267885F9DA7F17C9B95E|build\agent2\session3\verify-bins.py"
+ set "GPPIN_22=309DF316B576D2C39715D1C2B6803F34AB92F1FAFC84315D2B65483159AC7B3B|build\agent3\vpad\xinput1_4.dll"
+-set "GPPIN_23=31C33A80A2DC997304B32454750406754B811F6ED640170B1CC4CA613296C504|build\agent3\gameplay\prompt_sidecar.py"
+-set "GPPIN_24=BAA14BFC266D6502995FF7827363FFB5EBD8CC8734EEF37769DE5F00AB12356F|build\agent3\gameplay\selftest_prompt.py"
++set "GPPIN_23=1D9A6EB54B3C300AF0FEB57E266AAD072B272C808CC6087FD47CA2F39A194A4B|build\agent3\gameplay\prompt_sidecar.py"
++set "GPPIN_24=A48065480D3299B5C2AD60A3E1A814B9112F3606B413174370A824F1F13B9547|build\agent3\gameplay\selftest_prompt.py"
+ set "GPPIN_25=3446BA57E1CFD771203F158A13B17B7457A4FE4E70FE12041C5A526454C02D63|build\agent3\toypad\fake_listener.py"
+ set "DRY="
+ set "PINONLY="
+diff --git a/a/gameplay-run.ps1 b/b/gameplay-run.ps1
+index 1a3df0a..a2abaf7 100644
+--- a/a/gameplay-run.ps1
++++ b/b/gameplay-run.ps1
+@@ -13,6 +13,16 @@
+ #   nativeonly | xenosonly   one arm only.
+ #   dump         DIAGNOSTIC, only with 'manual' (native arm): adds LEGO_DUMP_MISSING_SHADERS=<kit>\shader-dumps-native-<stamp>
+ #                (M16 PLAN-story-dump option A: miss cache off + pool-copy hash check, so the run's timing is invalid).
++#   zone         not with 'manual': the prompt sidecar gets --zone --zone-delay 45 (answers the story's zone step from the
++#                Toy Pad LEDs: pad 3 Wyldstyle, pad 2 Gandalf, pad 1 Batman; see prompt_sidecar.py; first pad 3 command at
++#                T0 + 45 s, M10 Z-S1: earliest evidenced accept ~T0 + 48.5 s) and the route mark v-replace is
++#                not wired (it would reshuffle the figures during the step). Off unless this word is given.
++#                Explore and route runs always pass --led-shots (the watcher also shoots the sidecar's LED-state rows).
++#   cand5        M16 proof5 candidate (PLAN-proof5), ONLY with 'nativeonly' (exit 2 with manual / explore / dump /
++#                xenosonly or without nativeonly): the native arm runs build\agent16\pack\native5pack-bin (MANIFEST
++#                787CD694..46A1, exe 90BF6B45..EE7D, fp a349d5292f67b127) from its own copy bin-native5 (bin-native is
++#                not touched), tag gp5-native, trace dir trace-native5-<stamp>, post --expect-fp a349d5292f67b127.
++#                Without this word nothing changes (native4bp-bin, bin-native, gp-native, trace-native-<stamp>, 39129c4c).
+ #   dryrun       no game: preconditions (reported), pin + copy checks, the real command lines, run-game -DryRun per arm
+ #                (also parses the route), route = generator output, prompt sidecar --help + self-test + tag check, watcher + post
+ #                self-tests; removes dryrun-runs. Prints DRY RUN ALL PASS and exits 0 when everything passes.
+@@ -23,7 +33,8 @@
+ #      -InputScript <route> -Cvar <cap> [-Env LEGO_NATIVE_TRACE_DIR=<abs>]; each run gets a fresh <run>\user (sandbox
+ #      profile/saves: the user's own profile is never read or written). VPad = harness default
+ #      build\agent3\vpad\xinput1_4.dll (read-only; nothing under build\agent3\vpad is touched).
+-#   native: build\agent16\pack\native4bp-bin (MANIFEST C5181520..A690, fp 39129c4c059be5f0), native_fps_limit=60, trace on.
++#   native: build\agent16\pack\native4bp-bin (MANIFEST C5181520..A690, fp 39129c4c059be5f0), native_fps_limit=60, trace on
++#           (with 'cand5': native5pack-bin, see above).
+ #   xenos : build\agent2\devfinal2-bin (MANIFEST 4A4A13ED..982D, BIN-PINS.md), framerate_limit=60.
+ #   (caps as M8's build\agent8\s5\matrix-s5-baseline.json). Pinned dirs are only read: sha256-checked copies in
+ #   build\agent3\gameplay\bin-<arm> are what runs.
+@@ -44,7 +55,7 @@
+ # after 30 s) and stops the helpers it started, by their held handles. A closed console window can't run it.
+ $ErrorActionPreference = 'Stop'
+ $words = @($args | ForEach-Object { "$_".ToLower().TrimStart('-') })
+-$known = @('explore', 'manual', 'nativeonly', 'xenosonly', 'dryrun', 'allowhidden', 'dump')
++$known = @('explore', 'manual', 'nativeonly', 'xenosonly', 'dryrun', 'allowhidden', 'dump', 'zone', 'cand5')
+ $unknown = @($words | Where-Object { $known -notcontains $_ })
+ if ($unknown.Count) { Write-Host "unknown word(s): $($unknown -join ' ') (known: $($known -join ' '))"; exit 2 }
+ $DryRun = $words -contains 'dryrun'; $AllowHidden = $words -contains 'allowhidden'; $Explore = $words -contains 'explore'
+@@ -53,6 +64,11 @@ if ($Manual -and $Explore) { Write-Host "'manual' and 'explore' exclude each oth
+ $Dump = $words -contains 'dump'   # FUNCTIONAL ONLY: LEGO_DUMP_MISSING_SHADERS (miss cache OFF, pool-copy hash check)
+ if ($Dump -and -not $Manual) { Write-Host "'dump' is allowed only with 'manual' (functional, untimed)"; exit 2 }
+ if ($Dump -and ($words -contains 'xenosonly')) { Write-Host "'dump' needs the native arm (not with 'xenosonly')"; exit 2 }
++$Zone = $words -contains 'zone'   # prompt sidecar --zone (Toy Pad actions from the LEDs); explore / route only
++if ($Zone -and $Manual) { Write-Host "'zone' is not allowed with 'manual' (there the ctl files drive the zone step)"; exit 2 }
++$Cand5 = $words -contains 'cand5'   # M16 proof5: native arm = native5pack-bin (copy bin-native5, tag gp5, fp a349d529)
++if ($Cand5 -and ($Manual -or $Explore -or $Dump)) { Write-Host "'cand5' is not allowed with 'manual', 'explore' or 'dump' (route runs with 'nativeonly' only)"; exit 2 }
++if ($Cand5 -and (($words -notcontains 'nativeonly') -or ($words -contains 'xenosonly'))) { Write-Host "'cand5' needs 'nativeonly' (and not 'xenosonly')"; exit 2 }
+ $Seconds = if ($Manual) { 1200 } else { 1500 }   # explore + route: a cap (the route's 'stop' ends it, ~900 s)
+ $kit = $PSScriptRoot                                   # build\agent3\gameplay
+ $ws = (Resolve-Path (Join-Path $kit '..\..\..')).Path
+@@ -110,15 +126,22 @@ function Sync-Copy([string]$src, [string]$dst) {
+ 
+ $allArms = @(
+     [pscustomobject]@{ name = 'native'; pinned = (Join-Path $ws 'build\agent16\pack\native4bp-bin'); copy = (Join-Path $kit 'bin-native')
+-        manifest = 'C518152026695279993085A8497E7B14D318C1DFF54B57F2767670B90A7AA690'; cvar = 'native_fps_limit=60'; trace = $true },
++        manifest = 'C518152026695279993085A8497E7B14D318C1DFF54B57F2767670B90A7AA690'; cvar = 'native_fps_limit=60'; trace = $true; tr = 'native' },
+     [pscustomobject]@{ name = 'xenos'; pinned = (Join-Path $ws 'build\agent2\devfinal2-bin'); copy = (Join-Path $kit 'bin-xenos')
+-        manifest = '4A4A13EDFBFF6A5F32798837A4156256A5A58A2C44579F272B5147768E50982D'; cvar = 'framerate_limit=60'; trace = $false }
++        manifest = '4A4A13EDFBFF6A5F32798837A4156256A5A58A2C44579F272B5147768E50982D'; cvar = 'framerate_limit=60'; trace = $false; tr = 'xenos' }
+ )
++if ($Cand5) {   # arm name stays 'native' (post: --arm native=..., native fingerprint check)
++    $allArms[0].pinned = Join-Path $ws 'build\agent16\pack\native5pack-bin'; $allArms[0].copy = Join-Path $kit 'bin-native5'
++    $allArms[0].manifest = '787CD694F0B884D99D1D1E3C807642B33CBA22D79A8F9253C071A8898D1446A1'; $allArms[0].tr = 'native5'
++}
+ $want = if ($words -contains 'nativeonly') { @('native') } elseif ($words -contains 'xenosonly') { @('xenos') } elseif ($Explore -or $Manual) { @('native') } else { @('native', 'xenos') }
+ $arms = @($allArms | Where-Object { $want -contains $_.name })
+-$nativeFp = '39129c4c059be5f0'
++$nativeFp = if ($Cand5) { 'a349d5292f67b127' } else { '39129c4c059be5f0' }
++$wiringFp = '39129c4c059be5f0'   # dryrun native wiring stand-in: M16's native4bp smoke run (always 39129c4c)
+ Say "gameplay $(if ($Manual) { 'MANUAL' } elseif ($Explore) { 'EXPLORE' } else { 'ROUTE' }) $(if ($DryRun) { 'DRY RUN (no game)' } else { 'REAL RUN' }); arms $($want -join ', '); route $(if ($Manual) { 'none (manual: no -InputScript, default SDL input)' } else { $route }); -Seconds $Seconds; WS $ws"
+ if ($Dump) { Say "DIAGNOSTIC: dump on, timing invalid (LEGO_DUMP_MISSING_SHADERS=$(Join-Path $kit "shader-dumps-native-$stamp"))" }
++if ($Zone) { Say 'ZONE: prompt sidecar --zone --zone-delay 45 on (zone step answered from the Toy Pad LEDs); route mark v-replace not wired' }
++if ($Cand5) { Say "CAND5: native arm = $($allArms[0].pinned) (MANIFEST $($allArms[0].manifest.Substring(0,16))), copy $($allArms[0].copy), tag gp5-native, trace trace-native5-$stamp, post --expect-fp $nativeFp" }
+ 
+ # --- preconditions ---
+ $fail = @(); $refuse = @()
+@@ -173,7 +196,7 @@ foreach ($arm in $arms) {
+ }
+ if ($bad) { exit 2 }
+ 
+-$tagBase = if ($Manual) { 'gpman' } elseif ($Explore) { 'gpexp' } else { 'gp' }
++$tagBase = if ($Manual) { 'gpman' } elseif ($Explore) { 'gpexp' } elseif ($Cand5) { 'gp5' } else { 'gp' }
+ function Rg-Args($arm, [string]$root, [string]$trace, [bool]$dry) {
+     $x = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $rg, '-BinDir', $arm.copy, '-Seconds', "$Seconds", '-GpuLog',
+         '-Tag', "$tagBase-$($arm.name)", '-RunsRoot', $root)
+@@ -191,13 +214,13 @@ function Sidecar-Args($arm, [string]$root, [datetime]$t0) {
+     $s = @('-B', $psc, '--runs-root', $root, '--tag', "$tagBase-$($arm.name)", '--not-before', $t0.ToString('o'), '--tags-dir', $tags,
+         '--timeout', "$($Seconds + 240)", '--delay', '2', '--boot', 'starter')
+     foreach ($o in $onSpecs) { $s += @('--on', $o) }
+-    if (-not $Manual) { $s += @('--then-mark', 'v-replace', '--then-delay', '1', '--then-action', 'replace') }; $s
++    if (-not $Manual) { $s += '--led-shots'; if ($Zone) { $s += @('--zone', '--zone-delay', '45') } else { $s += @('--then-mark', 'v-replace', '--then-delay', '1', '--then-action', 'replace') } }; $s
+ }
+ 
+ if ($DryRun) {
+     $bad = 0
+     foreach ($arm in $arms) {
+-        $tr = Join-Path $kit "trace-$($arm.name)-$stamp"
++        $tr = Join-Path $kit "trace-$($arm.tr)-$stamp"
+         Say "COMMAND (real run, arm $($arm.name)): $(Cmd-Line (Rg-Args $arm (Join-Path $kit 'runs') $tr $false))"
+         $sca = @((Sidecar-Args $arm (Join-Path $kit 'runs') (Get-Date)) | ForEach-Object { if ("$_" -match '\s') { '"' + $_ + '"' } else { "$_" } })
+         Say "SIDECAR (real run, arm $($arm.name)): $py $($sca -join ' ')"
+@@ -209,10 +232,10 @@ if ($DryRun) {
+     $ErrorActionPreference = 'Continue'
+     $h = @(& $py -B $psc --help 2>&1 | ForEach-Object { "$_" }); $hrc = $LASTEXITCODE
+     $ErrorActionPreference = 'Stop'
+-    $okh = ($hrc -eq 0) -and (($h -join ' ') -match '--then-mark') -and (($h -join ' ') -match '--then-action') -and (($h -join ' ') -match '--on ')
+-    Say "prompt sidecar --help exit $hrc, then-mark/then-action/on flags $(if ($okh) { 'present' } else { 'MISSING' })"; if (-not $okh) { $bad++ }
++    $okh = ($hrc -eq 0) -and (($h -join ' ') -match '--then-mark') -and (($h -join ' ') -match '--then-action') -and (($h -join ' ') -match '--on ') -and (($h -join ' ') -match '--zone ') -and (($h -join ' ') -match '--led-shots')
++    Say "prompt sidecar --help exit $hrc, then-mark/then-action/on/zone/led-shots flags $(if ($okh) { 'present' } else { 'MISSING' })"; if (-not $okh) { $bad++ }
+     $rc = Run-Logged $py @('-B', $pst)
+-    Say "prompt sidecar self-test (fake listener: boot, prompts, ctl place/remove/move/swap/replace/status, route marks, bad --on) exit $rc"; if ($rc -ne 0) { $bad++ }
++    Say "prompt sidecar self-test (fake listener: boot, prompts, ctl place/remove/move/swap/replace/status, route marks, bad --on, zone step + retry/stop, led shots) exit $rc"; if ($rc -ne 0) { $bad++ }
+     $tc = "import sys; sys.path.insert(0, r'$(Split-Path -Parent $sidecar)'); import ldtag, toypad_client as tc; t = tc.starter_tags(r'$tags'); print('tags ok: ' + ', '.join('%s id=%d pad=%d index=%d' % (n, ldtag.figure_id(x), p, i) for n, p, i, x in t)); sys.exit(0 if len(t) == 3 else 1)"
+     $rc = Run-Logged $py @('-B', '-c', $tc)
+     Say "starter tag check exit $rc"; if ($rc -ne 0) { $bad++ }
+@@ -227,11 +250,16 @@ if ($DryRun) {
+     $nr = Join-Path $m16 'runs\20261125-174131-smoke-4bp'; $nt = Join-Path $m16 'trace-4bp-20261125-174125'; $ns = Join-Path $m16 'shots\20261125-174125'
+     if ((Test-Path -LiteralPath $nr) -and (Test-Path -LiteralPath $nt)) {
+         $wo = Join-Path $kit "logs\post-native-wiring-$stamp.txt"
+-        $rc = Run-Logged $py @('-B', $post, '--arm', "native=$nr,$nt,$ns", '--expect-fp', $nativeFp, '--out', $wo)
++        $rc = Run-Logged $py @('-B', $post, '--arm', "native=$nr,$nt,$ns", '--expect-fp', $wiringFp, '--out', $wo)
+         $txt = Get-Content -LiteralPath $wo -Raw -ErrorAction SilentlyContinue
+         $ok = ($rc -eq 0) -and ($txt -match 'PASS native fingerprint') -and ($txt -match 'missing draws \(native trace') -and ($txt -match '(?m)^RESULT: ')
+         Say "post native wiring (M16 smoke run as stand-in) exit $rc, fingerprint + trace + RESULT $(if ($ok) { 'ok' } else { 'BAD' })"; if (-not $ok) { $bad++ }
+     } else { Say 'note: M16 smoke run not found: native wiring test skipped' }
++    # word combos that must exit 2 (they exit in the word checks, before the lock, python and any file work)
++    foreach ($wc in @('zone manual', 'cand5 manual nativeonly', 'cand5 explore nativeonly', 'cand5 manual dump nativeonly', 'cand5', 'cand5 nativeonly xenosonly', 'dump', 'bogusword')) {
++        $rc = Run-Logged 'powershell' (@('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $PSCommandPath) + @($wc -split ' '))
++        Say "word combo '$wc' exit $rc $(if ($rc -eq 2) { '(expected 2: ok)' } else { '(expected 2: BAD)' })"; if ($rc -ne 2) { $bad++ }
++    }
+     if (Test-Path -LiteralPath $runsRoot) {
+         $rp = @(Get-ChildItem -LiteralPath $runsRoot -Recurse -Force | Where-Object { $_.Attributes -band [IO.FileAttributes]::ReparsePoint })
+         if ($rp.Count) { Say 'dryrun-runs has reparse points: NOT deleted'; $bad++ } else { Remove-Item -LiteralPath $runsRoot -Recurse -Force; Say 'dryrun-runs removed' }
+@@ -268,7 +296,7 @@ function Stop-Ours {
+ try {
+ foreach ($arm in $arms) {
+     if (Test-Path -LiteralPath $hold) { Say "WINDOW-HOLD.txt appeared: arm $($arm.name) not started"; $rcAll = 3; break }
+-    $tr = Join-Path $kit "trace-$($arm.name)-$stamp"
++    $tr = Join-Path $kit "trace-$($arm.tr)-$stamp"
+     $tag = "$tagBase-$($arm.name)"
+     $base = Join-Path $kit "logs\$stamp-$($arm.name)"
+     $x = Rg-Args $arm $runsRoot $tr $false
+@@ -323,6 +351,6 @@ $sums = Join-Path $kit "post\SHA256SUMS-$stamp.txt"
+ $items = @(Get-Item -LiteralPath $postOut -ErrorAction SilentlyContinue)
+ if (Test-Path -LiteralPath $shots) { $items += Get-ChildItem -LiteralPath $shots -File }
+ $items | ForEach-Object { "$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash)  $($_.Length)  $($_.FullName.Substring($ws.Length + 1))" } | Set-Content -LiteralPath $sums -Encoding ascii
+-Set-Content -LiteralPath (Join-Path $kit 'LATEST.txt') -Value "$stamp $(if ($Explore) { 'explore' } else { 'route' }) exit=$rcAll post=$prc shots=$shots report=$postOut $verdict" -Encoding ascii
++Set-Content -LiteralPath (Join-Path $kit 'LATEST.txt') -Value "$stamp $(if ($Explore) { 'explore' } else { 'route' })$(if ($Cand5) { ' cand5' }) exit=$rcAll post=$prc shots=$shots report=$postOut $verdict" -Encoding ascii
+ Say "GAMEPLAY DONE: run-game $(if ($rcAll) { "exit code $rcAll" } else { 'exit 0' }); post exit $prc; $verdict; shots $shots; report $postOut"
+ exit $(if ($rcAll -ne 0 -or $prc -ne 0) { $(if ($rcAll -eq 3) { 3 } else { 1 }) } else { 0 })
+diff --git a/a/gameplay-watch.ps1 b/b/gameplay-watch.ps1
+index 8d9636b..5006c7b 100644
+--- a/a/gameplay-watch.ps1
++++ b/b/gameplay-watch.ps1
+@@ -4,7 +4,9 @@
+ # new 'mark' row, captures the GAME WINDOW's client area only (CopyFromScreen of that rectangle: needs the visible
+ # desktop and the game window on top; a mark while the game is NOT the foreground window is logged and skipped, so no
+ # other window's pixels are ever saved) as JPEG into -OutDir\<arm>-<nnn>-<mark>.jpg (nnn = mark number in the route) and
+-# appends index.csv (file,time,route_t_s,mark,x,y,w,h,foreground). Capture code as M16's smoke-watch.ps1 /
++# appends index.csv (file,time,route_t_s,mark,x,y,w,h,foreground). Also a shot for every 'shot' row the prompt sidecar
++# writes to <run>\toypad-events.csv (--led-shots: Toy Pad LED states) as -OutDir\<arm>-led-<nn>-<label>.jpg (index.csv
++# mark 'led_<label>', route_t_s empty; gameplay_post.py's <arm>-<nnn>- mark lookup skips these). Capture code as M16's smoke-watch.ps1 /
+ # build\agent3\session3\s33-rows\row3\row3-watch.ps1 (read-only references). Exits when the game has been gone for 5 s or
+ # at -Seconds + 240. Touches no process; writes only -OutDir.
+ # -SelfTest: one synthetic JPEG + the input.csv mark parser on -SelfTestCsv (no game, no capture). Exit 0 ok, 1 failed.
+@@ -66,6 +68,21 @@ function Read-Marks([string]$csv) {
+     @($txt -split "`r?`n" | ForEach-Object { $c = $_.Split(','); if ($c.Count -ge 5 -and $c[2] -eq 'mark') { , @($c[0], $c[3]) } })
+ }
+ function Safe([string]$s) { ($s -replace '[^A-Za-z0-9._-]', '_') }
++function Read-Shots([string]$csv) {
++    # labels of the 'shot' rows of the prompt sidecar's toypad-events.csv (wall,t_sidecar,game_ts,kind,detail) in the
++    # complete lines added since the last call (byte offset $script:tpPos: the file is read once, not every poll)
++    try { $fs = [IO.File]::Open($csv, 'Open', 'Read', [IO.FileShare]'ReadWrite, Delete') } catch { return @() }
++    try {
++        if ($fs.Length -le $script:tpPos) { return @() }
++        $null = $fs.Seek($script:tpPos, 'Begin'); $buf = New-Object byte[] ($fs.Length - $script:tpPos)
++        $n = $fs.Read($buf, 0, $buf.Length)
++    } finally { $fs.Dispose() }
++    if ($n -le 0) { return @() }
++    $end = [Array]::LastIndexOf($buf, [byte]10, $n - 1); if ($end -lt 0) { return @() }
++    $script:tpPos += $end + 1
++    @([Text.Encoding]::UTF8.GetString($buf, 0, $end + 1) -split "`r?`n" | ForEach-Object { $c = $_.Split(',', 5); if ($c.Count -eq 5 -and $c[3] -eq 'shot') { $c[4] } })
++}
++$script:tpPos = 0
+ 
+ if ($SelfTest) {
+     $ok = $true
+@@ -78,11 +95,17 @@ if ($SelfTest) {
+     Say "SELFTEST jpg $len B; marks in csv $($m.Count) (first $first, last $last); names e.g. $Arm-001-$(Safe $(if ($m.Count) { $m[0][1] } else { 'x' })).jpg"
+     if ($SelfTestCsv -and $m.Count -lt 3) { $ok = $false }
+     if (Test-Path -LiteralPath $p) { Remove-Item -LiteralPath $p -Force }
++    $tp = Join-Path $OutDir "selftest-$Arm-toypad-events.csv"
++    Set-Content -LiteralPath $tp -Encoding ascii -Value @('wall,t_sidecar,game_ts,kind,detail', '05:25:41.306,1.00,05:25:41.300,zone-t0,pad 3 lit FF 00 18 speed 15 after the prompts',
++        '05:25:41.307,1.01,05:25:41.300,shot,zone-t0', '05:27:26.820,2.00,05:27:26.818,alert,"pad 1 lit FF 00 00 speed 18: state 1, starts"', '05:27:31.830,3.00,,shot,alert1-plus05s')
++    $sh = @(Read-Shots $tp); Remove-Item -LiteralPath $tp -Force
++    Say "SELFTEST led shot rows $($sh.Count) ($($sh -join ' ')); names e.g. $Arm-led-01-$(Safe $(if ($sh.Count) { $sh[0] } else { 'x' })).jpg"
++    if (($sh -join ' ') -ne 'zone-t0 alert1-plus05s') { $ok = $false }
+     Say "SELFTEST $(if ($ok) { 'ok' } else { 'FAILED' })"; exit $(if ($ok) { 0 } else { 1 })
+ }
+ 
+ $start = Get-Date; $deadline = $start.AddSeconds($Seconds + 240)
+-$run = $null; $handled = 0; $seen = $false; $gone = $null; $idx = Join-Path $OutDir 'index.csv'; $shots = 0
++$run = $null; $handled = 0; $tpHandled = 0; $seen = $false; $gone = $null; $idx = Join-Path $OutDir 'index.csv'; $shots = 0
+ if (-not (Test-Path -LiteralPath $idx)) { Set-Content -LiteralPath $idx -Value 'file,time,route_t_s,mark,x,y,w,h,foreground' -Encoding ascii }
+ Say "watching $RunsRoot for *-$Tag; every mark"
+ while ((Get-Date) -lt $deadline) {
+@@ -110,8 +133,21 @@ while ((Get-Date) -lt $deadline) {
+                 Say "mark $handled $($mk[1]) (route $($mk[0]) s): saved $name ($($a.Width)x$($a.Height), foreground $fg)"
+             } catch { Say "mark $handled $($mk[1]): capture failed: $($_.Exception.Message)" }
+         }
++        # Toy Pad LED states the prompt sidecar asks for (--led-shots: zone cues, the speed-18 state +5/+30/+60 s)
++        $new = @(Read-Shots (Join-Path $run 'toypad-events.csv'))
++        foreach ($lb in $new) {
++            $tpHandled++
++            $h = $g[0].MainWindowHandle; $a = [M3GpCap]::Area($h); $fg = ([M3GpCap]::GetForegroundWindow() -eq $h)
++            if ($a.IsEmpty -or $a.Width -le 0 -or -not $fg) { Say "led shot $tpHandled $lb`: no game window area or game not foreground: no shot"; continue }
++            $name = '{0}-led-{1:00}-{2}.jpg' -f $Arm, $tpHandled, (Safe $lb)
++            try {
++                [M3GpCap]::Save($a, (Join-Path $OutDir $name), $Quality); $shots++
++                Add-Content -LiteralPath $idx -Value ('{0},{1},,{2},{3},{4},{5},{6},{7}' -f $name, (Get-Date).ToString('yyyy-MM-dd HH:mm:ss.fff'), (Safe "led:$lb"), $a.X, $a.Y, $a.Width, $a.Height, $fg) -Encoding ascii
++                Say "led shot $tpHandled $lb`: saved $name ($($a.Width)x$($a.Height))"
++            } catch { Say "led shot $tpHandled $lb`: capture failed: $($_.Exception.Message)" }
++        }
+     }
+     Start-Sleep -Milliseconds 250
+ }
+-Say "watcher end: $handled marks seen, $shots shots"
++Say "watcher end: $handled marks seen, $tpHandled led shot requests, $shots shots"
+ exit 0
+diff --git a/a/prompt_sidecar.py b/b/prompt_sidecar.py
+index b378dbd..1bfe23e 100644
+--- a/a/prompt_sidecar.py
++++ b/b/prompt_sidecar.py
+@@ -17,6 +17,18 @@ action layer (the sidecar's own slot map: tag -> pad 1-3 (1 centre, 2 left, 3 ri
+              Re-arms after --on-cooldown s while the game keeps prompting; at most --on-max fires per trigger.
+   --boot     starter (default) = the 3 starter tags placed on --trigger-log/--trigger-mark as before; none = no boot
+              placement (tags reach the pads only through commands/prompts).
++  --zone     (OFF by default) the story's zone step after the 3 prompts (manual run 20261126-051159-gpman-native,
++             EXPLORE3 20261126-045407): T0 = pad 3 'lit FF 00 18 ... speed 15' once every --on prompt has fired ok; the
++             pads then ask in the order 3 (Wyldstyle), 2 (Gandalf), 1 (Batman); a pad's cue is a speed-15 blink of
++             FF 00 18 / FF 6E 18 / 00 00 18 (wanted figure on no pad) or FF 00 00 (pads 2/1: it is on another pad).
++             Step pad P, figure F (pad 3 at T0 + --zone-delay, pads 2/1 on their own cue + --zone-gap): REMOVE every
++             other figure on P, then REMOVE F if it is on any pad, then LOAD F on P; --zone-gap s between commands.
++             Handoff = the next pad's cue (pad 1: all 3 pads 99 42 0E); none within --zone-confirm s after the last
++             LOAD -> one retry of the step, then the zone rule stops (logged). A command error -> one retry, then stop.
++             A later pad's cue while a step is open skips forward to it (counted: zone-skips= in the result line); a
++             prompt that fires after T0 is logged as a 'zone' row 'prompt after T0'.
++  --led-shots asks gameplay-watch.ps1 for screenshots ('shot' rows in toypad-events.csv): the zone cues/handoffs
++             (with --zone) and the all-pads FF 00 00 speed-18 state at +5/+30/+60 s after it starts. Passive.
+ The story's prompts (manual run 20261125-204323-gpman-native): pad 2 'lit 00 00 16'/'00 00 05' (Batman), pad 3
+ 'lit F4 69 16'/'3D 1A 05' (Wyldstyle), ~0.5 s apart for 120 s; then the game's failsafe plays on without a figure.
+ Writes only <run>/toypad-events.csv, <run>/toypad-ctl/ and stdout; its only client is the game's 127.0.0.1 listener.
+@@ -43,6 +55,141 @@ RE_NAME = re.compile(r"^[a-z0-9_]{1,32}$")
+ CTL_MIN_AGE = 0.5
+ CTL_MAX_BYTES = 4096
+ CTL_MAX_LINES = 20
++RE_LED = re.compile(r"Toypad: pad ([123]) mode \d lit ([0-9A-F]{2} [0-9A-F]{2} [0-9A-F]{2}) \(on \d+ off \d+ count \d+ "
++                    r"speed (\d+)\)")
++ZONE_ORDER = (3, 2, 1)
++ZONE_WANT = {3: "wyldstyle", 2: "gandalf", 1: "batman"}
++ZONE_CUE = {3: ("FF 00 18",), 2: ("FF 6E 18", "FF 00 00"), 1: ("00 00 18", "FF 00 00")}
++ZONE_SPEED = 15
++ZONE_DONE = "99 42 0E"
++ALERT = ("FF 00 00", 18)          # all pads fast red after the zone step (manual 20261126-051159 from 05:27:26)
++ALERT_SHOTS = (5, 30, 60)
++ALERT_REARM = 120.0
++
++
++def _secs(ts):
++    """'HH:MM:SS.fff' (a game.log time) -> seconds of the day; 0.0 if empty/unparsable."""
++    try:
++        h, m, s = ts.split(":")
++        return int(h) * 3600 + int(m) * 60 + float(s)
++    except (AttributeError, ValueError):
++        return 0.0
++
++
++class Zone:
++    """--zone: the observed-driven zone step. feed_led/feed_confirm from game.log lines, tick() from the main loop."""
++
++    def __init__(self, pad, log, shot, prompts_done, delay, gap, confirm):
++        self.pad, self.log, self.shot, self.prompts_done = pad, log, shot, prompts_done
++        self.delay, self.gap, self.confirm = delay, gap, confirm
++        self.state = "armed"      # armed -> wait -> act -> confirm -> (next step) ... -> done | stopped
++        self.k = -1               # index into ZONE_ORDER
++        self.due = None           # next command (wait/act) or the confirm deadline
++        self.queue = []
++        self.retried = False
++        self.t0 = None
++        self.last_confirm = None  # time of the last listener LOAD confirm for this step's pad
++        self.amber = set()
++        self.result = "armed"
++        self.skips = 0            # forward skips (a later pad's cue while a step was open)
++
++    def _start(self, k, due, why, ts):
++        self.k, self.state, self.due, self.queue, self.retried, self.last_confirm = k, "wait", due, [], False, None
++        self.amber = set()
++        p = ZONE_ORDER[k]
++        self.log("zone", "step %d pad %d wants %s: %s; first command in %.1f s" % (
++            k + 1, p, ZONE_WANT[p], why, max(0.0, due - time.time())), ts)
++
++    def plan(self):
++        p = ZONE_ORDER[self.k]
++        f = ZONE_WANT[p]
++        cmds = [["remove", n] for n, (q, _i) in sorted(self.pad.on.items()) if q == p and n != f]
++        if f in self.pad.on:
++            cmds.append(["remove", f])
++        cmds.append(["place", f, str(p)])
++        return cmds
++
++    def _stop(self, why, ts=""):
++        self.state, self.due, self.queue, self.result = "stopped", None, [], "stopped: " + why
++        self.log("zone-stop", why, ts)
++        self.shot("zone-stop")
++
++    def feed_confirm(self, pad_no, ts=""):
++        if self.state in ("act", "confirm") and pad_no == ZONE_ORDER[self.k]:
++            self.last_confirm = (time.time(), ts)
++
++    def feed_led(self, p, rgb, speed, ts):
++        now = time.time()
++        if self.state in ("done", "stopped") or speed != ZONE_SPEED:
++            return
++        if self.state == "armed":
++            if p == 3 and rgb in ZONE_CUE[3] and self.prompts_done():
++                self.t0 = now
++                self.log("zone-t0", "pad 3 lit %s speed %d after the prompts" % (rgb, speed), ts)
++                self.shot("zone-t0")
++                self._start(0, now + self.delay, "T0 + %.0f s" % self.delay, ts)
++            return
++        if self.k == len(ZONE_ORDER) - 1 and rgb == ZONE_DONE:
++            self.amber.add(p)
++            if len(self.amber) == 3:
++                self._handoff("all 3 pads %s" % ZONE_DONE, ts)
++                self.state, self.due, self.result = "done", None, "done"
++                self.log("zone-done", "all 3 pads %s, T0 + %.1f s" % (ZONE_DONE, now - self.t0), ts)
++                self.shot("zone-done")
++            return
++        if p not in ZONE_ORDER[self.k + 1:] or rgb not in ZONE_CUE[p]:
++            return
++        j = ZONE_ORDER.index(p)
++        if j > self.k + 1:
++            self.skips += 1
++            self.log("zone", "pad %d cue %s while step %d (pad %d) was open: skipping to it" % (
++                p, rgb, self.k + 1, ZONE_ORDER[self.k]), ts)
++        else:
++            self._handoff("pad %d lit %s" % (p, rgb), ts)
++        self.shot("zone-cue-pad%d" % p)
++        self._start(j, now + self.gap, "cue pad %d lit %s" % (p, rgb), ts)
++
++    def _handoff(self, what, ts):
++        p = ZONE_ORDER[self.k]
++        if self.state == "confirm" and self.last_confirm is not None:
++            t_sc, t_game = self.last_confirm
++            dt, base = _secs(ts) - _secs(t_game), "game_ts"
++            if not (ts and t_game) or dt < 0:
++                dt, base = time.time() - t_sc, "sidecar clock"
++            self.log("zone", "step %d pad %d handoff (%s) %.3f s after the LOAD confirm (%s)%s" % (
++                self.k + 1, p, what, dt, base, " (after the retry)" if self.retried else ""), ts)
++        else:
++            self.log("zone", "step %d pad %d handoff (%s) in state %s, before our LOAD was confirmed (game timeout or "
++                     "an earlier figure)" % (self.k + 1, p, what, self.state), ts)
++
++    def tick(self):
++        if self.state not in ("wait", "act", "confirm") or self.due is None or time.time() < self.due:
++            return
++        p = ZONE_ORDER[self.k]
++        if self.state == "confirm":
++            if self.retried:
++                self._stop("step %d pad %d: no handoff %.0f s after the retry" % (self.k + 1, p, self.confirm))
++                return
++            self.retried = True
++            self.log("zone", "step %d pad %d: no handoff %.0f s after the last LOAD: retry" % (self.k + 1, p, self.confirm))
++            self.state, self.queue = "act", self.plan()
++        elif self.state == "wait":
++            self.state, self.queue = "act", self.plan()
++            self.log("zone", "step %d pad %d plan: %s" % (self.k + 1, p, "; ".join(" ".join(c) for c in self.queue)))
++        words = self.queue.pop(0)
++        ok, msg = self.pad.run(words, "zone")
++        self.log("zone", "step %d %s: %s -> %s" % (self.k + 1, "ok" if ok else "ERR", " ".join(words), msg))
++        if not ok:
++            if self.retried:
++                self._stop("step %d pad %d: %s failed after the retry: %s" % (self.k + 1, p, " ".join(words), msg))
++                return
++            self.retried = True
++            self.queue = self.plan()
++            self.log("zone", "step %d pad %d: retry plan %s" % (self.k + 1, p, "; ".join(" ".join(c) for c in self.queue)))
++        if self.queue:
++            self.due = time.time() + self.gap
++        else:
++            self.state, self.due = "confirm", time.time() + self.confirm
+ 
+ 
+ class Toypad:
+@@ -242,6 +389,11 @@ def main(argv=None):
+     ap.add_argument("--on-delay", type=float, default=1.0)
+     ap.add_argument("--on-cooldown", type=float, default=15.0)
+     ap.add_argument("--on-max", type=int, default=4)
++    ap.add_argument("--zone", action="store_true", help="OFF by default: answer the story's zone step (see above)")
++    ap.add_argument("--zone-delay", type=float, default=25.0, help="s from T0 to the first pad 3 command (gameplay-run.ps1 'zone' passes 45)")
++    ap.add_argument("--zone-gap", type=float, default=2.0, help="s between zone commands (and from a cue to its first)")
++    ap.add_argument("--zone-confirm", type=float, default=10.0, help="s after a step's last LOAD to wait for the handoff")
++    ap.add_argument("--led-shots", action="store_true", help="'shot' rows for gameplay-watch.ps1 (see above)")
+     a = ap.parse_args(argv)
+     try:
+         ons = [parse_on(s) for s in a.on]
+@@ -257,6 +409,11 @@ def main(argv=None):
+     print("tags ok: " + ", ".join("%s id=%d pad=%d index=%d" % (n, ldtag.figure_id(t), p, i) for n, p, i, t in tags), flush=True)
+     for rx, n, p in ons:
+         print("on: /%s/ => %s pad %s" % (rx.pattern, n, "from the match" if p is None else p), flush=True)
++    if a.zone and not ons:
++        print("bad --zone: it needs the --on prompt triggers (T0 counts only after each has fired ok)", flush=True)
++        return 2
++    print("zone %s%s; led shots %s" % ("ON" if a.zone else "off", " (delay %.0f s, gap %.0f s, confirm %.0f s)" % (
++        a.zone_delay, a.zone_gap, a.zone_confirm) if a.zone else "", "on" if a.led_shots else "off"), flush=True)
+     run = find_run(a.runs_root, a.tag, nb, a.find_timeout)
+     if not run:
+         print("no run dir for tag %s within %.0f s" % (a.tag, a.find_timeout), flush=True)
+@@ -292,6 +449,31 @@ def main(argv=None):
+                for rx, n, p in ons]
+     summary = os.path.join(run, "summary.json")
+     deadline = t_start + a.timeout
++    shots = {"n": 0}
++
++    def shot(label, ts=""):
++        if a.led_shots:
++            shots["n"] += 1
++            log("shot", label, ts)
++
++    zone = Zone(pad, log, shot, lambda: bool(prompts) and all(pr["ok"] >= 1 for pr in prompts),
++                a.zone_delay, a.zone_gap, a.zone_confirm) if a.zone else None
++    alert = {"start": None, "last": None, "due": [], "n": 0}
++
++    def led(line, ts):
++        m = RE_LED.search(line)
++        if not m:
++            return
++        p, rgb, speed = int(m.group(1)), m.group(2), int(m.group(3))
++        if zone is not None:
++            zone.feed_led(p, rgb, speed, ts)
++        if (rgb, speed) == ALERT:
++            now = time.time()
++            if alert["start"] is None or now - alert["last"] > ALERT_REARM:
++                alert["start"], alert["n"] = now, alert["n"] + 1
++                alert["due"] = [(now + s, s) for s in ALERT_SHOTS]
++                log("alert", "pad %d lit %s speed %d: all-pads fast red state %d starts" % (p, rgb, speed, alert["n"]), ts)
++            alert["last"] = now
+ 
+     def place_starters(why):
+         for k, (n, p, _i, _t) in enumerate(tags):
+@@ -400,6 +582,11 @@ def main(argv=None):
+             log(kind, detail, ts)
+         if not st["listener"]:
+             return
++        if "Toypad" in line and (zone is not None or a.led_shots):
++            mc = re.search(r"Toypad listener: LOAD -> pad=([123]) ", line)
++            if mc and zone is not None:
++                zone.feed_confirm(int(mc.group(1)), ts)
++            led(line, ts)
+         if trig is not None and st["trig_at"] is None and trig.search(line):
+             st["trig_at"] = time.time()
+             log("trigger", "log /%s/" % a.trigger_log, ts)
+@@ -421,6 +608,9 @@ def main(argv=None):
+                 pr["fires"] += 1
+                 log("prompt", "%s fire %d/%d: /%s/ -> pad %d in %.1f s" % (
+                     pr["name"], pr["fires"], a.on_max, pr["rx"].pattern, p, a.on_delay), ts)
++                if zone is not None and zone.t0 is not None:
++                    log("zone", "prompt after T0: %s fire %d/%d -> pad %d (zone step %d, state %s)" % (
++                        pr["name"], pr["fires"], a.on_max, p, zone.k + 1, zone.state), ts)
+ 
+     def marks():
+         for line in ic.lines():
+@@ -457,6 +647,11 @@ def main(argv=None):
+                 pr["ok"] += 1 if prompt_act(pr) else 0
+                 pr["due"] = None
+                 pr["last"] = time.time()
++        if zone is not None:
++            zone.tick()
++        while alert["due"] and time.time() >= alert["due"][0][0]:
++            _t, s = alert["due"].pop(0)
++            shot("alert%d-plus%02ds" % (alert["n"], s))
+         if os.path.exists(summary):
+             for line in gl.lines():
+                 feed(line)
+@@ -467,12 +662,15 @@ def main(argv=None):
+         log("end", "sidecar timeout %.0f s" % a.timeout)
+     want = 3 if boot else 0
+     log("result", "listener=%s boot=%s trigger=%s placed=%s load-confirms=%d then=%s remove-confirms=%d prompts=%s "
+-        "ctl=%d done/%d err route=%d ok/%d err %s" % (
++        "ctl=%d done/%d err route=%d ok/%d err zone=%s zone-skips=%d alerts=%d shots=%d %s" % (
+             st["listener"], a.boot, st["trig_at"] is not None, st["placed_at"] is not None, st["confirms"],
+             ("%s done" % a.then_action) if then_done else ("triggered, not done" if st["then_at"] else (
+                 "off" if (then_re is None and not a.then_mark) else "not triggered")),
+             st["removes"], " ".join("%s:%d/%d" % (p["name"], p["ok"], p["fires"]) for p in prompts) or "off",
+-            st["ctl_done"], st["ctl_err"], st["route"], st["route_err"], pad.status()))
++            st["ctl_done"], st["ctl_err"], st["route"], st["route_err"],
++            "off" if zone is None else ("%s (step %d)" % (zone.result, zone.k + 1) if zone.result != "done" else "done"),
++            0 if zone is None else zone.skips,
++            alert["n"], shots["n"], pad.status()))
+     ev.close()
+     return 0 if st["listener"] and st["confirms"] >= want else 1
+ 
+diff --git a/a/selftest_prompt.py b/b/selftest_prompt.py
+index 2f7ee6e..6d2de71 100644
+--- a/a/selftest_prompt.py
++++ b/b/selftest_prompt.py
+@@ -11,9 +11,18 @@ game.log / input.csv under build/agent3/gameplay/selftest/simruns/ drives the si
+     indexes, figure ids).
+   B (boot none, fixed-pad specs): no boot LOADs; the Batman prompt -> a plain LOAD on pad 2, the Gandalf colour on pad 3
+     is ignored by the @1 spec, on pad 1 -> a plain LOAD on pad 1.
+-  C: 4 bad --on specs -> exit 2 each.
++  C: 4 bad --on specs -> exit 2 each; --zone without --on -> exit 2.
++  D (--zone --led-shots): boot, a ctl swap to the confirmed layout (batman 2, gandalf 3, wyldstyle 1), the pad 3 zone
++    colour before the prompt is answered and at the wrong speed (no T0), the Batman prompt, T0 -> step 1 (remove
++    gandalf, remove + LOAD wyldstyle 3) after --zone-delay, pad 2 cue -> step 2 (remove batman, LOAD gandalf 2), no
++    handoff -> one retry, pad 1 cue (FF 00 00 variant) -> LOAD batman 1, all pads 99 42 0E -> done; the speed-18 state
++    -> alert + the +5 s shot row; exact LOAD/REMOVE sequence and shot rows.
++  E (--zone, boot none): no handoff after step 1 and its retry -> the rule stops; a later cue does nothing.
++  F (--zone, boot none): the Batman prompt fires again after T0 (a 'prompt after T0' zone row), the pad 1 cue while
++    step 1 is open -> forward skip to step 3 (zone-skips=1), all pads 99 42 0E -> done.
+   python -B selftest_prompt.py      exit 0 = PASS
+ """
++import csv
+ import os
+ import shutil
+ import subprocess
+@@ -52,8 +61,8 @@ class Log:
+         self.f.write("[2026-11-25 21:00:00.000] [info] [core] [t1] %s\n" % msg)
+         self.f.flush()
+ 
+-    def lit(self, pad, rgb, mode=3):
+-        self.w("Toypad: pad %d mode %d lit %s (on 0 off 0 count 1 speed 16)" % (pad, mode, rgb))
++    def lit(self, pad, rgb, mode=3, speed=16):
++        self.w("Toypad: pad %d mode %d lit %s (on 0 off 0 count 1 speed %d)" % (pad, mode, rgb, speed))
+ 
+     def pulse(self, pad, a, b, secs, step=0.25):
+         t_end = time.time() + secs
+@@ -199,6 +208,137 @@ def scenario_c():
+         r = subprocess.run([sys.executable, "-B", SIDECAR, "--runs-root", ROOT, "--tag", "simC", "--on", spec],
+                            capture_output=True, text=True, timeout=30)
+         check(r.returncode == 2 and "bad --on" in r.stdout, "C %s -> exit %d" % (why, r.returncode))
++    r = subprocess.run([sys.executable, "-B", SIDECAR, "--runs-root", ROOT, "--tag", "simC", "--zone"],
++                       capture_output=True, text=True, timeout=30)
++    check(r.returncode == 2 and "bad --zone" in r.stdout, "C --zone without --on prompts -> exit %d" % r.returncode)
++
++
++ZONE_ARGS = ["--zone", "--zone-delay", "1", "--zone-gap", "0.3", "--zone-confirm", "2", "--led-shots"]
++
++
++def rows(run, kind):
++    with open(os.path.join(run, "toypad-events.csv"), newline="", encoding="utf-8") as f:
++        return [r[4] for r in csv.reader(f) if len(r) == 5 and r[3] == kind]
++
++
++def scenario_d():
++    print("--- D: --zone step (3 -> 2 -> 1, one retry on pad 2), --led-shots, the speed-18 alert", flush=True)
++    fl = FakeListener(0)
++    p, run = start(fl, "simD", ZONE_ARGS, ["pad 2 mode 3 lit 00 00 (05|16)=>batman"])
++    g = Log(os.path.join(run, "game.log"))
++    g.w("Toypad listener active on 127.0.0.1:%d" % fl.port)
++    g.lit(3, "FF FF FF", mode=1)
++    check(wait_acts(fl, 3) == 3, "D boot: 3 LOADs (batman 2, gandalf 1, wyldstyle 3)")
++    for _ in range(3):                                # the zone colours before the prompt is answered: no T0
++        g.lit(3, "FF 00 18", speed=15)
++        time.sleep(0.25)
++    time.sleep(1.5)
++    check(len(acts(fl)) == 3, "D pad 3 FF 00 18 speed 15 before the prompts are done: no zone action")
++    ctl = os.path.join(run, "toypad-ctl")
++    with open(os.path.join(ctl, "001.cmd"), "w", encoding="utf-8") as f:
++        f.write("swap gandalf wyldstyle\n")         # -> the confirmed layout b2 g3 w1
++    check(wait_acts(fl, 7) == 7, "D ctl swap -> batman 2, gandalf 3, wyldstyle 1")
++    g.pulse(2, "00 00 16", "00 00 05", 1.0)
++    check(wait_acts(fl, 9) == 9, "D batman prompt answered (replace)")
++    g.lit(3, "FF 00 18", speed=16)                    # wrong speed: no T0
++    time.sleep(0.6)
++    t0 = time.time()
++    g.lit(3, "FF 00 18", speed=15)                    # T0
++    check(wait_acts(fl, 12) == 12 and time.time() - t0 >= 1.0, "D step 1 (pad 3) after T0 + delay: 3 commands")
++    g.w("Toypad listener: LOAD -> pad=3 index=2 (path len 0)")
++    g.lit(2, "FF 6E 18", speed=15)                    # handoff -> step 2
++    check(wait_acts(fl, 14) == 14, "D step 2 (pad 2): remove batman, place gandalf 2")
++    check(wait_acts(fl, 16, timeout=8) == 16, "D step 2: no handoff in 2 s -> one retry (remove + place gandalf 2)")
++    g.w("Toypad listener: LOAD -> pad=2 index=1 (path len 0)")
++    g.lit(1, "FF 00 00", speed=15)                    # pad 1 cue, variant 'wanted figure on another pad'
++    check(wait_acts(fl, 17) == 17, "D step 3 (pad 1): place batman 1")
++    g.w("Toypad listener: LOAD -> pad=1 index=0 (path len 0)")
++    for pad_ in (1, 2, 3):
++        g.lit(pad_, "99 42 0E", speed=15)
++    time.sleep(1.0)
++    t_end = time.time() + 6.5
++    while time.time() < t_end:                        # the all-pads fast red state
++        for pad_ in (1, 2, 3):
++            g.lit(pad_, "FF 00 00", speed=18)
++        time.sleep(0.25)
++    out = finish(p, run)
++    fl.close()
++    exp = [("load", 2, 0, 1), ("load", 1, 1, 2), ("load", 3, 2, 3),
++           ("remove", 1, 1), ("remove", 3, 2), ("load", 3, 1, 2), ("load", 1, 2, 3),   # swap gandalf wyldstyle
++           ("remove", 2, 0), ("load", 2, 0, 1),                                        # batman prompt
++           ("remove", 3, 1), ("remove", 1, 2), ("load", 3, 2, 3),                      # step 1
++           ("remove", 2, 0), ("load", 2, 1, 2),                                        # step 2
++           ("remove", 2, 1), ("load", 2, 1, 2),                                        # step 2 retry
++           ("load", 1, 0, 1)]                                                          # step 3
++    got = acts(fl)
++    check(got == exp, "D listener LOAD/REMOVE sequence (%d actions)" % len(got))
++    if got != exp:
++        print("   got %s\n   exp %s" % (got, exp))
++    check(p.returncode == 0, "D sidecar exit %d" % p.returncode)
++    check("zone=done zone-skips=0 alerts=1" in out, "D result: zone=done, zone-skips=0, alerts=1")
++    shots = rows(run, "shot")
++    check(shots == ["zone-t0", "zone-cue-pad2", "zone-cue-pad1", "zone-done", "alert1-plus05s"],
++          "D shot rows: %s" % " ".join(shots))
++    zl = " | ".join(rows(run, "zone"))
++    check("after the LOAD confirm (game_ts) (after the retry)" in zl and "plan: remove gandalf; remove wyldstyle; "
++          "place wyldstyle 3" in zl, "D zone rows: step 1 plan, retry handoff timed from the LOAD confirm")
++    return out
++
++
++def scenario_e():
++    print("--- E: --zone with no handoff: one retry, then the zone rule stops", flush=True)
++    fl = FakeListener(0)
++    p, run = start(fl, "simE", ["--boot", "none"] + ZONE_ARGS[:-1], ["pad 2 mode 3 lit 00 00 (05|16)=>batman"])
++    g = Log(os.path.join(run, "game.log"))
++    g.w("Toypad listener active on 127.0.0.1:%d" % fl.port)
++    g.pulse(2, "00 00 16", "00 00 05", 0.5)
++    check(wait_acts(fl, 1) == 1, "E batman prompt: a plain LOAD on pad 2")
++    g.lit(3, "FF 00 18", speed=15)
++    check(wait_acts(fl, 4, timeout=10) == 4, "E step 1: place wyldstyle 3, then the retry (remove + place)")
++    t_end = time.time() + 8
++    while time.time() < t_end and not rows(run, "zone-stop"):
++        time.sleep(0.2)
++    g.lit(2, "FF 6E 18", speed=15)                    # too late: the rule has stopped
++    time.sleep(1.0)
++    out = finish(p, run)
++    fl.close()
++    check(acts(fl) == [("load", 2, 0, 1), ("load", 3, 2, 3), ("remove", 3, 2), ("load", 3, 2, 3)],
++          "E sequence: no action after the stop (%s)" % acts(fl))
++    check("zone=stopped: step 1 pad 3: no handoff" in out and "shots=0" in out, "E result: zone stopped at step 1, "
++          "no shot rows without --led-shots")
++    check(p.returncode == 0, "E sidecar exit %d" % p.returncode)
++    return out
++
++
++def scenario_f():
++    print("--- F: --zone, a prompt after T0 (logged), pad 1 cue while step 1 is open (forward skip, counted)", flush=True)
++    fl = FakeListener(0)
++    p, run = start(fl, "simF", ["--boot", "none"] + ZONE_ARGS[:-1], ["pad 2 mode 3 lit 00 00 (05|16)=>batman"])
++    g = Log(os.path.join(run, "game.log"))
++    g.w("Toypad listener active on 127.0.0.1:%d" % fl.port)
++    g.pulse(2, "00 00 16", "00 00 05", 0.5)
++    check(wait_acts(fl, 1) == 1, "F batman prompt: a plain LOAD on pad 2")
++    time.sleep(2.3)                                   # past --on-cooldown 2
++    g.lit(3, "FF 00 18", speed=15)                    # T0
++    g.pulse(2, "00 00 16", "00 00 05", 0.5)           # the prompt again after T0 -> fire 2/2 (replace batman)
++    check(wait_acts(fl, 4) == 4, "F prompt replace (remove + LOAD batman 2) and step 1 (LOAD wyldstyle 3)")
++    g.lit(1, "FF 00 00", speed=15)                    # pad 1 cue while step 1 is open -> skip to step 3
++    check(wait_acts(fl, 6) == 6, "F skip to step 3: remove batman, LOAD batman 1")
++    g.w("Toypad listener: LOAD -> pad=1 index=0 (path len 0)")
++    for pad_ in (1, 2, 3):
++        g.lit(pad_, "99 42 0E", speed=15)
++    time.sleep(1.0)
++    out = finish(p, run)
++    fl.close()
++    got = acts(fl)
++    check(len(got) == 6 and got[-2:] == [("remove", 2, 0), ("load", 1, 0, 1)],
++          "F sequence: 6 actions, ends remove batman 2 + LOAD batman 1 (%s)" % got)
++    zl = " | ".join(rows(run, "zone"))
++    check("prompt after T0: batman fire 2/2 -> pad 2" in zl and "skipping to it" in zl,
++          "F zone rows: 'prompt after T0' and the forward skip")
++    check("zone=done zone-skips=1 " in out and "prompts=batman:2/2" in out, "F result: zone=done, zone-skips=1, batman 2/2")
++    check(p.returncode == 0, "F sidecar exit %d" % p.returncode)
++    return out
+ 
+ 
+ def main():
+@@ -207,8 +347,13 @@ def main():
+     out_a = scenario_a()
+     out_b = scenario_b()
+     scenario_c()
++    out_d = scenario_d()
++    out_e = scenario_e()
++    out_f = scenario_f()
+     if FAILS:
+-        print("--- sidecar output A ---\n" + out_a.rstrip() + "\n--- sidecar output B ---\n" + out_b.rstrip())
++        print("--- sidecar output A ---\n" + out_a.rstrip() + "\n--- sidecar output B ---\n" + out_b.rstrip() +
++              "\n--- sidecar output D ---\n" + out_d.rstrip() + "\n--- sidecar output E ---\n" + out_e.rstrip() +
++              "\n--- sidecar output F ---\n" + out_f.rstrip())
+     print("RESULT: %s (%d failed)" % ("PASS" if not FAILS else "FAIL", len(FAILS)))
+     return 0 if not FAILS else 1
+ 

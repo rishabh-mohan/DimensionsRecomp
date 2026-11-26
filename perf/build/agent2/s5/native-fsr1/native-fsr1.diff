@@ -1,0 +1,61 @@
+diff --git a/src/ui/presenter.cpp b/src/ui/presenter.cpp
+--- a/src/ui/presenter.cpp
++++ b/src/ui/presenter.cpp
+@@ -72,8 +72,27 @@
+     .allowed({"auto", "nativeaa", "quality", "balanced", "performance", "ultra_performance"})
+     .lifecycle(rex::cvar::Lifecycle::kRequiresRestart);
+ #else
+-REXCVAR_DEFINE_STRING(present_effect, "bilinear", "UI/Presenter", "Guest output effect: bilinear")
+-    .allowed({"bilinear"})
++// No FidelityFX SDK: the guest output paint has only bilinear. "fsr" is still
++// accepted so a GPU path that brings its own FSR 1 can be selected (the LEGO
++// Dimensions native renderer tests present_effect == "fsr" and draws EASU/RCAS
++// from the precompiled bytecode). ParsePresentEffect maps it to bilinear here.
++REXCVAR_DEFINE_STRING(present_effect, "bilinear", "UI/Presenter",
++                      "Guest output effect: bilinear, fsr (fsr = FSR 1 where the GPU path provides "
++                      "it; bilinear in this build's presenter)")
++    .allowed({"bilinear", "fsr"})
++    .lifecycle(rex::cvar::Lifecycle::kRequiresRestart);
++
++// For such a GPU path's FSR 1. Same ranges and defaults as the FidelityFX
++// build: presenter.h kFsrMaxUpscalingPassesMax = 4 and
++// kFsrSharpnessReductionMin/Max/Default = 0 / 2 / 0.2.
++REXCVAR_DEFINE_INT32(present_fsr_max_upsampling_passes, 4, "UI/Presenter",
++                     "Maximum chained FSR EASU passes")
++    .range(1, 4)
++    .lifecycle(rex::cvar::Lifecycle::kRequiresRestart);
++
++REXCVAR_DEFINE_DOUBLE(present_fsr_sharpness_reduction, 0.2f, "UI/Presenter",
++                      "FSR RCAS sharpness reduction in stops")
++    .range(0.0, 2.0)
+     .lifecycle(rex::cvar::Lifecycle::kRequiresRestart);
+ #endif
+ 
+@@ -259,6 +278,16 @@
+         "guest output; using guest output size");
+   }
+ }
++#else
++void LogBilinearFallbackOnce(const std::string& effect_name) {
++  static std::atomic<bool> bilinear_fallback_logged = false;
++  if (!bilinear_fallback_logged.exchange(true)) {
++    REXLOG_INFO(
++        "present_effect={}: this build has no FidelityFX SDK, so the SDK presenter uses "
++        "bilinear (a GPU path with its own FSR 1 still applies it)",
++        effect_name);
++  }
++}
+ #endif  // defined(REX_HAS_FIDELITYFX_SDK)
+ 
+ GuestOutputPaintConfig BuildGuestOutputPaintConfigFromCVar() {
+@@ -267,6 +296,10 @@
+ #if defined(REX_HAS_FIDELITYFX_SDK)
+   if (IsTemporalFsrCompatibilityEffect(parsed_effect)) {
+     LogTemporalFsrCompatibilityPathOnce();
++  }
++#else
++  if (REXCVAR_GET(present_effect) != "bilinear") {
++    LogBilinearFallbackOnce(REXCVAR_GET(present_effect));
+   }
+ #endif
+   config.SetAllowOverscanCutoff(REXCVAR_GET(present_allow_overscan_cutoff));

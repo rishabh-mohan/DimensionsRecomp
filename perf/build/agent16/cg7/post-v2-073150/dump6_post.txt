@@ -1,0 +1,49 @@
+dump6_post.py sha256 2AD999BD6763B4B4BAF5FE37165FFE6BD2815CBD382C66A47885C41AC442357E
+trace       40060326FA9A2E860705AA60BCE9DAE6A0D2CC72A674F2BC90CB8962C2AB31CA <workspace>\build\agent3\gameplay\trace-native5-20261126-073150\events.tsv
+game.log    52574F8573C1943F8BD9AFF21B82818D9647D5D0258D25CC400C322307C57B5C <workspace>\build\agent3\gameplay\runs\20261126-073156-gp5-native\game.log
+post        590FB347974DD70B6390E73B5947C135FFAD1296C1457B8C5F940BC5C2343871 <workspace>\build\agent3\gameplay\post\gameplay-20261126-073150.txt
+runlog      E04C6695A98304B9744E16902E64009A991C55735B7C55063011F90857882F42 <workspace>\build\agent3\gameplay\logs\gameplay-20261126-073150.txt
+sidecar     B1F9FB5F661F0CCEF0F2EAFDA27A688308213075F269923DEF0A9FB41AB08A69 <workspace>\build\agent3\gameplay\logs\20261126-073150-native.sidecar.out.txt
+root-vs     FD947EBF69C161EEE01B84EA9FFF73217D7079D9D4E40E97F69C9EE2E44B287E <workspace>\build\agent3\gameplay\shader-dumps-native-20261126-051154\vs-A58EBA123EFB541C.bin
+noident     552EE07E99213262F69B4D5DFF1A414C3F900949AC10DDB302161B6E34AD2FA6 <workspace>\build\agent16\cg7\data\noident.txt
+trace-start DC540B7D353064AD755E220F2693FC42039D16EB5663277E4F593F71A1997D0F <workspace>\build\agent3\gameplay\trace-native5-20261126-073150\trace-start.json
+dump-dir    NONE (not given: 0 identity files)
+fingerprint a349d5292f67b127 in game.log: True
+trace start unix_ms 1795699919914 (2026-11-26 07:31:59.914000 local)
+red start (game.log, first pad 1 FF 00 00 speed 18): 2026-11-26 07:44:52.486 -> trace 772572.0 ms; sidecar alert 07:44:52.729
+D1 route: PASS; clean exit 0 yes; steps 302/302 yes; stop reached (last: done) yes; title gate HIT yes; prompts 3/3 yes; kit exits 0 yes; zone=done yes; red-18 start yes
+   ctl (reported only, not gated): ctl=0 done/0 err
+trace: frames 37536; last frame 37537 at 877092.6 ms; miss-cache inserts 6 (dump mode: miss cache off, expect 0); draw_missing rows before red+40 s: 0
+D2 reach: stop = red + 104.5 s (need >= red + 80 s): PASS; W1 = red+40..65 s; W2 coverage 39.5 s (red+65 s..stop)
+game.log placement warnings (capped at 16 lines): 2 distinct (stage, guest) with backing
+   VS AB80F350 backing ED25B6A0 prefix C77B3ABB6F87ACD9
+   PS AB77B580 backing ED25B8E0 prefix C77B3ABB6F87ACD9
+identity events: 0 (VS 0, PS 0)
+physical_hash joins between identity events (information; never used to cover a target): 0
+
+D3 W1 targets (stage guest: unrecognized rows, draw_missing rows, first..last red+s; match; true first row; identity times; C-S1)
+   VS AB80F350: 520, 476, +43.5..+51.8  UNMATCHED (backing ED25B6A0 known, no identity with it); true first red+43.5 s
+   VS AB64C0E0: 332, 166, +44.5..+51.7  UNMATCHED; true first red+44.5 s
+   PS AB77B580: 520, 0, +43.5..+51.8  UNMATCHED (backing ED25B8E0 known, no identity with it); true first red+43.5 s
+   PS ABB3F110: 332, 0, +44.5..+51.7  UNMATCHED; true first red+44.5 s
+   pairs at draw_missing rows (last unrecognized VS, PS): draws VSmiss PSmiss first..last red+s
+     AB80F350 AB77B580    476    476      0  +43.5..+51.8
+     AB64C0E0 ABB3F110    166    166      0  +44.5..+51.7
+D3 W2 targets (stage guest: unrecognized rows, draw_missing rows, first..last red+s; match; true first row; identity times; C-S1)
+   VS A7F7A100: 2014, 1007, +75.7..+104.5  UNMATCHED; true first red+75.7 s
+   PS A7F79ED0: 2014, 0, +75.7..+104.5  UNMATCHED; true first red+75.7 s
+   pairs at draw_missing rows (last unrecognized VS, PS): draws VSmiss PSmiss first..last red+s
+     A7F7A100 A7F79ED0   1007   1007      0  +75.7..+104.5
+
+D4 container files (check run: name + size == vb+4+pb + marker == vheader[8:12] + sha256; container_hash NOT recomputed, no xxhash module)
+   no dump dir given: 0 container files
+D4: FAIL (no dump dir)
+D5 identity events before red+40 s: 0 (expect 0)
+D6 (information only; the root is never packed, D-C2): VS physical sections vs root vs-A58EBA12 bytes 304..703 (400 B)
+   no VS container files
+D7 (information): raw + root files
+   no dump dir
+
+C-S1: identity events 0 (capture cap 256): below cap; flagged matches: none
+W1/W2 split: W1 NOT-COVERED (0/4); W2 NOT-COVERED (0/2)
+RESULT: NOT-COVERED (0/6 targets matched; unmatched: W1 VS AB80F350, W1 VS AB64C0E0, W1 PS AB77B580, W1 PS ABB3F110, W2 VS A7F7A100, W2 PS A7F79ED0); W1 NOT-COVERED (0/4), W2 NOT-COVERED (0/2)

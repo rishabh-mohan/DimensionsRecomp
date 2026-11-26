@@ -1,0 +1,120 @@
+diff --git a/orig/RUN-RT-SMOKE.cmd b/new/RUN-RT-SMOKE.cmd
+index b76128c..88a3e8e 100644
+--- a/orig/RUN-RT-SMOKE.cmd
++++ b/new/RUN-RT-SMOKE.cmd
+@@ -1,8 +1,8 @@
+ @echo off
+ rem RUN-RT-SMOKE.cmd - S5 Phase 3 T2/F3 smoke (M2), three FUNCTIONAL arms (untimed, no perf verdicts; M10 P1/P2), one approval:
+ rem   T2   build\agent2\s5\devs5toml-bin, harness toml: one present_effect 'fsr' rejected line, no new ERROR vs devfinal2
+-rem   F3A  build\agent2\s5\natives5fsr1-bin, harness toml (present_effect fsr): spatial_fsr_presented=1 (P4)
+-rem   F3B  natives5fsr1-bin, -Toml native-fsr1\perf-bilinear.toml (pinned): spatial_fsr_presented=0 (P4)
++rem   F3A  build\agent2\s5\natives5fsr1p-bin, harness toml (present_effect fsr): spatial_fsr_presented=1 (P4)
++rem   F3B  natives5fsr1p-bin, -Toml native-fsr1\perf-bilinear.toml (pinned): spatial_fsr_presented=0 (P4)
+ rem   attract-long pad route, 240 s each, fresh run dir per arm, then rt_smoke_post.py (per-arm verdicts +
+ rem   FSR1-vs-bilinear side-by-side PNGs into rt-smoke\post\sbs-*). F3A F3B take PrintWindow shots at 60 120 146 200 s.
+ rem   RUN-RT-SMOKE.cmd               real run (interactive desktop; 3 x ~4.5 min, about 15 min; self-closing)
+@@ -26,8 +26,8 @@ for %%A in (%*) do (
+ set "BAD=0"
+ set "PINOK=0"
+ rem PINS-BEGIN (mkpins_rt.py)
+-call :pin "build\agent2\s5\rt-smoke-run.ps1" 02C6C88C89BE91248C0055D62D76061454087214B36960EAFB157D99FDE1A92E
+-call :pin "build\agent2\s5\rt_smoke_post.py" 6034CA362A1FDDFAAD8580EE7E7E1308BF9ACA53EF4632ACCA9AA71E5E4F801F
++call :pin "build\agent2\s5\rt-smoke-run.ps1" 8275759B16EF97087F12DA1E7FDC832E5AF654DA61C9C036DFB4140EA15301C6
++call :pin "build\agent2\s5\rt_smoke_post.py" 749274A7641313092A4A44F7AD639C1CFA49315498C93CDBD5FFD1173D7F0487
+ call :pin "harness\run-game.ps1" C2533FDFE9A3A4941F14A06C243C2A82875F5C2C93F1EBC95D68B48AB3DFA55F
+ call :pin "harness\guard.ps1" 7A71E72057A0C87F8E7851DB3363B103F6713C520305AFB26E0492036A3E0759
+ call :pin "harness\winhelper.cs" 37619E3DA38CE249ED4C219C606085992A33C36B7046F7BEB2AC204308C1C4B3
+diff --git a/orig/manual-capture.ps1 b/new/manual-capture.ps1
+index 48f3b97..aee76b6 100644
+--- a/orig/manual-capture.ps1
++++ b/new/manual-capture.ps1
+@@ -3,7 +3,7 @@
+ # key, type, scroll or mouse. Timing from build\agent2\s5\rt-mark.ps1 (read-only). Output: rt-smoke\manual\<stamp>-<arm>\
+ #   powershell -File manual-capture.ps1 -Arm F3A      (start it once the arm's game is up, or just before)
+ param([Parameter(Mandatory)][ValidateSet('F3A', 'F3B')][string]$Arm,
+-      [double[]]$Times = @(60, 62, 122.25, 146.75, 201.5), [double]$ZoomLead = 0.35, [double]$CheckLead = 1.3)
++      [double[]]$Times = @(122.25, 146.75, 201.5), [double]$ZoomLead = 0.35, [double]$CheckLead = 1.3)
+ $ErrorActionPreference = 'Stop'
+ $s5 = '<workspace>\build\agent2\s5'
+ $cli = 'C:\Users\<user>\.vscode\projects\agy-grid\src\computer-cli.js'
+diff --git a/orig/rt-smoke-run.ps1 b/new/rt-smoke-run.ps1
+index b9d7629..47cba47 100644
+--- a/orig/rt-smoke-run.ps1
++++ b/new/rt-smoke-run.ps1
+@@ -5,9 +5,9 @@
+ #   T2   build\agent2\s5\devs5toml-bin    (MANIFEST pin 87DF5ED9, rt-bin/BIN-PINS-devs5toml.md)  harness toml,
+ #        -Cvar framerate_limit=60 (= the toml value; the devfinal2 refs ran with it). P1: one
+ #        "Config: present_effect = 'fsr' ... rejected (allowed: bilinear)" line, no new ERROR vs devfinal2.
+-#   F3A  build\agent2\s5\natives5fsr1-bin (MANIFEST pin 102AAD90, rt-bin/BIN-PINS-natives5fsr1.md) harness toml
++#   F3A  build\agent2\s5\natives5fsr1p-bin (MANIFEST pin 15A92E4D, rt-bin/BIN-PINS-natives5fsr1p.md) harness toml
+ #        (present_effect='fsr'), -Cvar native_fps_limit=60 (as the nativefinal2 refs). P4: spatial_fsr_presented=1.
+-#   F3B  natives5fsr1-bin with -Toml perf-bilinear.toml (sha256 pin $bilPin, F1: the harness toml with
++#   F3B  natives5fsr1p-bin with -Toml perf-bilinear.toml (sha256 pin $bilPin, F1: the harness toml with
+ #        present_effect='bilinear'), -Cvar native_fps_limit=60. P4: spatial_fsr_presented=0.
+ # Then rt_smoke_post.py (per-arm gates + FSR1-vs-bilinear side-by-side PNGs, in rt-smoke\post). Words (any order):
+ # dryrun, allowhidden, arms=T2,F3A,F3B (subset/order), noshots (no kit shots at all: no shot job, nothing on screen
+@@ -40,10 +40,10 @@ $out = Join-Path $kit 'rt-smoke'
+ $runsRoot = Join-Path $out $(if ($DryRun) { 'dryrun-runs' } else { 'runs' })
+ $Seconds = 240
+ $binToml = Join-Path $ws 'build\agent2\s5\devs5toml-bin'
+-$binFsr1 = Join-Path $ws 'build\agent2\s5\natives5fsr1-bin'
+-$pins = @{   # MANIFEST.txt sha256 (rt-bin/BIN-PINS-devs5toml.md, rt-bin/BIN-PINS-natives5fsr1.md)
++$binFsr1 = Join-Path $ws 'build\agent2\s5\natives5fsr1p-bin'
++$pins = @{   # MANIFEST.txt sha256 (rt-bin/BIN-PINS-devs5toml.md, rt-bin/BIN-PINS-natives5fsr1p.md)
+     $binToml = '87DF5ED9E863ED773F2EFD545B906CB527FB6AA36653722F790AC19FF5E78702'
+-    $binFsr1 = '102AAD905209F57F7CF80CBC9F280CDDACDB1FD38063475E2F9EF07E14E5B8F0' }
++    $binFsr1 = '15A92E4DBFD634FC028DEE90DD8D18B77F90157A58E87E04FB7DFBB4A8BEAD90' }
+ $bilToml = Join-Path $ws 'build\agent2\s5\native-fsr1\perf-bilinear.toml'
+ $bilPin = 'FA47B1E31787B24D04B59E15F26D8B2ADFFC456B38E7DE24A2B5F80F24375B16'   # F1 (M10 P2)
+ New-Item -ItemType Directory -Force -Path (Join-Path $out 'logs'), (Join-Path $out 'post') | Out-Null
+diff --git a/orig/rt_smoke_post.py b/new/rt_smoke_post.py
+index abc390f..69f5646 100644
+--- a/orig/rt_smoke_post.py
++++ b/new/rt_smoke_post.py
+@@ -1,15 +1,15 @@
+ #!/usr/bin/env python3
+-"""rt_smoke_post.py - post checks for RUN-RT-SMOKE.cmd (M2, S5 Phase 3: T2 + F3) on devs5toml-bin / natives5fsr1-bin.
++"""rt_smoke_post.py - post checks for RUN-RT-SMOKE.cmd (M2, S5 Phase 3: T2 + F3) on devs5toml-bin / natives5fsr1p-bin.
+ 
+ FUNCTIONAL only (M10 P1/P2): no timing or perf verdicts. Arms (run dirs from harness\\run-game.ps1), any subset:
+   --T2  <dir>  devs5toml-bin, harness toml (present_effect='fsr'), framerate_limit=60
+-  --F3A <dir>  natives5fsr1-bin, harness toml (present_effect='fsr'), native_fps_limit=60       FSR 1 arm
+-  --F3B <dir>  natives5fsr1-bin, perf-bilinear.toml (present_effect='bilinear'), native_fps_limit=60
++  --F3A <dir>  natives5fsr1p-bin, harness toml (present_effect='fsr'), native_fps_limit=60       FSR 1 arm
++  --F3B <dir>  natives5fsr1p-bin, perf-bilinear.toml (present_effect='bilinear'), native_fps_limit=60
+ Gates (every arm): run.json clean exit (exit 0, not early, wm_close), no dumps/crash events/WER, bin_dir = the arm's
+ bin, cvars exactly as the arm, run-dir toml = the arm's source toml (sha256-pinned) except user_data_root and the
+ -Cvar keys, toml not rewritten by the game, check-defaults PASS (T2 --mode xenos, F3 --mode native); against the
+-sha256-pinned reference logs of the same build family (T2: devfinal2 cold-ship60 + ship60-r1; F3: nativefinal2
+-cold-nat60 + nat60-r1, window 20261125-1804, attract-long): every runstats.py marker the refs have is there,
++sha256-pinned reference logs of the same build family (T2: devfinal2 cold-ship60 + ship60-r1; F3: native4bp
++cold-n4bp60 + n4bp60-r1, window 20261125-1804, attract-long): every runstats.py marker the refs have is there,
+ 0 error/critical lines whose normalised text the refs lack, 0 new 'Config: unknown cvar' names; 0 'Native FSR 1:' lines.
+   T2   exactly one warning-level "Config: present_effect = 'fsr' in <toml> rejected (allowed: bilinear); keeping
+        'bilinear' ... (reported before logging started)" line (P1); 0 FFX-fallback INFO lines (not in this bin).
+@@ -38,8 +38,8 @@ MX = r'build\agent8\s5\matrix\20261125-1804\runs'
+ REFS = {  # game.log sha256 pins
+     'devfinal2': [(MX + r'\1805-cold-ship60', '0FB3DC8AF9140841D5B28E38681865C693E956C7321FA4F2B513C708AA449FF0'),
+                   (MX + r'\1815-ship60-r1', '850B9BE0FD6053B658C3209EF994BCD2C6585AFC253534A7469EE48734159683')],
+-    'nativefinal2': [(MX + r'\1809-cold-nat60', 'F2F652C2294936545A15E01FDE8322788562D9EC236189286ED77249F30F8990'),
+-                     (MX + r'\1820-nat60-r1', '6F17177FC99557D6177963C925C86B98367F82E55B864E47BE6826DA745818FB')],
++    'native4bp': [(MX + r'\1812-cold-n4bp60', '93E1754B876684F286C13EF6923ACFEA46B89C994B4269D36D13EC2795533502'),
++                  (MX + r'\1825-n4bp60-r1', '5AD5426AE17EAB2F9C22E22E688C4A75C0B5407DE92860D48D5D236EB892D1E9')],
+ }
+ TOML_H = (r'harness\legodimensions.toml', 'B763DABBE2C5FE7AFA300B3013EFDEE1FB9BF33E7A0A96738BEAC4BAF474FF54')
+ TOML_B = (r'build\agent2\s5\native-fsr1\perf-bilinear.toml',
+@@ -47,10 +47,10 @@ TOML_B = (r'build\agent2\s5\native-fsr1\perf-bilinear.toml',
+ ARMS = {
+     'T2': dict(bin=r'build\agent2\s5\devs5toml-bin', cvars={'framerate_limit': '60'}, toml=TOML_H, effect='fsr',
+                mode='xenos', ref='devfinal2', native=False),
+-    'F3A': dict(bin=r'build\agent2\s5\natives5fsr1-bin', cvars={'native_fps_limit': '60'}, toml=TOML_H, effect='fsr',
+-                mode='native', ref='nativefinal2', native=True, fsr=1),
+-    'F3B': dict(bin=r'build\agent2\s5\natives5fsr1-bin', cvars={'native_fps_limit': '60'}, toml=TOML_B,
+-                effect='bilinear', mode='native', ref='nativefinal2', native=True, fsr=0),
++    'F3A': dict(bin=r'build\agent2\s5\natives5fsr1p-bin', cvars={'native_fps_limit': '60'}, toml=TOML_H, effect='fsr',
++                mode='native', ref='native4bp', native=True, fsr=1),
++    'F3B': dict(bin=r'build\agent2\s5\natives5fsr1p-bin', cvars={'native_fps_limit': '60'}, toml=TOML_B,
++                effect='bilinear', mode='native', ref='native4bp', native=True, fsr=0),
+ }
+ SHOT_ARMS, SHOT_TIMES = ('F3A', 'F3B'), (60, 120, 146, 200)
+ MIN_ROWS, FSR_SHARE = 2000, 0.90

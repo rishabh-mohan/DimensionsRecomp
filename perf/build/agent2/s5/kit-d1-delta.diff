@@ -1,0 +1,112 @@
+diff --git a/pins-test/ps1-1D93442E.ps1 b/nops-smoke-run.ps1
+index f784294..b7e59ef 100644
+--- a/pins-test/ps1-1D93442E.ps1
++++ b/nops-smoke-run.ps1
+@@ -109,11 +109,13 @@ function Get-Refusals {
+     if ($g.Count) { $r += "a game is running (pid $(($g | ForEach-Object Id) -join ','))" }
+     $runners = @(Get-ActiveRunners)
+     if ($runners.Count) { $r += "Agent 8 runner active: $($runners -join '; ')" }
+-    # The timed-window kit scripts as a script path on a shell/python command line (a path separator before the name and
+-    # a script extension after it), so a grep that only mentions a name does not refuse the kit (M10 D1).
++    # The timed-window kit scripts only in the form M3 launches them (M10 D1 v2): powershell/pwsh with -File <path to the
++    # window or matrix .ps1>, or cmd.exe running the window .cmd. A grep/editor/python command line that merely contains
++    # the full path does not refuse the kit.
+     $win = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object {
+-            $_.ProcessId -ne $PID -and $_.Name -match '^(?i)(powershell|pwsh|cmd|python|py)\.exe$' -and
+-            $_.CommandLine -match '(?i)[\\/](window-s5\.ps1|RUN-WINDOW-S5[^\\/\s"]*\.cmd|run-matrix[^\\/\s"]*\.(ps1|cmd|py))' })
++            $_.ProcessId -ne $PID -and $_.Name -match '^(?i)(powershell|pwsh|cmd)\.exe$' -and (
++                $_.CommandLine -match '(?i)-File\s+"?[^"]*(window-s5|run-matrix)\.ps1' -or
++                ($_.Name -ieq 'cmd.exe' -and $_.CommandLine -match '(?i)RUN-WINDOW-S5[^\s"]*\.cmd')) })
+     if ($win.Count) { $r += "timed-window kit running (pid $(($win | ForEach-Object ProcessId) -join ','))" }
+     if ($desk -ne 'Default' -and -not $AllowHidden) { $r += "not on the interactive desktop ($desk)" }
+     $r
+diff --git a/pins-test/cmd-AF57C90E.cmd b/RUN-NOPS-SMOKE.cmd
+index f675a14..21d1e89 100644
+--- a/pins-test/cmd-AF57C90E.cmd
++++ b/RUN-NOPS-SMOKE.cmd
+@@ -12,7 +12,8 @@ rem   N2: each arm starts from a fresh <run>\user (cold shader/pipeline storage)
+ rem   N3: a real run needs both N1 and N2 (unless allowsubset); T1 T2 N1 N2 take PrintWindow shots
+ rem       at 60 120 146 152 200 s into <run>\kit-shots (read-only job; post gates 5 ok shots per arm)
+ rem   Pins: the waiter pins only this .cmd, so it pins the ps1, the post script and every helper they run
+-rem   (sha256 via certutil, before anything else; any mismatch or missing file = exit 3). Written by mkpins.py.
++rem   (sha256 via certutil, before anything else; any mismatch or missing file = exit 3; fail closed: the launch also
++rem   needs PINOK == the pin count, so a pin line that is skipped or removed = exit 3). Written by mkpins.py.
+ setlocal
+ set "KIT=%~dp0"
+ for %%W in ("%KIT%..\..\..") do set "WS=%%~fW"
+@@ -23,8 +24,9 @@ for %%A in (%*) do (
+     if /i "%%~A"=="pinsonly" set "PINSONLY=1"
+ )
+ set "BAD=0"
++set "PINOK=0"
+ rem PINS-BEGIN (mkpins.py)
+-call :pin "build\agent2\s5\nops-smoke-run.ps1" 1D93442E3BD0BCD4F62823CB1F4B4BA7EB3F214B220324267AA110B3BC7ED711
++call :pin "build\agent2\s5\nops-smoke-run.ps1" 4885AE6DA29A26BDC5419749D82557B20357FB07F47C2918C58781BB9F933EB5
+ call :pin "build\agent2\s5\nops_smoke_post.py" 54BA5CF9D85418DF5D1A52529DB5390DE88F0F24C86438089DF6F57B00FD1144
+ call :pin "harness\run-game.ps1" C2533FDFE9A3A4941F14A06C243C2A82875F5C2C93F1EBC95D68B48AB3DFA55F
+ call :pin "harness\guard.ps1" 7A71E72057A0C87F8E7851DB3363B103F6713C520305AFB26E0492036A3E0759
+@@ -43,6 +45,12 @@ if not "%BAD%"=="0" (
+     if not defined DRY if not defined PINSONLY timeout /t 15 >nul 2>&1
+     exit /b 3
+ )
++rem fail closed: every pin must have been checked and matched (M10 NIT, as natcmp)
++if not "%PINOK%"=="13" (
++    echo [nops-smoke] REFUSED: %PINOK% of 13 pins verified ^(WS %WS%^)
++    if not defined DRY if not defined PINSONLY timeout /t 15 >nul 2>&1
++    exit /b 3
++)
+ echo [nops-smoke] pins OK: 13 files ^(WS %WS%^)
+ if defined PINSONLY exit /b 0
+ powershell -NoProfile -ExecutionPolicy Bypass -File "%KIT%nops-smoke-run.ps1" %*
+@@ -59,5 +67,7 @@ set "H=%H: =%"
+ if /i not "%H%"=="%~2" (
+     echo [nops-smoke] PIN MISMATCH %~1: got %H%, pinned %~2
+     set /a BAD+=1
++) else (
++    set /a PINOK+=1
+ )
+ exit /b 0
+diff --git a/pins-test/mkpins-prev.py b/mkpins.py
+index 4bc926c..8ae3b4c 100644
+--- a/pins-test/mkpins-prev.py
++++ b/mkpins.py
+@@ -36,7 +36,8 @@ rem   N2: each arm starts from a fresh <run>\user (cold shader/pipeline storage)
+ rem   N3: a real run needs both N1 and N2 (unless allowsubset); T1 T2 N1 N2 take PrintWindow shots
+ rem       at 60 120 146 152 200 s into <run>\kit-shots (read-only job; post gates 5 ok shots per arm)
+ rem   Pins: the waiter pins only this .cmd, so it pins the ps1, the post script and every helper they run
+-rem   (sha256 via certutil, before anything else; any mismatch or missing file = exit 3). Written by mkpins.py.
++rem   (sha256 via certutil, before anything else; any mismatch or missing file = exit 3; fail closed: the launch also
++rem   needs PINOK == the pin count, so a pin line that is skipped or removed = exit 3). Written by mkpins.py.
+ setlocal
+ set "KIT=%~dp0"
+ for %%W in ("%KIT%..\..\..") do set "WS=%%~fW"
+@@ -47,6 +48,7 @@ for %%A in (%*) do (
+     if /i "%%~A"=="pinsonly" set "PINSONLY=1"
+ )
+ set "BAD=0"
++set "PINOK=0"
+ rem PINS-BEGIN (mkpins.py)
+ '''
+ 
+@@ -56,6 +58,12 @@ if not "%BAD%"=="0" (
+     if not defined DRY if not defined PINSONLY timeout /t 15 >nul 2>&1
+     exit /b 3
+ )
++rem fail closed: every pin must have been checked and matched (M10 NIT, as natcmp)
++if not "%PINOK%"=="{n}" (
++    echo [nops-smoke] REFUSED: %PINOK% of {n} pins verified ^(WS %WS%^)
++    if not defined DRY if not defined PINSONLY timeout /t 15 >nul 2>&1
++    exit /b 3
++)
+ echo [nops-smoke] pins OK: {n} files ^(WS %WS%^)
+ if defined PINSONLY exit /b 0
+ powershell -NoProfile -ExecutionPolicy Bypass -File "%KIT%nops-smoke-run.ps1" %*
+@@ -72,6 +80,8 @@ set "H=%H: =%"
+ if /i not "%H%"=="%~2" (
+     echo [nops-smoke] PIN MISMATCH %~1: got %H%, pinned %~2
+     set /a BAD+=1
++) else (
++    set /a PINOK+=1
+ )
+ exit /b 0
+ '''

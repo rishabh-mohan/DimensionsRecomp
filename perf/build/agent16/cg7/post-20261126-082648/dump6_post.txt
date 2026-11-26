@@ -1,0 +1,67 @@
+dump6_post.py sha256 7887B90A73497D5A5BFE56DAEE147AFDFC83BCB97D9AC5D249467BAF76DADD5E
+trace       5341E0FC5B28810FA98D48FF9359EEA1350A0F164621706B98E0585802D5E0A5 <workspace>\build\agent3\gameplay\trace-native5d-20261126-082648\events.tsv
+game.log    329D14677D23F197B73E8269D694C5B72F516FACC0B52F36C18FF49D79BC5D52 <workspace>\build\agent3\gameplay\runs\20261126-082653-gp5d-native\game.log
+post        5D115339A3C7B6D56741267FC8DB556666000714B4C71B3CD99B89D4C619E0CA <workspace>\build\agent3\gameplay\post\gameplay-20261126-082648.txt
+runlog      6D5424E1F883ED7F5A1427CA7348F1031B0FED8D02536CABF3024ACE2A0DAB5B <workspace>\build\agent3\gameplay\logs\gameplay-20261126-082648.txt
+sidecar     62541FBCA293C8400A8C151EFEF2252589D4F12FC23885573AAA6F3DD93AE119 <workspace>\build\agent3\gameplay\logs\20261126-082648-native.sidecar.out.txt
+root-vs     FD947EBF69C161EEE01B84EA9FFF73217D7079D9D4E40E97F69C9EE2E44B287E <workspace>\build\agent3\gameplay\shader-dumps-native-20261126-051154\vs-A58EBA123EFB541C.bin
+noident     552EE07E99213262F69B4D5DFF1A414C3F900949AC10DDB302161B6E34AD2FA6 <workspace>\build\agent16\cg7\data\noident.txt
+trace-start 8906C99DF10FA32CBC0A785DA6B188E2497483D9110A1241A38D0A401D2F3FA9 <workspace>\build\agent3\gameplay\trace-native5d-20261126-082648\trace-start.json
+dump-dir    <workspace>\build\agent3\gameplay\shader-dumps-native-20261126-082648
+fingerprint a349d5292f67b127 in game.log: True
+trace start unix_ms 1795703217754 (2026-11-26 08:26:57.754000 local)
+red start (game.log, first pad 1 FF 00 00 speed 18): 2026-11-26 08:39:59.590 -> trace 781836.0 ms; sidecar alert 08:39:59.700
+D1 route: PASS; clean exit 0 yes; steps 302/302 yes; stop reached (last: done) yes; title gate HIT yes; prompts 3/3 yes; kit exits 0 yes; zone=done yes; red-18 start yes
+   ctl (reported only, not gated): ctl=0 done/0 err
+trace: frames 37329; last frame 37330 at 886529.7 ms; miss-cache inserts 0 (dump mode: miss cache off, expect 0); draw_missing rows before red+40 s: 0
+D2 reach: stop = red + 104.7 s (need >= red + 80 s): PASS; W1 = red+40..65 s; W2 coverage 39.7 s (red+65 s..stop)
+game.log placement warnings (capped at 16 lines): 2 distinct (stage, guest) with backing
+   VS AB7D1200 backing ED25B6A0 prefix C77B3ABB6F87ACD9
+   PS AB854C80 backing ED25B8E0 prefix C77B3ABB6F87ACD9
+identity events: 5 (VS 2, PS 3)
+   VS guest AB7D1200 physical ED25B6A0 vb 156 pb 568 container 56F180069A723975 physical_hash D242E6DD5E8E2B92 at red+43.5 s
+   PS guest AB854C80 physical ED25B8E0 vb 120 pb 328 container E566393ABD204284 physical_hash 202FDF4B505B50FC at red+43.5 s
+   PS guest ABB41A90 physical ED25BC80 vb 120 pb 376 container 6EE915B02394D8D4 physical_hash FC2D1A8BD52F5FCD at red+44.5 s
+   VS guest A7F79FD0 physical ED65D8C0 vb 156 pb 532 container F976B389E947A6DA physical_hash 23C2216405D65119 at red+59.0 s
+   PS guest A7F79DA0 physical ED65DAE0 vb 120 pb 280 container 4DB01A8D1CE316BA physical_hash 60CD95D1E439F00A at red+59.0 s
+physical_hash joins between identity events (information; never used to cover a target): 0
+
+D3 W1 targets (stage guest: unrecognized rows, draw_missing rows, first..last red+s; match)
+   VS AB7D1200: 486, 344, +43.5..+55.9  MATCHED by guest -> container 56F180069A723975
+   VS ABA99710: 312, 156, +44.5..+55.8  UNMATCHED
+   VS A7F79FD0: 426, 213, +59.0..+65.0  MATCHED by guest -> container F976B389E947A6DA
+   PS AB854C80: 486, 0, +43.5..+55.9  MATCHED by guest -> container E566393ABD204284
+   PS ABB41A90: 312, 0, +44.5..+55.8  MATCHED by guest -> container 6EE915B02394D8D4
+   PS A7F79DA0: 426, 0, +59.0..+65.0  MATCHED by guest -> container 4DB01A8D1CE316BA
+   pairs at draw_missing rows (last unrecognized VS, PS): draws VSmiss PSmiss first..last red+s
+     AB7D1200 AB854C80    344    344      0  +43.5..+55.9
+     A7F79FD0 A7F79DA0    213    213      0  +59.0..+65.0
+     ABA99710 ABB41A90    156    156      0  +44.5..+55.8
+D3 W2 targets (stage guest: unrecognized rows, draw_missing rows, first..last red+s; match)
+   VS A7F79FD0: 2812, 1406, +65.0..+104.7  MATCHED by guest -> container F976B389E947A6DA
+   PS A7F79DA0: 2812, 0, +65.0..+104.7  MATCHED by guest -> container 4DB01A8D1CE316BA
+   pairs at draw_missing rows (last unrecognized VS, PS): draws VSmiss PSmiss first..last red+s
+     A7F79FD0 A7F79DA0   1406   1406      0  +65.0..+104.7
+
+D4 container files (check run: name + size == vb+4+pb + marker == vheader[8:12] + sha256; container_hash NOT recomputed, no xxhash module)
+   vs-56F180069A723975.bin size 728 (expect 728) OK marker OK sha256 98E17056EC7CA618AC75A080C25420A4DAD458AD39BDFF62EA5A2F4275E4EDA8
+   ps-E566393ABD204284.bin size 452 (expect 452) OK marker OK sha256 18439A7BF7DF34572304FCBA24A172D7859413FD3DE59B343498B98121298916
+   ps-6EE915B02394D8D4.bin size 500 (expect 500) OK marker OK sha256 CFD5F3E413C1771EAC5591803F39C981F0D1C16E15A8D92717F5B655BC1F47B2
+   vs-F976B389E947A6DA.bin size 692 (expect 692) OK marker OK sha256 6D75E47BD5D6FCD6F544A266789FFDB132947B6025CC723586CF89D704EE32E0
+   ps-4DB01A8D1CE316BA.bin size 404 (expect 404) OK marker OK sha256 4A14CC86EE04ED23A9052D6B238FB3825067CBE2BCA17D0BADB660D7C442722E
+D4: PASS
+D5 identity events before red+40 s: 0 (expect 0)
+D6 (information only; the root is never packed, D-C2): VS physical sections vs root vs-A58EBA12 bytes 304..703 (400 B)
+   vs-56F180069A723975.bin guest AB7D1200 physical 568 B: DIFF
+   vs-F976B389E947A6DA.bin guest A7F79FD0 physical 532 B: DIFF
+D7 (information): raw + root files
+   raw VS: 1 file(s) = unique (stage, prefix) for 2 identities (prefix-keyed, no overwrite: expect <= identities)
+   raw PS: 1 file(s) = unique (stage, prefix) for 3 identities (prefix-keyed, no overwrite: expect <= identities)
+     ps-C77B3ABB6F87ACD9.bin 1824 B
+     vs-C77B3ABB6F87ACD9.bin 2048 B
+   root files: 2; boot files present: ['ps-93B9F93B535E7CCA.bin', 'vs-A58EBA123EFB541C.bin']; other: none
+   game.log prefix VS C77B3ABB6F87ACD9: raw file present
+   game.log prefix PS C77B3ABB6F87ACD9: raw file present
+
+W1/W2 split: W1 PARTIAL (5/6); W2 COVERED
+RESULT: PARTIAL (7/8 targets matched; unmatched: W1 VS ABA99710); W1 PARTIAL (5/6), W2 COVERED

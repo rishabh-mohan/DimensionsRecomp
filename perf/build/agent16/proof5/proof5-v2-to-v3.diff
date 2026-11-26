@@ -1,0 +1,71 @@
+diff --git a/prev/v2/proof5_post.py b/proof5_post.py
+index 51e4ba1..842d2c9 100644
+--- a/prev/v2/proof5_post.py
++++ b/proof5_post.py
+@@ -15,7 +15,8 @@
+ # STABLE targets (image-range 0xAC4/0xAC5 guests of DUMP-TARGETS-story) are also compared by address.
+ # A NEW key that is @-keyed may be a base guest that just had no insert event: listed apart as "possibly REMAIN".
+ # Route checks (M10 P5/P-S1): frames ratio cand/base within +-10%, and the cand route completed like 054546
+-# (clean exit 0, steps 302/302 last: done, title gate HIT, prompts 3/3, ctl=0, all kit exits 0).
++# (clean exit 0, steps 302/302 last: done, title gate HIT = route L55 wait ok, prompts exactly 1/1 each, ctl=0,
++# all kit exits 0).
+ # RESULT, first match wins: INVALID (fingerprint check failed) | INCONCLUSIVE (frames ratio or route check
+ # failed) | FAIL (missing draws per 1000 frames not lower) | PASS-WITH-CHECKS (rate lower, some STABLE remain)
+ # | PASS (rate lower AND every STABLE target that missed in base has 0 missing draws in cand).
+@@ -96,8 +97,8 @@ def route_checks(post, runlog, sidecar):
+         ('clean exit 0', 'PASS native clean exit: exit 0x00000000' in P),
+         ('steps 302/302', 'steps 302/302 stopped_by_script True error None' in P),
+         ('stop reached (last: done)', re.search(r'steps 302/302 \(last: done\)', R) is not None),
+-        ('title gate HIT', re.search(r'wait line \d+ current=5 pending=0 \d+ +ok after', P) is not None),
+-        ('prompts 3/3', 'prompts=batman:1/1 gandalf:1/1 wyldstyle:1/1' in S),
++        ('title gate HIT', re.search(r'wait line 55 current=5 pending=0 \d+ +ok after', P) is not None),
++        ('prompts 3/3', re.search(r'(?:^|\s)prompts=batman:1/1 gandalf:1/1 wyldstyle:1/1(?=\s|$)', S) is not None),
+         ('ctl 0', ' ctl=0 done/0 err' in S),
+         ('kit exits 0', all(s in R for s in ('run-game (native) exit 0', 'sidecar exit 0', 'holdwatch exit 0',
+                                              'watcher exit 0', 'GAMEPLAY DONE: run-game exit 0; post exit 0'))),
+diff --git a/prev/v2/PLAN-proof5.md b/PLAN-proof5.md
+index a7ab9a8..954d36f 100644
+--- a/prev/v2/PLAN-proof5.md
++++ b/PLAN-proof5.md
+@@ -2,7 +2,7 @@
+ 
+ **Question:** does the 143-container pack remove the missing-shader draws it targets, and which misses remain? The remaining set is the 22 no-identity stage+guests from the 051159 dump session, including VS A7FA6EA0 (formerly A7FA6E00).
+ 
+-**Status:** draft v2 (revised after M10's rating `build\agent10\s5\proof5-plan-rating.md` B5CE9F38, SAFE-IF P1-P6: P-S1, P-N1, P-N2, P-N3 addressed). It needs these, in order (M10 P1):
++**Status:** draft v3. v2 was revised after M10's rating `build\agent10\s5\proof5-plan-rating.md` B5CE9F38 (P-S1, P-N1, P-N2, P-N3 addressed). v3 follows `build\agent10\s5\kit-rev2-proof5v2-rating.md` 18509DEB (P-N4, P-N5; prompts exactly 1/1). It needs these, in order (M10 P1):
+ 1. ~~the native5pack-bin build to PASS~~ **DONE 06:11**: bin-log 9FEF87D2 VERDICT PASS; check A357A041 RESULT PASS;
+ 2. M10's rating of M3's `cand5` kit revision (section 2);
+ 3. install, pins, tamper and dryruns of that kit, rated on their own (the dryrun copies and hashes about 365 MB, so it needs a slot of its own);
+@@ -80,8 +80,8 @@ Report sections:
+   - clean exit 0: post `PASS native clean exit: exit 0x00000000`;
+   - steps 302/302: post `steps 302/302 stopped_by_script True error None`;
+   - stop reached: run log `steps 302/302 (last: done)` (the route's `stop` is L310);
+-  - title gate HIT: post `wait line <n> current=5 pending=0 <t> ok after` (the TITLE GATE CHECK `wait_log` of gameplay-route.txt L55);
+-  - prompts 3/3: the last sidecar `result` line has `prompts=batman:1/1 gandalf:1/1 wyldstyle:1/1`;
++  - title gate HIT: post `wait line 55 current=5 pending=0 <t> ok after`, pinned to line 55, the TITLE GATE CHECK `wait_log` of gameplay-route.txt (P-N4; mapping confirmed by M10);
++  - prompts 3/3: the last sidecar `result` line has exactly `prompts=batman:1/1 gandalf:1/1 wyldstyle:1/1` as a whole token run; e.g. `2/1` or `1/10` is NO, so a second fire of any prompt makes the run INCONCLUSIVE (strict, as P5);
+   - ctl 0: the same line has `ctl=0 done/0 err`;
+   - kit exits 0: run log `run-game (native) exit 0`, `sidecar exit 0`, `holdwatch exit 0`, `watcher exit 0`, `GAMEPLAY DONE: run-game exit 0; post exit 0`;
+ - per-run totals;
+@@ -100,15 +100,16 @@ RESULT, first matching row wins:
+ 
+ Exit 0 for PASS / PASS-WITH-CHECKS, 1 otherwise, 2 = refused. P5 still applies on top: the reviewer compares M3's post with 054546 (e.g. the pad 3 / pad 2 outcome), and the script's route line does not replace that.
+ 
+-**Self-tests (v2):**
+-- Fixture (scratch `p5_selftest2.py`), reports in `proof5\selftest2-*`, SELFTEST PASS, 18/18:
++**Self-tests (v3):**
++- Fixture (scratch `p5_selftest3.py`), reports in `proof5\selftest3-*`, summary `proof5\selftest3-SUMMARY.txt`, SELFTEST PASS, 21/21:
+   - PASS, PASS-WITH-CHECKS, FAIL; INVALID for a bad cand fp and for a bad base fp;
+-  - INCONCLUSIVE for frames 0.85, steps 250/302, title gate TIMEOUT, prompts wyldstyle 0/1 and sidecar exit 1; frames 1.10 is still OK;
++  - INCONCLUSIVE for frames 0.85, steps 250/302, title gate TIMEOUT, prompts wyldstyle 0/1 and sidecar exit 1; v3 adds the gate wait on line 56 instead of 55, prompts wyldstyle 1/10 and batman 2/1, all INCONCLUSIVE; frames 1.10 is still OK;
+   - order: INCONCLUSIVE beats FAIL, INVALID beats INCONCLUSIVE;
+   - an @-keyed cand-only guest is listed under "NEW @-keyed ... possibly REMAIN";
+   - refusals exit 2: `--out` outside proof5, `--out` existing, cand fp equal to base fp, and `--base-log` missing.
+-- Real data (`proof5\selftest-real2-054546`, report E44ADBC3…): the baseline vs itself, with M3's 054546 post, run log and sidecar as the cand route files. It reproduces 40881 frames, 220710 missing draws (VS 134404, PS 86306), 5398.8 per 1000 frames, 46 guests, 16 keys and 64 inserts; frames ratio 1.000 OK; route completion OK (all 7 items yes); 0 FIXED, 0 NEW, 0 NEW @-keyed. The result is INVALID by design, since fp5 is not in the base log.
+-- v1 self-tests (`selftest-{pass,pwc,fail,invalid}`, `selftest-real-054546` BBC9E692) are kept and are superseded.
++- Real data (`proof5\selftest-real3-054546`, report 00E2DE87…): the baseline vs itself, with M3's 054546 post, run log and sidecar as the cand route files. It reproduces 40881 frames, 220710 missing draws (VS 134404, PS 86306), 5398.8 per 1000 frames, 46 guests, 16 keys and 64 inserts; frames ratio 1.000 OK; route completion OK (all 7 items yes); 0 FIXED, 0 NEW, 0 NEW @-keyed. The result is INVALID by design, since fp5 is not in the base log.
++- Earlier self-tests are kept and superseded: v1 `selftest-{pass,pwc,fail,invalid}`, `selftest-real-054546` BBC9E692; v2 `selftest2-*`, `selftest-real2-054546` E44ADBC3.
++- Diff: `proof5\proof5-v2-to-v3.diff` (relative paths; `prev\v1` and `prev\v2` hold the earlier PLAN and script).
+ 
+ > [!NOTE]
+ > Prefix keying is coarse. The 46 baseline guests fold into 16 keys: many shaders share their first 8 bytes, and 10 guests had no insert event, so they are keyed by address. A key counts as FIXED only when every guest under it is gone. The headline evidence is therefore:

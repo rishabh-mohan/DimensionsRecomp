@@ -1,0 +1,282 @@
+{
+ "args": {
+  "runs": [
+   "<WS>\\build\\agent3\\runs\\20261125-071741-s33-offsf",
+   "<WS>\\build\\agent3\\runs\\20261125-123609-s33-ond"
+  ],
+  "span": 180.0,
+  "anchor": 1500,
+  "anchor_hold": 1.0,
+  "anchor_mode": "sustained",
+  "thr3d": 600,
+  "margin": 2.0,
+  "anchor_late": 90.0,
+  "end_low_xenos": 1000,
+  "end_low_native": 120,
+  "end_low_hold": 5.0,
+  "end_abs": 10,
+  "end_rel": 0.05,
+  "end_hold": 20.0,
+  "sustain_min": 0.5,
+  "thermal_outlier": 0.25,
+  "cap": "none",
+  "cap_lo": 57.0,
+  "cap_hi": 61.5,
+  "native_default_ok": false,
+  "thermal_flag": 0.1,
+  "hw_void": 0.05,
+  "host_margin": 1.0,
+  "step_gap": 12.0,
+  "align_tol": 3.0,
+  "presses": 3,
+  "route": "<WS>\\harness\\routes\\attract-long.txt",
+  "renderer": "auto",
+  "warm": false,
+  "json": "<WS>\\build\\agent10\\s5\\scratch-m12\\out-gates-offsf-ond-span180.json",
+  "selftest": false
+ },
+ "runs": [
+  {
+   "run_dir": "<WS>\\build\\agent3\\runs\\20261125-071741-s33-offsf",
+   "tag": "s33-offsf",
+   "bin_dir": "<WS>\\build\\agent2\\devoff4b-s33-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 0.68 s, no WER/dump"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "PASS",
+     "why": "info: first >=1500 frame at 108.6 s is transient; sustained anchor 128.5 s (sustained used)",
+     "t3d": 102.43,
+     "anchor_t": 128.48,
+     "anchor_minus_last_press": 55.11,
+     "anchor_minus_3d": 26.05,
+     "sustain10": 1.0
+    },
+    "span": {
+     "status": "VOID",
+     "why": "window runs 24.5 s past end of 3D at 284.0 s",
+     "end3d_t": 283.99,
+     "end3d_low_t": 283.99,
+     "end3d_flat_t": 299.92,
+     "window": [
+      128.48,
+      308.48
+     ],
+     "span_s": 180.0
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 91/91 (completed), last step t 462.8",
+     "last_press_t": 73.37,
+     "steps_done": 91,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "FLAG",
+     "why": "no cooldown record in run.json (first gpu.csv temp 71.0 C)",
+     "start_temp_c": 71.0,
+     "temp_at_anchor_c": 87.0
+    },
+    "thermal": {
+     "status": "PASS",
+     "why": "thermal-limited 0.68 > 0.10 (covariate; set rule: arm outlier -> FLAG)",
+     "samples": 180,
+     "expected": 180,
+     "thermal_share": 0.683,
+     "hw_brake_share": 0.0,
+     "powercap_share": 0.078,
+     "util_gpu": 68.01,
+     "gr_mhz": 1484.89,
+     "power_w": 24.49,
+     "temp_c": 86.26,
+     "p0_share": 1.0,
+     "thermal_limited": true
+    },
+    "host": {
+     "status": "NODATA",
+     "why": "no nongame_cores",
+     "nongame_mean": null,
+     "rows": 180
+    },
+    "cap": {
+     "status": "PASS",
+     "why": "fps 34.11",
+     "arm": "none",
+     "reported": null
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "perf.csv",
+    "first_frame_t": 4.87,
+    "perf_rows": 22698,
+    "perf_last_t": 463.31,
+    "anchor_first_t": 108.6,
+    "anchor_sustained_t": 128.48,
+    "runner_window_start": null,
+    "first_t_by_draws": {
+     "600": 102.43,
+     "1000": 107.22,
+     "1500": 108.6,
+     "2000": 108.6
+    },
+    "max_draws": 16025,
+    "cap_sources": {
+     "runner_effective": null,
+     "cvar": null,
+     "native_frames_cvar": null
+    },
+    "axis_minus_close_s": 1.26,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": 0.509,
+     "max_abs": 0.509
+    }
+   },
+   "renderer": "xenos",
+   "metrics": {
+    "frames": 6140,
+    "window_s": 179.997,
+    "fps": 34.112,
+    "median_ms": 24.799,
+    "p99_ms": 93.709,
+    "low1_ms": 205.843,
+    "max_ms": 1761.58,
+    "n_ge100": 55,
+    "n_ge250": 11,
+    "at60_share": 0.088
+   },
+   "verdict": "VOID"
+  },
+  {
+   "run_dir": "<WS>\\build\\agent3\\runs\\20261125-123609-s33-ond",
+   "tag": "s33-ond",
+   "bin_dir": "<WS>\\build\\agent2\\devoff4b-s33d-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 0.69 s, no WER/dump"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "PASS",
+     "why": "ok",
+     "t3d": 86.34,
+     "anchor_t": 112.3,
+     "anchor_minus_last_press": 39.45,
+     "anchor_minus_3d": 25.95,
+     "sustain10": 1.0
+    },
+    "span": {
+     "status": "VOID",
+     "why": "window runs 24.5 s past end of 3D at 267.8 s",
+     "end3d_t": 267.78,
+     "end3d_low_t": 267.78,
+     "end3d_flat_t": 279.23,
+     "window": [
+      112.3,
+      292.3
+     ],
+     "span_s": 180.0
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 91/91 (completed), last step t 462.8",
+     "last_press_t": 72.85,
+     "steps_done": 91,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "FLAG",
+     "why": "no cooldown record in run.json (first gpu.csv temp 65.0 C)",
+     "start_temp_c": 65.0,
+     "temp_at_anchor_c": 86.0
+    },
+    "thermal": {
+     "status": "PASS",
+     "why": "thermal-limited 0.68 > 0.10 (covariate; set rule: arm outlier -> FLAG)",
+     "samples": 180,
+     "expected": 180,
+     "thermal_share": 0.683,
+     "hw_brake_share": 0.0,
+     "powercap_share": 0.15,
+     "util_gpu": 73.58,
+     "gr_mhz": 1513.46,
+     "power_w": 26.5,
+     "temp_c": 86.37,
+     "p0_share": 1.0,
+     "thermal_limited": true
+    },
+    "host": {
+     "status": "FLAG",
+     "why": "hidden-desktop run (mode 'FUNCTIONAL ONLY (hidden desktop exebox-DTPDCJ2KO5E3NY5FKT2YLANBFW), NOT FOR TIMING'): foreground check not applicable; nongame 2.220 cores (set rule applied below)",
+     "nongame_mean": 2.22,
+     "rows": 180
+    },
+    "cap": {
+     "status": "PASS",
+     "why": "fps 38.76",
+     "arm": "none",
+     "reported": null
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "perf.csv",
+    "first_frame_t": 4.36,
+    "perf_rows": 23671,
+    "perf_last_t": 463.11,
+    "anchor_first_t": 112.3,
+    "anchor_sustained_t": 112.3,
+    "runner_window_start": null,
+    "first_t_by_draws": {
+     "600": 86.34,
+     "1000": 89.24,
+     "1500": 112.3,
+     "2000": 112.3
+    },
+    "max_draws": 13090,
+    "cap_sources": {
+     "runner_effective": null,
+     "cvar": null,
+     "native_frames_cvar": null
+    },
+    "axis_minus_close_s": 1.08,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": 0.328,
+     "max_abs": 0.328
+    }
+   },
+   "renderer": "xenos",
+   "metrics": {
+    "frames": 6977,
+    "window_s": 179.997,
+    "fps": 38.762,
+    "median_ms": 23.706,
+    "p99_ms": 70.685,
+    "low1_ms": 101.92,
+    "max_ms": 442.565,
+    "n_ge100": 20,
+    "n_ge250": 2,
+    "at60_share": 0.145
+   },
+   "verdict": "VOID"
+  }
+ ]
+}

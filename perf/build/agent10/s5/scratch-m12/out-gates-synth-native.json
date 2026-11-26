@@ -1,0 +1,124 @@
+{
+ "args": {
+  "runs": [
+   "build\\agent10\\s5\\scratch-m12\\synth\\20261125-165219-final2-3d-native"
+  ],
+  "span": 110.0,
+  "anchor": 1500,
+  "anchor_hold": 1.0,
+  "anchor_mode": "sustained",
+  "thr3d": 600,
+  "margin": 2.0,
+  "anchor_late": 90.0,
+  "end_low_xenos": 1000,
+  "end_low_native": 120,
+  "end_low_hold": 5.0,
+  "end_abs": 10,
+  "end_rel": 0.05,
+  "end_hold": 20.0,
+  "sustain_min": 0.5,
+  "thermal_outlier": 0.25,
+  "cap": "none",
+  "cap_lo": 57.0,
+  "cap_hi": 61.5,
+  "native_default_ok": true,
+  "thermal_flag": 0.1,
+  "hw_void": 0.05,
+  "host_margin": 1.0,
+  "step_gap": 12.0,
+  "align_tol": 3.0,
+  "presses": 3,
+  "route": "harness\\routes\\attract-long.txt",
+  "renderer": "auto",
+  "warm": false,
+  "json": "build\\agent10\\s5\\scratch-m12\\out-gates-synth-native.json",
+  "selftest": false
+ },
+ "runs": [
+  {
+   "run_dir": "<WS>\\build\\agent10\\s5\\scratch-m12\\synth\\20261125-165219-final2-3d-native",
+   "tag": "final2-3d-native",
+   "bin_dir": "<WS>\\build\\agent2\\nativefinal2-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 0.89 s, no WER/dump"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "VOID",
+     "why": "no frame >= 600 draws",
+     "t3d": null,
+     "anchor_t": null
+    },
+    "span": {
+     "status": "VOID",
+     "why": "no anchor, no window"
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 43/91 (halted), last step t 241.0",
+     "last_press_t": 72.71,
+     "steps_done": 43,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "FLAG",
+     "why": "no cooldown record in run.json (first gpu.csv temp 70.0 C)",
+     "start_temp_c": 70.0,
+     "temp_at_anchor_c": null
+    },
+    "thermal": {
+     "status": "NODATA",
+     "why": "no window"
+    },
+    "host": {
+     "status": "NODATA",
+     "why": "no sys.csv (host-busy, battery, foreground, user input unknown)",
+     "nongame_mean": null
+    },
+    "cap": {
+     "status": "NODATA",
+     "why": "no window frames"
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "perf.csv",
+    "first_frame_t": 4.23,
+    "perf_rows": 36194,
+    "perf_last_t": 240.56,
+    "anchor_first_t": null,
+    "anchor_sustained_t": null,
+    "runner_window_start": 125.49,
+    "first_t_by_draws": {
+     "600": null,
+     "1000": null,
+     "1500": null,
+     "2000": null
+    },
+    "max_draws": 0,
+    "cap_sources": {
+     "runner_effective": 240,
+     "cvar": null,
+     "native_frames_cvar": null
+    },
+    "axis_minus_close_s": 0.51,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": -0.464,
+     "max_abs": 0.464
+    }
+   },
+   "renderer": "native",
+   "metrics": {},
+   "verdict": "VOID"
+  }
+ ]
+}

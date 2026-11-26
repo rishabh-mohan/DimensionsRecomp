@@ -1,0 +1,190 @@
+diff --git a/src/graphics/d3d12/command_processor.cpp b/src/graphics/d3d12/command_processor.cpp
+--- a/src/graphics/d3d12/command_processor.cpp
++++ b/src/graphics/d3d12/command_processor.cpp
+@@ -111,6 +111,12 @@ REXCVAR_DEFINE_UINT32(d3d12_submit_split_kb, 0, "GPU/D3D12",
+                       "this many KB (0 = off)")
+     .lifecycle(rex::cvar::Lifecycle::kInitOnly);
+ 
++// S5 S1 diagnostics (test only): log the occlusion (EVENT_WRITE_ZPD) query
++// counters - on the first query, when host queries get disabled, about every
++// 10 s while queries come in, and at shutdown. Off, nothing is logged.
++REXCVAR_DEFINE_BOOL(d3d12_log_occlusion_queries, false, "GPU/D3D12",
++                    "Log occlusion query counters, including draws dropped inside a query");
++
+ namespace rex::graphics::d3d12 {
+ 
+ // Generated with `xb buildshaders`.
+@@ -126,6 +132,62 @@ namespace shaders {
+ 
+ namespace {
+ 
++// The d3d12_log_occlusion_queries counters. A draw dropped while its pipeline
++// is pending adds no samples to an active query, so the guest reads a low
++// count. GPU Commands thread only, one command processor per process, so file
++// scope is enough. The counters are always kept; only the log is optional.
++struct OcclusionQueryLog {
++  uint64_t zpd = 0;                  // EVENT_WRITE_ZPD packets
++  uint64_t zpd_no_host = 0;          // ... while host queries are off or unavailable
++  uint64_t begun = 0;                // host queries begun
++  uint64_t resolved = 0;             // host sample counts written to the guest
++  uint64_t fallback = 0;             // fallback (fake) results written to the guest
++  uint64_t disabled = 0;             // host queries disabled (DisableHostOcclusionQueries)
++  const char* disable_reason = "";
++  uint64_t ended_by_submission = 0;  // queries ended early by EndSubmission
++  uint64_t draws_in_query = 0;       // draws reaching the pipeline check in a query
++  uint64_t dropped_in_query_ps = 0;  // ... dropped while their pipeline is pending
++  uint64_t dropped_in_query_no_ps = 0;
++  std::chrono::steady_clock::time_point last_log{};
++};
++OcclusionQueryLog occlusion_query_log;
++
++void LogOcclusionQueries(const char* when, uint64_t frame) {
++  if (!REXCVAR_GET(d3d12_log_occlusion_queries)) {
++    return;
++  }
++  OcclusionQueryLog& q = occlusion_query_log;
++  q.last_log = std::chrono::steady_clock::now();
++  REXGPU_INFO(
++      "d3d12_occlusion_queries ({}): frame={} zpd={} zpd_no_host={} begun={} resolved={} "
++      "fallback={} disabled={} reason='{}' ended_by_submission={} draws_in_query={} "
++      "dropped_in_query_ps={} dropped_in_query_no_ps={}",
++      when, frame, q.zpd, q.zpd_no_host, q.begun, q.resolved, q.fallback, q.disabled,
++      q.disable_reason, q.ended_by_submission, q.draws_in_query, q.dropped_in_query_ps,
++      q.dropped_in_query_no_ps);
++}
++
++// Counts one ZPD packet, and logs when the handler returns: on the first
++// packet, after a disable, or 10 s after the last line.
++struct OcclusionQueryPacketScope {
++  explicit OcclusionQueryPacketScope(uint64_t frame_in)
++      : frame(frame_in), disabled_before(occlusion_query_log.disabled) {
++    ++occlusion_query_log.zpd;
++  }
++  ~OcclusionQueryPacketScope() {
++    const OcclusionQueryLog& q = occlusion_query_log;
++    if (q.zpd == 1) {
++      LogOcclusionQueries("first", frame);
++    } else if (q.disabled != disabled_before) {
++      LogOcclusionQueries("disabled", frame);
++    } else if (std::chrono::steady_clock::now() - q.last_log >= std::chrono::seconds(10)) {
++      LogOcclusionQueries("periodic", frame);
++    }
++  }
++  uint64_t frame;
++  uint64_t disabled_before;
++};
++
+ // The skip list: the cvar string parsed once per change, plus whatever ps_skip
+ // toggled at runtime (which writes the cvar back so the two never disagree).
+ // One command processor per process, so file scope is enough; the mutex is for
+@@ -435,7 +497,9 @@ void D3D12CommandProcessor::InitializeShaderStorage(const std::filesystem::path&
+ 
+ bool D3D12CommandProcessor::ExecutePacketType3_EVENT_WRITE_ZPD(memory::RingBuffer* reader,
+                                                                uint32_t packet, uint32_t count) {
++  OcclusionQueryPacketScope occlusion_query_packet_scope(frame_current_);
+   if (!REXCVAR_GET(occlusion_query_enable) || !occlusion_query_resources_available_) {
++    ++occlusion_query_log.zpd_no_host;
+     return CommandProcessor::ExecutePacketType3_EVENT_WRITE_ZPD(reader, packet, count);
+   }
+ 
+@@ -448,11 +512,13 @@ bool D3D12CommandProcessor::ExecutePacketType3_EVENT_WRITE_ZPD(memory::RingBuffe
+   auto* sample_counts =
+       memory_->TranslatePhysical<xenos::xe_gpu_depth_sample_counts*>(sample_count_addr);
+   if (!sample_counts) {
++    occlusion_query_log.disable_reason = "no sample count memory";
+     DisableHostOcclusionQueries();
+     return true;
+   }
+ 
+   auto write_fallback_result = [sample_counts, kQueryFinished]() -> bool {
++    ++occlusion_query_log.fallback;
+     auto fake_sample_count = REXCVAR_GET(query_occlusion_fake_sample_count);
+     if (fake_sample_count < 0) {
+       return true;
+@@ -478,17 +544,22 @@ bool D3D12CommandProcessor::ExecutePacketType3_EVENT_WRITE_ZPD(memory::RingBuffe
+   if (!is_end) {
+     if (active_occlusion_query_.valid &&
+         active_occlusion_query_.sample_count_address != sample_count_addr) {
++      occlusion_query_log.disable_reason = "begin at another address while one is active";
+       DisableHostOcclusionQueries();
+       return write_fallback_result();
+     }
+     if (!BeginGuestOcclusionQuery(sample_count_addr)) {
+       return write_fallback_result();
+     }
++    ++occlusion_query_log.begun;
+     return true;
+   }
+ 
+   if (!active_occlusion_query_.valid ||
+       active_occlusion_query_.sample_count_address != sample_count_addr) {
++    occlusion_query_log.disable_reason = active_occlusion_query_.valid
++                                             ? "end at another address"
++                                             : "end without an active query";
+     DisableHostOcclusionQueries();
+     return write_fallback_result();
+   }
+@@ -497,6 +568,7 @@ bool D3D12CommandProcessor::ExecutePacketType3_EVENT_WRITE_ZPD(memory::RingBuffe
+     return write_fallback_result();
+   }
+ 
++  ++occlusion_query_log.resolved;
+   return true;
+ }
+ 
+@@ -1944,6 +2016,7 @@ void D3D12CommandProcessor::ShutdownContext() {
+     on_demand_fence_event_ = nullptr;
+   }
+   InvalidateAllVertexBufferResidency();
++  LogOcclusionQueries("shutdown", frame_current_);
+   ShutdownOcclusionQueryResources();
+ 
+   ui::d3d12::util::ReleaseAndNull(readback_buffer_);
+@@ -2760,6 +2833,9 @@ bool D3D12CommandProcessor::IssueDraw(xenos::PrimitiveType primitive_type, uint3
+   // failed). With d3d12_pipeline_creation_no_wait, EndSubmission doesn't wait
+   // for pipelines in creation, so such a draw must never be recorded, even if
+   // async_shader_compilation has been turned off since.
++  if (active_occlusion_query_.valid) {
++    ++occlusion_query_log.draws_in_query;
++  }
+   if ((REXCVAR_GET(async_shader_compilation) || pipeline_cache_->IsCreationNoWait()) &&
+       pipeline_cache_->GetD3D12PipelineByHandle(pipeline_handle) == nullptr) {
+     bool skip_draw = true;
+@@ -2774,6 +2850,10 @@ bool D3D12CommandProcessor::IssueDraw(xenos::PrimitiveType primitive_type, uint3
+       skip_draw = pipeline_cache_->GetD3D12PipelineByHandle(pipeline_handle) == nullptr;
+     }
+     if (skip_draw) {
++      if (active_occlusion_query_.valid) {
++        ++(pixel_shader != nullptr ? occlusion_query_log.dropped_in_query_ps
++                                   : occlusion_query_log.dropped_in_query_no_ps);
++      }
+       frame_stats::Add(frame_stats::kDroppedDraw, 0);
+       return true;
+     }
+@@ -4294,6 +4374,7 @@ bool D3D12CommandProcessor::EndSubmission(bool is_swap) {
+     assert_false(scratch_buffer_used_);
+ 
+     if (active_occlusion_query_.valid && occlusion_query_heap_) {
++      ++occlusion_query_log.ended_by_submission;
+       deferred_command_list_.D3DEndQuery(occlusion_query_heap_.Get(), D3D12_QUERY_TYPE_OCCLUSION,
+                                          active_occlusion_query_.host_index);
+       active_occlusion_query_ = {};
+@@ -5817,6 +5898,10 @@ bool D3D12CommandProcessor::AcquireOcclusionQueryIndex(uint32_t& host_index_out)
+ }
+ 
+ void D3D12CommandProcessor::DisableHostOcclusionQueries() {
++  // Every disable path counts here; the caller sets disable_reason first.
++  if (occlusion_query_resources_available_) {
++    ++occlusion_query_log.disabled;
++  }
+   if (active_occlusion_query_.valid && occlusion_query_heap_) {
+     uint32_t host_index = active_occlusion_query_.host_index;
+     // Clear before EndSubmission to prevent the EndSubmission safety net from issuing a second
+@@ -5841,6 +5926,7 @@ bool D3D12CommandProcessor::BeginGuestOcclusionQuery(uint32_t sample_count_addre
+   if (active_occlusion_query_.valid) {
+     REXGPU_WARN(
+         "D3D12CommandProcessor: Occlusion query begin issued while another query is active");
++    occlusion_query_log.disable_reason = "begin while another query is active";
+     DisableHostOcclusionQueries();
+     return false;
+   }

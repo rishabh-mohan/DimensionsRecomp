@@ -1,0 +1,54 @@
+start 2026-11-25 17:44:11
+PASS FFX sdk/include + ffx-api/include exist in snap1
+    cache diff CMAKE_CXX_COMPILER: snap1-sdk='clang++' new='<workspace>/toolchain/llvm-23.1.6/bin/clang++.exe'
+    cache diff CMAKE_C_COMPILER: snap1-sdk='clang' new='<workspace>/toolchain/llvm-23.1.6/bin/clang.exe'
+    cache diff CMAKE_INSTALL_PREFIX: snap1-sdk='<workspace>/build/agent2/snap1-sdk/install' new='<workspace>/build/agent2/s5/ffx-a/install-never'
+    cache diff CMAKE_RC_COMPILER: snap1-sdk='C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x64/rc.exe' new='<workspace>/toolchain/llvm-23.1.6/bin/llvm-rc.exe'
+    cache diff REXGLUE_FIDELITYFX_SOURCE_DIR: snap1-sdk=None new='<workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk/thirdparty/FidelityFX-SDK'
+PASS cache == snap1-sdk except install prefix, FFX source dir, compiler spelling, RC compiler (not used by rexui): 0 unexpected
+PASS ccdb entry count == snap1-sdk (2277): 2277
+PASS define only on rexui entries: 108 with define, 108 rexui
+PASS every rexui entry has the define
+rexui entries: 108 total, 36 Release
+PASS 36 Release rexui entries (35 TUs + PCH .cxx): 36
+PASS non-rexui compile commands identical to snap1-sdk (modulo build dir): 0 differ
+    ok   rc=0 39.4s errors=0 warnings=0 ..\..\..\s5\ffx-a\b\src\ui\CMakeFiles\rexui.dir\cmake_pch.hxx.cxx
+    ok   rc=0 20.5s errors=0 warnings=0 src\ui\d3d12\d3d12_cpu_descriptor_pool.cpp
+    ok   rc=0 20.8s errors=0 warnings=0 src\ui\d3d12\d3d12_descriptor_heap_pool.cpp
+    ok   rc=0 15.3s errors=0 warnings=4 src\ui\d3d12\d3d12_immediate_drawer.cpp
+    ok   rc=0 15.4s errors=0 warnings=3 src\ui\d3d12\d3d12_presenter.cpp
+    ok   rc=0 10.8s errors=0 warnings=1 src\ui\d3d12\d3d12_provider.cpp
+    ok   rc=0 7.7s errors=0 warnings=0 src\ui\d3d12\d3d12_submission_tracker.cpp
+    ok   rc=0 5.5s errors=0 warnings=3 src\ui\d3d12\d3d12_upload_buffer_pool.cpp
+    ok   rc=0 4.5s errors=0 warnings=3 src\ui\d3d12\d3d12_util.cpp
+    ok   rc=0 36.5s errors=0 warnings=3 src\ui\graphics_upload_buffer_pool.cpp
+    ok   rc=0 36.7s errors=0 warnings=0 src\ui\graphics_util.cpp
+    ok   rc=0 36.5s errors=0 warnings=3 src\ui\image_decode.cpp
+    ok   rc=0 11.8s errors=0 warnings=1 src\ui\imgui_dialog.cpp
+    ok   rc=0 11.9s errors=0 warnings=2 src\ui\imgui_drawer.cpp
+    ok   rc=0 11.5s errors=0 warnings=0 src\ui\immediate_drawer.cpp
+    ok   rc=0 8.2s errors=0 warnings=1 src\ui\keybinds.cpp
+    ok   rc=0 7.3s errors=0 warnings=1 src\ui\menu_item.cpp
+    ok   rc=0 34.1s errors=0 warnings=1 src\ui\overlay\achievement_icon_cache.cpp
+    ok   rc=0 18.3s errors=0 warnings=2 src\ui\overlay\achievement_toast.cpp
+    ok   rc=0 19.6s errors=0 warnings=1 src\ui\overlay\achievements_overlay.cpp
+    ok   rc=0 11.8s errors=0 warnings=1 src\ui\overlay\console_commands.cpp
+    ok   rc=0 11.7s errors=0 warnings=0 src\ui\overlay\console_overlay.cpp
+    ok   rc=0 10.6s errors=0 warnings=0 src\ui\overlay\debug_overlay.cpp
+    ok   rc=0 20.7s errors=0 warnings=2 src\ui\overlay\settings_overlay.cpp
+    ok   rc=0 10.4s errors=0 warnings=0 src\ui\overlay\shader_compile_notice.cpp
+    ok   rc=0 9.2s errors=0 warnings=2 src\ui\presenter.cpp
+    ok   rc=0 7.1s errors=0 warnings=0 src\ui\renderdoc_api.cpp
+    ok   rc=0 7.1s errors=0 warnings=0 src\ui\renderdoc_capture.cpp
+    ok   rc=0 12.5s errors=0 warnings=0 src\ui\sdl_virtual_key.cpp
+    ok   rc=0 17.2s errors=0 warnings=0 src\ui\surface_win.cpp
+    ok   rc=0 11.3s errors=0 warnings=0 src\ui\ui_sound.cpp
+    ok   rc=0 22.2s errors=0 warnings=1 src\ui\window.cpp
+    ok   rc=0 23.5s errors=0 warnings=0 src\ui\window_sdl.cpp
+    ok   rc=0 33.3s errors=0 warnings=0 src\ui\windowed_app.cpp
+    ok   rc=0 31.7s errors=0 warnings=0 src\ui\windowed_app_context.cpp
+    ok   rc=0 34.3s errors=0 warnings=0 src\ui\windowed_app_context_sdl.cpp
+PASS fsyntax all 36 Release rexui entries (164.0 s wall, -j4 idle): 0 failed
+compile_commands.json sha256 95133453C3D22218
+CMakeCache.txt sha256 7CC74BD114791BB4
+RESULT: PASS

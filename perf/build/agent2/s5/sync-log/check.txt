@@ -1,0 +1,18 @@
+PASS SDK HEAD == a7e79c0: a7e79c09135f160f63bfaf8634f4e3b9cb760a75
+PASS patched file is LF-only like the blob
+base blob src/graphics/d3d12/pipeline_cache.cpp C4CB51CC6D2A6429637115F605FF10279FCE59AEDCF8BBC6E2195F92615C86C6
+new       src/graphics/d3d12/pipeline_cache.cpp BEA5C260F683A892026E411C4828E8CE13374FA58AAD549A995FB1CF92FB8570
+diff build\agent2\s5\sync-log\sync-log.diff sha256 A8CD7FEFD0A05E595D08C0E6C1F79BBA706D7071B60B1D3DEEB47055E7FE69E8 (+90/-2)
+PASS SDK index clean (== HEAD a7e79c0)
+PASS git apply --check --cached vs a7e79c0: Checking patch src/graphics/d3d12/pipeline_cache.cpp...
+PASS final2 gpu command for d3d12/pipeline_cache.cpp found
+PASS overlay frame_stats.h == a7e79c0 blob
+dropped ['-fmacro-prefix-map=<workspace>/build/agent2/final2/b/DimensionsRecomp/rexglue-sdk=<workspace>/build/agent2/snap1/DimensionsRecomp/rexglue-sdk'] (not needed for a check build)
+PASS fsyntax exit 0 (2.5 s): 0 errors, 1 warnings in pipeline_cache.cpp
+    <workspace>/build/agent2/s5/sync-log/ov/rexglue-sdk/src/graphics/d3d12/pipeline_cache.cpp:166:32: warning: moving a temporary object prevents copy elision [-Wpessimizing-move]
+PASS compile exit 0 (3.8 s): 0 errors, 1 warnings in pipeline_cache.cpp
+    <workspace>/build/agent2/s5/sync-log/ov/rexglue-sdk/src/graphics/d3d12/pipeline_cache.cpp:166:32: warning: moving a temporary object prevents copy elision [-Wpessimizing-move]
+obj build\agent2\s5\sync-log\obj\d3d12__pipeline_cache.cpp.obj 585922 B E4C1413571D8D981892566AD0306A014364B558277621442A5E3009FD4436918
+PASS needle in obj: d3d12_log_sync_pipeline_creation
+PASS needle in obj: sync pipeline #{} {:016X}
+RESULT: PASS

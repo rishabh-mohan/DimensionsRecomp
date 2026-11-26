@@ -1,0 +1,22 @@
+== arm 4bp: run <workspace>\build\agent16\smoke4bp\runs\20261125-174131-smoke-4bp
+PASS 4bp clean exit: exit 0x00000000 early False close wm_close 3.17 s wer False crash 0 dumps 0
+PASS 4bp route ran: steps 55/91 timeouts 0 error None
+INFO 4bp desktop Default elapsed 303.37 s peak_ws 2240 MB exe FA761654D665BC92
+PASS 4bp fingerprint: 39129c4c059be5f0 (must differ from nativefinal2 1616ce65e973c583; expected 39129c4c059be5f0)
+CHECK 4bp AOT-miss log lines: 2 lines, 2 unique
+    create A58EBA123EFB541C x1
+    create 93B9F93B535E7CCA x1
+INFO 4bp miss cache line: shader miss cache ON (build default); game.log 2480 lines
+INFO 4bp trace: {"frames": 29937, "missing_events_total": 0, "guests_total": 0, "first3d_ms": 161365.84, "first3d_frame": 26648, "window_frames": 3291, "window_s": 134.6, "missing_total": 0, "missing_median": 0, "missing_p90": 0, "frames_with_missing": 0, "draws_median": 518.0, "draws_p90": 2207.0, "draws_mean": 951.1, "submitted_median_est": 518.0}
+PASS 4bp first 3D: trace 161.4 s (frame 26648), 134.6 s of 3D after it
+PASS 4bp screenshots: 3 in <workspace>\build\agent16\smoke4bp\shots\20261125-174125
+    4bp-idle-120.png C5248D2317908449
+    4bp-idle-180.png 58CB2F71CAD3AF5A
+    4bp-idle-60.png 11847B0534073434
+== before vs after (before = 0.4a dump trace <workspace>\build\agent16\dump\trace-20261125-172422\events.tsv (miss cache OFF there))
+  before: 3D from 132.9 s, 4700 frames; missing/frame median 98 p90 127, total 423838, frames with misses 4699; recorded draws/frame median 610 (mean 1200.6)
+  after : 3D from 161.4 s, 3291 frames; missing/frame median 0 p90 0, total 0, frames with misses 0; recorded draws/frame median 518 (mean 951.1)
+PASS missing draws in the 3D window (after): 0 (before 423838)
+CHECK recorded draws/frame median after >= before: 518 vs 610 (scene mix differs per run: soft)
+PASS no new warning types vs before: 0 new
+RESULT: PASS-WITH-CHECKS: 4bp AOT-miss log lines; recorded draws/frame median after >= before

@@ -1,0 +1,37 @@
+# s5_gates: span 110 s, anchor >= 1500 draws, 3D >= 600, cap none, margin 2 s
+
+== final2-3d-xenos [xenos] verdict FLAG
+  clean    PASS   exit 0, wm_close 0.63 s, no WER/dump
+  runner   PASS   n/a: no runner status fields (not a run-timing run)
+  cold     PASS   seed_xenos null (cold)
+  3d       PASS   ok
+  span     PASS   covered: 23.0 s of frames after window end; end of 3D not seen
+  input    PASS   presses 3 ok, none in window; steps 43/91 (halted), last step t 240.0
+  cooldown FLAG   no cooldown record in run.json (first gpu.csv temp 58.0 C)
+  thermal  PASS   thermal-limited 0.77 > 0.10 (covariate; set rule: arm outlier -> FLAG)
+  host     NODATA no sys.csv (host-busy, battery, foreground, user input unknown)
+  cap      PASS   fps 45.95
+  align    PASS   ok
+  3d info: t3d 82.26 anchor 107.98 (last press +36.01, 3D +25.73) sustain10 1.00; first >=1500 107.98, sustained 107.98, runner 107.98; first t by draws {'600': 82.26, '1000': 87.3, '1500': 107.98, '2000': 107.98}
+  end of 3D: None (low band None, flat None); window [107.98, 217.98]
+  gpu: util 95.0% gr 1349.5 MHz 26.39 W temp 87.0 C P0 1.00 powercap 0.20 (n 110)
+  window: 5054 frames 110.0 s fps 45.95 med 20.17 p99 50.17 1%low 79.21 max 307.4 ms; >=100 7 >=250 2; at60 0.16
+  axis: first frame 3.48, draws perf.csv, axis-close 0.97 s, vs input perf_rows {'n': 1, 'median': 0.322, 'max_abs': 0.322}
+
+== final2-3d-native [native] verdict FLAG
+  clean    PASS   exit 0, wm_close 0.89 s, no WER/dump
+  runner   PASS   n/a: no runner status fields (not a run-timing run)
+  cold     PASS   seed_xenos null (cold)
+  3d       PASS   ok
+  span     PASS   covered: 5.1 s of frames after window end; end of 3D not seen
+  input    PASS   presses 3 ok, none in window; steps 43/91 (halted), last step t 240.0
+  cooldown FLAG   no cooldown record in run.json (first gpu.csv temp 70.0 C)
+  thermal  PASS   thermal 0.00, hw 0.00
+  host     NODATA no sys.csv (host-busy, battery, foreground, user input unknown)
+  cap      PASS   fps 76.79
+  align    PASS   ok
+  3d info: t3d 122.11 anchor 125.49 (last press +52.78, 3D +3.38) sustain10 0.87; first >=1500 125.49, sustained 125.49, runner 125.49; first t by draws {'600': 122.11, '1000': 122.11, '1500': 125.49, '2000': 125.49}
+  end of 3D: None (low band None, flat None); window [125.49, 235.49]
+  gpu: util 39.5% gr 1732.0 MHz 19.67 W temp 79.0 C P0 0.83 powercap 0.03 (n 110)
+  window: 8445 frames 110.0 s fps 76.79 med 10.17 p99 52.41 1%low 69.61 max 213.0 ms; >=100 3 >=250 0; at60 0.03
+  axis: first frame 4.23, draws frames.csv offset +1 (median |interval-frame_time| 0.001 ms), axis-close 0.51 s, vs input perf_rows {'n': 1, 'median': -0.464, 'max_abs': 0.464}

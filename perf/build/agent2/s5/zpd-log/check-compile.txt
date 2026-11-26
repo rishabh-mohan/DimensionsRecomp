@@ -1,0 +1,44 @@
+mode: static + compile
+PASS SDK HEAD == a7e79c0: a7e79c09135f160f63bfaf8634f4e3b9cb760a75
+PASS SDK index clean (== HEAD)
+a7e79c0 blob src/graphics/d3d12/command_processor.cpp 00EA93D3E9115B01FE6C45A28C39CAB72FF53716A11090602B9FBAD05F28E0FA
+PASS base/ == a7e79c0 blob (LF): 00EA93D3E9115B01FE6C45A28C39CAB72FF53716A11090602B9FBAD05F28E0FA
+PASS final2 overlay file (the devfinal2 TU) == a7e79c0 blob (LF-normalised): 00EA93D3E9115B01FE6C45A28C39CAB72FF53716A11090602B9FBAD05F28E0FA
+zpd-log.diff 5CAD04BBCDF20ED36392D14E5485058E04FB344E517664FA7D9EFDA63B2410CE
+PASS diff is LF-only
+PASS diff touches only src/graphics/d3d12/command_processor.cpp
+PASS diff only adds lines
+PASS git apply --check --cached vs a7e79c0: Checking patch src/graphics/d3d12/command_processor.cpp...
+PASS git apply in scratch copy: Checking patch src/graphics/d3d12/command_processor.cpp... | Applied patch src/graphics/d3d12/command_processor.cpp cleanly.
+PASS ov file == a7e79c0 + zpd-log.diff
+PASS ov file is LF-only
+ov file build\agent2\s5\zpd-log\ov\src\graphics\d3d12\command_processor.cpp 6DE509E3FB683A2E0C9D71FC7D5F806930F410D1AC6A3274DE423ECC7BC0D870
+PASS needle in source: REXCVAR_DEFINE_BOOL(d3d12_log_occlusion_queries, false, "GPU/D3D12",
+PASS needle in source: if (!REXCVAR_GET(d3d12_log_occlusion_queries)) {
+PASS needle in source: OcclusionQueryPacketScope occlusion_query_packet_scope(frame_current_)
+PASS needle in source: LogOcclusionQueries("shutdown", frame_current_);
+PASS REXGPU_INFO for the counters only inside LogOcclusionQueries
+PASS final2 gpu command for d3d12/command_processor.cpp found
+PASS zpd fsyntax exit 0 (2.5 s): 0 errors, 8 warnings in command_processor.cpp
+    <workspace>/build/agent2/s5/zpd-log/ov/src/graphics/d3d12/command_processor.cpp:520:48: warning: lambda capture 'kQueryFinished' is not required to be captured for this use [-Wunused-lambda-capture]
+    <workspace>/build/agent2/s5/zpd-log/ov/src/graphics/d3d12/command_processor.cpp:2290:48: warning: unused parameter 'frontbuffer_ptr' [-Wunused-parameter]
+    <workspace>/build/agent2/s5/zpd-log/ov/src/graphics/d3d12/command_processor.cpp:2669:83: warning: unused parameter 'guest_address' [-Wunused-parameter]
+    <workspace>/build/agent2/s5/zpd-log/ov/src/graphics/d3d12/command_processor.cpp:2675:56: warning: unused parameter 'index_buffer_info' [-Wunused-parameter]
+    <workspace>/build/agent2/s5/zpd-log/ov/src/graphics/d3d12/command_processor.cpp:2676:44: warning: unused parameter 'major_mode_explicit' [-Wunused-parameter]
+    <workspace>/build/agent2/s5/zpd-log/ov/src/graphics/d3d12/command_processor.cpp:3480:45: warning: unused parameter 'global_lock_locked_once' [-Wunused-parameter]
+    <workspace>/build/agent2/s5/zpd-log/ov/src/graphics/d3d12/command_processor.cpp:3541:51: warning: unused parameter 'global_lock' [-Wunused-parameter]
+    <workspace>/build/agent2/s5/zpd-log/ov/src/graphics/d3d12/command_processor.cpp:5951:14: warning: unused parameter 'sample_count_address' [-Wunused-parameter]
+PASS zpd compile exit 0 (4.8 s): 0 errors, 8 warnings in command_processor.cpp
+    <workspace>/build/agent2/s5/zpd-log/ov/src/graphics/d3d12/command_processor.cpp:520:48: warning: lambda capture 'kQueryFinished' is not required to be captured for this use [-Wunused-lambda-capture]
+    <workspace>/build/agent2/s5/zpd-log/ov/src/graphics/d3d12/command_processor.cpp:2290:48: warning: unused parameter 'frontbuffer_ptr' [-Wunused-parameter]
+    <workspace>/build/agent2/s5/zpd-log/ov/src/graphics/d3d12/command_processor.cpp:2669:83: warning: unused parameter 'guest_address' [-Wunused-parameter]
+    <workspace>/build/agent2/s5/zpd-log/ov/src/graphics/d3d12/command_processor.cpp:2675:56: warning: unused parameter 'index_buffer_info' [-Wunused-parameter]
+    <workspace>/build/agent2/s5/zpd-log/ov/src/graphics/d3d12/command_processor.cpp:2676:44: warning: unused parameter 'major_mode_explicit' [-Wunused-parameter]
+    <workspace>/build/agent2/s5/zpd-log/ov/src/graphics/d3d12/command_processor.cpp:3480:45: warning: unused parameter 'global_lock_locked_once' [-Wunused-parameter]
+    <workspace>/build/agent2/s5/zpd-log/ov/src/graphics/d3d12/command_processor.cpp:3541:51: warning: unused parameter 'global_lock' [-Wunused-parameter]
+    <workspace>/build/agent2/s5/zpd-log/ov/src/graphics/d3d12/command_processor.cpp:5951:14: warning: unused parameter 'sample_count_address' [-Wunused-parameter]
+obj build\agent2\s5\zpd-log\obj\zpd__command_processor.cpp.obj 832481 B 75BA5D187093B31D58EDFB523EDA9791D666C930DA0907D052E5D59785DEA703
+PASS needle in obj: d3d12_log_occlusion_queries
+PASS needle in obj: d3d12_occlusion_queries ({}): frame={}
+PASS needle in obj: end without an active query
+RESULT: PASS

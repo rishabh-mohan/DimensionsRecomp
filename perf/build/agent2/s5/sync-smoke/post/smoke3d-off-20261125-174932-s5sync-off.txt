@@ -1,0 +1,45 @@
+# smoke3d_post 2026-11-25 17:58:20 (check-defaults <workspace>\build\agent2\final\check-defaults.py)
+== arm xenos: <workspace>\build\agent2\s5\sync-smoke\runs\20261125-174932-s5sync-off
+INFO bin <workspace>\build\agent2\s5\devs5sync-bin; exe sha256 6C8E281156CCE828; desktop Default; started 2026-11-25T17:49:33.5202001-06:00; elapsed 241.63 s; seconds_requested 240
+PASS clean exit: exit 0x00000000 early False close wm_close 1.39 s wer False crash_events 0 dumps 0
+PASS plain default (no cvars; env only harness LEGO_NATIVE_FRAME_METRICS/AGENT3_VPAD): cvars {} env ['AGENT3_VPAD', 'LEGO_NATIVE_FRAME_METRICS']
+PASS no extra game args: none
+PASS route: pad loaded by the game, no error/timeouts, first frame + START/A/A ok: steps_done 43/91 last halted; marks 20 (last idle-150); presses START:ok x1 A:ok x1 A:ok x1; pad_active_reads 38; close at 240.1 s
+PASS route: steps ran up to the close (a step within 12 s of the close): last row t=241.60 end 
+INFO game log files game.log, 244 lines
+PASS first 3D (perf.csv draw_calls >= 600): at perf 90.7 s, frame 5424, 625 draws; max draws 15966 over 9483 frames / 236.7 s
+PASS first 3D + >= 60 s of run after it: perf 146.0 s after first 3D
+PASS no game.log line with d3d12_pipeline_creation_no_wait: 0
+--- check-defaults --mode xenos (exit 0)
+log:  <workspace>\build\agent2\s5\sync-smoke\runs\20261125-174932-s5sync-off\game.log
+mode: xenos
+key                                    value    source
+physical_protect_hold_global_lock      true     default
+physical_protect_keep_watch            true     default
+host_timer_resolution_ms               1        default
+host_timer_throttling_optout           true     default
+precise_guest_sleep                    true     default
+wait_timeout_round_up                  true     default
+cs_spin                                true     default
+spinlock_pause_spin                    true     default
+clock_lockfree                         true     default
+tls_bounds_fix                         true     default
+timer_queue_precise_wait               true     default
+shared_memory_single_hold_rearm        true     default
+physical_protect_keep_watch_verify     false    default
+  ok   1 ms timer line: 1 (want 1) 'Host timer resolution set to 1 ms (background opt-out on)'
+  ok   C1 keep-watch on line: 1 (want 1) 'C1 keep-watch: on (with physical_protect_hold_global_lock)'
+  ok   TimerQueue precise line: 1 (want 1) 'TimerQueue: precise wait (timer_queue_precise_wait)'
+  ok   back-off ON 500/30, stats OFF, GetData hook line: 1 (want 1) 'GPU wait back-off: ON (quantum 500 us, spin 30 us); stats OFF; GetData hook built.'
+  ok   back-off lines of any kind: 1 (want 1) 'GPU wait back-off:'
+  ok   back-off OFF line: 0 (want 0) 'GPU wait back-off: OFF'
+  ok   bad string 'Recovered stale physical page protection': 0
+  ok   bad string 'Unhandled guest physical write fault': 0
+  ok   bad string 'PhysicalHeap::Protect failed': 0
+  ok   bad string 'is not a plain number': 0
+  ok   bad string 'C1 verify: on': 0
+RESULT PASS
+PASS check-defaults --mode xenos PASS: exit 0
+ARM xenos: ALL PASS
+
+RESULT: ALL PASS

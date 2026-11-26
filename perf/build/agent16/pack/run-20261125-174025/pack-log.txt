@@ -1,0 +1,58 @@
+[17:40:25] native4bp.py pack pid=1412 priority=0x40 affinity=0x3 python=3.11.9 sha256=37FD3989880479C7D384D2F3FD8B61604360D1ECB6E8DA3BF81BFC0A180CA3E1
+[17:40:25] PIN  gradient       ok   705980C4F6071E9B675DFBB57A33ED64C0C74BA6F8172FD7094850A76371A653 build\agent6\aot\gradient-build\gradient_compiler.exe
+[17:40:25] PIN  dxcompiler     ok   0689E2FEE0A1C9DF8662A59680469F24E2A3AD7CE6BBBCC9284F7A83172BFC59 build\agent6\aot\gradient-build\dxcompiler.dll
+[17:40:25] PIN  dxil           ok   64BE2368211D257A038A7D4EA6BB3E24C878EB8D588C7B8414FCCF759B69C2AC build\agent6\aot\gradient-build\dxil.dll
+[17:40:25] PIN  fmt            ok   BB89FF51186F9E8F8F7CAE69E5A229C9D1D322562B033C0D8DD35071434A1FE5 build\agent6\aot\gradient-build\fmt.dll
+[17:40:25] PIN  common         ok   362E9EDBA0B9E4AC156982E7D75A70AF1341C6E1F1F52139BE03978DB3AA1E8F DimensionsRecomp\rexlego\out\native-gpu\current-compiler\gradients\source\shader_common.h
+[17:40:25] PIN  indexer        ok   3B5A68FE447DF23D46BCFF7913E590A8AF4A14A2FBBE28453B17EB23144BB9A1 build\agent6\aot\microcode-index\lego_gpu_microcode_index.exe
+[17:40:25] PIN  oldindex       ok   2DB859177B4656477D2858B87F37E7F068CABA420362FA21AFA1B3C8C6DD13A2 build\agent2\snap1\DimensionsRecomp\rexlego\out\native-gpu\lego-microcode-index.cpp
+[17:40:25] PIN  maincache      ok   FF9386C1CD435E7EE12781F43A6F42F97AED7062A4147D4E649AF2450157A819 build\agent2\snap1\DimensionsRecomp\rexlego\out\native-gpu\aot\lego-dxil-cache.cpp
+[17:40:25] PIN  merge          ok   20986E998AB8B6F83FC0390A15A45DABB86F37E81206A9ED06D06E205DDB1BE2 DimensionsRecomp\tools\gpu-aot\merge_microcode_index.py
+[17:40:25] PIN  lookup         ok   856D0A8E0E827D6AECF99FC0D34DDCCB0FE0F182D9EE372A20048FDC3350058B DimensionsRecomp\tools\gpu-aot\test_placement_capture_lookup.py
+[17:40:25] PIN  archive        ok   1C5B1767B8F6871D7E11DAAE59733E0CE8FA86362E95BECF7E03BC3EB67092EC DimensionsRecomp\rexlego\src\gpu_native\shader_archive.cpp
+[17:40:25] PIN  archiveh       ok   83B030F92C504D1FF5AD554371745A8DA38C52310B290DA9246A212CC3F743D5 DimensionsRecomp\rexlego\src\gpu_native\shader_archive.h
+[17:40:25] PIN  snaparch       ok   1C5B1767B8F6871D7E11DAAE59733E0CE8FA86362E95BECF7E03BC3EB67092EC build\agent2\snap1\DimensionsRecomp\rexlego\src\gpu_native\shader_archive.cpp
+[17:40:25] PIN  checker        logd 223A3A356287048AAA57E32DBCE5CEBC51A287DE405E5C5EFA50B452AF2D11F9 build\agent16\pack\check_pack.py
+[17:40:25] PIN  wrapper        logd 5182AEB0487DE86A36F06BB7CDE9F78AFCB6323ACAFD4C2C678A1EE1FB6650EF build\agent16\pack\run_lookup.py
+[17:40:25] staged 4 containers (4 s35 + 0 from --input), 0 excluded
+[17:40:25] RUN  precheck : C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent16\pack\check_pack.py precheck <workspace>\build\agent16\pack\run-20261125-174025\runtime-input --staged <workspace>\build\agent16\pack\run-20261125-174025\runtime-input\STAGED.tsv   (cwd build\agent16\pack\run-20261125-174025\work)
+[17:40:25] DONE precheck exit=0 wall_s=0.2
+[17:40:25] RUN  gradient : <workspace>\build\agent6\aot\gradient-build\gradient_compiler.exe <workspace>\build\agent16\pack\run-20261125-174025\runtime-input <workspace>\build\agent16\pack\run-20261125-174025\runtime-cache.cpp <workspace>\DimensionsRecomp\rexlego\out\native-gpu\current-compiler\gradients\source\shader_common.h   (cwd build\agent16\pack\run-20261125-174025\work)
+[17:40:26] DONE gradient exit=0 wall_s=0.2
+[17:40:26] RUN  indexer : <workspace>\build\agent6\aot\microcode-index\lego_gpu_microcode_index.exe <workspace>\build\agent16\pack\run-20261125-174025\index-addition.cpp <workspace>\build\agent16\pack\run-20261125-174025\runtime-input   (cwd build\agent16\pack\run-20261125-174025\work)
+[17:40:26] DONE indexer exit=0 wall_s=0.0
+[17:40:26] RUN  merge : C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\DimensionsRecomp\tools\gpu-aot\merge_microcode_index.py <workspace>\build\agent2\snap1\DimensionsRecomp\rexlego\out\native-gpu\lego-microcode-index.cpp <workspace>\build\agent16\pack\run-20261125-174025\index-addition.cpp <workspace>\build\agent16\pack\run-20261125-174025\lego-microcode-index.cpp --report <workspace>\build\agent16\pack\run-20261125-174025\merge-report.json   (cwd build\agent16\pack\run-20261125-174025\work)
+[17:40:26] DONE merge exit=0 wall_s=0.2
+[17:40:26] RUN  prelookup : C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent16\pack\check_pack.py prelookup <workspace>\build\agent16\pack\run-20261125-174025 --old-index <workspace>\build\agent2\snap1\DimensionsRecomp\rexlego\out\native-gpu\lego-microcode-index.cpp --main-cache <workspace>\build\agent2\snap1\DimensionsRecomp\rexlego\out\native-gpu\aot\lego-dxil-cache.cpp   (cwd build\agent16\pack\run-20261125-174025\work)
+[17:40:26] DONE prelookup exit=0 wall_s=0.3
+[17:40:26]        26 checks, 0 FAIL, 0 warning(s); index 19116 -> 19122 rows (+6); runtime cache 4 entries, spec masks {1: 2, 2: 2}; hlsl files 4
+[17:40:26]        runtime-cache.cpp AEA36683202B97535C52DFA7D7548EEBA1D3512E70717C2DE381FB59CC29A734; index E4C05782462452C3104A165AF588F21F42910FBD07A75A0071A34F89E3060617
+[17:40:26]      PRELOOKUP PASS
+[17:40:26] RUN  lookup : C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent16\pack\run_lookup.py <workspace>\DimensionsRecomp\tools\gpu-aot\test_placement_capture_lookup.py <workspace>\build\agent16\pack\run-20261125-174025\runtime-input <workspace>\build\agent16\pack\run-20261125-174025\lego-microcode-index.cpp <workspace>\build\agent16\pack\run-20261125-174025\runtime-cache.cpp <workspace>\build\agent16\pack\run-20261125-174025\lookup   (cwd build\agent16\pack\run-20261125-174025\work)
+[17:40:28] DONE lookup exit=0 wall_s=2.0
+[17:40:28] RUN  lookup-main : C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent16\pack\run_lookup.py <workspace>\DimensionsRecomp\tools\gpu-aot\test_placement_capture_lookup.py <workspace>\build\agent16\pack\run-20261125-174025\runtime-input <workspace>\build\agent16\pack\run-20261125-174025\lego-microcode-index.cpp <workspace>\build\agent16\pack\run-20261125-174025\runtime-cache.cpp <workspace>\build\agent16\pack\run-20261125-174025\lookup-main --main-cache <workspace>\build\agent2\snap1\DimensionsRecomp\rexlego\out\native-gpu\aot\lego-dxil-cache.cpp   (cwd build\agent16\pack\run-20261125-174025\work)
+[17:40:30] DONE lookup-main exit=0 wall_s=1.7
+[17:40:30] side effects: none
+[17:40:30] PIN  gradient       ok   705980C4F6071E9B675DFBB57A33ED64C0C74BA6F8172FD7094850A76371A653 build\agent6\aot\gradient-build\gradient_compiler.exe
+[17:40:30] PIN  dxcompiler     ok   0689E2FEE0A1C9DF8662A59680469F24E2A3AD7CE6BBBCC9284F7A83172BFC59 build\agent6\aot\gradient-build\dxcompiler.dll
+[17:40:30] PIN  dxil           ok   64BE2368211D257A038A7D4EA6BB3E24C878EB8D588C7B8414FCCF759B69C2AC build\agent6\aot\gradient-build\dxil.dll
+[17:40:30] PIN  fmt            ok   BB89FF51186F9E8F8F7CAE69E5A229C9D1D322562B033C0D8DD35071434A1FE5 build\agent6\aot\gradient-build\fmt.dll
+[17:40:30] PIN  common         ok   362E9EDBA0B9E4AC156982E7D75A70AF1341C6E1F1F52139BE03978DB3AA1E8F DimensionsRecomp\rexlego\out\native-gpu\current-compiler\gradients\source\shader_common.h
+[17:40:30] PIN  indexer        ok   3B5A68FE447DF23D46BCFF7913E590A8AF4A14A2FBBE28453B17EB23144BB9A1 build\agent6\aot\microcode-index\lego_gpu_microcode_index.exe
+[17:40:30] PIN  oldindex       ok   2DB859177B4656477D2858B87F37E7F068CABA420362FA21AFA1B3C8C6DD13A2 build\agent2\snap1\DimensionsRecomp\rexlego\out\native-gpu\lego-microcode-index.cpp
+[17:40:30] PIN  maincache      ok   FF9386C1CD435E7EE12781F43A6F42F97AED7062A4147D4E649AF2450157A819 build\agent2\snap1\DimensionsRecomp\rexlego\out\native-gpu\aot\lego-dxil-cache.cpp
+[17:40:30] PIN  merge          ok   20986E998AB8B6F83FC0390A15A45DABB86F37E81206A9ED06D06E205DDB1BE2 DimensionsRecomp\tools\gpu-aot\merge_microcode_index.py
+[17:40:30] PIN  lookup         ok   856D0A8E0E827D6AECF99FC0D34DDCCB0FE0F182D9EE372A20048FDC3350058B DimensionsRecomp\tools\gpu-aot\test_placement_capture_lookup.py
+[17:40:30] PIN  archive        ok   1C5B1767B8F6871D7E11DAAE59733E0CE8FA86362E95BECF7E03BC3EB67092EC DimensionsRecomp\rexlego\src\gpu_native\shader_archive.cpp
+[17:40:30] PIN  archiveh       ok   83B030F92C504D1FF5AD554371745A8DA38C52310B290DA9246A212CC3F743D5 DimensionsRecomp\rexlego\src\gpu_native\shader_archive.h
+[17:40:30] PIN  snaparch       ok   1C5B1767B8F6871D7E11DAAE59733E0CE8FA86362E95BECF7E03BC3EB67092EC build\agent2\snap1\DimensionsRecomp\rexlego\src\gpu_native\shader_archive.cpp
+[17:40:30] PIN  checker        logd 223A3A356287048AAA57E32DBCE5CEBC51A287DE405E5C5EFA50B452AF2D11F9 build\agent16\pack\check_pack.py
+[17:40:30] PIN  wrapper        logd 5182AEB0487DE86A36F06BB7CDE9F78AFCB6323ACAFD4C2C678A1EE1FB6650EF build\agent16\pack\run_lookup.py
+[17:40:30] RUN  check : C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe <workspace>\build\agent16\pack\check_pack.py post <workspace>\build\agent16\pack\run-20261125-174025 --old-index <workspace>\build\agent2\snap1\DimensionsRecomp\rexlego\out\native-gpu\lego-microcode-index.cpp --main-cache <workspace>\build\agent2\snap1\DimensionsRecomp\rexlego\out\native-gpu\aot\lego-dxil-cache.cpp --out <workspace>\build\agent16\pack\run-20261125-174025\pack-check.json   (cwd build\agent16\pack\run-20261125-174025\work)
+[17:40:30] DONE check exit=0 wall_s=0.3
+[17:40:30]        28 checks, 0 FAIL, 0 warning(s); index 19116 -> 19122 rows (+6); runtime cache 4 entries, spec masks {1: 2, 2: 2}; hlsl files 4
+[17:40:30]        runtime-cache.cpp AEA36683202B97535C52DFA7D7548EEBA1D3512E70717C2DE381FB59CC29A734; index E4C05782462452C3104A165AF588F21F42910FBD07A75A0071A34F89E3060617
+[17:40:30]      POST PASS
+[17:40:30] VERDICT PASS (tools: ok; check exit: 0; side effects: 0; pins changed after: 0; wall 5.2 s)
+[17:40:30] runtime-cache.cpp AEA36683202B97535C52DFA7D7548EEBA1D3512E70717C2DE381FB59CC29A734
+[17:40:30] lego-microcode-index.cpp E4C05782462452C3104A165AF588F21F42910FBD07A75A0071A34F89E3060617

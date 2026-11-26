@@ -1,0 +1,69 @@
+﻿matrix out: <workspace>\build\agent8\s5\matrix\20261125-1804
+--- 1
+False, ship60          1
+False, nat60           1
+False, n4bp60          1
+True, ship60           4
+True, nat60            4
+True, n4bp60           4
+True, natU             2
+1805-cold-ship60
+1809-cold-nat60
+1812-cold-n4bp60
+1815-ship60-r1
+1820-nat60-r1
+1825-n4bp60-r1
+1830-natU-r1
+1835-nat60-r2
+1839-n4bp60-r2
+1844-natU-r2
+1849-ship60-r2
+1854-n4bp60-r3
+1859-ship60-r3
+1904-nat60-r3
+1909-ship60-r4
+1914-nat60-r4
+1919-n4bp60-r4
+--- 2
+p03-gates exit 0
+# s5_gates: span 120 s, anchor >= 1500 draws, 3D >= 600, cap auto, margin 2 s
+# runs-root <workspace>\build\agent8\s5\matrix\20261125-1804\runs: 14 scored (tag ~ ^(?!cold-|warm\d+-).+-r\d+$), 3 skipped: 1805-cold-ship60(cold-ship60), 1809-cold-nat60(cold-nat60), 1812-cold-n4bp60(cold-n4bp60)
+== ship60-r1 [xenos] verdict FLAG
+== nat60-r1 [native] verdict FLAG
+== n4bp60-r1 [native] verdict FLAG
+== natU-r1 [native] verdict VOID
+== nat60-r2 [native] verdict FLAG
+== n4bp60-r2 [native] verdict PASS
+== natU-r2 [native] verdict PASS
+== ship60-r2 [xenos] verdict PASS
+== n4bp60-r3 [native] verdict PASS
+== ship60-r3 [xenos] verdict PASS
+== nat60-r3 [native] verdict PASS
+== ship60-r4 [xenos] verdict PASS
+== nat60-r4 [native] verdict PASS
+== n4bp60-r4 [native] verdict PASS
+--- 3
+p03-readout exit 0
+p03-readout-noflag exit 0
+--- 3b
+p03-confound exit 0
+# s5_confound (POST-HOC, NON-GATING): low-load second = nongame < 4.0 cores; gates JSON <workspace>\build\agent12\s5\p03\p03-gates.json
+# CONFOUND (M16, window 20261125-1804): nongame CPU load and effective CPU clock differ by arm (ship60/n4bp60 ~5.3-7.5 nongame cores at ~1.6-1.75 GHz vs nat60 ~3.0-3.8 cores at ~2.7 GHz; MsMpEng 1.35-1.8 vs ~0.9 cores). Arm fps / p99 contrasts mix renderer effect and host load: do NOT state "<arm> X% slower/faster" without this caveat. The low-load section is post-hoc and non-gating.
+== confound check: PRESENT - eff CPU MHz medians differ by 32% (> 10%): n4bp60 2229, nat60 2875, natU 2183, ship60 2254
+--- 4
+p03-gates-first exit 0
+p03-readout-first exit 0
+--- 5
+FFF042C695FB87EB8445AB6FA9AFCE69FD33DBA13622DB62C73280F70B87E7FA p03-confound.json
+73C65E3DD3B879CEB19DF304E07CF616D1EDE738EC83A0FE2139331564B828BC p03-confound.txt
+8ED8FA95A75478E36D9091858AA9BA9FAEF43188DB94E3812D1FB91A9F99D926 p03-gates-first.json
+9FFE98FEAE5F9BE8C6440740B64B0D7E7C42922B91065488C487F7C7AD98B289 p03-gates-first.txt
+09F21049D480998B7FF7E4EA044801A27C48D0FCE829A5C046334E2B1F0363F4 p03-gates.json
+221F1904DC096FDCB66309F78DB58E1C4A896720F58F404F8B74258D0C2BA263 p03-gates.txt
+BE1A69B30071EBC9C671C4BB99B9D630717ABA8C0DA3D44F4CC16F8A8740269B p03-readout-first.json
+76EC0CAE4326DC6360C22E324EE9F64ED2FAD8021C9713775A328E45566F29E1 p03-readout-first.txt
+CCBEB148CE538E9419BF1A75AA4539F1904B665C9D7A7358C3ADFCCB1205717D p03-readout-noflag.json
+4841888347F93EA4F562A7D92B3B7C54ADB489F7A529C854D1A90CBB5D8310C0 p03-readout-noflag.txt
+6C8D4450DBF780F8891386430D72E55F0311110D5736787230DE68DB2DEB207D p03-readout.json
+DE7B94806085968A4E9CF378D49D8C85CE8B30F38A44AC303A5C0D439885AB18 p03-readout.txt
+ALL DONE

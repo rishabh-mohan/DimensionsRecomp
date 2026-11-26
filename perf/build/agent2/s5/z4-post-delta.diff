@@ -1,0 +1,74 @@
+diff --git a/pins-test/post-54BA5CF9.py b/nops_smoke_post.py
+index 8686446..38f7763 100644
+--- a/pins-test/post-54BA5CF9.py
++++ b/nops_smoke_post.py
+@@ -17,7 +17,8 @@ Gates (every arm): run.json clean exit, no dumps/crash events/WER, cvars exactly
+ Report only (no gate): attribution for A1/A2 (sync lines, slow frames with 'pipeline create' joined to them,
+ dropped draws), timing for T/N from perf.csv (3D section stats, pipeline-miss burst frames) and the pair deltas.
+ Also every arm (unless --nozpd): cvar d3d12_log_occlusion_queries=true and its counter lines (S1: ZPD queries,
+-draws dropped inside a query, split ps / no ps; report only, the 'shutdown' line is a note); N2 gate: cold storage
++draws dropped inside a query, split ps / no ps; report only; Z4 gate: one 'shutdown' line, or none after the
++title's hard exit, where the last counter line stands in); N2 gate: cold storage
+ (run.json seed_xenos empty, user_data_root = <run>/user, no storage file older than the run start); N3 gate for
+ T1 T2 N1 N2: kit-shots/shots.txt has one line per shot time, none black, no window problems.
+ Exit 0 = every gate PASS. --selftest A1=<dir> T1=<dir> ...: parse only (no gates), for the dry run.
+@@ -53,6 +54,7 @@ L_LOG = 'd3d12_log_sync_pipeline_creation:'
+ L_NW_ON = 'd3d12_pipeline_creation_no_wait: not waiting'
+ L_NW_IGN = 'd3d12_pipeline_creation_no_wait ignored'
+ L_FAILED = 'Failed to create graphics pipeline'
++L_HARD_EXIT = 'Title terminated; hard-exiting process'
+ SYNC_RE = re.compile(r'\[t(\d+)\] sync pipeline #(\d+) ([0-9A-F]{16}): ([\d.]+) ms \(([^)]*)\) \| vs ([0-9A-F]{16}) '
+                      r'\(host type (\d+)\) ps (\S+) \| memexport vs ([0-9A-F]+) ps ([0-9A-F]+) \| ([^|]+?) \| '
+                      r'rt bits ([0-9A-F]+) color mask ([0-9A-F]+) z (\d+) write (\d+) \| prim (\d+) \| (\w+) \| '
+@@ -205,8 +207,15 @@ def zpd_report(arm, lines, g):
+             else:
+                 say('UNPARSED occlusion line: %s' % l[:160])
+     # Z4 (M10 zpd-log rating): every run logs one "shutdown" line; a "first" line means the route issued ZPDs.
+-    check('%s Z4 occlusion-query "shutdown" line once' % arm, sum(r['when'] == 'shutdown' for r in rows) == 1,
+-          '%d lines, %s' % (len(rows), dict(Counter(r['when'] for r in rows))), g)
++    # On WM_CLOSE the title hard-exits ('Title terminated; hard-exiting process') before the GPU shutdown runs, so
++    # with that line in the log and no shutdown line, the last counter line (normally periodic) stands in.
++    n_sd, cnt = sum(r['when'] == 'shutdown' for r in rows), dict(Counter(r['when'] for r in rows))
++    if n_sd == 0 and rows and any(L_HARD_EXIT in l for l in lines):
++        check('%s Z4 occlusion-query "shutdown" line once' % arm, True,
++              'shutdown line absent: hard-exit; counters from the last line (%s, frame %d); %d lines, %s' % (
++                  rows[-1]['when'], rows[-1]['frame'], len(rows), cnt), g)
++    else:
++        check('%s Z4 occlusion-query "shutdown" line once' % arm, n_sd == 1, '%d lines, %s' % (len(rows), cnt), g)
+     if not rows:
+         say('  S1: no occlusion counter lines (no ZPD packet and no shutdown line): unknown')
+         return None
+diff --git a/pins-test/synth-prev.py b/nops-smoke/synth/synth_post.py
+index 5a9d316..51ed9d4 100644
+--- a/pins-test/synth-prev.py
++++ b/nops-smoke/synth/synth_post.py
+@@ -38,6 +38,16 @@ assert not post.fails, post.fails
+ post.zpd_report('T2', [z('first', 1, 0, 1, 0, 0)], True)
+ assert len(post.fails) == 1 and 'Z4' in post.fails[0], post.fails
+ del post.fails[:]
++# Z4 hard exit: no shutdown line + the hard-exit line -> the last periodic line stands in (PASS); without the
++# hard-exit line, or with no counter lines at all, Z4 still FAILs
++HX = '[core] [t1] Title terminated; hard-exiting process.'
++r = post.zpd_report('T2', [z('first', 1, 0, 1, 0, 0), z('disabled', 2, 0, 1, 0, 1), z('periodic', 900, 898, 1, 0, 1), HX], True)
++assert not post.fails and r['zpd'] == 900 and r['s1'].startswith('0 NOT valid'), (post.fails, r)
++assert any('shutdown line absent: hard-exit' in s and '(periodic, frame 1)' in s for s in post.out_lines), post.out_lines[-6:]
++post.zpd_report('T2', [z('first', 1, 0, 1, 0, 0), z('periodic', 900, 898, 1, 0, 1)], True)
++post.zpd_report('T2', ['noise', HX], True)
++assert len(post.fails) == 2 and all('Z4' in f for f in post.fails), post.fails
++del post.fails[:]
+ # negative: old storage file, a black shot
+ os.utime(os.path.join(rd, 'user', 'cache', 'shaders', 'shareable', 'x.xsh'), (t0 - 100, t0 - 100))
+ with open(os.path.join(rd, 'kit-shots', 'shots.txt'), 'a') as f:
+diff --git a/pins-test/cmd-51E7A02E.cmd b/RUN-NOPS-SMOKE.cmd
+index 21d1e89..e679e47 100644
+--- a/pins-test/cmd-51E7A02E.cmd
++++ b/RUN-NOPS-SMOKE.cmd
+@@ -27,7 +27,7 @@ set "BAD=0"
+ set "PINOK=0"
+ rem PINS-BEGIN (mkpins.py)
+ call :pin "build\agent2\s5\nops-smoke-run.ps1" 4885AE6DA29A26BDC5419749D82557B20357FB07F47C2918C58781BB9F933EB5
+-call :pin "build\agent2\s5\nops_smoke_post.py" 54BA5CF9D85418DF5D1A52529DB5390DE88F0F24C86438089DF6F57B00FD1144
++call :pin "build\agent2\s5\nops_smoke_post.py" 1B869FFC496516BDC36485F8FACFCE03BC6D37377A343182026E52082B82AC5F
+ call :pin "harness\run-game.ps1" C2533FDFE9A3A4941F14A06C243C2A82875F5C2C93F1EBC95D68B48AB3DFA55F
+ call :pin "harness\guard.ps1" 7A71E72057A0C87F8E7851DB3363B103F6713C520305AFB26E0492036A3E0759
+ call :pin "harness\winhelper.cs" 37619E3DA38CE249ED4C219C606085992A33C36B7046F7BEB2AC204308C1C4B3

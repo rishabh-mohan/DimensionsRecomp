@@ -1,0 +1,99 @@
+# rt_smoke_post 2026-11-25 21:15:42
+
+--- T2 <workspace>\build\agent8\s5\matrix\20261125-1804\runs\1815-ship60-r1
+bin <workspace>\build\agent2\devfinal2-bin exe  cvars {'framerate_limit': '60'}
+PASS  T2 clean exit (exit 0, not early, wm_close)  [exit 0x00000000 early False close wm_close]
+PASS  T2 no dumps / crash events / WER  [dumps [] crash [] wer False]
+note  T2 bin_dir = build\agent2\s5\devs5toml-bin  [<workspace>\build\agent2\devfinal2-bin]
+PASS  T2 cvars exactly {'framerate_limit': '60'}  [{'framerate_limit': '60'}]
+PASS  T2 source toml legodimensions.toml sha256 = pin B763DABBE2C5FE7A  [<workspace>\harness\legodimensions.toml]
+PASS  T2 run-dir toml = legodimensions.toml except user_data_root/-Cvar keys, which hold the run values  [other lines equal True; {'user_data_root': "'<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1815-ship60-r1\\user'", 'framerate_limit': '60'}]
+PASS  T2 run-dir toml present_effect = 'fsr'  [['fsr']]
+PASS  T2 toml not rewritten by the game  [toml_rewritten None]
+logs ['game.log'], 263 lines
+PASS  T2 check-defaults --mode xenos PASS  [exit 0; RESULT PASS]
+PASS  ref devfinal2 1805-cold-ship60 game.log sha256 = pin 0FB3DC8AF9140841  [<workspace>\build\agent8\s5\matrix\20261125-1804\runs\1805-cold-ship60\game.log]
+PASS  ref devfinal2 1815-ship60-r1 game.log sha256 = pin 850B9BE0FD6053B6  [<workspace>\build\agent8\s5\matrix\20261125-1804\runs\1815-ship60-r1\game.log]
+ref devfinal2: markers ['dxgi_adapter', 'module_launch', 'shader_storage', 'xex_patch']; ref error/critical kinds: 0; warning kinds 5; unknown cvars 0
+T2 levels {'info': 113, 'warning': 142}, unparsed (continuation) lines 8
+PASS  T2 runstats markers of the devfinal2 refs all present (P1: log patterns still match)  [missing []; have {'dxgi_adapter': 1, 'xex_patch': 1, 'module_launch': 1, 'shader_storage': 1}]
+PASS  T2 0 new error/critical lines vs devfinal2  [0 error/critical, 0 new: ]
+PASS  T2 0 new 'Config: unknown cvar' names  [[]]
+  info: 0 new warning kinds vs devfinal2
+PASS  T2 0 'Native FSR 1:' lines  [0]
+T2 present_effect reject lines: 0
+note  T2 exactly one warning-level present_effect 'fsr' reject line with the '(reported before logging started)' suffix (P1)  [0]
+  info: other Config: lines 0
+PASS  T2 0 FFX-fallback INFO lines ('present_effect=fsr: this build has no FidelityFX SDK')  [0]
+  info: hard-exit line 1
+
+--- F3A <workspace>\build\agent8\s5\matrix\20261125-1804\runs\1820-nat60-r1
+bin <workspace>\build\agent2\nativefinal2-bin exe  cvars {'native_fps_limit': '60'}
+PASS  F3A clean exit (exit 0, not early, wm_close)  [exit 0x00000000 early False close wm_close]
+PASS  F3A no dumps / crash events / WER  [dumps [] crash [] wer False]
+note  F3A bin_dir = build\agent2\s5\natives5fsr1-bin  [<workspace>\build\agent2\nativefinal2-bin]
+PASS  F3A cvars exactly {'native_fps_limit': '60'}  [{'native_fps_limit': '60'}]
+PASS  F3A source toml legodimensions.toml sha256 = pin B763DABBE2C5FE7A  [<workspace>\harness\legodimensions.toml]
+note  F3A run-dir toml = legodimensions.toml except user_data_root/-Cvar keys, which hold the run values  [other lines equal True; {'user_data_root': "'<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1820-nat60-r1\\user'"}]
+PASS  F3A run-dir toml present_effect = 'fsr'  [['fsr']]
+PASS  F3A toml not rewritten by the game  [toml_rewritten None]
+logs ['game.log'], 2756 lines
+PASS  F3A check-defaults --mode native PASS  [exit 0; RESULT PASS]
+PASS  ref nativefinal2 1809-cold-nat60 game.log sha256 = pin F2F652C229493654  [<workspace>\build\agent8\s5\matrix\20261125-1804\runs\1809-cold-nat60\game.log]
+PASS  ref nativefinal2 1820-nat60-r1 game.log sha256 = pin 6F17177FC99557D6  [<workspace>\build\agent8\s5\matrix\20261125-1804\runs\1820-nat60-r1\game.log]
+ref nativefinal2: markers ['gpu_caps', 'gpu_ready', 'module_launch', 'swap_chain', 'xex_patch']; ref error/critical kinds: 0; warning kinds 12; unknown cvars 0
+F3A levels {'info': 2572, 'warning': 184}, unparsed (continuation) lines 0
+PASS  F3A runstats markers of the nativefinal2 refs all present (P1: log patterns still match)  [missing []; have {'xex_patch': 1, 'module_launch': 1, 'gpu_caps': 1, 'swap_chain': 1, 'gpu_ready': 1}]
+PASS  F3A 0 new error/critical lines vs nativefinal2  [0 error/critical, 0 new: ]
+PASS  F3A 0 new 'Config: unknown cvar' names  [[]]
+  info: 0 new warning kinds vs nativefinal2
+PASS  F3A 0 'Native FSR 1:' lines  [0]
+  info: other Config: lines 0
+  info: FFX-fallback INFO line (present_effect=fsr: this build has no FidelityFX SDK ...) 0
+  info: hard-exit line 1
+F3A frames: 14092 rows (native-frames.csv), spatial_fsr_presented=1 on 0 (0.0%), first at frame None; fsr_enabled!=0 on 0; sizes {'1920x1080->2240x1294': 14092}
+  rows with spatial_fsr_presented=0 by source->output size: {'1920x1080->2240x1294': 14092}
+PASS  F3A frames.csv >= 2000 rows  [14092]
+note  F3A spatial_fsr_presented=1 on >= 90% of rows (P4, FSR 1 on)  [0.0%]
+PASS  F3A fsr_enabled=0 on every row (no native FSR 3)  [0]
+note  F3A screenshots (4 times, none black)  [0 ok of 0 lines: <workspace>\build\agent8\s5\matrix\20261125-1804\runs\1820-nat60-r1\kit-shots]
+
+--- F3B <workspace>\build\agent8\s5\matrix\20261125-1804\runs\1835-nat60-r2
+bin <workspace>\build\agent2\nativefinal2-bin exe  cvars {'native_fps_limit': '60'}
+PASS  F3B clean exit (exit 0, not early, wm_close)  [exit 0x00000000 early False close wm_close]
+PASS  F3B no dumps / crash events / WER  [dumps [] crash [] wer False]
+note  F3B bin_dir = build\agent2\s5\natives5fsr1-bin  [<workspace>\build\agent2\nativefinal2-bin]
+PASS  F3B cvars exactly {'native_fps_limit': '60'}  [{'native_fps_limit': '60'}]
+PASS  F3B source toml perf-bilinear.toml sha256 = pin FA47B1E31787B24D  [<workspace>\build\agent2\s5\native-fsr1\perf-bilinear.toml]
+note  F3B run-dir toml = perf-bilinear.toml except user_data_root/-Cvar keys, which hold the run values  [other lines equal False; {'user_data_root': "'<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1835-nat60-r2\\user'"}]
+note  F3B run-dir toml present_effect = 'bilinear'  [['fsr']]
+PASS  F3B toml not rewritten by the game  [toml_rewritten None]
+logs ['game.log'], 2726 lines
+PASS  F3B check-defaults --mode native PASS  [exit 0; RESULT PASS]
+F3B levels {'info': 2542, 'warning': 184}, unparsed (continuation) lines 0
+PASS  F3B runstats markers of the nativefinal2 refs all present (P1: log patterns still match)  [missing []; have {'xex_patch': 1, 'module_launch': 1, 'gpu_caps': 1, 'swap_chain': 1, 'gpu_ready': 1}]
+PASS  F3B 0 new error/critical lines vs nativefinal2  [0 error/critical, 0 new: ]
+PASS  F3B 0 new 'Config: unknown cvar' names  [[]]
+  info: 0 new warning kinds vs nativefinal2
+PASS  F3B 0 'Native FSR 1:' lines  [0]
+  info: other Config: lines 0
+PASS  F3B 0 FFX-fallback INFO lines ('present_effect=fsr: this build has no FidelityFX SDK')  [0]
+  info: hard-exit line 1
+F3B frames: 14150 rows (native-frames.csv), spatial_fsr_presented=1 on 0 (0.0%), first at frame None; fsr_enabled!=0 on 0; sizes {'1920x1080->2240x1294': 14150}
+PASS  F3B frames.csv >= 2000 rows  [14150]
+PASS  F3B spatial_fsr_presented=0 on every row (P4, bilinear)  [0 rows with 1]
+PASS  F3B fsr_enabled=0 on every row (no native FSR 3)  [0]
+note  F3B screenshots (4 times, none black)  [0 ok of 0 lines: <workspace>\build\agent8\s5\matrix\20261125-1804\runs\1835-nat60-r2\kit-shots]
+
+=== SIDE-BY-SIDE (left <workspace>\build\agent2\s5\nops-smoke\runs\20261125-201249-s5nops-t1 | right <workspace>\build\agent2\s5\nops-smoke\runs\20261125-201719-s5nops-t2) -> C:\Users\<user>\.gemini\antigravity-cli\brain\a657e030-6ccb-4c5f-a989-c912a51530ce\scratch\sbs-test2 ===
+side-by-side 060s: C:\Users\<user>\.gemini\antigravity-cli\brain\a657e030-6ccb-4c5f-a989-c912a51530ce\scratch\sbs-test2\sbs-060s.png | C:\Users\<user>\.gemini\antigravity-cli\brain\a657e030-6ccb-4c5f-a989-c912a51530ce\scratch\sbs-test2\sbs-060s-crop2x.png  (A 1942x1136, B 1942x1136; detail A 1.48 B 1.50, info only: different frames)
+side-by-side 120s: C:\Users\<user>\.gemini\antigravity-cli\brain\a657e030-6ccb-4c5f-a989-c912a51530ce\scratch\sbs-test2\sbs-120s.png | C:\Users\<user>\.gemini\antigravity-cli\brain\a657e030-6ccb-4c5f-a989-c912a51530ce\scratch\sbs-test2\sbs-120s-crop2x.png  (A 1942x1136, B 1942x1136; detail A 1.75 B 1.73, info only: different frames)
+side-by-side 146s: C:\Users\<user>\.gemini\antigravity-cli\brain\a657e030-6ccb-4c5f-a989-c912a51530ce\scratch\sbs-test2\sbs-146s.png | C:\Users\<user>\.gemini\antigravity-cli\brain\a657e030-6ccb-4c5f-a989-c912a51530ce\scratch\sbs-test2\sbs-146s-crop2x.png  (A 1942x1136, B 1942x1136; detail A 1.59 B 1.62, info only: different frames)
+side-by-side 200s: C:\Users\<user>\.gemini\antigravity-cli\brain\a657e030-6ccb-4c5f-a989-c912a51530ce\scratch\sbs-test2\sbs-200s.png | C:\Users\<user>\.gemini\antigravity-cli\brain\a657e030-6ccb-4c5f-a989-c912a51530ce\scratch\sbs-test2\sbs-200s-crop2x.png  (A 1942x1136, B 1942x1136; detail A 1.37 B 1.37, info only: different frames)
+
+=== PER-ARM VERDICTS (functional, untimed) ===
+T2   n/a (selftest, no gates)
+F3A  n/a (selftest, no gates)
+F3B  n/a (selftest, no gates)
+
+RESULT: SELFTEST (no gates)

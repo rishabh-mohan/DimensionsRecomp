@@ -1,0 +1,135 @@
+diff --git a/build/agent3/gameplay/RUN-EXPLORE.cmd b/build/agent3/gameplay/RUN-EXPLORE.cmd
+index e92a68b..5a237a8 100644
+--- a/build/agent3/gameplay/RUN-EXPLORE.cmd
++++ b/build/agent3/gameplay/RUN-EXPLORE.cmd
+@@ -15,8 +15,8 @@ set "GP=%~dp0"
+ set "GPPIN_01=D97C9228422E1362B0552D694DC5150B388AF07DD9C9A4EA692B9EBCE218AC60|build\agent3\gameplay\gameplay-run.ps1"
+ set "GPPIN_02=2950A4471C1271BCDAC132816D89CF3C95812785AF7A569A94850E6A1A3DE068|build\agent3\gameplay\gameplay-watch.ps1"
+ set "GPPIN_03=E33DF65402DF053C0DBA5328632A14A0B6B90831EA0E51B1DD319C98501C8F50|build\agent3\gameplay\gameplay_post.py"
+-set "GPPIN_04=40D9316A8FB61B788901DBB93BAEA053B30F5B76A18F94E60205243830D90C00|build\agent3\gameplay\gen_gameplay_route.py"
+-set "GPPIN_05=4C9B82D6D1053698208CB20DC9E6ED112B31C3A932F547E4A439AF946F04DA1D|build\agent3\gameplay\explore-route.txt"
++set "GPPIN_04=3F849107E24BC86B8B04AD34BC2DD6C2AEF75B9E79823064CAF381C4CFF731E9|build\agent3\gameplay\gen_gameplay_route.py"
++set "GPPIN_05=CB271440130C47ED8CBE8FAE804BD82F4B82EBA3C8C48C77D920AA563F91831F|build\agent3\gameplay\explore-route.txt"
+ set "GPPIN_06=D491FF7FC07A6C3808EABD8A1481841996DDAD1A4EFA0AF8DAFC81DDBF59858E|build\agent3\gameplay\gameplay-route.txt"
+ set "GPPIN_07=798ECC30B1920F386EE4A68F8E0B6307F77BA3DA8618EF65175240E150195B77|build\agent3\gameplay\tags\batman.bin"
+ set "GPPIN_08=44E16868B3B5AD6F374925EA93E88FFA5A618C41F24DE49D82FD4C885CC1DFFE|build\agent3\gameplay\tags\gandalf.bin"
+diff --git a/build/agent3/gameplay/RUN-GAMEPLAY.cmd b/build/agent3/gameplay/RUN-GAMEPLAY.cmd
+index f2b5b04..0ae2b9c 100644
+--- a/build/agent3/gameplay/RUN-GAMEPLAY.cmd
++++ b/build/agent3/gameplay/RUN-GAMEPLAY.cmd
+@@ -13,8 +13,8 @@ set "GP=%~dp0"
+ set "GPPIN_01=D97C9228422E1362B0552D694DC5150B388AF07DD9C9A4EA692B9EBCE218AC60|build\agent3\gameplay\gameplay-run.ps1"
+ set "GPPIN_02=2950A4471C1271BCDAC132816D89CF3C95812785AF7A569A94850E6A1A3DE068|build\agent3\gameplay\gameplay-watch.ps1"
+ set "GPPIN_03=E33DF65402DF053C0DBA5328632A14A0B6B90831EA0E51B1DD319C98501C8F50|build\agent3\gameplay\gameplay_post.py"
+-set "GPPIN_04=40D9316A8FB61B788901DBB93BAEA053B30F5B76A18F94E60205243830D90C00|build\agent3\gameplay\gen_gameplay_route.py"
+-set "GPPIN_05=4C9B82D6D1053698208CB20DC9E6ED112B31C3A932F547E4A439AF946F04DA1D|build\agent3\gameplay\explore-route.txt"
++set "GPPIN_04=3F849107E24BC86B8B04AD34BC2DD6C2AEF75B9E79823064CAF381C4CFF731E9|build\agent3\gameplay\gen_gameplay_route.py"
++set "GPPIN_05=CB271440130C47ED8CBE8FAE804BD82F4B82EBA3C8C48C77D920AA563F91831F|build\agent3\gameplay\explore-route.txt"
+ set "GPPIN_06=D491FF7FC07A6C3808EABD8A1481841996DDAD1A4EFA0AF8DAFC81DDBF59858E|build\agent3\gameplay\gameplay-route.txt"
+ set "GPPIN_07=798ECC30B1920F386EE4A68F8E0B6307F77BA3DA8618EF65175240E150195B77|build\agent3\gameplay\tags\batman.bin"
+ set "GPPIN_08=44E16868B3B5AD6F374925EA93E88FFA5A618C41F24DE49D82FD4C885CC1DFFE|build\agent3\gameplay\tags\gandalf.bin"
+diff --git a/build/agent3/gameplay/RUN-MANUAL.cmd b/build/agent3/gameplay/RUN-MANUAL.cmd
+index 8e33b62..be9501a 100644
+--- a/build/agent3/gameplay/RUN-MANUAL.cmd
++++ b/build/agent3/gameplay/RUN-MANUAL.cmd
+@@ -17,8 +17,8 @@ set "GP=%~dp0"
+ set "GPPIN_01=D97C9228422E1362B0552D694DC5150B388AF07DD9C9A4EA692B9EBCE218AC60|build\agent3\gameplay\gameplay-run.ps1"
+ set "GPPIN_02=2950A4471C1271BCDAC132816D89CF3C95812785AF7A569A94850E6A1A3DE068|build\agent3\gameplay\gameplay-watch.ps1"
+ set "GPPIN_03=E33DF65402DF053C0DBA5328632A14A0B6B90831EA0E51B1DD319C98501C8F50|build\agent3\gameplay\gameplay_post.py"
+-set "GPPIN_04=40D9316A8FB61B788901DBB93BAEA053B30F5B76A18F94E60205243830D90C00|build\agent3\gameplay\gen_gameplay_route.py"
+-set "GPPIN_05=4C9B82D6D1053698208CB20DC9E6ED112B31C3A932F547E4A439AF946F04DA1D|build\agent3\gameplay\explore-route.txt"
++set "GPPIN_04=3F849107E24BC86B8B04AD34BC2DD6C2AEF75B9E79823064CAF381C4CFF731E9|build\agent3\gameplay\gen_gameplay_route.py"
++set "GPPIN_05=CB271440130C47ED8CBE8FAE804BD82F4B82EBA3C8C48C77D920AA563F91831F|build\agent3\gameplay\explore-route.txt"
+ set "GPPIN_06=D491FF7FC07A6C3808EABD8A1481841996DDAD1A4EFA0AF8DAFC81DDBF59858E|build\agent3\gameplay\gameplay-route.txt"
+ set "GPPIN_07=798ECC30B1920F386EE4A68F8E0B6307F77BA3DA8618EF65175240E150195B77|build\agent3\gameplay\tags\batman.bin"
+ set "GPPIN_08=44E16868B3B5AD6F374925EA93E88FFA5A618C41F24DE49D82FD4C885CC1DFFE|build\agent3\gameplay\tags\gandalf.bin"
+diff --git a/build/agent3/gameplay/explore-route.txt b/build/agent3/gameplay/explore-route.txt
+index 667268c..63c320d 100644
+--- a/build/agent3/gameplay/explore-route.txt
++++ b/build/agent3/gameplay/explore-route.txt
+@@ -34,16 +34,26 @@ mark intro-20
+ wait_log "current=12 pending=4294967295" 420                  # title 'Press START' (the intro ends by itself)
+ sleep 3
+ mark title
+-press START
+-wait_log "current=13 pending=4294967295" 15
++sleep 12                                        # title gate: settle (START at +3.8 s was ignored)
++press START                                     # title gate try 1/6
++wait_log "current=13 pending=4294967295" 10
++press START                                     # title gate try 2/6
++wait_log "current=13 pending=4294967295" 10
++press START                                     # title gate try 3/6
++wait_log "current=13 pending=4294967295" 10
++press START                                     # title gate try 4/6
++wait_log "current=13 pending=4294967295" 10
++press START                                     # title gate try 5/6
++wait_log "current=13 pending=4294967295" 10
++press START                                     # title gate try 6/6
++wait_log "current=13 pending=4294967295" 10
+ sleep 2
+ mark press-start
+-press A
+-wait_log "current=0 pending=4294967295" 20                   # Updates panel
+-sleep 3
++press B                                         # converge: 13 -> Updates panel; nothing if already there
++sleep 4
+ mark updates-panel
+ press A                                         # -> the Store notice (5 -> 0)
+-wait_log "current=5 pending=0" 15
++wait_log "current=5 pending=0" 20               # TITLE GATE CHECK: TIMEOUT = the title never took START
+ sleep 3
+ mark store-notice
+ press A                                         # OK
+diff --git a/build/agent3/gameplay/gen_gameplay_route.py b/build/agent3/gameplay/gen_gameplay_route.py
+index 79cdf71..a8c7347 100644
+--- a/build/agent3/gameplay/gen_gameplay_route.py
++++ b/build/agent3/gameplay/gen_gameplay_route.py
+@@ -21,6 +21,9 @@ import sys
+ 
+ HERE = os.path.dirname(os.path.abspath(__file__))
+ ORANGE = '"Toypad: pad 1 mode 3 lit FF 6E 00"'
++# EXPLORE2 title gate (boot2): settle s after the title marker, then TITLE_TRIES x (START + TITLE_WAIT s wait for 13);
++# fixed bound 3 + 12 + 6 x ~10.8 = ~80 s, START tries at ~+15/26/37/47/58/69 s after 12
++TITLE_SETTLE, TITLE_TRIES, TITLE_WAIT = 12, 6, 10
+ 
+ # stick values: XInput thumb, +Y = up/forward
+ N, S, E, W = (0, 30000), (0, -30000), (30000, 0), (-30000, 0)
+@@ -82,7 +85,14 @@ def boot2(name, about):
+     nothing), 0 install + intro (~184 s), 12 title (START; A/B do nothing), 13 'press A', 0 Updates panel
+     (A = Store notice, then OK + B), 17 main menu (cursor on Credits), New Game -> 34/39/40 -> 47.
+     wait_log scans forward from the previous match and has no branches: one wait per marker; a short wait that times
+-    out leaves the cursor at the end of the log, so the next wait still sees a later marker."""
++    out leaves the cursor at the end of the log, so the next wait still sees a later marker.
++    Title gate (EXPLORE2 20261126-031601: one START 3.8 s after 12 was ignored, the title then sat 17 min; START/Enter
++    was taken at +28.6, +53, +176 and +1067 s in other runs): a 12 s settle, then TITLE_TRIES x (START + a TITLE_WAIT s
++    wait for 13). The runner cannot branch, so the later STARTs also run after a hit; START does nothing on the Updates
++    panel (RUN-EXPLORE 20261125-195931 20:07:07) and at 13 it either does nothing or goes on to the Updates panel as A/B
++    do. One B then converges both cases on the Updates panel (B at 13 -> 35/8/11/17/0, EXPLORE2 03:37:58; B does
++    nothing on the Updates panel, manual 20261125-204323 20:48:19, or at the title). The Store-notice wait right after is
++    the gate check: it can only match from the Updates panel, so its TIMEOUT means the title never took START."""
+     L = ["# build/agent3/gameplay/%s - M3 gameplay task. Generated by gen_gameplay_route.py: do not edit by hand." % name]
+     L += ["# " + s for s in about]
+     L += [
+@@ -111,14 +121,15 @@ def boot2(name, about):
+           "sleep 20", "mark intro-20",
+           "wait_log %s 420                  # title 'Press START' (the intro ends by itself)" % fe(12),
+           "sleep 3", "mark title",
+-          "press START",
+-          "wait_log %s 15" % fe(13),
+-          "sleep 2", "mark press-start",
+-          "press A",
+-          "wait_log %s 20                   # Updates panel" % fe(0),
+-          "sleep 3", "mark updates-panel",
++          "sleep %d                                        # title gate: settle (START at +3.8 s was ignored)" % TITLE_SETTLE]
++    for k in range(1, TITLE_TRIES + 1):
++        L += ["press START                                     # title gate try %d/%d" % (k, TITLE_TRIES),
++              "wait_log %s %d" % (fe(13), TITLE_WAIT)]
++    L += ["sleep 2", "mark press-start",
++          "press B                                         # converge: 13 -> Updates panel; nothing if already there",
++          "sleep 4", "mark updates-panel",
+           "press A                                         # -> the Store notice (5 -> 0)",
+-          'wait_log "current=5 pending=0" 15',
++          'wait_log "current=5 pending=0" 20               # TITLE GATE CHECK: TIMEOUT = the title never took START',
+           "sleep 3", "mark store-notice",
+           "press A                                         # OK",
+           "sleep 3",

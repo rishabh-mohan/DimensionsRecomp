@@ -1,0 +1,27 @@
+# build\agent2\s5\natives5fsr1p-bin - Agent 2 (board run 2 task #1). S5 test bin natives5fsr1p: native4bp + native-fsr1 rexruntime (present_effect fsr accepted, native FSR 1, AOT placement pack) [M2, build/agent2/s5/rt-bin/stage-fsr1p.py]
+# staged 2026-11-26 04:33:22 from build\agent16\pack\native4bp-bin (MANIFEST sha256 C518152026695279993085A8497E7B14D318C1DFF54B57F2767670B90A7AA690); every file copied with mtime = now; replaced: rexruntime.dll <- build\agent2\s5\natives5fsr1-bin\rexruntime.dll.
+# sources: build/agent16/pack/native4bp-bin (MANIFEST C5181520; 7 files kept byte-equal incl. exe FA761654, map 493DA6DA) + build/agent2/s5/natives5fsr1-bin/rexruntime.dll (DF527CBC; MANIFEST 102AAD90); only src/ui/presenter.cpp changed in that rexruntime (native-fsr1, diff 4579F090)
+# native4bp = nativefinal2 + AOT placement pack (exe/map); natives5fsr1 = nativefinal2 + native-fsr1 (rexruntime); this bin combines the two disjoint replacements
+# reason: s5/black-scene-diag.md (natives5fsr1 black scene: title placement shaders missing from the nativefinal2 AOT index)
+# rating: native-fsr1 SAFE-IF F1-F3 (build/agent10/s5/toml-reject-native-fsr1-rating.md) + natives5fsr1p SAFE-IF P1-P6 (build/agent10/s5/natives5fsr1p-rating.md D3E2EF03)
+# pe-check: imports of exe FA761654 from rexruntime.dll vs exports of DF527CBC: 453/453 resolve; exports DF527CBC == 641BD225 (10467 names); native4bp exe imports == nativefinal2 exe imports
+# native GPU fingerprint 39129c4c059be5f0, first boot cold
+# TEST bin only (F3A/F3B functional smoke); perf only within this bin (F3A vs F3B, F1 bilinear toml), never against nativefinal2 / natives5fsr1 / S5 0.3 numbers (M10 P6)
+# files: name, size, mtime, sha256, source
+FiraSans-Regular.ttf	456996	2026-11-26 04:33:21	C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23	build\agent2\snap1\DimensionsRecomp\rexlego\res\FiraSans-Regular.ttf
+TracyClient.dll	233472	2026-11-26 04:33:21	85044850B6C663B5CE8722285D13070381C33C9ABC49D06B3E59BA0277F8FF4E	build\agent2\snap1-sdk\install\bin\TracyClient.dll
+achievement_unlocked.wav	191018	2026-11-26 04:33:21	A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5	build\agent2\snap1-on\achievement_unlocked.wav
+amd_fidelityfx_dx12.dll	6675664	2026-11-26 04:33:21	12A5081257EC95B0B53AD51B4A87FB3C03F97FE0BBB59F9496968F8D50EF93A6	build\agent2\snap1-on\amd_fidelityfx_dx12.dll
+legodimensions.exe	316297728	2026-11-26 04:33:21	FA761654D665BC928B9FC82AC5DCE58E25EE2E87BF60ED519CC5480A3012187C	build\agent16\pack\binwork-20261125-173830\on\link\legodimensions.exe
+legodimensions.map	43745602	2026-11-26 04:33:21	493DA6DA6660CC9F9C5C923E4E29F9336AEA82721C5BB88B7DD044FB2D73CE2D	build\agent16\pack\binwork-20261125-173830\on\link\legodimensions.map
+rexgpu-xenos.dll	3434496	2026-11-26 04:33:22	9A7CC3F4853A8E8B01501734B1E53ABB36962F05C22BAF46638217F27E90A4EC	build\agent2\final2\b\gpu\link-on\rexgpu-xenos.dll
+rexruntime.dll	10918912	2026-11-26 04:33:22	DF527CBC259B770010FEE1D8410FB7AAA5947A88EEB6832AC3DB6E72C82A3CE5	build\agent2\s5\natives5fsr1-bin\rexruntime.dll
+# checks:
+#   PASS staged copy identical: FiraSans-Regular.ttf
+#   PASS staged copy identical: TracyClient.dll
+#   PASS staged copy identical: achievement_unlocked.wav
+#   PASS staged copy identical: amd_fidelityfx_dx12.dll
+#   PASS staged copy identical: legodimensions.exe
+#   PASS staged copy identical: legodimensions.map
+#   PASS staged copy identical: rexgpu-xenos.dll
+#   PASS staged copy identical: rexruntime.dll (replaced: base 641BD22519921ACD -> DF527CBC259B7700)

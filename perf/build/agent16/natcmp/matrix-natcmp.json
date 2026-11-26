@@ -1,0 +1,36 @@
+{
+  "title": "S5 natcmp (M16): n4bp60 vs ship60 (default) or nat60, back to back, quiet-gated, attract-long pad, 3D-only score (one arm per run-matrix call)",
+  "reference": "ship60",
+  "warmup_from": "firstframe",
+  "settle_s": 0,
+  "warmup_s": 90,
+  "measure_s": 180,
+  "min_window_after_ff_s": 60,
+  "repeats": 1,
+  "order": "fixed",
+  "cold_run": false,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "cooldown_s": 10,
+  "sys_csv": true,
+  "input_script": "harness/routes/attract-long.txt",
+  "gpu_log": true,
+  "cooldown_temp_c": 72,
+  "cooldown_timeout_s": 90,
+  "cooldown_est_s": 45,
+  "start3d_draws": 1500,
+  "reach3d_draws": 600,
+  "span3d_s": 120,
+  "notes": [
+    "Same run settings as matrix-s5-baseline.json (M8, window 20261125-1804) for the ship60, nat60 and n4bp60 arms; only cold_run (false), repeats (1) and order differ.",
+    "natcmp\\cmp-run.ps1 calls run-matrix once per arm (-Only <arm> -Repeats 1 -NoCold) so it can gate on the nongame CPU load between runs; the ABBA order, the base arm (vs ship|nat) and the unscored primes are set by cmp-run.ps1, not by this file."
+  ],
+  "arms": [
+    { "id": "ship60", "group": "base", "ref": true, "bin": "build/agent2/devfinal2-bin", "frames": "perf", "cap": 60,
+      "note": "Xenos ship default arm, framerate_limit=60 (same as the window's ship60)" },
+    { "id": "nat60", "group": "base", "bin": "build/agent2/nativefinal2-bin", "frames": "native", "cap": 60,
+      "note": "native default arm, native_fps_limit=60 (same as the window's nat60)" },
+    { "id": "n4bp60", "group": "base", "bin": "build/agent16/pack/native4bp-bin", "frames": "native", "cap": 60,
+      "note": "native4bp (nativefinal2 + AOT placement pack, fingerprint 39129c4c059be5f0), native_fps_limit=60 (same as the window's n4bp60)" }
+  ]
+}

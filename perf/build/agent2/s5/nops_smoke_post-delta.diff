@@ -1,0 +1,60 @@
+diff --git a/pins-test/tt/build/agent2/s5/nops_smoke_post.py b/nops_smoke_post.py
+index 673d382..8686446 100644
+--- a/pins-test/tt/build/agent2/s5/nops_smoke_post.py
++++ b/nops_smoke_post.py
+@@ -204,8 +204,9 @@ def zpd_report(arm, lines, g):
+                 rows.append(dict(when=v[0], **{k: (x if k == 'reason' else int(x)) for k, x in zip(ZPD_KEYS, v[1:])}))
+             else:
+                 say('UNPARSED occlusion line: %s' % l[:160])
+-    check('%s S1 occlusion-query "shutdown" line once' % arm, sum(r['when'] == 'shutdown' for r in rows) == 1,
+-          '%d lines, %s' % (len(rows), dict(Counter(r['when'] for r in rows))), gate=False)
++    # Z4 (M10 zpd-log rating): every run logs one "shutdown" line; a "first" line means the route issued ZPDs.
++    check('%s Z4 occlusion-query "shutdown" line once' % arm, sum(r['when'] == 'shutdown' for r in rows) == 1,
++          '%d lines, %s' % (len(rows), dict(Counter(r['when'] for r in rows))), g)
+     if not rows:
+         say('  S1: no occlusion counter lines (no ZPD packet and no shutdown line): unknown')
+         return None
+@@ -215,16 +216,27 @@ def zpd_report(arm, lines, g):
+         if r['when'] in ('first', 'disabled'):
+             say('  S1 %s at frame %d: zpd %d begun %d resolved %d fallback %d disabled %d reason %r' % (
+                 r['when'], r['frame'], r['zpd'], r['begun'], r['resolved'], r['fallback'], r['disabled'], r['reason']))
+-    if last['zpd'] == 0:
+-        v = 'no ZPD (occlusion) query in this run'
++    # Z5 read-out: no_ps > 0 confirms S1; a 0 counts only with begun > 0, resolved > 0 and no early loss of host
++    # queries (the disable came after half the ZPDs or never, and at least half the ZPDs had host queries).
++    dis = [r for r in rows if r['disabled']]
++    zpd_at_disable = dis[0]['zpd'] if dis else None
++    host_frac = (last['zpd'] - last['zpd_no_host']) / last['zpd'] if last['zpd'] else 0.0
++    late = zpd_at_disable is None or zpd_at_disable >= 0.5 * last['zpd']
++    ps = (' (+%d PS draws dropped inside a query: HEAD behaviour)' % last['dropped_in_query_ps']
++          if last['dropped_in_query_ps'] else '')
++    if not any(r['when'] == 'first' for r in rows) or last['zpd'] == 0:
++        v = 'no ZPD on this route: the arm proves nothing about S1 (Z4)'
+     elif last['dropped_in_query_no_ps']:
+-        v = 'HIT: %d depth-only (no PS) draws dropped inside a query' % last['dropped_in_query_no_ps']
+-    elif last['dropped_in_query_ps']:
+-        v = 'queries seen; only PS draws dropped inside one (%d, HEAD behaviour)' % last['dropped_in_query_ps']
++        v = 'S1 CONFIRMED (Z5): %d depth-only (no PS) draws dropped inside a query' % last['dropped_in_query_no_ps']
++    elif last['begun'] and last['resolved'] and late and host_frac >= 0.5:
++        v = 'valid 0 (Z5, this route only, lower bound): %d ZPD, begun %d, resolved %d, host fraction %.2f' % (
++            last['zpd'], last['begun'], last['resolved'], host_frac)
+     else:
+-        v = 'queries seen (%d ZPD packets), no draw dropped inside a query' % last['zpd']
++        v = '0 NOT valid (Z5): begun %d resolved %d, first disable at zpd %s of %d, host fraction %.2f' % (
++            last['begun'], last['resolved'], zpd_at_disable, last['zpd'], host_frac)
++    v += ps
+     say('  S1 verdict: %s' % v)
+-    return last
++    return dict(last, s1=v)
+ 
+ 
+ def n2_n3_gates(arm, rd, J, g):
+@@ -310,6 +322,8 @@ def pair_report(R):
+                 'disabled %d -> %d' % (a, b, zx['zpd'], zy['zpd'], zx['draws_in_query'], zy['draws_in_query'],
+                                        zx['dropped_in_query_no_ps'], zy['dropped_in_query_no_ps'],
+                                        zx['dropped_in_query_ps'], zy['dropped_in_query_ps'], zx['disabled'], zy['disabled']))
++            say('    %s S1: %s' % (a, zx['s1']))
++            say('    %s S1: %s' % (b, zy['s1']))
+         if 'attr' in x and 'attr' in y:
+             say('%s -> %s: command-thread create %.1f -> %.1f ms, worst frame create %.1f -> %.1f ms, movable sync '
+                 'creates %d -> %d, dropped draws %d -> %d' % (

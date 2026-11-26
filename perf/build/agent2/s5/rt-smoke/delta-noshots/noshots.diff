@@ -1,0 +1,91 @@
+diff --git a/orig/RUN-RT-SMOKE.cmd b/new/RUN-RT-SMOKE.cmd
+index 52b9f0f..b76128c 100644
+--- a/orig/RUN-RT-SMOKE.cmd
++++ b/new/RUN-RT-SMOKE.cmd
+@@ -8,7 +8,7 @@ rem   FSR1-vs-bilinear side-by-side PNGs into rt-smoke\post\sbs-*). F3A F3B take
+ rem   RUN-RT-SMOKE.cmd               real run (interactive desktop; 3 x ~4.5 min, about 15 min; self-closing)
+ rem   RUN-RT-SMOKE.cmd dryrun        no game: verify-bins, command lines, run-game -DryRun, post self-test; exit 0 = pass
+ rem   RUN-RT-SMOKE.cmd pinsonly      only check the sha256 pins below; exit 0 = all match, 3 = changed or missing
+-rem   extra words: allowhidden, arms=T2,F3A,F3B (subset/order)
++rem   extra words: allowhidden, arms=T2,F3A,F3B (subset/order), noshots (no kit shots; matched manual capture)
+ rem   P5: bin MANIFEST pins are checked by the ps1 (fail closed, before and after every arm), one kit at a time,
+ rem   interactive desktop only (unless allowhidden).
+ rem   Pins: the waiter pins only this .cmd, so it pins the ps1, the post script, perf-bilinear.toml and every helper
+@@ -26,7 +26,7 @@ for %%A in (%*) do (
+ set "BAD=0"
+ set "PINOK=0"
+ rem PINS-BEGIN (mkpins_rt.py)
+-call :pin "build\agent2\s5\rt-smoke-run.ps1" 4311865FD6ECC5151D3FEBBB097C7C29D5200EFA161A2EF6EA68055EE3146272
++call :pin "build\agent2\s5\rt-smoke-run.ps1" 02C6C88C89BE91248C0055D62D76061454087214B36960EAFB157D99FDE1A92E
+ call :pin "build\agent2\s5\rt_smoke_post.py" 6034CA362A1FDDFAAD8580EE7E7E1308BF9ACA53EF4632ACCA9AA71E5E4F801F
+ call :pin "harness\run-game.ps1" C2533FDFE9A3A4941F14A06C243C2A82875F5C2C93F1EBC95D68B48AB3DFA55F
+ call :pin "harness\guard.ps1" 7A71E72057A0C87F8E7851DB3363B103F6713C520305AFB26E0492036A3E0759
+diff --git a/new/rt-mark.ps1 b/new/rt-mark.ps1
+new file mode 100644
+index 0000000..28dbfe9
+--- /dev/null
++++ b/new/rt-mark.ps1
+@@ -0,0 +1,31 @@
++# rt-mark.ps1 - read-only timing helper for the matched manual capture of RUN-RT-SMOKE noshots (M2). It never launches,
++# closes, focuses or sends input to anything; it only reads Get-Process. The kit's game = the newest legodimensions.exe
++# whose image is under rt-smoke\runs\ (run-game hard-links the bin into each run dir) and that is younger than 235 s
++# (an arm is 240 s, so the previous arm's game is never picked). The route clock starts at the process start (+-0.5 s).
++#   rt-mark.ps1                  wait (<= -Timeout s) for the kit's game; print pid, run dir, start and target clock times
++#   rt-mark.ps1 -Until 122.25    then block until start + 122.25 s - Lead; exit 0. Exit 2 = no game, or already > 1 s past.
++param([double]$Until = -1, [double]$Lead = 0.5, [double[]]$Times = @(60, 122.25, 146.75, 201.5), [int]$Timeout = 180)
++$rr = (Join-Path $PSScriptRoot 'rt-smoke\runs').TrimEnd('\') + '\'
++$deadline = (Get-Date).AddSeconds($Timeout); $p = $null
++while (-not $p) {
++    $p = Get-Process -Name legodimensions -ErrorAction SilentlyContinue | Where-Object {
++        $x = try { $_.Path } catch { '' }
++        $x -and $x.StartsWith($rr, [StringComparison]::OrdinalIgnoreCase) -and $_.StartTime -gt (Get-Date).AddSeconds(-235) } |
++        Sort-Object StartTime | Select-Object -Last 1
++    if (-not $p) {
++        if ((Get-Date) -ge $deadline) { 'rt-mark: no kit game process'; exit 2 }
++        Start-Sleep -Milliseconds 250
++    }
++}
++$t0 = $p.StartTime
++$run = Split-Path -Leaf (Split-Path -Parent $p.Path)
++if ($Until -lt 0) {
++    "rt-mark: pid $($p.Id) run $run started $($t0.ToString('HH:mm:ss.fff'))"
++    foreach ($t in $Times) { '  {0,6:0.##} s = {1}' -f $t, $t0.AddSeconds($t).ToString('HH:mm:ss.f') }
++    exit 0
++}
++$wait = ($t0.AddSeconds($Until - $Lead) - (Get-Date)).TotalMilliseconds
++if ($wait -lt -1000) { 'rt-mark: {0} s already past (now {1:N1} s, run {2})' -f $Until, ((Get-Date) - $t0).TotalSeconds, $run; exit 2 }
++if ($wait -gt 0) { Start-Sleep -Milliseconds ([int]$wait) }
++'rt-mark: pid {0} run {1} at {2:N2} s (target {3} s, lead {4} s)' -f $p.Id, $run, ((Get-Date) - $t0).TotalSeconds, $Until, $Lead
++exit 0
+diff --git a/orig/rt-smoke-run.ps1 b/new/rt-smoke-run.ps1
+index 7d00303..b9d7629 100644
+--- a/orig/rt-smoke-run.ps1
++++ b/new/rt-smoke-run.ps1
+@@ -10,7 +10,8 @@
+ #   F3B  natives5fsr1-bin with -Toml perf-bilinear.toml (sha256 pin $bilPin, F1: the harness toml with
+ #        present_effect='bilinear'), -Cvar native_fps_limit=60. P4: spatial_fsr_presented=0.
+ # Then rt_smoke_post.py (per-arm gates + FSR1-vs-bilinear side-by-side PNGs, in rt-smoke\post). Words (any order):
+-# dryrun, allowhidden, arms=T2,F3A,F3B (subset/order).
++# dryrun, allowhidden, arms=T2,F3A,F3B (subset/order), noshots (no kit shots at all: no shot job, nothing on screen
++# from the kit; for a matched manual capture. The post's two screenshot gates then FAIL by design).
+ #   shots   F3A F3B: a background job PNGs the game window (harness winhelper Shot, read-only) at 60 120 146 200 s
+ #           after the game process starts, into <run>\kit-shots\ (+ shots.txt). Same times in both arms, so the
+ #           post can pair them (FSR 1 left, bilinear right). T2 takes none. Only a game whose image is under the
+@@ -53,7 +54,7 @@ $all = [ordered]@{
+     T2 = [pscustomobject]@{ bin = $binToml; toml = ''; cvar = 'framerate_limit=60' }
+     F3A = [pscustomobject]@{ bin = $binFsr1; toml = ''; cvar = 'native_fps_limit=60' }
+     F3B = [pscustomobject]@{ bin = $binFsr1; toml = $bilToml; cvar = 'native_fps_limit=60' } }
+-$ShotArms = @('F3A', 'F3B'); $ShotTimes = @(60, 120, 146, 200)
++$ShotArms = @(if ($words -notcontains 'noshots') { 'F3A'; 'F3B' }); $ShotTimes = @(60, 120, 146, 200)
+ $sel = @($words | Where-Object { $_ -like 'arms=*' } | ForEach-Object { $_.Substring(5).ToUpper() -split ',' } | Where-Object { $_ })
+ if (-not $sel.Count) { $sel = @($all.Keys) }
+ $bad = @($sel | Where-Object { -not $all.Contains($_) })
+@@ -62,7 +63,7 @@ $arms = @($sel | ForEach-Object { [pscustomobject]@{ arm = $_; tag = "s5rt-$($_.
+ $bins = @($arms | ForEach-Object { $_.bin } | Select-Object -Unique)
+ Say "S5 RT-SMOKE kit $(if ($DryRun) { 'DRY RUN (no game)' } else { 'REAL RUN' }); order $(($arms | ForEach-Object { $_.arm }) -join ' '); -Seconds $Seconds each; FUNCTIONAL, untimed (M10 P1/P2)"
+ Say "WS $ws"
+-Say "bins $($bins -join ' | '); shots in $($ShotArms -join ' ') at $($ShotTimes -join ' ') s; fresh run dir per arm (no -UserDir/-SeedXenos)"
++Say "bins $($bins -join ' | '); shots $(if ($ShotArms.Count) { "in $($ShotArms -join ' ') at $($ShotTimes -join ' ') s" } else { 'NONE (noshots: manual capture)' }); fresh run dir per arm (no -UserDir/-SeedXenos)"
+ 
+ function Run-Logged([string]$exe, [string[]]$argv) {
+     $ErrorActionPreference = 'Continue'   # native stderr through 2>&1 must not throw (PS 5.1)

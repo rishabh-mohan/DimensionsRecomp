@@ -1,0 +1,304 @@
+diff --git a/native5pack.py b/native6pack.py
+index a0ecf57..43ca766 100644
+--- a/native5pack.py
++++ b/native6pack.py
+@@ -1,7 +1,10 @@
+ #!/usr/bin/env python3
+-# native5pack.py - M16 (S5), derived from native4bp.py 37FD3989 with 4 changes: no LATEST-pack.txt /
+-# LATEST-bin.txt writes; bin requires --pack-run (no LATEST fallback); default --bin-out native5pack-bin;
+-# names in the log / MANIFEST title / MANIFEST note. Everything else is native4bp.py unchanged.
++# native6pack.py - M16 (S5), copy of native5pack.py 7DDFB8B9 (frozen, N6) with 5 changes: names native6pack in the
++# log / MANIFEST title / MANIFEST note; default --bin-out native6pack-bin; S1: bin re-checks PINS_BIN and diffs the
++# top-level listing of the watched dirs after stage + verify-bins (binwork side-effects.txt, gated); ON fingerprint
++# gates also against native5pack a349d5292f67b127; N1 header fix (no LATEST-pack.txt in the pack outputs).
++# native5pack.py itself: native4bp.py 37FD3989 with no LATEST-pack.txt / LATEST-bin.txt writes and --pack-run
++# required for bin (no LATEST fallback); everything else is native4bp.py unchanged.
+ # native4bp.py - E16.1 (S5 phase 0.4b), build/agent16/pack: dumped placement containers -> tools/gpu-aot ->
+ # native4bp AOT pack -> native4bp bin. Launch through native4bp.ps1 (dot-sources env\devshell.ps1 so clang++
+ # and the MSVC env are on PATH; sets Idle priority + affinity 0x3 first so every child inherits them).
+@@ -16,13 +19,14 @@
+ #       verified against its SHA256SUMS.txt, de-duplicated by sha256, placement-raw refused, default exclusions
+ #       logged) -> gradient_compiler (DXIL only) -> microcode indexer -> merge over the snap1 index 2DB85917 ->
+ #       check_pack.py prelookup -> production lookup (runtime cache, then + main cache) -> check_pack.py post ->
+-#       pin re-check, watched-dir listing diff, SHA256SUMS.txt, pack\LATEST-pack.txt.
++#       pin re-check, watched-dir listing diff, SHA256SUMS.txt (no pack\LATEST-pack.txt write).
+ # bin:  the build-final2 nat-leg recipe (recompile.py + relink.py UNCHANGED, objects of build/agent2/snap1-on,
+ #       outputs only under binwork): prelink runtime exe relink with the new runtime cache -> run it ->
+ #       embed_linked_bank.py --runtime -> fingerprint (fp-on.cmake with the 3 AOT inputs swapped) -> recompile
+ #       7 TUs (index, runtime_shader_cache, runtime_linked_shader_cache, device, pipeline_library, shader_archive,
+ #       final2 shaders.cpp overlay) with --include-first <gen> -> relink legodimensions.exe (+ runtime linked-bank.obj)
+-#       -> gates -> stage-variant.py on nativefinal2-bin -> verify-bins.py. With CTL (default) every step is first
++#       -> gates -> stage-variant.py on nativefinal2-bin -> verify-bins.py -> PINS_BIN re-check + watched-dir listing
++#       diff (S1). With CTL (default) every step is first
+ #       run with the shipped inputs and must reproduce nativefinal2 (exe+map equal except TimeDateStamp).
+ # HARD RULES baked in: every write is asserted inside build/agent16/pack; HOLD file (perf-notes/WINDOW-HOLD.txt)
+ # refuses a start; TMP/TEMP point inside the run dir; PYTHONDONTWRITEBYTECODE=1; jobs <= 2; Idle priority.
+@@ -41,6 +45,7 @@ PY = sys.executable
+ IDLE = 0x00000040
+ NOWIN = 0x08000000
+ FP_OLD = '1616ce65e973c583'
++FP_N5 = 'a349d5292f67b127'  # native5pack-bin (MANIFEST 787CD694); the ON fp must differ from it too
+ S35_DIR = os.path.join(W, r'build\agent8\matrix\20261122-0509\runs\0509-sd-r1\shader-dumps\placement-containers')
+ S35 = {
+     'vs-ACAF01F01E1C03D2.bin': '6C4F65C3161DF6BEE23F9C551F34971D60275BB49C3DB6327CFF9084F4317A66',
+@@ -421,7 +426,7 @@ def do_pack(a, check, stamp):
+             sums.append('%s  %s' % (sha(fp), os.path.relpath(fp, run_)))
+     with open(in_pack(os.path.join(run_, 'SHA256SUMS.txt')), 'w', encoding='utf-8', newline='\n') as f:
+         f.write('\n'.join(sorted(sums, key=lambda s: s[66:])) + '\n')
+-    log('LATEST-pack.txt not written (native5pack): run-%s %s containers=%d input=%s' % (
++    log('LATEST-pack.txt not written (native6pack): run-%s %s containers=%d input=%s' % (
+         stamp, verdict, len(rows), a.input or '-'))
+     log('VERDICT %s (tools: %s; check exit: %s; side effects: %d; pins changed after: %d; wall %.1f s)' % (
+         verdict, failed or 'ok', rc_check, len(diff), bad_after, time.time() - t_all))
+@@ -525,7 +530,7 @@ def write_lists(v, x, cache_src, index_src):
+ 
+ def do_bin(a, stamp):
+     t_all = time.time()
+-    pr = os.path.abspath(a.pack_run) if a.pack_run else None  # native5pack: --pack-run required
++    pr = os.path.abspath(a.pack_run) if a.pack_run else None  # native6pack: --pack-run required
+     bw = in_pack(os.path.join(PACK, 'binwork-' + stamp))
+     out_bin = in_pack(os.path.join(PACK, a.bin_out))
+     plan_only = a.mode == 'plan'
+@@ -551,6 +556,7 @@ def do_bin(a, stamp):
+             for f in fails:
+                 log('FAIL %s' % f)
+             return 1
++        before = listing(WATCH)  # S1 (native6pack): watched-dir listing before the bin
+     s = bin_plan(a, bw, pr)
+     inp = os.path.join(bw, 'inputs')
+     cache_on, index_on = os.path.join(inp, 'runtime-cache.cpp'), os.path.join(inp, 'lego-microcode-index.cpp')
+@@ -658,6 +664,7 @@ def do_bin(a, stamp):
+                     else:
+                         x['fp_new'] = fp_txt
+                         gate('ON fingerprint %s != %s' % (fp_txt, FP_OLD), fp_txt != FP_OLD)
++                        gate('ON fingerprint %s != native5pack %s' % (fp_txt, FP_N5), fp_txt != FP_N5)
+                 if name == 'exe-recompile':
+                     cmdf = open(os.path.join(x['logs'], 'recompile-commands.txt'), encoding='utf-8').read()
+                     gi = fwd(x['gen'])
+@@ -673,7 +680,8 @@ def do_bin(a, stamp):
+                         raise RuntimeError('CTL relink differs from nativefinal2')
+         if plan_only:
+             log('then: gates (fingerprint needles, overlay bytes, pe-check, mapcheck --mode same), stage-variant.py '
+-                '--base %s --out %s, verify-bins.py' % (rel(NF2), rel(out_bin)))
++                '--base %s --out %s, verify-bins.py, PINS_BIN re-check + watched-dir listing diff (S1)' % (
++                rel(NF2), rel(out_bin)))
+             return 0
+         # 2. gates on the ON exe
+         x = s['on']
+@@ -681,6 +689,7 @@ def do_bin(a, stamp):
+         b = open(exe, 'rb').read()
+         gate('ON exe contains the new fingerprint %s' % x['fp_new'], x['fp_new'].encode() in b)
+         gate('ON exe lacks the old fingerprint %s' % FP_OLD, FP_OLD.encode() not in b)
++        gate('ON exe lacks the native5pack fingerprint %s' % FP_N5, FP_N5.encode() not in b)
+         ovre = re.compile(rb'agent2[/\\]+final2[/\\]+b[/\\]', re.I)
+         gate('no overlay path bytes (agent2/final2/b/) in exe/map', not ovre.search(b) and
+              not ovre.search(open(mp, 'rb').read()))
+@@ -705,13 +714,13 @@ def do_bin(a, stamp):
+                                                pc['index']['old_rows'], pc['index']['new_rows']),
+             'runtime-linked-dxil-cache.cpp %s; runtime linked-bank.obj %s' % (
+                 sha(x['rlc']), sha(os.path.join(x['emb'], 'linked-bank.obj'))),
+-            'built by build/agent16/pack/native5pack.py bin (sha256 %s): build-final2 nat recipe, recompile.py/relink.py '
++            'built by build/agent16/pack/native6pack.py bin (sha256 %s): build-final2 nat recipe, recompile.py/relink.py '
+             'unchanged on build/agent2/snap1-on objects; work dir %s' % (sha(os.path.abspath(__file__)), rel(bw)),
+             'gates: %s' % '; '.join('%s %s' % ('PASS' if ok else 'FAIL', n) for n, ok in gates),
+         ]
+         cmd = [PY, pin('stage'), '--base', NF2, '--out', out_bin, '--replace', 'legodimensions.exe=' + exe,
+                '--replace', 'legodimensions.map=' + mp, '--title',
+-               'native5pack: nativefinal2 + AOT placement pack (%d containers), native GPU fingerprint %s' % (
++               'native6pack: nativefinal2 + AOT placement pack (%d containers), native GPU fingerprint %s' % (
+                    ncont, x['fp_new'])]
+         for n_ in notes:
+             cmd += ['--note', n_]
+@@ -723,11 +732,23 @@ def do_bin(a, stamp):
+         gate('verify-bins %s' % rel(out_bin), rc == 0)
+         if rc:
+             raise RuntimeError('verify-bins failed')
++        # 4. S1 (native6pack): watched-dir listing diff + PINS_BIN re-check after stage + verify-bins
++        after = listing(WATCH)
++        diff = sorted(set(before) ^ set(after))
++        with open(in_pack(os.path.join(bw, 'side-effects.txt')), 'w', encoding='utf-8') as f:
++            f.write('\n'.join(('< ' if y in before else '> ') + y for y in diff) + '\n' if diff else
++                    'none: the top level of all %d watched dirs is unchanged\n' % len(WATCH))
++        log('side effects: %s' % ('%d listing change(s), see side-effects.txt' % len(diff) if diff else 'none'))
++        gate('bin side effects: top level of all %d watched dirs unchanged' % len(WATCH), not diff)
++        bad_after = check_pins(PINS_BIN)
++        gate('bin pins unchanged after stage + verify-bins (%d bad)' % bad_after, not bad_after)
++        if diff or bad_after:
++            raise RuntimeError('bin side effects: %d listing change(s), %d pin(s) changed' % (len(diff), bad_after))
+         mf = os.path.join(out_bin, 'MANIFEST.txt')
+         log('STAGED %s MANIFEST sha256 %s; exe %s; map %s; fingerprint %s' % (
+             rel(out_bin), sha(mf), sha(os.path.join(out_bin, 'legodimensions.exe')),
+             sha(os.path.join(out_bin, 'legodimensions.map')), x['fp_new']))
+-        log('LATEST-bin.txt not written (native5pack): %s PASS MANIFEST=%s fingerprint=%s pack=%s' % (
++        log('LATEST-bin.txt not written (native6pack): %s PASS MANIFEST=%s fingerprint=%s pack=%s' % (
+             a.bin_out, sha(mf), x['fp_new'], rel(pr)))
+         log('VERDICT PASS (wall %.1f s)' % (time.time() - t_all))
+         return 0
+@@ -748,7 +769,7 @@ def main():
+     ap.add_argument('--exclude', action='append', default=[], help='extra NAME to leave out (logged)')
+     ap.add_argument('--no-default-exclude', action='store_true')
+     ap.add_argument('--pack-run', help='bin: a PASS pack run dir (required; no LATEST-pack.txt fallback)')
+-    ap.add_argument('--bin-out', default='native5pack-bin')
++    ap.add_argument('--bin-out', default='native6pack-bin')
+     ap.add_argument('--no-ctl', dest='ctl', action='store_false')
+     ap.add_argument('--jobs', type=int, default=2)
+     a = ap.parse_args()
+@@ -767,7 +788,7 @@ def main():
+     pc, aff = self_limit()
+     if a.mode == 'plan':
+         log.open(os.path.join(PACK, 'plan-%s.txt' % stamp))
+-    log('native5pack.py %s pid=%d priority=0x%X affinity=0x%X python=%s sha256=%s' % (
++    log('native6pack.py %s pid=%d priority=0x%X affinity=0x%X python=%s sha256=%s' % (
+         a.mode, os.getpid(), pc, aff, sys.version.split()[0], sha(os.path.abspath(__file__))))
+     if pc != IDLE or aff & ~0x3 or not aff:
+         log('FAIL: not at Idle priority / affinity within 0x3')
+diff --git a/native5pack.ps1 b/native6pack.ps1
+index 215056f..db96cdd 100644
+--- a/native5pack.ps1
++++ b/native6pack.ps1
+@@ -1,20 +1,21 @@
+ <#
+-  native5pack.ps1 - M16, build\agent16\pack: launcher for native5pack.py (plan | pack | bin); copy of native4bp.ps1 83A8B01F.
++  native6pack.ps1 - M16, build\agent16\pack: launcher for native6pack.py (plan | pack | bin); copy of native5pack.ps1 22245C44
++  with the names changed and $W derived from $PSScriptRoot (N3: no hard-coded workspace path).
+   Sets Idle priority + affinity 0x3 on this PowerShell first (every child inherits both), dot-sources
+   env\devshell.ps1 -Jobs 1 -Quiet (clang++ + MSVC env for the lookup fixture and the recompiles), then runs
+-  python native5pack.py with the same arguments. Exit code = native5pack.py's.
++  python native6pack.py with the same arguments. Exit code = native6pack.py's.
+ 
+-  powershell -NoProfile -ExecutionPolicy Bypass -File build\agent16\pack\native5pack.ps1 plan --input <pack-input dir>
+-  powershell -NoProfile -ExecutionPolicy Bypass -File build\agent16\pack\native5pack.ps1 pack --input <pack-input dir>
+-  powershell -NoProfile -ExecutionPolicy Bypass -File build\agent16\pack\native5pack.ps1 bin --pack-run <run dir> [--bin-out native5pack-bin]
++  powershell -NoProfile -ExecutionPolicy Bypass -File build\agent16\pack\native6pack.ps1 plan --input <pack-input dir>
++  powershell -NoProfile -ExecutionPolicy Bypass -File build\agent16\pack\native6pack.ps1 pack --input <pack-input dir>
++  powershell -NoProfile -ExecutionPolicy Bypass -File build\agent16\pack\native6pack.ps1 bin --pack-run <run dir> [--bin-out native6pack-bin]
+ #>
+ $ErrorActionPreference = 'Stop'
+ $me = [System.Diagnostics.Process]::GetCurrentProcess()
+ $me.PriorityClass = [System.Diagnostics.ProcessPriorityClass]::Idle
+ $me.ProcessorAffinity = [IntPtr]3
+-$W = '<workspace>'
++$W = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
+ . (Join-Path $W 'env\devshell.ps1') -Jobs 1 -Quiet
+ $env:PYTHONDONTWRITEBYTECODE = '1'
+ $py = (Get-Command python -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
+-& $py (Join-Path $PSScriptRoot 'native5pack.py') @args
++& $py (Join-Path $PSScriptRoot 'native6pack.py') @args
+ exit $LASTEXITCODE
+diff --git a/native5pack_check.py b/native6pack_check.py
+index 7d54254..e77372e 100644
+--- a/native5pack_check.py
++++ b/native6pack_check.py
+@@ -1,24 +1,30 @@
+ #!/usr/bin/env python3
+-# native5pack_check.py - M16 (S5), build/agent16/pack: read-only post-checks of the candidate bin native5pack-bin.
++# native6pack_check.py - M16 (S5), build/agent16/pack: read-only post-checks of the candidate bin native6pack-bin.
++# Copy of native5pack_check.py F57713CE (frozen, N6) with native5pack-bin added as a pinned bin (C2, C3, C4, C6)
++# and its fingerprint a349d5292f67b127 added to the old fingerprints (C5).
+ #
+-#   python build\agent16\pack\native5pack_check.py
++#   python build\agent16\pack\native6pack_check.py
+ #
+ # Sets Idle priority + affinity 0x3 on itself first (children inherit). Writes ONLY build\agent16\pack\
+-# native5pack-check-<stamp>\ (refuses to reuse a dir). Checks:
+-#   C1 verify-bins.py native5pack-bin (MANIFEST rows = files, sizes, sha256)        -> verify-bins-native5pack.txt
+-#   C2 verify-bins.py native4bp-bin + nativefinal2-bin (pinned bins untouched)       -> verify-bins-pinned.txt
+-#   C3 pinned shas: native4bp MANIFEST C5181520 / exe FA761654, nf2 MANIFEST 4E5E2620, LATEST-pack AC7B9053,
++# native6pack-check-<stamp>\ (refuses to reuse a dir). Checks:
++#   C1 verify-bins.py native6pack-bin (MANIFEST rows = files, sizes, sha256)        -> verify-bins-native6pack.txt
++#   C2 verify-bins.py native4bp-bin + nativefinal2-bin + native5pack-bin (pinned bins untouched)
++#                                                                                    -> verify-bins-pinned.txt
++#   C3 pinned shas: native4bp MANIFEST C5181520 / exe FA761654, native5pack MANIFEST 787CD694 / exe 90BF6B45,
++#      nf2 MANIFEST 4E5E2620, LATEST-pack AC7B9053,
+ #      LATEST-bin 76D0EFB9 (unchanged)
+-#   C4 pe-check.py native5pack exe vs nativefinal2 exe and vs native4bp exe (exports/imports equal)
+-#   C5 MANIFEST title fingerprint: present in the exe; 1616ce65e973c583 and 39129c4c059be5f0 absent
+-#   C6 the 6 non-exe/map files are byte-identical to nativefinal2-bin; exe+map differ from nf2 and native4bp
++#   C4 pe-check.py native6pack exe vs the nativefinal2, native4bp and native5pack exes (exports/imports equal)
++#   C5 MANIFEST title fingerprint: present in the exe; 1616ce65e973c583, 39129c4c059be5f0, a349d5292f67b127 absent
++#   C6 the 6 non-exe/map files are byte-identical to nativefinal2-bin; exe+map differ from nf2, native4bp and
++#      native5pack
+ # Exit 0 = RESULT PASS, 1 = FAIL, 2 = refused.
+ import ctypes, datetime, hashlib, os, re, subprocess, sys
+ 
+ W = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..'))
+ PACK = os.path.join(W, 'build', 'agent16', 'pack')
+-NEW = os.path.join(PACK, 'native5pack-bin')
++NEW = os.path.join(PACK, 'native6pack-bin')
+ N4 = os.path.join(PACK, 'native4bp-bin')
++N5 = os.path.join(PACK, 'native5pack-bin')
+ NF2 = os.path.join(W, 'build', 'agent2', 'nativefinal2-bin')
+ VB = os.path.join(W, 'build', 'agent2', 'session3', 'verify-bins.py')
+ PEC = os.path.join(W, 'build', 'agent2', 'final', 'pe-check.py')
+@@ -27,11 +33,13 @@ TOOLS = {VB: '80FF4C5F581C4B1BC02C8E98039CBA6A62BEB4CE5F0E267885F9DA7F17C9B95E',
+ PINNED = [
+     (os.path.join(N4, 'MANIFEST.txt'), 'C518152026695279993085A8497E7B14D318C1DFF54B57F2767670B90A7AA690'),
+     (os.path.join(N4, 'legodimensions.exe'), 'FA761654D665BC928B9FC82AC5DCE58E25EE2E87BF60ED519CC5480A3012187C'),
++    (os.path.join(N5, 'MANIFEST.txt'), '787CD694F0B884D99D1D1E3C807642B33CBA22D79A8F9253C071A8898D1446A1'),
++    (os.path.join(N5, 'legodimensions.exe'), '90BF6B4552217E71E437D2BA7976D49EEA30AB3D8EE42B21B6A20E58A2F7EE7D'),
+     (os.path.join(NF2, 'MANIFEST.txt'), '4E5E2620F38F7D09E064FB191BA396D7149B27A593C5158EF317CB2D9A31A163'),
+     (os.path.join(PACK, 'LATEST-pack.txt'), 'AC7B9053C05BB53A9BD62CF191093F72CE85E9A4253FAE6987992D1C3E75E320'),
+     (os.path.join(PACK, 'LATEST-bin.txt'), '76D0EFB9F59DD2679735A5857B2D7805F8FE4C0091940E13DE4CC8C0A2AEE82E'),
+ ]
+-OLD_FPS = ('1616ce65e973c583', '39129c4c059be5f0')
++OLD_FPS = ('1616ce65e973c583', '39129c4c059be5f0', 'a349d5292f67b127')
+ 
+ 
+ def sha(p):
+@@ -50,7 +58,7 @@ def main():
+     if not os.path.isdir(NEW):
+         print('REFUSED: %s missing' % NEW)
+         return 2
+-    out = os.path.join(PACK, 'native5pack-check-' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S'))
++    out = os.path.join(PACK, 'native6pack-check-' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S'))
+     if not os.path.normcase(out).startswith(os.path.normcase(PACK) + os.sep) or os.path.exists(out):
+         print('REFUSED: bad or existing out dir %s' % out)
+         return 2
+@@ -75,20 +83,20 @@ def main():
+         tail = [l for l in r.stdout.splitlines() if l.startswith('RESULT')]
+         return r.returncode, tail[-1] if tail else ''
+ 
+-    rc, t = runlog('verify-bins-native5pack.txt.log', [sys.executable, VB, NEW, '--out',
+-                                                        os.path.join(out, 'verify-bins-native5pack.txt')])
+-    rec(rc == 0, 'C1 verify-bins native5pack-bin (exit %d) %s' % (rc, t))
+-    rc, t = runlog('verify-bins-pinned.txt.log', [sys.executable, VB, N4, NF2, '--out',
++    rc, t = runlog('verify-bins-native6pack.txt.log', [sys.executable, VB, NEW, '--out',
++                                                        os.path.join(out, 'verify-bins-native6pack.txt')])
++    rec(rc == 0, 'C1 verify-bins native6pack-bin (exit %d) %s' % (rc, t))
++    rc, t = runlog('verify-bins-pinned.txt.log', [sys.executable, VB, N4, NF2, N5, '--out',
+                                                    os.path.join(out, 'verify-bins-pinned.txt')])
+-    rec(rc == 0, 'C2 verify-bins native4bp-bin + nativefinal2-bin (exit %d) %s' % (rc, t))
++    rec(rc == 0, 'C2 verify-bins native4bp-bin + nativefinal2-bin + native5pack-bin (exit %d) %s' % (rc, t))
+     for p, h in PINNED:
+         got = sha(p)
+         rec(got == h, 'C3 pinned %s = %s (got %s)' % (os.path.relpath(p, W), h[:8], got[:8]))
+     exe = os.path.join(NEW, 'legodimensions.exe')
+-    for ref, tag in ((NF2, 'nf2'), (N4, 'native4bp')):
++    for ref, tag in ((NF2, 'nf2'), (N4, 'native4bp'), (N5, 'native5pack')):
+         rc, t = runlog('pe-check-vs-%s.txt' % tag, [sys.executable, PEC, '--new', exe, '--ref',
+                                                     os.path.join(ref, 'legodimensions.exe')])
+-        rec(rc == 0, 'C4 pe-check native5pack exe vs %s exe (exit %d) %s' % (tag, rc, t))
++        rec(rc == 0, 'C4 pe-check native6pack exe vs %s exe (exit %d) %s' % (tag, rc, t))
+     mf = open(os.path.join(NEW, 'MANIFEST.txt'), encoding='utf-8', errors='replace').read()
+     m = re.search(r'native GPU fingerprint ([0-9a-f]{16})', mf)
+     fp = m.group(1) if m else None
+@@ -105,8 +113,8 @@ def main():
+         a, r2 = sha(os.path.join(NEW, n)), sha(os.path.join(NF2, n)) if os.path.exists(os.path.join(NF2, n)) else '-'
+         lines.append('HASH %s %s nf2=%s' % (a, n, r2))
+         if n in ('legodimensions.exe', 'legodimensions.map'):
+-            n4 = sha(os.path.join(N4, n))
+-            rec(a != r2 and a != n4, 'C6 %s differs from nf2 and native4bp' % n)
++            n4, n5 = sha(os.path.join(N4, n)), sha(os.path.join(N5, n))
++            rec(a != r2 and a != n4 and a != n5, 'C6 %s differs from nf2, native4bp and native5pack' % n)
+         else:
+             rec(a == r2, 'C6 %s identical to nf2' % n)
+     lines.append('HASH %s MANIFEST.txt' % sha(os.path.join(NEW, 'MANIFEST.txt')))
+@@ -116,7 +124,7 @@ def main():
+ def finish(out, lines, fails):
+     res = 'RESULT: %s' % ('PASS' if not fails else 'FAIL (%d)' % len(fails))
+     lines.append(res)
+-    p = os.path.join(out, 'native5pack-check.txt')
++    p = os.path.join(out, 'native6pack-check.txt')
+     with open(p, 'w', encoding='utf-8', newline='\n') as f:
+         f.write('\n'.join(lines) + '\n')
+     print(res)

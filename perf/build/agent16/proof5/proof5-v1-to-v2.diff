@@ -1,0 +1,267 @@
+diff --git a/prev/v1/proof5_post.py b/prev/v2/proof5_post.py
+index 9aa5cd7..51e4ba1 100644
+--- a/prev/v1/proof5_post.py
++++ b/prev/v2/proof5_post.py
+@@ -2,8 +2,10 @@
+ # proof5_post.py - M16 (S5), build/agent16/proof5: miss-count proof for the candidate bin native5pack-bin.
+ # Read-only on its inputs; writes ONLY <--out> (must be a NEW dir under build\agent16\proof5).
+ #
+-#   python build\agent16\proof5\proof5_post.py --base-trace <events.tsv> --cand-trace <events.tsv>
+-#          --cand-fp <16 hex> [--base-fp 39129c4c059be5f0] [--base-log <game.log>] [--cand-log <game.log>]
++#   python build\agent16\proof5\proof5_post.py --base-trace <events.tsv> --base-log <game.log>
++#          --cand-trace <events.tsv> --cand-log <game.log> --cand-fp <16 hex> [--base-fp 39129c4c059be5f0]
++#          --cand-post <M3 post\gameplay-<stamp>.txt> --cand-runlog <M3 logs\gameplay-<stamp>.txt>
++#          --cand-sidecar <M3 logs\<stamp>-native.sidecar.out.txt>
+ #          [--targets build\agent16\pack\DUMP-TARGETS-story.txt] --out build\agent16\proof5\post-<stamp>
+ #
+ # Both traces must come from miss-cache-ON runs (no dump) of the same scripted route. Per run it counts frames,
+@@ -11,9 +13,13 @@
+ # (XXH3 of the first 8 bytes, from shader_miss_cache_insert; stage 6 = VS, 7 = PS). Heap guests move between
+ # runs, so keys are (stage, prefix); a guest without a unique prefix is keyed by address (@guest).
+ # STABLE targets (image-range 0xAC4/0xAC5 guests of DUMP-TARGETS-story) are also compared by address.
+-# RESULT: INVALID (fingerprint check failed) | PASS (missing draws per 1000 frames lower AND every STABLE
+-# target that missed in base has 0 missing draws in cand) | PASS-WITH-CHECKS (rate lower, some STABLE remain)
+-# | FAIL (rate not lower). Exit 0 for PASS / PASS-WITH-CHECKS, 1 otherwise, 2 = refused.
++# A NEW key that is @-keyed may be a base guest that just had no insert event: listed apart as "possibly REMAIN".
++# Route checks (M10 P5/P-S1): frames ratio cand/base within +-10%, and the cand route completed like 054546
++# (clean exit 0, steps 302/302 last: done, title gate HIT, prompts 3/3, ctl=0, all kit exits 0).
++# RESULT, first match wins: INVALID (fingerprint check failed) | INCONCLUSIVE (frames ratio or route check
++# failed) | FAIL (missing draws per 1000 frames not lower) | PASS-WITH-CHECKS (rate lower, some STABLE remain)
++# | PASS (rate lower AND every STABLE target that missed in base has 0 missing draws in cand).
++# Exit 0 for PASS / PASS-WITH-CHECKS, 1 otherwise, 2 = refused.
+ import argparse, collections, ctypes, hashlib, os, re, sys
+ 
+ HERE = os.path.dirname(os.path.abspath(__file__))
+@@ -73,12 +79,31 @@ def stable_targets(path):
+ 
+ 
+ def fp_in_log(path, fp):
+-    if not path:
+-        return None
+     t = open(path, encoding='utf-8', errors='replace').read()
+     return ('Native GPU [%s]' % fp) in t
+ 
+ 
++def txt(path):
++    return open(path, encoding='utf-8', errors='replace').read()
++
++
++def route_checks(post, runlog, sidecar):
++    """M3 post + gameplay run log + sidecar log of the cand run -> [(name, ok)] (054546 outcome = all True)."""
++    P, R = txt(post), txt(runlog)
++    res = [l for l in txt(sidecar).splitlines() if re.match(r'^\S+ result ', l)]
++    S = res[-1] if res else ''
++    return [
++        ('clean exit 0', 'PASS native clean exit: exit 0x00000000' in P),
++        ('steps 302/302', 'steps 302/302 stopped_by_script True error None' in P),
++        ('stop reached (last: done)', re.search(r'steps 302/302 \(last: done\)', R) is not None),
++        ('title gate HIT', re.search(r'wait line \d+ current=5 pending=0 \d+ +ok after', P) is not None),
++        ('prompts 3/3', 'prompts=batman:1/1 gandalf:1/1 wyldstyle:1/1' in S),
++        ('ctl 0', ' ctl=0 done/0 err' in S),
++        ('kit exits 0', all(s in R for s in ('run-game (native) exit 0', 'sidecar exit 0', 'holdwatch exit 0',
++                                             'watcher exit 0', 'GAMEPLAY DONE: run-game exit 0; post exit 0'))),
++    ]
++
++
+ def main():
+     k = ctypes.windll.kernel32
+     k.SetPriorityClass(k.GetCurrentProcess(), 0x00100000)  # background mode (Idle + low I/O)
+@@ -87,8 +112,11 @@ def main():
+     ap.add_argument('--cand-trace', required=True)
+     ap.add_argument('--cand-fp', required=True)
+     ap.add_argument('--base-fp', default='39129c4c059be5f0')
+-    ap.add_argument('--base-log')
+-    ap.add_argument('--cand-log')
++    ap.add_argument('--base-log', required=True)
++    ap.add_argument('--cand-log', required=True)
++    ap.add_argument('--cand-post', required=True)
++    ap.add_argument('--cand-runlog', required=True)
++    ap.add_argument('--cand-sidecar', required=True)
+     ap.add_argument('--targets', default=os.path.join(W, 'build', 'agent16', 'pack', 'DUMP-TARGETS-story.txt'))
+     ap.add_argument('--out', required=True)
+     a = ap.parse_args()
+@@ -104,15 +132,28 @@ def main():
+     w = L.append
+     w('proof5_post.py sha256 %s' % sha(os.path.abspath(__file__)))
+     for tag, p in (('base trace', a.base_trace), ('cand trace', a.cand_trace), ('base log', a.base_log),
+-                   ('cand log', a.cand_log), ('targets', a.targets)):
+-        if p:
+-            w('%-10s %s %s' % (tag, sha(p), os.path.abspath(p)))
++                   ('cand log', a.cand_log), ('cand post', a.cand_post), ('cand runlog', a.cand_runlog),
++                   ('cand sidecar', a.cand_sidecar), ('targets', a.targets)):
++        w('%-12s %s %s' % (tag, sha(p), os.path.abspath(p)))
+     bad_fp = []
+     for tag, p, fp in (('base', a.base_log, a.base_fp), ('cand', a.cand_log, a.cand_fp)):
+         r = fp_in_log(p, fp)
+-        w('fingerprint %s %s in game.log: %s' % (tag, fp, 'not checked (no log)' if r is None else r))
+-        if r is False or (tag == 'cand' and r is None):
++        w('fingerprint %s %s in game.log: %s' % (tag, fp, r))
++        if not r:
+             bad_fp.append(tag)
++    inconc = []
++    ratio = C['frames'] / B['frames'] if B['frames'] else float('nan')
++    fr_ok = 0.9 <= ratio <= 1.1
++    w('frames ratio cand/base: %d / %d = %.3f (%s; must be within +-10%%)' % (
++        C['frames'], B['frames'], ratio, 'OK' if fr_ok else 'OUT OF RANGE'))
++    if not fr_ok:
++        inconc.append('frames ratio %.3f' % ratio)
++    rc_ = route_checks(a.cand_post, a.cand_runlog, a.cand_sidecar)
++    rbad = [n for n, ok in rc_ if not ok]
++    w('route completion (cand): %s; %s' % ('OK' if not rbad else 'FAILED',
++                                           '; '.join('%s %s' % (n, 'yes' if ok else 'NO') for n, ok in rc_)))
++    if rbad:
++        inconc.append('route: ' + ', '.join(rbad))
+ 
+     def rate(R):
+         return 1000.0 * R['total'] / R['frames'] if R['frames'] else float('nan')
+@@ -134,9 +175,11 @@ def main():
+     w('')
+     fixed = [k_ for k_ in B['keyed'] if k_ not in C['keyed']]
+     remain = [k_ for k_ in B['keyed'] if k_ in C['keyed']]
+-    new = [k_ for k_ in C['keyed'] if k_ not in B['keyed']]
++    new = [k_ for k_ in C['keyed'] if k_ not in B['keyed'] and not k_[1].startswith('@')]
++    new_at = [k_ for k_ in C['keyed'] if k_ not in B['keyed'] and k_[1].startswith('@')]
+     for name, ks, src in (('FIXED (base keys gone in cand)', fixed, B), ('REMAIN (in both)', remain, C),
+-                          ('NEW (cand only)', new, C)):
++                          ('NEW (cand only, prefix-keyed)', new, C),
++                          ('NEW @-keyed (cand only, no insert event: possibly REMAIN)', new_at, C)):
+         w('%s: %d keys, %d cand-or-base draws' % (name, len(ks), sum(src['keyed'][x] for x in ks)))
+         for x in sorted(ks, key=lambda x: -src['keyed'][x]):
+             w('  %s %s base %7d cand %7d  guests base %s cand %s' % (
+@@ -147,13 +190,15 @@ def main():
+     rb, rc = rate(B), rate(C)
+     if bad_fp:
+         res = 'INVALID (fingerprint check failed: %s)' % ', '.join(bad_fp)
++    elif inconc:
++        res = 'INCONCLUSIVE (%s; per 1000 frames %.1f -> %.1f not judged)' % ('; '.join(inconc), rb, rc)
+     elif not rc < rb:
+         res = 'FAIL (missing draws per 1000 frames %.1f -> %.1f, not lower)' % (rb, rc)
+     elif st_left:
+         res = 'PASS-WITH-CHECKS (per 1000 frames %.1f -> %.1f; STABLE remaining: %s)' % (rb, rc, ', '.join(st_left))
+     else:
+         res = 'PASS (per 1000 frames %.1f -> %.1f; all base-missed STABLE targets fixed; keys fixed %d, remain %d, ' \
+-              'new %d)' % (rb, rc, len(fixed), len(remain), len(new))
++              'new %d, new @-keyed %d)' % (rb, rc, len(fixed), len(remain), len(new), len(new_at))
+     w('RESULT: ' + res)
+     os.makedirs(out)
+     rp = os.path.join(out, 'proof5_post.txt')
+diff --git a/prev/v1/PLAN-proof5.md b/prev/v2/PLAN-proof5.md
+index 7b4ab74..a7ab9a8 100644
+--- a/prev/v1/PLAN-proof5.md
++++ b/prev/v2/PLAN-proof5.md
+@@ -2,11 +2,12 @@
+ 
+ **Question:** does the 143-container pack remove the missing-shader draws it targets, and which misses remain? The remaining set is the 22 no-identity stage+guests from the 051159 dump session, including VS A7FA6EA0 (formerly A7FA6E00).
+ 
+-**Status:** draft. It needs these, in order:
++**Status:** draft v2 (revised after M10's rating `build\agent10\s5\proof5-plan-rating.md` B5CE9F38, SAFE-IF P1-P6: P-S1, P-N1, P-N2, P-N3 addressed). It needs these, in order (M10 P1):
+ 1. ~~the native5pack-bin build to PASS~~ **DONE 06:11**: bin-log 9FEF87D2 VERDICT PASS; check A357A041 RESULT PASS;
+-2. an M3 kit opt-in (section 2);
+-3. M10's rating;
+-4. an Overseer slot.
++2. M10's rating of M3's `cand5` kit revision (section 2);
++3. install, pins, tamper and dryruns of that kit, rated on their own (the dryrun copies and hashes about 365 MB, so it needs a slot of its own);
++4. M10's re-rate of this v2 plan and post script;
++5. an Overseer GO for the run.
+ 
+ **Candidate pins:**
+ 
+@@ -31,6 +32,10 @@ The route covers the story scenes: 14 of the 16 STABLE story targets miss in it,
+ 
+ **Candidate run:** the SAME scripted route (gameplay-route.txt 705A3A50, unattended, self-closing, ~15 min, cap 25 min), native arm only, with the bin swapped to native5pack-bin. Everything else is identical: trace on, `native_fps_limit=60`, a fresh `<run>\user`, the toypad sidecar, and no dump. A dump would turn the miss cache off and change the events.
+ 
++**Run shape (M10 P2):** `RUN-GAMEPLAY.cmd nativeonly cand5` and nothing else.
++- **No `zone`:** the zone ctl changes scene progression, so the route would no longer be comparable with 054546.
++- No dump, no ctl. Hands off during the run (X1). `--led-shots` is passive and allowed.
++
+ ## 2. Dependency: M3 kit opt-in (M3 writes it; M16 does not touch M3's files)
+ 
+ M3's `gameplay-run.ps1` hard-codes the native arm at line 112: pinned `build\agent16\pack\native4bp-bin`, MANIFEST C5181520, copy `bin-native`. Requested change: an opt-in word, e.g. `cand5`, allowed only with `nativeonly` and not with manual, explore or dump. It would:
+@@ -45,36 +50,65 @@ After that come a new kit pin set, M3's selftest/dryrun, and M10's re-rate of th
+ 
+ ## 3. Post: `build\agent16\proof5\proof5_post.py` (read-only; writes only a NEW dir under build\agent16\proof5)
+ 
++Run it only after the waiter END and after M3's G5 post for the run (M10 P4), with a fresh `post-<stamp>`. All of `--base-log`, `--cand-log`, `--cand-post`, `--cand-runlog` and `--cand-sidecar` are required (P-N1); a missing file stops the script with an error and no report.
++
+ ```
+ python build\agent16\proof5\proof5_post.py ^
+-  --base-trace build\agent3\gameplay\trace-native-20261126-054546\events.tsv ^
+-  --base-log   build\agent3\gameplay\runs\20261126-054551-gp-native\game.log ^
+-  --cand-trace build\agent3\gameplay\trace-native5-<stamp>\events.tsv ^
+-  --cand-log   build\agent3\gameplay\runs\<stamp>-gp5-native\game.log ^
++  --base-trace   build\agent3\gameplay\trace-native-20261126-054546\events.tsv ^
++  --base-log     build\agent3\gameplay\runs\20261126-054551-gp-native\game.log ^
++  --cand-trace   build\agent3\gameplay\trace-native5-<stamp>\events.tsv ^
++  --cand-log     build\agent3\gameplay\runs\<stamp>-gp5-native\game.log ^
++  --cand-post    build\agent3\gameplay\post\gameplay-<stamp>.txt ^
++  --cand-runlog  build\agent3\gameplay\logs\gameplay-<stamp>.txt ^
++  --cand-sidecar build\agent3\gameplay\logs\<stamp>-native.sidecar.out.txt ^
+   --cand-fp a349d5292f67b127 --out build\agent16\proof5\post-<fresh stamp>
+ ```
+ 
++(The cand trace/run dir names follow M3's cand5 kit; use the names it actually writes.)
++
+ What it does:
+-- Runs in background mode (Idle plus low I/O) and streams both traces, about 2 s each.
++- Runs in background mode (Idle plus low I/O) and streams both traces (268 MB for the baseline). That takes from a few seconds (file cache warm) to about a minute (cold disk); it runs after the game has exited, so the time does not matter (P-N3).
+ - Counts frames and `draw_missing_{vertex,pixel}_shader` per (stage, guest).
+ - Maps each guest to its microcode prefix through `shader_miss_cache_insert` (prefix = XXH3 of the first 8 bytes; stage 6 = VS, 7 = PS). Keys are (stage, prefix), so heap guests that move between runs still match. A guest without a unique prefix is keyed by address (`@guest`).
+ - Compares the STABLE targets of DUMP-TARGETS-story (9C185250) by address.
+ 
+ Report sections:
++- input shas (both traces, both game.logs, cand post / run log / sidecar, targets);
++- fingerprint lines (base 39129c4c, cand fp5);
++- **frames ratio** line: cand/base frames, OK within ±10%, else OUT OF RANGE (P-S1);
++- **route completion** line for the cand run (P-S1, the 054546 outcome of M10 P5), each item yes/NO:
++  - clean exit 0: post `PASS native clean exit: exit 0x00000000`;
++  - steps 302/302: post `steps 302/302 stopped_by_script True error None`;
++  - stop reached: run log `steps 302/302 (last: done)` (the route's `stop` is L310);
++  - title gate HIT: post `wait line <n> current=5 pending=0 <t> ok after` (the TITLE GATE CHECK `wait_log` of gameplay-route.txt L55);
++  - prompts 3/3: the last sidecar `result` line has `prompts=batman:1/1 gandalf:1/1 wyldstyle:1/1`;
++  - ctl 0: the same line has `ctl=0 done/0 err`;
++  - kit exits 0: run log `run-game (native) exit 0`, `sidecar exit 0`, `holdwatch exit 0`, `watcher exit 0`, `GAMEPLAY DONE: run-game exit 0; post exit 0`;
+ - per-run totals;
+ - the STABLE table (FIXED / REMAINS / not-in-base);
+-- key lists: FIXED (gone in cand), REMAIN (in both, with the guest addresses of each run) and NEW (cand only).
++- key lists: FIXED (gone in cand), REMAIN (in both, with the guest addresses of each run), NEW (cand only, prefix-keyed), and, listed apart, **NEW @-keyed (cand only, no insert event: possibly REMAIN)** (P-N2): a guest that had no insert event in one run is keyed by address there and may be a base miss under a prefix key.
++
++RESULT, first matching row wins:
+ 
+ | RESULT | condition |
+ |---|---|
+-| INVALID | fp5 not found in the cand game.log, or 39129c4c not found in the base log |
+-| PASS | missing draws per 1000 frames are lower, and every STABLE target that missed in base has 0 in cand |
++| INVALID | fp5 not found in the cand game.log, or 39129c4c not found in the base game.log |
++| INCONCLUSIVE | frames ratio outside ±10%, or any route-completion item NO (M10 P5); the rates are printed but not judged |
++| FAIL | missing draws per 1000 frames are not lower |
+ | PASS-WITH-CHECKS | the rate is lower, but some STABLE targets remain |
+-| FAIL | the rate is not lower |
++| PASS | the rate is lower, and every STABLE target that missed in base has 0 in cand |
++
++Exit 0 for PASS / PASS-WITH-CHECKS, 1 otherwise, 2 = refused. P5 still applies on top: the reviewer compares M3's post with 054546 (e.g. the pad 3 / pad 2 outcome), and the script's route line does not replace that.
+ 
+-**Self-tests:**
+-- Fixture (scratch `p5_selftest.py`): PASS, PASS-WITH-CHECKS, FAIL and INVALID each came out as expected. A heap guest that moved (same prefix, new address) matched as REMAIN. The refusals for out-of-tree `--out` and for an fp equal to the base fp both exit 2. Reports are in `proof5\selftest-{pass,pwc,fail,invalid}`.
+-- Real data (`proof5\selftest-real-054546`, BBC9E692…): baseline vs itself gives identical totals, 0 FIXED and 0 NEW. The result is INVALID by design, since the cand log was not given.
++**Self-tests (v2):**
++- Fixture (scratch `p5_selftest2.py`), reports in `proof5\selftest2-*`, SELFTEST PASS, 18/18:
++  - PASS, PASS-WITH-CHECKS, FAIL; INVALID for a bad cand fp and for a bad base fp;
++  - INCONCLUSIVE for frames 0.85, steps 250/302, title gate TIMEOUT, prompts wyldstyle 0/1 and sidecar exit 1; frames 1.10 is still OK;
++  - order: INCONCLUSIVE beats FAIL, INVALID beats INCONCLUSIVE;
++  - an @-keyed cand-only guest is listed under "NEW @-keyed ... possibly REMAIN";
++  - refusals exit 2: `--out` outside proof5, `--out` existing, cand fp equal to base fp, and `--base-log` missing.
++- Real data (`proof5\selftest-real2-054546`, report E44ADBC3…): the baseline vs itself, with M3's 054546 post, run log and sidecar as the cand route files. It reproduces 40881 frames, 220710 missing draws (VS 134404, PS 86306), 5398.8 per 1000 frames, 46 guests, 16 keys and 64 inserts; frames ratio 1.000 OK; route completion OK (all 7 items yes); 0 FIXED, 0 NEW, 0 NEW @-keyed. The result is INVALID by design, since fp5 is not in the base log.
++- v1 self-tests (`selftest-{pass,pwc,fail,invalid}`, `selftest-real-054546` BBC9E692) are kept and are superseded.
+ 
+ > [!NOTE]
+ > Prefix keying is coarse. The 46 baseline guests fold into 16 keys: many shaders share their first 8 bytes, and 10 guests had no insert event, so they are keyed by address. A key counts as FIXED only when every guest under it is gone. The headline evidence is therefore:
+@@ -96,6 +130,8 @@ Report sections:
+   - no legodimensions process;
+   - s5wait status ends in an END line;
+   - no HOLD file;
+-  - native5pack_check RESULT PASS.
++  - native5pack_check RESULT PASS (A357A041);
++  - the cand5 kit pins MANIFEST 787CD694, and its copy dir `bin-native5` matches that MANIFEST (M10 P3).
++- **No promotion (M10 P6 / N4):** even a PASS does not promote native5pack-bin. Promotion needs its own package and rating. Re-rate if this PLAN, the post script or the bin changes.
+ - **Rollback:** delete the gp5 run dir, `trace-native5-<stamp>`, `bin-native5` and `proof5\post-<stamp>`.
+ - None of M10's D1 strings appear in any command here.

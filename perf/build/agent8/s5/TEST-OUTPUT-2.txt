@@ -1,0 +1,75 @@
+TEST-OUTPUT-2 (M8, 2026-11-25 18:00): static checks only. No run-matrix/run-timing/window-s5/RUN-WINDOW process, no game.
+
+## 1. Parse / JSON / copies
+window-s5.ps1 parse errors=0
+run-matrix.ps1 parse errors=0
+run-timing.ps1 parse errors=0
+common.ps1 parse errors=0
+timing-env.ps1 parse errors=0
+matrix json ok; arms [('ship60', 4, 60), ('nat60', 4, 60), ('n4bp60', 4, 60), ('natU', 2, 0)] measure 180 cold 60 100
+run-timing.ps1 / run-matrix.ps1 diffs vs bench/agent8/run: unchanged since the 17:49 package (regenerated, byte-identical); copies common/timing-env/winhelper/frame_summary/sys_summary/drivers\* identical to bench/agent8/run
+RUN-WINDOW-S5.cmd: CRLF 25 = LF 25, ASCII only
+
+## 2. Rated-files check (RUN-WINDOW-S5.cmd inline check on a scratch mirror of the kit + external files)
+cmd under test: RUN-WINDOW-S5.cmd sha256 2B22FD0063C1F5029E0F3C5D0ACD61F790710191578484F7A6FBC8EB695D19C1; only the window-s5 start line and the 15 s timeout are replaced
+== pass (untouched copy) : exit 0
+   [window-s5] rated files ok: 17 pins match
+   WOULD-START window-s5 
+   [window-s5] exit 0
+== tamper run-matrix.ps1 (+1 byte) : exit 3
+   [window-s5] PIN FAIL changed run-matrix.ps1
+   [window-s5] refused: rated files do not match PINS-S5.txt (nothing started)
+   [window-s5] exit 3
+== tamper matrix json (+1 byte) : exit 3
+   [window-s5] PIN FAIL changed matrix-s5-baseline.json
+   [window-s5] refused: rated files do not match PINS-S5.txt (nothing started)
+   [window-s5] exit 3
+== tamper external attract-long.txt : exit 3
+   [window-s5] PIN FAIL changed ..\..\..\harness\routes\attract-long.txt
+   [window-s5] refused: rated files do not match PINS-S5.txt (nothing started)
+   [window-s5] exit 3
+== missing drivers\LdSys.cs : exit 3
+   [window-s5] PIN FAIL missing drivers\LdSys.cs
+   [window-s5] refused: rated files do not match PINS-S5.txt (nothing started)
+   [window-s5] exit 3
+== PINS-S5.txt edited : exit 3
+   [window-s5] PINS-S5.txt is not the rated sha256
+   [window-s5] refused: rated files do not match PINS-S5.txt (nothing started)
+   [window-s5] exit 3
+== PINS-S5.txt missing : exit 3
+   [window-s5] PINS-S5.txt missing
+   [window-s5] refused: rated files do not match PINS-S5.txt (nothing started)
+   [window-s5] exit 3
+
+## 3. Static plan (run-matrix Read-Matrix/Build-Plan/Get-PlanLines evaluated in-process; scratch plan-static.ps1)
+cold     ship60 (build/agent2/devfinal2-bin), nat60 (build/agent2/nativefinal2-bin), n4bp60 (build/agent16/pack/native4bp-bin): unscored, before round 1 (warm-up 60 s, window 100 s)
+round 1  ship60 nat60 n4bp60 natU
+round 2  nat60 n4bp60 natU ship60
+round 3  n4bp60 ship60 nat60
+round 4  ship60 nat60 n4bp60
+order    ship60 nat60 n4bp60 natU | nat60 n4bp60 natU ship60 | n4bp60 ship60 nat60 | ship60 nat60 n4bp60
+estimate 17 runs (3 cold), about 94 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+   1 cold-ship60      250
+   2 cold-nat60       250
+   3 cold-n4bp60      250
+   4 ship60-r1        347
+   5 nat60-r1         347
+   6 n4bp60-r1        347
+   7 natU-r1          347
+   8 nat60-r2         347
+   9 n4bp60-r2        347
+  10 natU-r2          347
+  11 ship60-r2        347
+  12 n4bp60-r3        347
+  13 ship60-r3        347
+  14 nat60-r3         347
+  15 ship60-r4        347
+  16 nat60-r4         347
+  17 n4bp60-r4        347
+total 5608 s = 93.5 min; worst case (every cooldown hits its 90 s timeout instead of the 45 s estimate) 6373 s = 106.2 min
+errors: 0
+
+## 4. Day launcher state mid-window
+window-s5.ps1:63-67 reads bench\agent5\day\status\state.txt once, before run-matrix starts; refuses only on waiting-for-quiet / running.
+run-matrix.ps1 per-run guard (L741-742) checks only legodimensions.exe (wait <= 90 s, else that run SKIPPED); run-timing.ps1 and score3d.py never read launcher state or processes. A launcher state change or exit (20:00 end-by) mid-window cannot abort, refuse or VOID a run.
+Build tools (Get-BuildProcs, run-timing.ps1:497-500) running during a warm-up/window set valid_timing=False on that run (flag, not VOID).

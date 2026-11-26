@@ -1,0 +1,149 @@
+diff --git a/v1/dump6_post.py b/dump6_post.py
+index a406909..2320a8f 100644
+--- a/v1/dump6_post.py
++++ b/dump6_post.py
+@@ -17,6 +17,12 @@
+ #              event of the same stage with the same guest, or with physical == the target's backing address from a
+ #              game.log `placement ... shader 0x<guest> backing 0x<phys> ... missing from AOT index` line (capped at
+ #              16 lines). physical_hash only joins identity events to each other (listed); it NEVER covers a target.
++#              v2 (B-N1 + C-S1, M10 dump6-stepC-rating B0A9B0C6 / dump6-B-review 2090CDB5): each target line also gives
++#              its TRUE first row (any unrecognized_shader / draw_missing_* row of that stage+guest anywhere in the
++#              trace, not clipped at the window start) and every matching identity time. A guest match is C-S1 OK
++#              only if some matching identity is at >= true first row - 1 s (else EARLY); a backing match is OK at any
++#              time. CAP: identity events >= 256 (the capture cap) flags EVERY match. A flagged match is still
++#              listed as matched, but its window and the RESULT can be at most PARTIAL.
+ # D4 files   : per identity: placement-containers\{vs,ps}-<container_hash:016X>.bin exists, size == virtual_bytes +
+ #              4 + physical_bytes, the 4 marker bytes == virtual header bytes 8..11, sha256 listed. No xxhash module
+ #              is installed, so container_hash itself is NOT recomputed (name + size + marker + sha256 only).
+@@ -27,8 +33,9 @@
+ #              L587-589): expect unique (stage, prefix) files, <= 1 per stage for the zero bucket, not 1 per
+ #              identity. Root files: expect the 2 boot files (ps-93B9F93B535E7CCA, vs-A58EBA123EFB541C); others listed.
+ # RESULT, first match wins: INVALID (--fp given and not in game.log) | INCONCLUSIVE (D1 failed, or no target rows
+-#              at >= red + 40 s) | NOT-REACHED (D2 failed) | COVERED (every VS and PS target matched AND D4 passed)
+-#              | PARTIAL (some targets matched, or all matched but D4 failed) | NOT-COVERED (no target matched).
++#              at >= red + 40 s) | NOT-REACHED (D2 failed) | COVERED (every VS and PS target matched, no C-S1 flag,
++#              AND D4 passed) | PARTIAL (some targets matched, or all matched but D4 failed or a match is C-S1
++#              flagged) | NOT-COVERED (no target matched).
+ #              Plus a W1/W2 split line. Exit 0 for COVERED, 1 otherwise, 2 = refused.
+ import argparse, collections, ctypes, datetime, hashlib, json, os, re, sys
+ 
+@@ -45,6 +52,7 @@ RED = re.compile(r'^\[(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d{3})\].*Toypad: pad 1 m
+ BACK = re.compile(r'placement (vertex|pixel) shader 0x([0-9A-Fa-f]{8}) backing 0x([0-9A-Fa-f]{8})'
+                   r'(?: prefix=0x([0-9A-Fa-f]{16}))?.*missing from AOT index')
+ SIDE_RED = re.compile(r'^(\d\d:\d\d:\d\d\.\d{3}) alert pad 1 lit FF 00 00 speed 18')
++CAPN = 256                                  # process-wide capture cap (snap1 shaders.cpp 9567FE3F L161, L192)
+ 
+ 
+ def sha(p):
+@@ -84,6 +92,7 @@ def scan(path, red, w1lo, w2lo):
+     pairs = {'W1': {}, 'W2': {}}            # win -> (last VS, last PS) -> [draws, VSmiss, PSmiss, first ms, last ms]
+     last = {6: None, 7: None}
+     idents = []
++    allfirst = {}                           # (stage, guest) -> first row ms anywhere in the trace (B-N1)
+     with open(path, 'rb') as f:
+         for l in f:
+             p = l.rstrip(b'\r\n').split(b'\t', 4)
+@@ -119,6 +128,7 @@ def scan(path, red, w1lo, w2lo):
+                 g = d.get('guest_vs' if st == 6 else 'guest_ps')
+                 if g is None:
+                     continue
++            allfirst.setdefault((st, g), ts)
+             if ts < t1:
+                 if e != b'unrecognized_shader':
+                     early_miss += 1
+@@ -133,7 +143,7 @@ def scan(path, red, w1lo, w2lo):
+                 q[1 if st == 6 else 2] += 1
+                 q[4] = ts
+     return dict(frames=frames, last_ms=last_ms, last_fr=last_fr, inserts=inserts, early_miss=early_miss,
+-                targets=targets, pairs=pairs, idents=idents)
++                targets=targets, pairs=pairs, idents=idents, allfirst=allfirst)
+ 
+ 
+ def red_ms(log, trace):
+@@ -258,11 +268,13 @@ def main():
+ 
+     # ---- D3
+     w('')
+-    split, matched_all, unmatched_all, used = {}, [], [], []
++    cap = len(ids) >= CAPN
++    split, matched_all, unmatched_all, flagged_all, used = {}, [], [], [], []
+     for win in ('W1', 'W2'):
+         T = R['targets'][win]
+-        w('D3 %s targets (stage guest: unrecognized rows, draw_missing rows, first..last red+s; match)' % win)
+-        mt = []
++        w('D3 %s targets (stage guest: unrecognized rows, draw_missing rows, first..last red+s; match; true first row; '
++          'identity times; C-S1)' % win)
++        mt, nf = [], 0
+         for (st, g), (nu, nd, f0, f1) in sorted(T.items(), key=lambda x: (x[0][0], x[1][2])):
+             b = back.get((st, g))
+             hit = [d for d in ids if d.get('stage') == st and d.get('guest') == g]
+@@ -270,13 +282,28 @@ def main():
+             if not hit and b:
+                 hit = [d for d in ids if d.get('stage') == st and d.get('physical') == b[0]]
+                 how = 'backing %08X' % b[0]
++            tf = R['allfirst'].get((st, g), f0)
+             mt.append(bool(hit))
+             (matched_all if hit else unmatched_all).append('%s %s %08X' % (win, ST[st], g))
+             used += hit
+-            w('   %s %08X: %d, %d, %+.1f..%+.1f  %s' % (
++            if hit:
++                fl = []
++                if how == 'guest' and not any(d['ms'] >= tf - 1000.0 for d in hit):
++                    fl.append('EARLY')
++                if cap:
++                    fl.append('CAP')
++                if fl:
++                    nf += 1
++                    flagged_all.append('%s %s %08X %s' % (win, ST[st], g, '+'.join(fl)))
++                cs1 = '; true first red%+.1f s; identity at %s; C-S1 %s' % (
++                    (tf - red) / 1000.0, ', '.join('red%+.1f s' % ((d['ms'] - red) / 1000.0) for d in hit),
++                    ' '.join(fl) if fl else ('OK (backing)' if how != 'guest' else 'OK'))
++            else:
++                cs1 = '; true first red%+.1f s' % ((tf - red) / 1000.0)
++            w('   %s %08X: %d, %d, %+.1f..%+.1f  %s%s' % (
+                 ST[st], g, nu, nd, (f0 - red) / 1000.0, (f1 - red) / 1000.0,
+                 'MATCHED by %s -> container %s' % (how, ','.join('%016X' % d.get('container_hash', 0) for d in hit))
+-                if hit else 'UNMATCHED%s' % (' (backing %08X known, no identity with it)' % b[0] if b else '')))
++                if hit else 'UNMATCHED%s' % (' (backing %08X known, no identity with it)' % b[0] if b else ''), cs1))
+         w('   pairs at draw_missing rows (last unrecognized VS, PS): draws VSmiss PSmiss first..last red+s')
+         for (v, p_), (c, x, y, f0, f1) in sorted(R['pairs'][win].items(), key=lambda x: -x[1][0]):
+             fm = lambda z: '%08X' % z if z is not None else '-'
+@@ -286,10 +313,10 @@ def main():
+             split[win] = 'NOT-REACHED'
+         elif not T:
+             split[win] = 'NO-TARGETS'
+-        elif all(mt):
++        elif all(mt) and not nf:
+             split[win] = 'COVERED'
+         elif any(mt):
+-            split[win] = 'PARTIAL (%d/%d)' % (sum(mt), len(mt))
++            split[win] = 'PARTIAL (%d/%d%s)' % (sum(mt), len(mt), '; C-S1 flagged %d' % nf if nf else '')
+         else:
+             split[win] = 'NOT-COVERED (0/%d)' % len(mt)
+ 
+@@ -372,6 +399,8 @@ def main():
+ 
+     # ---- RESULT
+     w('')
++    w('C-S1: identity events %d (capture cap %d): %s; flagged matches: %s' % (
++        len(ids), CAPN, 'CAP' if cap else 'below cap', ', '.join(flagged_all) if flagged_all else 'none'))
+     w('W1/W2 split: W1 %s; W2 %s' % (split['W1'], split['W2']))
+     ntg = len(matched_all) + len(unmatched_all)
+     if bad_fp:
+@@ -382,12 +411,12 @@ def main():
+         res = 'INCONCLUSIVE (no target rows at >= red + %.0f s)' % a.w1_s
+     elif not d2:
+         res = 'NOT-REACHED (stop red + %.1f s < red + %.0f s)' % (reach, a.reach_s)
+-    elif not unmatched_all and d4:
+-        res = 'COVERED (%d/%d targets matched; D4 PASS)' % (len(matched_all), ntg)
++    elif not unmatched_all and d4 and not flagged_all:
++        res = 'COVERED (%d/%d targets matched; D4 PASS; C-S1 0 flagged)' % (len(matched_all), ntg)
+     elif matched_all:
+-        res = 'PARTIAL (%d/%d targets matched%s%s)' % (
++        res = 'PARTIAL (%d/%d targets matched%s%s%s)' % (
+             len(matched_all), ntg, '; unmatched: ' + ', '.join(unmatched_all) if unmatched_all else '',
+-            '' if d4 else '; D4 FAIL')
++            '' if d4 else '; D4 FAIL', '; C-S1 flagged: ' + ', '.join(flagged_all) if flagged_all else '')
+     else:
+         res = 'NOT-COVERED (0/%d targets matched; unmatched: %s)' % (ntg, ', '.join(unmatched_all))
+     res += '; W1 %s, W2 %s' % (split['W1'], split['W2'])

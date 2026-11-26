@@ -1,0 +1,40 @@
+﻿=== timing matrix: S5 Phase 0.3 baseline: gameplay route (attract-long pad), 3D-only score; ship60, nat60, n4bp60 x4 at cap60 + natU x2 (info) ===
+matrix   <workspace>\build\agent8\s5\matrix-s5-baseline.json
+note     Every run: attract-long.txt virtual-pad route (START, A, A, then idle: the attract 3D sequence), run ends at first frame + 270 s (warm-up 90 + window 180; about 274 s from launch, M12 gate needs >= 270).
+note     Score = score3d.py: 3D reached = first frame with >= 600 draws (else VOID); window starts at the sustained anchor = first frame of >= 1.0 s with every frame >= 1500 draws (M12 S5-GATES; launch clock xenos 107.98 s, native 125.49 s in the smoke runs, offsf 128.48 s) and spans 120 s of frames (short = VOID); run.json gets window_start_s + effective_cap.
+note     Thermals: before each run wait until the GPU is below 72 C (NVML, timeout 90 s, flag cooldown_timeout; idle floor was 68-71 C at P8 at 17:38, 58 C at 16:47; 3D runs 77-87 C); gpu.csv 1 Hz; thermal-limited share per run in results.csv (gpu_thermal_share).
+note     Pinned bins, never modified: devfinal2-bin MANIFEST 4A4A13ED, nativefinal2-bin MANIFEST 4E5E2620 (build/agent2/final2/BIN-PINS.md), native4bp-bin MANIFEST C5181520 (build/agent16/pack, Overseer 17:51). One unscored cold run per bin before round 1, long enough (first frame + 160 s) to pass the 3D anchor so the driver-level shader cache has seen the 3D scene; every run has its own user_data_root, so no run reuses another run's game shader/PSO cache.
+settings warm-up from firstframe (boot timeout 240 s, settle 0 s); order roundrobin; close timeout 60 s; cooldown 10 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+s5       gpu.csv ON (NVML 1 Hz); cooldown until GPU < 72 C (timeout 90 s, estimate 45 s per run); 3D score: reached >= 600 draws, start >= 1500 draws, span 120 s (score3d.py; VOID if not reached or short)
+arms:
+       ship60: bin build/agent2/devfinal2-bin; frames perf; x4; warm-up 90 s; window 180 s; group base (ref); cap framerate_limit=60; input attract-long.txt
+         Xenos ship default arm, framerate_limit=60
+       nat60: bin build/agent2/nativefinal2-bin; frames native; x4; warm-up 90 s; window 180 s; group base; cap native_fps_limit=60; input attract-long.txt
+         native default arm, native_fps_limit=60 (build default 240)
+       n4bp60: bin build/agent16/pack/native4bp-bin; frames native; x4; warm-up 90 s; window 180 s; group base; cap native_fps_limit=60; input attract-long.txt
+         native4bp (nativefinal2 + AOT placement pack, fingerprint 39129c4c059be5f0), native_fps_limit=60
+       natU: bin build/agent2/nativefinal2-bin; frames native; x2; warm-up 90 s; window 180 s; group base; cap native_fps_limit=0 (UNCAPPED); input attract-long.txt
+         native UNCAPPED arm, native_fps_limit=0 (device.cpp:1802 if (limit <= 0) return; vsync off by default); info only, x2
+cold     ship60 (build/agent2/devfinal2-bin), nat60 (build/agent2/nativefinal2-bin), n4bp60 (build/agent16/pack/native4bp-bin): unscored, before round 1 (warm-up 60 s, window 100 s)
+round 1  ship60 nat60 n4bp60 natU
+round 2  nat60 n4bp60 natU ship60
+round 3  n4bp60 ship60 nat60
+round 4  ship60 nat60 n4bp60
+order    ship60 nat60 n4bp60 natU | nat60 n4bp60 natU ship60 | n4bp60 ship60 nat60 | ship60 nat60 n4bp60
+estimate 17 runs (3 cold), about 94 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\Default -> interactive desktop: timing can be valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   14.58 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent16/pack/native4bp-bin : ok (MANIFEST.txt)
+bin        build/agent2/devfinal2-bin : ok (MANIFEST.txt)
+bin        build/agent2/nativefinal2-bin : ok (MANIFEST.txt)
+screensaver none
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   17 runs, about 94 min: done around 19:38
+keep-awake ON (SetThreadExecutionState continuous+system+display until the matrix ends)

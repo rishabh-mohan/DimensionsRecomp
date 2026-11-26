@@ -1,0 +1,104 @@
+# sync_smoke_post 2026-11-25 17:58:19
+--- OFF arm <workspace>\build\agent2\s5\sync-smoke\runs\20261125-174932-s5sync-off
+bin <workspace>\build\agent2\s5\devs5sync-bin exe 6C8E281156CCE828 cvars {}
+  | # smoke3d_post 2026-11-25 17:58:20 (check-defaults <workspace>\build\agent2\final\check-defaults.py)
+  | == arm xenos: <workspace>\build\agent2\s5\sync-smoke\runs\20261125-174932-s5sync-off
+  | INFO bin <workspace>\build\agent2\s5\devs5sync-bin; exe sha256 6C8E281156CCE828; desktop Default; started 2026-11-25T17:49:33.5202001-06:00; elapsed 241.63 s; seconds_requested 240
+  | PASS clean exit: exit 0x00000000 early False close wm_close 1.39 s wer False crash_events 0 dumps 0
+  | PASS plain default (no cvars; env only harness LEGO_NATIVE_FRAME_METRICS/AGENT3_VPAD): cvars {} env ['AGENT3_VPAD', 'LEGO_NATIVE_FRAME_METRICS']
+  | PASS no extra game args: none
+  | PASS route: pad loaded by the game, no error/timeouts, first frame + START/A/A ok: steps_done 43/91 last halted; marks 20 (last idle-150); presses START:ok x1 A:ok x1 A:ok x1; pad_active_reads 38; close at 240.1 s
+  | PASS route: steps ran up to the close (a step within 12 s of the close): last row t=241.60 end 
+  | INFO game log files game.log, 244 lines
+  | PASS first 3D (perf.csv draw_calls >= 600): at perf 90.7 s, frame 5424, 625 draws; max draws 15966 over 9483 frames / 236.7 s
+  | PASS first 3D + >= 60 s of run after it: perf 146.0 s after first 3D
+  | PASS no game.log line with d3d12_pipeline_creation_no_wait: 0
+  | --- check-defaults --mode xenos (exit 0)
+  | log:  <workspace>\build\agent2\s5\sync-smoke\runs\20261125-174932-s5sync-off\game.log
+  | mode: xenos
+  | key                                    value    source
+  | physical_protect_hold_global_lock      true     default
+  | physical_protect_keep_watch            true     default
+  | host_timer_resolution_ms               1        default
+  | host_timer_throttling_optout           true     default
+  | precise_guest_sleep                    true     default
+  | wait_timeout_round_up                  true     default
+  | cs_spin                                true     default
+  | spinlock_pause_spin                    true     default
+  | clock_lockfree                         true     default
+  | tls_bounds_fix                         true     default
+  | timer_queue_precise_wait               true     default
+  | shared_memory_single_hold_rearm        true     default
+  | physical_protect_keep_watch_verify     false    default
+  |   ok   1 ms timer line: 1 (want 1) 'Host timer resolution set to 1 ms (background opt-out on)'
+  |   ok   C1 keep-watch on line: 1 (want 1) 'C1 keep-watch: on (with physical_protect_hold_global_lock)'
+  |   ok   TimerQueue precise line: 1 (want 1) 'TimerQueue: precise wait (timer_queue_precise_wait)'
+  |   ok   back-off ON 500/30, stats OFF, GetData hook line: 1 (want 1) 'GPU wait back-off: ON (quantum 500 us, spin 30 us); stats OFF; GetData hook built.'
+  |   ok   back-off lines of any kind: 1 (want 1) 'GPU wait back-off:'
+  |   ok   back-off OFF line: 0 (want 0) 'GPU wait back-off: OFF'
+  |   ok   bad string 'Recovered stale physical page protection': 0
+  |   ok   bad string 'Unhandled guest physical write fault': 0
+  |   ok   bad string 'PhysicalHeap::Protect failed': 0
+  |   ok   bad string 'is not a plain number': 0
+  |   ok   bad string 'C1 verify: on': 0
+  | RESULT PASS
+  | PASS check-defaults --mode xenos PASS: exit 0
+  | ARM xenos: ALL PASS
+  | 
+  | RESULT: ALL PASS
+PASS  OFF smoke3d_post.py (clean exit, plain default, route, first 3D, check-defaults) exit 0  [exit 0]
+logs ['game.log'], 244 lines
+PASS  D3 OFF: 0 Initialize lines (d3d12_log_sync_pipeline_creation:)  [0]
+PASS  D3 OFF: 0 'sync pipeline #' lines  [0]
+
+--- ON arm <workspace>\build\agent2\s5\sync-smoke\runs\20261125-175402-s5sync-on
+bin <workspace>\build\agent2\s5\devs5sync-bin exe 6C8E281156CCE828 cvars {'d3d12_log_sync_pipeline_creation': 'true', 'slow_frame_log_ms': '1'}
+PASS  ON clean exit (run.json exit_code 0, not early, wm_close)  [exit 0x00000000 early False close wm_close]
+PASS  ON cvars: d3d12_log_sync_pipeline_creation=true (+ slow_frame_log_ms only)  [{'d3d12_log_sync_pipeline_creation': 'true', 'slow_frame_log_ms': '1'}]
+logs ['game.log'], 9429 lines
+PASS  D3 ON: the Initialize line exactly once  [1; peline_creation: logging pipelines created on the GPU command thread (async_shader_compilation true, 9 creation threads)]
+PASS  ON check-defaults --mode xenos PASS  [exit 0; RESULT PASS]
+
+=== ATTRIBUTION ONLY (D2): d3d12_log_sync_pipeline_creation=true perturbs timing; counts and joins only ===
+sync lines logged 45; last #45, last total 879.9 ms, suppressed 0
+per-create ms: min 0.0 median 8.4 p90 56.9 max 135.1 sum(logged) 879.8
+reason:       no pixel shader 45
+pixel shader: none 45
+RT path:      host render targets 45
+state:        ok 45
+host prim:    4 34, 1 6, 8 5
+host vs type: 0 45
+memexport: vs!=0 1, ps!=0 0
+distinct pipelines 45, distinct vs 27
+slowest 10:
+  line 7854 #20 7AA6D114E7912C42 135.1 ms (no pixel shader) vs 33A70FFABED3D898 ps none rt bits 3 mask 0 z 1/1 prim 4
+  line 7856 #22 0CB98C1677CD8127 88.2 ms (no pixel shader) vs BF22BB71E1B4DE51 ps none rt bits 3 mask 0 z 1/1 prim 4
+  line 7855 #21 6B59D43C78316E1F 61.3 ms (no pixel shader) vs 4823A7F1CF5ADB82 ps none rt bits 3 mask 0 z 1/1 prim 4
+  line 7849 #15 D2162F4D99D67A6B 58.5 ms (no pixel shader) vs 29B963D3D7898CF7 ps none rt bits F mask 0 z 1/0 prim 4
+  line 7980 #26 7F1F827DDF17F5D4 56.9 ms (no pixel shader) vs 7D406D09F4D7C5EC ps none rt bits 3 mask 0 z 1/1 prim 4
+  line 7853 #19 F34921DD3C7FB59F 56.3 ms (no pixel shader) vs 4A60DD3C36C67DD8 ps none rt bits 3 mask 0 z 1/1 prim 4
+  line 7850 #16 248F3F28CF3F509A 46.3 ms (no pixel shader) vs 8F39BF1A89201D66 ps none rt bits F mask 0 z 1/0 prim 4
+  line 9254 #45 A6AC70160097BCC7 42.1 ms (no pixel shader) vs 4BF540A5EFB50EDF ps none rt bits 3 mask 0 z 1/1 prim 4
+  line 1842 #6 2663D413C6695F7E 37.1 ms (no pixel shader) vs 9E10D1C39A24E18B ps none rt bits 3 mask 0 z 1/0 prim 1
+  line 7979 #25 58E94033E129AE6A 29.3 ms (no pixel shader) vs F447C2D10536589E ps none rt bits 3 mask 0 z 1/1 prim 4
+slow frames with pipeline create > 0: 16 (slow-frame lines total 9140)
+top 15 by pipeline-create ms: frame ms | create ms (Nx) | joined sync lines: n, sum ms, ps none, reasons
+  line 7857 frame #7601 945.7 ms | create 458.5 (8x) new 67 | sync 8, 458.6 ms, ps none 8, {'no pixel shader': 8}
+  line 8036 frame #7760 196.0 ms | create 118.1 (10x) new 27 | sync 10, 118.0 ms, ps none 10, {'no pixel shader': 10}
+  line 7981 frame #7720 126.9 ms | create 86.2 (2x) new 15 | sync 2, 86.2 ms, ps none 2, {'no pixel shader': 2}
+  line 7987 frame #7723 97.5 ms | create 59.9 (3x) new 12 | sync 3, 59.9 ms, ps none 3, {'no pixel shader': 3}
+  line 9255 frame #8970 95.7 ms | create 42.1 (1x) new 5 | sync 1, 42.1 ms, ps none 1, {'no pixel shader': 1}
+  line 1843 frame #1736 57.9 ms | create 37.1 (1x) new 1 | sync 1, 37.1 ms, ps none 1, {'no pixel shader': 1}
+  line 6484 frame #6239 201.3 ms | create 29.2 (4x) new 23 | sync 4, 29.2 ms, ps none 4, {'no pixel shader': 4}
+  line 8104 frame #7827 225.5 ms | create 24.2 (1x) new 3 | sync 1, 24.2 ms, ps none 1, {'no pixel shader': 1}
+  line 6124 frame #5884 333.3 ms | create 17.6 (4x) new 21 | sync 4, 17.7 ms, ps none 4, {'no pixel shader': 4}
+  line 8012 frame #7746 71.2 ms | create 0.3 (2x) new 4 | sync 2, 0.3 ms, ps none 2, {'no pixel shader': 2}
+  line 7876 frame #7619 115.6 ms | create 0.2 (1x) new 1 | sync 1, 0.2 ms, ps none 1, {'no pixel shader': 1}
+  line 7945 frame #7686 37.6 ms | create 0.2 (1x) new 1 | sync 1, 0.2 ms, ps none 1, {'no pixel shader': 1}
+  line 8119 frame #7841 121.8 ms | create 0.2 (1x) new 1 | sync 1, 0.2 ms, ps none 1, {'no pixel shader': 1}
+  line 8296 frame #8017 57.5 ms | create 0.2 (1x) new 1 | sync 1, 0.2 ms, ps none 1, {'no pixel shader': 1}
+  line 60 frame #2 21.1 ms | create 0.0 (2x) new 3 | sync 4, 5.7 ms, ps none 4, {'no pixel shader': 4}
+frames with create >= 100 ms: 2; count match (Nx == joined sync lines) 2; all no-PS 2
+sync lines not before any slow frame with create > 0: 0
+
+RESULT: PASS

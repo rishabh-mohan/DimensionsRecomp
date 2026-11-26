@@ -1,0 +1,301 @@
+﻿diff --git "a/bench\\agent8\\run\\run-timing.ps1" "b/build\\agent8\\s5\\run-timing.ps1"
+index f86673c..acf0f39 100644
+--- "a/bench\\agent8\\run\\run-timing.ps1"
++++ "b/build\\agent8\\s5\\run-timing.ps1"
+@@ -6,6 +6,8 @@
+ #       [-Driver script.ps1 [-DriverArgs 'a;b'] [-DriverTimeoutSec 120]] [-Frames perf|native]
+ #       [-SeedCache <run dir or dir> [-SeedRecipesOnly]] [-TriggerAtMeasure 'path;path']
+ #       [-SysCsv] [-MinWindowAfterFirstFrame 60] [-LightMs 4.5]
++#       [-InputScript harness\routes\attract-long.txt [-VPadDll build\agent3\vpad\xinput1_4.dll]]
++#       [-GpuLog] [-CooldownTempC 60 [-CooldownTimeoutSec 600] [-CooldownPollSec 5]]
+ # With powershell -File, list items are separated with ';' (a ',' stays part of the value).
+ # Placeholder <run> = the run dir, in -Cvar/-Env/-Toml values, -DriverArgs and -TriggerAtMeasure (toml values get
+ # forward slashes, so a path inside a TOML "..." string needs no escaping); run.json keeps both forms.
+@@ -37,6 +39,24 @@
+ #   (checked every 5 s) also make the run FUNCTIONAL ONLY (valid_timing false).
+ #   Dumps of other processes (<exe>.<pid>.dmp that is not legodimensions.exe.<this pid>) are foreign_crash_dumps,
+ #   not a problem.
++# -InputScript (Agent 3's virtual XInput pad, harness\vpad; port of harness\run-game.ps1 -InputScript): -VPadDll
++#   (default build\agent3\vpad\xinput1_4.dll) is copied into the run dir only; the game loads it and reads the pad
++#   state file <run>\vpad-state.bin (env AGENT3_VPAD; --input_backend=xinput is added unless an arg sets
++#   input_backend). The script (syntax in harness\vpad\vpadhost.cs) runs on a background thread from the process
++#   start: input.csv gets one row per step, the proc.csv notes get the step changes. No system input, so the sys
++#   flags are unaffected. The window still decides the end: a script 'stop' is only noted, and the steps are halted
++#   when the loop ends. Not started (exit 1): missing script or DLL, bad script, a bin dir with its own
++#   xinput1_4.dll, or a pad host already used in this PowerShell process that has no ResetRun (vpadhost.cs before
++#   Agent 3's reset patch; run-matrix.ps1 runs in-process). Problems: script error, timed-out waits, pad never read.
++#   Scripts with wait_log want -Cvar log_flush_interval=1 (run-game.ps1 passes it; attract-long.txt has no wait_log).
++# S5 (Agent 8, staged in build\agent8\s5):
++#   -GpuLog: <run>\gpu.csv, one NVML row per 1 s pass from the process start (harness\nvml.cs, as run-game.ps1
++#   -GpuLog): t_s (this runner's clock, 0 = process start, same as proc.csv / input.csv),pstate,gr_mhz,mem_mhz,
++#   temp_c,power_w,util_gpu,util_mem,throttle (0x1 idle, 0x4 sw power cap, 0x8 hw slowdown, 0x20/0x40 sw/hw
++#   thermal),epoch_s. No NVML = a note and run.json gpu_log.error; the run goes on.
++#   -CooldownTempC C (0 = off): before the run dir is created, poll the GPU temperature every -CooldownPollSec s
++#   until it is below C; after -CooldownTimeoutSec s start anyway with flag cooldown_timeout (no sensor:
++#   cooldown_no_sensor). run.json cooldown = set point, temps before/at start, waited s, flag.
+ # Exit codes: 0 ok, 1 run problem (died/hung/killed/no frames/no first frame/missing seed file), 3 not started (RAM).
+ param(
+     [string]$BinDir = 'build\baseline-bin',
+@@ -66,7 +86,13 @@ param(
+     [string[]]$TriggerAtMeasure = @(),
+     [switch]$SysCsv,
+     [double]$MinWindowAfterFirstFrame = 0,
+-    [double]$LightMs = 4.5
++    [double]$LightMs = 4.5,
++    [string]$InputScript = '',
++    [string]$VPadDll = '',
++    [switch]$GpuLog,
++    [double]$CooldownTempC = 0,
++    [int]$CooldownTimeoutSec = 600,
++    [int]$CooldownPollSec = 5
+ )
+ $ErrorActionPreference = 'Stop'
+ . "$PSScriptRoot\common.ps1"
+@@ -146,8 +172,65 @@ if ($SeedCache) {
+     if ($missing.Count) { "!!! SEED CACHE: missing $($missing -join ', ') in $seedSrc (from -SeedCache $SeedCache): game not started"; exit 1 }
+ }
+ 
++# -InputScript: check before anything is created (a missing script or pad DLL, a bad script, a bin dir with its own
++# xinput1_4.dll or a used pad host that cannot reset = not started, exit 1).
++$inputScriptRaw = $InputScript; $vpadDllRaw = $VPadDll
++$inputInfo = $null; $inputStarted = $false; $lastInput = ''; $inputStop = $false
++$padDll = $null; $padState = $null; $inputCsv = $null
++if ($InputScript) {
++    $InputScript = Abs-Path $InputScript
++    $VPadDll = Abs-Path $(if ($VPadDll) { $VPadDll } else { 'build\agent3\vpad\xinput1_4.dll' })
++    $inErr = $null
++    if (-not (Test-Path -LiteralPath $InputScript -PathType Leaf)) { $inErr = "no script $InputScript" }
++    elseif (-not (Test-Path -LiteralPath $VPadDll -PathType Leaf)) { $inErr = "no pad DLL $VPadDll (build it: harness\vpad\build-vpad.ps1)" }
++    elseif (Test-Path -LiteralPath (Join-Path (Resolve-RepoPath $BinDir) 'xinput1_4.dll')) { $inErr = "REFUSED: $BinDir has its own xinput1_4.dll" }
++    else {
++        if (-not ('Agent3Input' -as [type])) { Add-Type -Path (Join-Path $repoRoot 'harness\vpad\vpadhost.cs') }
++        if ($null -ne [Agent3Input].GetMethod('ResetRun')) { $inErr = [Agent3Input]::ResetRun() }
++        elseif ([Agent3Input]::Status() -ne 'not started') {
++            $inErr = 'the pad host was already used in this PowerShell process and this vpadhost.cs has no ResetRun (run-matrix.ps1 calls run-timing.ps1 in-process): run each -InputScript run in its own powershell.exe'
++        }
++        if (-not $inErr) { $inErr = [Agent3Input]::Load($InputScript) }
++    }
++    if ($inErr) { "!!! INPUT SCRIPT: $inErr; game not started"; exit 1 }
++    if (@(Select-String -LiteralPath $InputScript -Pattern '^\s*wait_log\b').Count -and -not @($cvarRaw | Where-Object { $_ -match '^-*log_flush_interval=' }).Count) {
++        "note: the input script has wait_log steps; without -Cvar log_flush_interval=1 they see game.log late (run-game.ps1 passes --log_flush_interval=1)"
++    }
++}
++
++# S5: NVML for -GpuLog / -CooldownTempC (opened once per run; closed after the game exits).
++$nvmlErr = $null; $nvmlOpen = $false; $gpuW = $null; $gpuRows = 0; $gpuCsv = $null; $cool = $null
++function Get-GpuTempC { try { $f = ([string][LdNvml]::Sample()).Split(','); if ($f.Count -ge 4 -and $f[3]) { return [int]$f[3] } } catch { }; return $null }
++if ($GpuLog -or $CooldownTempC -gt 0) {
++    try {
++        if (-not ('LdNvml' -as [type])) { Add-Type -Path (Join-Path $repoRoot 'harness\nvml.cs') }
++        $nvmlErr = [LdNvml]::Open()
++    } catch { $nvmlErr = $_.Exception.Message }
++    $nvmlOpen = -not $nvmlErr
++    if ($nvmlErr) { "note: NVML unavailable ($nvmlErr): no gpu.csv, no cooldown" }
++}
++if ($CooldownTempC -gt 0) {
++    $coolSw = [Diagnostics.Stopwatch]::StartNew(); $coolFlag = $null
++    $tBefore = if ($nvmlOpen) { Get-GpuTempC } else { $null }; $tNow = $tBefore
++    if ($null -eq $tNow) { $coolFlag = 'cooldown_no_sensor' }
++    else {
++        if ($tNow -ge $CooldownTempC) { "cooldown: GPU $tNow C, waiting for < $CooldownTempC C (timeout $CooldownTimeoutSec s)" }
++        while ($tNow -ge $CooldownTempC) {
++            if ($coolSw.Elapsed.TotalSeconds -ge $CooldownTimeoutSec) { $coolFlag = 'cooldown_timeout'; break }
++            Start-Sleep -Seconds ([math]::Max(1, $CooldownPollSec))
++            $tNow = Get-GpuTempC
++            if ($null -eq $tNow) { $coolFlag = 'cooldown_no_sensor'; break }
++        }
++    }
++    $cool = [ordered]@{ set_point_c = $CooldownTempC; timeout_s = $CooldownTimeoutSec; poll_s = $CooldownPollSec
++                        temp_before_c = $tBefore; temp_start_c = $tNow; waited_s = [math]::Round($coolSw.Elapsed.TotalSeconds, 1); flag = $coolFlag
++                        # M12 S5-GATES.md contract 2 names
++                        target_c = $CooldownTempC; start_c = $tBefore; end_c = $tNow; met = ($null -ne $tNow -and $tNow -lt $CooldownTempC); timed_out = ($coolFlag -eq 'cooldown_timeout') }
++    "cooldown: GPU $tBefore C -> $tNow C after $($cool.waited_s) s (set point < $CooldownTempC C)$(if ($coolFlag) { " FLAG $coolFlag" })"
++}
++
+ $free0 = Get-FreeRamGB
+-if ($free0 -lt $MinFreeRamGB) { "free RAM $free0 GB is under $MinFreeRamGB GB: not starting"; exit 3 }
++if ($free0 -lt $MinFreeRamGB) { if ($nvmlOpen) { [LdNvml]::Close() }; "free RAM $free0 GB is under $MinFreeRamGB GB: not starting"; exit 3 }
+ $run = New-RunDir -BinDir $BinDir -Tag $Tag -RunsRoot $RunsRoot
+ # <run> placeholder -> run dir (toml: forward slashes). The raw forms stay in run.json params.
+ function Expand-Run([string]$S, [string]$With) { if ([string]::IsNullOrEmpty($S)) { return $S }; return [regex]::Replace($S, '(?i)<run>', $With.Replace('$', '$$')) }
+@@ -172,6 +255,20 @@ if ($SeedCache) {
+     $seed = [ordered]@{ requested = $SeedCache; source_dir = $seedSrc; recipes_only = [bool]$SeedRecipesOnly; dest = $cacheDir; files = $sf }
+ }
+ $gameArgs = Get-GameArgs -Run $run -Cvar $Cvar
++if ($InputScript) {
++    # The pad: the DLL is copied into the run dir only (New-RunDir mirrors the MANIFEST files; this copy is never linked
++    # back into the bin dir); it maps vpad-state.bin (AGENT3_VPAD); input.csv gets one row per script step.
++    $padDll = Join-Path $run 'xinput1_4.dll'; $padState = Join-Path $run 'vpad-state.bin'; $inputCsv = Join-Path $run 'input.csv'
++    $inErr = [Agent3Input]::Start($InputScript, $padState, $inputCsv, (Join-Path $run 'game.log'), (Join-Path $run 'perf.csv'))
++    if ($inErr) { "!!! INPUT SCRIPT: $inErr; game not started (run dir $run)"; exit 1 }
++    $inputStarted = $true
++    Copy-Item -LiteralPath $VPadDll -Destination $padDll -Force
++    if (-not @($gameArgs | Where-Object { $_ -like '--input_backend=*' }).Count) { $gameArgs += '--input_backend=xinput' }
++    $envH['AGENT3_VPAD'] = $padState
++    $inputInfo = [ordered]@{ note = 'virtual XInput pad (harness\vpad, Agent 3): the game loads xinput1_4.dll from the run dir and reads vpad-state.bin; the script presses at fixed times; no system input'
++        script = $InputScript; script_sha256 = (Get-FileHash -LiteralPath $InputScript -Algorithm SHA256).Hash; steps_total = [Agent3Input]::StepsTotal
++        dll_source = $VPadDll; dll = $padDll; dll_sha256 = (Get-FileHash -LiteralPath $padDll -Algorithm SHA256).Hash; state_file = $padState; input_csv = $inputCsv }
++}
+ $trigger = Join-Path $run 'profile.trigger'
+ if ($Profile) { $envH['LEGO_SAMPLE_PROFILE'] = '1'; $envH['LEGO_SAMPLE_PROFILE_TRIGGER'] = $trigger }
+ $csvPath = if ($Frames -eq 'native') { Join-Path $run 'native-frames.csv' } else { Join-Path $run 'perf.csv' }
+@@ -192,6 +289,7 @@ if ($seed) { "seed cache: $(($seed.files | ForEach-Object { "$($_.name) $($_.byt
+ if ($fromFirst) { "warm-up from the first frame (boot timeout $BootTimeoutSec s): settle $SettleSec s$(if ($MenuText) { ", menu step $MenuSec s" }), warm-up $Warmup s, window $Seconds s" }
+ else { "warm-up $Warmup s from launch, window $Seconds s" }
+ "$(if ($Profile) { "profile trigger for the first $ProfileSeconds s of the window; " })free RAM $free0 GB"
++if ($inputInfo) { "input: $($inputInfo['script']) ($($inputInfo['steps_total']) steps) -> virtual pad $padDll (in the game process, run dir only; no system input); the window decides the end" }
+ 
+ $ncpu = [Environment]::ProcessorCount
+ $logC = New-LineCounter (Join-Path $run 'game.log')
+@@ -226,7 +324,17 @@ try {
+ $null = $p.Handle   # keep the handle so ExitCode stays readable after exit
+ $sw = [Diagnostics.Stopwatch]::StartNew()
+ $gamePid = $p.Id
++if ($inputStarted) { [Agent3Input]::Go($sw.Elapsed.TotalSeconds) }   # input.csv t_s on this clock (0 = process start)
+ "started pid $gamePid at $($start.ToString('HH:mm:ss.fff'))"
++if ($GpuLog -and $nvmlOpen) {
++    $gpuCsv = Join-Path $run 'gpu.csv'
++    try {
++        $gpuW = New-Object IO.StreamWriter($gpuCsv, $false, (New-Object Text.UTF8Encoding($false)))
++        $gpuW.NewLine = "`r`n"; $gpuW.AutoFlush = $true
++        $gpuW.WriteLine('t_s,pstate,gr_mhz,mem_mhz,temp_c,power_w,util_gpu,util_mem,throttle,epoch_s')
++        "gpu.csv: NVML $([LdNvml]::Name), 1 row per pass"
++    } catch { $gpuW = $null; $nvmlErr = "gpu.csv not creatable: $($_.Exception.Message)"; "!!! $nvmlErr" }
++}
+ # sys.csv sampler (-SysCsv): from now until the game exits (or <run>\sys.stop appears).
+ $sysDrv = $null; $sysInfo = $null; $sysErr = $null
+ $sysCsvPath = Join-Path $run 'sys.csv'; $sysStop = Join-Path $run 'sys.stop'
+@@ -395,6 +503,14 @@ try {
+         $s = $null
+         try { $s = Get-ProcSample $p } catch { }
+         if ($null -eq $s) { $tick--; continue }   # exited between the checks: the next pass records it
++        if ($inputStarted) {
++            $ist = [Agent3Input]::Status()
++            if ($ist -ne $lastInput) { $note = ($note + "; input $ist").TrimStart('; '); $lastInput = $ist }
++            if ([Agent3Input]::StopRequested -and -not $inputStop) {
++                $inputStop = $true; $note = ($note + '; input script stop').TrimStart('; ')
++                "input script: 'stop' at $t s (only noted: the window decides the end)"
++            }
++        }
+         $dCpu = $s.cpu_s - $prevCpu; $dT = $t - $prevT
+         $cores = if ($dT -gt 0) { $dCpu / $dT } else { 0 }
+         $prevCpu = $s.cpu_s; $prevT = $t
+@@ -425,12 +541,16 @@ try {
+                  (Fmt ($s.commit / 1MB) 0), (Fmt ($s.peak_commit / 1MB) 0), $s.threads, $s.handles, $s.responding,
+                  $logC.Lines, $bytes, (Fmt (Get-FreeRamGB) 2), ($note -replace ',', ';'))
+         Add-ProcRow ($row -join ',')
++        if ($gpuW) { try { $gpuW.WriteLine(('{0},{1},{2}' -f (Fmt $t 2), [LdNvml]::Sample(), (Fmt (Get-Epoch) 3))); $gpuRows++ } catch { } }
+         if (($tick % 10) -eq 0 -or $tick -eq $startTick -or $tick -eq $endTick) {
+             "t=$t s $phase cpu=$(Fmt $cores 2) cores ws=$(Fmt ($s.ws/1MB) 0) MB commit=$(Fmt ($s.commit/1MB) 0) MB $csvName=$bytes B log=$($logC.Lines)$(if ($note) { " [$note]" })"
+         }
+         if ($null -ne $mEnd -and $tick -ge $endTick) { break }
+     }
+ 
++    # Input script: halt the steps and release the pad when the loop ends (the game still runs; Finish after the close).
++    if ($inputStarted) { [Agent3Input]::Halt() }
++
+     # Driver: wait for it (it was started at the window start).
+     if ($drv) {
+         if (-not $drv.HasExited) { "waiting for the driver (pid $($drv.Id), up to $DriverTimeoutSec s)" }
+@@ -475,6 +595,7 @@ try {
+     $problems.Add("RUNNER ERROR: $runErr")
+ } finally {
+     if (-not $closedOk) {
++        if ($inputStarted) { try { [Agent3Input]::Halt() } catch { } }
+         if ($drv -and -not $drv.HasExited) { try { $drv.Kill() } catch { } }
+         if ($p -and -not $p.HasExited) {
+             Write-Host "!!! error or interrupt: closing the game (pid $gamePid; WM_CLOSE, up to $CloseTimeoutSec s, then kill)" -ForegroundColor Red
+@@ -483,7 +604,26 @@ try {
+         if ($Profile -and (Test-Path -LiteralPath $trigger)) { Remove-Item -LiteralPath $trigger -Force -ErrorAction SilentlyContinue }
+     }
+ }
++# Input script: final counters (the game has exited), the last input.csv row, release the state file.
++if ($inputStarted) {
++    try { $fin = [Agent3Input]::Finish(); foreach ($key in @($fin.Keys)) { $inputInfo[$key] = $fin[$key] } }
++    catch { $problems.Add("input script: Finish failed: $($_.Exception.Message)") }
++}
++# S5: close gpu.csv and NVML (the game has exited).
++if ($gpuW) { try { $gpuW.Close() } catch { } }
++if ($nvmlOpen) { try { [LdNvml]::Close() } catch { } }
++$gpuInfo = $null
++if ($GpuLog) { $gpuInfo = [ordered]@{ csv = $gpuCsv; rows = $gpuRows; device = $(if ($nvmlOpen) { [LdNvml]::Name } else { $null }); error = $nvmlErr
++                                      clock = 't_s = runner clock, 0 = process start (proc.csv/input.csv); epoch_s = wall' } }
+ $end = Get-Date
++# S5: crash events as harness\run-game.ps1 records them (Application log ids 1000/1001/1002/1026 naming the exe or pid),
++# for the run-game style compat fields in run.json (M12's s5_gates.py clean gate).
++$crashEvents = @()
++try {
++    $crashEvents = @(Get-WinEvent -FilterHashtable @{ LogName = 'Application'; StartTime = $start.AddSeconds(-2); Id = 1000, 1001, 1002, 1026 } -ErrorAction Stop |
++        Where-Object { $_.Message -match 'legodimensions\.exe' -or ($gamePid -and $_.Message -match "\b$gamePid\b") } |
++        ForEach-Object { $m = $_.Message -replace '\s+', ' '; [ordered]@{ id = $_.Id; provider = $_.ProviderName; time = $_.TimeCreated.ToString('o'); summary = $m.Substring(0, [math]::Min(300, $m.Length)) } })
++} catch { }
+ Start-Sleep -Seconds 2
+ Update-LineCounter $logC
+ $artifacts = @()
+@@ -589,6 +729,8 @@ if ($MinWindowAfterFirstFrame -gt 0 -and $null -ne $mStart -and ($null -eq $ffTo
+ if ($ticksSkippedWin -gt 0) { $flagsInfo.Add('ticks_skipped') }
+ if ($bpWarm.Count) { $flagsInfo.Add('build_procs_warmup') }
+ if ($bpWin.Count) { $flagsInfo.Add('build_procs_window') }
++if ($cool -and $cool.flag) { $flagsInfo.Add([string]$cool.flag) }
++if ($GpuLog -and -not $gpuRows) { $flagsInfo.Add('gpu_log_missing') }
+ $sysExcluding = @('input_during_window', 'not_foreground', 'on_battery', 'battery_saver', 'power_change', 'desktop_not_default', 'screensaver')
+ if ($SysCsv) {
+     if ($null -ne $sysSum -and $sysSum.PSObject.Properties['flags']) {
+@@ -627,6 +769,11 @@ if ($drvInfo) {
+     elseif ($drvInfo.killed) { $problems.Add("DRIVER KILLED: still running $DriverTimeoutSec s after the window") }
+     elseif ($null -ne $drvInfo.exit_code -and $drvInfo.exit_code -ne 0) { $problems.Add("driver exit $($drvInfo.exit_code)") }
+ }
++if ($inputInfo) {
++    if ($inputInfo['error']) { $problems.Add("INPUT SCRIPT ERROR: $($inputInfo['error'])") }
++    if ($inputInfo['timeouts'] -gt 0) { $problems.Add("INPUT SCRIPT: $($inputInfo['timeouts']) wait step(s) timed out (script lines $($inputInfo['timeout_lines']))") }
++    if ($null -ne $inputInfo['pad_reads'] -and $inputInfo['pad_reads'] -le 0) { $problems.Add('INPUT SCRIPT: the game never read the virtual pad (pad_reads 0)') }
++}
+ if ($fsum) {
+     if ($fsum.frames -eq 0) { $problems.Add('NO FRAMES in the window') }
+     elseif ($fsum.window.short) { $problems.Add("SHORT WINDOW: only $($fsum.window_s) s of frames after the start mark") }
+@@ -691,6 +838,9 @@ if ($null -ne $winCpuMean) {
+     $L.Add("process  window cpu mean $(Fmt $winCpuMean 2) cores, max $(Fmt $winCpuMax 2) cores (1 s samples, $($winCores.Count)); peak working set $(Fmt ($winPeakWs / 1MB) 0) MB, peak commit $(Fmt ($winPeakCommit / 1MB) 0) MB (window samples); lifetime peaks $(Fmt ($lifePeakWs / 1MB) 0) / $(Fmt ($lifePeakCommit / 1MB) 0) MB")
+ }
+ if ($drvInfo) { $L.Add("driver   $($drvInfo.path): exit $($drvInfo.exit_code)$(if ($drvInfo.killed) { ' KILLED' }); output driver.out.txt / driver.err.txt") }
++if ($inputInfo) { $L.Add("input    $($inputInfo['script']): steps $($inputInfo['steps_done'])/$($inputInfo['steps_total']), last '$($inputInfo['last_step'])', timeouts $($inputInfo['timeouts'])$(if ($inputInfo['stopped_by_script']) { ', script stop reached' }); pad reads $($inputInfo['pad_reads']) ($($inputInfo['pad_active_reads']) with input); virtual pad in the run dir (no system input); input.csv") }
++if ($gpuInfo) { $L.Add("gpu      gpu.csv $($gpuInfo.rows) rows$(if ($gpuInfo.device) { ", $($gpuInfo.device)" })$(if ($gpuInfo.error) { "; ERROR $($gpuInfo.error)" })") }
++if ($cool) { $L.Add("cooldown GPU $($cool.temp_before_c) C -> $($cool.temp_start_c) C after $($cool.waited_s) s (set point < $($cool.set_point_c) C, timeout $($cool.timeout_s) s)$(if ($cool.flag) { "; FLAG $($cool.flag)" })") }
+ if ($mTriggers.Count) { $L.Add("triggers $(($mTriggers | ForEach-Object { "$($_.path) at $($_.t_s) s$(if ($_.error) { " ERROR $($_.error)" })$(if ($_.exists_after_run) { ' (still there after the run)' })" }) -join '; ')") }
+ if ($close) { $L.Add("close    WM_CLOSE posted to $($close.wm_close_posted) window(s) at $($close.wm_close_post_wall), exit seen after $($close.exit_seen_s) s, killed $($close.killed)$(if ($close.kill_error) { ", kill error: $($close.kill_error)" }), exit $($close.exit_code_hex)") }
+ else { $L.Add("close    process exited by itself at $exitedAt s, exit $(if ($null -ne $code) { '0x{0:X8}' -f ([int64]$code -band 0xFFFFFFFFL) } else { '?' })") }
+@@ -703,13 +853,25 @@ $runJson = [ordered]@{
+     valid_timing = $validTiming; valid_timing_why = $validWhy.ToArray()
+     run = $run; bin_dir = (Resolve-RepoPath $BinDir); tag = $Tag
+     runner_error = $runErr; measure_triggers = $mTriggers.ToArray(); placeholder_run = $run
++    # S5 compat: harness\run-game.ps1 run.json field names read by M12's s5_gates.py (clean/cold/input/host/cap/align).
++    started_epoch_s = [math]::Round([DateTimeOffset]::new($start).ToUnixTimeMilliseconds() / 1000.0, 3)
++    elapsed_s = [math]::Round(($end - $start).TotalSeconds, 2)
++    close_method = $(if (-not $close) { 'none' } elseif ($close.clean) { 'wm_close' } elseif ($close.killed) { 'killed' } else { 'none' })
++    close_seconds = $(if ($close) { $close.exit_seen_s } else { $null })
++    close_sent_s = $(if ($close -and $close.wm_close_post_wall) { [math]::Round(([datetime]::ParseExact($close.wm_close_post_wall, 'yyyy-MM-dd HH:mm:ss.fff', $null) - $start).TotalSeconds, 2) } else { $null })
++    wer_seen = $werSeen; crash_events = $crashEvents
++    dumps = @(@($artifacts) | Where-Object { $_ -and ([string]$_).ToLower().EndsWith('.dmp') })
++    seed_xenos = $(if ($seed) { $SeedCache } else { $null })
++    cvars = $($cv = [ordered]@{}; foreach ($c in @($cvarRaw)) { if ($c -match '^\s*([^=]+?)\s*=\s*(.*)$') { $cv[$Matches[1]] = $Matches[2] } }; $cv)
+     params = [ordered]@{ warmup_s = $Warmup; seconds = $Seconds; cvar = $cvarRaw; env = $envItems; toml = $tomlItems; trigger_at_measure = $trigRaw
+                          close_timeout_s = $CloseTimeoutSec; min_free_ram_gb = $MinFreeRamGB; profile = [bool]$Profile
+                          profile_seconds = $ProfileSeconds; runs_root = $RunsRoot; stall_s = $StallSec
+                          warmup_from = $WarmupFrom; boot_timeout_s = $BootTimeoutSec; settle_s = $SettleSec
+                          menu_text = $MenuText; menu_s = $MenuSec; driver = $Driver; driver_args = $drvArgItems
+                          driver_timeout_s = $DriverTimeoutSec; frames = $Frames; seed_cache = $SeedCache; seed_recipes_only = [bool]$SeedRecipesOnly
+-                         sys_csv = [bool]$SysCsv; min_window_after_ff_s = $MinWindowAfterFirstFrame; light_ms = $LightMs; warmup_requested_s = $warmupAsked }
++                         sys_csv = [bool]$SysCsv; min_window_after_ff_s = $MinWindowAfterFirstFrame; light_ms = $LightMs; warmup_requested_s = $warmupAsked
++                         input_script = $inputScriptRaw; vpad_dll = $vpadDllRaw
++                         gpu_log = [bool]$GpuLog; cooldown_temp_c = $CooldownTempC; cooldown_timeout_s = $CooldownTimeoutSec; cooldown_poll_s = $CooldownPollSec }
+     args = $gameArgs; env_set = $envH; toml_set = $tomlH
+     frames_csv = $csvPath; frames_csv_header_bytes = $headerBytes
+     first_frame_signal_s = $firstFrameS; boot_s = $firstFrameS; no_first_frame = $bootTimedOut
+@@ -728,7 +890,7 @@ $runJson = [ordered]@{
+     perf_csv_stalled = $stalled; perf_csv_stall_at_s = $stallAt; perf_csv_max_no_growth_window_s = $maxNoGrowWin
+     dialogs = $dialogs.ToArray(); werfault_seen = $werSeen; windows_at_end = $windowDesc; artifacts = $artifacts
+     log_lines = $logC.Lines; free_ram_gb_at_start = $free0; logical_cpus = $ncpu
+-    seed_cache = $seed; driver = $drvInfo
++    seed_cache = $seed; driver = $drvInfo; input_script = $inputInfo; gpu_log = $gpuInfo; cooldown = $cool
+     profile_trigger_on = $trigOn; profile_trigger_off = $trigOff; profiles = $profiles; profile_meta = $profileMeta
+     frames = $fsum
+     ff_signal_epoch_s = $ffEpoch; ff_to_window_s = $ffToWin; min_window_after_ff_s = $MinWindowAfterFirstFrame; warmup_raised = $floorNote

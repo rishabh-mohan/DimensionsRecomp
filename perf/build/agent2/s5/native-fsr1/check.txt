@@ -1,0 +1,25 @@
+PASS SDK HEAD == a7e79c0: a7e79c09135f160f63bfaf8634f4e3b9cb760a75
+PASS src/ui/presenter.cpp: overlay LF-only like the blob
+PASS src/ui/presenter.cpp: snap1 copy (compiled tree) == a7e79c0 blob
+  base B8CBD2FE5EC05031  new 944B98E5103E137A
+diff build\agent2\s5\native-fsr1\native-fsr1.diff sha256 4579F090BD6F098303DD9948386EE8EA3279C4E4081F284D74F104058FBA292F (+35/-2)
+PASS SDK index clean (== HEAD a7e79c0)
+PASS git apply --check --cached vs a7e79c0: Checking patch src/ui/presenter.cpp...
+PASS src/ui/presenter.cpp: snap1-sdk Release command found: 1 match(es)
+PASS src/ui/presenter.cpp fsyntax exit 0 (2.3 s): 0 errors, 4 warnings in presenter.cpp
+    <workspace>/build/agent2/s5/native-fsr1/ov/rexglue-sdk/src/ui/presenter.cpp:893:10: warning: moving a local object in a return statement prevents copy elision [-Wpessimizing-move]
+    <workspace>/build/agent2/s5/native-fsr1/ov/rexglue-sdk/src/ui/presenter.cpp:1073:12: warning: unused variable 'output_width_clamped' [-Wunused-variable]
+    <workspace>/build/agent2/s5/native-fsr1/ov/rexglue-sdk/src/ui/presenter.cpp:1074:12: warning: unused variable 'output_height_clamped' [-Wunused-variable]
+    <workspace>/build/agent2/s5/native-fsr1/ov/rexglue-sdk/src/ui/presenter.cpp:1670:16: warning: moving a local object in a return statement prevents copy elision [-Wpessimizing-move]
+PASS src/ui/presenter.cpp: all 4 warnings pre-existing in the a7e79c0 TU: 4 in base
+PASS src/ui/presenter.cpp compile exit 0 (3.1 s): 0 errors, 4 warnings in presenter.cpp
+    <workspace>/build/agent2/s5/native-fsr1/ov/rexglue-sdk/src/ui/presenter.cpp:893:10: warning: moving a local object in a return statement prevents copy elision [-Wpessimizing-move]
+    <workspace>/build/agent2/s5/native-fsr1/ov/rexglue-sdk/src/ui/presenter.cpp:1073:12: warning: unused variable 'output_width_clamped' [-Wunused-variable]
+    <workspace>/build/agent2/s5/native-fsr1/ov/rexglue-sdk/src/ui/presenter.cpp:1074:12: warning: unused variable 'output_height_clamped' [-Wunused-variable]
+    <workspace>/build/agent2/s5/native-fsr1/ov/rexglue-sdk/src/ui/presenter.cpp:1670:16: warning: moving a local object in a return statement prevents copy elision [-Wpessimizing-move]
+  obj build\agent2\s5\native-fsr1\obj\presenter.cpp.obj 236512 B 576388631C60AD65
+PASS needle in presenter.cpp.obj: this build has no FidelityFX SDK
+PASS needle in presenter.cpp.obj: present_fsr_max_upsampling_passes
+PASS needle in presenter.cpp.obj: present_fsr_sharpness_reduction
+PASS needle in presenter.cpp.obj: Guest output effect: bilinear, fsr (
+RESULT: PASS

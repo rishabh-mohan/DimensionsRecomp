@@ -1,0 +1,37 @@
+# s5_gates: span 180 s, anchor >= 1500 draws, 3D >= 600, cap none, margin 2 s
+
+== s33-offsf [xenos] verdict VOID
+  clean    PASS   exit 0, wm_close 0.68 s, no WER/dump
+  runner   PASS   n/a: no runner status fields (not a run-timing run)
+  cold     PASS   seed_xenos null (cold)
+  3d       PASS   info: first >=1500 frame at 108.6 s is transient; sustained anchor 128.5 s (sustained used)
+  span     VOID   window runs 24.5 s past end of 3D at 284.0 s
+  input    PASS   presses 3 ok, none in window; steps 91/91 (completed), last step t 461.9
+  cooldown FLAG   no cooldown record in run.json (first gpu.csv temp 71.0 C)
+  thermal  PASS   thermal-limited 0.68 > 0.10 (covariate; set rule: arm outlier -> FLAG)
+  host     NODATA no nongame_cores
+  cap      PASS   fps 34.11
+  align    PASS   ok
+  3d info: t3d 102.43 anchor 128.48 (last press +55.11, 3D +26.05) sustain10 1.00; first >=1500 108.6, sustained 128.48, runner None; first t by draws {'600': 102.43, '1000': 107.22, '1500': 108.6, '2000': 108.6}
+  end of 3D: 283.99 (low band 283.99, flat 299.92); window [128.48, 308.48]
+  gpu: util 73.0% gr 1496.0 MHz 24.49 W temp 86.0 C P0 1.00 powercap 0.08 (n 180)
+  window: 6140 frames 180.0 s fps 34.11 med 24.80 p99 93.71 1%low 205.84 max 1761.6 ms; >=100 55 >=250 11; at60 0.09
+  axis: first frame 4.87, draws perf.csv, axis-close 1.26 s, vs input perf_rows {'n': 1, 'median': 0.509, 'max_abs': 0.509}
+
+== s33-ond [xenos] verdict VOID
+  clean    PASS   exit 0, wm_close 0.69 s, no WER/dump
+  runner   PASS   n/a: no runner status fields (not a run-timing run)
+  cold     PASS   seed_xenos null (cold)
+  3d       PASS   ok
+  span     VOID   window runs 24.5 s past end of 3D at 267.8 s
+  input    PASS   presses 3 ok, none in window; steps 91/91 (completed), last step t 461.3
+  cooldown FLAG   no cooldown record in run.json (first gpu.csv temp 65.0 C)
+  thermal  PASS   thermal-limited 0.68 > 0.10 (covariate; set rule: arm outlier -> FLAG)
+  host     FLAG   hidden-desktop run (mode 'FUNCTIONAL ONLY (hidden desktop exebox-DTPDCJ2KO5E3NY5FKT2YLANBFW), NOT FOR TIMING'): foreground check not applicable; nongame 2.220 cores (set rule applied below)
+  cap      PASS   fps 38.76
+  align    PASS   ok
+  3d info: t3d 86.34 anchor 112.30 (last press +39.45, 3D +25.95) sustain10 1.00; first >=1500 112.3, sustained 112.3, runner None; first t by draws {'600': 86.34, '1000': 89.24, '1500': 112.3, '2000': 112.3}
+  end of 3D: 267.78 (low band 267.78, flat 279.23); window [112.3, 292.3]
+  gpu: util 79.0% gr 1522.0 MHz 26.36 W temp 86.0 C P0 1.00 powercap 0.15 (n 180)
+  window: 6977 frames 180.0 s fps 38.76 med 23.71 p99 70.69 1%low 101.92 max 442.6 ms; >=100 20 >=250 2; at60 0.14
+  axis: first frame 4.36, draws perf.csv, axis-close 1.08 s, vs input perf_rows {'n': 1, 'median': 0.328, 'max_abs': 0.328}

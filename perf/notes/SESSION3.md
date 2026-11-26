@@ -476,3 +476,118 @@ pending M12's restart check that `build/agent2/native4b-bin/MANIFEST.txt` is unc
   - Part 1, plain first-boot per bin (16:13, 16:18): clean exit, check-defaults PASS (xenos: 13 keys default + back-off line; native: miss cache ON), 0 `d3d12_pipeline_creation_no_wait` lines. No first 3D: with no input the game stays at the title screen (max 228 draws). The CF route also never leaves the front end (CF1 ship peaks 226-228 draws), so "uncapped fps" in CF1/CF2 is a front-end scene.
   - Part 2, RUN-SMOKE3D.cmd (B0B52007; attract-long.txt input, 240 s per arm), opened via computer use with the user's approval (the first request at 16:28 auto-declined while the user was away; user, 16:47: "I'll approve it, it gets auto declined if I don't respond"). 16:47:52-16:56:27, ALL PASS: xenos first 3D 625 draws at ~83 s after launch (max 15746), native 3D by proxy (199 new native GPU lines from 95 s); clean exits; check-defaults PASS; 0 no_wait lines. Screenshot of xenos 3D at 16:50 (brain artifact smoke3d-xenos.png); the native screenshot came after the arm ended.
 - Result: the pushed source builds, boots to 3D on both renderers with the shipped defaults, and #33 stays off by default.
+
+## 16:58-17:00 (Overseer) - notes commit
+- export_perf.py --copy (Idle): 6382 files, 51.4 MB, 15746 scrub edits in 2159 files, 0 files still holding the account name; 1 flagged (disasm, left out). Secret scan of the export (webhook URLs, tokens): 0 hits.
+- DimensionsRecomp perf/opt d19aeba "perf: session 3 notes, results and final bin pins" (perf/ only, 1852 files changed), pushed to `mine` 2de88ce..d19aeba, ls-remote matches. The committed SESSION3 copy ends at the 16:05-16:58 section.
+- Final state: SDK perf/opt a7e79c0, superproject perf/opt d19aeba (code at 2de88ce). Day launcher pid 24624 still waiting-for-go until 20:00 (nothing queued).
+
+## 17:12-17:20 (Overseer) - README + S5 decisions
+- 17:14 user: "can you update the perf Branch's readme?" -> DimensionsRecomp perf/opt a8e8dc8 "README: describe the perf/opt branch (new defaults, measured results, build steps, AVX2 floor)" (README.md + perf/README.md only), pushed d19aeba..a8e8dc8, ls-remote matches.
+  - Correction found while writing it: on this branch (and Native GPU 0.2.0) the game builds with LEGODIMENSIONS_X86_BASELINE=x86-64-v3 (rexlego/CMakeLists.txt; every CMakeCache here says v3), so the game needs AVX2. The SDK stays x86-64-v2. The README's old "SSE4.2 minimum" applies to 0.1.30-0.1.38 only.
+- 17:15 user (Discord), verbatim: "do the recommended for 1 and 2, for 3 any amount of time works, do the recommended for 4". S5 decisions:
+  1. native first (Xenos only for 2.1 and 3.1);
+  2. lower internal resolution + FSR may become the default only if it passes the user's Phase 4 visual review, else opt-in;
+  3. timed windows any time (the user still approves each computer-use open);
+  4. fps cap 60 by default in A/B runs, plus one uncapped arm.
+- S5 Phase 0 starts: M8 runner (input + 3D scoring + thermal controls), M12 gameplay gates, M2 Phase 1 diagnostics, a new native manager (M16) for the missing-shader dump -> native4bp. M15 (research) retired; its report stays in its log.
+
+## 17:29-17:35 (Overseer) - dump done, S5 waiter
+- RUN-DUMP (M16, 9D2A95BA) opened 17:24 with the user's approval, done 17:29:37, USABLE: 83 placement containers + 2 create-path misses (VS A58EBA123EFB541C, PS 93B9F93B535E7CCA), cap not reached; before-trace 3D median 71 missing draws/frame (~13% of submitted). Report build/agent16/dump/post/dump-post-20261125-172422.txt.
+- M10 rated M2's sync-log.diff (A8CD7FEF) Code SAFE, diag bin SAFE-IF D1-D3 (build/agent10/s5/sync-log-rating.md 6968138A).
+- M8: the day launcher (pid 24624) can't run the S5 runner: it pins the runner files at start and refuses GO after a change (run-day.ps1:185-208, :901-902).
+- 17:27 user: "I'm leaving at 5:40 until probably 7:30, so prepare work to do then as well". 17:32 user: "can you ask for approval now and start it later?"
+- -> Overseer wrote build/agent1/s5wait/WAIT-S5.cmd + wait-s5.ps1. It waits for GO.txt lines `abs .cmd under WS\build|sha256|args`, refuses a bad hash, a path outside build\ and & | < > ^ % in args; it runs jobs serially, waits while legodimensions.exe runs, STOP.txt ends it, and it ends at 23:30. Self-test PASS (1 run + 3 refusals). Opened via computer use 17:33 with the user's approval: pid 37824, session 1.
+
+
+## 17:47-17:52 (Overseer) - native4bp smoke PASS, sync smoke GO
+- 0.4c native4bp smoke: PASS-WITH-CHECKS. 0 missing draws in the 3D window, against the before trace (0.4a dump, nf2, miss cache off) at median 98/frame and 423,838 total. Clean exit. fp 39129c4c059be5f0. Only the 2 excluded root shaders (A58EBA12, 93B9F93B) log an AOT miss. First 3D came at 161 s, vs 133 s before (cold boot?). Report: build/agent16/smoke4bp/post/smoke-20261125-174125.txt CC19D56F. Shots posted to Discord (HTTP 200).
+- The nf2 ref arm was refused, because M8's dry-run run-matrix (pid 43776) was active, so the overall exit was 1. It will be re-run after the window. M8 is told to make no more dry runs.
+- 17:49:29: GO RUN-SYNC-SMOKE.cmd 0A6AE926...B932 (no args), ~10 min.
+- M10 sent early blockers on the s5_gates (B1: native-frames.csv; S1-S6), all forwarded to M12. M8's runner is ready; it is adding SHA enforcement and n4bp60 x4, with natU x2. M10 reviews the unchanged diffs now; the rating is due 18:30.
+- M16 2.3 r2 (52341EDF) and the psobin scripts are queued at M10. The PSO bin keeps fp 39129c4c (the .cpp is not a fingerprint input).
+
+## 17:53-17:55 (Overseer) - scripted gameplay route
+- 17:53 user: "are you testing with actual gameplay as well?" -> no: every S5 run so far uses the attract sequence (harness/routes/attract-long.txt, START A A then no input). The user chose option 1: a scripted gameplay route (save -> level, emulated Toypad figure, walk/fight), functional + visual, not timed, run after the window.
+- Assigned to M3 (build/agent3/gameplay/): static feasibility research due ~18:45 (input sticks, Toypad scripting, saves, route design), then a kit (route, RUN-GAMEPLAY.cmd, post script, dryrun). No launches/builds before ~20:15; never touch the user's real saves.
+
+## 17:56-18:01 (Overseer) - sync smoke attributed, PSO bin GO
+- 17:56 user: "do anything you need to test the game, including holding buttons, emulated figures, etc" -> forwarded to M3 (stick/hold input, scripted emulated Toypad figures, test-only bin if needed; M10 still rates diffs, sandbox saves only).
+- M10 rated PSO r2 (build/agent10/s5/pso-native-r2-rating.md 5EA81E27): 2.2 SAFE, 2.3 r2 SAFE, psobin SAFE-IF P-C1 (A/B ref = n4bp60) / P-C2 (src gate 4247ECB9). fp stays 39129c4c; cache per exe dir. M16 GO to build by 18:35 after the sync smoke exits.
+- Sync smoke (RUN-SYNC-SMOKE, 17:49-18:00) PASS, both arms clean. The 322 ms stall = 8 synchronous no-pixel-shader (depth-only, color mask 0) pipeline creates: on arm frame #7601 945.7 ms, create 458.5 ms (8x) matched to 8 sync lines; off arm row 7545 940 ms at the same scene point, so the stall is in the bin, not caused by the logging. 45 sync lines in total, all 'no pixel shader'. Separate GPU-wait/memexport stalls (#6553-#6615, #7620) are noted for later. Files: build/agent2/s5/sync-smoke/ANALYSIS.md 91F3A6C5.
+- M2 is staging the Phase 2.1 diff (no-PS async opt-in, default off) in build/agent2/s5/nops-async/; it builds after the window.
+
+## 18:01-18:05 (Overseer) - timed baseline window GO
+- M8 final package 18:01: RUN-WINDOW-S5.cmd 2B22FD00 (hard-codes PINS-S5.txt BE96CED7; 17 files checked, exit 3 on any mismatch), window-s5 112FD183, matrix 57255790, SUMS E7D9AB5B. 17 runs: cold ship60/nat60/n4bp60 (unscored, ff+160) + 4 rotating rounds ship60/nat60/n4bp60 x4 + natU x2; ~93.5 min (worst ~106). Every run has its own user_data_root, so all arms are game-cache-cold (caveat for the read-out).
+- M12 gates fixes: s5_gates.py 6CF65B8D, s5_readout.py 2940D94D (B1, S1-S6 + numeric cap compare); 35+10 selftests PASS. Queued at M10 for a cross-check.
+- M10 rated the runner SAFE-IF C1-C5 (build/agent10/s5/s5-runner-rating.md 32C73981): C1 start only via the cmd; C2 harness legodimensions.toml/vpadhost.cs/guard.ps1/winhelper.cs hashes (checked 18:03, all match); C3 no WINDOW-GO.txt, no other game launches; C4 the read-out lists SKIPPED/VOID runs and never averages them; C5 no compiles/links during the window (they VOID runs via valid_timing), and the user should not touch the PC.
+- M3 Step 1: the gameplay route is feasible with no code changes (vpadhost already has hold/stick/trigger/combos/wait_log; emulated Toypad TCP 127.0.0.1:9191 + toypad_sidecar/ldtag; fresh sandbox profile, no save needed). Unknown: player control after the vortex scene -> one exploration run on native first (Overseer chose this).
+- 18:04 FREEZE sent to all managers. GO written 18:04:26; the waiter took it at 18:04:41. window-s5 log logs\window-s5-20261125-1804.txt: 17 files checked, 3 MANIFEST = pin, launcher waiting-for-go, desktop Default, START 18:04:44 -> matrix\20261125-1804. Discord: 'do not touch the PC' posted (HTTP 204).
+
+## 18:05-18:20 (Overseer) - window running; post-window kits staged
+- M2 nops-async (build/agent2/s5/nops-async/ nops-async.diff AB149BE6): cvar d3d12_async_depth_only_pipelines (default off) moves only CreateD3D12Pipeline of no-PS, non-memexport, host-RT pipelines into the async block. M10 6487C0EB: code SAFE; test bin SAFE-IF N1-N4 (build after the window, same cold storage per arm, the no_wait pair mandatory, default off); S1 occlusion-query proxy drop in default mode before any promotion. Smoke kit RUN-NOPS-SMOKE.cmd 801A064A (6 arms, ~30 min, pin TBD).
+- M12 gates final D8D17C86 / readout C54664D7 (--runs-root filters on the run.json tag; --vs secondary). M10 xcheck B0EE4A7D CONFIRMED (X1 '14 scored', X2 after the freeze, X3 the contrasts). READOUT-CMD.txt CD819610.
+- M10 toml-reject + native-fsr1 (E3D652D7): both code SAFE; native-fsr1 F1: the harness tomls set present_effect='fsr', so a native bin with it runs FSR1 in timed runs -> use a bilinear perf toml for timing.
+- M3 explore kit (provisional, untested), M16 PSO rows/ab kit RUN-PSO-ROWS.cmd 8B9B7701 (rows ~60 min, ab n2 ~55, ab ~90). Both sent to M10 for a run-script safety review.
+- M16: every close path (X, Alt+F4, Quit, harness WM_CLOSE) hard-exits (rex_app.cpp:704-706 std::_Exit; 250 ms watchdog legodimensions_app.h:409-428), so PipelineLibrary Stop()/final save never run. The loss is small: the autosave runs after 3 s quiet (pipeline_library.cpp:325-339, kQuietBeforeSave L37), so at most <3 s of new pipelines. Backlog, not this sprint.
+- Post-window order: refonly -> M3 explore -> M2 nops build+smoke -> M16 rows -> ab n2 (-> ab if time; the waiter ends 23:30).
+
+## 18:30-19:56 (Overseer) - window done, read-out, kits rated
+
+- **Timed window** 20261125-1804 DONE at 19:24, exit 0, 17/17 OK. 14 scored: PASS 9, FLAG 4 host-busy (all before 18:39), VOID 1 natU-r1 (short span).
+- **Read-out**, M12 build/agent12/s5/p03/ (gates 221F1904, readout DE7B9480, confound 40937433):
+  - nat60 vs ship60: fps +18% [8.9, 43]; quiet runs +20.8%.
+  - n4bp60 vs nat60: -9 to -10%.
+  - n4bp60 vs ship60: +5.5%, not resolved.
+  - nat60 skips ~96 draws per frame. GPU 10.8 W vs 25 W; CPU clock 2875 vs ~2230 MHz, which tracks GPU power (shared cooling).
+  - Host load is a time effect (Defender + agents before quiet mode), not an arm effect. Every arm uses hard links.
+- **Refonly smoke** 192908: PASS-WITH-CHECKS. nf2 missing median 96 per frame; 4bp 0.
+- **Kits rated and ready** for the user's return:
+  - M3 RUN-EXPLORE 73C56B77 (P4 A7BF3056);
+  - M2 devs5nops-bin MANIFEST 8A8B2E77, RUN-NOPS-SMOKE 51E7A02E (43AD8609; K3 dryrun pending);
+  - M16 RUN-PSO-ROWS 0B4436FC (F4EE7FC8);
+  - M16 RUN-NATCMP 7FABD416 (vs ship default, 5C615C9D; C3 dryrun pending).
+- **User pause** from 20:00 (light coding). The Defender exclusion on build\ has been requested.
+
+
+## 20:00 (11-25) - 09:30 (11-26) (Overseer) - gameplay route, zone step, native packs, E proof run
+
+- **Manual session (user present)**:
+  - The title gate fixes a title stall that an early START caused. Kit title tries 2-6 waste ~50 s (backlog).
+  - natives5fsr1p fixes the FSR1 native bin.
+  - A black scene on RT runs = a no-pack bin.
+  - The Toy Pad colour map had been swapped (fixed). START at FE 13 does nothing; J (A) works.
+- **Toy Pad add/remove/shift mid-game** (user requirement, integral to gameplay):
+  - Proven by hand via ctl files (051159).
+  - Then unattended through the kit's `zone` word (sidecar --zone --zone-delay 45, answered from the Toy Pad LEDs): 070554, 073150, 082648, 090939.
+  - Zone timing is stable across runs: LOADs T0+49.3-49.6 / 53.6-53.9 / 55.9-56.2 s; done→red-18 ≈ 17.0-17.4 s; handoffs ≤ 106 ms.
+- **Red-18** = all pads FF 00 00, speed 18 (88 red + 87 off rows per pad), held after the zone step. Hypothesis: the in-game red portal state. A manual probe (PROBE-RED18 P1-P4) is pending; it needs the user.
+- **Unattended kits**: EXPLORE3 and GAMEPLAY run with no hand input, through the S5 waiter (GO lines `<cmd>|<sha256>|<args>`, Overseer only).
+- **dtime findings**:
+  - The stall is guest-side.
+  - Frame +1 = 29 PSO creates (~19 ms) + texture-upload hashing (21-29 ms).
+  - A PSO-creation storm happens on first sight of new scenes.
+- **native5pack** (bin 787CD694, fp a349d5292f67b127):
+  - proof5 PASS on the route (220710 → 0 missing draws).
+  - The scenes after the zone step still had 1649 misses (3 VS+PS pairs, from red+43.5 s; all VS key C77B3ABB6F87ACD9).
+- **dump6 run B** (082648, nativeonly cand5 zone dump, DIAGNOSTIC only): 5 of 6 target shaders captured (VS ABA99710 unmatched; likely deduped with 56F18006). Dump mode turns the miss cache off, so its counts (2119) are not comparable.
+- **native6pack**:
+  - stage6 NEW 5 → combined6 (144 files) → plan of 148.
+  - Pack run-20261126-085430 PASS (index 19116 → 19394).
+  - bin binwork-20261126-085606 PASS; check C1-C6 PASS.
+  - native6pack-bin MANIFEST 6D841C1E, exe F5816ABE, fp e5c874ca2b87a59d.
+  - Candidate only: not promoted, no LATEST.
+- **E proof run 090939** (`nativeonly cand6 zone`, 09:09:38-09:24:49, exit 0, kit PASS). M10: VALID / PASS, route-only (build/agent10/s5/E-run-090939-review.md DA29A2B9).
+  - On the zone route, the cand6 candidate bin produced 0 missing draws over the whole trace (base 073150: 1649, 43.9/1000 frames). Key C77B3ABB FIXED; REMAIN/NEW 0.
+  - e6_roles: every window and role is 0, including U-ABA99710, which counts as covered by key on this route, not by identity.
+  - The only AOT-miss lines are the 2 boot root shaders (A58EBA12, 93B9F93B), the same as in base.
+  - One route-only run: no timing or perf claim, no promotion. The 22 no-identity guests stay open by identity.
+  - Reports: build/agent16/proof5/post-090939/proof5_post.txt 48FBC72A; build/agent16/cg7/roles-090939/e6_roles.txt D9A20145.
+- **Open for the user (Phase 4)**:
+  - visual review (FSR1 vs bilinear; native5pack/6pack gateway renders);
+  - native6pack promotion/repin;
+  - native PSO pre-warm/async;
+  - texture-upload hashing; memexport stalls;
+  - S1 occlusion before nops promotion; PSO final save on close;
+  - thermals 84-87 °C; perf.csv draw_calls is dead on native (use frames.csv);
+  - a timed run on the pack bins (perf unknown); re-run the S5 0.3 baseline.

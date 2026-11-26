@@ -1,0 +1,14 @@
+diff --git a/1F7900B9/gameplay-run.ps1 b/fix191/gameplay-run.ps1
+index 514a2be..3f8e97d 100644
+--- a/1F7900B9/gameplay-run.ps1
++++ b/fix191/gameplay-run.ps1
+@@ -188,7 +188,8 @@ if ($DryRun) {
+     foreach ($arm in $arms) {
+         $tr = Join-Path $kit "trace-$($arm.name)-$stamp"
+         Say "COMMAND (real run, arm $($arm.name)): $(Cmd-Line (Rg-Args $arm (Join-Path $kit 'runs') $tr $false))"
+-        Say "SIDECAR (real run, arm $($arm.name)): $py $(((Sidecar-Args $arm (Join-Path $kit 'runs') (Get-Date)) | ForEach-Object { if ("$_" -match '\s') { "`"$_`"" } else { "$_" } }) -join ' ')"
++        $sca = @((Sidecar-Args $arm (Join-Path $kit 'runs') (Get-Date)) | ForEach-Object { if ("$_" -match '\s') { '"' + $_ + '"' } else { "$_" } })
++        Say "SIDECAR (real run, arm $($arm.name)): $py $($sca -join ' ')"
+         $rc = Run-Logged 'powershell' (Rg-Args $arm $runsRoot $tr $true)
+         Say "run-game -DryRun ($($arm.name)) exit $rc"; if ($rc -ne 0) { $bad++ }
+     }

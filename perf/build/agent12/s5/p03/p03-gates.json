@@ -1,0 +1,2036 @@
+{
+ "args": {
+  "runs": [
+   "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1815-ship60-r1",
+   "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1820-nat60-r1",
+   "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1825-n4bp60-r1",
+   "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1830-natU-r1",
+   "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1835-nat60-r2",
+   "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1839-n4bp60-r2",
+   "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1844-natU-r2",
+   "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1849-ship60-r2",
+   "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1854-n4bp60-r3",
+   "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1859-ship60-r3",
+   "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1904-nat60-r3",
+   "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1909-ship60-r4",
+   "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1914-nat60-r4",
+   "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1919-n4bp60-r4"
+  ],
+  "runs_root": "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs",
+  "scored_tag": "^(?!cold-|warm\\d+-).+-r\\d+$",
+  "span": 120.0,
+  "anchor": 1500,
+  "anchor_hold": 1.0,
+  "anchor_mode": "sustained",
+  "thr3d": 600,
+  "margin": 2.0,
+  "anchor_late": 90.0,
+  "end_low_xenos": 1000,
+  "end_low_native": 120,
+  "end_low_hold": 5.0,
+  "end_abs": 10,
+  "end_rel": 0.05,
+  "end_hold": 20.0,
+  "sustain_min": 0.5,
+  "thermal_outlier": 0.25,
+  "cap": "auto",
+  "cap_lo": 57.0,
+  "cap_hi": 61.5,
+  "native_default_ok": false,
+  "thermal_flag": 0.1,
+  "hw_void": 0.05,
+  "host_margin": 1.0,
+  "step_gap": 12.0,
+  "align_tol": 3.0,
+  "presses": 3,
+  "route": "<workspace>\\harness\\routes\\attract-long.txt",
+  "renderer": "auto",
+  "warm": false,
+  "json": "<workspace>\\build\\agent12\\s5\\p03\\p03-gates.json",
+  "selftest": false,
+  "skipped": [
+   "1805-cold-ship60(cold-ship60)",
+   "1809-cold-nat60(cold-nat60)",
+   "1812-cold-n4bp60(cold-n4bp60)"
+  ]
+ },
+ "runs": [
+  {
+   "run_dir": "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1815-ship60-r1",
+   "tag": "ship60-r1",
+   "bin_dir": "<workspace>\\build\\agent2\\devfinal2-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 1.45 s, no WER/dump"
+    },
+    "runner": {
+     "status": "PASS",
+     "why": "status OK, valid_timing True, excluded False; info flags: nongame_load"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "PASS",
+     "why": "info: first >=1500 frame at 100.3 s is transient; sustained anchor 119.7 s (sustained used)",
+     "t3d": 93.32,
+     "anchor_t": 119.67,
+     "anchor_minus_last_press": 46.47,
+     "anchor_minus_3d": 26.36,
+     "sustain10": 1.0
+    },
+    "span": {
+     "status": "PASS",
+     "why": "covered: 36.5 s of frames after window end; end of 3D not seen",
+     "end3d_t": null,
+     "end3d_low_t": null,
+     "end3d_flat_t": null,
+     "window": [
+      119.67,
+      239.67
+     ],
+     "span_s": 120.0
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 51/91 (halted), last step t 275.1",
+     "last_press_t": 73.2,
+     "steps_done": 51,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "PASS",
+     "why": "cooldown met",
+     "record": {
+      "set_point_c": 72,
+      "timeout_s": 90,
+      "poll_s": 5,
+      "temp_before_c": 71,
+      "temp_start_c": 71,
+      "waited_s": 0,
+      "flag": null,
+      "target_c": 72,
+      "start_c": 71,
+      "end_c": 71,
+      "met": true,
+      "timed_out": false
+     },
+     "start_temp_c": 72.0,
+     "temp_at_anchor_c": 87.0
+    },
+    "thermal": {
+     "status": "FLAG",
+     "why": "thermal outlier: share 0.64 vs arm devfinal2-bin/60 median 0.91 (> +-0.25); thermal-limited 0.64 > 0.10 (covariate; set rule: arm outlier -> FLAG)",
+     "samples": 120,
+     "expected": 120,
+     "thermal_share": 0.642,
+     "hw_brake_share": 0.0,
+     "powercap_share": 0.133,
+     "util_gpu": 66.5,
+     "gr_mhz": 1522.0,
+     "power_w": 25.41,
+     "temp_c": 86.0,
+     "p0_share": 1.0,
+     "thermal_limited": true,
+     "arm_median": 0.913
+    },
+    "host": {
+     "status": "FLAG",
+     "why": "host-busy: nongame 5.525 > set median 1.889 + 1.0",
+     "nongame_mean": 5.525,
+     "rows": 120,
+     "set_median": 1.889,
+     "limit": 2.889
+    },
+    "cap": {
+     "status": "PASS",
+     "why": "below cap: GPU-bound info (fps 31.81, at60 share 0.05)",
+     "arm": "60",
+     "reported": 60
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "perf.csv",
+    "first_frame_t": 4.69,
+    "perf_rows": 11681,
+    "perf_last_t": 276.21,
+    "anchor_first_t": 100.27,
+    "anchor_sustained_t": 119.67,
+    "runner_window_start": 119.67,
+    "first_t_by_draws": {
+     "600": 93.32,
+     "1000": 99.87,
+     "1500": 100.27,
+     "2000": 100.27
+    },
+    "max_draws": 12970,
+    "cap_sources": {
+     "runner_effective": 60,
+     "cvar": "60",
+     "native_frames_cvar": null
+    },
+    "axis_minus_close_s": 1.03,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": -0.521,
+     "max_abs": 0.521
+    }
+   },
+   "renderer": "xenos",
+   "metrics": {
+    "frames": 3816,
+    "window_s": 119.964,
+    "fps": 31.81,
+    "median_ms": 27.332,
+    "p99_ms": 113.335,
+    "low1_ms": 211.276,
+    "max_ms": 991.308,
+    "n_ge100": 45,
+    "n_ge250": 8,
+    "at60_share": 0.046
+   },
+   "verdict": "FLAG"
+  },
+  {
+   "run_dir": "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1820-nat60-r1",
+   "tag": "nat60-r1",
+   "bin_dir": "<workspace>\\build\\agent2\\nativefinal2-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 0.66 s, no WER/dump"
+    },
+    "runner": {
+     "status": "PASS",
+     "why": "status OK, valid_timing True, excluded False; info flags: nongame_load"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "PASS",
+     "why": "ok",
+     "t3d": 112.01,
+     "anchor_t": 115.38,
+     "anchor_minus_last_press": 41.58,
+     "anchor_minus_3d": 3.37,
+     "sustain10": 0.927
+    },
+    "span": {
+     "status": "PASS",
+     "why": "covered: 40.7 s of frames after window end; end of 3D at 267.4 s (32.0 s after window)",
+     "end3d_t": 267.43,
+     "end3d_low_t": 267.43,
+     "end3d_flat_t": null,
+     "window": [
+      115.38,
+      235.38
+     ],
+     "span_s": 120.0
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 51/91 (halted), last step t 275.1",
+     "last_press_t": 73.8,
+     "steps_done": 51,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "PASS",
+     "why": "cooldown met",
+     "record": {
+      "set_point_c": 72,
+      "timeout_s": 90,
+      "poll_s": 5,
+      "temp_before_c": 76,
+      "temp_start_c": 71,
+      "waited_s": 20,
+      "flag": null,
+      "target_c": 72,
+      "start_c": 76,
+      "end_c": 71,
+      "met": true,
+      "timed_out": false
+     },
+     "start_temp_c": 73.0,
+     "temp_at_anchor_c": 74.0
+    },
+    "thermal": {
+     "status": "PASS",
+     "why": "thermal 0.00, hw 0.00",
+     "samples": 120,
+     "expected": 120,
+     "thermal_share": 0.0,
+     "hw_brake_share": 0.0,
+     "powercap_share": 0.0,
+     "util_gpu": 35.0,
+     "gr_mhz": 1061.0,
+     "power_w": 10.75,
+     "temp_c": 75.0,
+     "p0_share": 0.775,
+     "arm_median": 0.0
+    },
+    "host": {
+     "status": "FLAG",
+     "why": "host-busy: nongame 3.005 > set median 1.889 + 1.0",
+     "nongame_mean": 3.005,
+     "rows": 120,
+     "set_median": 1.889,
+     "limit": 2.889
+    },
+    "cap": {
+     "status": "PASS",
+     "why": "below cap: GPU-bound info (fps 46.38, at60 share 0.66)",
+     "arm": "60",
+     "reported": 60
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "native-frames.csv offset +1 (median |interval-frame_time| 0.001 ms)",
+    "first_frame_t": 5.31,
+    "perf_rows": 14093,
+    "perf_last_t": 276.06,
+    "anchor_first_t": 115.38,
+    "anchor_sustained_t": 115.38,
+    "runner_window_start": 115.38,
+    "first_t_by_draws": {
+     "600": 112.01,
+     "1000": 112.01,
+     "1500": 115.38,
+     "2000": 115.38
+    },
+    "max_draws": 6071,
+    "cap_sources": {
+     "runner_effective": 60,
+     "cvar": "60",
+     "native_frames_cvar": "60"
+    },
+    "axis_minus_close_s": 0.98,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": 0.326,
+     "max_abs": 0.326
+    }
+   },
+   "renderer": "native",
+   "metrics": {
+    "frames": 5566,
+    "window_s": 119.998,
+    "fps": 46.384,
+    "median_ms": 16.755,
+    "p99_ms": 68.502,
+    "low1_ms": 82.872,
+    "max_ms": 191.712,
+    "n_ge100": 3,
+    "n_ge250": 0,
+    "at60_share": 0.664
+   },
+   "verdict": "FLAG"
+  },
+  {
+   "run_dir": "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1825-n4bp60-r1",
+   "tag": "n4bp60-r1",
+   "bin_dir": "<workspace>\\build\\agent16\\pack\\native4bp-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 1.45 s, no WER/dump"
+    },
+    "runner": {
+     "status": "PASS",
+     "why": "status OK, valid_timing True, excluded False; info flags: nongame_load"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "PASS",
+     "why": "ok",
+     "t3d": 111.3,
+     "anchor_t": 114.72,
+     "anchor_minus_last_press": 41.35,
+     "anchor_minus_3d": 3.42,
+     "sustain10": 0.938
+    },
+    "span": {
+     "status": "PASS",
+     "why": "covered: 41.4 s of frames after window end; end of 3D at 266.9 s (32.1 s after window)",
+     "end3d_t": 266.87,
+     "end3d_low_t": 266.87,
+     "end3d_flat_t": null,
+     "window": [
+      114.72,
+      234.72
+     ],
+     "span_s": 120.0
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 51/91 (halted), last step t 275.1",
+     "last_press_t": 73.37,
+     "steps_done": 51,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "PASS",
+     "why": "cooldown met",
+     "record": {
+      "set_point_c": 72,
+      "timeout_s": 90,
+      "poll_s": 5,
+      "temp_before_c": 70,
+      "temp_start_c": 70,
+      "waited_s": 0,
+      "flag": null,
+      "target_c": 72,
+      "start_c": 70,
+      "end_c": 70,
+      "met": true,
+      "timed_out": false
+     },
+     "start_temp_c": 72.0,
+     "temp_at_anchor_c": 79.0
+    },
+    "thermal": {
+     "status": "FLAG",
+     "why": "thermal outlier: share 0.00 vs arm native4bp-bin/60 median 0.28 (> +-0.25); thermal 0.00, hw 0.00",
+     "samples": 120,
+     "expected": 120,
+     "thermal_share": 0.0,
+     "hw_brake_share": 0.0,
+     "powercap_share": 0.117,
+     "util_gpu": 40.0,
+     "gr_mhz": 1717.0,
+     "power_w": 19.91,
+     "temp_c": 79.0,
+     "p0_share": 0.75,
+     "arm_median": 0.279
+    },
+    "host": {
+     "status": "FLAG",
+     "why": "host-busy: nongame 5.281 > set median 1.889 + 1.0",
+     "nongame_mean": 5.281,
+     "rows": 120,
+     "set_median": 1.889,
+     "limit": 2.889
+    },
+    "cap": {
+     "status": "PASS",
+     "why": "below cap: GPU-bound info (fps 34.60, at60 share 0.38)",
+     "arm": "60",
+     "reported": 60
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "native-frames.csv offset +1 (median |interval-frame_time| 0.001 ms)",
+    "first_frame_t": 4.87,
+    "perf_rows": 12320,
+    "perf_last_t": 276.12,
+    "anchor_first_t": 114.72,
+    "anchor_sustained_t": 114.72,
+    "runner_window_start": 114.72,
+    "first_t_by_draws": {
+     "600": 111.3,
+     "1000": 111.3,
+     "1500": 114.72,
+     "2000": 114.72
+    },
+    "max_draws": 6071,
+    "cap_sources": {
+     "runner_effective": 60,
+     "cvar": "60",
+     "native_frames_cvar": "60"
+    },
+    "axis_minus_close_s": 0.95,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": -0.505,
+     "max_abs": 0.505
+    }
+   },
+   "renderer": "native",
+   "metrics": {
+    "frames": 4151,
+    "window_s": 119.987,
+    "fps": 34.596,
+    "median_ms": 17.911,
+    "p99_ms": 136.253,
+    "low1_ms": 174.596,
+    "max_ms": 299.219,
+    "n_ge100": 137,
+    "n_ge250": 2,
+    "at60_share": 0.379
+   },
+   "verdict": "FLAG"
+  },
+  {
+   "run_dir": "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1830-natU-r1",
+   "tag": "natU-r1",
+   "bin_dir": "<workspace>\\build\\agent2\\nativefinal2-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 1.45 s, no WER/dump"
+    },
+    "runner": {
+     "status": "PASS",
+     "why": "status OK, valid_timing True, excluded False; info flags: nongame_load"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "FLAG",
+     "why": "anchor 92.1 s after last press > 90",
+     "t3d": 164.83,
+     "anchor_t": 168.22,
+     "anchor_minus_last_press": 92.11,
+     "anchor_minus_3d": 3.39,
+     "sustain10": 0.935
+    },
+    "span": {
+     "status": "VOID",
+     "why": "SHORT: perf ends 278.6 s < window end 288.2 + margin 2 (need -Seconds >= ~292)",
+     "end3d_t": null,
+     "end3d_low_t": null,
+     "end3d_flat_t": null,
+     "window": [
+      168.22,
+      288.22
+     ],
+     "span_s": 120.0
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 51/91 (halted), last step t 278.2",
+     "last_press_t": 76.11,
+     "steps_done": 51,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "PASS",
+     "why": "cooldown met",
+     "record": {
+      "set_point_c": 72,
+      "timeout_s": 90,
+      "poll_s": 5,
+      "temp_before_c": 73,
+      "temp_start_c": 71,
+      "waited_s": 10,
+      "flag": null,
+      "target_c": 72,
+      "start_c": 73,
+      "end_c": 71,
+      "met": true,
+      "timed_out": false
+     },
+     "start_temp_c": 71.0,
+     "temp_at_anchor_c": 74.0
+    },
+    "thermal": {
+     "status": "PASS",
+     "why": "thermal 0.00, hw 0.00",
+     "samples": 110,
+     "expected": 120,
+     "thermal_share": 0.0,
+     "hw_brake_share": 0.0,
+     "powercap_share": 0.009,
+     "util_gpu": 31.0,
+     "gr_mhz": 1282.5,
+     "power_w": 13.61,
+     "temp_c": 76.0,
+     "p0_share": 0.791
+    },
+    "host": {
+     "status": "VOID",
+     "why": "game not foreground in 3/113 rows; game not alive",
+     "nongame_mean": 6.319,
+     "rows": 113
+    },
+    "cap": {
+     "status": "PASS",
+     "why": "fps 49.25",
+     "arm": "none",
+     "reported": 0
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "native-frames.csv offset +1 (median |interval-frame_time| 0.002 ms)",
+    "first_frame_t": 7.56,
+    "perf_rows": 45405,
+    "perf_last_t": 278.64,
+    "anchor_first_t": 168.22,
+    "anchor_sustained_t": 168.22,
+    "runner_window_start": 168.22,
+    "first_t_by_draws": {
+     "600": 164.83,
+     "1000": 164.83,
+     "1500": 168.22,
+     "2000": 168.22
+    },
+    "max_draws": 5979,
+    "cap_sources": {
+     "runner_effective": 0,
+     "cvar": "0",
+     "native_frames_cvar": "0"
+    },
+    "axis_minus_close_s": 0.38,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": -1.256,
+     "max_abs": 1.256
+    }
+   },
+   "renderer": "native",
+   "metrics": {
+    "frames": 5438,
+    "window_s": 110.422,
+    "fps": 49.247,
+    "median_ms": 14.506,
+    "p99_ms": 101.618,
+    "low1_ms": 130.927,
+    "max_ms": 251.271,
+    "n_ge100": 55,
+    "n_ge250": 1,
+    "at60_share": 0.05
+   },
+   "verdict": "VOID"
+  },
+  {
+   "run_dir": "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1835-nat60-r2",
+   "tag": "nat60-r2",
+   "bin_dir": "<workspace>\\build\\agent2\\nativefinal2-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 0.69 s, no WER/dump"
+    },
+    "runner": {
+     "status": "PASS",
+     "why": "status OK, valid_timing True, excluded False; info flags: nongame_load"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "PASS",
+     "why": "ok",
+     "t3d": 116.96,
+     "anchor_t": 120.33,
+     "anchor_minus_last_press": 45.03,
+     "anchor_minus_3d": 3.37,
+     "sustain10": 0.95
+    },
+    "span": {
+     "status": "PASS",
+     "why": "covered: 37.7 s of frames after window end; end of 3D at 272.5 s (32.1 s after window)",
+     "end3d_t": 272.46,
+     "end3d_low_t": 272.46,
+     "end3d_flat_t": null,
+     "window": [
+      120.33,
+      240.33
+     ],
+     "span_s": 120.0
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 51/91 (halted), last step t 277.1",
+     "last_press_t": 75.3,
+     "steps_done": 51,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "PASS",
+     "why": "cooldown met",
+     "record": {
+      "set_point_c": 72,
+      "timeout_s": 90,
+      "poll_s": 5,
+      "temp_before_c": 71,
+      "temp_start_c": 71,
+      "waited_s": 0,
+      "flag": null,
+      "target_c": 72,
+      "start_c": 71,
+      "end_c": 71,
+      "met": true,
+      "timed_out": false
+     },
+     "start_temp_c": 71.0,
+     "temp_at_anchor_c": 77.0
+    },
+    "thermal": {
+     "status": "PASS",
+     "why": "thermal 0.00, hw 0.00",
+     "samples": 120,
+     "expected": 120,
+     "thermal_share": 0.0,
+     "hw_brake_share": 0.0,
+     "powercap_share": 0.0,
+     "util_gpu": 38.0,
+     "gr_mhz": 1005.0,
+     "power_w": 10.77,
+     "temp_c": 76.0,
+     "p0_share": 0.758,
+     "arm_median": 0.0
+    },
+    "host": {
+     "status": "FLAG",
+     "why": "host-busy: nongame 3.684 > set median 1.889 + 1.0",
+     "nongame_mean": 3.684,
+     "rows": 120,
+     "set_median": 1.889,
+     "limit": 2.889
+    },
+    "cap": {
+     "status": "PASS",
+     "why": "below cap: GPU-bound info (fps 48.99, at60 share 0.69)",
+     "arm": "60",
+     "reported": 60
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "native-frames.csv offset +1 (median |interval-frame_time| 0.001 ms)",
+    "first_frame_t": 6.81,
+    "perf_rows": 14151,
+    "perf_last_t": 278.07,
+    "anchor_first_t": 120.33,
+    "anchor_sustained_t": 120.33,
+    "runner_window_start": 120.33,
+    "first_t_by_draws": {
+     "600": 116.96,
+     "1000": 116.96,
+     "1500": 120.33,
+     "2000": 120.33
+    },
+    "max_draws": 6071,
+    "cap_sources": {
+     "runner_effective": 60,
+     "cvar": "60",
+     "native_frames_cvar": "60"
+    },
+    "axis_minus_close_s": 0.99,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": 0.309,
+     "max_abs": 0.309
+    }
+   },
+   "renderer": "native",
+   "metrics": {
+    "frames": 5878,
+    "window_s": 119.978,
+    "fps": 48.992,
+    "median_ms": 16.725,
+    "p99_ms": 70.506,
+    "low1_ms": 98.988,
+    "max_ms": 156.662,
+    "n_ge100": 26,
+    "n_ge250": 0,
+    "at60_share": 0.687
+   },
+   "verdict": "FLAG"
+  },
+  {
+   "run_dir": "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1839-n4bp60-r2",
+   "tag": "n4bp60-r2",
+   "bin_dir": "<workspace>\\build\\agent16\\pack\\native4bp-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 0.59 s, no WER/dump"
+    },
+    "runner": {
+     "status": "PASS",
+     "why": "status OK, valid_timing True, excluded False"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "PASS",
+     "why": "ok",
+     "t3d": 111.85,
+     "anchor_t": 115.22,
+     "anchor_minus_last_press": 41.89,
+     "anchor_minus_3d": 3.37,
+     "sustain10": 0.934
+    },
+    "span": {
+     "status": "PASS",
+     "why": "covered: 40.8 s of frames after window end; end of 3D at 267.4 s (32.1 s after window)",
+     "end3d_t": 267.36,
+     "end3d_low_t": 267.36,
+     "end3d_flat_t": null,
+     "window": [
+      115.22,
+      235.22
+     ],
+     "span_s": 120.0
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 51/91 (halted), last step t 275.1",
+     "last_press_t": 73.33,
+     "steps_done": 51,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "PASS",
+     "why": "cooldown met",
+     "record": {
+      "set_point_c": 72,
+      "timeout_s": 90,
+      "poll_s": 5,
+      "temp_before_c": 68,
+      "temp_start_c": 68,
+      "waited_s": 0,
+      "flag": null,
+      "target_c": 72,
+      "start_c": 68,
+      "end_c": 68,
+      "met": true,
+      "timed_out": false
+     },
+     "start_temp_c": 70.0,
+     "temp_at_anchor_c": 86.0
+    },
+    "thermal": {
+     "status": "PASS",
+     "why": "thermal-limited 0.19 > 0.10 (covariate; set rule: arm outlier -> FLAG)",
+     "samples": 120,
+     "expected": 120,
+     "thermal_share": 0.192,
+     "hw_brake_share": 0.0,
+     "powercap_share": 0.175,
+     "util_gpu": 51.5,
+     "gr_mhz": 1713.5,
+     "power_w": 25.39,
+     "temp_c": 85.0,
+     "p0_share": 0.875,
+     "thermal_limited": true,
+     "arm_median": 0.279
+    },
+    "host": {
+     "status": "PASS",
+     "why": "nongame 2.067 cores (set rule applied below)",
+     "nongame_mean": 2.067,
+     "rows": 120,
+     "set_median": 1.889,
+     "limit": 2.889
+    },
+    "cap": {
+     "status": "PASS",
+     "why": "below cap: GPU-bound info (fps 44.45, at60 share 0.55)",
+     "arm": "60",
+     "reported": 60
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "native-frames.csv offset +1 (median |interval-frame_time| 0.001 ms)",
+    "first_frame_t": 4.81,
+    "perf_rows": 13764,
+    "perf_last_t": 276.06,
+    "anchor_first_t": 115.22,
+    "anchor_sustained_t": 115.22,
+    "runner_window_start": 115.22,
+    "first_t_by_draws": {
+     "600": 111.85,
+     "1000": 111.85,
+     "1500": 115.22,
+     "2000": 115.22
+    },
+    "max_draws": 6071,
+    "cap_sources": {
+     "runner_effective": 60,
+     "cvar": "60",
+     "native_frames_cvar": "60"
+    },
+    "axis_minus_close_s": 0.97,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": 0.379,
+     "max_abs": 0.379
+    }
+   },
+   "renderer": "native",
+   "metrics": {
+    "frames": 5334,
+    "window_s": 119.99,
+    "fps": 44.454,
+    "median_ms": 16.884,
+    "p99_ms": 76.409,
+    "low1_ms": 94.306,
+    "max_ms": 229.944,
+    "n_ge100": 11,
+    "n_ge250": 0,
+    "at60_share": 0.548
+   },
+   "verdict": "PASS"
+  },
+  {
+   "run_dir": "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1844-natU-r2",
+   "tag": "natU-r2",
+   "bin_dir": "<workspace>\\build\\agent2\\nativefinal2-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 0.67 s, no WER/dump"
+    },
+    "runner": {
+     "status": "PASS",
+     "why": "status OK, valid_timing True, excluded False"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "PASS",
+     "why": "ok",
+     "t3d": 132.26,
+     "anchor_t": 135.65,
+     "anchor_minus_last_press": 63.23,
+     "anchor_minus_3d": 3.38,
+     "sustain10": 0.877
+    },
+    "span": {
+     "status": "PASS",
+     "why": "covered: 18.7 s of frames after window end; end of 3D not seen",
+     "end3d_t": null,
+     "end3d_low_t": null,
+     "end3d_flat_t": null,
+     "window": [
+      135.65,
+      255.65
+     ],
+     "span_s": 120.0
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 51/91 (halted), last step t 274.1",
+     "last_press_t": 72.42,
+     "steps_done": 51,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "PASS",
+     "why": "cooldown met",
+     "record": {
+      "set_point_c": 72,
+      "timeout_s": 90,
+      "poll_s": 5,
+      "temp_before_c": 74,
+      "temp_start_c": 71,
+      "waited_s": 10,
+      "flag": null,
+      "target_c": 72,
+      "start_c": 74,
+      "end_c": 71,
+      "met": true,
+      "timed_out": false
+     },
+     "start_temp_c": 72.0,
+     "temp_at_anchor_c": 81.0
+    },
+    "thermal": {
+     "status": "PASS",
+     "why": "thermal 0.00, hw 0.00",
+     "samples": 120,
+     "expected": 120,
+     "thermal_share": 0.0,
+     "hw_brake_share": 0.0,
+     "powercap_share": 0.0,
+     "util_gpu": 36.5,
+     "gr_mhz": 1732.0,
+     "power_w": 18.3,
+     "temp_c": 79.0,
+     "p0_share": 0.8
+    },
+    "host": {
+     "status": "PASS",
+     "why": "nongame 1.588 cores (set rule applied below)",
+     "nongame_mean": 1.588,
+     "rows": 120,
+     "set_median": 1.889,
+     "limit": 2.889
+    },
+    "cap": {
+     "status": "PASS",
+     "why": "fps 67.72",
+     "arm": "none",
+     "reported": 0
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "native-frames.csv offset +1 (median |interval-frame_time| 0.001 ms)",
+    "first_frame_t": 3.9,
+    "perf_rows": 61478,
+    "perf_last_t": 274.38,
+    "anchor_first_t": 135.65,
+    "anchor_sustained_t": 135.65,
+    "runner_window_start": 135.65,
+    "first_t_by_draws": {
+     "600": 132.26,
+     "1000": 132.26,
+     "1500": 135.65,
+     "2000": 135.65
+    },
+    "max_draws": 6071,
+    "cap_sources": {
+     "runner_effective": 0,
+     "cvar": "0",
+     "native_frames_cvar": "0"
+    },
+    "axis_minus_close_s": 0.27,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": -0.487,
+     "max_abs": 0.487
+    }
+   },
+   "renderer": "native",
+   "metrics": {
+    "frames": 8126,
+    "window_s": 119.993,
+    "fps": 67.72,
+    "median_ms": 10.572,
+    "p99_ms": 59.136,
+    "low1_ms": 78.106,
+    "max_ms": 283.966,
+    "n_ge100": 6,
+    "n_ge250": 1,
+    "at60_share": 0.02
+   },
+   "verdict": "PASS"
+  },
+  {
+   "run_dir": "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1849-ship60-r2",
+   "tag": "ship60-r2",
+   "bin_dir": "<workspace>\\build\\agent2\\devfinal2-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 0.59 s, no WER/dump"
+    },
+    "runner": {
+     "status": "PASS",
+     "why": "status OK, valid_timing True, excluded False"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "PASS",
+     "why": "ok",
+     "t3d": 83.2,
+     "anchor_t": 108.98,
+     "anchor_minus_last_press": 36.35,
+     "anchor_minus_3d": 25.78,
+     "sustain10": 1.0
+    },
+    "span": {
+     "status": "PASS",
+     "why": "covered: 47.1 s of frames after window end; end of 3D at 264.4 s (35.4 s after window)",
+     "end3d_t": 264.43,
+     "end3d_low_t": 264.43,
+     "end3d_flat_t": null,
+     "window": [
+      108.98,
+      228.98
+     ],
+     "span_s": 120.0
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 51/91 (halted), last step t 275.1",
+     "last_press_t": 72.63,
+     "steps_done": 51,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "PASS",
+     "why": "cooldown met",
+     "record": {
+      "set_point_c": 72,
+      "timeout_s": 90,
+      "poll_s": 5,
+      "temp_before_c": 71,
+      "temp_start_c": 71,
+      "waited_s": 0,
+      "flag": null,
+      "target_c": 72,
+      "start_c": 71,
+      "end_c": 71,
+      "met": true,
+      "timed_out": false
+     },
+     "start_temp_c": 72.0,
+     "temp_at_anchor_c": 87.0
+    },
+    "thermal": {
+     "status": "PASS",
+     "why": "thermal-limited 0.93 > 0.10 (covariate; set rule: arm outlier -> FLAG)",
+     "samples": 120,
+     "expected": 120,
+     "thermal_share": 0.933,
+     "hw_brake_share": 0.0,
+     "powercap_share": 0.017,
+     "util_gpu": 95.0,
+     "gr_mhz": 1267.0,
+     "power_w": 25.18,
+     "temp_c": 87.0,
+     "p0_share": 1.0,
+     "thermal_limited": true,
+     "arm_median": 0.913
+    },
+    "host": {
+     "status": "PASS",
+     "why": "nongame 1.491 cores (set rule applied below)",
+     "nongame_mean": 1.491,
+     "rows": 120,
+     "set_median": 1.889,
+     "limit": 2.889
+    },
+    "cap": {
+     "status": "PASS",
+     "why": "below cap: GPU-bound info (fps 44.96, at60 share 0.11)",
+     "arm": "60",
+     "reported": 60
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "perf.csv",
+    "first_frame_t": 4.11,
+    "perf_rows": 13965,
+    "perf_last_t": 276.1,
+    "anchor_first_t": 108.98,
+    "anchor_sustained_t": 108.98,
+    "runner_window_start": 108.98,
+    "first_t_by_draws": {
+     "600": 83.2,
+     "1000": 88.31,
+     "1500": 108.98,
+     "2000": 108.98
+    },
+    "max_draws": 15746,
+    "cap_sources": {
+     "runner_effective": 60,
+     "cvar": "60",
+     "native_frames_cvar": null
+    },
+    "axis_minus_close_s": 0.99,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": 0.41,
+     "max_abs": 0.41
+    }
+   },
+   "renderer": "xenos",
+   "metrics": {
+    "frames": 5394,
+    "window_s": 119.982,
+    "fps": 44.957,
+    "median_ms": 20.396,
+    "p99_ms": 53.898,
+    "low1_ms": 90.507,
+    "max_ms": 559.653,
+    "n_ge100": 7,
+    "n_ge250": 2,
+    "at60_share": 0.106
+   },
+   "verdict": "PASS"
+  },
+  {
+   "run_dir": "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1854-n4bp60-r3",
+   "tag": "n4bp60-r3",
+   "bin_dir": "<workspace>\\build\\agent16\\pack\\native4bp-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 0.67 s, no WER/dump"
+    },
+    "runner": {
+     "status": "PASS",
+     "why": "status OK, valid_timing True, excluded False"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "PASS",
+     "why": "ok",
+     "t3d": 110.45,
+     "anchor_t": 113.8,
+     "anchor_minus_last_press": 40.38,
+     "anchor_minus_3d": 3.35,
+     "sustain10": 0.947
+    },
+    "span": {
+     "status": "PASS",
+     "why": "covered: 42.2 s of frames after window end; end of 3D at 266.0 s (32.2 s after window)",
+     "end3d_t": 266.03,
+     "end3d_low_t": 266.03,
+     "end3d_flat_t": null,
+     "window": [
+      113.8,
+      233.8
+     ],
+     "span_s": 120.0
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 51/91 (halted), last step t 275.1",
+     "last_press_t": 73.42,
+     "steps_done": 51,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "PASS",
+     "why": "cooldown met",
+     "record": {
+      "set_point_c": 72,
+      "timeout_s": 90,
+      "poll_s": 5,
+      "temp_before_c": 76,
+      "temp_start_c": 70,
+      "waited_s": 15,
+      "flag": null,
+      "target_c": 72,
+      "start_c": 76,
+      "end_c": 70,
+      "met": true,
+      "timed_out": false
+     },
+     "start_temp_c": 73.0,
+     "temp_at_anchor_c": 86.0
+    },
+    "thermal": {
+     "status": "PASS",
+     "why": "thermal-limited 0.44 > 0.10 (covariate; set rule: arm outlier -> FLAG)",
+     "samples": 120,
+     "expected": 120,
+     "thermal_share": 0.442,
+     "hw_brake_share": 0.0,
+     "powercap_share": 0.05,
+     "util_gpu": 55.0,
+     "gr_mhz": 1567.5,
+     "power_w": 24.67,
+     "temp_c": 86.0,
+     "p0_share": 0.9,
+     "thermal_limited": true,
+     "arm_median": 0.279
+    },
+    "host": {
+     "status": "PASS",
+     "why": "nongame 1.711 cores (set rule applied below)",
+     "nongame_mean": 1.711,
+     "rows": 120,
+     "set_median": 1.889,
+     "limit": 2.889
+    },
+    "cap": {
+     "status": "PASS",
+     "why": "below cap: GPU-bound info (fps 46.86, at60 share 0.59)",
+     "arm": "60",
+     "reported": 60
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "native-frames.csv offset +1 (median |interval-frame_time| 0.001 ms)",
+    "first_frame_t": 4.93,
+    "perf_rows": 13911,
+    "perf_last_t": 276.04,
+    "anchor_first_t": 113.8,
+    "anchor_sustained_t": 113.8,
+    "runner_window_start": 113.8,
+    "first_t_by_draws": {
+     "600": 110.45,
+     "1000": 110.45,
+     "1500": 113.8,
+     "2000": 113.8
+    },
+    "max_draws": 6071,
+    "cap_sources": {
+     "runner_effective": 60,
+     "cvar": "60",
+     "native_frames_cvar": "60"
+    },
+    "axis_minus_close_s": 0.94,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": 0.235,
+     "max_abs": 0.235
+    }
+   },
+   "renderer": "native",
+   "metrics": {
+    "frames": 5623,
+    "window_s": 119.986,
+    "fps": 46.864,
+    "median_ms": 16.809,
+    "p99_ms": 65.706,
+    "low1_ms": 78.486,
+    "max_ms": 196.056,
+    "n_ge100": 3,
+    "n_ge250": 0,
+    "at60_share": 0.587
+   },
+   "verdict": "PASS"
+  },
+  {
+   "run_dir": "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1859-ship60-r3",
+   "tag": "ship60-r3",
+   "bin_dir": "<workspace>\\build\\agent2\\devfinal2-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 0.63 s, no WER/dump"
+    },
+    "runner": {
+     "status": "PASS",
+     "why": "status OK, valid_timing True, excluded False"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "PASS",
+     "why": "info: first >=1500 frame at 88.7 s is transient; sustained anchor 109.1 s (sustained used)",
+     "t3d": 83.36,
+     "anchor_t": 109.13,
+     "anchor_minus_last_press": 36.5,
+     "anchor_minus_3d": 25.77,
+     "sustain10": 1.0
+    },
+    "span": {
+     "status": "PASS",
+     "why": "covered: 46.9 s of frames after window end; end of 3D at 264.6 s (35.4 s after window)",
+     "end3d_t": 264.56,
+     "end3d_low_t": 264.56,
+     "end3d_flat_t": null,
+     "window": [
+      109.13,
+      229.13
+     ],
+     "span_s": 120.0
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 51/91 (halted), last step t 275.1",
+     "last_press_t": 72.63,
+     "steps_done": 51,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "PASS",
+     "why": "cooldown met",
+     "record": {
+      "set_point_c": 72,
+      "timeout_s": 90,
+      "poll_s": 5,
+      "temp_before_c": 73,
+      "temp_start_c": 71,
+      "waited_s": 5,
+      "flag": null,
+      "target_c": 72,
+      "start_c": 73,
+      "end_c": 71,
+      "met": true,
+      "timed_out": false
+     },
+     "start_temp_c": 72.0,
+     "temp_at_anchor_c": 87.0
+    },
+    "thermal": {
+     "status": "PASS",
+     "why": "thermal-limited 0.89 > 0.10 (covariate; set rule: arm outlier -> FLAG)",
+     "samples": 120,
+     "expected": 120,
+     "thermal_share": 0.892,
+     "hw_brake_share": 0.0,
+     "powercap_share": 0.025,
+     "util_gpu": 92.0,
+     "gr_mhz": 1267.0,
+     "power_w": 24.35,
+     "temp_c": 86.0,
+     "p0_share": 1.0,
+     "thermal_limited": true,
+     "arm_median": 0.913
+    },
+    "host": {
+     "status": "PASS",
+     "why": "nongame 2.257 cores (set rule applied below)",
+     "nongame_mean": 2.257,
+     "rows": 120,
+     "set_median": 1.889,
+     "limit": 2.889
+    },
+    "cap": {
+     "status": "PASS",
+     "why": "below cap: GPU-bound info (fps 42.15, at60 share 0.08)",
+     "arm": "60",
+     "reported": 60
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "perf.csv",
+    "first_frame_t": 4.13,
+    "perf_rows": 13342,
+    "perf_last_t": 276.06,
+    "anchor_first_t": 88.68,
+    "anchor_sustained_t": 109.13,
+    "runner_window_start": 109.13,
+    "first_t_by_draws": {
+     "600": 83.36,
+     "1000": 88.28,
+     "1500": 88.68,
+     "2000": 88.68
+    },
+    "max_draws": 15746,
+    "cap_sources": {
+     "runner_effective": 60,
+     "cvar": "60",
+     "native_frames_cvar": null
+    },
+    "axis_minus_close_s": 0.97,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": 0.328,
+     "max_abs": 0.328
+    }
+   },
+   "renderer": "xenos",
+   "metrics": {
+    "frames": 5056,
+    "window_s": 119.949,
+    "fps": 42.151,
+    "median_ms": 21.375,
+    "p99_ms": 72.338,
+    "low1_ms": 110.059,
+    "max_ms": 528.448,
+    "n_ge100": 16,
+    "n_ge250": 2,
+    "at60_share": 0.083
+   },
+   "verdict": "PASS"
+  },
+  {
+   "run_dir": "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1904-nat60-r3",
+   "tag": "nat60-r3",
+   "bin_dir": "<workspace>\\build\\agent2\\nativefinal2-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 0.53 s, no WER/dump"
+    },
+    "runner": {
+     "status": "PASS",
+     "why": "status OK, valid_timing True, excluded False"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "PASS",
+     "why": "ok",
+     "t3d": 110.52,
+     "anchor_t": 113.87,
+     "anchor_minus_last_press": 40.61,
+     "anchor_minus_3d": 3.35,
+     "sustain10": 0.952
+    },
+    "span": {
+     "status": "PASS",
+     "why": "covered: 41.2 s of frames after window end; end of 3D at 265.9 s (32.0 s after window)",
+     "end3d_t": 265.91,
+     "end3d_low_t": 265.91,
+     "end3d_flat_t": null,
+     "window": [
+      113.87,
+      233.87
+     ],
+     "span_s": 120.0
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 51/91 (halted), last step t 274.0",
+     "last_press_t": 73.26,
+     "steps_done": 51,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "PASS",
+     "why": "cooldown met",
+     "record": {
+      "set_point_c": 72,
+      "timeout_s": 90,
+      "poll_s": 5,
+      "temp_before_c": 75,
+      "temp_start_c": 71,
+      "waited_s": 15,
+      "flag": null,
+      "target_c": 72,
+      "start_c": 75,
+      "end_c": 71,
+      "met": true,
+      "timed_out": false
+     },
+     "start_temp_c": 72.0,
+     "temp_at_anchor_c": 75.0
+    },
+    "thermal": {
+     "status": "PASS",
+     "why": "thermal 0.00, hw 0.00",
+     "samples": 120,
+     "expected": 120,
+     "thermal_share": 0.0,
+     "hw_brake_share": 0.0,
+     "powercap_share": 0.0,
+     "util_gpu": 38.0,
+     "gr_mhz": 1057.0,
+     "power_w": 11.24,
+     "temp_c": 76.5,
+     "p0_share": 0.817,
+     "arm_median": 0.0
+    },
+    "host": {
+     "status": "PASS",
+     "why": "nongame 1.254 cores (set rule applied below)",
+     "nongame_mean": 1.254,
+     "rows": 120,
+     "set_median": 1.889,
+     "limit": 2.889
+    },
+    "cap": {
+     "status": "PASS",
+     "why": "below cap: GPU-bound info (fps 51.07, at60 share 0.76)",
+     "arm": "60",
+     "reported": 60
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "native-frames.csv offset +1 (median |interval-frame_time| 0.001 ms)",
+    "first_frame_t": 4.76,
+    "perf_rows": 14789,
+    "perf_last_t": 275.07,
+    "anchor_first_t": 113.87,
+    "anchor_sustained_t": 113.87,
+    "runner_window_start": 113.87,
+    "first_t_by_draws": {
+     "600": 110.52,
+     "1000": 110.52,
+     "1500": 113.87,
+     "2000": 113.87
+    },
+    "max_draws": 6071,
+    "cap_sources": {
+     "runner_effective": 60,
+     "cvar": "60",
+     "native_frames_cvar": "60"
+    },
+    "axis_minus_close_s": 1.01,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": 0.476,
+     "max_abs": 0.476
+    }
+   },
+   "renderer": "native",
+   "metrics": {
+    "frames": 6127,
+    "window_s": 119.977,
+    "fps": 51.068,
+    "median_ms": 16.717,
+    "p99_ms": 44.715,
+    "low1_ms": 55.779,
+    "max_ms": 148.641,
+    "n_ge100": 1,
+    "n_ge250": 0,
+    "at60_share": 0.758
+   },
+   "verdict": "PASS"
+  },
+  {
+   "run_dir": "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1909-ship60-r4",
+   "tag": "ship60-r4",
+   "bin_dir": "<workspace>\\build\\agent2\\devfinal2-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 0.63 s, no WER/dump"
+    },
+    "runner": {
+     "status": "PASS",
+     "why": "status OK, valid_timing True, excluded False"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "PASS",
+     "why": "info: first >=1500 frame at 88.8 s is transient; sustained anchor 109.2 s (sustained used)",
+     "t3d": 83.41,
+     "anchor_t": 109.19,
+     "anchor_minus_last_press": 36.51,
+     "anchor_minus_3d": 25.78,
+     "sustain10": 1.0
+    },
+    "span": {
+     "status": "PASS",
+     "why": "covered: 46.9 s of frames after window end; end of 3D at 264.6 s (35.5 s after window)",
+     "end3d_t": 264.64,
+     "end3d_low_t": 264.64,
+     "end3d_flat_t": null,
+     "window": [
+      109.19,
+      229.19
+     ],
+     "span_s": 120.0
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 51/91 (halted), last step t 275.1",
+     "last_press_t": 72.68,
+     "steps_done": 51,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "PASS",
+     "why": "cooldown met",
+     "record": {
+      "set_point_c": 72,
+      "timeout_s": 90,
+      "poll_s": 5,
+      "temp_before_c": 68,
+      "temp_start_c": 68,
+      "waited_s": 0,
+      "flag": null,
+      "target_c": 72,
+      "start_c": 68,
+      "end_c": 68,
+      "met": true,
+      "timed_out": false
+     },
+     "start_temp_c": 69.0,
+     "temp_at_anchor_c": 87.0
+    },
+    "thermal": {
+     "status": "PASS",
+     "why": "thermal-limited 0.95 > 0.10 (covariate; set rule: arm outlier -> FLAG)",
+     "samples": 120,
+     "expected": 120,
+     "thermal_share": 0.95,
+     "hw_brake_share": 0.0,
+     "powercap_share": 0.033,
+     "util_gpu": 92.5,
+     "gr_mhz": 1267.0,
+     "power_w": 24.74,
+     "temp_c": 87.0,
+     "p0_share": 1.0,
+     "thermal_limited": true,
+     "arm_median": 0.913
+    },
+    "host": {
+     "status": "PASS",
+     "why": "nongame 1.690 cores (set rule applied below)",
+     "nongame_mean": 1.69,
+     "rows": 120,
+     "set_median": 1.889,
+     "limit": 2.889
+    },
+    "cap": {
+     "status": "PASS",
+     "why": "below cap: GPU-bound info (fps 42.61, at60 share 0.11)",
+     "arm": "60",
+     "reported": 60
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "perf.csv",
+    "first_frame_t": 4.18,
+    "perf_rows": 13531,
+    "perf_last_t": 276.09,
+    "anchor_first_t": 88.79,
+    "anchor_sustained_t": 109.19,
+    "runner_window_start": 109.19,
+    "first_t_by_draws": {
+     "600": 83.41,
+     "1000": 85.81,
+     "1500": 88.79,
+     "2000": 88.79
+    },
+    "max_draws": 15746,
+    "cap_sources": {
+     "runner_effective": 60,
+     "cvar": "60",
+     "native_frames_cvar": null
+    },
+    "axis_minus_close_s": 1.0,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": 0.384,
+     "max_abs": 0.384
+    }
+   },
+   "renderer": "xenos",
+   "metrics": {
+    "frames": 5112,
+    "window_s": 119.967,
+    "fps": 42.612,
+    "median_ms": 21.244,
+    "p99_ms": 64.732,
+    "low1_ms": 95.125,
+    "max_ms": 364.866,
+    "n_ge100": 11,
+    "n_ge250": 2,
+    "at60_share": 0.114
+   },
+   "verdict": "PASS"
+  },
+  {
+   "run_dir": "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1914-nat60-r4",
+   "tag": "nat60-r4",
+   "bin_dir": "<workspace>\\build\\agent2\\nativefinal2-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 0.52 s, no WER/dump"
+    },
+    "runner": {
+     "status": "PASS",
+     "why": "status OK, valid_timing True, excluded False"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "PASS",
+     "why": "ok",
+     "t3d": 110.19,
+     "anchor_t": 113.56,
+     "anchor_minus_last_press": 40.23,
+     "anchor_minus_3d": 3.37,
+     "sustain10": 0.952
+    },
+    "span": {
+     "status": "PASS",
+     "why": "covered: 42.5 s of frames after window end; end of 3D at 265.6 s (32.1 s after window)",
+     "end3d_t": 265.62,
+     "end3d_low_t": 265.62,
+     "end3d_flat_t": null,
+     "window": [
+      113.56,
+      233.56
+     ],
+     "span_s": 120.0
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 51/91 (halted), last step t 275.1",
+     "last_press_t": 73.33,
+     "steps_done": 51,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "PASS",
+     "why": "cooldown met",
+     "record": {
+      "set_point_c": 72,
+      "timeout_s": 90,
+      "poll_s": 5,
+      "temp_before_c": 75,
+      "temp_start_c": 71,
+      "waited_s": 15,
+      "flag": null,
+      "target_c": 72,
+      "start_c": 75,
+      "end_c": 71,
+      "met": true,
+      "timed_out": false
+     },
+     "start_temp_c": 72.0,
+     "temp_at_anchor_c": 73.0
+    },
+    "thermal": {
+     "status": "PASS",
+     "why": "thermal 0.00, hw 0.00",
+     "samples": 120,
+     "expected": 120,
+     "thermal_share": 0.0,
+     "hw_brake_share": 0.0,
+     "powercap_share": 0.0,
+     "util_gpu": 38.0,
+     "gr_mhz": 990.0,
+     "power_w": 10.66,
+     "temp_c": 76.0,
+     "p0_share": 0.725,
+     "arm_median": 0.0
+    },
+    "host": {
+     "status": "PASS",
+     "why": "nongame 1.201 cores (set rule applied below)",
+     "nongame_mean": 1.201,
+     "rows": 120,
+     "set_median": 1.889,
+     "limit": 2.889
+    },
+    "cap": {
+     "status": "PASS",
+     "why": "below cap: GPU-bound info (fps 51.86, at60 share 0.78)",
+     "arm": "60",
+     "reported": 60
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "native-frames.csv offset +1 (median |interval-frame_time| 0.001 ms)",
+    "first_frame_t": 4.81,
+    "perf_rows": 14940,
+    "perf_last_t": 276.08,
+    "anchor_first_t": 113.56,
+    "anchor_sustained_t": 113.56,
+    "runner_window_start": 113.56,
+    "first_t_by_draws": {
+     "600": 110.19,
+     "1000": 110.19,
+     "1500": 113.56,
+     "2000": 113.56
+    },
+    "max_draws": 6071,
+    "cap_sources": {
+     "runner_effective": 60,
+     "cvar": "60",
+     "native_frames_cvar": "60"
+    },
+    "axis_minus_close_s": 1.0,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": 0.491,
+     "max_abs": 0.491
+    }
+   },
+   "renderer": "native",
+   "metrics": {
+    "frames": 6222,
+    "window_s": 119.979,
+    "fps": 51.859,
+    "median_ms": 16.706,
+    "p99_ms": 40.794,
+    "low1_ms": 53.523,
+    "max_ms": 144.959,
+    "n_ge100": 2,
+    "n_ge250": 0,
+    "at60_share": 0.781
+   },
+   "verdict": "PASS"
+  },
+  {
+   "run_dir": "<workspace>\\build\\agent8\\s5\\matrix\\20261125-1804\\runs\\1919-n4bp60-r4",
+   "tag": "n4bp60-r4",
+   "bin_dir": "<workspace>\\build\\agent16\\pack\\native4bp-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 0.76 s, no WER/dump"
+    },
+    "runner": {
+     "status": "PASS",
+     "why": "status OK, valid_timing True, excluded False"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "PASS",
+     "why": "ok",
+     "t3d": 109.94,
+     "anchor_t": 113.29,
+     "anchor_minus_last_press": 40.11,
+     "anchor_minus_3d": 3.35,
+     "sustain10": 0.948
+    },
+    "span": {
+     "status": "PASS",
+     "why": "covered: 41.8 s of frames after window end; end of 3D at 265.4 s (32.1 s after window)",
+     "end3d_t": 265.4,
+     "end3d_low_t": 265.4,
+     "end3d_flat_t": null,
+     "window": [
+      113.29,
+      233.29
+     ],
+     "span_s": 120.0
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 51/91 (halted), last step t 274.1",
+     "last_press_t": 73.18,
+     "steps_done": 51,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "PASS",
+     "why": "cooldown met",
+     "record": {
+      "set_point_c": 72,
+      "timeout_s": 90,
+      "poll_s": 5,
+      "temp_before_c": 68,
+      "temp_start_c": 68,
+      "waited_s": 0,
+      "flag": null,
+      "target_c": 72,
+      "start_c": 68,
+      "end_c": 68,
+      "met": true,
+      "timed_out": false
+     },
+     "start_temp_c": 70.0,
+     "temp_at_anchor_c": 83.0
+    },
+    "thermal": {
+     "status": "PASS",
+     "why": "thermal-limited 0.37 > 0.10 (covariate; set rule: arm outlier -> FLAG)",
+     "samples": 120,
+     "expected": 120,
+     "thermal_share": 0.367,
+     "hw_brake_share": 0.0,
+     "powercap_share": 0.083,
+     "util_gpu": 56.0,
+     "gr_mhz": 1620.0,
+     "power_w": 25.38,
+     "temp_c": 86.0,
+     "p0_share": 0.908,
+     "thermal_limited": true,
+     "arm_median": 0.279
+    },
+    "host": {
+     "status": "PASS",
+     "why": "nongame 1.379 cores (set rule applied below)",
+     "nongame_mean": 1.379,
+     "rows": 120,
+     "set_median": 1.889,
+     "limit": 2.889
+    },
+    "cap": {
+     "status": "PASS",
+     "why": "below cap: GPU-bound info (fps 48.34, at60 share 0.60)",
+     "arm": "60",
+     "reported": 60
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "native-frames.csv offset +1 (median |interval-frame_time| 0.001 ms)",
+    "first_frame_t": 4.69,
+    "perf_rows": 14203,
+    "perf_last_t": 275.07,
+    "anchor_first_t": 113.29,
+    "anchor_sustained_t": 113.29,
+    "runner_window_start": 113.29,
+    "first_t_by_draws": {
+     "600": 109.94,
+     "1000": 109.94,
+     "1500": 113.29,
+     "2000": 113.29
+    },
+    "max_draws": 6071,
+    "cap_sources": {
+     "runner_effective": 60,
+     "cvar": "60",
+     "native_frames_cvar": "60"
+    },
+    "axis_minus_close_s": 0.98,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": 0.189,
+     "max_abs": 0.189
+    }
+   },
+   "renderer": "native",
+   "metrics": {
+    "frames": 5799,
+    "window_s": 119.975,
+    "fps": 48.335,
+    "median_ms": 16.803,
+    "p99_ms": 55.453,
+    "low1_ms": 74.581,
+    "max_ms": 228.999,
+    "n_ge100": 5,
+    "n_ge250": 0,
+    "at60_share": 0.603
+   },
+   "verdict": "PASS"
+  }
+ ]
+}

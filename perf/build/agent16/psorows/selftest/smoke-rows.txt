@@ -1,0 +1,53 @@
+pso_post.py mode rows; expect fingerprint 39129c4c059be5f0
+  arm s0-ref-cold: <workspace>\build\agent16\smoke4bp\runs\20261125-174131-smoke-4bp
+  arm c-pso-t1: (not given)  <- MISSING
+  arm c-pso-unl: (not given)  <- MISSING
+  arm w-ref-t1: (not given)  <- MISSING
+  arm w-pso-t1: (not given)  <- MISSING
+  arm w-ref-t4: (not given)  <- MISSING
+  arm w-pso-t2: (not given)  <- MISSING
+  arm w-pso-t4: (not given)  <- MISSING
+  arm w-pso-unl: (not given)  <- MISSING
+  frame pacing (fps mean, p99 ms, 1% low fps) from: summary.json frames; hitch50/blockfr/worst from the 'PSO frames:' line of the exit summary
+== table
+arm                  exit  fp        cache   open_B  L  C  F  R  thr  elapsed  compiles  aux_req  aux_cmp  aux_ms  saves  svfail  held_ms  copy_ms  retry  mwait_wst  sum  hitch50  blockfr  worst  fps   p99   1%low  1st_fr_s
+-------------------  ----  --------  ------  ------  -  -  -  -  ---  -------  --------  -------  -------  ------  -----  ------  -------  -------  -----  ---------  ---  -------  -------  -----  ----  ----  -----  --------
+s0-ref-cold          ok    39129c4c  opened  0       -  -  -  -  -    -        -         -        -        -       -      -       -        -        -      -          -    -        -        -      96.5  94.8  10.6   5.0     
+c-pso-t1 (MISSING)   -     -         -       -       -  -  -  -  -    -        -         -        -        -       -      -       -        -        -      -          -    -        -        -      -     -     -      -       
+c-pso-unl (MISSING)  -     -         -       -       -  -  -  -  -    -        -         -        -        -       -      -       -        -        -      -          -    -        -        -      -     -     -      -       
+w-ref-t1 (MISSING)   -     -         -       -       -  -  -  -  -    -        -         -        -        -       -      -       -        -        -      -          -    -        -        -      -     -     -      -       
+w-pso-t1 (MISSING)   -     -         -       -       -  -  -  -  -    -        -         -        -        -       -      -       -        -        -      -          -    -        -        -      -     -     -      -       
+w-ref-t4 (MISSING)   -     -         -       -       -  -  -  -  -    -        -         -        -        -       -      -       -        -        -      -          -    -        -        -      -     -     -      -       
+w-pso-t2 (MISSING)   -     -         -       -       -  -  -  -  -    -        -         -        -        -       -      -       -        -        -      -          -    -        -        -      -     -     -      -       
+w-pso-t4 (MISSING)   -     -         -       -       -  -  -  -  -    -        -         -        -        -       -      -       -        -        -      -          -    -        -        -      -     -     -      -       
+w-pso-unl (MISSING)  -     -         -       -       -  -  -  -  -    -        -         -        -        -       -      -       -        -        -      -          -    -        -        -      -     -     -      -       
+== checks
+FAIL arm c-pso-t1 missing: not given
+FAIL arm c-pso-unl missing: not given
+FAIL arm w-ref-t1 missing: not given
+FAIL arm w-pso-t1 missing: not given
+FAIL arm w-ref-t4 missing: not given
+FAIL arm w-pso-t2 missing: not given
+FAIL arm w-pso-t4 missing: not given
+FAIL arm w-pso-unl missing: not given
+-- s0-ref-cold
+PASS s0-ref-cold clean exit: exit 0x00000000 early False close wm_close 3.17 s wer False crash 0 dumps 0
+PASS s0-ref-cold route ran: steps 55/91 last halted timeouts 0 error None
+PASS s0-ref-cold fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+FAIL s0-ref-cold PSO stats lines: stats-on 0, interval lines 0, summary blocks 0 (none)
+PASS s0-ref-cold no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS s0-ref-cold cold confirmed: 'no startup pipeline recipes yet' 1, startup line no, opened 0 bytes, summary cache None
+PASS s0-ref-cold no unlocked env lines (envs unset): save 0, aux 0
+INFO s0-ref-cold Stop(): not reached ('Title terminated; hard-exiting' x1): the shutdown-save check does not apply; cache saves logged 15
+INFO s0-ref-cold PSO saves: no summary block: failed count unknown (write/replace/E_INVALIDARG lines are checked above)
+PASS s0-ref-cold seed written: recipes saved [1, 2, 5, 30, 53, 56, 59, 136, 223, 233, 237, 238, 244, 245, 254], cache saves 15
+== 2.2 recipe replay
+FAIL 2.2 t1 comparison: w-pso-t1 or w-ref-t1 missing
+FAIL 2.2 w-pso-t2 vs w-pso-t1: w-pso-t2 or w-pso-t1 missing or without a startup line
+FAIL 2.2 w-pso-t4 vs w-pso-t1: w-pso-t4 or w-pso-t1 missing or without a startup line
+FAIL 2.2 t4 comparison: w-pso-t4 or w-ref-t4 missing
+INFO elapsed_ms: 
+== 2.3 unlocked aux/save
+FAIL 2.3 c-pso-unl vs c-pso-t1: arm missing
+FAIL 2.3 w-pso-unl vs w-pso-t1: arm missing
+RESULT: FAIL: arm c-pso-t1 missing; arm c-pso-unl missing; arm w-ref-t1 missing; arm w-pso-t1 missing; arm w-ref-t4 missing; arm w-pso-t2 missing; arm w-pso-t4 missing; arm w-pso-unl missing; s0-ref-cold PSO stats lines; 2.2 t1 comparison; 2.2 w-pso-t2 vs w-pso-t1; 2.2 w-pso-t4 vs w-pso-t1; 2.2 t4 comparison; 2.3 c-pso-unl vs c-pso-t1; 2.3 w-pso-unl vs w-pso-t1

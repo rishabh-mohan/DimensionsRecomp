@@ -1,0 +1,9 @@
+C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\python.exe -B <workspace>\build\agent16\pack\stage6_inputs.py --dump-dir <workspace>\build\agent16\pack\selftest6\run-20261126-083015\collision\dump --base <workspace>\build\agent16\pack\selftest6\run-20261126-083015\collision\base --base-sums 897D0391 --out-root <workspace>\build\agent16\pack\selftest6\run-20261126-083015\collision\out
+stage6_inputs.py sha256=11E42639C5878E683DE83E6C60E5A0F513ABBACA121105C10896E183D3AC4294 dump=<workspace>\build\agent16\pack\selftest6\run-20261126-083015\collision\dump base=<workspace>\build\agent16\pack\selftest6\run-20261126-083015\collision\base out-root=<workspace>\build\agent16\pack\selftest6\run-20261126-083015\collision\out
+base: 4 files, SUMS 897D0391; 1 root file(s) not carried into combined6 (D-C2): vs-A58EBA123EFB541C.bin
+dump placement-containers: 5 files; 1 already in base (same bytes); 1 same bytes as a base file under another name; 2 NEW
+DUP  ps-3333333333333333.bin = base ps-BBBBBBBBBBBBBBBB.bin
+NEW  ps-2222222222222222.bin 03FCFC088F6A069EA437EE716DC116D962CA79846640EF32F343573A01554739 62 B
+NEW  vs-1111111111111111.bin 5894B6CA567C55A85B833EE439100916B96083270276E65372F98D1A99EAEAD1 60 B
+FAIL name collision: ps-BBBBBBBBBBBBBBBB.bin in the dump differs from the base copy
+RESULT FAIL (NEW 2, base 4, root dropped 1, combined 5)

@@ -1,0 +1,215 @@
+pso_post.py mode rows; expect fingerprint 39129c4c059be5f0
+  arm s0-ref-cold: <workspace>\build\agent16\psorows\selftest\fixtures\rows-good\s0-ref-cold
+  arm c-pso-t1: <workspace>\build\agent16\psorows\selftest\fixtures\rows-good\c-pso-t1
+  arm c-pso-unl: <workspace>\build\agent16\psorows\selftest\fixtures\rows-good\c-pso-unl
+  arm w-ref-t1: <workspace>\build\agent16\psorows\selftest\fixtures\rows-good\w-ref-t1
+  arm w-pso-t1: <workspace>\build\agent16\psorows\selftest\fixtures\rows-good\w-pso-t1
+  arm w-ref-t4: <workspace>\build\agent16\psorows\selftest\fixtures\rows-good\w-ref-t4
+  arm w-pso-t2: <workspace>\build\agent16\psorows\selftest\fixtures\rows-good\w-pso-t2
+  arm w-pso-t4: <workspace>\build\agent16\psorows\selftest\fixtures\rows-good\w-pso-t4
+  arm w-pso-unl: <workspace>\build\agent16\psorows\selftest\fixtures\rows-good\w-pso-unl
+  frame pacing (fps mean, p99 ms, 1% low fps) from: summary.json frames; hitch50/blockfr/worst from the 'PSO frames:' line of the exit summary
+== table
+arm          exit  fp        cache   open_B    L    C   F  R    thr  elapsed  compiles  aux_req  aux_cmp  aux_ms  saves  svfail  held_ms  copy_ms  retry  mwait_wst  sum   hitch50  blockfr  worst   fps    p99   1%low  1st_fr_s
+-----------  ----  --------  ------  --------  ---  --  -  ---  ---  -------  --------  -------  -------  ------  -----  ------  -------  -------  -----  ---------  ----  -------  -------  ------  -----  ----  -----  --------
+s0-ref-cold  ok    39129c4c  new     0         -    -   -  -    -    -        500       12       12       900.0   2      0       45.0     40.0     0      25.0       exit  40       120      1130.0  100.0  60.0  12.0   5.0     
+c-pso-t1     ok    39129c4c  new     0         -    -   -  -    -    -        500       12       12       900.0   2      0       45.0     40.0     0      25.0       exit  40       120      1130.0  100.0  60.0  12.0   5.0     
+c-pso-unl    ok    39129c4c  new     0         -    -   -  -    -    -        500       12       12       900.0   2      0       5.0      40.0     1      25.0       exit  40       120      1130.0  100.0  60.0  12.0   5.0     
+w-ref-t1     ok    39129c4c  loaded  31457280  400  72  0  472  1    1800     500       12       12       900.0   2      0       45.0     40.0     0      25.0       exit  40       120      1130.0  100.0  60.0  12.0   5.0     
+w-pso-t1     ok    39129c4c  loaded  31457280  400  72  0  472  1    1800     500       12       12       900.0   2      0       45.0     40.0     0      25.0       exit  40       120      1130.0  100.0  60.0  12.0   5.0     
+w-ref-t4     ok    39129c4c  loaded  31457280  400  72  0  472  4    900      500       12       12       900.0   2      0       45.0     40.0     0      25.0       exit  40       120      1130.0  100.0  60.0  12.0   5.0     
+w-pso-t2     ok    39129c4c  loaded  31457280  410  62  0  472  2    1200     500       12       12       900.0   2      0       45.0     40.0     0      25.0       exit  40       120      1130.0  100.0  60.0  12.0   5.0     
+w-pso-t4     ok    39129c4c  loaded  31457280  400  72  0  472  4    900      500       12       12       900.0   2      0       45.0     40.0     0      25.0       exit  40       120      1130.0  100.0  60.0  12.0   5.0     
+w-pso-unl    ok    39129c4c  loaded  31457280  400  72  0  472  1    1800     500       12       12       900.0   2      0       5.0      40.0     1      25.0       exit  40       120      1130.0  100.0  60.0  12.0   5.0     
+== checks
+-- s0-ref-cold
+PASS s0-ref-cold clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS s0-ref-cold route ran: steps 55/91 last halted timeouts 0 error None
+PASS s0-ref-cold fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS s0-ref-cold PSO stats lines: stats-on 1, interval lines 1, summary blocks 2 (request, exit)
+PASS s0-ref-cold PSO summary block: used exit
+INFO s0-ref-cold PSO summary used: reason 'exit' at game.log line 15, 29000 frames over 290.0 s; 2 block(s) in the log
+PASS s0-ref-cold PSO summary reason: 'exit' (want pso-stats.now or exit)
+PASS s0-ref-cold no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS s0-ref-cold cold confirmed: 'no startup pipeline recipes yet' 1, startup line no, opened 0 bytes, summary cache new (no usable file)
+PASS s0-ref-cold no unlocked env lines (envs unset): save 0, aux 0
+PASS s0-ref-cold no cache save after Stop: saves after the Stop line 0, Stop/earlier save present True; Stop hits/misses/stored/saves {'hits': 900, 'misses': 30, 'stored': 30, 'saves': 2}
+PASS s0-ref-cold PSO saves failed = 0: {'written': 2, 'bytes': 41971520, 'failed': 0, 'postponed': 0, 'held_ms': 45.0, 'held_worst_ms': 45.0, 'copy_ms': 40.0, 'alloc_ms': 3.0, 'write_ms': 20.0, 'retries': 0, 'under_lock': 0}
+PASS s0-ref-cold auxiliary failed = 0: {'requests': 12, 'hits': 0, 'compiles': 12, 'failed': 0, 'ms': 900.0, 'worst_ms': 400.0}
+PASS s0-ref-cold seed written: recipes saved [472], cache saves 2
+-- c-pso-t1
+PASS c-pso-t1 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS c-pso-t1 route ran: steps 55/91 last halted timeouts 0 error None
+PASS c-pso-t1 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS c-pso-t1 PSO stats lines: stats-on 1, interval lines 1, summary blocks 2 (request, exit)
+PASS c-pso-t1 PSO summary block: used exit
+INFO c-pso-t1 PSO summary used: reason 'exit' at game.log line 15, 29000 frames over 290.0 s; 2 block(s) in the log
+PASS c-pso-t1 PSO summary reason: 'exit' (want pso-stats.now or exit)
+PASS c-pso-t1 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS c-pso-t1 no new hard WARN/ERROR types vs baseline: 0 hard
+PASS c-pso-t1 no new WARN/ERROR types vs baseline: 0 new
+PASS c-pso-t1 cold confirmed: 'no startup pipeline recipes yet' 1, startup line no, opened 0 bytes, summary cache new (no usable file)
+PASS c-pso-t1 no unlocked env lines (envs unset): save 0, aux 0
+PASS c-pso-t1 no cache save after Stop: saves after the Stop line 0, Stop/earlier save present True; Stop hits/misses/stored/saves {'hits': 900, 'misses': 30, 'stored': 30, 'saves': 2}
+PASS c-pso-t1 PSO saves failed = 0: {'written': 2, 'bytes': 41971520, 'failed': 0, 'postponed': 0, 'held_ms': 45.0, 'held_worst_ms': 45.0, 'copy_ms': 40.0, 'alloc_ms': 3.0, 'write_ms': 20.0, 'retries': 0, 'under_lock': 0}
+PASS c-pso-t1 auxiliary failed = 0: {'requests': 12, 'hits': 0, 'compiles': 12, 'failed': 0, 'ms': 900.0, 'worst_ms': 400.0}
+-- c-pso-unl
+PASS c-pso-unl clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS c-pso-unl route ran: steps 55/91 last halted timeouts 0 error None
+PASS c-pso-unl fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS c-pso-unl PSO stats lines: stats-on 1, interval lines 1, summary blocks 2 (request, exit)
+PASS c-pso-unl PSO summary block: used exit
+INFO c-pso-unl PSO summary used: reason 'exit' at game.log line 17, 29000 frames over 290.0 s; 2 block(s) in the log
+PASS c-pso-unl PSO summary reason: 'exit' (want pso-stats.now or exit)
+PASS c-pso-unl no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS c-pso-unl no new hard WARN/ERROR types vs baseline: 0 hard
+PASS c-pso-unl no new WARN/ERROR types vs baseline: 0 new
+PASS c-pso-unl cold confirmed: 'no startup pipeline recipes yet' 1, startup line no, opened 0 bytes, summary cache new (no usable file)
+PASS c-pso-unl SAVE_UNLOCKED and AUX_UNLOCKED env lines: save 1, aux 1
+PASS c-pso-unl no cache save after Stop: saves after the Stop line 0, Stop/earlier save present True; Stop hits/misses/stored/saves {'hits': 900, 'misses': 30, 'stored': 30, 'saves': 2}
+PASS c-pso-unl PSO saves failed = 0: {'written': 2, 'bytes': 41971520, 'failed': 0, 'postponed': 0, 'held_ms': 5.0, 'held_worst_ms': 5.0, 'copy_ms': 40.0, 'alloc_ms': 3.0, 'write_ms': 20.0, 'retries': 1, 'under_lock': 0}
+PASS c-pso-unl save mutex held < copy: held 5.0 ms (worst 5.0), copy 40.0 ms, retries 1, under-lock allocations 0
+PASS c-pso-unl auxiliary failed = 0: {'requests': 12, 'hits': 0, 'compiles': 12, 'failed': 0, 'ms': 900.0, 'worst_ms': 400.0}
+-- w-ref-t1
+PASS w-ref-t1 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS w-ref-t1 route ran: steps 55/91 last halted timeouts 0 error None
+PASS w-ref-t1 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS w-ref-t1 PSO stats lines: stats-on 1, interval lines 1, summary blocks 2 (request, exit)
+PASS w-ref-t1 PSO summary block: used exit
+INFO w-ref-t1 PSO summary used: reason 'exit' at game.log line 18, 29000 frames over 290.0 s; 2 block(s) in the log
+PASS w-ref-t1 PSO summary reason: 'exit' (want pso-stats.now or exit)
+PASS w-ref-t1 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS w-ref-t1 no new hard WARN/ERROR types vs baseline: 0 hard
+PASS w-ref-t1 no new WARN/ERROR types vs baseline: 0 new
+PASS w-ref-t1 warm cache accepted: opened 31457280 bytes, rejected 0, recipes ignored 0, summary cache loaded
+PASS w-ref-t1 startup replay: loaded 400 compiled 72 failed 0 resident 472 elapsed_ms 1800
+PASS w-ref-t1 startup failed = 0: failed 0
+PASS w-ref-t1 no unlocked env lines (envs unset): save 0, aux 0
+PASS w-ref-t1 no 'uses N threads' line (threads 1): None
+PASS w-ref-t1 no cache save after Stop: saves after the Stop line 0, Stop/earlier save present True; Stop hits/misses/stored/saves {'hits': 900, 'misses': 30, 'stored': 30, 'saves': 2}
+PASS w-ref-t1 PSO saves failed = 0: {'written': 2, 'bytes': 41971520, 'failed': 0, 'postponed': 0, 'held_ms': 45.0, 'held_worst_ms': 45.0, 'copy_ms': 40.0, 'alloc_ms': 3.0, 'write_ms': 20.0, 'retries': 0, 'under_lock': 0}
+PASS w-ref-t1 auxiliary failed = 0: {'requests': 12, 'hits': 0, 'compiles': 12, 'failed': 0, 'ms': 900.0, 'worst_ms': 400.0}
+INFO w-ref-t1 replay lines: processed [472], seeds [('native-pso-seed.bin', 40)], removed seeded [40]
+-- w-pso-t1
+PASS w-pso-t1 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS w-pso-t1 route ran: steps 55/91 last halted timeouts 0 error None
+PASS w-pso-t1 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS w-pso-t1 PSO stats lines: stats-on 1, interval lines 1, summary blocks 2 (request, exit)
+PASS w-pso-t1 PSO summary block: used exit
+INFO w-pso-t1 PSO summary used: reason 'exit' at game.log line 18, 29000 frames over 290.0 s; 2 block(s) in the log
+PASS w-pso-t1 PSO summary reason: 'exit' (want pso-stats.now or exit)
+PASS w-pso-t1 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS w-pso-t1 no new hard WARN/ERROR types vs baseline: 0 hard
+PASS w-pso-t1 no new WARN/ERROR types vs baseline: 0 new
+PASS w-pso-t1 warm cache accepted: opened 31457280 bytes, rejected 0, recipes ignored 0, summary cache loaded
+PASS w-pso-t1 startup replay: loaded 400 compiled 72 failed 0 resident 472 elapsed_ms 1800
+PASS w-pso-t1 startup failed = 0: failed 0
+PASS w-pso-t1 no unlocked env lines (envs unset): save 0, aux 0
+PASS w-pso-t1 no 'uses N threads' line (threads 1): None
+PASS w-pso-t1 no cache save after Stop: saves after the Stop line 0, Stop/earlier save present True; Stop hits/misses/stored/saves {'hits': 900, 'misses': 30, 'stored': 30, 'saves': 2}
+PASS w-pso-t1 PSO saves failed = 0: {'written': 2, 'bytes': 41971520, 'failed': 0, 'postponed': 0, 'held_ms': 45.0, 'held_worst_ms': 45.0, 'copy_ms': 40.0, 'alloc_ms': 3.0, 'write_ms': 20.0, 'retries': 0, 'under_lock': 0}
+PASS w-pso-t1 auxiliary failed = 0: {'requests': 12, 'hits': 0, 'compiles': 12, 'failed': 0, 'ms': 900.0, 'worst_ms': 400.0}
+INFO w-pso-t1 replay lines: processed [472], seeds [('native-pso-seed.bin', 40)], removed seeded [40]
+-- w-ref-t4
+PASS w-ref-t4 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS w-ref-t4 route ran: steps 55/91 last halted timeouts 0 error None
+PASS w-ref-t4 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS w-ref-t4 PSO stats lines: stats-on 1, interval lines 1, summary blocks 2 (request, exit)
+PASS w-ref-t4 PSO summary block: used exit
+INFO w-ref-t4 PSO summary used: reason 'exit' at game.log line 19, 29000 frames over 290.0 s; 2 block(s) in the log
+PASS w-ref-t4 PSO summary reason: 'exit' (want pso-stats.now or exit)
+PASS w-ref-t4 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS w-ref-t4 no new hard WARN/ERROR types vs baseline: 0 hard
+PASS w-ref-t4 no new WARN/ERROR types vs baseline: 0 new
+PASS w-ref-t4 warm cache accepted: opened 31457280 bytes, rejected 0, recipes ignored 0, summary cache loaded
+PASS w-ref-t4 startup replay: loaded 400 compiled 72 failed 0 resident 472 elapsed_ms 900
+PASS w-ref-t4 startup failed = 0: failed 0
+PASS w-ref-t4 no unlocked env lines (envs unset): save 0, aux 0
+PASS w-ref-t4 'uses 4 threads' line: [4]
+PASS w-ref-t4 no cache save after Stop: saves after the Stop line 0, Stop/earlier save present True; Stop hits/misses/stored/saves {'hits': 900, 'misses': 30, 'stored': 30, 'saves': 2}
+PASS w-ref-t4 PSO saves failed = 0: {'written': 2, 'bytes': 41971520, 'failed': 0, 'postponed': 0, 'held_ms': 45.0, 'held_worst_ms': 45.0, 'copy_ms': 40.0, 'alloc_ms': 3.0, 'write_ms': 20.0, 'retries': 0, 'under_lock': 0}
+PASS w-ref-t4 auxiliary failed = 0: {'requests': 12, 'hits': 0, 'compiles': 12, 'failed': 0, 'ms': 900.0, 'worst_ms': 400.0}
+INFO w-ref-t4 replay lines: processed [472], seeds [('native-pso-seed.bin', 40)], removed seeded [40]
+-- w-pso-t2
+PASS w-pso-t2 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS w-pso-t2 route ran: steps 55/91 last halted timeouts 0 error None
+PASS w-pso-t2 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS w-pso-t2 PSO stats lines: stats-on 1, interval lines 1, summary blocks 2 (request, exit)
+PASS w-pso-t2 PSO summary block: used exit
+INFO w-pso-t2 PSO summary used: reason 'exit' at game.log line 19, 29000 frames over 290.0 s; 2 block(s) in the log
+PASS w-pso-t2 PSO summary reason: 'exit' (want pso-stats.now or exit)
+PASS w-pso-t2 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS w-pso-t2 no new hard WARN/ERROR types vs baseline: 0 hard
+PASS w-pso-t2 no new WARN/ERROR types vs baseline: 0 new
+PASS w-pso-t2 warm cache accepted: opened 31457280 bytes, rejected 0, recipes ignored 0, summary cache loaded
+PASS w-pso-t2 startup replay: loaded 410 compiled 62 failed 0 resident 472 elapsed_ms 1200
+PASS w-pso-t2 startup failed = 0: failed 0
+PASS w-pso-t2 no unlocked env lines (envs unset): save 0, aux 0
+PASS w-pso-t2 'uses 2 threads' line: [2]
+PASS w-pso-t2 no cache save after Stop: saves after the Stop line 0, Stop/earlier save present True; Stop hits/misses/stored/saves {'hits': 900, 'misses': 30, 'stored': 30, 'saves': 2}
+PASS w-pso-t2 PSO saves failed = 0: {'written': 2, 'bytes': 41971520, 'failed': 0, 'postponed': 0, 'held_ms': 45.0, 'held_worst_ms': 45.0, 'copy_ms': 40.0, 'alloc_ms': 3.0, 'write_ms': 20.0, 'retries': 0, 'under_lock': 0}
+PASS w-pso-t2 auxiliary failed = 0: {'requests': 12, 'hits': 0, 'compiles': 12, 'failed': 0, 'ms': 900.0, 'worst_ms': 400.0}
+INFO w-pso-t2 replay lines: processed [472], seeds [('native-pso-seed.bin', 40)], removed seeded [40]
+-- w-pso-t4
+PASS w-pso-t4 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS w-pso-t4 route ran: steps 55/91 last halted timeouts 0 error None
+PASS w-pso-t4 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS w-pso-t4 PSO stats lines: stats-on 1, interval lines 1, summary blocks 2 (request, exit)
+PASS w-pso-t4 PSO summary block: used exit
+INFO w-pso-t4 PSO summary used: reason 'exit' at game.log line 19, 29000 frames over 290.0 s; 2 block(s) in the log
+PASS w-pso-t4 PSO summary reason: 'exit' (want pso-stats.now or exit)
+PASS w-pso-t4 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS w-pso-t4 no new hard WARN/ERROR types vs baseline: 0 hard
+PASS w-pso-t4 no new WARN/ERROR types vs baseline: 0 new
+PASS w-pso-t4 warm cache accepted: opened 31457280 bytes, rejected 0, recipes ignored 0, summary cache loaded
+PASS w-pso-t4 startup replay: loaded 400 compiled 72 failed 0 resident 472 elapsed_ms 900
+PASS w-pso-t4 startup failed = 0: failed 0
+PASS w-pso-t4 no unlocked env lines (envs unset): save 0, aux 0
+PASS w-pso-t4 'uses 4 threads' line: [4]
+PASS w-pso-t4 no cache save after Stop: saves after the Stop line 0, Stop/earlier save present True; Stop hits/misses/stored/saves {'hits': 900, 'misses': 30, 'stored': 30, 'saves': 2}
+PASS w-pso-t4 PSO saves failed = 0: {'written': 2, 'bytes': 41971520, 'failed': 0, 'postponed': 0, 'held_ms': 45.0, 'held_worst_ms': 45.0, 'copy_ms': 40.0, 'alloc_ms': 3.0, 'write_ms': 20.0, 'retries': 0, 'under_lock': 0}
+PASS w-pso-t4 auxiliary failed = 0: {'requests': 12, 'hits': 0, 'compiles': 12, 'failed': 0, 'ms': 900.0, 'worst_ms': 400.0}
+INFO w-pso-t4 replay lines: processed [472], seeds [('native-pso-seed.bin', 40)], removed seeded [40]
+-- w-pso-unl
+PASS w-pso-unl clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS w-pso-unl route ran: steps 55/91 last halted timeouts 0 error None
+PASS w-pso-unl fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS w-pso-unl PSO stats lines: stats-on 1, interval lines 1, summary blocks 2 (request, exit)
+PASS w-pso-unl PSO summary block: used exit
+INFO w-pso-unl PSO summary used: reason 'exit' at game.log line 20, 29000 frames over 290.0 s; 2 block(s) in the log
+PASS w-pso-unl PSO summary reason: 'exit' (want pso-stats.now or exit)
+PASS w-pso-unl no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS w-pso-unl no new hard WARN/ERROR types vs baseline: 0 hard
+PASS w-pso-unl no new WARN/ERROR types vs baseline: 0 new
+PASS w-pso-unl warm cache accepted: opened 31457280 bytes, rejected 0, recipes ignored 0, summary cache loaded
+PASS w-pso-unl startup replay: loaded 400 compiled 72 failed 0 resident 472 elapsed_ms 1800
+PASS w-pso-unl startup failed = 0: failed 0
+PASS w-pso-unl SAVE_UNLOCKED and AUX_UNLOCKED env lines: save 1, aux 1
+PASS w-pso-unl no 'uses N threads' line (threads 1): None
+PASS w-pso-unl no cache save after Stop: saves after the Stop line 0, Stop/earlier save present True; Stop hits/misses/stored/saves {'hits': 900, 'misses': 30, 'stored': 30, 'saves': 2}
+PASS w-pso-unl PSO saves failed = 0: {'written': 2, 'bytes': 41971520, 'failed': 0, 'postponed': 0, 'held_ms': 5.0, 'held_worst_ms': 5.0, 'copy_ms': 40.0, 'alloc_ms': 3.0, 'write_ms': 20.0, 'retries': 1, 'under_lock': 0}
+PASS w-pso-unl save mutex held < copy: held 5.0 ms (worst 5.0), copy 40.0 ms, retries 1, under-lock allocations 0
+PASS w-pso-unl auxiliary failed = 0: {'requests': 12, 'hits': 0, 'compiles': 12, 'failed': 0, 'ms': 900.0, 'worst_ms': 400.0}
+INFO w-pso-unl replay lines: processed [472], seeds [('native-pso-seed.bin', 40)], removed seeded [40]
+== 2.2 recipe replay
+PASS w-pso-t1 vs w-ref-t1 startup counts exactly equal: pso [400, 72, 0, 472] ref [400, 72, 0, 472]
+PASS w-pso-t1 vs w-ref-t1 seed lines and removed-seeded equal: pso ([('native-pso-seed.bin', 40)], [40]) ref ([('native-pso-seed.bin', 40)], [40])
+PASS w-pso-t2 loaded+compiled == w-pso-t1: 472 vs 472 (L/C 410/62 vs 400/72)
+PASS w-pso-t2 resident == min(512, L+C): 472 vs 472
+PASS w-pso-t2 failed <= w-pso-t1: 0 vs 0
+PASS w-pso-t4 loaded+compiled == w-pso-t1: 472 vs 472 (L/C 400/72 vs 400/72)
+PASS w-pso-t4 resident == min(512, L+C): 472 vs 472
+PASS w-pso-t4 failed <= w-pso-t1: 0 vs 0
+INFO w-pso-t1 resident vs min(512, L+C): 472 vs 472
+PASS w-pso-t4 vs w-ref-t4 L+C, failed, resident equal: pso L+C 472 F 0 R 472; ref L+C 472 F 0 R 472
+PASS w-pso-t4 vs w-ref-t4 L/C split equal: 400/72 vs 400/72
+INFO elapsed_ms: w-ref-t1 1800, w-pso-t1 1800, w-pso-t2 1200, w-ref-t4 900, w-pso-t4 900
+PASS w-pso-t4 elapsed_ms < w-pso-t1: 900 vs 1800
+== 2.3 unlocked aux/save
+PASS c-pso-unl auxiliary counts == c-pso-t1: c-pso-unl req/hits/comp/fail [12, 0, 12, 0] c-pso-t1 [12, 0, 12, 0]; ms 900.0 vs 900.0
+INFO c-pso-unl lookups mutex wait vs c-pso-t1: worst 25.0 vs 25.0 ms, total 120.0 vs 120.0 ms, waits>=1ms 7 vs 7
+PASS w-pso-unl auxiliary counts == w-pso-t1: w-pso-unl req/hits/comp/fail [12, 0, 12, 0] w-pso-t1 [12, 0, 12, 0]; ms 900.0 vs 900.0
+INFO w-pso-unl lookups mutex wait vs w-pso-t1: worst 25.0 vs 25.0 ms, total 120.0 vs 120.0 ms, waits>=1ms 7 vs 7
+PASS w-pso-unl reload of the c-pso-unl cache: opened 31457280 bytes, rejected 0, loaded 400, summary cache loaded
+INFO c-pso-t1 vs s0-ref-cold (driver cache primed by s0): hitch50 40 vs 40, compiles 500 vs 500 (6500.0 vs 6500.0 ms), p99 60.0 vs 60.0
+RESULT: PASS

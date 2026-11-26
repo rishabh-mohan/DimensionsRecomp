@@ -1,0 +1,90 @@
+diff --git a/build/agent10/s5/scratch-m12/r2/s5_readout.py b/build/agent10/s5/scratch-m12/r2/cur/s5_readout.py
+index 8032cd3..3f259d3 100644
+--- a/build/agent10/s5/scratch-m12/r2/s5_readout.py
++++ b/build/agent10/s5/scratch-m12/r2/cur/s5_readout.py
+@@ -87,4 +87,7 @@ def main(argv=None):
+     p.add_argument('--exclude-flagged', action='store_true')
+     p.add_argument('--round-regex', default=r'(?:^|[-_])r(\d+)(?:$|[-_])', help='round number from the run tag / dir')
++    p.add_argument('--unscored-tag', default=r'^(?:cold-|warm\d+-)', help='run tags dropped as unscored (run-matrix cold / warm-up runs)')
++    p.add_argument('--vs', action='append', default=[], metavar='A:B',
++                   help='extra contrast within each cap: bin containing A vs bin containing B (e.g. native4bp:nativefinal2)')
+     p.add_argument('--draws', type=int, default=20000)
+     p.add_argument('--seed', type=int, default=1)
+@@ -99,10 +102,17 @@ def main(argv=None):
+             runs += json.load(fh)['runs']
+     rx = re.compile(a.round_regex)
++    unscored = re.compile(a.unscored_tag)
+     L, arms, dropped = [], {}, []
+     seen = {}  # (bin, cap) -> runs in, including dropped ones
++    verd = {}  # (bin, cap) -> {verdict: count}, gate verdicts of every scored run in
+     for r in runs:
+         b = str(r.get('bin_dir') or r['renderer']).rstrip('\\/').replace('\\', '/').split('/')[-1]
+         cap = r['gates']['cap'].get('arm')
++        if unscored.search(str(r.get('tag') or '')):
++            dropped.append((r.get('tag'), 'unscored'))
++            continue
+         seen[(b, cap)] = seen.get((b, cap), 0) + 1
++        vc = verd.setdefault((b, cap), {})
++        vc[r['verdict']] = vc.get(r['verdict'], 0) + 1
+         if r['verdict'] == 'VOID' or (a.exclude_flagged and r['verdict'] == 'FLAG'):
+             dropped.append((r.get('tag') or r['run_dir'], r['verdict']))
+@@ -117,5 +127,9 @@ def main(argv=None):
+         len(runs), sum(len(x) for x in arms.values()), len(dropped), ', '.join('%s:%s' % d for d in dropped) or '-',
+         'exclude VOID+FLAG' if a.exclude_flagged else 'exclude VOID', a.draws, a.seed))
+-    out = {'arms': {}, 'contrasts': [], 'dropped': dropped, 'variant': 'no-flag' if a.exclude_flagged else 'all-valid'}
++    out = {'arms': {}, 'contrasts': [], 'dropped': dropped, 'variant': 'no-flag' if a.exclude_flagged else 'all-valid',
++           'verdicts': {'%s|%s' % k: v for k, v in sorted(verd.items(), key=lambda kv: str(kv[0]))}}
++    L.append('# gate verdicts per arm (scored runs in): ' + '; '.join(
++        '%s/%s %s' % (k[0], k[1], ' '.join('%s %d' % (s, v.get(s, 0)) for s in ('PASS', 'FLAG', 'VOID')))
++        for k, v in sorted(verd.items(), key=lambda kv: str(kv[0]))))
+     for key in sorted(arms):
+         rs = arms[key]
+@@ -161,4 +175,14 @@ def main(argv=None):
+         if (b, 'none') in arms and (b, '60') in arms:
+             pairs.append(((b, 'none'), (b, '60'), 'uncapped vs cap60 (info)'))
++    for spec in a.vs:
++        sa, _, sb = spec.partition(':')
++        for cap in sorted({k[1] for k in seen}, key=str):
++            ka = [k for k in sorted(arms) if k[1] == cap and sa in k[0]]
++            kb = [k for k in sorted(arms) if k[1] == cap and sb in k[0]]
++            if ka and kb:
++                pairs += [(x, y, 'secondary %s' % spec) for x in ka for y in kb if x != y]
++            elif any(sa in k[0] for k in seen if k[1] == cap) or any(sb in k[0] for k in seen if k[1] == cap):
++                L.append('')
++                L.append('== contrast %s cap %s: not available (%s arm missing)' % (spec, cap, sa if not ka else sb))
+     for A, B, why in pairs:
+         L.append('')
+@@ -231,4 +255,33 @@ def selftest():
+               ('S6 uncapped no-ref note', 'no devfinal2 arm (not run)' in buf.getvalue()),
+               ('S6 no n4bp contrast', not any('native4bp' in x['A'] for x in o['contrasts']))]
++    # P0.3 matrix shape (matrix-s5-baseline 57255790): run-matrix tags, 3 cold runs + a warm-up run (unscored),
++    # ship60/nat60/n4bp60 x4 at cap60, natU x2; secondary contrast --vs native4bp:nativefinal2
++    runs = []
++    for arm, b, cap, f0 in (('ship60', 'devfinal2-bin', '60', 40), ('nat60', 'nativefinal2-bin', '60', 55),
++                            ('n4bp60', 'native4bp-bin', '60', 57), ('natU', 'nativefinal2-bin', 'none', 75)):
++        runs.append(mk('cold-' + arm, b, cap, 5.0))
++        for k in range(1, (3 if arm == 'natU' else 5)):
++            runs.append(mk('%s-r%d' % (arm, k), b, cap, f0 + k * 0.3, verdict='FLAG' if (arm, k) == ('n4bp60', 2) else 'PASS'))
++    runs.append(mk('warm1-nat60', 'nativefinal2-bin', '60', 5.0))
++    f2 = os.path.join(td, 'g2.json')
++    with open(f2, 'w') as fh:
++        json.dump({'runs': runs}, fh)
++    buf2 = io.StringIO()
++    with contextlib.redirect_stdout(buf2):
++        main([f2, '--json', os.path.join(td, 'r2.json'), '--draws', '2000', '--vs', 'native4bp:nativefinal2'])
++    with open(os.path.join(td, 'r2.json')) as fh:
++        o2 = json.load(fh)
++    def con(A, B, kind):
++        x = [x for x in o2['contrasts'] if x['metric'] == 'fps' and x['A'] == A and x['B'] == B and x['kind'].startswith(kind)]
++        return x[0] if x else None
++    sec = con('native4bp-bin|60', 'nativefinal2-bin|60', 'secondary')
++    checks += [('P03 unscored dropped 5', sorted(d[0] for d in o2['dropped'] if d[1] == 'unscored') ==
++                ['cold-n4bp60', 'cold-nat60', 'cold-natU', 'cold-ship60', 'warm1-nat60'] and len(o2['dropped']) == 5),
++               ('P03 primary nat60 vs ship60', con('nativefinal2-bin|60', 'devfinal2-bin|60', 'bin vs ref') is not None),
++               ('P03 secondary n4bp vs nat60 n4', sec is not None and sec['paired'] and sec['paired']['n'] == 4 and sec['word'] == 'A higher'),
++               ('P03 natU vs nat60 info', con('nativefinal2-bin|none', 'nativefinal2-bin|60', 'uncapped') is not None),
++               ('P03 verdict counts', o2['verdicts'].get('native4bp-bin|60') == {'PASS': 3, 'FLAG': 1}
++                and o2['verdicts'].get('nativefinal2-bin|none') == {'PASS': 2}),
++               ('P03 arm n', o2['arms']['devfinal2-bin|60']['fps']['n'] == 4 and o2['arms']['nativefinal2-bin|none']['fps']['n'] == 2)]
+     ok = all(x[1] for x in checks)
+     for name, good in checks:

@@ -1,0 +1,22 @@
+# build\agent2\s5\devs5toml-bin - Agent 2 (board run 2 task #1). S5 test bin devs5toml: devfinal2 + toml-reject (rejected TOML values reach game.log) [M2, build/agent2/s5/rt-bin/build-s5rt.py --variant toml]
+# staged 2026-11-25 21:00:31 from build\agent2\devfinal2-bin (MANIFEST sha256 4A4A13EDFBFF6A5F32798837A4156256A5A58A2C44579F272B5147768E50982D); every file copied with mtime = now; replaced: rexruntime.dll <- build\agent2\s5\rt-bin\b-toml\rt\link-on\rexruntime.dll.
+# devs5toml = devfinal2-bin (MANIFEST 4A4A13ED) with rexruntime.dll rebuilt: only src/core/cvar.cpp and src/core/logging.cpp changed (a7e79c0 + toml-reject, cvar 4C967C64, logging FBA29918; diff 31C19232)
+# rating build/agent10/s5/toml-reject-native-fsr1-rating.md (toml-reject SAFE-IF T1-T2); diagnostics only, no cvar value changes; exports == devfinal2 (relink keeps snap1-sdk exports.def, so the additive FlushDeferredConfigWarnings is not exported; its only caller is logging.cpp in the same DLL)
+# TEST bin only (T2 boot smoke); never timed against other bins
+# CTL relink == devfinal2-bin rexruntime.dll except TimeDateStamp; pe-check imports NEW == REF (s5\rt-bin\b-toml\build-leg.txt)
+# files: name, size, mtime, sha256, source
+FiraSans-Regular.ttf	456996	2026-11-25 21:00:29	C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23	build\agent2\snap1\DimensionsRecomp\rexlego\res\FiraSans-Regular.ttf
+TracyClient.dll	233472	2026-11-25 21:00:29	85044850B6C663B5CE8722285D13070381C33C9ABC49D06B3E59BA0277F8FF4E	build\agent2\snap1-sdk\install\bin\TracyClient.dll
+achievement_unlocked.wav	191018	2026-11-25 21:00:29	A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5	build\agent2\snap1-off\achievement_unlocked.wav
+legodimensions.exe	170350080	2026-11-25 21:00:29	6C8E281156CCE828A217B870F273021202F953F7230C7C7BA6CC3E4EA7F45581	build\agent2\final2\b\xe\link-on\legodimensions.exe
+legodimensions.map	39181726	2026-11-25 21:00:30	3F93A71469556D485142F40FF9FF742CC3E9F031A077774C9C24253C872477E6	build\agent2\final2\b\xe\link-on\legodimensions.map
+rexgpu-xenos.dll	3434496	2026-11-25 21:00:30	9A7CC3F4853A8E8B01501734B1E53ABB36962F05C22BAF46638217F27E90A4EC	build\agent2\final2\b\gpu\link-on\rexgpu-xenos.dll
+rexruntime.dll	10924032	2026-11-25 21:00:30	2954AF77379AD3AFFED8D09C44AF78F4A2C17066364456D4D204A7540252071D	build\agent2\s5\rt-bin\b-toml\rt\link-on\rexruntime.dll
+# checks:
+#   PASS staged copy identical: FiraSans-Regular.ttf
+#   PASS staged copy identical: TracyClient.dll
+#   PASS staged copy identical: achievement_unlocked.wav
+#   PASS staged copy identical: legodimensions.exe
+#   PASS staged copy identical: legodimensions.map
+#   PASS staged copy identical: rexgpu-xenos.dll
+#   PASS staged copy identical: rexruntime.dll (replaced: base 641BD22519921ACD -> 2954AF77379AD3AF)

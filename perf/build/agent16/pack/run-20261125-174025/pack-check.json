@@ -1,0 +1,302 @@
+{
+  "run": "<workspace>\\build\\agent16\\pack\\run-20261125-174025",
+  "checks": [
+    {
+      "name": "inputs: exactly the 4 staged placement containers (STAGED.tsv), structure OK",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "runtime cache: declared entry count equals the parsed rows",
+      "ok": true,
+      "detail": "declared 4, parsed 4"
+    },
+    {
+      "name": "ps-75A4D1ABA62F7594.bin: has index-addition rows (container hash = file name)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "ps-75A4D1ABA62F7594.bin: every index row has stage 1",
+      "ok": true,
+      "detail": [
+        1,
+        1
+      ]
+    },
+    {
+      "name": "ps-75A4D1ABA62F7594.bin: whole-physical-section signature size 208",
+      "ok": true,
+      "detail": [
+        144,
+        208
+      ]
+    },
+    {
+      "name": "ps-75A4D1ABA62F7594.bin: instruction-stream signature size 144",
+      "ok": true,
+      "detail": [
+        144,
+        208
+      ]
+    },
+    {
+      "name": "ps-75A4D1ABA62F7594.bin: compiled into runtime-cache.cpp (DXIL present)",
+      "ok": true,
+      "detail": "dxilSize 4644"
+    },
+    {
+      "name": "ps-E81FD692C3AB35E1.bin: has index-addition rows (container hash = file name)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "ps-E81FD692C3AB35E1.bin: every index row has stage 1",
+      "ok": true,
+      "detail": [
+        1,
+        1
+      ]
+    },
+    {
+      "name": "ps-E81FD692C3AB35E1.bin: whole-physical-section signature size 184",
+      "ok": true,
+      "detail": [
+        120,
+        184
+      ]
+    },
+    {
+      "name": "ps-E81FD692C3AB35E1.bin: instruction-stream signature size 120",
+      "ok": true,
+      "detail": [
+        120,
+        184
+      ]
+    },
+    {
+      "name": "ps-E81FD692C3AB35E1.bin: compiled into runtime-cache.cpp (DXIL present)",
+      "ok": true,
+      "detail": "dxilSize 3772"
+    },
+    {
+      "name": "vs-ACAF01F01E1C03D2.bin: has index-addition rows (container hash = file name)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "vs-ACAF01F01E1C03D2.bin: every index row has stage 0",
+      "ok": true,
+      "detail": [
+        0
+      ]
+    },
+    {
+      "name": "vs-ACAF01F01E1C03D2.bin: whole-physical-section signature size 324",
+      "ok": true,
+      "detail": [
+        324
+      ]
+    },
+    {
+      "name": "vs-ACAF01F01E1C03D2.bin: instruction-stream signature size 324",
+      "ok": true,
+      "detail": [
+        324
+      ]
+    },
+    {
+      "name": "vs-ACAF01F01E1C03D2.bin: compiled into runtime-cache.cpp (DXIL present)",
+      "ok": true,
+      "detail": "dxilSize 5420"
+    },
+    {
+      "name": "vs-CCD7655302B54D80.bin: has index-addition rows (container hash = file name)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "vs-CCD7655302B54D80.bin: every index row has stage 0",
+      "ok": true,
+      "detail": [
+        0
+      ]
+    },
+    {
+      "name": "vs-CCD7655302B54D80.bin: whole-physical-section signature size 288",
+      "ok": true,
+      "detail": [
+        288
+      ]
+    },
+    {
+      "name": "vs-CCD7655302B54D80.bin: instruction-stream signature size 288",
+      "ok": true,
+      "detail": [
+        288
+      ]
+    },
+    {
+      "name": "vs-CCD7655302B54D80.bin: compiled into runtime-cache.cpp (DXIL present)",
+      "ok": true,
+      "detail": "dxilSize 5100"
+    },
+    {
+      "name": "runtime cache: exactly one entry per staged container (4), nothing else",
+      "ok": true,
+      "detail": "cache 4, matched 4, extra []"
+    },
+    {
+      "name": "merge: every old record preserved (19116)",
+      "ok": true,
+      "detail": 0
+    },
+    {
+      "name": "merge: new index = old + addition, no duplicates",
+      "ok": true,
+      "detail": "19122 rows, 19122 unique"
+    },
+    {
+      "name": "merge-report.json agrees",
+      "ok": true,
+      "detail": {
+        "before": 19116,
+        "addition": 6,
+        "after": 19122,
+        "added": 6,
+        "preserved_all_old_records": true,
+        "included_all_addition_records": true
+      }
+    },
+    {
+      "name": "lookup: production FindShaderByMicrocode resolves all 4 (physical and instruction sections)",
+      "ok": true,
+      "detail": "PASS: 4 captured containers, physical and instruction sections resolve to their exact compiled shader through production lookup"
+    },
+    {
+      "name": "lookup-main: production FindShaderByMicrocode resolves all 4 (physical and instruction sections)",
+      "ok": true,
+      "detail": "PASS: 4 captured containers, physical and instruction sections resolve to their exact compiled shader through production lookup"
+    }
+  ],
+  "warnings": [],
+  "containers": [
+    {
+      "file": "ps-75A4D1ABA62F7594.bin",
+      "bytes": 1716,
+      "sha256": "09D05274AFBC26A2605D0B91E5C2A0E0C95303C4C0C84F4D463105EB678D66EE",
+      "problems": [],
+      "flags": "102A1100",
+      "virtual_size": 1504,
+      "physical_size": 208,
+      "marker": true,
+      "physical_base": 1508,
+      "stage": 1,
+      "microcode_offset": 64,
+      "microcode_size": 144,
+      "container_hash": "75A4D1ABA62F7594",
+      "index_sizes": [
+        144,
+        208
+      ],
+      "spec_constants_mask": 2
+    },
+    {
+      "file": "ps-E81FD692C3AB35E1.bin",
+      "bytes": 1640,
+      "sha256": "58B4FA21E35500529895AA400F4B307F0DD09BBBBDB71F5C7C8E8748B31170F1",
+      "problems": [],
+      "flags": "102A1100",
+      "virtual_size": 1452,
+      "physical_size": 184,
+      "marker": true,
+      "physical_base": 1456,
+      "stage": 1,
+      "microcode_offset": 64,
+      "microcode_size": 120,
+      "container_hash": "E81FD692C3AB35E1",
+      "index_sizes": [
+        120,
+        184
+      ],
+      "spec_constants_mask": 2
+    },
+    {
+      "file": "vs-ACAF01F01E1C03D2.bin",
+      "bytes": 1304,
+      "sha256": "6C4F65C3161DF6BEE23F9C551F34971D60275BB49C3DB6327CFF9084F4317A66",
+      "problems": [],
+      "flags": "102A1101",
+      "virtual_size": 976,
+      "physical_size": 324,
+      "marker": true,
+      "physical_base": 980,
+      "stage": 0,
+      "microcode_offset": 0,
+      "microcode_size": 324,
+      "container_hash": "ACAF01F01E1C03D2",
+      "index_sizes": [
+        324
+      ],
+      "spec_constants_mask": 1
+    },
+    {
+      "file": "vs-CCD7655302B54D80.bin",
+      "bytes": 944,
+      "sha256": "F4EE30B28DEE9E4AB5AE2E9204D54195A0AC9D8D5497B7F2C8FAC11D90EEC65E",
+      "problems": [],
+      "flags": "102A1101",
+      "virtual_size": 652,
+      "physical_size": 288,
+      "marker": true,
+      "physical_base": 656,
+      "stage": 0,
+      "microcode_offset": 0,
+      "microcode_size": 288,
+      "container_hash": "CCD7655302B54D80",
+      "index_sizes": [
+        288
+      ],
+      "spec_constants_mask": 1
+    }
+  ],
+  "runtime_cache": {
+    "sha256": "AEA36683202B97535C52DFA7D7548EEBA1D3512E70717C2DE381FB59CC29A734",
+    "bytes": 33765,
+    "sizes": {
+      "g_shaderCacheEntryCount": 4,
+      "g_dxilCacheCompressedSize": 9340,
+      "g_dxilCacheDecompressedSize": 18936,
+      "g_spirvCacheCompressedSize": 9,
+      "g_spirvCacheDecompressedSize": 0
+    },
+    "entries": 4,
+    "spec_constants_masks": {
+      "1": 2,
+      "2": 2
+    }
+  },
+  "index": {
+    "old_rows": 19116,
+    "addition_rows": 6,
+    "new_rows": 19122,
+    "added_rows": 6,
+    "new_sha256": "E4C05782462452C3104A165AF588F21F42910FBD07A75A0071A34F89E3060617",
+    "addition_sha256": "154242FB07BEDC92075585D96C714CFA5273824EEE4B5FA9690F46CFBD3398F6"
+  },
+  "merge_report": {
+    "before": 19116,
+    "addition": 6,
+    "after": 19122,
+    "added": 6,
+    "preserved_all_old_records": true,
+    "included_all_addition_records": true
+  },
+  "main_cache": {
+    "entries": 9601,
+    "declared": 9601
+  },
+  "hlsl_dump_files": 4,
+  "fails": [],
+  "verdict": "PASS"
+}

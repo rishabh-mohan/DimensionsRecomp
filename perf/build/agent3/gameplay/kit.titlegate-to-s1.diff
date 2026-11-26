@@ -1,0 +1,418 @@
+diff --git a/build/agent3/gameplay/RUN-EXPLORE.cmd b/build/agent3/gameplay/RUN-EXPLORE.cmd
+index 5a237a8..4f9f303 100644
+--- a/build/agent3/gameplay/RUN-EXPLORE.cmd
++++ b/build/agent3/gameplay/RUN-EXPLORE.cmd
+@@ -12,12 +12,12 @@ rem Kit pins: every file this kit runs or reads as code/data is sha256-pinned he
+ rem any mismatch refuses with exit 3 before anything starts. Paths are relative to the WS (three levels up).
+ setlocal
+ set "GP=%~dp0"
+-set "GPPIN_01=D97C9228422E1362B0552D694DC5150B388AF07DD9C9A4EA692B9EBCE218AC60|build\agent3\gameplay\gameplay-run.ps1"
++set "GPPIN_01=28F7785BDB47FBDFCA0397BD0139AF5D82BB1EF9D28FFD1298C98CBAD09271BA|build\agent3\gameplay\gameplay-run.ps1"
+ set "GPPIN_02=2950A4471C1271BCDAC132816D89CF3C95812785AF7A569A94850E6A1A3DE068|build\agent3\gameplay\gameplay-watch.ps1"
+ set "GPPIN_03=E33DF65402DF053C0DBA5328632A14A0B6B90831EA0E51B1DD319C98501C8F50|build\agent3\gameplay\gameplay_post.py"
+-set "GPPIN_04=3F849107E24BC86B8B04AD34BC2DD6C2AEF75B9E79823064CAF381C4CFF731E9|build\agent3\gameplay\gen_gameplay_route.py"
++set "GPPIN_04=2C1977DE3652DF2496F57C9D4B10D0E73008871F8DF3B516D62DB52D59004D50|build\agent3\gameplay\gen_gameplay_route.py"
+ set "GPPIN_05=CB271440130C47ED8CBE8FAE804BD82F4B82EBA3C8C48C77D920AA563F91831F|build\agent3\gameplay\explore-route.txt"
+-set "GPPIN_06=D491FF7FC07A6C3808EABD8A1481841996DDAD1A4EFA0AF8DAFC81DDBF59858E|build\agent3\gameplay\gameplay-route.txt"
++set "GPPIN_06=705A3A504BF6B669ECD237243C6AC93227D57EE80243A0815502B6ED173B073D|build\agent3\gameplay\gameplay-route.txt"
+ set "GPPIN_07=798ECC30B1920F386EE4A68F8E0B6307F77BA3DA8618EF65175240E150195B77|build\agent3\gameplay\tags\batman.bin"
+ set "GPPIN_08=44E16868B3B5AD6F374925EA93E88FFA5A618C41F24DE49D82FD4C885CC1DFFE|build\agent3\gameplay\tags\gandalf.bin"
+ set "GPPIN_09=6ED54B855D8624BCB9BCCCC0E13A89151564D09CA15F7BCAFE767CCBD7D236C8|build\agent3\gameplay\tags\wyldstyle.bin"
+diff --git a/build/agent3/gameplay/RUN-GAMEPLAY.cmd b/build/agent3/gameplay/RUN-GAMEPLAY.cmd
+index 0ae2b9c..9b794a7 100644
+--- a/build/agent3/gameplay/RUN-GAMEPLAY.cmd
++++ b/build/agent3/gameplay/RUN-GAMEPLAY.cmd
+@@ -1,6 +1,6 @@
+ @echo off
+ rem RUN-GAMEPLAY.cmd - M3 gameplay task: the scripted gameplay route on native4bp, then xenos (devfinal2).
+-rem   RUN-GAMEPLAY.cmd            real run (interactive desktop; ~2 x 12-15 min; self-closing)
++rem   RUN-GAMEPLAY.cmd            real run (interactive desktop; ~2 x 15-25 min, cap 25 min each; self-closing)
+ rem   RUN-GAMEPLAY.cmd dryrun     no game: checks, command lines, run-game -DryRun, self-tests; exit 0 = pass (HEAVY I/O:
+ rem                               copies + hashes the pinned native and xenos bins, ~600 MB)
+ rem   RUN-GAMEPLAY.cmd pincheck   only the kit pin check below; exit 0 = all pins match, 3 = mismatch
+@@ -10,12 +10,12 @@ rem Kit pins: every file this kit runs or reads as code/data is sha256-pinned he
+ rem any mismatch refuses with exit 3 before anything starts. Paths are relative to the WS (three levels up).
+ setlocal
+ set "GP=%~dp0"
+-set "GPPIN_01=D97C9228422E1362B0552D694DC5150B388AF07DD9C9A4EA692B9EBCE218AC60|build\agent3\gameplay\gameplay-run.ps1"
++set "GPPIN_01=28F7785BDB47FBDFCA0397BD0139AF5D82BB1EF9D28FFD1298C98CBAD09271BA|build\agent3\gameplay\gameplay-run.ps1"
+ set "GPPIN_02=2950A4471C1271BCDAC132816D89CF3C95812785AF7A569A94850E6A1A3DE068|build\agent3\gameplay\gameplay-watch.ps1"
+ set "GPPIN_03=E33DF65402DF053C0DBA5328632A14A0B6B90831EA0E51B1DD319C98501C8F50|build\agent3\gameplay\gameplay_post.py"
+-set "GPPIN_04=3F849107E24BC86B8B04AD34BC2DD6C2AEF75B9E79823064CAF381C4CFF731E9|build\agent3\gameplay\gen_gameplay_route.py"
++set "GPPIN_04=2C1977DE3652DF2496F57C9D4B10D0E73008871F8DF3B516D62DB52D59004D50|build\agent3\gameplay\gen_gameplay_route.py"
+ set "GPPIN_05=CB271440130C47ED8CBE8FAE804BD82F4B82EBA3C8C48C77D920AA563F91831F|build\agent3\gameplay\explore-route.txt"
+-set "GPPIN_06=D491FF7FC07A6C3808EABD8A1481841996DDAD1A4EFA0AF8DAFC81DDBF59858E|build\agent3\gameplay\gameplay-route.txt"
++set "GPPIN_06=705A3A504BF6B669ECD237243C6AC93227D57EE80243A0815502B6ED173B073D|build\agent3\gameplay\gameplay-route.txt"
+ set "GPPIN_07=798ECC30B1920F386EE4A68F8E0B6307F77BA3DA8618EF65175240E150195B77|build\agent3\gameplay\tags\batman.bin"
+ set "GPPIN_08=44E16868B3B5AD6F374925EA93E88FFA5A618C41F24DE49D82FD4C885CC1DFFE|build\agent3\gameplay\tags\gandalf.bin"
+ set "GPPIN_09=6ED54B855D8624BCB9BCCCC0E13A89151564D09CA15F7BCAFE767CCBD7D236C8|build\agent3\gameplay\tags\wyldstyle.bin"
+diff --git a/build/agent3/gameplay/RUN-MANUAL.cmd b/build/agent3/gameplay/RUN-MANUAL.cmd
+index be9501a..8dfa6e6 100644
+--- a/build/agent3/gameplay/RUN-MANUAL.cmd
++++ b/build/agent3/gameplay/RUN-MANUAL.cmd
+@@ -14,12 +14,12 @@ rem Kit pins: every file this kit runs or reads as code/data is sha256-pinned he
+ rem any mismatch refuses with exit 3 before anything starts. Paths are relative to the WS (three levels up).
+ setlocal
+ set "GP=%~dp0"
+-set "GPPIN_01=D97C9228422E1362B0552D694DC5150B388AF07DD9C9A4EA692B9EBCE218AC60|build\agent3\gameplay\gameplay-run.ps1"
++set "GPPIN_01=28F7785BDB47FBDFCA0397BD0139AF5D82BB1EF9D28FFD1298C98CBAD09271BA|build\agent3\gameplay\gameplay-run.ps1"
+ set "GPPIN_02=2950A4471C1271BCDAC132816D89CF3C95812785AF7A569A94850E6A1A3DE068|build\agent3\gameplay\gameplay-watch.ps1"
+ set "GPPIN_03=E33DF65402DF053C0DBA5328632A14A0B6B90831EA0E51B1DD319C98501C8F50|build\agent3\gameplay\gameplay_post.py"
+-set "GPPIN_04=3F849107E24BC86B8B04AD34BC2DD6C2AEF75B9E79823064CAF381C4CFF731E9|build\agent3\gameplay\gen_gameplay_route.py"
++set "GPPIN_04=2C1977DE3652DF2496F57C9D4B10D0E73008871F8DF3B516D62DB52D59004D50|build\agent3\gameplay\gen_gameplay_route.py"
+ set "GPPIN_05=CB271440130C47ED8CBE8FAE804BD82F4B82EBA3C8C48C77D920AA563F91831F|build\agent3\gameplay\explore-route.txt"
+-set "GPPIN_06=D491FF7FC07A6C3808EABD8A1481841996DDAD1A4EFA0AF8DAFC81DDBF59858E|build\agent3\gameplay\gameplay-route.txt"
++set "GPPIN_06=705A3A504BF6B669ECD237243C6AC93227D57EE80243A0815502B6ED173B073D|build\agent3\gameplay\gameplay-route.txt"
+ set "GPPIN_07=798ECC30B1920F386EE4A68F8E0B6307F77BA3DA8618EF65175240E150195B77|build\agent3\gameplay\tags\batman.bin"
+ set "GPPIN_08=44E16868B3B5AD6F374925EA93E88FFA5A618C41F24DE49D82FD4C885CC1DFFE|build\agent3\gameplay\tags\gandalf.bin"
+ set "GPPIN_09=6ED54B855D8624BCB9BCCCC0E13A89151564D09CA15F7BCAFE767CCBD7D236C8|build\agent3\gameplay\tags\wyldstyle.bin"
+diff --git a/build/agent3/gameplay/gameplay-route.txt b/build/agent3/gameplay/gameplay-route.txt
+index b9720d9..d05f07e 100644
+--- a/build/agent3/gameplay/gameplay-route.txt
++++ b/build/agent3/gameplay/gameplay-route.txt
+@@ -1,120 +1,103 @@
+ # build/agent3/gameplay/gameplay-route.txt - M3 gameplay task. Generated by gen_gameplay_route.py: do not edit by hand.
+-# Best-guess both-arms route (refine from the exploration run): after the vortex 60 s observe, the A/START-A
+-# skip probes, then ~4 min of walk/fight cycles (marks w-NN-a/b). ~650 s; -Seconds 900.
++# Both-arms route: the EXPLORE2 marker-gated boot (title gate) -> New Game -> slot 1 -> the story, the 3 figure
++# prompts (prompt sidecar), 60 s observe, the A/START-A skip probes, then ~4 min of walk/fight cycles (marks
++# wNN-a/b). -Seconds 1500 per arm (a cap: the route's 'stop' ends it).
+ # Needs the toypad sidecar (gameplay-run.ps1 starts it: the virtual Batman/Gandalf/Wyldstyle tags 2 s after the
+ # front end's all-pads-white line; 'mark v-replace' = REMOVE + re-LOAD them). Every 'mark' = one screenshot.
+ wait_first_frame 240
+ mark first-frame
+-sleep 50
+-mark title
+-press START
+-sleep 3
+-press A                                         # title -> front end (all pads white); tags 2 s later
++wait_log "current=7 pending=4294967295" 120                    # install prompt
++sleep 2
++mark install-prompt
++press A                                         # -> all pads white; the sidecar places the tags 2 s later
+ wait_log "Toypad: pad 3 mode 1 lit FF FF FF" 25
+ mark pads-white
+ wait_log "Toypad listener: LOAD -> pad=3" 20
+ mark tags-placed
+-sleep 3
+-press A
+-sleep 5
+-mark m01
+-press A
+-sleep 5
+-mark m02
+-press A
+-sleep 5
+-mark m03
+-press A
+-sleep 5
+-mark m04
+-press A
+-sleep 5
+-mark m05
+-press A
+-sleep 5
+-mark m06
+-press A
+-sleep 5
+-mark m07
+-press A
+-sleep 5
+-mark m08
+-press A
+-sleep 5
+-mark m09
+-press A
+-sleep 5
+-mark m10
+-wait_log "lit 99 42 0E" 60                       # story load: amber fade after the profile read
+-mark story-load
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-mark load-05
++sleep 2
+ press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
++wait_log "current=0 pending=4294967295" 6
+ press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
++wait_log "current=0 pending=4294967295" 6
+ press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
++wait_log "current=0 pending=4294967295" 6
+ press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
++wait_log "current=0 pending=4294967295" 6
+ press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-mark load-10
++wait_log "current=0 pending=4294967295" 6
+ press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-mark load-15
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-mark load-20
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-mark load-25
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
++wait_log "current=0 pending=4294967295" 6
++mark intro-start
++sleep 20
++mark intro-20
++wait_log "current=12 pending=4294967295" 420                  # title 'Press START' (the intro ends by itself)
++sleep 3
++mark title
++sleep 12                                        # title gate: settle (START at +3.8 s was ignored)
++press START                                     # title gate try 1/6
++wait_log "current=13 pending=4294967295" 10
++press START                                     # title gate try 2/6
++wait_log "current=13 pending=4294967295" 10
++press START                                     # title gate try 3/6
++wait_log "current=13 pending=4294967295" 10
++press START                                     # title gate try 4/6
++wait_log "current=13 pending=4294967295" 10
++press START                                     # title gate try 5/6
++wait_log "current=13 pending=4294967295" 10
++press START                                     # title gate try 6/6
++wait_log "current=13 pending=4294967295" 10
++sleep 2
++mark press-start
++press B                                         # converge: 13 -> Updates panel; nothing if already there
++sleep 4
++mark updates-panel
++press A                                         # -> the Store notice (5 -> 0)
++wait_log "current=5 pending=0" 20               # TITLE GATE CHECK: TIMEOUT = the title never took START
++sleep 3
++mark store-notice
++press A                                         # OK
++sleep 3
++press B
++wait_log "current=17 pending=4294967295" 20                  # main menu
++sleep 2
++mark main-menu
++stick L 30000 0 250                             # Credits -> New Game (one short tap)
++sleep 1.5
++mark menu-newgame
++press A
++wait_log "current=47 pending=4294967295" 15                  # New Game: save slots
++sleep 3
++mark ng-slots
++press A                                         # slot 1
++wait_log "current=49 pending=4294967295" 15                  # Confirm (default Yes)
++sleep 3
++mark ng-confirm
+ press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
++wait_log "current=54 pending=4294967295" 20                  # autosave notice (52 -> 53 -> 54)
++sleep 3
++mark ng-autosave
+ press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
++wait_log "current=55 pending=4294967295" 15                  # Toypad picture ('Select A')
++sleep 3
++mark ng-toypad
+ press A
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 5
+-mark load-30
+-wait_log "Toypad: pad 1 mode 3 lit FF 6E 00" 240
+-mark vortex                                     # the post-load scene: ~766 draws, rainbow pads
++wait_log "current=55 pending=0" 15              # -> the story (front end 0 from here)
++sleep 3
++mark story-00
++# --- S: the story's figure prompts (manual run: pad 2 Batman, pad 3 Gandalf, pad 1 Wyldstyle; 120 s each) ---
++wait_log "Toypad listener: LOAD -> pad=2" 240
++mark s-batman                                 # the sidecar answered (or the wait timed out)
++sleep 10
++mark s-batman-10
++wait_log "Toypad listener: LOAD -> pad=3" 240
++mark s-gandalf                                 # the sidecar answered (or the wait timed out)
++sleep 10
++mark s-gandalf-10
++wait_log "Toypad listener: LOAD -> pad=1" 240
++mark s-wyldstyle                                 # the sidecar answered (or the wait timed out)
++sleep 10
++mark s-wyldstyle-10
++# --- O: observe, no input ---
+ sleep 10
+ mark o-01
+ sleep 10
+diff --git a/build/agent3/gameplay/gameplay-run.ps1 b/build/agent3/gameplay/gameplay-run.ps1
+index d430f51..1a3df0a 100644
+--- a/build/agent3/gameplay/gameplay-run.ps1
++++ b/build/agent3/gameplay/gameplay-run.ps1
+@@ -3,7 +3,8 @@
+ #   explore      the exploration route (explore-route.txt: front-end-marker-gated boot -> New Game -> the story's 3 figure
+ #                prompts -> 120 s observe -> single probes -> walk/fight probe loop, a mark + screenshot at every step);
+ #                -Seconds 1500 (a cap: the route stops itself); arms default to native only.
+-#                Without it: gameplay-route.txt (best-guess walk/fight route) on native, then xenos.
++#                Without it: gameplay-route.txt (the same gated boot + prompts, then a walk/fight route) on native, then
++#                xenos; -Seconds 1500 per arm (a cap: the route stops itself).
+ #   manual       an untimed hand-driven session: no route, no -InputScript (so the game keeps its default SDL input:
+ #                keyboard to the FOCUSED visible window, or a real pad), -Seconds 1200, native only by default,
+ #                tag gpman-<arm>; the sidecar still places the 3 tags (no v-replace) and answers the story's pad prompts;
+@@ -18,7 +19,7 @@
+ #                HEAVY: it copies + sha256-checks the pinned bins (native ~382 MB, xenos ~225 MB) and runs verify-bins
+ #                twice per arm, even when a real run would refuse. Run it only when the PC is free for I/O.
+ #   allowhidden  run even if not on the interactive desktop ('Default') (no screenshots then).
+-# Arm: harness\run-game.ps1 -BinDir <kit copy> -Seconds 900 -GpuLog -Tag <tag> -RunsRoot build\agent3\gameplay\runs
++# Arm: harness\run-game.ps1 -BinDir <kit copy> -Seconds <1500, manual 1200> -GpuLog -Tag <tag> -RunsRoot build\agent3\gameplay\runs
+ #      -InputScript <route> -Cvar <cap> [-Env LEGO_NATIVE_TRACE_DIR=<abs>]; each run gets a fresh <run>\user (sandbox
+ #      profile/saves: the user's own profile is never read or written). VPad = harness default
+ #      build\agent3\vpad\xinput1_4.dll (read-only; nothing under build\agent3\vpad is touched).
+@@ -52,7 +53,7 @@ if ($Manual -and $Explore) { Write-Host "'manual' and 'explore' exclude each oth
+ $Dump = $words -contains 'dump'   # FUNCTIONAL ONLY: LEGO_DUMP_MISSING_SHADERS (miss cache OFF, pool-copy hash check)
+ if ($Dump -and -not $Manual) { Write-Host "'dump' is allowed only with 'manual' (functional, untimed)"; exit 2 }
+ if ($Dump -and ($words -contains 'xenosonly')) { Write-Host "'dump' needs the native arm (not with 'xenosonly')"; exit 2 }
+-$Seconds = if ($Manual) { 1200 } elseif ($Explore) { 1500 } else { 900 }   # explore: a cap (the route's 'stop' ends it ~900 s)
++$Seconds = if ($Manual) { 1200 } else { 1500 }   # explore + route: a cap (the route's 'stop' ends it, ~900 s)
+ $kit = $PSScriptRoot                                   # build\agent3\gameplay
+ $ws = (Resolve-Path (Join-Path $kit '..\..\..')).Path
+ $rg = Join-Path $ws 'harness\run-game.ps1'
+diff --git a/build/agent3/gameplay/gen_gameplay_route.py b/build/agent3/gameplay/gen_gameplay_route.py
+index a8c7347..cfdea30 100644
+--- a/build/agent3/gameplay/gen_gameplay_route.py
++++ b/build/agent3/gameplay/gen_gameplay_route.py
+@@ -8,10 +8,11 @@
+                       triggers, else the game's 120 s failsafe), O: 120 s of no input, P: skip probes (A, START, B,
+                       hold Y), an A ladder, a tag re-place, W: a walk/fight probe loop.
+                       (The first explore route's 'vortex' (orange FF 6E 00) was the title screen's LED cycle.)
+-  gameplay-route.txt  the best-guess both-arms route (same path, a shorter observe phase, the A-skip probe, then a
+-                      ~4 min walk/fight loop). To be refined from the exploration run's screenshots.
++  gameplay-route.txt  the both-arms route: the same boot2 path and S prompts, then a shorter observe phase, the A-skip
++                      probes, then a ~4 min walk/fight loop (M10 S1, m3-titlegate-rating: the old blind sleep 50 + one
++                      START prefix is gone).
+ 
+-Base = build/agent3/toypad/routes/level-l.txt (gen_route_l.py, 119 steps; s4b20/s4bL0 reached the vortex 119/119).
++The walk/fight cycle comes from build/agent3/toypad/routes/level-l.txt (gen_route_l.py).
+ No route regex contains a comma (input.csv is comma separated). Marks named 'v-replace' make the toypad sidecar
+ (--then-mark v-replace --then-action replace) REMOVE and re-LOAD the 3 tags. Output is ASCII with CRLF.
+ Usage: python -B gen_gameplay_route.py [--check]   (--check: regenerate in memory and compare with the files; exit 1 if different)
+@@ -20,7 +21,6 @@ import os
+ import sys
+ 
+ HERE = os.path.dirname(os.path.abspath(__file__))
+-ORANGE = '"Toypad: pad 1 mode 3 lit FF 6E 00"'
+ # EXPLORE2 title gate (boot2): settle s after the title marker, then TITLE_TRIES x (START + TITLE_WAIT s wait for 13);
+ # fixed bound 3 + 12 + 6 x ~10.8 = ~80 s, START tries at ~+15/26/37/47/58/69 s after 12
+ TITLE_SETTLE, TITLE_TRIES, TITLE_WAIT = 12, 6, 10
+@@ -29,39 +29,6 @@ TITLE_SETTLE, TITLE_TRIES, TITLE_WAIT = 12, 6, 10
+ N, S, E, W = (0, 30000), (0, -30000), (30000, 0), (-30000, 0)
+ 
+ 
+-def prefix(name, about):
+-    L = ["# build/agent3/gameplay/%s - M3 gameplay task. Generated by gen_gameplay_route.py: do not edit by hand." % name]
+-    L += ["# " + s for s in about]
+-    L += [
+-        "# Needs the toypad sidecar (gameplay-run.ps1 starts it: the virtual Batman/Gandalf/Wyldstyle tags 2 s after the",
+-        "# front end's all-pads-white line; 'mark v-replace' = REMOVE + re-LOAD them). Every 'mark' = one screenshot.",
+-        "wait_first_frame 240",
+-        "mark first-frame",
+-        "sleep 50",
+-        "mark title",
+-        "press START",
+-        "sleep 3",
+-        "press A                                         # title -> front end (all pads white); tags 2 s later",
+-        'wait_log "Toypad: pad 3 mode 1 lit FF FF FF" 25',
+-        "mark pads-white",
+-        'wait_log "Toypad listener: LOAD -> pad=3" 20',
+-        "mark tags-placed",
+-        "sleep 3",
+-    ]
+-    for i in range(1, 11):
+-        L += ["press A", "sleep 5", "mark m%02d" % i]
+-    L += ['wait_log "lit 99 42 0E" 60                       # story load: amber fade after the profile read',
+-          "mark story-load"]
+-    # A every ~6 s through the load and the heavy-3D part (as level-l); each short wait ends early on the orange fade
+-    for i in range(1, 31):
+-        L += ["press A", "wait_log %s 5" % ORANGE]
+-        if i % 5 == 0:
+-            L.append("mark load-%02d" % i)
+-    L += ["wait_log %s 240" % ORANGE,
+-          "mark vortex                                     # the post-load scene: ~766 draws, rainbow pads"]
+-    return L
+-
+-
+ def walk_cycle(L, c, dirs, shots=2):
+     """one walk/fight cycle: 4 stick moves with attack/jump/build/camera between them; 'shots' marks."""
+     (d1, d2, d3, d4) = dirs
+@@ -156,17 +123,22 @@ def boot2(name, about):
+     return L
+ 
+ 
++def prompts(L):
++    """S: one wait per story figure prompt; the prompt sidecar's --on triggers answer them (else the 120 s failsafe)."""
++    L.append("# --- S: the story's figure prompts (manual run: pad 2 Batman, pad 3 Gandalf, pad 1 Wyldstyle; 120 s each) ---")
++    for pad_, who in ((2, "batman"), (3, "gandalf"), (1, "wyldstyle")):
++        L += ['wait_log "Toypad listener: LOAD -> pad=%d" 240' % pad_,
++              "mark s-%s                                 # the sidecar answered (or the wait timed out)" % who,
++              "sleep 10", "mark s-%s-10" % who]
++
++
+ def explore():
+     L = boot2("explore-route.txt", [
+         "EXPLORE2 (native): marker-gated boot -> title -> Updates -> main menu -> New Game -> slot 1 -> the story, then",
+         "the 3 figure prompts (the prompt sidecar re-places / moves the asked tag; else the game's 120 s failsafe), then",
+         "O = 120 s no input, skip probes, an A ladder, a tag re-place, a walk/fight loop. ~900 s; -Seconds 1500 (cap).",
+         "No tp-* route marks: the prompts are the sidecar's job (--on); a timed-out wait jumps to the log end."])
+-    L.append("# --- S: the story's figure prompts (manual run: pad 2 Batman, pad 3 Gandalf, pad 1 Wyldstyle; 120 s each) ---")
+-    for pad_, who in ((2, "batman"), (3, "gandalf"), (1, "wyldstyle")):
+-        L += ['wait_log "Toypad listener: LOAD -> pad=%d" 240' % pad_,
+-              "mark s-%s                                 # the sidecar answered (or the wait timed out)" % who,
+-              "sleep 10", "mark s-%s-10" % who]
++    prompts(L)
+     L.append("# --- O: observe, no input ---")
+     for i in range(1, 13):
+         L += ["sleep 10", "mark o-%02d" % i]
+@@ -188,9 +160,12 @@ def explore():
+ 
+ 
+ def gameplay():
+-    L = prefix("gameplay-route.txt", [
+-        "Best-guess both-arms route (refine from the exploration run): after the vortex 60 s observe, the A/START-A",
+-        "skip probes, then ~4 min of walk/fight cycles (marks w-NN-a/b). ~650 s; -Seconds 900."])
++    L = boot2("gameplay-route.txt", [
++        "Both-arms route: the EXPLORE2 marker-gated boot (title gate) -> New Game -> slot 1 -> the story, the 3 figure",
++        "prompts (prompt sidecar), 60 s observe, the A/START-A skip probes, then ~4 min of walk/fight cycles (marks",
++        "wNN-a/b). -Seconds 1500 per arm (a cap: the route's 'stop' ends it)."])
++    prompts(L)
++    L.append("# --- O: observe, no input ---")
+     for i in range(1, 7):
+         L += ["sleep 10", "mark o-%02d" % i]
+     L += ["press A", "sleep 8", "mark s-a", "press START", "sleep 5", "press A", "sleep 8", "mark s-start-a",

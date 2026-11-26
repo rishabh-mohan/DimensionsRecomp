@@ -1,0 +1,25 @@
+# build\agent2\s5\natives5fsr1-bin - Agent 2 (board run 2 task #1). S5 test bin natives5fsr1: nativefinal2 + native-fsr1 (present_effect fsr accepted, native FSR 1) [M2, build/agent2/s5/rt-bin/build-s5rt.py --variant fsr1]
+# staged 2026-11-25 21:02:02 from build\agent2\nativefinal2-bin (MANIFEST sha256 4E5E2620F38F7D09E064FB191BA396D7149B27A593C5158EF317CB2D9A31A163); every file copied with mtime = now; replaced: rexruntime.dll <- build\agent2\s5\rt-bin\b-fsr1\rt\link-on\rexruntime.dll.
+# natives5fsr1 = nativefinal2-bin (MANIFEST 4E5E2620) with rexruntime.dll rebuilt: only src/ui/presenter.cpp changed (a7e79c0 + native-fsr1, 944B98E5; diff 4579F090)
+# rating build/agent10/s5/toml-reject-native-fsr1-rating.md (native-fsr1 SAFE-IF F1-F3)
+# S1: native FSR 1 active with harness toml (present_effect=fsr): a different native workload; timing only with the bilinear perf toml (F1), never against S5 or earlier native numbers
+# native3_boot_check.py needs the F2 fix before it runs on this bin
+# CTL relink == devfinal2-bin rexruntime.dll except TimeDateStamp; pe-check imports NEW == REF (s5\rt-bin\b-fsr1\build-leg.txt)
+# files: name, size, mtime, sha256, source
+FiraSans-Regular.ttf	456996	2026-11-25 21:01:59	C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23	build\agent2\snap1\DimensionsRecomp\rexlego\res\FiraSans-Regular.ttf
+TracyClient.dll	233472	2026-11-25 21:01:59	85044850B6C663B5CE8722285D13070381C33C9ABC49D06B3E59BA0277F8FF4E	build\agent2\snap1-sdk\install\bin\TracyClient.dll
+achievement_unlocked.wav	191018	2026-11-25 21:01:59	A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5	build\agent2\snap1-on\achievement_unlocked.wav
+amd_fidelityfx_dx12.dll	6675664	2026-11-25 21:01:59	12A5081257EC95B0B53AD51B4A87FB3C03F97FE0BBB59F9496968F8D50EF93A6	build\agent2\snap1-on\amd_fidelityfx_dx12.dll
+legodimensions.exe	315813888	2026-11-25 21:02:00	090A420BA16797A1A94FFAA0D07730734BEF906435A11081B5638C90C4856C25	build\agent2\final2\b\nat\link-on\legodimensions.exe
+legodimensions.map	43745602	2026-11-25 21:02:02	B669786E17B3B09E53840139A9B372FD66D15019C8B9AD4A59797134A1139D92	build\agent2\final2\b\nat\link-on\legodimensions.map
+rexgpu-xenos.dll	3434496	2026-11-25 21:02:02	9A7CC3F4853A8E8B01501734B1E53ABB36962F05C22BAF46638217F27E90A4EC	build\agent2\final2\b\gpu\link-on\rexgpu-xenos.dll
+rexruntime.dll	10918912	2026-11-25 21:02:02	DF527CBC259B770010FEE1D8410FB7AAA5947A88EEB6832AC3DB6E72C82A3CE5	build\agent2\s5\rt-bin\b-fsr1\rt\link-on\rexruntime.dll
+# checks:
+#   PASS staged copy identical: FiraSans-Regular.ttf
+#   PASS staged copy identical: TracyClient.dll
+#   PASS staged copy identical: achievement_unlocked.wav
+#   PASS staged copy identical: amd_fidelityfx_dx12.dll
+#   PASS staged copy identical: legodimensions.exe
+#   PASS staged copy identical: legodimensions.map
+#   PASS staged copy identical: rexgpu-xenos.dll
+#   PASS staged copy identical: rexruntime.dll (replaced: base 641BD22519921ACD -> DF527CBC259B7700)

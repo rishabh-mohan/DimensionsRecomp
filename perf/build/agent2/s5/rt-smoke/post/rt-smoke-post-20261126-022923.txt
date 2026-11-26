@@ -1,0 +1,90 @@
+# rt_smoke_post 2026-11-26 02:37:54
+
+--- F3A <workspace>\build\agent2\s5\rt-smoke\runs\20261126-022926-s5rt-f3a
+bin <workspace>\build\agent2\s5\natives5fsr1-bin exe 090A420BA16797A1 cvars {'native_fps_limit': '60'}
+PASS  F3A clean exit (exit 0, not early, wm_close)  [exit 0x00000000 early False close wm_close]
+PASS  F3A no dumps / crash events / WER  [dumps [] crash [] wer False]
+PASS  F3A bin_dir = build\agent2\s5\natives5fsr1-bin  [<workspace>\build\agent2\s5\natives5fsr1-bin]
+PASS  F3A cvars exactly {'native_fps_limit': '60'}  [{'native_fps_limit': '60'}]
+PASS  F3A source toml legodimensions.toml sha256 = pin B763DABBE2C5FE7A  [<workspace>\harness\legodimensions.toml]
+PASS  F3A run-dir toml = legodimensions.toml except user_data_root/-Cvar keys, which hold the run values  [other lines equal True; {'user_data_root': "'<workspace>\\build\\agent2\\s5\\rt-smoke\\runs\\20261126-022926-s5rt-f3a\\user'", 'native_fps_limit': '60'}]
+PASS  F3A run-dir toml present_effect = 'fsr'  [['fsr']]
+PASS  F3A toml not rewritten by the game  [toml_rewritten False]
+logs ['game.log'], 2296 lines
+PASS  F3A check-defaults --mode native PASS  [exit 0; RESULT PASS]
+PASS  ref nativefinal2 1809-cold-nat60 game.log sha256 = pin F2F652C229493654  [<workspace>\build\agent8\s5\matrix\20261125-1804\runs\1809-cold-nat60\game.log]
+PASS  ref nativefinal2 1820-nat60-r1 game.log sha256 = pin 6F17177FC99557D6  [<workspace>\build\agent8\s5\matrix\20261125-1804\runs\1820-nat60-r1\game.log]
+ref nativefinal2: markers ['gpu_caps', 'gpu_ready', 'module_launch', 'swap_chain', 'xex_patch']; ref error/critical kinds: 0; warning kinds 12; unknown cvars 0
+F3A levels {'info': 2112, 'warning': 184}, unparsed (continuation) lines 0
+PASS  F3A runstats markers of the nativefinal2 refs all present (P1: log patterns still match)  [missing []; have {'xex_patch': 1, 'module_launch': 1, 'gpu_caps': 1, 'swap_chain': 1, 'gpu_ready': 1}]
+PASS  F3A 0 new error/critical lines vs nativefinal2  [0 error/critical, 0 new: ]
+PASS  F3A 0 new 'Config: unknown cvar' names  [[]]
+  info: 0 new warning kinds vs nativefinal2
+PASS  F3A 0 'Native FSR 1:' lines  [0]
+  info: other Config: lines 0
+  info: FFX-fallback INFO line (present_effect=fsr: this build has no FidelityFX SDK ...) 0
+  info: hard-exit line 1
+F3A frames: 13203 rows (frames.csv), spatial_fsr_presented=1 on 13203 (100.0%), first at frame 2; fsr_enabled!=0 on 0; sizes {'1920x1080->2240x1294': 13203}
+PASS  F3A frames.csv >= 2000 rows  [13203]
+PASS  F3A spatial_fsr_presented=1 on >= 90% of rows (P4, FSR 1 on)  [100.0%]
+PASS  F3A fsr_enabled=0 on every row (no native FSR 3)  [0]
+F3A shots.txt 8 lines
+    shot 60 s (at 60.1 s) pid 28380: printwindow -> <workspace>\build\agent2\s5\rt-smoke\runs\20261126-022926-s5rt-f3a\kit-shots\shot-060s.png (client non-black 0.0%)
+    shot 60 s (at 60.3 s) pid 28380: fallback screen copy -> <workspace>\build\agent2\s5\rt-smoke\runs\20261126-022926-s5rt-f3a\kit-shots\shot-060s-screen.png (client non-black 1.1%)
+    shot 120 s (at 120.1 s) pid 28380: printwindow -> <workspace>\build\agent2\s5\rt-smoke\runs\20261126-022926-s5rt-f3a\kit-shots\shot-120s.png (client non-black 0.0%)
+    shot 120 s (at 120.3 s) pid 28380: fallback screen copy -> <workspace>\build\agent2\s5\rt-smoke\runs\20261126-022926-s5rt-f3a\kit-shots\shot-120s-screen.png (client non-black 1.1%)
+    shot 146 s (at 146.1 s) pid 28380: printwindow -> <workspace>\build\agent2\s5\rt-smoke\runs\20261126-022926-s5rt-f3a\kit-shots\shot-146s.png (client non-black 0.0%)
+    shot 146 s (at 146.3 s) pid 28380: fallback screen copy -> <workspace>\build\agent2\s5\rt-smoke\runs\20261126-022926-s5rt-f3a\kit-shots\shot-146s-screen.png (client non-black 1.1%)
+    shot 200 s (at 200.1 s) pid 28380: printwindow -> <workspace>\build\agent2\s5\rt-smoke\runs\20261126-022926-s5rt-f3a\kit-shots\shot-200s.png (client non-black 0.0%)
+    shot 200 s (at 200.2 s) pid 28380: fallback screen copy -> <workspace>\build\agent2\s5\rt-smoke\runs\20261126-022926-s5rt-f3a\kit-shots\shot-200s-screen.png (client non-black 1.1%)
+FAIL  F3A screenshots (4 times, client >= 2% non-black, PrintWindow or screen copy)  [060s printwindow 0.4% screen 1.2% -> NONE; 120s printwindow 0.4% screen 1.2% -> NONE; 146s printwindow 0.4% screen 1.2% -> NONE; 200s printwindow 0.4% screen 1.2% -> NONE]
+
+--- F3B <workspace>\build\agent2\s5\rt-smoke\runs\20261126-023351-s5rt-f3b
+bin <workspace>\build\agent2\s5\natives5fsr1-bin exe 090A420BA16797A1 cvars {'native_fps_limit': '60'}
+PASS  F3B clean exit (exit 0, not early, wm_close)  [exit 0x00000000 early False close wm_close]
+PASS  F3B no dumps / crash events / WER  [dumps [] crash [] wer False]
+PASS  F3B bin_dir = build\agent2\s5\natives5fsr1-bin  [<workspace>\build\agent2\s5\natives5fsr1-bin]
+PASS  F3B cvars exactly {'native_fps_limit': '60'}  [{'native_fps_limit': '60'}]
+PASS  F3B source toml perf-bilinear.toml sha256 = pin FA47B1E31787B24D  [<workspace>\build\agent2\s5\native-fsr1\perf-bilinear.toml]
+PASS  F3B run-dir toml = perf-bilinear.toml except user_data_root/-Cvar keys, which hold the run values  [other lines equal True; {'user_data_root': "'<workspace>\\build\\agent2\\s5\\rt-smoke\\runs\\20261126-023351-s5rt-f3b\\user'", 'native_fps_limit': '60'}]
+PASS  F3B run-dir toml present_effect = 'bilinear'  [['bilinear']]
+PASS  F3B toml not rewritten by the game  [toml_rewritten False]
+logs ['game.log'], 2339 lines
+PASS  F3B check-defaults --mode native PASS  [exit 0; RESULT PASS]
+F3B levels {'info': 2155, 'warning': 184}, unparsed (continuation) lines 0
+PASS  F3B runstats markers of the nativefinal2 refs all present (P1: log patterns still match)  [missing []; have {'xex_patch': 1, 'module_launch': 1, 'gpu_caps': 1, 'swap_chain': 1, 'gpu_ready': 1}]
+PASS  F3B 0 new error/critical lines vs nativefinal2  [0 error/critical, 0 new: ]
+PASS  F3B 0 new 'Config: unknown cvar' names  [[]]
+  info: 0 new warning kinds vs nativefinal2
+PASS  F3B 0 'Native FSR 1:' lines  [0]
+  info: other Config: lines 0
+PASS  F3B 0 FFX-fallback INFO lines ('present_effect=fsr: this build has no FidelityFX SDK')  [0]
+  info: hard-exit line 1
+F3B frames: 13181 rows (frames.csv), spatial_fsr_presented=1 on 0 (0.0%), first at frame None; fsr_enabled!=0 on 0; sizes {'1920x1080->2240x1294': 13181}
+PASS  F3B frames.csv >= 2000 rows  [13181]
+PASS  F3B spatial_fsr_presented=0 on every row (P4, bilinear)  [0 rows with 1]
+PASS  F3B fsr_enabled=0 on every row (no native FSR 3)  [0]
+F3B shots.txt 8 lines
+    shot 60 s (at 60.2 s) pid 14592: printwindow -> <workspace>\build\agent2\s5\rt-smoke\runs\20261126-023351-s5rt-f3b\kit-shots\shot-060s.png (client non-black 0.0%)
+    shot 60 s (at 60.3 s) pid 14592: fallback screen copy -> <workspace>\build\agent2\s5\rt-smoke\runs\20261126-023351-s5rt-f3b\kit-shots\shot-060s-screen.png (client non-black 1.1%)
+    shot 120 s (at 120.1 s) pid 14592: printwindow -> <workspace>\build\agent2\s5\rt-smoke\runs\20261126-023351-s5rt-f3b\kit-shots\shot-120s.png (client non-black 0.0%)
+    shot 120 s (at 120.2 s) pid 14592: fallback screen copy -> <workspace>\build\agent2\s5\rt-smoke\runs\20261126-023351-s5rt-f3b\kit-shots\shot-120s-screen.png (client non-black 1.1%)
+    shot 146 s (at 146.1 s) pid 14592: printwindow -> <workspace>\build\agent2\s5\rt-smoke\runs\20261126-023351-s5rt-f3b\kit-shots\shot-146s.png (client non-black 0.0%)
+    shot 146 s (at 146.3 s) pid 14592: fallback screen copy -> <workspace>\build\agent2\s5\rt-smoke\runs\20261126-023351-s5rt-f3b\kit-shots\shot-146s-screen.png (client non-black 1.1%)
+    shot 200 s (at 200.2 s) pid 14592: printwindow -> <workspace>\build\agent2\s5\rt-smoke\runs\20261126-023351-s5rt-f3b\kit-shots\shot-200s.png (client non-black 0.0%)
+    shot 200 s (at 200.4 s) pid 14592: fallback screen copy -> <workspace>\build\agent2\s5\rt-smoke\runs\20261126-023351-s5rt-f3b\kit-shots\shot-200s-screen.png (client non-black 1.1%)
+FAIL  F3B screenshots (4 times, client >= 2% non-black, PrintWindow or screen copy)  [060s printwindow 0.4% screen 1.2% -> NONE; 120s printwindow 0.4% screen 1.2% -> NONE; 146s printwindow 0.4% screen 1.2% -> NONE; 200s printwindow 0.4% screen 1.2% -> NONE]
+
+=== SIDE-BY-SIDE (left <workspace>\build\agent2\s5\rt-smoke\runs\20261126-022926-s5rt-f3a | right <workspace>\build\agent2\s5\rt-smoke\runs\20261126-023351-s5rt-f3b) -> <workspace>\build\agent2\s5\rt-smoke\post\sbs-20261126-022923 ===
+side-by-side 060s: <workspace>\build\agent2\s5\rt-smoke\post\sbs-20261126-022923\sbs-060s.png | <workspace>\build\agent2\s5\rt-smoke\post\sbs-20261126-022923\sbs-060s-crop2x.png  (A shot-060s.png 2262x1350, B shot-060s.png 2262x1350; detail A 0.23 B 0.23, info only: different frames)
+side-by-side 120s: <workspace>\build\agent2\s5\rt-smoke\post\sbs-20261126-022923\sbs-120s.png | <workspace>\build\agent2\s5\rt-smoke\post\sbs-20261126-022923\sbs-120s-crop2x.png  (A shot-120s.png 2262x1350, B shot-120s.png 2262x1350; detail A 0.23 B 0.23, info only: different frames)
+side-by-side 146s: <workspace>\build\agent2\s5\rt-smoke\post\sbs-20261126-022923\sbs-146s.png | <workspace>\build\agent2\s5\rt-smoke\post\sbs-20261126-022923\sbs-146s-crop2x.png  (A shot-146s.png 2262x1350, B shot-146s.png 2262x1350; detail A 0.22 B 0.22, info only: different frames)
+side-by-side 200s: <workspace>\build\agent2\s5\rt-smoke\post\sbs-20261126-022923\sbs-200s.png | <workspace>\build\agent2\s5\rt-smoke\post\sbs-20261126-022923\sbs-200s-crop2x.png  (A shot-200s.png 2262x1350, B shot-200s.png 2262x1350; detail A 0.23 B 0.23, info only: different frames)
+
+=== PER-ARM VERDICTS (functional, untimed) ===
+F3A  FAIL (1)
+       - F3A screenshots (4 times, client >= 2% non-black, PrintWindow or screen copy)
+F3B  FAIL (1)
+       - F3B screenshots (4 times, client >= 2% non-black, PrintWindow or screen copy)
+
+RESULT: FAIL (2): F3A screenshots (4 times, client >= 2% non-black, PrintWindow or screen copy); F3B screenshots (4 times, client >= 2% non-black, PrintWindow or screen copy)

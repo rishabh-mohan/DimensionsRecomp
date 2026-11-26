@@ -1,0 +1,224 @@
+== trace trace-native-20261126-051154\events.tsv
+first frame (b'68.051', b'2') last frame (b'1196338.144', b'50132')
+     1135858 texture_fetch_changed
+      399241 unrecognized_shader
+      335694 texture_color_authority
+      208283 draw_missing_vertex_shader
+       92510 draw_missing_pixel_shader
+       50131 frame
+        3747 texture_header_refresh
+        2146 texture_upload_changed
+         140 resolve
+          60 missing_placement_shader_identity
+           1 event
+== samples
+   elapsed_ms	frame	event	anomaly_candidate	details
+   5.742	0	resolve	0	signature_src_dst_flags_level_slice_rect_point_format= 3019c000,aceb073c,00000000,00000000,00000000,00000000,00000000,00000780,00000438,00000000,00000000,18280106, dst_width= 1280 dst_height= 720
+   55.980	1	resolve	0	signature_src_dst_flags_level_slice_rect_point_format= 3019c000,aceb0610,00000000,00000000,00000000,00000000,00000000,00000780,00000438,00000000,00000000,18280106, dst_width= 1280 dst_height= 720
+   322505.598	16927	missing_placement_shader_identity	1	stage= 6 guest= 2890185828 physical= 3978546720 virtual_bytes= 640 physical_bytes= 144 container_hash= 6337567190315010954 physical_hash= 13161130640581549616
+   460693.814	24798	missing_placement_shader_identity	1	stage= 7 guest= 2891174060 physical= 3978074976 virtual_bytes= 896 physical_bytes= 412 container_hash= 14339722193387989322 physical_hash= 2579733739319171947
+   322512.259	16927	unrecognized_shader	1	guest= 2890185828 stage= 6
+   322512.665	16927	unrecognized_shader	1	guest= 2890185828 stage= 6
+   322512.732	16927	draw_missing_vertex_shader	1	guest_vs= 2890185828
+   322517.272	16928	draw_missing_vertex_shader	1	guest_vs= 2890185828
+   460707.259	24798	draw_missing_pixel_shader	1	guest_ps= 2891174060
+   460758.278	24798	draw_missing_pixel_shader	1	guest_ps= 2890512632
+== per (event, guest): count, first (frame, ts), last  [draw_missing and unrecognized only, sorted by event,count]
+  draw_missing_pixel_shader    A81E2A40   24083 first (26415, 523205.845) last (31702, 655767.688)
+  draw_missing_pixel_shader    AC53D0AC   16079 first (24798, 460707.259) last (50131, 1196312.087)
+  draw_missing_pixel_shader    AC49B8F8   13079 first (24798, 460758.278) last (50131, 1196328.201)
+  draw_missing_pixel_shader    A7C9F5A0   11808 first (37564, 818335.302) last (50131, 1196318.99)
+  draw_missing_pixel_shader    A81E7630    7238 first (26415, 523201.97) last (31702, 655767.267)
+  draw_missing_pixel_shader    A81DF240    6379 first (25053, 465433.69) last (31702, 655769.495)
+  draw_missing_pixel_shader    AB1B5050    2496 first (31892, 660576.439) last (32667, 685564.896)
+  draw_missing_pixel_shader    AC4945A8    2167 first (28665, 574852.443) last (37560, 817718.456)
+  draw_missing_pixel_shader    AC4974EC    2167 first (28665, 574875.388) last (37560, 817721.513)
+  draw_missing_pixel_shader    AC493C6C    2157 first (28666, 574932.887) last (37560, 817719.379)
+  draw_missing_pixel_shader    A7775CB0    1351 first (31892, 660470.224) last (32642, 684961.99)
+  draw_missing_pixel_shader    AC556A1C     939 first (25053, 465467.436) last (26131, 518275.473)
+  draw_missing_pixel_shader    AAF463D0     580 first (41304, 906434.872) last (41419, 912960.768)
+  draw_missing_pixel_shader    A7C66C50     580 first (41304, 906441.162) last (41419, 912961.23)
+  draw_missing_pixel_shader    AC544B3C     522 first (25632, 493062.282) last (26097, 516364.183)
+  draw_missing_pixel_shader    AC54327C     295 first (25053, 465452.376) last (25898, 505289.073)
+  draw_missing_pixel_shader    AB625D70     290 first (25054, 465577.403) last (26131, 518254.209)
+  draw_missing_pixel_shader    A86EC990     290 first (25054, 465577.926) last (26131, 518254.66)
+  draw_missing_pixel_shader    AC493354      10 first (28665, 574870.313) last (36362, 789109.795)
+  draw_missing_vertex_shader   AC44BC64   63853 first (16927, 322512.732) last (50127, 1196196.487)
+  draw_missing_vertex_shader   AB8DC720   28944 first (42431, 944501.572) last (50131, 1196301.32)
+  draw_missing_vertex_shader   AC48E494   25676 first (26780, 529919.724) last (47472, 1108855.506)
+  draw_missing_vertex_shader   A8048930   16606 first (41302, 906079.551) last (50131, 1196301.694)
+  draw_missing_vertex_shader   AC4B7828   14486 first (42431, 944523.922) last (50131, 1196311.346)
+  draw_missing_vertex_shader   A7F81CD0   14420 first (42922, 954731.782) last (50131, 1196335.935)
+  draw_missing_vertex_shader   A7B658A0   11128 first (31502, 646520.752) last (33127, 700505.245)
+  draw_missing_vertex_shader   A7FA6EA0    7458 first (37630, 821130.233) last (42431, 944557.408)
+  draw_missing_vertex_shader   A7B63130    4508 first (31502, 646493.788) last (33127, 700504.234)
+  draw_missing_vertex_shader   AC5AB248    4334 first (28665, 574863.351) last (37560, 817718.986)
+  draw_missing_vertex_shader   A7FA8A90    4090 first (24799, 460814.254) last (42431, 944555.833)
+  draw_missing_vertex_shader   A7B9AC10    2618 first (31502, 646573.21) last (33127, 700508.788)
+  draw_missing_vertex_shader   AC44EF40    1465 first (25167, 472099.662) last (41632, 918655.535)
+  draw_missing_vertex_shader   AB7E3DB0    1418 first (41303, 906279.218) last (42894, 953808.234)
+  draw_missing_vertex_shader   A7B622F0    1309 first (31502, 646553.66) last (33127, 700501.238)
+  draw_missing_vertex_shader   A7B56CD0     864 first (31502, 646589.827) last (33127, 700510.346)
+  draw_missing_vertex_shader   A7B66500     629 first (31502, 646525.477) last (31538, 649045.108)
+  draw_missing_vertex_shader   AC471F18     626 first (25173, 472788.762) last (32922, 695266.181)
+  draw_missing_vertex_shader   A7B0D820     552 first (25053, 465234.219) last (25981, 510156.215)
+  draw_missing_vertex_shader   A791C1B0     552 first (25053, 465238.889) last (25981, 510156.775)
+  draw_missing_vertex_shader   A7B600D0     534 first (31502, 646501.869) last (33127, 700500.239)
+  draw_missing_vertex_shader   A7B9B600     534 first (31502, 646564.54) last (33127, 700507.403)
+  draw_missing_vertex_shader   AAC29570     381 first (25053, 465433.181) last (26040, 512164.555)
+  draw_missing_vertex_shader   AC48CC80     344 first (27451, 542470.359) last (41643, 919330.343)
+  draw_missing_vertex_shader   A7B09C50     290 first (25054, 465626.609) last (26131, 518265.888)
+  draw_missing_vertex_shader   A7B53290     176 first (31502, 646584.8) last (33127, 700509.274)
+  draw_missing_vertex_shader   A7B70390     176 first (31502, 646604.145) last (33127, 700511.934)
+  draw_missing_vertex_shader   A7B98960     146 first (31502, 646577.725) last (31538, 649048.8)
+  draw_missing_vertex_shader   A7B5F240      73 first (31502, 646554.268) last (31538, 649039.264)
+  draw_missing_vertex_shader   A7B52390      45 first (31502, 646590.486) last (31538, 649020.727)
+  draw_missing_vertex_shader   A7B64000      34 first (33123, 700260.125) last (33127, 700504.728)
+  draw_missing_vertex_shader   A7B774F0       8 first (33123, 700284.111) last (33127, 700508.093)
+  draw_missing_vertex_shader   A7B5E310       4 first (33123, 700273.556) last (33127, 700500.73)
+  draw_missing_vertex_shader   A7B55170       2 first (33126, 700447.996) last (33127, 700509.814)
+  unrecognized_shader          AC44BC64   35426 first (16927, 322512.259) last (50127, 1196196.472)
+  unrecognized_shader          AC53D0AC   32158 first (24798, 460706.451) last (50131, 1196312.038)
+  unrecognized_shader          AC49B8F8   26158 first (24798, 460757.903) last (50131, 1196328.148)
+  unrecognized_shader          A7C9F5A0   23616 first (37564, 818334.994) last (50131, 1196318.946)
+  unrecognized_shader          A7F81CD0   21630 first (42922, 954726.698) last (50131, 1196335.681)
+  unrecognized_shader          A7F81A50   21630 first (42922, 954731.042) last (50131, 1196335.906)
+  unrecognized_shader          AC48E494   16163 first (26780, 529919.261) last (47472, 1108855.488)
+  unrecognized_shader          A8048930   16087 first (41302, 906073.314) last (50131, 1196301.634)
+  unrecognized_shader          A8048300   16087 first (41302, 906079.136) last (50131, 1196301.66)
+  unrecognized_shader          AC4B7828   14486 first (42431, 944518.44) last (50131, 1196311.123)
+  unrecognized_shader          AC4B749C   14486 first (42431, 944523.252) last (50131, 1196311.296)
+  unrecognized_shader          AB8DC720   14480 first (42431, 944494.172) last (50131, 1196301.063)
+  unrecognized_shader          AB8DDB50   14480 first (42431, 944501.073) last (50131, 1196301.235)
+  unrecognized_shader          A7FA6EA0   11187 first (37630, 821123.953) last (42431, 944557.13)
+  unrecognized_shader          A7FA6C80   11187 first (37630, 821129.466) last (42431, 944557.374)
+  unrecognized_shader          A7FA8A90    8180 first (24799, 460797.567) last (42431, 944555.619)
+  unrecognized_shader          A7FA8850    8180 first (24799, 460812.924) last (42431, 944555.816)
+  unrecognized_shader          A7B63130    6879 first (31502, 646489.193) last (33127, 700505.35)
+  unrecognized_shader          A7B64AA0    6879 first (31502, 646493.454) last (33127, 700505.369)
+  unrecognized_shader          A7B658A0    5120 first (31502, 646516.055) last (33127, 700505.086)
+  unrecognized_shader          A7B66FA0    5120 first (31502, 646520.323) last (33127, 700505.22)
+  unrecognized_shader          A81DF240    4564 first (25053, 465433.507) last (31702, 655769.478)
+  unrecognized_shader          AC4945A8    4334 first (28665, 574851.156) last (37560, 817718.428)
+  unrecognized_shader          AC5AB248    4334 first (28665, 574858.218) last (37560, 817718.862)
+  unrecognized_shader          AC5AB10C    4334 first (28665, 574862.343) last (37560, 817718.91)
+  unrecognized_shader          AC4974EC    4334 first (28665, 574874.415) last (37560, 817721.44)
+  unrecognized_shader          AC493C6C    4314 first (28666, 574931.614) last (37560, 817719.364)
+  unrecognized_shader          AB7C3310    2407 first (41303, 906278.641) last (42894, 953808.214)
+  unrecognized_shader          AB7E3DB0    2226 first (41303, 906273.345) last (42894, 953808.039)
+  unrecognized_shader          A81E7630    2006 first (26415, 523201.646) last (31702, 655767.204)
+  unrecognized_shader          A81E2A40    2006 first (26415, 523205.582) last (31702, 655767.57)
+  unrecognized_shader          AC556A1C    1878 first (25053, 465467.082) last (26131, 518275.428)
+  unrecognized_shader          AAF463D0    1715 first (41304, 906434.4) last (41419, 912960.935)
+  unrecognized_shader          A7775CB0    1595 first (31892, 660469.831) last (32642, 684961.97)
+  unrecognized_shader          A7B9B600    1420 first (31502, 646560.265) last (33127, 700508.904)
+  unrecognized_shader          A7B9A5A0    1420 first (31502, 646564.216) last (33127, 700508.933)
+  unrecognized_shader          A7B600D0    1335 first (31502, 646501.521) last (33127, 700501.344)
+  unrecognized_shader          A7B61510    1335 first (31502, 646501.565) last (33127, 700501.363)
+  unrecognized_shader          AC44EF40    1278 first (25167, 472099.026) last (41632, 918655.417)
+  unrecognized_shader          A7B9AC10    1208 first (31502, 646568.724) last (33127, 700508.602)
+  unrecognized_shader          A7B9C150    1208 first (31502, 646572.788) last (33127, 700508.751)
+  unrecognized_shader          AB1B5050    1202 first (31892, 660576.057) last (32667, 685564.832)
+  unrecognized_shader          A7C66C50    1160 first (41304, 906440.56) last (41419, 912961.216)
+  unrecognized_shader          A7B0D820    1102 first (25053, 465230.024) last (25981, 510156.004)
+  unrecognized_shader          A7B0C550    1102 first (25053, 465233.703) last (25981, 510156.194)
+  unrecognized_shader          A791C1B0    1102 first (25053, 465234.389) last (25981, 510156.592)
+  unrecognized_shader          A791D5E0    1102 first (25053, 465238.359) last (25981, 510156.76)
+  unrecognized_shader          A7B66500    1054 first (31502, 646520.934) last (31538, 649044.966)
+  unrecognized_shader          A7B651A0    1054 first (31502, 646525.025) last (31538, 649045.096)
+  unrecognized_shader          AC471F18     913 first (25173, 472788.324) last (32922, 695266.138)
+  unrecognized_shader          AC544B3C     810 first (25632, 493061.954) last (26097, 516364.162)
+  unrecognized_shader          AAC29570     708 first (25053, 465429.198) last (26040, 512164.376)
+  unrecognized_shader          AAC28FE0     708 first (25053, 465432.72) last (26040, 512164.536)
+  unrecognized_shader          AC48CC80     651 first (27451, 542469.896) last (41643, 919330.275)
+  unrecognized_shader          A7B622F0     604 first (31502, 646553.136) last (33127, 700501.073)
+  unrecognized_shader          A7B61C10     604 first (31502, 646553.336) last (33127, 700501.206)
+  unrecognized_shader          AC54327C     590 first (25053, 465452.104) last (25898, 505289.017)
+  unrecognized_shader          A86EC990     575 first (25054, 465577.735) last (26131, 518254.637)
+  unrecognized_shader          AB625D70     574 first (25054, 465577.19) last (26131, 518254.181)
+  unrecognized_shader          A7B09C50     544 first (25054, 465625.95) last (26131, 518265.618)
+  unrecognized_shader          A7B09700     544 first (25054, 465626.209) last (26131, 518265.854)
+  unrecognized_shader          A7B53290     528 first (31502, 646584.512) last (33127, 700510.46)
+  unrecognized_shader          A7B52C10     528 first (31502, 646584.561) last (33127, 700510.486)
+  unrecognized_shader          A7B56CD0     404 first (31502, 646589.227) last (33127, 700510.176)
+  unrecognized_shader          A7B566C0     404 first (31502, 646589.479) last (33127, 700510.318)
+  unrecognized_shader          A7B70390     352 first (31502, 646599.395) last (33127, 700511.777)
+  unrecognized_shader          A7B70ED0     352 first (31502, 646603.689) last (33127, 700511.919)
+  unrecognized_shader          A7B98960     244 first (31502, 646573.391) last (31538, 649048.653)
+  unrecognized_shader          A7B99E90     244 first (31502, 646577.219) last (31538, 649048.788)
+  unrecognized_shader          A7B5F240     122 first (31502, 646553.829) last (31538, 649039.124)
+  unrecognized_shader          A7B5EB40     122 first (31502, 646553.984) last (31538, 649039.252)
+  unrecognized_shader          A7B52390      78 first (31502, 646589.999) last (31538, 649020.588)
+  unrecognized_shader          A7B51D20      78 first (31502, 646590.15) last (31538, 649020.716)
+  unrecognized_shader          A7B64000      68 first (33123, 700255.625) last (33127, 700504.582)
+  unrecognized_shader          A7B62B20      68 first (33123, 700259.719) last (33127, 700504.716)
+  unrecognized_shader          AC493354      20 first (28665, 574868.951) last (36362, 789109.779)
+  unrecognized_shader          A7B774F0      16 first (33123, 700279.519) last (33127, 700507.846)
+  unrecognized_shader          A7B76240      16 first (33123, 700283.679) last (33127, 700508.062)
+  unrecognized_shader          A7B5E310       8 first (33123, 700273.154) last (33127, 700500.585)
+  unrecognized_shader          A7B5DD00       8 first (33123, 700273.295) last (33127, 700500.718)
+  unrecognized_shader          A7B55170       4 first (33126, 700447.586) last (33127, 700509.642)
+  unrecognized_shader          A7B54C20       4 first (33126, 700447.736) last (33127, 700509.799)
+== inserts (0)
+== identity events (60)
+   322505.598	16927	missing_placement_shader_identity	1	stage= 6 guest= 2890185828 physical= 3978546720 virtual_bytes= 640 physical_bytes= 144 container_hash= 6337567190315010954 physical_hash= 13161130640581549616
+   460693.814	24798	missing_placement_shader_identity	1	stage= 7 guest= 2891174060 physical= 3978074976 virtual_bytes= 896 physical_bytes= 412 container_hash= 14339722193387989322 physical_hash= 2579733739319171947
+   460746.635	24798	missing_placement_shader_identity	1	stage= 7 guest= 2890512632 physical= 3978397216 virtual_bytes= 468 physical_bytes= 484 container_hash= 8555038189620973120 physical_hash= 2257860283653833530
+   460786.123	24799	missing_placement_shader_identity	1	stage= 6 guest= 2818214544 physical= 3987002016 virtual_bytes= 156 physical_bytes= 568 container_hash= 6717655962813665798 physical_hash= 16337436926985917614
+   460798.345	24799	missing_placement_shader_identity	1	stage= 7 guest= 2818213968 physical= 3987002592 virtual_bytes= 120 physical_bytes= 340 container_hash= 2657440324097876515 physical_hash= 8784180233587394236
+   465225.916	25053	missing_placement_shader_identity	1	stage= 6 guest= 2813384736 physical= 3986940480 virtual_bytes= 168 physical_bytes= 1204 container_hash= 3841259996556673678 physical_hash= 16947433692610459471
+   465230.291	25053	missing_placement_shader_identity	1	stage= 7 guest= 2813379920 physical= 3986941696 virtual_bytes= 124 physical_bytes= 1124 container_hash= 4395618240853725742 physical_hash= 1162474744191841924
+   465234.566	25053	missing_placement_shader_identity	1	stage= 7 guest= 2811352544 physical= 3985189088 virtual_bytes= 124 physical_bytes= 1172 container_hash= 12794140083744220968 physical_hash= 7424294228762742689
+   465425.006	25053	missing_placement_shader_identity	1	stage= 6 guest= 2864878960 physical= 3985449472 virtual_bytes= 172 physical_bytes= 904 container_hash= 11735964978338048110 physical_hash= 16708874632595234051
+   465429.465	25053	missing_placement_shader_identity	1	stage= 7 guest= 2864877536 physical= 3985450400 virtual_bytes= 128 physical_bytes= 1184 container_hash= 5054922380084975540 physical_hash= 13585989562551261500
+   465448.535	25053	missing_placement_shader_identity	1	stage= 7 guest= 2891199100 physical= 3978068032 virtual_bytes= 1124 physical_bytes= 604 container_hash= 6084743657709570990 physical_hash= 4206265912079265632
+   465463.350	25053	missing_placement_shader_identity	1	stage= 7 guest= 2891278876 physical= 3978034400 virtual_bytes= 1816 physical_bytes= 1408 container_hash= 2894551345991032125 physical_hash= 15831619115436658703
+   465622.085	25054	missing_placement_shader_identity	1	stage= 6 guest= 2813369424 physical= 3980913696 virtual_bytes= 160 physical_bytes= 856 container_hash= 15552854523618858548 physical_hash= 14639616492056670605
+   472094.367	25167	missing_placement_shader_identity	1	stage= 6 guest= 2890198848 physical= 3978539584 virtual_bytes= 1220 physical_bytes= 688 container_hash= 10065540130077896217 physical_hash= 14076457466783688171
+   472782.946	25173	missing_placement_shader_identity	1	stage= 6 guest= 2890342168 physical= 3978460672 virtual_bytes= 1148 physical_bytes= 348 container_hash= 554565426708060595 physical_hash= 16890154740792121552
+   493057.994	25632	missing_placement_shader_identity	1	stage= 7 guest= 2891205436 physical= 3978065984 virtual_bytes= 1124 physical_bytes= 520 container_hash= 9128990958182252643 physical_hash= 11543131515523998684
+   523197.567	26415	missing_placement_shader_identity	1	stage= 7 guest= 2820568624 physical= 3979416576 virtual_bytes= 128 physical_bytes= 1160 container_hash= 8091957870537601799 physical_hash= 6513525030180262623
+   523202.407	26415	missing_placement_shader_identity	1	stage= 7 guest= 2820549184 physical= 3979428800 virtual_bytes= 140 physical_bytes= 1364 container_hash= 1214902318507384557 physical_hash= 7937969211076344467
+   529915.752	26780	missing_placement_shader_identity	1	stage= 6 guest= 2890458260 physical= 3978424320 virtual_bytes= 1032 physical_bytes= 2324 container_hash= 17833579029384307867 physical_hash= 601075777116601231
+   542466.234	27451	missing_placement_shader_identity	1	stage= 6 guest= 2890452096 physical= 3978427840 virtual_bytes= 1164 physical_bytes= 652 container_hash= 14940438899219551071 physical_hash= 13739660591045040731
+   574847.699	28665	missing_placement_shader_identity	1	stage= 7 guest= 2890483112 physical= 3978408512 virtual_bytes= 212 physical_bytes= 148 container_hash= 18256353847205563683 physical_hash= 10130246414321196304
+   574854.627	28665	missing_placement_shader_identity	1	stage= 6 guest= 2891625032 physical= 3977908608 virtual_bytes= 628 physical_bytes= 196 container_hash= 10509568465433444355 physical_hash= 17675040930377738430
+   574858.258	28665	missing_placement_shader_identity	1	stage= 7 guest= 2891624716 physical= 3977908832 virtual_bytes= 268 physical_bytes= 96 container_hash= 4198515585754271799 physical_hash= 11116489958737794197
+   574865.235	28665	missing_placement_shader_identity	1	stage= 7 guest= 2890478420 physical= 3978410304 virtual_bytes= 712 physical_bytes= 1120 container_hash= 1694310154534978481 physical_hash= 17558328982076677663
+   574870.779	28665	missing_placement_shader_identity	1	stage= 7 guest= 2890495212 physical= 3978403584 virtual_bytes= 580 physical_bytes= 692 container_hash= 11693768793495891992 physical_hash= 5410704340900676770
+   574925.997	28666	missing_placement_shader_identity	1	stage= 7 guest= 2890480748 physical= 3978408864 virtual_bytes= 748 physical_bytes= 1228 container_hash= 1670132285926897355 physical_hash= 15934629420752828175
+   646485.104	31502	missing_placement_shader_identity	1	stage= 6 guest= 2813735216 physical= 3980812384 virtual_bytes= 216 physical_bytes= 1792 container_hash= 186294833883318924 physical_hash= 5040723179103964447
+   646489.246	31502	missing_placement_shader_identity	1	stage= 7 guest= 2813741728 physical= 3980814176 virtual_bytes= 140 physical_bytes= 1540 container_hash= 10775248829737297748 physical_hash= 3174076630129845002
+   646497.440	31502	missing_placement_shader_identity	1	stage= 6 guest= 2813722832 physical= 3980821088 virtual_bytes= 208 physical_bytes= 1180 container_hash= 6667683170394449590 physical_hash= 11206179495502383253
+   646512.366	31502	missing_placement_shader_identity	1	stage= 6 guest= 2813745312 physical= 3980806208 virtual_bytes= 212 physical_bytes= 1552 container_hash= 2430124880290310422 physical_hash= 1520626722892475957
+   646516.284	31502	missing_placement_shader_identity	1	stage= 7 guest= 2813751200 physical= 3980807776 virtual_bytes= 140 physical_bytes= 1504 container_hash= 14392496815117300255 physical_hash= 4443043338391219599
+   646521.097	31502	missing_placement_shader_identity	1	stage= 7 guest= 2813743520 physical= 3980810848 virtual_bytes= 140 physical_bytes= 1528 container_hash= 5763427374455373313 physical_hash= 1885063409893288710
+   646549.030	31502	missing_placement_shader_identity	1	stage= 6 guest= 2813731568 physical= 3980818624 virtual_bytes= 204 physical_bytes= 940 container_hash= 15875364277889498357 physical_hash= 8684056774083215661
+   646556.328	31502	missing_placement_shader_identity	1	stage= 6 guest= 2813965824 physical= 3980617056 virtual_bytes= 192 physical_bytes= 1552 container_hash= 16942557105862182906 physical_hash= 14671502897199799696
+   646560.328	31502	missing_placement_shader_identity	1	stage= 7 guest= 2813961632 physical= 3980618624 virtual_bytes= 132 physical_bytes= 1360 container_hash= 7873884952625475363 physical_hash= 7513695928870826347
+   646564.689	31502	missing_placement_shader_identity	1	stage= 6 guest= 2813963280 physical= 3980614432 virtual_bytes= 184 physical_bytes= 1288 container_hash= 6871518519126034652 physical_hash= 14603242332400782037
+   646568.974	31502	missing_placement_shader_identity	1	stage= 7 guest= 2813968720 physical= 3980615744 virtual_bytes= 128 physical_bytes= 1300 container_hash= 17967781147693679694 physical_hash= 4431836646105739028
+   646573.555	31502	missing_placement_shader_identity	1	stage= 7 guest= 2813959824 physical= 3980621312 virtual_bytes= 128 physical_bytes= 1360 container_hash= 13789345637686539844 physical_hash= 2327537808697241282
+   646580.793	31502	missing_placement_shader_identity	1	stage= 6 guest= 2813670032 physical= 3980860128 virtual_bytes= 184 physical_bytes= 1084 container_hash= 18140644405342611056 physical_hash= 3558243454538779761
+   646584.933	31502	missing_placement_shader_identity	1	stage= 6 guest= 2813684944 physical= 3980847424 virtual_bytes= 176 physical_bytes= 820 container_hash= 291730099500730565 physical_hash= 2117830613045404534
+   646595.389	31502	missing_placement_shader_identity	1	stage= 6 guest= 2813789072 physical= 3980640000 virtual_bytes= 180 physical_bytes= 1480 container_hash= 14811306877891688705 physical_hash= 1161018162887265920
+   646599.639	31502	missing_placement_shader_identity	1	stage= 7 guest= 2813791952 physical= 3980641504 virtual_bytes= 128 physical_bytes= 1168 container_hash= 9749539607875777538 physical_hash= 6537426424492578833
+   660465.607	31892	missing_placement_shader_identity	1	stage= 7 guest= 2809617584 physical= 3985400224 virtual_bytes= 136 physical_bytes= 1268 container_hash= 16209486543599240233 physical_hash= 14905809590987640073
+   660571.960	31892	missing_placement_shader_identity	1	stage= 7 guest= 2870693968 physical= 3985843872 virtual_bytes= 136 physical_bytes= 1352 container_hash= 12522839643482973052 physical_hash= 4040457724335523767
+   700255.779	33123	missing_placement_shader_identity	1	stage= 7 guest= 2813733664 physical= 3980817312 virtual_bytes= 140 physical_bytes= 1288 container_hash= 14594406784464244328 physical_hash= 15099604517299611177
+   700279.666	33123	missing_placement_shader_identity	1	stage= 7 guest= 2813813312 physical= 3980629664 virtual_bytes= 128 physical_bytes= 1108 container_hash= 2972228179213023705 physical_hash= 3477384725110260095
+   818331.163	37564	missing_placement_shader_identity	1	stage= 7 guest= 2815030688 physical= 3983948832 virtual_bytes= 116 physical_bytes= 328 container_hash= 1651369811294865948 physical_hash= 1607224201921595585
+   821124.218	37630	missing_placement_shader_identity	1	stage= 7 guest= 2818206848 physical= 3987005216 virtual_bytes= 120 physical_bytes= 280 container_hash= 14708713683409075012 physical_hash= 907831035942897778
+   906067.420	41302	missing_placement_shader_identity	1	stage= 6 guest= 2818869552 physical= 3979597408 virtual_bytes= 204 physical_bytes= 1120 container_hash= 5026744623574736046 physical_hash= 17455142684242249020
+   906073.397	41302	missing_placement_shader_identity	1	stage= 7 guest= 2818867968 physical= 3979598528 virtual_bytes= 140 physical_bytes= 1324 container_hash= 15851006656500155590 physical_hash= 18092839412399871101
+   906264.222	41303	missing_placement_shader_identity	1	stage= 6 guest= 2877177264 physical= 3978718176 virtual_bytes= 144 physical_bytes= 496 container_hash= 4890692846774911342 physical_hash= 3276916915232314898
+   906273.664	41303	missing_placement_shader_identity	1	stage= 7 guest= 2877043472 physical= 3978718688 virtual_bytes= 116 physical_bytes= 232 container_hash= 11453258529014426912 physical_hash= 6935704285463778851
+   906429.569	41304	missing_placement_shader_identity	1	stage= 7 guest= 2868143056 physical= 3980583680 virtual_bytes= 128 physical_bytes= 1264 container_hash= 12752328128113686854 physical_hash= 4040891247445415260
+   906435.788	41304	missing_placement_shader_identity	1	stage= 7 guest= 2814798928 physical= 3980971648 virtual_bytes= 124 physical_bytes= 1156 container_hash= 5101632237731193080 physical_hash= 9761551115922041883
+   944484.757	42431	missing_placement_shader_identity	1	stage= 6 guest= 2878195488 physical= 3978670624 virtual_bytes= 160 physical_bytes= 592 container_hash= 17140419518380701591 physical_hash= 6237663566051953552
+   944494.576	42431	missing_placement_shader_identity	1	stage= 7 guest= 2878200656 physical= 3978671232 virtual_bytes= 124 physical_bytes= 520 container_hash= 13103342265065978728 physical_hash= 2337983102813629069
+   944513.958	42431	missing_placement_shader_identity	1	stage= 6 guest= 2890627112 physical= 3978354272 virtual_bytes= 736 physical_bytes= 244 container_hash= 10421790268569453856 physical_hash= 9267803545441958391
+   944518.713	42431	missing_placement_shader_identity	1	stage= 7 guest= 2890626204 physical= 3978354528 virtual_bytes= 860 physical_bytes= 580 container_hash= 18376278334659801281 physical_hash= 13304703199771207385
+   954722.477	42922	missing_placement_shader_identity	1	stage= 6 guest= 2818055376 physical= 3987016800 virtual_bytes= 156 physical_bytes= 580 container_hash= 1388467483109340885 physical_hash= 14895384306245038007
+   954727.148	42922	missing_placement_shader_identity	1	stage= 7 guest= 2818054736 physical= 3987017408 virtual_bytes= 120 physical_bytes= 352 container_hash= 14941579177260148583 physical_hash= 11354806312032976887
+== wanted guest samples

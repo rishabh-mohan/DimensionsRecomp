@@ -1,0 +1,38 @@
+proof5_post.py sha256 6EDA1DEA5668DEEF8B0F52EC98708B87F511DCE4A0CCEECA0F80D10DAC1F14F6
+base trace DC6CEDC7E9DBC3046E4AEA2E80946D2C331E7676B1F94C946C9C92016FEB7CCA C:\Users\<user>\.gemini\antigravity-cli\brain\4105add7-8923-4bac-b5f6-bf8e11333d25\scratch\p5fix\b.tsv
+cand trace DC6CEDC7E9DBC3046E4AEA2E80946D2C331E7676B1F94C946C9C92016FEB7CCA C:\Users\<user>\.gemini\antigravity-cli\brain\4105add7-8923-4bac-b5f6-bf8e11333d25\scratch\p5fix\c3.tsv
+base log   CF68887F7F836438C5C0C46E7ED0D11FBE2DB317B6638366B0AFC35743F86069 C:\Users\<user>\.gemini\antigravity-cli\brain\4105add7-8923-4bac-b5f6-bf8e11333d25\scratch\p5fix\bl.txt
+cand log   9B9941DF014663F11109FC126BA5CC8499308B2E696DB35ED15292B693CFEAFA C:\Users\<user>\.gemini\antigravity-cli\brain\4105add7-8923-4bac-b5f6-bf8e11333d25\scratch\p5fix\cl.txt
+targets    9C18525029FE333D163D34671412A729682B19C85ECF1A09D61DAC13251FB39C <workspace>\build\agent16\pack\DUMP-TARGETS-story.txt
+fingerprint base 39129c4c059be5f0 in game.log: True
+fingerprint cand 0123456789abcdef in game.log: True
+base: frames 100; missing draws 110 (VS 90, PS 20); per 1000 frames 1100.0; missed guests 4; keys 4; miss-cache inserts 4
+cand: frames 100; missing draws 110 (VS 90, PS 20); per 1000 frames 1100.0; missed guests 4; keys 4; miss-cache inserts 4
+
+STABLE targets (by address; base -> cand missing draws)
+  PS AC493354       0 ->       0  not-in-base
+  PS AC493C6C       0 ->       0  not-in-base
+  PS AC4945A8       0 ->       0  not-in-base
+  PS AC4974EC       0 ->       0  not-in-base
+  PS AC49B8F8       0 ->       0  not-in-base
+  PS AC53D0AC       0 ->       0  not-in-base
+  PS AC54327C       0 ->       0  not-in-base
+  PS AC544B3C       0 ->       0  not-in-base
+  PS AC556A1C       0 ->       0  not-in-base
+  PS AC5AB10C       0 ->       0  not-in-base
+  VS AC44BC64      50 ->      50  REMAINS
+  VS AC44EF40       0 ->       0  not-in-base
+  VS AC471F18       0 ->       0  not-in-base
+  VS AC48CC80       0 ->       0  not-in-base
+  VS AC48E494      30 ->      30  REMAINS
+  VS AC5AB248       0 ->       0  not-in-base
+
+FIXED (base keys gone in cand): 0 keys, 0 cand-or-base draws
+REMAIN (in both): 4 keys, 110 cand-or-base draws
+  VS 000000000000000B base      50 cand      50  guests base AC44BC64 cand AC44BC64
+  VS 000000000000000C base      30 cand      30  guests base AC48E494 cand AC48E494
+  PS 000000000000000D base      20 cand      20  guests base A81E1B60 cand A81E1B60
+  VS 000000000000000E base      10 cand      10  guests base A7FA6480 cand A7FA6480
+NEW (cand only): 0 keys, 0 cand-or-base draws
+
+RESULT: FAIL (missing draws per 1000 frames 1100.0 -> 1100.0, not lower)

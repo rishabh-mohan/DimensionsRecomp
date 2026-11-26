@@ -1,0 +1,14 @@
+ok  rows-good: rc 0 (want 0); RESULT: PASS
+ok  rows-hardexit: rc 0 (want 0); RESULT: PASS-WITH-CHECKS: s0-ref-cold PSO summary block; c-pso-t1 PSO summary block; c-pso-unl PSO summary block; w-ref-t1 PSO summary block; w-pso-t1 PSO summary block; w-ref-t4 PSO summary block; w-pso-t2 PSO summary block; w-pso-t4 PSO summary block; w-pso-unl PSO summary block; c-pso-unl auxilia
+ok  rows-trigger: rc 0 (want 0); RESULT: PASS
+ok  rows-bad: rc 1 (want 1); RESULT: FAIL: arm w-pso-unl missing; c-pso-t1 PSO summary reason; c-pso-unl no cache write/replace/E_INVALIDARG/gave-up/unavailable lines; c-pso-unl no new hard WARN/ERROR types vs baseline; c-pso-unl no cache save after Stop; c-pso-unl PSO saves failed = 0; w-ref-t1 fingerprint; w-ref-t1 warm cache
+ok  ab-good: rc 0 (want 0); RESULT: PASS
+ok  ab-bad: rc 1 (want 1); RESULT: FAIL: arm w2-2 missing; c1-2 async failed = 0; w0-3 clean exit; w0-3 warm cache accepted; w0-3 warm startup failed = 0 (hard)
+ok  ab-n2: rc 0 (want 0); RESULT: PASS
+ok  ab-n2-extra: rc 0 (want 0); RESULT: PASS
+ok  usage ['noequals']: malformed --arm 'noequals' (want NAME=RUN_DIR)
+ok  usage ['a=x', 'a=y']: duplicate --arm a
+ok  smoke-rows: rc 1 (want 1); RESULT: FAIL: arm c-pso-t1 missing; arm c-pso-unl missing; arm w-ref-t1 missing; arm w-pso-t1 missing; arm w-ref-t4 missing; arm w-pso-t2 missing; arm w-pso-t4 missing; arm w-pso-unl missing; s0-ref-cold PSO stats lines; 2.2 t1 comparison; 2.2 w-pso-t2 vs w-pso-t1; 2.2 w-pso-t4 vs w-pso-t1; 2.2 t4 c
+ok  smoke-ab: rc 1 (want 1); RESULT: FAIL: arm c0-1 missing; arm c0-2 missing; arm c0-3 missing; arm c1-1 missing; arm c1-2 missing; arm c1-3 missing; arm w0-1 missing; arm w0-2 missing; arm w0-3 missing; arm w1-1 missing; arm w1-2 missing; arm w1-3 missing; arm w2-1 missing; arm w2-2 missing; prime PSO stats lines
+regex coverage: 41/41 matched at least once
+RESULT: selftest ok

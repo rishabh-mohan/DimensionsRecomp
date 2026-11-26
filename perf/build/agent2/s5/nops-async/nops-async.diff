@@ -1,0 +1,63 @@
+diff --git a/src/graphics/d3d12/pipeline_cache.cpp b/src/graphics/d3d12/pipeline_cache.cpp
+--- a/src/graphics/d3d12/pipeline_cache.cpp
++++ b/src/graphics/d3d12/pipeline_cache.cpp
+@@ -60,6 +60,25 @@ REXCVAR_DEFINE_INT32(d3d12_pipeline_creation_threads, -1, "GPU/D3D12",
+     .range(-1, 32)
+     .lifecycle(rex::cvar::Lifecycle::kRequiresRestart);
+ 
++// With async_shader_compilation, ConfigurePipeline creates a pipeline without
++// a pixel shader (depth-only) on the command thread, which stalls the frame.
++// With this on, such a pipeline is created on the creation threads instead,
++// like one with a pixel shader, and its draws are skipped until it's ready.
++// Its vertex shader is still translated on the command thread, so the root
++// signature is final when the pipeline is queued. Not for vertex shaders that
++// memexport (skipping them would lose data the guest reads) or for the ROV
++// path. Read once, in PipelineCache::Initialize.
++REXCVAR_DEFINE_BOOL(d3d12_async_depth_only_pipelines, false, "GPU/D3D12",
++                    "With async_shader_compilation, also create pipelines without a pixel shader "
++                    "(depth-only) on the creation threads: their draws are skipped until ready "
++                    "instead of stalling the frame. Not for memexport vertex shaders or ROV")
++    .lifecycle(rex::cvar::Lifecycle::kRequiresRestart);
++
++namespace {
++// d3d12_async_depth_only_pipelines, latched in PipelineCache::Initialize.
++bool async_depth_only_pipelines = false;
++}  // namespace
++
+ // With async_shader_compilation, a draw whose pipeline is still being created
+ // is skipped, and EndSubmission waits for every pipeline in creation: pop-in
+ // lasts one submission, but the wait is a stall. With this on, EndSubmission
+@@ -180,6 +199,15 @@ bool PipelineCache::Initialize() {
+       creation_threads_.push_back(std::move(creation_thread));
+     }
+   }
++  async_depth_only_pipelines =
++      REXCVAR_GET(d3d12_async_depth_only_pipelines) && !creation_threads_.empty();
++  if (async_depth_only_pipelines) {
++    REXGPU_INFO(
++        "d3d12_async_depth_only_pipelines: creating pipelines without a pixel shader on the "
++        "creation threads (with async_shader_compilation, host render targets, no memexport)");
++  } else if (REXCVAR_GET(d3d12_async_depth_only_pipelines)) {
++    REXGPU_WARN("d3d12_async_depth_only_pipelines ignored: there are no pipeline creation threads");
++  }
+   // Latched: async_shader_compilation can change at runtime, while the command
+   // processor relies on this staying the same. Bindless only: there a
+   // pipeline's root signature doesn't depend on its pixel shader, so it can't
+@@ -1094,7 +1122,16 @@ bool PipelineCache::ConfigurePipeline(
+   pipelines_.emplace(hash, new_pipeline);
+   COUNT_profile_set("gpu/pipeline_cache/pipelines", pipelines_.size());
+ 
+-  if (use_async) {
++  // d3d12_async_depth_only_pipelines: without a pixel shader, use_async is
++  // false, so the vertex shader has been translated above and the root
++  // signature doesn't depend on a pending shader - the pipeline can be created
++  // on the creation threads as it is (like pipelines from the storage).
++  bool create_async =
++      use_async || (async_depth_only_pipelines && pixel_shader == nullptr &&
++                    REXCVAR_GET(async_shader_compilation) &&
++                    !vertex_shader->shader().memexport_eM_written() &&
++                    render_target_cache_.GetPath() == RenderTargetCache::Path::kHostRenderTargets);
++  if (create_async) {
+     uint32_t bound_rts =
+         pipeline_util::GetBoundRTMaskFromNormalizedColorMask(normalized_color_mask);
+     uint32_t shader_writes_color_targets =

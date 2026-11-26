@@ -1,0 +1,41 @@
+﻿--- "a/build\\agent10\\s5\\scratch-runner\\run-timing.pre.diff"
++++ "b/build\\agent10\\s5\\scratch-runner\\run-timing.v2.diff"
+-index f86673c..81b5fe8 100644
++index f86673c..acf0f39 100644
+-@@ -483,6 +604,17 @@ try {
++@@ -483,7 +604,26 @@ try {
+++# S5: crash events as harness\run-game.ps1 records them (Application log ids 1000/1001/1002/1026 naming the exe or pid),
+++# for the run-game style compat fields in run.json (M12's s5_gates.py clean gate).
+++$crashEvents = @()
+++try {
+++    $crashEvents = @(Get-WinEvent -FilterHashtable @{ LogName = 'Application'; StartTime = $start.AddSeconds(-2); Id = 1000, 1001, 1002, 1026 } -ErrorAction Stop |
+++        Where-Object { $_.Message -match 'legodimensions\.exe' -or ($gamePid -and $_.Message -match "\b$gamePid\b") } |
+++        ForEach-Object { $m = $_.Message -replace '\s+', ' '; [ordered]@{ id = $_.Id; provider = $_.ProviderName; time = $_.TimeCreated.ToString('o'); summary = $m.Substring(0, [math]::Min(300, $m.Length)) } })
+++} catch { }
+-@@ -589,6 +721,8 @@ if ($MinWindowAfterFirstFrame -gt 0 -and $null -ne $mStart -and ($null -eq $ffTo
++ $artifacts = @()
++@@ -589,6 +729,8 @@ if ($MinWindowAfterFirstFrame -gt 0 -and $null -ne $mStart -and ($null -eq $ffTo
+-@@ -627,6 +761,11 @@ if ($drvInfo) {
++@@ -627,6 +769,11 @@ if ($drvInfo) {
+-@@ -691,6 +830,9 @@ if ($null -ne $winCpuMean) {
++@@ -691,6 +838,9 @@ if ($null -ne $winCpuMean) {
+-@@ -709,7 +851,9 @@ $runJson = [ordered]@{
++@@ -703,13 +853,25 @@ $runJson = [ordered]@{
++     valid_timing = $validTiming; valid_timing_why = $validWhy.ToArray()
++     run = $run; bin_dir = (Resolve-RepoPath $BinDir); tag = $Tag
++     runner_error = $runErr; measure_triggers = $mTriggers.ToArray(); placeholder_run = $run
+++    # S5 compat: harness\run-game.ps1 run.json field names read by M12's s5_gates.py (clean/cold/input/host/cap/align).
+++    started_epoch_s = [math]::Round([DateTimeOffset]::new($start).ToUnixTimeMilliseconds() / 1000.0, 3)
+++    elapsed_s = [math]::Round(($end - $start).TotalSeconds, 2)
+++    close_method = $(if (-not $close) { 'none' } elseif ($close.clean) { 'wm_close' } elseif ($close.killed) { 'killed' } else { 'none' })
+++    close_seconds = $(if ($close) { $close.exit_seen_s } else { $null })
+++    close_sent_s = $(if ($close -and $close.wm_close_post_wall) { [math]::Round(([datetime]::ParseExact($close.wm_close_post_wall, 'yyyy-MM-dd HH:mm:ss.fff', $null) - $start).TotalSeconds, 2) } else { $null })
+++    wer_seen = $werSeen; crash_events = $crashEvents
+++    dumps = @(@($artifacts) | Where-Object { $_ -and ([string]$_).ToLower().EndsWith('.dmp') })
+++    seed_xenos = $(if ($seed) { $SeedCache } else { $null })
+++    cvars = $($cv = [ordered]@{}; foreach ($c in @($cvarRaw)) { if ($c -match '^\s*([^=]+?)\s*=\s*(.*)$') { $cv[$Matches[1]] = $Matches[2] } }; $cv)
++     params = [ordered]@{ warmup_s = $Warmup; seconds = $Seconds; cvar = $cvarRaw; env = $envItems; toml = $tomlItems; trigger_at_measure = $trigRaw
++                          close_timeout_s = $CloseTimeoutSec; min_free_ram_gb = $MinFreeRamGB; profile = [bool]$Profile
++                          profile_seconds = $ProfileSeconds; runs_root = $RunsRoot; stall_s = $StallSec
+-@@ -728,7 +872,7 @@ $runJson = [ordered]@{
++@@ -728,7 +890,7 @@ $runJson = [ordered]@{

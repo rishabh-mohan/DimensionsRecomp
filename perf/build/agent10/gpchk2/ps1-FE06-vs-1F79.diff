@@ -1,0 +1,21 @@
+﻿diff --git "a/C:\\Users\\<user>\\.gemini\\antigravity-cli\\brain\\fb8236b8-d55e-43b4-b916-2c89854a1c24\\scratch\\kit-backup-2114\\gameplay-run.ps1" "b/<workspace>\\build\\agent3\\gameplay\\gameplay-run.ps1"
+index 6b1ffd9..514a2be 100644
+--- "a/C:\\Users\\<user>\\.gemini\\antigravity-cli\\brain\\fb8236b8-d55e-43b4-b916-2c89854a1c24\\scratch\\kit-backup-2114\\gameplay-run.ps1"
++++ "b/<workspace>\\build\\agent3\\gameplay\\gameplay-run.ps1"
+@@ -1,6 +1,7 @@
+ # gameplay-run.ps1 - M3 gameplay task: scripted LEGO Dimensions gameplay route (functional + visual, NEVER timed).
+ # Words (any order):
+-#   explore      the exploration route (explore-route.txt: level-l path -> vortex -> 120 s observe -> single probes ->
+-#                walk/fight probe loop, a mark + screenshot about every 10 s); arms default to native only.
++#   explore      the exploration route (explore-route.txt: front-end-marker-gated boot -> New Game -> the story's 3 figure
++#                prompts -> 120 s observe -> single probes -> walk/fight probe loop, a mark + screenshot at every step);
++#                -Seconds 1500 (a cap: the route stops itself); arms default to native only.
+ #                Without it: gameplay-route.txt (best-guess walk/fight route) on native, then xenos.
+ #   manual       an untimed hand-driven session: no route, no -InputScript (so the game keeps its default SDL input:
+@@ -47,5 +48,5 @@ $DryRun = $words -contains 'dryrun'; $AllowHidden = $words -contains 'allowhidde
+ $Manual = $words -contains 'manual'
+ if ($Manual -and $Explore) { Write-Host "'manual' and 'explore' exclude each other"; exit 2 }
+-$Seconds = if ($Manual) { 1200 } else { 900 }
++$Seconds = if ($Manual) { 1200 } elseif ($Explore) { 1500 } else { 900 }   # explore: a cap (the route's 'stop' ends it ~900 s)
+ $kit = $PSScriptRoot                                   # build\agent3\gameplay
+ $ws = (Resolve-Path (Join-Path $kit '..\..\..')).Path

@@ -1,0 +1,141 @@
+diff --git a/a/RUN-EXPLORE.cmd b/b/RUN-EXPLORE.cmd
+index 557cc84..1c28d94 100644
+--- a/a/RUN-EXPLORE.cmd
++++ b/b/RUN-EXPLORE.cmd
+@@ -14,7 +14,7 @@ rem Kit pins: every file this kit runs or reads as code/data is sha256-pinned he
+ rem any mismatch refuses with exit 3 before anything starts. Paths are relative to the WS (three levels up).
+ setlocal
+ set "GP=%~dp0"
+-set "GPPIN_01=DE16A2D29C0F040ABA32EE0FFF7BAE5293DBE59172CFC7F41F54174E2EB7AA77|build\agent3\gameplay\gameplay-run.ps1"
++set "GPPIN_01=82EBF1BCE9E64346D1A0381F4A9C58F46138088B68186FA703A60328C587183B|build\agent3\gameplay\gameplay-run.ps1"
+ set "GPPIN_02=4BE7E90E16F08AAA5C7E069442DF8F602E79385FE287A5FA3FD4BD9521A1F776|build\agent3\gameplay\gameplay-watch.ps1"
+ set "GPPIN_03=E33DF65402DF053C0DBA5328632A14A0B6B90831EA0E51B1DD319C98501C8F50|build\agent3\gameplay\gameplay_post.py"
+ set "GPPIN_04=2C1977DE3652DF2496F57C9D4B10D0E73008871F8DF3B516D62DB52D59004D50|build\agent3\gameplay\gen_gameplay_route.py"
+diff --git a/a/RUN-GAMEPLAY.cmd b/b/RUN-GAMEPLAY.cmd
+index 009ee25..155c53b 100644
+--- a/a/RUN-GAMEPLAY.cmd
++++ b/b/RUN-GAMEPLAY.cmd
+@@ -10,12 +10,15 @@ rem                cand5 (only with nativeonly: native arm = M16 native5pack-bin
+ rem                trace-native5, post fp a349d5292f67b127; default off; exit 2 with any other mode word),
+ rem                dump (DIAGNOSTIC: only with manual, or with all of nativeonly cand5 zone: tag gp5d,
+ rem                trace-native5d, LEGO_DUMP_MISSING_SHADERS, timing invalid)
++rem                cand6 (only with nativeonly; exit 2 with cand5, dump, manual, explore or xenosonly:
++rem                native arm = M16 native6pack-bin, copy bin-native6, tag gp6, trace-native6,
++rem                post fp e5c874ca2b87a59d; default off)
+ rem Route = gameplay-route.txt (refined after the exploration run). Writes only build\agent3\gameplay\.
+ rem Kit pins: every file this kit runs or reads as code/data is sha256-pinned here (the waiter pins only this .cmd);
+ rem any mismatch refuses with exit 3 before anything starts. Paths are relative to the WS (three levels up).
+ setlocal
+ set "GP=%~dp0"
+-set "GPPIN_01=DE16A2D29C0F040ABA32EE0FFF7BAE5293DBE59172CFC7F41F54174E2EB7AA77|build\agent3\gameplay\gameplay-run.ps1"
++set "GPPIN_01=82EBF1BCE9E64346D1A0381F4A9C58F46138088B68186FA703A60328C587183B|build\agent3\gameplay\gameplay-run.ps1"
+ set "GPPIN_02=4BE7E90E16F08AAA5C7E069442DF8F602E79385FE287A5FA3FD4BD9521A1F776|build\agent3\gameplay\gameplay-watch.ps1"
+ set "GPPIN_03=E33DF65402DF053C0DBA5328632A14A0B6B90831EA0E51B1DD319C98501C8F50|build\agent3\gameplay\gameplay_post.py"
+ set "GPPIN_04=2C1977DE3652DF2496F57C9D4B10D0E73008871F8DF3B516D62DB52D59004D50|build\agent3\gameplay\gen_gameplay_route.py"
+diff --git a/a/RUN-MANUAL.cmd b/b/RUN-MANUAL.cmd
+index 6544613..e1bf112 100644
+--- a/a/RUN-MANUAL.cmd
++++ b/b/RUN-MANUAL.cmd
+@@ -14,7 +14,7 @@ rem Kit pins: every file this kit runs or reads as code/data is sha256-pinned he
+ rem any mismatch refuses with exit 3 before anything starts. Paths are relative to the WS (three levels up).
+ setlocal
+ set "GP=%~dp0"
+-set "GPPIN_01=DE16A2D29C0F040ABA32EE0FFF7BAE5293DBE59172CFC7F41F54174E2EB7AA77|build\agent3\gameplay\gameplay-run.ps1"
++set "GPPIN_01=82EBF1BCE9E64346D1A0381F4A9C58F46138088B68186FA703A60328C587183B|build\agent3\gameplay\gameplay-run.ps1"
+ set "GPPIN_02=4BE7E90E16F08AAA5C7E069442DF8F602E79385FE287A5FA3FD4BD9521A1F776|build\agent3\gameplay\gameplay-watch.ps1"
+ set "GPPIN_03=E33DF65402DF053C0DBA5328632A14A0B6B90831EA0E51B1DD319C98501C8F50|build\agent3\gameplay\gameplay_post.py"
+ set "GPPIN_04=2C1977DE3652DF2496F57C9D4B10D0E73008871F8DF3B516D62DB52D59004D50|build\agent3\gameplay\gen_gameplay_route.py"
+diff --git a/a/gameplay-run.ps1 b/b/gameplay-run.ps1
+index 55cff27..9542e78 100644
+--- a/a/gameplay-run.ps1
++++ b/b/gameplay-run.ps1
+@@ -24,7 +24,11 @@
+ #                787CD694..46A1, exe 90BF6B45..EE7D, fp a349d5292f67b127) from its own copy bin-native5 (bin-native is
+ #                not touched), tag gp5-native, trace dir trace-native5-<stamp>, post --expect-fp a349d5292f67b127.
+ #                With 'dump' (DIAGNOSTIC, PLAN-dump6): tag gp5d-native, trace dir trace-native5d-<stamp>.
+-#                Without this word nothing changes (native4bp-bin, bin-native, gp-native, trace-native-<stamp>, 39129c4c).
++#   cand6        M16 native6pack candidate (PLAN-dump6 step E), ONLY with 'nativeonly' (exit 2 with cand5 / dump / manual /
++#                explore / xenosonly or without nativeonly): the native arm runs build\agent16\pack\native6pack-bin (MANIFEST
++#                6D841C1E..D9A6, fp e5c874ca2b87a59d) from its own copy bin-native6 (bin-native and bin-native5 are not touched),
++#                tag gp6-native, trace dir trace-native6-<stamp>, post --expect-fp e5c874ca2b87a59d.
++#                Without cand5 / cand6 nothing changes (native4bp-bin, bin-native, gp-native, trace-native-<stamp>, 39129c4c).
+ #   dryrun       no game: preconditions (reported), pin + copy checks, the real command lines, run-game -DryRun per arm
+ #                (also parses the route), route = generator output, prompt sidecar --help + self-test + tag check, watcher + post
+ #                self-tests; removes dryrun-runs. Prints DRY RUN ALL PASS and exits 0 when everything passes.
+@@ -36,7 +40,7 @@
+ #      profile/saves: the user's own profile is never read or written). VPad = harness default
+ #      build\agent3\vpad\xinput1_4.dll (read-only; nothing under build\agent3\vpad is touched).
+ #   native: build\agent16\pack\native4bp-bin (MANIFEST C5181520..A690, fp 39129c4c059be5f0), native_fps_limit=60, trace on
+-#           (with 'cand5': native5pack-bin, see above).
++#           (with 'cand5': native5pack-bin; with 'cand6': native6pack-bin; see above).
+ #   xenos : build\agent2\devfinal2-bin (MANIFEST 4A4A13ED..982D, BIN-PINS.md), framerate_limit=60.
+ #   (caps as M8's build\agent8\s5\matrix-s5-baseline.json). Pinned dirs are only read: sha256-checked copies in
+ #   build\agent3\gameplay\bin-<arm> are what runs.
+@@ -57,7 +61,7 @@
+ # after 30 s) and stops the helpers it started, by their held handles. A closed console window can't run it.
+ $ErrorActionPreference = 'Stop'
+ $words = @($args | ForEach-Object { "$_".ToLower().TrimStart('-') })
+-$known = @('explore', 'manual', 'nativeonly', 'xenosonly', 'dryrun', 'allowhidden', 'dump', 'zone', 'cand5')
++$known = @('explore', 'manual', 'nativeonly', 'xenosonly', 'dryrun', 'allowhidden', 'dump', 'zone', 'cand5', 'cand6')
+ $unknown = @($words | Where-Object { $known -notcontains $_ })
+ if ($unknown.Count) { Write-Host "unknown word(s): $($unknown -join ' ') (known: $($known -join ' '))"; exit 2 }
+ $DryRun = $words -contains 'dryrun'; $AllowHidden = $words -contains 'allowhidden'; $Explore = $words -contains 'explore'
+@@ -71,6 +75,10 @@ if ($Zone -and $Manual) { Write-Host "'zone' is not allowed with 'manual' (there
+ $Cand5 = $words -contains 'cand5'   # M16 proof5: native arm = native5pack-bin (copy bin-native5, tag gp5, fp a349d529)
+ if ($Cand5 -and ($Manual -or $Explore)) { Write-Host "'cand5' is not allowed with 'manual' or 'explore' (route runs with 'nativeonly' only)"; exit 2 }
+ if ($Cand5 -and (($words -notcontains 'nativeonly') -or ($words -contains 'xenosonly'))) { Write-Host "'cand5' needs 'nativeonly' (and not 'xenosonly')"; exit 2 }
++$Cand6 = $words -contains 'cand6'   # M16 step E: native arm = native6pack-bin (copy bin-native6, tag gp6, fp e5c874ca2b87a59d)
++if ($Cand6 -and $Cand5) { Write-Host "'cand5' and 'cand6' exclude each other"; exit 2 }
++if ($Cand6 -and ($Manual -or $Explore -or $Dump)) { Write-Host "'cand6' is not allowed with 'manual', 'explore' or 'dump' (route runs with 'nativeonly' only)"; exit 2 }
++if ($Cand6 -and (($words -notcontains 'nativeonly') -or ($words -contains 'xenosonly'))) { Write-Host "'cand6' needs 'nativeonly' (and not 'xenosonly')"; exit 2 }
+ $Seconds = if ($Manual) { 1200 } else { 1500 }   # explore + route: a cap (the route's 'stop' ends it, ~900 s)
+ $kit = $PSScriptRoot                                   # build\agent3\gameplay
+ $ws = (Resolve-Path (Join-Path $kit '..\..\..')).Path
+@@ -136,14 +144,19 @@ if ($Cand5) {   # arm name stays 'native' (post: --arm native=..., native finger
+     $allArms[0].pinned = Join-Path $ws 'build\agent16\pack\native5pack-bin'; $allArms[0].copy = Join-Path $kit 'bin-native5'
+     $allArms[0].manifest = '787CD694F0B884D99D1D1E3C807642B33CBA22D79A8F9253C071A8898D1446A1'; $allArms[0].tr = $(if ($Dump) { 'native5d' } else { 'native5' })
+ }
++if ($Cand6) {   # arm name stays 'native' (post: --arm native=..., native fingerprint check)
++    $allArms[0].pinned = Join-Path $ws 'build\agent16\pack\native6pack-bin'; $allArms[0].copy = Join-Path $kit 'bin-native6'
++    $allArms[0].manifest = '6D841C1E7D03B8A40B595E6ABDBBA02ACA4F478587623F6CC530FFA5E5BFD9A6'; $allArms[0].tr = 'native6'
++}
+ $want = if ($words -contains 'nativeonly') { @('native') } elseif ($words -contains 'xenosonly') { @('xenos') } elseif ($Explore -or $Manual) { @('native') } else { @('native', 'xenos') }
+ $arms = @($allArms | Where-Object { $want -contains $_.name })
+-$nativeFp = if ($Cand5) { 'a349d5292f67b127' } else { '39129c4c059be5f0' }
++$nativeFp = if ($Cand5) { 'a349d5292f67b127' } elseif ($Cand6) { 'e5c874ca2b87a59d' } else { '39129c4c059be5f0' }
+ $wiringFp = '39129c4c059be5f0'   # dryrun native wiring stand-in: M16's native4bp smoke run (always 39129c4c)
+ Say "gameplay $(if ($Manual) { 'MANUAL' } elseif ($Explore) { 'EXPLORE' } else { 'ROUTE' }) $(if ($DryRun) { 'DRY RUN (no game)' } else { 'REAL RUN' }); arms $($want -join ', '); route $(if ($Manual) { 'none (manual: no -InputScript, default SDL input)' } else { $route }); -Seconds $Seconds; WS $ws"
+ if ($Dump) { Say "DIAGNOSTIC: dump run, timing invalid, miss cache OFF (LEGO_DUMP_MISSING_SHADERS=$(Join-Path $kit "shader-dumps-native-$stamp"))" }
+ if ($Zone) { Say 'ZONE: prompt sidecar --zone --zone-delay 45 on (zone step answered from the Toy Pad LEDs); route mark v-replace not wired' }
+ if ($Cand5) { Say "CAND5: native arm = $($allArms[0].pinned) (MANIFEST $($allArms[0].manifest.Substring(0,16))), copy $($allArms[0].copy), tag $(if ($Dump) { 'gp5d' } else { 'gp5' })-native, trace trace-$($allArms[0].tr)-$stamp, post --expect-fp $nativeFp" }
++if ($Cand6) { Say "CAND6: native arm = $($allArms[0].pinned) (MANIFEST $($allArms[0].manifest.Substring(0,16))), copy $($allArms[0].copy), tag gp6-native, trace trace-$($allArms[0].tr)-$stamp, post --expect-fp $nativeFp" }
+ 
+ # --- preconditions ---
+ $fail = @(); $refuse = @()
+@@ -198,7 +211,7 @@ foreach ($arm in $arms) {
+ }
+ if ($bad) { exit 2 }
+ 
+-$tagBase = if ($Manual) { 'gpman' } elseif ($Explore) { 'gpexp' } elseif ($Cand5) { if ($Dump) { 'gp5d' } else { 'gp5' } } else { 'gp' }
++$tagBase = if ($Manual) { 'gpman' } elseif ($Explore) { 'gpexp' } elseif ($Cand5) { if ($Dump) { 'gp5d' } else { 'gp5' } } elseif ($Cand6) { 'gp6' } else { 'gp' }
+ function Rg-Args($arm, [string]$root, [string]$trace, [bool]$dry) {
+     $x = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $rg, '-BinDir', $arm.copy, '-Seconds', "$Seconds", '-GpuLog',
+         '-Tag', "$tagBase-$($arm.name)", '-RunsRoot', $root)
+@@ -259,7 +272,8 @@ if ($DryRun) {
+     } else { Say 'note: M16 smoke run not found: native wiring test skipped' }
+     # word combos that must exit 2 (they exit in the word checks, before the lock, python and any file work)
+     foreach ($wc in @('zone manual', 'cand5 manual nativeonly', 'cand5 explore nativeonly', 'cand5 manual dump nativeonly', 'cand5', 'cand5 nativeonly xenosonly', 'dump', 'bogusword',
+-        'nativeonly cand5 dump', 'nativeonly zone dump', 'cand5 zone dump', 'nativeonly cand5 zone dump xenosonly', 'cand5 explore zone dump nativeonly')) {
++        'nativeonly cand5 dump', 'nativeonly zone dump', 'cand5 zone dump', 'nativeonly cand5 zone dump xenosonly', 'cand5 explore zone dump nativeonly',
++        'cand6', 'cand6 nativeonly xenosonly', 'cand6 manual nativeonly', 'cand6 explore nativeonly', 'cand6 nativeonly zone dump', 'cand6 manual dump nativeonly', 'cand5 cand6 nativeonly zone')) {
+         $rc = Run-Logged 'powershell' (@('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $PSCommandPath) + @($wc -split ' '))
+         Say "word combo '$wc' exit $rc $(if ($rc -eq 2) { '(expected 2: ok)' } else { '(expected 2: BAD)' })"; if ($rc -ne 2) { $bad++ }
+     }
+@@ -354,6 +368,6 @@ $sums = Join-Path $kit "post\SHA256SUMS-$stamp.txt"
+ $items = @(Get-Item -LiteralPath $postOut -ErrorAction SilentlyContinue)
+ if (Test-Path -LiteralPath $shots) { $items += Get-ChildItem -LiteralPath $shots -File }
+ $items | ForEach-Object { "$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash)  $($_.Length)  $($_.FullName.Substring($ws.Length + 1))" } | Set-Content -LiteralPath $sums -Encoding ascii
+-Set-Content -LiteralPath (Join-Path $kit 'LATEST.txt') -Value "$stamp $(if ($Explore) { 'explore' } else { 'route' })$(if ($Cand5) { ' cand5' })$(if ($Dump) { ' DIAGNOSTIC dump on, timing invalid' }) exit=$rcAll post=$prc shots=$shots report=$postOut $verdict" -Encoding ascii
++Set-Content -LiteralPath (Join-Path $kit 'LATEST.txt') -Value "$stamp $(if ($Explore) { 'explore' } else { 'route' })$(if ($Cand5) { ' cand5' })$(if ($Cand6) { ' cand6' })$(if ($Dump) { ' DIAGNOSTIC dump on, timing invalid' }) exit=$rcAll post=$prc shots=$shots report=$postOut $verdict" -Encoding ascii
+ Say "GAMEPLAY DONE: run-game $(if ($rcAll) { "exit code $rcAll" } else { 'exit 0' }); post exit $prc; $verdict; shots $shots; report $postOut"
+ exit $(if ($rcAll -ne 0 -or $prc -ne 0) { $(if ($rcAll -eq 3) { 3 } else { 1 }) } else { 0 })

@@ -1,0 +1,287 @@
+{
+ "args": {
+  "runs": [
+   "<workspace>\\build\\agent8\\session3\\smoke-final2\\runs\\20261125-164755-final2-3d-xenos",
+   "<workspace>\\build\\agent8\\session3\\smoke-final2\\runs\\20261125-165219-final2-3d-native"
+  ],
+  "span": 120.0,
+  "anchor": 1500,
+  "anchor_hold": 1.0,
+  "anchor_mode": "sustained",
+  "thr3d": 600,
+  "margin": 2.0,
+  "anchor_late": 90.0,
+  "end_low_xenos": 1000,
+  "end_low_native": 120,
+  "end_low_hold": 5.0,
+  "end_abs": 10,
+  "end_rel": 0.05,
+  "end_hold": 20.0,
+  "sustain_min": 0.5,
+  "thermal_outlier": 0.25,
+  "cap": "none",
+  "cap_lo": 57.0,
+  "cap_hi": 61.5,
+  "native_default_ok": true,
+  "thermal_flag": 0.1,
+  "hw_void": 0.05,
+  "host_margin": 1.0,
+  "step_gap": 12.0,
+  "align_tol": 3.0,
+  "presses": 3,
+  "route": "<workspace>\\harness\\routes\\attract-long.txt",
+  "renderer": "auto",
+  "warm": false,
+  "json": "<workspace>\\build\\agent12\\s5\\s5-gates-smoke-span120.json",
+  "selftest": false
+ },
+ "runs": [
+  {
+   "run_dir": "<workspace>\\build\\agent8\\session3\\smoke-final2\\runs\\20261125-164755-final2-3d-xenos",
+   "tag": "final2-3d-xenos",
+   "bin_dir": "<workspace>\\build\\agent2\\devfinal2-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 0.63 s, no WER/dump"
+    },
+    "runner": {
+     "status": "PASS",
+     "why": "n/a: no runner status fields (not a run-timing run)"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "PASS",
+     "why": "ok",
+     "t3d": 82.26,
+     "anchor_t": 107.98,
+     "anchor_minus_last_press": 36.01,
+     "anchor_minus_3d": 25.73,
+     "sustain10": 1.0
+    },
+    "span": {
+     "status": "PASS",
+     "why": "covered: 13.0 s of frames after window end; end of 3D not seen",
+     "end3d_t": null,
+     "end3d_low_t": null,
+     "end3d_flat_t": null,
+     "window": [
+      107.98,
+      227.98
+     ],
+     "span_s": 120.0
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 43/91 (halted), last step t 240.0",
+     "last_press_t": 71.97,
+     "steps_done": 43,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "FLAG",
+     "why": "no cooldown record in run.json (first gpu.csv temp 58.0 C)",
+     "start_temp_c": 58.0,
+     "temp_at_anchor_c": 84.0
+    },
+    "thermal": {
+     "status": "PASS",
+     "why": "thermal-limited 0.77 > 0.10 (covariate; set rule: arm outlier -> FLAG)",
+     "samples": 120,
+     "expected": 120,
+     "thermal_share": 0.767,
+     "hw_brake_share": 0.0,
+     "powercap_share": 0.2,
+     "util_gpu": 95.0,
+     "gr_mhz": 1357.0,
+     "power_w": 26.51,
+     "temp_c": 87.0,
+     "p0_share": 1.0,
+     "thermal_limited": true
+    },
+    "host": {
+     "status": "NODATA",
+     "why": "no sys.csv (host-busy, battery, foreground, user input unknown)",
+     "nongame_mean": null
+    },
+    "cap": {
+     "status": "PASS",
+     "why": "fps 45.60",
+     "arm": "none",
+     "reported": 0
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "perf.csv",
+    "first_frame_t": 3.48,
+    "perf_rows": 12261,
+    "perf_last_t": 241.0,
+    "anchor_first_t": 107.98,
+    "anchor_sustained_t": 107.98,
+    "runner_window_start": 107.98,
+    "first_t_by_draws": {
+     "600": 82.26,
+     "1000": 87.3,
+     "1500": 107.98,
+     "2000": 107.98
+    },
+    "max_draws": 15746,
+    "cap_sources": {
+     "runner_effective": 0,
+     "cvar": null,
+     "native_frames_cvar": null
+    },
+    "axis_minus_close_s": 0.97,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": 0.322,
+     "max_abs": 0.322
+    }
+   },
+   "renderer": "xenos",
+   "metrics": {
+    "frames": 5472,
+    "window_s": 119.987,
+    "fps": 45.605,
+    "median_ms": 20.294,
+    "p99_ms": 51.896,
+    "low1_ms": 79.633,
+    "max_ms": 307.44,
+    "n_ge100": 7,
+    "n_ge250": 2,
+    "at60_share": 0.15
+   },
+   "verdict": "FLAG"
+  },
+  {
+   "run_dir": "<workspace>\\build\\agent8\\session3\\smoke-final2\\runs\\20261125-165219-final2-3d-native",
+   "tag": "final2-3d-native",
+   "bin_dir": "<workspace>\\build\\agent2\\nativefinal2-bin",
+   "gates": {
+    "clean": {
+     "status": "PASS",
+     "why": "exit 0, wm_close 0.89 s, no WER/dump"
+    },
+    "runner": {
+     "status": "PASS",
+     "why": "n/a: no runner status fields (not a run-timing run)"
+    },
+    "cold": {
+     "status": "PASS",
+     "why": "seed_xenos null (cold)"
+    },
+    "3d": {
+     "status": "PASS",
+     "why": "ok",
+     "t3d": 122.11,
+     "anchor_t": 125.49,
+     "anchor_minus_last_press": 52.78,
+     "anchor_minus_3d": 3.38,
+     "sustain10": 0.873
+    },
+    "span": {
+     "status": "VOID",
+     "why": "SHORT: perf ends 240.6 s < window end 245.5 + margin 2 (need -Seconds >= ~249)",
+     "end3d_t": null,
+     "end3d_low_t": null,
+     "end3d_flat_t": null,
+     "window": [
+      125.49,
+      245.49
+     ],
+     "span_s": 120.0
+    },
+    "input": {
+     "status": "PASS",
+     "why": "presses 3 ok, none in window; steps 43/91 (halted), last step t 240.0",
+     "last_press_t": 72.71,
+     "steps_done": 43,
+     "steps_total": 91
+    },
+    "cooldown": {
+     "status": "FLAG",
+     "why": "no cooldown record in run.json (first gpu.csv temp 70.0 C)",
+     "start_temp_c": 70.0,
+     "temp_at_anchor_c": 79.0
+    },
+    "thermal": {
+     "status": "PASS",
+     "why": "thermal 0.00, hw 0.00",
+     "samples": 115,
+     "expected": 120,
+     "thermal_share": 0.0,
+     "hw_brake_share": 0.0,
+     "powercap_share": 0.026,
+     "util_gpu": 39.0,
+     "gr_mhz": 1732.0,
+     "power_w": 19.51,
+     "temp_c": 79.0,
+     "p0_share": 0.835
+    },
+    "host": {
+     "status": "NODATA",
+     "why": "no sys.csv (host-busy, battery, foreground, user input unknown)",
+     "nongame_mean": null
+    },
+    "cap": {
+     "status": "PASS",
+     "why": "fps 75.40",
+     "arm": "none",
+     "reported": 240
+    },
+    "align": {
+     "status": "PASS",
+     "why": "ok"
+    }
+   },
+   "info": {
+    "draws_source": "frames.csv offset +1 (median |interval-frame_time| 0.001 ms)",
+    "first_frame_t": 4.23,
+    "perf_rows": 36194,
+    "perf_last_t": 240.56,
+    "anchor_first_t": 125.49,
+    "anchor_sustained_t": 125.49,
+    "runner_window_start": 125.49,
+    "first_t_by_draws": {
+     "600": 122.11,
+     "1000": 122.11,
+     "1500": 125.49,
+     "2000": 125.49
+    },
+    "max_draws": 5979,
+    "cap_sources": {
+     "runner_effective": 240,
+     "cvar": null,
+     "native_frames_cvar": "240"
+    },
+    "axis_minus_close_s": 0.51,
+    "axis_vs_input_perf_rows_s": {
+     "n": 1,
+     "median": -0.464,
+     "max_abs": 0.464
+    }
+   },
+   "renderer": "native",
+   "metrics": {
+    "frames": 8676,
+    "window_s": 115.069,
+    "fps": 75.398,
+    "median_ms": 10.21,
+    "p99_ms": 53.877,
+    "low1_ms": 71.375,
+    "max_ms": 213.025,
+    "n_ge100": 3,
+    "n_ge250": 0,
+    "at60_share": 0.025
+   },
+   "verdict": "VOID"
+  }
+ ]
+}

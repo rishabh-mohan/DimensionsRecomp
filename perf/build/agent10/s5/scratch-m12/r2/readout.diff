@@ -1,0 +1,92 @@
+diff --git a/build/agent10/s5/scratch-m12/s5_readout.py b/build/agent10/s5/scratch-m12/r2/s5_readout.py
+index 90cf3c6..8032cd3 100644
+--- a/build/agent10/s5/scratch-m12/s5_readout.py
++++ b/build/agent10/s5/scratch-m12/r2/s5_readout.py
+@@ -9,4 +9,6 @@ Descriptive, CF1 method (build/agent8/session3/confirm/readout_night.py):
+ Arms = (bin dir basename, cap arm). Contrasts: every bin vs --ref within each cap arm; uncapped vs cap60 within each
+ bin (info). Runs with verdict VOID are always dropped; --exclude-flagged also drops FLAG runs (sensitivity variant).
++Missing arms (no runs, or all dropped) are listed as 'not run' / 'no valid runs' and their contrasts are skipped with a
++note; no arm is required (matrix-s5-baseline: ship60, nat60, natU, optional native4bp at cap60).
+ 
+ Usage: python -B s5_readout.py GATES.json [GATES.json ...] [--ref devfinal2] [--exclude-flagged] [--json OUT]
+@@ -64,6 +66,6 @@ def boot_diff(va, vb, n, seed):
+ 
+ def paired(a, b, key):
+-    ka = {x['round']: x['v'][key] for x in a if x['round'] is not None and x['v'].get(key)}
+-    kb = {x['round']: x['v'][key] for x in b if x['round'] is not None and x['v'].get(key)}
++    ka = {x['round']: x['v'][key] for x in a if x['round'] is not None and x['v'].get(key) is not None}
++    kb = {x['round']: x['v'][key] for x in b if x['round'] is not None and x['v'].get(key) is not None}
+     common = sorted(set(ka) & set(kb))
+     d = [math.log(ka[c] / kb[c]) for c in common if ka[c] > 0 and kb[c] > 0]
+@@ -98,13 +100,15 @@ def main(argv=None):
+     rx = re.compile(a.round_regex)
+     L, arms, dropped = [], {}, []
++    seen = {}  # (bin, cap) -> runs in, including dropped ones
+     for r in runs:
++        b = str(r.get('bin_dir') or r['renderer']).rstrip('\\/').replace('\\', '/').split('/')[-1]
++        cap = r['gates']['cap'].get('arm')
++        seen[(b, cap)] = seen.get((b, cap), 0) + 1
+         if r['verdict'] == 'VOID' or (a.exclude_flagged and r['verdict'] == 'FLAG'):
+             dropped.append((r.get('tag') or r['run_dir'], r['verdict']))
+             continue
+-        if not r.get('metrics'):
++        if not r.get('metrics') or r['metrics'].get('fps') is None:
+             dropped.append((r.get('tag') or r['run_dir'], 'no metrics'))
+             continue
+-        b = str(r.get('bin_dir') or r['renderer']).rstrip('\\/').replace('\\', '/').split('/')[-1]
+-        cap = r['gates']['cap'].get('arm')
+         mm = rx.search(str(r.get('tag') or '')) or rx.search(r['run_dir'].replace('\\', '/').split('/')[-1])
+         arms.setdefault((b, cap), []).append({'tag': r.get('tag'), 'verdict': r['verdict'],
+@@ -129,8 +133,25 @@ def main(argv=None):
+                 lab, fmt(med, 3), fmt(lo, 3), fmt(hi, 3), fmt(min(vals), 3), fmt(max(vals), 3), len(vals)))
+         out['arms']['%s|%s' % key] = ad
++    # missing arms (e.g. matrix-s5-baseline has no xenos uncapped arm): reported, never required
++    bins = sorted({k[0] for k in seen})
++    allcaps = sorted({k[1] for k in seen if k[1] is not None} | {'60', 'none'}, key=str)
++    out['missing'] = {}
++    for b in bins:
++        for c in allcaps:
++            if (b, c) not in arms:
++                why = 'not run' if (b, c) not in seen else 'no valid runs (%d in, all dropped)' % seen[(b, c)]
++                out['missing']['%s|%s' % (b, c)] = why
++                L.append('')
++                L.append('== arm %s / cap %s: %s' % (b, c, why))
+     pairs = []
+     caps = sorted({k[1] for k in arms}, key=str)
+     for cap in caps:
+         refs = [k for k in arms if k[1] == cap and a.ref in k[0]]
++        others = [k for k in sorted(arms) if k[1] == cap and a.ref not in k[0]]
++        if not refs and others:
++            L.append('')
++            L.append('== contrast cap %s: no %s arm (%s), bin-vs-ref contrast not available for %s' % (
++                cap, a.ref, 'not run' if not any(a.ref in k[0] and k[1] == cap for k in seen) else 'no valid runs',
++                ', '.join(k[0] for k in others)))
+         for rk in refs:
+             for k in sorted(arms):
+@@ -184,4 +205,9 @@ def selftest():
+         runs.append(mk('nat-unc-r%d' % i, 'nativefinal2-bin', 'none', 75 + i * 0.2))
+     runs.append(mk('nat-c60-r9', 'nativefinal2-bin', '60', 10, verdict='VOID'))
++    # matrix-s5-baseline shape: no xenos uncapped arm; optional native4bp cap60 arm, here all VOID; a no-fps run
++    runs.append(mk('n4bp-c60-r1', 'native4bp-bin', '60', 58, verdict='VOID'))
++    nofps = mk('nat-c60-r8', 'nativefinal2-bin', '60', 50, verdict='FLAG')
++    nofps['metrics']['fps'] = None
++    runs.append(nofps)
+     td = tempfile.mkdtemp(prefix='readout-selftest-', dir=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'scratch'))
+     f = os.path.join(td, 'g.json')
+@@ -195,10 +221,14 @@ def selftest():
+     c = [x for x in o['contrasts'] if x['metric'] == 'fps' and x['A'] == 'nativefinal2-bin|60' and x['B'] == 'devfinal2-bin|60'][0]
+     u = [x for x in o['contrasts'] if x['metric'] == 'fps' and x['kind'].startswith('uncapped')][0]
+-    checks = [('void dropped', len(o['dropped']) == 1),
++    checks = [('void + no-fps dropped', len(o['dropped']) == 3),
+               ('nat vs xen fps +22.0%', abs(c['pct'] - (55.6 - 45.6) / 45.6 * 100) < 0.01 and c['word'] == 'A higher'),
+               ('paired n5', c['paired'] and c['paired']['n'] == 5),
+               ('p99 not resolved', [x for x in o['contrasts'] if x['metric'] == 'p99_ms' and x['A'] == c['A'] and x['B'] == c['B']][0]['word'] == 'not resolved'),
+               ('uncapped vs cap60 native', u['A'] == 'nativefinal2-bin|none' and u['word'] == 'A higher'),
+-              ('arm CI', o['arms']['devfinal2-bin|60']['fps']['lo'] is not None)]
++              ('arm CI', o['arms']['devfinal2-bin|60']['fps']['lo'] is not None),
++              ('S6 Xu not run', o['missing'].get('devfinal2-bin|none') == 'not run'),
++              ('S6 n4bp all dropped', str(o['missing'].get('native4bp-bin|60', '')).startswith('no valid runs')),
++              ('S6 uncapped no-ref note', 'no devfinal2 arm (not run)' in buf.getvalue()),
++              ('S6 no n4bp contrast', not any('native4bp' in x['A'] for x in o['contrasts']))]
+     ok = all(x[1] for x in checks)
+     for name, good in checks:

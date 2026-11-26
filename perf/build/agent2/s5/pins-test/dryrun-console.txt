@@ -1,0 +1,132 @@
+﻿[nops-smoke] pins OK: 13 files (WS <workspace>)
+[nops-smoke 19:58:36] S5 NOPS-SMOKE kit DRY RUN (no game); bin <workspace>\build\agent2\s5\devs5nops-bin; order T1 T2 N1 N2 A1 A2; -Seconds 240 each
+[nops-smoke 19:58:36] WS <workspace>
+[nops-smoke 19:58:36] S1: d3d12_log_occlusion_queries=true in every arm; N2: fresh run dir per arm, no -UserDir/-SeedXenos (cold storage <run>\user\cache\shaders); shots in T1 T2 N1 N2 at 60 120 146 152 200 s
+# verify-bins 2026-11-25 19:58:36
+PASS <workspace>\build\agent2\s5\devs5nops-bin: 7 rows, 7 files, 0 FAIL; MANIFEST sha256 8A8B2E776D896F12F2461E466E514F412EA204EDEA87546A9542E46F27D82D54
+RESULT: 0 FAIL
+[nops-smoke 19:58:36] MANIFEST sha256 8A8B2E776D896F12 = pin (s5/nops-bin/BIN-PINS.md)
+[nops-smoke 19:58:36] day launcher: state      waiting-for-go (since 2026-11-25 13:34:18)
+[nops-smoke 19:58:37] desktop exebox-D3ROZMF3RMBJ6J25PF2TUMCZ3P (hidden: not visible to the user)
+[nops-smoke 19:58:37] note (a real run would refuse): not on the interactive desktop (exebox-D3ROZMF3RMBJ6J25PF2TUMCZ3P)
+[nops-smoke 19:58:37] ARM T1 COMMAND (real run): powershell -NoProfile -ExecutionPolicy Bypass -File <workspace>\harness\run-game.ps1 -BinDir <workspace>\build\agent2\s5\devs5nops-bin -Seconds 240 -GpuLog -Tag s5nops-t1 -RunsRoot <workspace>\build\agent2\s5\nops-smoke\runs -InputScript <workspace>\harness\routes\attract-long.txt -Cvar d3d12_log_occlusion_queries=true
+run      <workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195838-s5nops-t1
+mode     FUNCTIONAL ONLY (hidden desktop exebox-D3ROZMF3RMBJ6J25PF2TUMCZ3P), NOT FOR TIMING
+command  legodimensions.exe --log_file=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195838-s5nops-t1\game.log --log_flush_interval=1 --perf_log_csv=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195838-s5nops-t1\perf.csv --native_settings_load=false --discord_rpc=false --audio_mute=true --pause_when_unfocused=false --input_backend=xinput
+env      LEGO_NATIVE_FRAME_METRICS=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195838-s5nops-t1\frames.csv AGENT3_VPAD=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195838-s5nops-t1\vpad-state.bin
+input    <workspace>\harness\routes\attract-long.txt (91 steps); virtual pad <workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195838-s5nops-t1\xinput1_4.dll
+dry run: not launched (8 files linked, 0 copied; map found)
+[nops-smoke 19:58:39] ARM T1 run-game -DryRun exit 0
+[nops-smoke 19:58:39] ARM T2 COMMAND (real run): powershell -NoProfile -ExecutionPolicy Bypass -File <workspace>\harness\run-game.ps1 -BinDir <workspace>\build\agent2\s5\devs5nops-bin -Seconds 240 -GpuLog -Tag s5nops-t2 -RunsRoot <workspace>\build\agent2\s5\nops-smoke\runs -InputScript <workspace>\harness\routes\attract-long.txt -Cvar "d3d12_async_depth_only_pipelines=true;d3d12_log_occlusion_queries=true"
+run      <workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195839-s5nops-t2
+mode     FUNCTIONAL ONLY (hidden desktop exebox-D3ROZMF3RMBJ6J25PF2TUMCZ3P), NOT FOR TIMING
+command  legodimensions.exe --log_file=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195839-s5nops-t2\game.log --log_flush_interval=1 --perf_log_csv=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195839-s5nops-t2\perf.csv --native_settings_load=false --discord_rpc=false --audio_mute=true --pause_when_unfocused=false --input_backend=xinput
+env      LEGO_NATIVE_FRAME_METRICS=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195839-s5nops-t2\frames.csv AGENT3_VPAD=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195839-s5nops-t2\vpad-state.bin
+input    <workspace>\harness\routes\attract-long.txt (91 steps); virtual pad <workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195839-s5nops-t2\xinput1_4.dll
+dry run: not launched (8 files linked, 0 copied; map found)
+[nops-smoke 19:58:40] ARM T2 run-game -DryRun exit 0
+[nops-smoke 19:58:40] ARM N1 COMMAND (real run): powershell -NoProfile -ExecutionPolicy Bypass -File <workspace>\harness\run-game.ps1 -BinDir <workspace>\build\agent2\s5\devs5nops-bin -Seconds 240 -GpuLog -Tag s5nops-n1 -RunsRoot <workspace>\build\agent2\s5\nops-smoke\runs -InputScript <workspace>\harness\routes\attract-long.txt -Cvar "d3d12_pipeline_creation_no_wait=true;d3d12_log_occlusion_queries=true"
+run      <workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195840-s5nops-n1
+mode     FUNCTIONAL ONLY (hidden desktop exebox-D3ROZMF3RMBJ6J25PF2TUMCZ3P), NOT FOR TIMING
+command  legodimensions.exe --log_file=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195840-s5nops-n1\game.log --log_flush_interval=1 --perf_log_csv=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195840-s5nops-n1\perf.csv --native_settings_load=false --discord_rpc=false --audio_mute=true --pause_when_unfocused=false --input_backend=xinput
+env      LEGO_NATIVE_FRAME_METRICS=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195840-s5nops-n1\frames.csv AGENT3_VPAD=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195840-s5nops-n1\vpad-state.bin
+input    <workspace>\harness\routes\attract-long.txt (91 steps); virtual pad <workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195840-s5nops-n1\xinput1_4.dll
+dry run: not launched (8 files linked, 0 copied; map found)
+[nops-smoke 19:58:41] ARM N1 run-game -DryRun exit 0
+[nops-smoke 19:58:41] ARM N2 COMMAND (real run): powershell -NoProfile -ExecutionPolicy Bypass -File <workspace>\harness\run-game.ps1 -BinDir <workspace>\build\agent2\s5\devs5nops-bin -Seconds 240 -GpuLog -Tag s5nops-n2 -RunsRoot <workspace>\build\agent2\s5\nops-smoke\runs -InputScript <workspace>\harness\routes\attract-long.txt -Cvar "d3d12_pipeline_creation_no_wait=true;d3d12_async_depth_only_pipelines=true;d3d12_log_occlusion_queries=true"
+run      <workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195842-s5nops-n2
+mode     FUNCTIONAL ONLY (hidden desktop exebox-D3ROZMF3RMBJ6J25PF2TUMCZ3P), NOT FOR TIMING
+command  legodimensions.exe --log_file=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195842-s5nops-n2\game.log --log_flush_interval=1 --perf_log_csv=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195842-s5nops-n2\perf.csv --native_settings_load=false --discord_rpc=false --audio_mute=true --pause_when_unfocused=false --input_backend=xinput
+env      LEGO_NATIVE_FRAME_METRICS=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195842-s5nops-n2\frames.csv AGENT3_VPAD=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195842-s5nops-n2\vpad-state.bin
+input    <workspace>\harness\routes\attract-long.txt (91 steps); virtual pad <workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195842-s5nops-n2\xinput1_4.dll
+dry run: not launched (8 files linked, 0 copied; map found)
+[nops-smoke 19:58:43] ARM N2 run-game -DryRun exit 0
+[nops-smoke 19:58:43] ARM A1 COMMAND (real run): powershell -NoProfile -ExecutionPolicy Bypass -File <workspace>\harness\run-game.ps1 -BinDir <workspace>\build\agent2\s5\devs5nops-bin -Seconds 240 -GpuLog -Tag s5nops-a1 -RunsRoot <workspace>\build\agent2\s5\nops-smoke\runs -InputScript <workspace>\harness\routes\attract-long.txt -Cvar "d3d12_log_sync_pipeline_creation=true;slow_frame_log_ms=1;d3d12_log_occlusion_queries=true"
+run      <workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195843-s5nops-a1
+mode     FUNCTIONAL ONLY (hidden desktop exebox-D3ROZMF3RMBJ6J25PF2TUMCZ3P), NOT FOR TIMING
+command  legodimensions.exe --log_file=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195843-s5nops-a1\game.log --log_flush_interval=1 --perf_log_csv=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195843-s5nops-a1\perf.csv --native_settings_load=false --discord_rpc=false --audio_mute=true --pause_when_unfocused=false --input_backend=xinput
+env      LEGO_NATIVE_FRAME_METRICS=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195843-s5nops-a1\frames.csv AGENT3_VPAD=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195843-s5nops-a1\vpad-state.bin
+input    <workspace>\harness\routes\attract-long.txt (91 steps); virtual pad <workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195843-s5nops-a1\xinput1_4.dll
+dry run: not launched (8 files linked, 0 copied; map found)
+[nops-smoke 19:58:44] ARM A1 run-game -DryRun exit 0
+[nops-smoke 19:58:44] ARM A2 COMMAND (real run): powershell -NoProfile -ExecutionPolicy Bypass -File <workspace>\harness\run-game.ps1 -BinDir <workspace>\build\agent2\s5\devs5nops-bin -Seconds 240 -GpuLog -Tag s5nops-a2 -RunsRoot <workspace>\build\agent2\s5\nops-smoke\runs -InputScript <workspace>\harness\routes\attract-long.txt -Cvar "d3d12_log_sync_pipeline_creation=true;slow_frame_log_ms=1;d3d12_async_depth_only_pipelines=true;d3d12_log_occlusion_queries=true"
+run      <workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195845-s5nops-a2
+mode     FUNCTIONAL ONLY (hidden desktop exebox-D3ROZMF3RMBJ6J25PF2TUMCZ3P), NOT FOR TIMING
+command  legodimensions.exe --log_file=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195845-s5nops-a2\game.log --log_flush_interval=1 --perf_log_csv=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195845-s5nops-a2\perf.csv --native_settings_load=false --discord_rpc=false --audio_mute=true --pause_when_unfocused=false --input_backend=xinput
+env      LEGO_NATIVE_FRAME_METRICS=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195845-s5nops-a2\frames.csv AGENT3_VPAD=<workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195845-s5nops-a2\vpad-state.bin
+input    <workspace>\harness\routes\attract-long.txt (91 steps); virtual pad <workspace>\build\agent2\s5\nops-smoke\dryrun-runs\20261125-195845-s5nops-a2\xinput1_4.dll
+dry run: not launched (8 files linked, 0 copied; map found)
+[nops-smoke 19:58:45] ARM A2 run-game -DryRun exit 0
+[nops-smoke 19:58:49] shot job self-test: shots: no game process
+[nops-smoke 19:58:50] hold watch self-test: hold: WINDOW-HOLD.txt appeared; no game of ours running
+# nops_smoke_post 2026-11-25 19:58:50
+
+--- A1 <workspace>\build\agent2\s5\sync-smoke\runs\20261125-175402-s5sync-on
+bin <workspace>\build\agent2\s5\devs5sync-bin exe 6C8E281156CCE828 cvars {'d3d12_log_sync_pipeline_creation': 'true', 'slow_frame_log_ms': '1'}
+PASS  A1 clean exit (exit 0, not early, wm_close)  [exit 0x00000000 early False close wm_close]
+PASS  A1 no dumps / crash events / WER  [dumps [] crash [] wer False]
+note  A1 cvars exactly {'d3d12_log_sync_pipeline_creation': 'true', 'slow_frame_log_ms': '1', 'd3d12_log_occlusion_queries': 'true'}  [{'d3d12_log_sync_pipeline_creation': 'true', 'slow_frame_log_ms': '1'}]
+logs ['game.log'], 9429 lines
+PASS  A1 check-defaults --mode xenos PASS  [exit 0; RESULT PASS]
+PASS  A1 nops Initialize line absent  [0]
+PASS  A1 no "d3d12_async_depth_only_pipelines ignored"  [0]
+PASS  A1 sync-log Initialize line once  [1]
+PASS  A1 no_wait Initialize line absent  [0]
+PASS  A1 no "d3d12_pipeline_creation_no_wait ignored"  [0]
+PASS  A1 0 "Failed to create graphics pipeline"  [0]
+PASS  A1 N2 cold storage (no seed, user_data_root = run/user, no file older than the run)  [seed None, user_data_root <workspace>\build\agent2\s5\sync-smoke\runs\20261125-175402-s5sync-on\user, 2 storage files (5752084B.rtv.d3d12.xpso 17508 B, 5752084B.xsh 179300 B), older 0]
+note  A1 Z4 occlusion-query "shutdown" line once  [0 lines, {}]
+  S1: no occlusion counter lines (no ZPD packet and no shutdown line): unknown
+  attribution (D2: logging perturbs timing; counts and joins only)
+  sync lines 45, sum 879.8 ms, max 135.1 ms; movable by the opt-in (ps none, memexport vs 0, host RT) 44; memexport-vs 1; reasons {'no pixel shader': 45}
+  slow-frame lines 9140; total pipeline create 874.0 ms (43x) on the command thread; dropped draws 1254; forced pipeline waits 0.0 ms (0x)
+  top 10 frames by pipeline create: frame ms | create ms (Nx) new | dropped | sync joined n / ms / movable
+    line 7857 frame #7601 945.7 ms | create 458.5 (8x) new 67 | dropped 137 | sync 8 / 458.6 / 8
+    line 8036 frame #7760 196.0 ms | create 118.1 (10x) new 27 | dropped 42 | sync 10 / 118.0 / 10
+    line 7981 frame #7720 126.9 ms | create 86.2 (2x) new 15 | dropped 37 | sync 2 / 86.2 / 2
+    line 7987 frame #7723 97.5 ms | create 59.9 (3x) new 12 | dropped 38 | sync 3 / 59.9 / 3
+    line 9255 frame #8970 95.7 ms | create 42.1 (1x) new 5 | dropped 4 | sync 1 / 42.1 / 1
+    line 1843 frame #1736 57.9 ms | create 37.1 (1x) new 1 | dropped 0 | sync 1 / 37.1 / 0
+    line 6484 frame #6239 201.3 ms | create 29.2 (4x) new 23 | dropped 23 | sync 4 / 29.2 / 4
+    line 8104 frame #7827 225.5 ms | create 24.2 (1x) new 3 | dropped 5 | sync 1 / 24.2 / 1
+    line 6124 frame #5884 333.3 ms | create 17.6 (4x) new 21 | dropped 19 | sync 4 / 17.7 / 4
+    line 8012 frame #7746 71.2 ms | create 0.3 (2x) new 4 | dropped 9 | sync 2 / 0.3 / 2
+  top 5 frames by frame time: frame ms | create ms (Nx) new | dropped | waits
+    line 6805 frame #6557 1438.6 ms | create 0.0 (0x) new 0 | dropped 0 | waits 0.0 (0x)
+    line 7877 frame #7620 1281.8 ms | create 0.0 (0x) new 0 | dropped 0 | waits 0.0 (0x)
+    line 7857 frame #7601 945.7 ms | create 458.5 (8x) new 67 | dropped 137 | waits 0.0 (0x)
+    line 6863 frame #6615 926.2 ms | create 0.0 (0x) new 0 | dropped 0 | waits 0.0 (0x)
+    line 6479 frame #6238 918.0 ms | create 0.0 (0x) new 0 | dropped 0 | waits 0.0 (0x)
+
+--- T1 <workspace>\build\agent2\s5\sync-smoke\runs\20261125-174932-s5sync-off
+bin <workspace>\build\agent2\s5\devs5sync-bin exe 6C8E281156CCE828 cvars {}
+PASS  T1 clean exit (exit 0, not early, wm_close)  [exit 0x00000000 early False close wm_close]
+PASS  T1 no dumps / crash events / WER  [dumps [] crash [] wer False]
+note  T1 cvars exactly {'d3d12_log_occlusion_queries': 'true'}  [{}]
+logs ['game.log'], 244 lines
+PASS  T1 check-defaults --mode xenos PASS  [exit 0; RESULT PASS]
+PASS  T1 nops Initialize line absent  [0]
+PASS  T1 no "d3d12_async_depth_only_pipelines ignored"  [0]
+PASS  T1 sync-log Initialize line absent  [0]
+PASS  T1 0 'sync pipeline #' lines  [0]
+PASS  T1 no_wait Initialize line absent  [0]
+PASS  T1 no "d3d12_pipeline_creation_no_wait ignored"  [0]
+PASS  T1 0 "Failed to create graphics pipeline"  [0]
+PASS  T1 N2 cold storage (no seed, user_data_root = run/user, no file older than the run)  [seed None, user_data_root <workspace>\build\agent2\s5\sync-smoke\runs\20261125-174932-s5sync-off\user, 2 storage files (5752084B.rtv.d3d12.xpso 17364 B, 5752084B.xsh 179300 B), older 0]
+note  T1 N3 screenshots (5 times, none black)  [0 ok of 0 lines: <workspace>\build\agent2\s5\sync-smoke\runs\20261125-174932-s5sync-off\kit-shots]
+note  T1 Z4 occlusion-query "shutdown" line once  [0 lines, {}]
+  S1: no occlusion counter lines (no ZPD packet and no shutdown line): unknown
+  timing (perf.csv, 9483 rows; 3D from data row 5423 (0-based) at 90.7 s): 4059 frames mean 35.97 p99 138.3 p99.9 347.2 max 1229.6 ms; >100 ms 135, >250 ms 12; misses 231
+  pipeline-miss bursts (>= 20 misses in a frame): 4
+    data row 5423 at 90.7 s: misses 21, frame 259.1 ms, next-2 114.0 9.0 ms
+    data row 5779 at 98.2 s: misses 23, frame 323.0 ms, next-2 157.4 18.8 ms
+    data row 7545 at 143.3 s: misses 67, frame 940.1 ms, next-2 176.2 153.0 ms
+    data row 7766 at 156.1 s: misses 27, frame 188.8 ms, next-2 96.7 46.9 ms
+
+=== PAIRS (report only; success is judged by the Overseer / user, README section 6) ===
+
+RESULT: SELFTEST (no gates)
+[nops-smoke 19:58:50] nops_smoke_post.py --selftest exit 0
+[nops-smoke 19:58:51] dryrun-runs removed
+[nops-smoke 19:58:51] DRY RUN ALL PASS
+[nops-smoke] exit 0

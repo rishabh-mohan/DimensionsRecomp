@@ -1,0 +1,115 @@
+diff --git 06C4134C/gameplay-run.ps1 1F7900B9/gameplay-run.ps1
+index f7f2052..514a2be 100644
+--- 06C4134C/gameplay-run.ps1
++++ 1F7900B9/gameplay-run.ps1
+@@ -1,14 +1,17 @@
+ # gameplay-run.ps1 - M3 gameplay task: scripted LEGO Dimensions gameplay route (functional + visual, NEVER timed).
+ # Words (any order):
+-#   explore      the exploration route (explore-route.txt: level-l path -> vortex -> 120 s observe -> single probes ->
+-#                walk/fight probe loop, a mark + screenshot about every 10 s); arms default to native only.
++#   explore      the exploration route (explore-route.txt: front-end-marker-gated boot -> New Game -> the story's 3 figure
++#                prompts -> 120 s observe -> single probes -> walk/fight probe loop, a mark + screenshot at every step);
++#                -Seconds 1500 (a cap: the route stops itself); arms default to native only.
+ #                Without it: gameplay-route.txt (best-guess walk/fight route) on native, then xenos.
+ #   manual       an untimed hand-driven session: no route, no -InputScript (so the game keeps its default SDL input:
+ #                keyboard to the FOCUSED visible window, or a real pad), -Seconds 1200, native only by default,
+-#                tag gpman-<arm>; the sidecar still places the 3 tags (no replace); no watcher, no post.
++#                tag gpman-<arm>; the sidecar still places the 3 tags (no v-replace) and answers the story's pad prompts;
++#                Toypad by hand: one command per file in <run>\toypad-ctl\NNN.cmd (place <tag> <pad> | remove <tag> |
++#                move <tag> <pad> | swap <a> <b> | replace <tag> | status; pads 1 centre 2 left 3 right); no watcher, no post.
+ #   nativeonly | xenosonly   one arm only.
+ #   dryrun       no game: preconditions (reported), pin + copy checks, the real command lines, run-game -DryRun per arm
+-#                (also parses the route), route = generator output, sidecar --help + tag check, watcher + post
++#                (also parses the route), route = generator output, prompt sidecar --help + self-test + tag check, watcher + post
+ #                self-tests; removes dryrun-runs. Prints DRY RUN ALL PASS and exits 0 when everything passes.
+ #                HEAVY: it copies + sha256-checks the pinned bins (native ~382 MB, xenos ~225 MB) and runs verify-bins
+ #                twice per arm, even when a real run would refuse. Run it only when the PC is free for I/O.
+@@ -21,10 +24,12 @@
+ #   xenos : build\agent2\devfinal2-bin (MANIFEST 4A4A13ED..982D, BIN-PINS.md), framerate_limit=60.
+ #   (caps as M8's build\agent8\s5\matrix-s5-baseline.json). Pinned dirs are only read: sha256-checked copies in
+ #   build\agent3\gameplay\bin-<arm> are what runs.
+-# Beside each arm (started and stopped by this script only): build\agent3\toypad\toypad_sidecar.py with
+-# --tags-dir build\agent3\gameplay\tags (places the virtual
++# Beside each arm (started and stopped by this script only): prompt_sidecar.py (this kit; imports build\agent3\toypad
++# read-only) with --tags-dir build\agent3\gameplay\tags (places the virtual
+ # Batman/Gandalf/Wyldstyle tags 2 s after the front end's all-pads-white line; at the route mark v-replace it REMOVEs and
+-# re-LOADs them; logs <run>\toypad-events.csv), build\agent3\s4b\holdwatch.ps1 (stops OUR game if
++# re-LOADs them; on the story's pad prompts (pad N mode 3 lit <colour> pulses) it re-places / moves the asked figure onto
++# that pad; route marks tp-<cmd>-<args> and ctl files <run>\toypad-ctl\*.cmd (place/remove/move/swap/replace/status, one
++# command per line; renamed .done/.err) drive it mid-game; logs <run>\toypad-events.csv), build\agent3\s4b\holdwatch.ps1 (stops OUR game if
+ # perf-notes\WINDOW-HOLD.txt appears), gameplay-watch.ps1 (a JPEG of the game window at every route mark).
+ # Then gameplay_post.py -> post\gameplay-<stamp>.txt (+ SHA256SUMS, LATEST.txt).
+ # Refuses (exit 3): another instance of this kit (logs\gameplay.lock), a pin mismatch, verify-bins FAIL,
+@@ -42,13 +47,19 @@ if ($unknown.Count) { Write-Host "unknown word(s): $($unknown -join ' ') (known:
+ $DryRun = $words -contains 'dryrun'; $AllowHidden = $words -contains 'allowhidden'; $Explore = $words -contains 'explore'
+ $Manual = $words -contains 'manual'
+ if ($Manual -and $Explore) { Write-Host "'manual' and 'explore' exclude each other"; exit 2 }
+-$Seconds = if ($Manual) { 1200 } else { 900 }
++$Seconds = if ($Manual) { 1200 } elseif ($Explore) { 1500 } else { 900 }   # explore: a cap (the route's 'stop' ends it ~900 s)
+ $kit = $PSScriptRoot                                   # build\agent3\gameplay
+ $ws = (Resolve-Path (Join-Path $kit '..\..\..')).Path
+ $rg = Join-Path $ws 'harness\run-game.ps1'
+ $vb = Join-Path $ws 'build\agent2\session3\verify-bins.py'
+ $hw = Join-Path $ws 'build\agent3\s4b\holdwatch.ps1'
+-$sidecar = Join-Path $ws 'build\agent3\toypad\toypad_sidecar.py'
++$sidecar = Join-Path $ws 'build\agent3\toypad\toypad_sidecar.py'   # read-only: prompt_sidecar.py imports it (+ ldtag, toypad_client)
++$psc = Join-Path $kit 'prompt_sidecar.py'
++$pst = Join-Path $kit 'selftest_prompt.py'
++$fake = Join-Path $ws 'build\agent3\toypad\fake_listener.py'        # read-only: the prompt self-test's stand-in listener
++# the story's pad prompts (manual run 20261125-204323: each pulses 120 s, then the game's failsafe goes on without it)
++$onSpecs = @('pad (?P<pad>[123]) mode 3 lit (00 00 16|00 00 05)=>batman@*', 'pad (?P<pad>[123]) mode 3 lit (F4 69 16|3D 1A 05)=>wyldstyle@*',
++    'pad (?P<pad>[123]) mode 3 lit (F4 00 16|3D 00 05)=>gandalf@*')
+ $post = Join-Path $kit 'gameplay_post.py'
+ $watch = Join-Path $kit 'gameplay-watch.ps1'
+ $gen = Join-Path $kit 'gen_gameplay_route.py'
+@@ -104,7 +115,7 @@ Say "gameplay $(if ($Manual) { 'MANUAL' } elseif ($Explore) { 'EXPLORE' } else {
+ 
+ # --- preconditions ---
+ $fail = @(); $refuse = @()
+-foreach ($p in @($rg, $vb, $hw, $sidecar, $post, $watch, $gen, $route, (Join-Path $tags 'batman.bin'), (Join-Path $tags 'gandalf.bin'), (Join-Path $tags 'wyldstyle.bin'))) { if (-not (Test-Path -LiteralPath $p)) { $fail += "missing $p" } }
++foreach ($p in @($rg, $vb, $hw, $sidecar, $psc, $pst, $fake, $post, $watch, $gen, $route, (Join-Path $tags 'batman.bin'), (Join-Path $tags 'gandalf.bin'), (Join-Path $tags 'wyldstyle.bin'))) { if (-not (Test-Path -LiteralPath $p)) { $fail += "missing $p" } }
+ foreach ($arm in $arms) { if (-not (Test-Path -LiteralPath (Join-Path $arm.pinned 'MANIFEST.txt'))) { $fail += "missing $($arm.pinned)\MANIFEST.txt" } }
+ if ($fail.Count) { $fail | ForEach-Object { Say "FAIL $_" }; exit 2 }
+ $rc = Run-Logged $py @('-B', $gen, '--check')
+@@ -166,8 +177,9 @@ function Rg-Args($arm, [string]$root, [string]$trace, [bool]$dry) {
+ }
+ function Cmd-Line([string[]]$x) { 'powershell ' + (($x | ForEach-Object { if ("$_" -match '[\s;]') { "`"$_`"" } else { "$_" } }) -join ' ') }
+ function Sidecar-Args($arm, [string]$root, [datetime]$t0) {
+-    $s = @('-B', $sidecar, '--runs-root', $root, '--tag', "$tagBase-$($arm.name)", '--not-before', $t0.ToString('o'), '--tags-dir', $tags,
+-        '--timeout', "$($Seconds + 240)", '--delay', '2')
++    $s = @('-B', $psc, '--runs-root', $root, '--tag', "$tagBase-$($arm.name)", '--not-before', $t0.ToString('o'), '--tags-dir', $tags,
++        '--timeout', "$($Seconds + 240)", '--delay', '2', '--boot', 'starter')
++    foreach ($o in $onSpecs) { $s += @('--on', $o) }
+     if (-not $Manual) { $s += @('--then-mark', 'v-replace', '--then-delay', '1', '--then-action', 'replace') }; $s
+ }
+ 
+@@ -176,15 +188,17 @@ if ($DryRun) {
+     foreach ($arm in $arms) {
+         $tr = Join-Path $kit "trace-$($arm.name)-$stamp"
+         Say "COMMAND (real run, arm $($arm.name)): $(Cmd-Line (Rg-Args $arm (Join-Path $kit 'runs') $tr $false))"
+-        Say "SIDECAR (real run, arm $($arm.name)): $py $((Sidecar-Args $arm (Join-Path $kit 'runs') (Get-Date)) -join ' ')"
++        Say "SIDECAR (real run, arm $($arm.name)): $py $(((Sidecar-Args $arm (Join-Path $kit 'runs') (Get-Date)) | ForEach-Object { if ("$_" -match '\s') { "`"$_`"" } else { "$_" } }) -join ' ')"
+         $rc = Run-Logged 'powershell' (Rg-Args $arm $runsRoot $tr $true)
+         Say "run-game -DryRun ($($arm.name)) exit $rc"; if ($rc -ne 0) { $bad++ }
+     }
+     $ErrorActionPreference = 'Continue'
+-    $h = @(& $py -B $sidecar --help 2>&1 | ForEach-Object { "$_" }); $hrc = $LASTEXITCODE
++    $h = @(& $py -B $psc --help 2>&1 | ForEach-Object { "$_" }); $hrc = $LASTEXITCODE
+     $ErrorActionPreference = 'Stop'
+-    $okh = ($hrc -eq 0) -and (($h -join ' ') -match '--then-mark') -and (($h -join ' ') -match '--then-action')
+-    Say "sidecar --help exit $hrc, then-mark/then-action flags $(if ($okh) { 'present' } else { 'MISSING' })"; if (-not $okh) { $bad++ }
++    $okh = ($hrc -eq 0) -and (($h -join ' ') -match '--then-mark') -and (($h -join ' ') -match '--then-action') -and (($h -join ' ') -match '--on ')
++    Say "prompt sidecar --help exit $hrc, then-mark/then-action/on flags $(if ($okh) { 'present' } else { 'MISSING' })"; if (-not $okh) { $bad++ }
++    $rc = Run-Logged $py @('-B', $pst)
++    Say "prompt sidecar self-test (fake listener: boot, prompts, ctl place/remove/move/swap/replace/status, route marks, bad --on) exit $rc"; if ($rc -ne 0) { $bad++ }
+     $tc = "import sys; sys.path.insert(0, r'$(Split-Path -Parent $sidecar)'); import ldtag, toypad_client as tc; t = tc.starter_tags(r'$tags'); print('tags ok: ' + ', '.join('%s id=%d pad=%d index=%d' % (n, ldtag.figure_id(x), p, i) for n, p, i, x in t)); sys.exit(0 if len(t) == 3 else 1)"
+     $rc = Run-Logged $py @('-B', '-c', $tc)
+     Say "starter tag check exit $rc"; if ($rc -ne 0) { $bad++ }
+@@ -261,6 +275,7 @@ foreach ($arm in $arms) {
+         $null = $wp.Handle; $script:helpers += $wp   # held handles: ExitCode stays readable and Kill() can't hit a reused PID
+     }
+     Say "arm $($arm.name): holdwatch pid $($hp.Id), sidecar pid $($sp.Id), watcher $(if ($wp) { "pid $($wp.Id)" } else { 'off (manual)' })"
++    Say "Toypad ctl dir: <run>\toypad-ctl under $runsRoot (exact path: the ctl-dir line in $base.sidecar.out.txt)"
+     Say "START $($arm.name): $(Cmd-Line $x)"
+     $rc = Run-Logged 'powershell' $x
+     if ($rc -ne 0) { $rcAll = 1 }

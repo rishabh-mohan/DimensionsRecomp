@@ -1,0 +1,108 @@
+diff --git a/build/agent3/gameplay/RUN-EXPLORE.cmd b/build/agent3/gameplay/RUN-EXPLORE.cmd
+index 05dc322..e92a68b 100644
+--- a/build/agent3/gameplay/RUN-EXPLORE.cmd
++++ b/build/agent3/gameplay/RUN-EXPLORE.cmd
+@@ -12,7 +12,7 @@ rem Kit pins: every file this kit runs or reads as code/data is sha256-pinned he
+ rem any mismatch refuses with exit 3 before anything starts. Paths are relative to the WS (three levels up).
+ setlocal
+ set "GP=%~dp0"
+-set "GPPIN_01=7204852317BAFE96C12CC4FB95789E04E441960B62D564532761188C90AF5A82|build\agent3\gameplay\gameplay-run.ps1"
++set "GPPIN_01=D97C9228422E1362B0552D694DC5150B388AF07DD9C9A4EA692B9EBCE218AC60|build\agent3\gameplay\gameplay-run.ps1"
+ set "GPPIN_02=2950A4471C1271BCDAC132816D89CF3C95812785AF7A569A94850E6A1A3DE068|build\agent3\gameplay\gameplay-watch.ps1"
+ set "GPPIN_03=E33DF65402DF053C0DBA5328632A14A0B6B90831EA0E51B1DD319C98501C8F50|build\agent3\gameplay\gameplay_post.py"
+ set "GPPIN_04=40D9316A8FB61B788901DBB93BAEA053B30F5B76A18F94E60205243830D90C00|build\agent3\gameplay\gen_gameplay_route.py"
+diff --git a/build/agent3/gameplay/RUN-GAMEPLAY.cmd b/build/agent3/gameplay/RUN-GAMEPLAY.cmd
+index 10169de..f2b5b04 100644
+--- a/build/agent3/gameplay/RUN-GAMEPLAY.cmd
++++ b/build/agent3/gameplay/RUN-GAMEPLAY.cmd
+@@ -10,7 +10,7 @@ rem Kit pins: every file this kit runs or reads as code/data is sha256-pinned he
+ rem any mismatch refuses with exit 3 before anything starts. Paths are relative to the WS (three levels up).
+ setlocal
+ set "GP=%~dp0"
+-set "GPPIN_01=7204852317BAFE96C12CC4FB95789E04E441960B62D564532761188C90AF5A82|build\agent3\gameplay\gameplay-run.ps1"
++set "GPPIN_01=D97C9228422E1362B0552D694DC5150B388AF07DD9C9A4EA692B9EBCE218AC60|build\agent3\gameplay\gameplay-run.ps1"
+ set "GPPIN_02=2950A4471C1271BCDAC132816D89CF3C95812785AF7A569A94850E6A1A3DE068|build\agent3\gameplay\gameplay-watch.ps1"
+ set "GPPIN_03=E33DF65402DF053C0DBA5328632A14A0B6B90831EA0E51B1DD319C98501C8F50|build\agent3\gameplay\gameplay_post.py"
+ set "GPPIN_04=40D9316A8FB61B788901DBB93BAEA053B30F5B76A18F94E60205243830D90C00|build\agent3\gameplay\gen_gameplay_route.py"
+diff --git a/build/agent3/gameplay/RUN-MANUAL.cmd b/build/agent3/gameplay/RUN-MANUAL.cmd
+index c6b5358..8e33b62 100644
+--- a/build/agent3/gameplay/RUN-MANUAL.cmd
++++ b/build/agent3/gameplay/RUN-MANUAL.cmd
+@@ -14,7 +14,7 @@ rem Kit pins: every file this kit runs or reads as code/data is sha256-pinned he
+ rem any mismatch refuses with exit 3 before anything starts. Paths are relative to the WS (three levels up).
+ setlocal
+ set "GP=%~dp0"
+-set "GPPIN_01=7204852317BAFE96C12CC4FB95789E04E441960B62D564532761188C90AF5A82|build\agent3\gameplay\gameplay-run.ps1"
++set "GPPIN_01=D97C9228422E1362B0552D694DC5150B388AF07DD9C9A4EA692B9EBCE218AC60|build\agent3\gameplay\gameplay-run.ps1"
+ set "GPPIN_02=2950A4471C1271BCDAC132816D89CF3C95812785AF7A569A94850E6A1A3DE068|build\agent3\gameplay\gameplay-watch.ps1"
+ set "GPPIN_03=E33DF65402DF053C0DBA5328632A14A0B6B90831EA0E51B1DD319C98501C8F50|build\agent3\gameplay\gameplay_post.py"
+ set "GPPIN_04=40D9316A8FB61B788901DBB93BAEA053B30F5B76A18F94E60205243830D90C00|build\agent3\gameplay\gen_gameplay_route.py"
+diff --git a/build/agent3/gameplay/gameplay-run.ps1 b/build/agent3/gameplay/gameplay-run.ps1
+index 44b3950..d430f51 100644
+--- a/build/agent3/gameplay/gameplay-run.ps1
++++ b/build/agent3/gameplay/gameplay-run.ps1
+@@ -10,6 +10,8 @@
+ #                Toypad by hand: one command per file in <run>\toypad-ctl\NNN.cmd (place <tag> <pad> | remove <tag> |
+ #                move <tag> <pad> | swap <a> <b> | replace <tag> | status; pads 1 centre 2 left 3 right); no watcher, no post.
+ #   nativeonly | xenosonly   one arm only.
++#   dump         DIAGNOSTIC, only with 'manual' (native arm): adds LEGO_DUMP_MISSING_SHADERS=<kit>\shader-dumps-native-<stamp>
++#                (M16 PLAN-story-dump option A: miss cache off + pool-copy hash check, so the run's timing is invalid).
+ #   dryrun       no game: preconditions (reported), pin + copy checks, the real command lines, run-game -DryRun per arm
+ #                (also parses the route), route = generator output, prompt sidecar --help + self-test + tag check, watcher + post
+ #                self-tests; removes dryrun-runs. Prints DRY RUN ALL PASS and exits 0 when everything passes.
+@@ -41,12 +43,15 @@
+ # after 30 s) and stops the helpers it started, by their held handles. A closed console window can't run it.
+ $ErrorActionPreference = 'Stop'
+ $words = @($args | ForEach-Object { "$_".ToLower().TrimStart('-') })
+-$known = @('explore', 'manual', 'nativeonly', 'xenosonly', 'dryrun', 'allowhidden')
++$known = @('explore', 'manual', 'nativeonly', 'xenosonly', 'dryrun', 'allowhidden', 'dump')
+ $unknown = @($words | Where-Object { $known -notcontains $_ })
+ if ($unknown.Count) { Write-Host "unknown word(s): $($unknown -join ' ') (known: $($known -join ' '))"; exit 2 }
+ $DryRun = $words -contains 'dryrun'; $AllowHidden = $words -contains 'allowhidden'; $Explore = $words -contains 'explore'
+ $Manual = $words -contains 'manual'
+ if ($Manual -and $Explore) { Write-Host "'manual' and 'explore' exclude each other"; exit 2 }
++$Dump = $words -contains 'dump'   # FUNCTIONAL ONLY: LEGO_DUMP_MISSING_SHADERS (miss cache OFF, pool-copy hash check)
++if ($Dump -and -not $Manual) { Write-Host "'dump' is allowed only with 'manual' (functional, untimed)"; exit 2 }
++if ($Dump -and ($words -contains 'xenosonly')) { Write-Host "'dump' needs the native arm (not with 'xenosonly')"; exit 2 }
+ $Seconds = if ($Manual) { 1200 } elseif ($Explore) { 1500 } else { 900 }   # explore: a cap (the route's 'stop' ends it ~900 s)
+ $kit = $PSScriptRoot                                   # build\agent3\gameplay
+ $ws = (Resolve-Path (Join-Path $kit '..\..\..')).Path
+@@ -112,6 +117,7 @@ $want = if ($words -contains 'nativeonly') { @('native') } elseif ($words -conta
+ $arms = @($allArms | Where-Object { $want -contains $_.name })
+ $nativeFp = '39129c4c059be5f0'
+ Say "gameplay $(if ($Manual) { 'MANUAL' } elseif ($Explore) { 'EXPLORE' } else { 'ROUTE' }) $(if ($DryRun) { 'DRY RUN (no game)' } else { 'REAL RUN' }); arms $($want -join ', '); route $(if ($Manual) { 'none (manual: no -InputScript, default SDL input)' } else { $route }); -Seconds $Seconds; WS $ws"
++if ($Dump) { Say "DIAGNOSTIC: dump on, timing invalid (LEGO_DUMP_MISSING_SHADERS=$(Join-Path $kit "shader-dumps-native-$stamp"))" }
+ 
+ # --- preconditions ---
+ $fail = @(); $refuse = @()
+@@ -172,7 +178,11 @@ function Rg-Args($arm, [string]$root, [string]$trace, [bool]$dry) {
+         '-Tag', "$tagBase-$($arm.name)", '-RunsRoot', $root)
+     if (-not $Manual) { $x += @('-InputScript', $route) }   # manual: no vpad, no xinput backend: the game's default SDL input
+     $x += @('-Cvar', $arm.cvar)
+-    if ($arm.trace) { $x += @('-Env', "LEGO_NATIVE_TRACE_DIR=$trace") }
++    if ($arm.trace) {
++        $e = "LEGO_NATIVE_TRACE_DIR=$trace"   # run-game splits -Env on ';' (no ';' in these kit paths)
++        if ($Dump) { $e += ";LEGO_DUMP_MISSING_SHADERS=$(Join-Path $kit "shader-dumps-$($arm.name)-$stamp")" }
++        $x += @('-Env', $e)
++    }
+     if ($dry) { $x += '-DryRun' }; $x
+ }
+ function Cmd-Line([string[]]$x) { 'powershell ' + (($x | ForEach-Object { if ("$_" -match '[\s;]') { "`"$_`"" } else { "$_" } }) -join ' ') }
+@@ -192,6 +202,8 @@ if ($DryRun) {
+         Say "SIDECAR (real run, arm $($arm.name)): $py $($sca -join ' ')"
+         $rc = Run-Logged 'powershell' (Rg-Args $arm $runsRoot $tr $true)
+         Say "run-game -DryRun ($($arm.name)) exit $rc"; if ($rc -ne 0) { $bad++ }
++        $dd = Join-Path $kit "shader-dumps-$($arm.name)-$stamp"
++        if (Test-Path -LiteralPath $dd) { Say "FAIL dryrun left a dump dir: $dd"; $bad++ }
+     }
+     $ErrorActionPreference = 'Continue'
+     $h = @(& $py -B $psc --help 2>&1 | ForEach-Object { "$_" }); $hrc = $LASTEXITCODE
+@@ -298,7 +310,7 @@ $armsDone = $true
+     if (-not $armsDone) { Say 'ABORTED (error or Ctrl-C) during an arm: cleanup of what this run started'; Stop-Ours }
+ }
+ if ($Manual) {   # no marks -> no post report; the run dir (game.log, toypad-events.csv, user\) is the record
+-    Set-Content -LiteralPath (Join-Path $kit 'LATEST.txt') -Value "$stamp manual exit=$rcAll runs=$runsRoot (no post)" -Encoding ascii
++    Set-Content -LiteralPath (Join-Path $kit 'LATEST.txt') -Value "$stamp manual exit=$rcAll runs=$runsRoot (no post)$(if ($Dump) { ' DIAGNOSTIC dump on, timing invalid' })" -Encoding ascii
+     Say "GAMEPLAY MANUAL DONE: run-game $(if ($rcAll) { "exit code $rcAll" } else { 'exit 0' }); no post (manual session)"
+     exit $rcAll
+ }

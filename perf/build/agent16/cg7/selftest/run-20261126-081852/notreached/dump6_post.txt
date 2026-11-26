@@ -1,0 +1,49 @@
+dump6_post.py sha256 7887B90A73497D5A5BFE56DAEE147AFDFC83BCB97D9AC5D249467BAF76DADD5E
+trace       A022DA83750299F046EF145554D39B136E1EDEBB3B205723340FCE91260307C3 <workspace>\build\agent16\cg7\selftest\fixtures\notreached\trace\events.tsv
+game.log    74183EAC59E06AEB91B2CCD02AE6BC161C0F592CCC3FD9F4F8BE8C5F75FCC69F <workspace>\build\agent16\cg7\selftest\fixtures\notreached\game.log
+post        EF57CB41486AE494060B4A847DF46D7756A5CCBACB45F3DFF805C4C08315575E <workspace>\build\agent16\cg7\selftest\fixtures\notreached\post.txt
+runlog      7493A5BC4C56053ADA88F2AFC658989A14F0F18E59F3BD3AE69CEFDEBB744514 <workspace>\build\agent16\cg7\selftest\fixtures\notreached\runlog.txt
+sidecar     9E62E71B75EB81D4BC9FEA61DC59C8C81618DEE7807743C7C5A207C66E7A6258 <workspace>\build\agent16\cg7\selftest\fixtures\notreached\sidecar.txt
+root-vs     A920D96A513E284C3A666197C692EF295A5AE6F35F7306813E94E998574778FB <workspace>\build\agent16\cg7\selftest\fixtures\notreached\shader-dumps-native-fixture\vs-A58EBA123EFB541C.bin
+noident     1236EDF54A6698081D0CA18BD77F0BDB1300FEA1C8DD2491441DBEE3DA11C3DA <workspace>\build\agent16\cg7\selftest\fixtures\notreached\noident.txt
+trace-start 6CF3BBB4E59232E56955B369839547D6CB78582ACFFE40D73444500A23AF8315 <workspace>\build\agent16\cg7\selftest\fixtures\notreached\trace\trace-start.json
+dump-dir    <workspace>\build\agent16\cg7\selftest\fixtures\notreached\shader-dumps-native-fixture
+fingerprint a349d5292f67b127 in game.log: True
+trace start unix_ms 1795708800000 (2026-11-26 10:00:00 local)
+red start (game.log, first pad 1 FF 00 00 speed 18): 2026-11-26 10:01:40.000 -> trace 100000.0 ms; sidecar alert 10:01:40.240
+D1 route: PASS; clean exit 0 yes; steps 302/302 yes; stop reached (last: done) yes; title gate HIT yes; prompts 3/3 yes; kit exits 0 yes; zone=done yes; red-18 start yes
+   ctl (reported only, not gated): ctl=0 done/0 err
+trace: frames 341; last frame 341 at 170000.0 ms; miss-cache inserts 0 (dump mode: miss cache off, expect 0); draw_missing rows before red+40 s: 0
+D2 reach: stop = red + 70.0 s (need >= red + 80 s): FAIL; W1 = red+40..65 s; W2 coverage 5.0 s (red+65 s..stop); W2 NOT-REACHED
+game.log placement warnings (capped at 16 lines): 1 distinct (stage, guest) with backing
+   PS AB77B580 backing ED25B8E0 prefix C77B3ABB6F87ACD9
+identity events: 2 (VS 1, PS 1)
+   VS guest AB80F350 physical ED25B6A0 vb 640 pb 144 container 1111111111111111 physical_hash AAAA000000000001 at red+45.0 s
+   PS guest 12345678 physical ED25B8E0 vb 896 pb 412 container 2222222222222222 physical_hash AAAA000000000002 at red+45.0 s
+physical_hash joins between identity events (information; never used to cover a target): 0
+
+D3 W1 targets (stage guest: unrecognized rows, draw_missing rows, first..last red+s; match)
+   VS AB80F350: 3, 3, +45.0..+47.0  MATCHED by guest -> container 1111111111111111
+   PS AB77B580: 3, 0, +45.0..+47.0  MATCHED by backing ED25B8E0 -> container 2222222222222222
+   pairs at draw_missing rows (last unrecognized VS, PS): draws VSmiss PSmiss first..last red+s
+     AB80F350 AB77B580      3      3      0  +45.0..+47.0
+D3 W2 targets (stage guest: unrecognized rows, draw_missing rows, first..last red+s; match)
+   pairs at draw_missing rows (last unrecognized VS, PS): draws VSmiss PSmiss first..last red+s
+
+D4 container files (check run: name + size == vb+4+pb + marker == vheader[8:12] + sha256; container_hash NOT recomputed, no xxhash module)
+   vs-1111111111111111.bin size 788 (expect 788) OK marker OK sha256 29075C6DF2215C65298689473C081620AB69C4D2299E257DC7922E367D73B359
+   ps-2222222222222222.bin size 1312 (expect 1312) OK marker OK sha256 62C33C2F499CA841E6250665AF62D9A2D273EC959BC62D561125ECACA83FAD3D
+D4: PASS
+D5 identity events before red+40 s: 0 (expect 0)
+D6 (information only; the root is never packed, D-C2): VS physical sections vs root vs-A58EBA12 bytes 304..703 (400 B)
+   vs-1111111111111111.bin guest AB80F350 physical 144 B: DIFF
+D7 (information): raw + root files
+   raw VS: 1 file(s) = unique (stage, prefix) for 1 identities (prefix-keyed, no overwrite: expect <= identities)
+   raw PS: 1 file(s) = unique (stage, prefix) for 1 identities (prefix-keyed, no overwrite: expect <= identities)
+     ps-C77B3ABB6F87ACD9.bin 1184 B
+     vs-C77B3ABB6F87ACD9.bin 2048 B
+   root files: 2; boot files present: ['ps-93B9F93B535E7CCA.bin', 'vs-A58EBA123EFB541C.bin']; other: none
+   game.log prefix PS C77B3ABB6F87ACD9: raw file present
+
+W1/W2 split: W1 COVERED; W2 NOT-REACHED
+RESULT: NOT-REACHED (stop red + 70.0 s < red + 80 s); W1 COVERED, W2 NOT-REACHED

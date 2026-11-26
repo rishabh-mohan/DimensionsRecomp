@@ -1,0 +1,242 @@
+diff --git a/src/core/cvar.cpp b/src/core/cvar.cpp
+--- a/src/core/cvar.cpp
++++ b/src/core/cvar.cpp
+@@ -18,6 +18,7 @@
+ #include <unordered_map>
+ 
+ #include <CLI/CLI.hpp>
++#include <fmt/format.h>
+ 
+ #include <rex/cvar.h>
+ #include <rex/logging.h>
+@@ -76,20 +77,98 @@
+   return result;
+ }
+ 
++// Config problems found before InitLogging (cvar::Init, ApplyEnvironment and
++// LoadConfig all run before it) reach only the early debugger sink, so a
++// rejected value such as present_effect = 'fsr' never shows up in game.log.
++// They are kept here and repeated by FlushDeferredConfigWarnings(), which
++// InitLogging calls once the real sinks exist. Later problems log directly.
++struct DeferredConfigWarning {
++  bool error;
++  std::string text;
++};
++
++std::mutex g_deferred_mutex;
++bool g_deferred_flushed = false;
++std::string g_config_file;  // The file LoadConfig is reading, for messages.
++
++std::vector<DeferredConfigWarning>& GetDeferredWarnings() {
++  static std::vector<DeferredConfigWarning> warnings;
++  return warnings;
++}
++
++void DeferConfigWarning(std::string text, bool error = false) {
++  std::lock_guard lock(g_deferred_mutex);
++  if (g_deferred_flushed) {
++    return;
++  }
++  auto& warnings = GetDeferredWarnings();
++  // ReXApp::SetupEnvironment usually loads the same file twice.
++  for (const auto& warning : warnings) {
++    if (warning.text == text) {
++      return;
++    }
++  }
++  warnings.push_back({error, std::move(text)});
++}
++
++const char* SourceName(Source source) {
++  switch (source) {
++    case Source::kDefault:
++      return "default";
++    case Source::kConfig:
++      return "config";
++    case Source::kEnvironment:
++      return "environment";
++    case Source::kCommandLine:
++      return "command line";
++    case Source::kRuntime:
++      return "runtime";
++  }
++  return "?";
++}
++
++std::string DescribeConstraints(const FlagEntry& entry) {
++  const auto& c = entry.constraints;
++  std::string text;
++  if (c.HasAllowedValues()) {
++    text = "allowed:";
++    for (const auto& allowed : c.allowed_values) {
++      text += (text.back() == ':' ? " " : ", ") + allowed;
++    }
++  } else if (c.HasRangeConstraint()) {
++    text = fmt::format("range {} to {}", c.min ? fmt::format("{}", *c.min) : "-inf",
++                       c.max ? fmt::format("{}", *c.max) : "inf");
++  } else if (c.custom_validator) {
++    text = "custom validator";
++  } else {
++    text = "unparseable value";
++  }
++  return text;
++}
++
+ enum class ApplyResult { kApplied, kSkipped, kRejected };
+ 
+ ApplyResult SetFlagFromSource(std::string_view name, std::string_view value, Source source);
++bool ValidateConstraints(const FlagEntry& entry, std::string_view value);
+ 
+ bool Outranks(Source source, const FlagEntry& entry) {
+   return source >= entry.source;
+ }
+ 
+-// Unvalidated apply, for the command line and environment paths.
++// Unvalidated apply, for the command line and environment paths (and for
++// config values replayed into a cvar registered after LoadConfig). The value
++// is still applied; one outside the constraints is now reported.
+ bool ApplyFromSource(FlagEntry& entry, std::string_view value, Source source) {
+   if (!Outranks(source, entry) || !entry.setter(value)) {
+     return false;
+   }
+   entry.source = source;
++  if (!ValidateConstraints(entry, value)) {
++    DeferConfigWarning(fmt::format(
++        "{}: {} = '{}' is outside the cvar's constraints ({}); applied unvalidated, so code "
++        "that only knows the allowed values may ignore it",
++        SourceName(source), entry.name, value, DescribeConstraints(entry)));
++  }
+   return true;
+ }
+ 
+@@ -112,6 +191,8 @@
+         value_str = value.as_string()->get();
+       } else {
+         REXLOG_WARN("Config: unsupported type for key '{}'", full_key);
++        DeferConfigWarning(
++            fmt::format("Config: unsupported type for key '{}' in {}", full_key, g_config_file));
+         continue;
+       }
+ 
+@@ -129,9 +210,24 @@
+         case ApplyResult::kSkipped:
+           REXLOG_DEBUG("Config: {} ignored, already set by a higher-priority source", full_key);
+           break;
+-        case ApplyResult::kRejected:
++        case ApplyResult::kRejected: {
+           REXLOG_WARN("Config: invalid value for cvar '{}'", full_key);
++          std::string kept;
++          std::string constraints;
++          Source kept_source = Source::kDefault;
++          {
++            std::lock_guard lock(GetRegistryMutex());
++            if (const FlagEntry* entry = GetFlagInfo(full_key)) {
++              kept = entry->getter();
++              kept_source = entry->source;
++              constraints = DescribeConstraints(*entry);
++            }
++          }
++          DeferConfigWarning(fmt::format("Config: {} = '{}' in {} rejected ({}); keeping '{}' ({})",
++                                         full_key, value_str, g_config_file, constraints, kept,
++                                         SourceName(kept_source)));
+           break;
++        }
+       }
+     }
+   }
+@@ -683,11 +779,15 @@
+   }
+ 
+   try {
++    g_config_file = config_path.string();
+     auto config = toml::parse_file(config_path.string());
+     ApplyTomlTable(config, "");
+     REXLOG_DEBUG("Loaded config from {}", config_path.string());
+   } catch (const toml::parse_error& err) {
+     REXLOG_ERROR("Failed to parse config {}: {}", config_path.string(), err.what());
++    DeferConfigWarning(fmt::format("Failed to parse config {}: {}; none of its settings were applied",
++                                   config_path.string(), err.what()),
++                       true);
+   }
+ }
+ 
+@@ -708,6 +808,7 @@
+       ++count;
+     } else {
+       REXLOG_WARN("Env: failed to parse {} = {}", env_name, *env_value);
++      DeferConfigWarning(fmt::format("Env: failed to parse {} = {}", env_name, *env_value));
+     }
+   }
+ 
+@@ -730,6 +831,24 @@
+   return g_finalized;
+ }
+ 
++// Called by InitLogging (logging.cpp) once the real sinks exist. Not declared
++// in rex/cvar.h, which is in every target's precompiled header.
++void FlushDeferredConfigWarnings() {
++  std::vector<DeferredConfigWarning> warnings;
++  {
++    std::lock_guard lock(g_deferred_mutex);
++    g_deferred_flushed = true;
++    warnings.swap(GetDeferredWarnings());
++  }
++  for (const auto& warning : warnings) {
++    if (warning.error) {
++      REXLOG_ERROR("{} (reported before logging started)", warning.text);
++    } else {
++      REXLOG_WARN("{} (reported before logging started)", warning.text);
++    }
++  }
++}
++
+ void SaveConfig(const std::filesystem::path& config_path) {
+   std::string content = SerializeToTOML();
+   if (content.empty()) {
+@@ -767,6 +886,9 @@
+   GetPendingValuesStorage().clear();
+   g_init_done = false;
+   g_finalized = false;
++  std::lock_guard lock(g_deferred_mutex);
++  GetDeferredWarnings().clear();
++  g_deferred_flushed = false;
+ }
+ 
+ }  // namespace testing
+diff --git a/src/core/logging.cpp b/src/core/logging.cpp
+--- a/src/core/logging.cpp
++++ b/src/core/logging.cpp
+@@ -59,6 +59,12 @@
+ REXCVAR_DEFINE_BOOL(log_level_gate, false, "Log",
+                     "Skip log calls below every logger's level with one inline compare")
+     .lifecycle(rex::cvar::Lifecycle::kInitOnly);
++
++namespace rex::cvar {
++// Defined in cvar.cpp. Declared here rather than in rex/cvar.h, which is in
++// every target's precompiled header.
++void FlushDeferredConfigWarnings();
++}  // namespace rex::cvar
+ 
+ namespace rex {
+ 
+@@ -209,7 +215,7 @@
+     (void)log::fs();
+   }
+ 
+-  std::lock_guard lock(g_mutex);
++  std::unique_lock lock(g_mutex);
+ 
+   if (g_initialized) {
+     g_config = config;
+@@ -295,6 +301,11 @@
+   int flush_interval = REXCVAR_GET(log_flush_interval);
+   if (flush_interval > 0)
+     spdlog::flush_every(std::chrono::seconds(flush_interval));
++
++  // Config problems found before this point (cvar::Init, ApplyEnvironment,
++  // LoadConfig) reached only the early sink; repeat them into the real sinks.
++  lock.unlock();
++  cvar::FlushDeferredConfigWarnings();
+ }
+ 
+ void InitLogging(const char* log_file, spdlog::level::level_enum level) {

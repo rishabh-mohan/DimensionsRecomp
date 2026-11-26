@@ -1,0 +1,38 @@
+mode: static + compile
+PASS SDK HEAD == a7e79c0: a7e79c09135f160f63bfaf8634f4e3b9cb760a75
+PASS SDK index clean (== HEAD)
+base blob src/graphics/d3d12/pipeline_cache.cpp C4CB51CC6D2A6429637115F605FF10279FCE59AEDCF8BBC6E2195F92615C86C6
+nops-async.diff AB149BE62719495375E0134624A49821F310F4B405216F9D113CD679786EEC35
+sync-log.diff   A8CD7FEFD0A05E595D08C0E6C1F79BBA706D7071B60B1D3DEEB47055E7FE69E8
+PASS diff is LF-only
+PASS diff touches only src/graphics/d3d12/pipeline_cache.cpp
+PASS git apply --check --cached vs a7e79c0: Checking patch src/graphics/d3d12/pipeline_cache.cpp...
+PASS compose sync-log then nops-async: sync-log.diff: Checking patch src/graphics/d3d12/pipeline_cache.cpp... | Applied patch src/graphics/d3d12/pipeline_cache.cpp cleanly. || nops-async.diff: Checking patch src/graphics/d3d12/pipeline_cache.cpp... | Hunk #1 succeeded at 61 (offset 1 line). | Hunk #2 succeeded at 245 (offset 46 lines). | Hunk #3 succeeded at 1175 (offset 53 lines). | Applied patch src/graphics/d3d12/pipeline_cache.cpp cleanly.
+    result 9B92AAF92D230C62ED00B73A522377F95F2EBD22800A1876ED59CC1FABC4AE9E
+PASS compose nops-async then sync-log: nops-async.diff: Checking patch src/graphics/d3d12/pipeline_cache.cpp... | Applied patch src/graphics/d3d12/pipeline_cache.cpp cleanly. || sync-log.diff: Checking patch src/graphics/d3d12/pipeline_cache.cpp... | Hunk #2 succeeded at 94 (offset 19 lines). | Hunk #3 succeeded at 128 (offset 19 lines). | Hunk #4 succeeded at 269 (offset 28 lines). | Hunk #5 succeeded at 1203 (offset 37 lines). | Applied patch src/graphics/d3d12/pipeline_cache.cpp cleanly.
+    result 9B92AAF92D230C62ED00B73A522377F95F2EBD22800A1876ED59CC1FABC4AE9E
+PASS both orders give the same file
+PASS stacked file is LF-only
+stacked file build\agent2\s5\nops-async\stk\src\graphics\d3d12\pipeline_cache.cpp 9B92AAF92D230C62ED00B73A522377F95F2EBD22800A1876ED59CC1FABC4AE9E
+PASS ov file == a7e79c0 + nops-async.diff
+PASS needle in source: REXCVAR_DEFINE_BOOL(d3d12_async_depth_only_pipelines, false, "GPU/D3D1
+PASS needle in source: bool async_depth_only_pipelines = false;
+PASS needle in source: use_async || (async_depth_only_pipelines && pixel_shader == nullptr &&
+PASS needle in source: !vertex_shader->shader().memexport_eM_written()
+PASS needle in source: RenderTargetCache::Path::kHostRenderTargets
+PASS needle in source: bool use_async = REXCVAR_GET(async_shader_compilation) && !creation_th
+PASS cvar is kRequiresRestart
+PASS the only use of the latch outside Initialize is create_async
+PASS if (use_async) replaced only in ConfigurePipeline (HEAD had 1)
+PASS final2 gpu command for d3d12/pipeline_cache.cpp found
+PASS nops fsyntax exit 0 (9.5 s): 0 errors, 1 warnings in pipeline_cache.cpp
+    <workspace>/build/agent2/s5/nops-async/ov/src/graphics/d3d12/pipeline_cache.cpp:139:32: warning: moving a temporary object prevents copy elision [-Wpessimizing-move]
+PASS stacked fsyntax exit 0 (2.0 s): 0 errors, 1 warnings in pipeline_cache.cpp
+    <workspace>/build/agent2/s5/nops-async/stk/src/graphics/d3d12/pipeline_cache.cpp:185:32: warning: moving a temporary object prevents copy elision [-Wpessimizing-move]
+PASS stacked compile exit 0 (4.8 s): 0 errors, 1 warnings in pipeline_cache.cpp
+    <workspace>/build/agent2/s5/nops-async/stk/src/graphics/d3d12/pipeline_cache.cpp:185:32: warning: moving a temporary object prevents copy elision [-Wpessimizing-move]
+obj build\agent2\s5\nops-async\obj\stacked__pipeline_cache.cpp.obj 598400 B CB8A004BCC51D19E38DE430548C0876748871C04C6F964B3B6DFE50C0C6C4237
+PASS needle in obj: d3d12_async_depth_only_pipelines
+PASS needle in obj: d3d12_log_sync_pipeline_creation
+PASS needle in obj: sync pipeline #{} {:016X}
+RESULT: PASS

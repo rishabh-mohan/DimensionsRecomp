@@ -1,0 +1,49 @@
+# s5_readout: 2 runs in, 2 used, 0 dropped (-); variant exclude VOID; bootstrap 20000 draws seed 1
+
+== arm devfinal2-bin / cap none: n 1 (final2-3d-xenos[F])
+  fps              median     45.946  95% CI [-, -]  range 45.946..45.946  (n 1)
+  median ms        median     20.172  95% CI [-, -]  range 20.172..20.172  (n 1)
+  p99 ms           median     50.169  95% CI [-, -]  range 50.169..50.169  (n 1)
+  1% low ms        median     79.209  95% CI [-, -]  range 79.209..79.209  (n 1)
+  max ms           median    307.440  95% CI [-, -]  range 307.440..307.440  (n 1)
+  >=100 ms /min    median      3.818  95% CI [-, -]  range 3.818..3.818  (n 1)
+  >=250 ms /min    median      1.091  95% CI [-, -]  range 1.091..1.091  (n 1)
+  >=100 ms n       median      7.000  95% CI [-, -]  range 7.000..7.000  (n 1)
+  >=250 ms n       median      2.000  95% CI [-, -]  range 2.000..2.000  (n 1)
+  GPU util %       median     91.250  95% CI [-, -]  range 91.250..91.250  (n 1)
+  GPU clock MHz    median   1334.910  95% CI [-, -]  range 1334.910..1334.910  (n 1)
+  GPU W            median     26.080  95% CI [-, -]  range 26.080..26.080  (n 1)
+  GPU temp C       median     86.460  95% CI [-, -]  range 86.460..86.460  (n 1)
+  thermal share    median      0.773  95% CI [-, -]  range 0.773..0.773  (n 1)
+  power-cap share  median      0.200  95% CI [-, -]  range 0.200..0.200  (n 1)
+  start temp C     median     58.000  95% CI [-, -]  range 58.000..58.000  (n 1)
+
+== arm nativefinal2-bin / cap none: n 1 (final2-3d-native[F])
+  fps              median     76.791  95% CI [-, -]  range 76.791..76.791  (n 1)
+  median ms        median     10.172  95% CI [-, -]  range 10.172..10.172  (n 1)
+  p99 ms           median     52.407  95% CI [-, -]  range 52.407..52.407  (n 1)
+  1% low ms        median     69.613  95% CI [-, -]  range 69.613..69.613  (n 1)
+  max ms           median    213.025  95% CI [-, -]  range 213.025..213.025  (n 1)
+  >=100 ms /min    median      1.637  95% CI [-, -]  range 1.637..1.637  (n 1)
+  >=250 ms /min    median      0.000  95% CI [-, -]  range 0.000..0.000  (n 1)
+  >=100 ms n       median      3.000  95% CI [-, -]  range 3.000..3.000  (n 1)
+  >=250 ms n       median      0.000  95% CI [-, -]  range 0.000..0.000  (n 1)
+  GPU util %       median     42.760  95% CI [-, -]  range 42.760..42.760  (n 1)
+  GPU clock MHz    median   1446.450  95% CI [-, -]  range 1446.450..1446.450  (n 1)
+  GPU W            median     17.660  95% CI [-, -]  range 17.660..17.660  (n 1)
+  GPU temp C       median     78.460  95% CI [-, -]  range 78.460..78.460  (n 1)
+  thermal share    median      0.000  95% CI [-, -]  range 0.000..0.000  (n 1)
+  power-cap share  median      0.027  95% CI [-, -]  range 0.027..0.027  (n 1)
+  start temp C     median     70.000  95% CI [-, -]  range 70.000..70.000  (n 1)
+
+== contrast nativefinal2-bin/none : devfinal2-bin/none  (bin vs ref; % of B; CI = bootstrap; paired = by round)
+  fps            A     76.791  B     45.946  d    30.845     67.1%  CI [-, -]%  n<2          paired -
+  p99 ms         A     52.407  B     50.169  d     2.238      4.5%  CI [-, -]%  n<2          paired -
+  1% low ms      A     69.613  B     79.209  d    -9.596    -12.1%  CI [-, -]%  n<2          paired -
+  max ms         A    213.025  B    307.440  d   -94.415    -30.7%  CI [-, -]%  n<2          paired -
+  >=100 ms /min  A      1.637  B      3.818  d    -2.181    -57.1%  CI [-, -]%  n<2          paired -
+  >=250 ms /min  A      0.000  B      1.091  d    -1.091   -100.0%  CI [-, -]%  n<2          paired -
+  GPU util %     A     42.760  B     91.250  d   -48.490    -53.1%  CI [-, -]%  n<2          paired -
+  GPU clock MHz  A   1446.450  B   1334.910  d   111.540      8.4%  CI [-, -]%  n<2          paired -
+  GPU W          A     17.660  B     26.080  d    -8.420    -32.3%  CI [-, -]%  n<2          paired -
+  thermal share  A      0.000  B      0.773  d    -0.773   -100.0%  CI [-, -]%  n<2          paired -

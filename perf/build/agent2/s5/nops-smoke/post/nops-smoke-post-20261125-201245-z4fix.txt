@@ -1,0 +1,207 @@
+# nops_smoke_post 2026-11-25 20:43:13
+
+--- A1 <workspace>\build\agent2\s5\nops-smoke\runs\20261125-203044-s5nops-a1
+bin <workspace>\build\agent2\s5\devs5nops-bin exe 6C8E281156CCE828 cvars {'d3d12_log_sync_pipeline_creation': 'true', 'slow_frame_log_ms': '1', 'd3d12_log_occlusion_queries': 'true'}
+PASS  A1 clean exit (exit 0, not early, wm_close)  [exit 0x00000000 early False close wm_close]
+PASS  A1 no dumps / crash events / WER  [dumps [] crash [] wer False]
+PASS  A1 cvars exactly {'d3d12_log_sync_pipeline_creation': 'true', 'slow_frame_log_ms': '1', 'd3d12_log_occlusion_queries': 'true'}  [{'d3d12_log_sync_pipeline_creation': 'true', 'slow_frame_log_ms': '1', 'd3d12_log_occlusion_queries': 'true'}]
+logs ['game.log'], 12065 lines
+PASS  A1 check-defaults --mode xenos PASS  [exit 0; RESULT PASS]
+PASS  A1 nops Initialize line absent  [0]
+PASS  A1 no "d3d12_async_depth_only_pipelines ignored"  [0]
+PASS  A1 sync-log Initialize line once  [1]
+PASS  A1 no_wait Initialize line absent  [0]
+PASS  A1 no "d3d12_pipeline_creation_no_wait ignored"  [0]
+PASS  A1 0 "Failed to create graphics pipeline"  [0]
+PASS  A1 N2 cold storage (no seed, user_data_root = run/user, no file older than the run)  [seed None, user_data_root <workspace>\build\agent2\s5\nops-smoke\runs\20261125-203044-s5nops-a1\user, 2 storage files (5752084B.rtv.d3d12.xpso 18444 B, 5752084B.xsh 192308 B), older 0]
+PASS  A1 Z4 occlusion-query "shutdown" line once  [shutdown line absent: hard-exit; counters from the last line (periodic, frame 11643); 15 lines, {'first': 1, 'disabled': 1, 'periodic': 13}]
+  S1 last (periodic): frame=11643 zpd=17965 zpd_no_host=17963 begun=1 resolved=0 fallback=1 disabled=1 reason=end at another address ended_by_submission=0 draws_in_query=1 dropped_in_query_ps=0 dropped_in_query_no_ps=0
+  S1 first at frame 5069: zpd 1 begun 1 resolved 0 fallback 0 disabled 0 reason ''
+  S1 disabled at frame 5069: zpd 2 begun 1 resolved 0 fallback 1 disabled 1 reason 'end at another address'
+  S1 verdict: 0 NOT valid (Z5): begun 1 resolved 0, first disable at zpd 2 of 17965, host fraction 0.00
+  attribution (D2: logging perturbs timing; counts and joins only)
+  sync lines 49, sum 484.6 ms, max 111.0 ms; movable by the opt-in (ps none, memexport vs 0, host RT) 48; memexport-vs 1; reasons {'no pixel shader': 49}
+  slow-frame lines 11752; total pipeline create 479.1 ms (47x) on the command thread; dropped draws 1281; forced pipeline waits 0.0 ms (0x)
+  top 10 frames by pipeline create: frame ms | create ms (Nx) new | dropped | sync joined n / ms / movable
+    line 7749 frame #7487 637.2 ms | create 298.2 (8x) new 67 | dropped 140 | sync 8 / 298.3 / 8
+    line 1812 frame #1705 63.6 ms | create 43.1 (1x) new 1 | dropped 0 | sync 1 / 43.1 / 0
+    line 8104 frame #7836 55.2 ms | create 31.7 (2x) new 15 | dropped 37 | sync 2 / 31.7 / 2
+    line 8215 frame #7935 65.3 ms | create 29.2 (6x) new 16 | dropped 26 | sync 6 / 29.1 / 6
+    line 8112 frame #7841 44.0 ms | create 20.7 (3x) new 12 | dropped 38 | sync 3 / 20.6 / 3
+    line 5315 frame #5069 95.1 ms | create 15.9 (4x) new 23 | dropped 23 | sync 4 / 15.9 / 4
+    line 8224 frame #7936 56.4 ms | create 14.2 (8x) new 22 | dropped 37 | sync 8 / 14.1 / 8
+    line 10864 frame #10560 42.5 ms | create 11.4 (1x) new 5 | dropped 4 | sync 1 / 11.4 / 1
+    line 8354 frame #8065 62.8 ms | create 8.9 (1x) new 3 | dropped 5 | sync 1 / 8.9 / 1
+    line 5202 frame #4962 148.2 ms | create 5.2 (4x) new 21 | dropped 19 | sync 4 / 5.1 / 4
+  top 5 frames by frame time: frame ms | create ms (Nx) new | dropped | waits
+    line 7749 frame #7487 637.2 ms | create 298.2 (8x) new 67 | dropped 140 | waits 0.0 (0x)
+    line 7767 frame #7505 467.5 ms | create 0.0 (0x) new 0 | dropped 0 | waits 0.0 (0x)
+    line 5515 frame #5266 349.9 ms | create 0.0 (0x) new 0 | dropped 0 | waits 0.0 (0x)
+    line 5308 frame #5068 228.3 ms | create 0.0 (0x) new 0 | dropped 0 | waits 0.0 (0x)
+    line 7752 frame #7490 219.3 ms | create 0.0 (0x) new 0 | dropped 0 | waits 0.0 (0x)
+
+--- A2 <workspace>\build\agent2\s5\nops-smoke\runs\20261125-203509-s5nops-a2
+bin <workspace>\build\agent2\s5\devs5nops-bin exe 6C8E281156CCE828 cvars {'d3d12_log_sync_pipeline_creation': 'true', 'slow_frame_log_ms': '1', 'd3d12_async_depth_only_pipelines': 'true', 'd3d12_log_occlusion_queries': 'true'}
+PASS  A2 clean exit (exit 0, not early, wm_close)  [exit 0x00000000 early False close wm_close]
+PASS  A2 no dumps / crash events / WER  [dumps [] crash [] wer False]
+PASS  A2 cvars exactly {'d3d12_log_sync_pipeline_creation': 'true', 'slow_frame_log_ms': '1', 'd3d12_async_depth_only_pipelines': 'true', 'd3d12_log_occlusion_queries': 'true'}  [{'d3d12_log_sync_pipeline_creation': 'true', 'slow_frame_log_ms': '1', 'd3d12_async_depth_only_pipelines': 'true', 'd3d12_log_occlusion_queries': 'true'}]
+logs ['game.1.log', 'game.log'], 12109 lines
+PASS  A2 check-defaults --mode xenos PASS  [exit 0; RESULT PASS]
+PASS  A2 nops Initialize line once  [1]
+PASS  A2 no "d3d12_async_depth_only_pipelines ignored"  [0]
+PASS  A2 sync-log Initialize line once  [1]
+PASS  A2 no_wait Initialize line absent  [0]
+PASS  A2 no "d3d12_pipeline_creation_no_wait ignored"  [0]
+PASS  A2 0 "Failed to create graphics pipeline"  [0]
+PASS  A2 N2 cold storage (no seed, user_data_root = run/user, no file older than the run)  [seed None, user_data_root <workspace>\build\agent2\s5\nops-smoke\runs\20261125-203509-s5nops-a2\user, 2 storage files (5752084B.rtv.d3d12.xpso 18444 B, 5752084B.xsh 192308 B), older 0]
+PASS  A2 Z4 occlusion-query "shutdown" line once  [shutdown line absent: hard-exit; counters from the last line (periodic, frame 11752); 15 lines, {'first': 1, 'disabled': 1, 'periodic': 13}]
+  S1 last (periodic): frame=11752 zpd=18033 zpd_no_host=18031 begun=1 resolved=0 fallback=1 disabled=1 reason=end at another address ended_by_submission=0 draws_in_query=1 dropped_in_query_ps=0 dropped_in_query_no_ps=1
+  S1 first at frame 5099: zpd 1 begun 1 resolved 0 fallback 0 disabled 0 reason ''
+  S1 disabled at frame 5099: zpd 2 begun 1 resolved 0 fallback 1 disabled 1 reason 'end at another address'
+  S1 verdict: S1 CONFIRMED (Z5): 1 depth-only (no PS) draws dropped inside a query
+  attribution (D2: logging perturbs timing; counts and joins only)
+  sync lines 1, sum 42.9 ms, max 42.9 ms; movable by the opt-in (ps none, memexport vs 0, host RT) 0; memexport-vs 1; reasons {'no pixel shader': 1}
+  slow-frame lines 11841; total pipeline create 42.9 ms (1x) on the command thread; dropped draws 1656; forced pipeline waits 0.0 ms (0x)
+  top 10 frames by pipeline create: frame ms | create ms (Nx) new | dropped | sync joined n / ms / movable
+    line 1809 frame #1706 64.6 ms | create 42.9 (1x) new 3 | dropped 2 | sync 1 / 42.9 / 0
+  top 5 frames by frame time: frame ms | create ms (Nx) new | dropped | waits
+    line 7805 frame #7561 515.2 ms | create 0.0 (0x) new 0 | dropped 0 | waits 0.0 (0x)
+    line 7783 frame #7539 495.9 ms | create 0.0 (0x) new 67 | dropped 162 | waits 0.0 (0x)
+    line 5535 frame #5298 324.2 ms | create 0.0 (0x) new 0 | dropped 0 | waits 0.0 (0x)
+    line 5330 frame #5098 222.0 ms | create 0.0 (0x) new 0 | dropped 0 | waits 0.0 (0x)
+    line 7786 frame #7542 202.9 ms | create 0.0 (0x) new 0 | dropped 0 | waits 0.0 (0x)
+PASS  A2 0 movable no-PS sync creates (ps none, memexport vs 0, host RT)  [0]
+
+--- T1 <workspace>\build\agent2\s5\nops-smoke\runs\20261125-201249-s5nops-t1
+bin <workspace>\build\agent2\s5\devs5nops-bin exe 6C8E281156CCE828 cvars {'d3d12_log_occlusion_queries': 'true'}
+PASS  T1 clean exit (exit 0, not early, wm_close)  [exit 0x00000000 early False close wm_close]
+PASS  T1 no dumps / crash events / WER  [dumps [] crash [] wer False]
+PASS  T1 cvars exactly {'d3d12_log_occlusion_queries': 'true'}  [{'d3d12_log_occlusion_queries': 'true'}]
+logs ['game.log'], 258 lines
+PASS  T1 check-defaults --mode xenos PASS  [exit 0; RESULT PASS]
+PASS  T1 nops Initialize line absent  [0]
+PASS  T1 no "d3d12_async_depth_only_pipelines ignored"  [0]
+PASS  T1 sync-log Initialize line absent  [0]
+PASS  T1 0 'sync pipeline #' lines  [0]
+PASS  T1 no_wait Initialize line absent  [0]
+PASS  T1 no "d3d12_pipeline_creation_no_wait ignored"  [0]
+PASS  T1 0 "Failed to create graphics pipeline"  [0]
+PASS  T1 N2 cold storage (no seed, user_data_root = run/user, no file older than the run)  [seed None, user_data_root <workspace>\build\agent2\s5\nops-smoke\runs\20261125-201249-s5nops-t1\user, 2 storage files (5752084B.rtv.d3d12.xpso 17436 B, 5752084B.xsh 179300 B), older 0]
+PASS  T1 N3 screenshots (5 times, none black)  [5 ok of 5 lines: <workspace>\build\agent2\s5\nops-smoke\runs\20261125-201249-s5nops-t1\kit-shots]
+PASS  T1 Z4 occlusion-query "shutdown" line once  [shutdown line absent: hard-exit; counters from the last line (periodic, frame 9096); 13 lines, {'first': 1, 'disabled': 1, 'periodic': 11}]
+  S1 last (periodic): frame=9096 zpd=10005 zpd_no_host=10003 begun=1 resolved=0 fallback=1 disabled=1 reason=end at another address ended_by_submission=0 draws_in_query=1 dropped_in_query_ps=0 dropped_in_query_no_ps=0
+  S1 first at frame 5989: zpd 1 begun 1 resolved 0 fallback 0 disabled 0 reason ''
+  S1 disabled at frame 5989: zpd 2 begun 1 resolved 0 fallback 1 disabled 1 reason 'end at another address'
+  S1 verdict: 0 NOT valid (Z5): begun 1 resolved 0, first disable at zpd 2 of 10005, host fraction 0.00
+  timing (perf.csv, 9494 rows; 3D from data row 5847 (0-based) at 97.7 s): 3646 frames mean 37.95 p99 150.8 p99.9 478.4 max 1665.1 ms; >100 ms 128, >250 ms 19; misses 232
+  pipeline-miss bursts (>= 20 misses in a frame): 4
+    data row 5847 at 97.7 s: misses 21, frame 214.5 ms, next-2 90.9 9.7 ms
+    data row 5988 at 100.6 s: misses 23, frame 148.9 ms, next-2 75.7 7.2 ms
+    data row 7628 at 145.9 s: misses 67, frame 912.1 ms, next-2 167.3 119.6 ms
+    data row 7820 at 158.8 s: misses 27, frame 228.6 ms, next-2 133.8 83.4 ms
+
+--- T2 <workspace>\build\agent2\s5\nops-smoke\runs\20261125-201719-s5nops-t2
+bin <workspace>\build\agent2\s5\devs5nops-bin exe 6C8E281156CCE828 cvars {'d3d12_async_depth_only_pipelines': 'true', 'd3d12_log_occlusion_queries': 'true'}
+PASS  T2 clean exit (exit 0, not early, wm_close)  [exit 0x00000000 early False close wm_close]
+PASS  T2 no dumps / crash events / WER  [dumps [] crash [] wer False]
+PASS  T2 cvars exactly {'d3d12_async_depth_only_pipelines': 'true', 'd3d12_log_occlusion_queries': 'true'}  [{'d3d12_async_depth_only_pipelines': 'true', 'd3d12_log_occlusion_queries': 'true'}]
+logs ['game.log'], 265 lines
+PASS  T2 check-defaults --mode xenos PASS  [exit 0; RESULT PASS]
+PASS  T2 nops Initialize line once  [1]
+PASS  T2 no "d3d12_async_depth_only_pipelines ignored"  [0]
+PASS  T2 sync-log Initialize line absent  [0]
+PASS  T2 0 'sync pipeline #' lines  [0]
+PASS  T2 no_wait Initialize line absent  [0]
+PASS  T2 no "d3d12_pipeline_creation_no_wait ignored"  [0]
+PASS  T2 0 "Failed to create graphics pipeline"  [0]
+PASS  T2 N2 cold storage (no seed, user_data_root = run/user, no file older than the run)  [seed None, user_data_root <workspace>\build\agent2\s5\nops-smoke\runs\20261125-201719-s5nops-t2\user, 2 storage files (5752084B.rtv.d3d12.xpso 17148 B, 5752084B.xsh 176888 B), older 0]
+PASS  T2 N3 screenshots (5 times, none black)  [5 ok of 5 lines: <workspace>\build\agent2\s5\nops-smoke\runs\20261125-201719-s5nops-t2\kit-shots]
+PASS  T2 Z4 occlusion-query "shutdown" line once  [shutdown line absent: hard-exit; counters from the last line (periodic, frame 9922); 13 lines, {'first': 1, 'disabled': 1, 'periodic': 11}]
+  S1 last (periodic): frame=9922 zpd=12921 zpd_no_host=12919 begun=1 resolved=0 fallback=1 disabled=1 reason=end at another address ended_by_submission=0 draws_in_query=1 dropped_in_query_ps=0 dropped_in_query_no_ps=1
+  S1 first at frame 5877: zpd 1 begun 1 resolved 0 fallback 0 disabled 0 reason ''
+  S1 disabled at frame 5877: zpd 2 begun 1 resolved 0 fallback 1 disabled 1 reason 'end at another address'
+  S1 verdict: S1 CONFIRMED (Z5): 1 depth-only (no PS) draws dropped inside a query
+  timing (perf.csv, 10302 rows; 3D from data row 5814 (0-based) at 97.2 s): 4487 frames mean 30.36 p99 125.6 p99.9 378.2 max 1186.2 ms; >100 ms 66, >250 ms 8; misses 207
+  pipeline-miss bursts (>= 20 misses in a frame): 3
+    data row 5876 at 98.7 s: misses 23, frame 126.2 ms, next-2 67.8 5.7 ms
+    data row 7855 at 143.7 s: misses 67, frame 667.1 ms, next-2 156.8 146.5 ms
+    data row 8147 at 156.6 s: misses 27, frame 49.7 ms, next-2 125.1 37.0 ms
+
+--- N1 <workspace>\build\agent2\s5\nops-smoke\runs\20261125-202149-s5nops-n1
+bin <workspace>\build\agent2\s5\devs5nops-bin exe 6C8E281156CCE828 cvars {'d3d12_pipeline_creation_no_wait': 'true', 'd3d12_log_occlusion_queries': 'true'}
+PASS  N1 clean exit (exit 0, not early, wm_close)  [exit 0x00000000 early False close wm_close]
+PASS  N1 no dumps / crash events / WER  [dumps [] crash [] wer False]
+PASS  N1 cvars exactly {'d3d12_pipeline_creation_no_wait': 'true', 'd3d12_log_occlusion_queries': 'true'}  [{'d3d12_pipeline_creation_no_wait': 'true', 'd3d12_log_occlusion_queries': 'true'}]
+logs ['game.log'], 260 lines
+PASS  N1 check-defaults --mode xenos PASS  [exit 0; RESULT PASS]
+PASS  N1 nops Initialize line absent  [0]
+PASS  N1 no "d3d12_async_depth_only_pipelines ignored"  [0]
+PASS  N1 sync-log Initialize line absent  [0]
+PASS  N1 0 'sync pipeline #' lines  [0]
+PASS  N1 no_wait Initialize line once  [1]
+PASS  N1 no "d3d12_pipeline_creation_no_wait ignored"  [0]
+PASS  N1 0 "Failed to create graphics pipeline"  [0]
+PASS  N1 N2 cold storage (no seed, user_data_root = run/user, no file older than the run)  [seed None, user_data_root <workspace>\build\agent2\s5\nops-smoke\runs\20261125-202149-s5nops-n1\user, 2 storage files (5752084B.rtv.d3d12.xpso 17724 B, 5752084B.xsh 179300 B), older 0]
+PASS  N1 N3 screenshots (5 times, none black)  [5 ok of 5 lines: <workspace>\build\agent2\s5\nops-smoke\runs\20261125-202149-s5nops-n1\kit-shots]
+PASS  N1 Z4 occlusion-query "shutdown" line once  [shutdown line absent: hard-exit; counters from the last line (periodic, frame 10792); 13 lines, {'first': 1, 'disabled': 1, 'periodic': 11}]
+  S1 last (periodic): frame=10792 zpd=14509 zpd_no_host=14507 begun=1 resolved=0 fallback=1 disabled=1 reason=end at another address ended_by_submission=0 draws_in_query=1 dropped_in_query_ps=0 dropped_in_query_no_ps=0
+  S1 first at frame 6164: zpd 1 begun 1 resolved 0 fallback 0 disabled 0 reason ''
+  S1 disabled at frame 6164: zpd 2 begun 1 resolved 0 fallback 1 disabled 1 reason 'end at another address'
+  S1 verdict: 0 NOT valid (Z5): begun 1 resolved 0, first disable at zpd 2 of 14509, host fraction 0.00
+  timing (perf.csv, 11032 rows; 3D from data row 5808 (0-based) at 97.0 s): 5223 frames mean 26.45 p99 77.3 p99.9 187.5 max 717.8 ms; >100 ms 34, >250 ms 3; misses 236
+  pipeline-miss bursts (>= 20 misses in a frame): 4
+    data row 5808 at 97.0 s: misses 21, frame 162.7 ms, next-2 32.5 7.8 ms
+    data row 6163 at 103.8 s: misses 23, frame 147.0 ms, next-2 98.2 14.4 ms
+    data row 8448 at 148.7 s: misses 67, frame 599.4 ms, next-2 150.6 117.6 ms
+    data row 8779 at 161.8 s: misses 22, frame 68.1 ms, next-2 58.5 44.0 ms
+
+--- N2 <workspace>\build\agent2\s5\nops-smoke\runs\20261125-202618-s5nops-n2
+bin <workspace>\build\agent2\s5\devs5nops-bin exe 6C8E281156CCE828 cvars {'d3d12_pipeline_creation_no_wait': 'true', 'd3d12_async_depth_only_pipelines': 'true', 'd3d12_log_occlusion_queries': 'true'}
+PASS  N2 clean exit (exit 0, not early, wm_close)  [exit 0x00000000 early False close wm_close]
+PASS  N2 no dumps / crash events / WER  [dumps [] crash [] wer False]
+PASS  N2 cvars exactly {'d3d12_pipeline_creation_no_wait': 'true', 'd3d12_async_depth_only_pipelines': 'true', 'd3d12_log_occlusion_queries': 'true'}  [{'d3d12_pipeline_creation_no_wait': 'true', 'd3d12_async_depth_only_pipelines': 'true', 'd3d12_log_occlusion_queries': 'true'}]
+logs ['game.log'], 264 lines
+PASS  N2 check-defaults --mode xenos PASS  [exit 0; RESULT PASS]
+PASS  N2 nops Initialize line once  [1]
+PASS  N2 no "d3d12_async_depth_only_pipelines ignored"  [0]
+PASS  N2 sync-log Initialize line absent  [0]
+PASS  N2 0 'sync pipeline #' lines  [0]
+PASS  N2 no_wait Initialize line once  [1]
+PASS  N2 no "d3d12_pipeline_creation_no_wait ignored"  [0]
+PASS  N2 0 "Failed to create graphics pipeline"  [0]
+PASS  N2 N2 cold storage (no seed, user_data_root = run/user, no file older than the run)  [seed None, user_data_root <workspace>\build\agent2\s5\nops-smoke\runs\20261125-202618-s5nops-n2\user, 2 storage files (5752084B.rtv.d3d12.xpso 17796 B, 5752084B.xsh 179300 B), older 0]
+PASS  N2 N3 screenshots (5 times, none black)  [5 ok of 5 lines: <workspace>\build\agent2\s5\nops-smoke\runs\20261125-202618-s5nops-n2\kit-shots]
+PASS  N2 Z4 occlusion-query "shutdown" line once  [shutdown line absent: hard-exit; counters from the last line (periodic, frame 11313); 14 lines, {'first': 1, 'disabled': 1, 'periodic': 12}]
+  S1 last (periodic): frame=11313 zpd=16185 zpd_no_host=16183 begun=1 resolved=0 fallback=1 disabled=1 reason=end at another address ended_by_submission=0 draws_in_query=1 dropped_in_query_ps=0 dropped_in_query_no_ps=0
+  S1 first at frame 5629: zpd 1 begun 1 resolved 0 fallback 0 disabled 0 reason ''
+  S1 disabled at frame 5629: zpd 2 begun 1 resolved 0 fallback 1 disabled 1 reason 'end at another address'
+  S1 verdict: 0 NOT valid (Z5): begun 1 resolved 0, first disable at zpd 2 of 16185, host fraction 0.00
+  timing (perf.csv, 11366 rows; 3D from data row 5566 (0-based) at 92.9 s): 5799 frames mean 24.09 p99 68.8 p99.9 182.4 max 678.5 ms; >100 ms 16, >250 ms 3; misses 216
+  pipeline-miss bursts (>= 20 misses in a frame): 3
+    data row 5628 at 94.3 s: misses 23, frame 98.1 ms, next-2 50.8 5.2 ms
+    data row 7885 at 138.8 s: misses 67, frame 216.8 ms, next-2 136.6 134.6 ms
+    data row 8320 at 152.2 s: misses 22, frame 45.1 ms, next-2 45.4 38.4 ms
+
+=== PAIRS (report only; success is judged by the Overseer / user, README section 6) ===
+A1 -> A2 S1: zpd 17965 -> 18033, draws in a query 1 -> 1, dropped in a query no-PS 0 -> 1, PS 0 -> 0, disabled 1 -> 1
+    A1 S1: 0 NOT valid (Z5): begun 1 resolved 0, first disable at zpd 2 of 17965, host fraction 0.00
+    A2 S1: S1 CONFIRMED (Z5): 1 depth-only (no PS) draws dropped inside a query
+A1 -> A2: command-thread create 479.1 -> 42.9 ms, worst frame create 298.2 -> 42.9 ms, movable sync creates 48 -> 0, dropped draws 1281 -> 1656
+T1 -> T2 S1: zpd 10005 -> 12921, draws in a query 1 -> 1, dropped in a query no-PS 0 -> 1, PS 0 -> 0, disabled 1 -> 1
+    T1 S1: 0 NOT valid (Z5): begun 1 resolved 0, first disable at zpd 2 of 10005, host fraction 0.00
+    T2 S1: S1 CONFIRMED (Z5): 1 depth-only (no PS) draws dropped inside a query
+T1 -> T2: 3D p99 150.8 -> 125.6 ms, max 1665.1 -> 1186.2 ms, >100 ms frames 128 -> 66
+    burst 1: 97.7 s misses 21 frame 214.5 (max of 3: 214.5) | 98.7 s misses 23 frame 126.2 (max of 3: 126.2)
+    burst 2: 100.6 s misses 23 frame 148.9 (max of 3: 148.9) | 143.7 s misses 67 frame 667.1 (max of 3: 667.1)
+    burst 3: 145.9 s misses 67 frame 912.1 (max of 3: 912.1) | 156.6 s misses 27 frame 49.7 (max of 3: 125.1)
+    burst 4: 158.8 s misses 27 frame 228.6 (max of 3: 228.6) | -
+N1 -> N2 S1: zpd 14509 -> 16185, draws in a query 1 -> 1, dropped in a query no-PS 0 -> 0, PS 0 -> 0, disabled 1 -> 1
+    N1 S1: 0 NOT valid (Z5): begun 1 resolved 0, first disable at zpd 2 of 14509, host fraction 0.00
+    N2 S1: 0 NOT valid (Z5): begun 1 resolved 0, first disable at zpd 2 of 16185, host fraction 0.00
+N1 -> N2: 3D p99 77.3 -> 68.8 ms, max 717.8 -> 678.5 ms, >100 ms frames 34 -> 16
+    burst 1: 97.0 s misses 21 frame 162.7 (max of 3: 162.7) | 94.3 s misses 23 frame 98.1 (max of 3: 98.1)
+    burst 2: 103.8 s misses 23 frame 147.0 (max of 3: 147.0) | 138.8 s misses 67 frame 216.8 (max of 3: 216.8)
+    burst 3: 148.7 s misses 67 frame 599.4 (max of 3: 599.4) | 152.2 s misses 22 frame 45.1 (max of 3: 45.4)
+    burst 4: 161.8 s misses 22 frame 68.1 (max of 3: 68.1) | -
+
+RESULT: PASS

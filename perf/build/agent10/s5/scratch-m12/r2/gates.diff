@@ -1,0 +1,308 @@
+diff --git a/build/agent10/s5/scratch-m12/s5_gates.py b/build/agent10/s5/scratch-m12/r2/s5_gates.py
+index 8c4c761..bad8d6c 100644
+--- a/build/agent10/s5/scratch-m12/s5_gates.py
++++ b/build/agent10/s5/scratch-m12/r2/s5_gates.py
+@@ -135,5 +135,12 @@ def analyse(rd, a):
+     run = rjson(os.path.join(rd, 'run.json'))
+     perf = rcsv(os.path.join(rd, 'perf.csv')) or []
+-    frames = rcsv(os.path.join(rd, 'frames.csv'))
++    # native frame metrics: run-timing.ps1 -Frames native writes native-frames.csv (rt L274), run-game.ps1 writes
++    # frames.csv; try both (as score3d.py load_frames), first one with interval_ms + draw_calls wins
++    frames, frames_name = None, None
++    for nm in ('native-frames.csv', 'frames.csv'):
++        fr = rcsv(os.path.join(rd, nm))
++        if fr and 'interval_ms' in fr[0] and 'draw_calls' in fr[0]:
++            frames, frames_name = fr, nm
++            break
+     gpu = rcsv(os.path.join(rd, 'gpu.csv'))
+     inp = rcsv(os.path.join(rd, 'input.csv')) or []
+@@ -145,9 +152,14 @@ def analyse(rd, a):
+     renderer = a.renderer
+     pd = [int(fnum(r.get('draw_calls'), 0)) for r in perf]
++    no_perf = not ft and bool(frames)
++    if no_perf:  # no perf.csv rows: frame times from the native csv interval_ms (offset 0)
++        ft = [fnum(r.get('interval_ms'), 0.0) for r in frames]
+     if renderer == 'auto':
+         renderer = 'native' if (frames is not None and not any(pd)) or 'native' in str(run.get('bin_dir', '')).lower() else 'xenos'
+     out['renderer'] = renderer
++    foff = 1
+     if renderer == 'native' and frames:
+-        off, md = native_offset(ft, frames)
++        off, md = (0, 0.0) if no_perf else native_offset(ft, frames)
++        foff = off
+         fd = [int(fnum(r.get('draw_calls'), 0)) for r in frames]
+         dr = [0] * len(ft)
+@@ -156,5 +168,6 @@ def analyse(rd, a):
+             if 0 <= j < len(ft):
+                 dr[j] = d
+-        I['draws_source'] = 'frames.csv offset %+d (median |interval-frame_time| %s ms)' % (off, None if md is None else round(md, 3))
++        I['draws_source'] = '%s offset %+d (median |interval-frame_time| %s ms)%s' % (
++            frames_name, off, None if md is None else round(md, 3), '; no perf.csv: frame times = interval_ms' if no_perf else '')
+     else:
+         dr = pd
+@@ -186,12 +199,40 @@ def analyse(rd, a):
+         why.append('WER')
+     if run.get('dumps'):
+-        why.append('dumps %d' % len(run['dumps']))
++        # run-timing lists every .dmp it collected in dumps; dumps of other processes / other pids are also listed in
++        # foreign_crash_dumps (not a problem, rt L757-761): only the rest count
++        foreign = {os.path.basename(str(x).replace('\\', '/')).lower() for x in (run.get('foreign_crash_dumps') or [])}
++        own = [x for x in run['dumps'] if os.path.basename(str(x).replace('\\', '/')).lower() not in foreign]
++        if own:
++            why.append('dumps %d' % len(own))
+     if run.get('crash_events'):
+         why.append('crash events %d' % len(run['crash_events']))
+     if run.get('exited_early'):
+         why.append('exited early')
+-    if any(f.lower().endswith('.dmp') for f in os.listdir(rd)):
+-        why.append('.dmp in run dir')
+-    G['clean'] = gate('VOID' if why else 'PASS', '; '.join(why) or 'exit 0, wm_close %.2f s, no WER/dump' % (run.get('close_seconds') or -1))
++    pid = run.get('pid')
++    dmps = [f for f in os.listdir(rd) if f.lower().endswith('.dmp')]
++    own_dmp = [f for f in dmps if pid is not None and f.lower() == ('legodimensions.exe.%s.dmp' % pid).lower()]
++    if own_dmp:
++        why.append('own-pid dump in run dir: %s' % own_dmp[0])
++    fdmp = [f for f in dmps if f not in own_dmp]
++    G['clean'] = gate('VOID' if why else 'PASS', '; '.join(why) or 'exit 0, wm_close %.2f s, no WER/dump%s' % (
++        run.get('close_seconds') or -1, '; info: foreign dump(s) %s' % ', '.join(fdmp) if fdmp else ''))
++
++    # ---- runner verdict (run-timing.ps1 status / valid_timing / excluded; absent on run-game.ps1 runs) ----
++    why = []
++    rst = run.get('status')
++    if rst is not None and rst != 'OK':
++        why.append('runner status %s (%s)' % (rst, '; '.join(str(x) for x in (run.get('problems') or [])) or '-'))
++    if run.get('valid_timing') is False:
++        why.append('valid_timing false (%s)' % ('; '.join(str(x) for x in (run.get('valid_timing_why') or [])) or '-'))
++    if run.get('excluded') is True:
++        why.append('runner excluded (%s)' % (', '.join(str(x) for x in (run.get('flags_excluding') or [])) or '-'))
++    if why:
++        G['runner'] = gate('VOID', '; '.join(why))
++    elif rst is None and 'valid_timing' not in run and 'excluded' not in run:
++        G['runner'] = gate('PASS', 'n/a: no runner status fields (not a run-timing run)')
++    else:
++        G['runner'] = gate('PASS', 'status %s, valid_timing %s, excluded %s%s' % (
++            rst, run.get('valid_timing'), run.get('excluded'),
++            '; info flags: %s' % ', '.join(str(x) for x in run['flags_info']) if run.get('flags_info') else ''))
+ 
+     # ---- cold ----
+@@ -335,5 +376,7 @@ def analyse(rd, a):
+     if in_win:
+         why_v.append('%d press(es) inside the window' % len(in_win))
+-    last_in = max((fnum(r.get('t_s'), 0.0) for r in inp), default=None)
++    # script steps only: vpadhost writes an 'end' row at Finish() after the close (and an 'error' row on a script
++    # error), which would always satisfy the alive check
++    last_in = max((fnum(r.get('t_s'), 0.0) for r in inp if str(r.get('cmd', '')).lower() not in ('end', 'error')), default=None)
+     done = isc.get('steps_done'); total = isc.get('steps_total')
+     completed = (done is not None and done == total) or isc.get('stopped_by_script') or isc.get('last_step') == 'stop'
+@@ -390,11 +433,11 @@ def analyse(rd, a):
+             hw = sum(1 for r in rows if thr(r) & HW_BRAKE_BITS) / n
+             pc = sum(1 for r in rows if thr(r) & PCAP_BIT) / n
+-            def mean(k):
++            def med(k):  # median of the 1 Hz samples in the window (READOUT-PLAN-P03 section 3)
+                 v = [fnum(r.get(k)) for r in rows]
+                 v = [x for x in v if x is not None]
+-                return round(sum(v) / len(v), 2) if v else None
++                return round(statistics.median(v), 2) if v else None
+             cov = {'samples': n, 'expected': round(a.span), 'thermal_share': round(th, 3), 'hw_brake_share': round(hw, 3),
+-                   'powercap_share': round(pc, 3), 'util_gpu': mean('util_gpu'), 'gr_mhz': mean('gr_mhz'),
+-                   'power_w': mean('power_w'), 'temp_c': mean('temp_c'),
++                   'powercap_share': round(pc, 3), 'util_gpu': med('util_gpu'), 'gr_mhz': med('gr_mhz'),
++                   'power_w': med('power_w'), 'temp_c': med('temp_c'),
+                    'p0_share': round(sum(1 for r in rows if r.get('pstate') == 'P0') / n, 3)}
+             st, w = 'PASS', []
+@@ -428,5 +471,5 @@ def analyse(rd, a):
+             if len({r.get('overlay') for r in rows}) > 1: why.append('power overlay change')
+             if any(r.get('screensaver') == '1' for r in rows): why.append('screensaver')
+-            hidden = 'hidden desktop' in str(run.get('mode', '')).lower()
++            hidden = 'hidden desktop' in str(run.get('mode', '')).lower() or run.get('on_timing_desktop') is False
+             fg0 = sum(1 for r in rows if r.get('fg_game') == '0')
+             if fg0 and not hidden: why.append('game not foreground in %d/%d rows' % (fg0, len(rows)))
+@@ -451,13 +494,15 @@ def analyse(rd, a):
+     eff = find_key(run, {'effective_cap', 'fps_cap_effective', 'cap_effective', 'effective_fps_cap'})
+     cv = run.get('cvars') or {}
+-    cvcap = cv.get('framerate_limit', cv.get('native_fps_limit')) if isinstance(cv, dict) else None
++    ck = ('native_fps_limit', 'framerate_limit') if renderer == 'native' else ('framerate_limit', 'native_fps_limit')
++    cvcap = cv.get(ck[0], cv.get(ck[1])) if isinstance(cv, dict) else None
+     ncap = None
+     if renderer == 'native' and frames and wi:
+-        vals = {frames[k].get('native_fps_limit_cvar') for k in range(len(frames)) if wi[0] <= k + 1 <= wi[-1]}
++        vals = {frames[k].get('native_fps_limit_cvar') for k in range(len(frames)) if wi[0] <= k + foff <= wi[-1]}
+         ncap = ','.join(sorted(v for v in vals if v))
+     I['cap_sources'] = {'runner_effective': eff, 'cvar': cvcap, 'native_frames_cvar': ncap}
+     want = a.cap
+-    if not met:
+-        G['cap'] = gate('NODATA', 'no window frames')
++    if not met or met.get('fps') is None:
++        G['cap'] = gate('NODATA', 'no window frames' if not met else
++                        'window frame-time sum 0 (%d frames): no fps' % met['frames'], arm=None if want == 'auto' else want)
+     else:
+         fps = met['fps']; w = []; st = 'PASS'
+@@ -482,5 +527,7 @@ def analyse(rd, a):
+                 w.append('below cap: GPU-bound info (fps %.2f, at60 share %.2f)' % (fps, met['at60_share']))
+         else:
+-            if rep_n not in (None, 0.0) and not (renderer == 'native' and reported == ncap and a.native_default_ok):
++            # numeric compare: runner effective_cap is an int, the frames cvar a string
++            native_default = renderer == 'native' and a.native_default_ok and rep_n is not None and abs(rep_n - 240) <= 0.5
++            if rep_n not in (None, 0.0) and not native_default:
+                 st = 'VOID'; w.append('reported cap %s on uncapped arm' % reported)
+             if 59.0 <= fps <= 61.0 and met['at60_share'] >= 0.8:
+@@ -553,8 +600,11 @@ def set_rules(runs, a):
+ def report(runs, a):
+     L = ['# s5_gates: span %.0f s, anchor >= %d draws, 3D >= %d, cap %s, margin %.0f s' % (a.span, a.anchor, a.thr3d, a.cap, a.margin)]
++    if getattr(a, 'skipped', None) is not None:
++        L.append('# runs-root %s: %d scored (tag ~ %s), %d skipped: %s' % (
++            a.runs_root, len(runs), a.scored_tag, len(a.skipped), ', '.join(a.skipped) or '-'))
+     for r in runs:
+         L.append('')
+         L.append('== %s [%s] verdict %s' % (r['tag'] or os.path.basename(r['run_dir']), r['renderer'], r['verdict']))
+-        for k in ('clean', 'cold', '3d', 'span', 'input', 'cooldown', 'thermal', 'host', 'cap', 'align'):
++        for k in ('clean', 'runner', 'cold', '3d', 'span', 'input', 'cooldown', 'thermal', 'host', 'cap', 'align'):
+             g = r['gates'][k]
+             L.append('  %-8s %-6s %s' % (k, g['status'], g['why']))
+@@ -572,7 +622,9 @@ def report(runs, a):
+                 th['util_gpu'], th['gr_mhz'], th['power_w'], th['temp_c'], th['p0_share'], th['powercap_share'], th['samples']))
+         m = r.get('metrics') or {}
+-        if m:
++        if m and m.get('fps') is not None:
+             L.append('  window: %d frames %.1f s fps %.2f med %.2f p99 %.2f 1%%low %.2f max %.1f ms; >=100 %d >=250 %d; at60 %.2f' % (
+                 m['frames'], m['window_s'], m['fps'], m['median_ms'], m['p99_ms'], m['low1_ms'], m['max_ms'], m['n_ge100'], m['n_ge250'], m['at60_share']))
++        elif m:
++            L.append('  window: %d frames, frame-time sum 0 (no fps)' % m['frames'])
+         L.append('  axis: first frame %s, draws %s, axis-close %s s, vs input perf_rows %s' % (
+             r['info'].get('first_frame_t'), r['info'].get('draws_source'), r['info'].get('axis_minus_close_s'), r['info'].get('axis_vs_input_perf_rows_s')))
+@@ -583,4 +635,7 @@ def parser():
+     p = argparse.ArgumentParser()
+     p.add_argument('runs', nargs='*')
++    p.add_argument('--runs-root', default=None, help='add every subdir of this runs\\ folder whose run.json tag matches --scored-tag')
++    p.add_argument('--scored-tag', default=r'^(?!cold-|warm\d+-).+-r\d+$',
++                   help='run.json tag regex for --runs-root (run-matrix scored tags <arm>-r<k>; cold-* / warm<j>-* skipped)')
+     p.add_argument('--span', type=float, default=120.0)
+     p.add_argument('--anchor', type=int, default=1500)
+@@ -618,8 +673,10 @@ def parser():
+ # ---------------- selftest ----------------
+ def _mk(d, draws_fn, n=30000, ft_ms=20.0, run_extra=None, presses=(54, 63, 72), gpu_thr='0x0', sys_rows=True,
+-        seconds=None, native=False, cd={'met': True}, ng=1.0, steps_done=91):
++        seconds=None, native=False, cd={'met': True}, ng=1.0, steps_done=91, frames_name='frames.csv', no_perf=False,
++        ft_fn=None, draws_i=None, input_stop=None, util_fn=None, files=()):
+     os.makedirs(d, exist_ok=True)
+     ff = 3.5
+-    total = ff + n * ft_ms / 1000.0
++    fts = [ft_fn(i) if ft_fn else ft_ms for i in range(n)]
++    total = ff + sum(fts) / 1000.0
+     sec = seconds if seconds is not None else total
+     run = {'tag': os.path.basename(d), 'bin_dir': 'x\\nativefinal2-bin' if native else 'x\\devfinal2-bin', 'pid': 7,
+@@ -634,17 +691,25 @@ def _mk(d, draws_fn, n=30000, ft_ms=20.0, run_extra=None, presses=(54, 63, 72),
+     with open(os.path.join(d, 'run.json'), 'w') as f:
+         json.dump(run, f)
+-    with open(os.path.join(d, 'perf.csv'), 'w', newline='') as f:
+-        w = csv.writer(f); w.writerow(['frame_time_us', 'fps', 'draw_calls'])
+-        t = ff
+-        for i in range(n):
+-            t += ft_ms / 1000.0
+-            w.writerow([round(ft_ms * 1000), 0, 0 if native else draws_fn(t)])
++    dfn = (lambda i, t: draws_i(i)) if draws_i else (lambda i, t: draws_fn(t))
++    if not no_perf:
++        with open(os.path.join(d, 'perf.csv'), 'w', newline='') as f:
++            w = csv.writer(f); w.writerow(['frame_time_us', 'fps', 'draw_calls'])
++            t = ff
++            for i in range(n):
++                t += fts[i] / 1000.0
++                w.writerow([round(fts[i] * 1000), 0, 0 if native else dfn(i, t)])
+     if native:
+-        with open(os.path.join(d, 'frames.csv'), 'w', newline='') as f:
++        with open(os.path.join(d, frames_name), 'w', newline='') as f:
+             w = csv.writer(f); w.writerow(['frame', 'interval_ms', 'draw_calls', 'native_fps_limit_cvar'])
+-            t = ff + ft_ms / 1000.0
+-            for k in range(n - 1):
+-                t += ft_ms / 1000.0
+-                w.writerow([k + 2, ft_ms + (0.5 if k % 2 else -0.5), draws_fn(t), 0])
++            if no_perf:  # frames row k = frame k (offset 0), exact intervals
++                t = ff
++                for k in range(n):
++                    t += fts[k] / 1000.0
++                    w.writerow([k + 1, fts[k], dfn(k, t), 0])
++            else:        # frames row k <-> perf row k + 1
++                t = ff + fts[0] / 1000.0
++                for k in range(n - 1):
++                    t += fts[k + 1] / 1000.0
++                    w.writerow([k + 2, fts[k + 1] + (0.5 if k % 2 else -0.5), dfn(k + 1, t), 0])
+     with open(os.path.join(d, 'input.csv'), 'w', newline='') as f:
+         w = csv.writer(f); w.writerow(['t_s', 'line', 'cmd', 'args', 'result', 'perf_rows'])
+@@ -653,10 +718,13 @@ def _mk(d, draws_fn, n=30000, ft_ms=20.0, run_extra=None, presses=(54, 63, 72),
+             w.writerow([p, 5, 'press', 'A', 'ok x1', int((p - ff) * 1000 / ft_ms)])
+         tt = 80.0
+-        while tt < min(sec, 472):
++        while tt < min(sec, 472, input_stop if input_stop is not None else 1e9):
+             w.writerow([tt, 9, 'sleep', '10', 'ok', int((tt - ff) * 1000 / ft_ms)]); tt += 10
++        w.writerow([round(sec + 1.0, 2), 0, 'end', '', 'steps %d/91; timeouts 0' % steps_done, ''])  # vpadhost Finish()
+     with open(os.path.join(d, 'gpu.csv'), 'w', newline='') as f:
+         w = csv.writer(f); w.writerow(['t_s', 'pstate', 'gr_mhz', 'temp_c', 'power_w', 'util_gpu', 'throttle'])
+         for s in range(int(sec)):
+-            w.writerow([float(s), 'P0', 1500, 70, 20, 99, gpu_thr(s) if callable(gpu_thr) else gpu_thr])
++            w.writerow([float(s), 'P0', 1500, 70, 20, util_fn(s) if util_fn else 99, gpu_thr(s) if callable(gpu_thr) else gpu_thr])
++    for fn in files:
++        open(os.path.join(d, fn), 'wb').close()
+     if sys_rows:
+         with open(os.path.join(d, 'sys.csv'), 'w', newline='') as f:
+@@ -697,4 +765,32 @@ def selftest():
+         ('spikefirst', dict(draws_fn=lambda t: 6000 if 90.0 <= t < 90.03 else d3(t), n=17000), {'anchor105': False}, ['--anchor-mode', 'first']),
+         ('runnerwin', dict(draws_fn=d3, n=17000, run_extra={'window_start_s': 90.0}), {'3d': 'FLAG'}),
++        # M10 E10.2 fixes
++        ('B1nativefr', dict(draws_fn=d3, n=40000, ft_ms=6.0, native=True, frames_name='native-frames.csv'),
++         {'verdict': 'PASS', 'src_native_frames': True}),
++        ('B1noperf', dict(draws_fn=d3, n=40000, ft_ms=6.0, native=True, frames_name='native-frames.csv', no_perf=True),
++         {'3d': 'PASS', 'span': 'PASS', 'cap': 'PASS', 'src_native_frames': True}),
++        ('S1foreign', dict(draws_fn=d3, n=17000, files=('chrome.exe.123.dmp', 'legodimensions.exe.99.dmp'),
++                           run_extra={'dumps': ['r\\chrome.exe.123.dmp', 'r\\legodimensions.exe.99.dmp'],
++                                      'foreign_crash_dumps': ['r\\chrome.exe.123.dmp', 'r\\legodimensions.exe.99.dmp']}),
++         {'clean': 'PASS', 'verdict': 'PASS'}),
++        ('S1own', dict(draws_fn=d3, n=17000, files=('legodimensions.exe.7.dmp',),
++                       run_extra={'dumps': ['r\\legodimensions.exe.7.dmp'], 'foreign_crash_dumps': []}), {'clean': 'VOID'}),
++        ('S1ownfile', dict(draws_fn=d3, n=17000, files=('legodimensions.exe.7.dmp',)), {'clean': 'VOID'}),
++        ('S2statusok', dict(draws_fn=d3, n=17000, run_extra={'status': 'OK', 'valid_timing': True, 'excluded': False,
++                                                              'flags_info': ['cooldown_timeout']}), {'runner': 'PASS', 'verdict': 'PASS'}),
++        ('S2problem', dict(draws_fn=d3, n=17000, run_extra={'status': 'PROBLEM', 'problems': ['dialogs: x']}), {'runner': 'VOID'}),
++        ('S2invalid', dict(draws_fn=d3, n=17000, run_extra={'status': 'OK', 'valid_timing': False}), {'runner': 'VOID'}),
++        ('S2excluded', dict(draws_fn=d3, n=17000, run_extra={'status': 'OK', 'excluded': True, 'flags_excluding': ['light_phase']}),
++         {'runner': 'VOID'}),
++        ('S3median', dict(draws_fn=d3, n=17000, util_fn=lambda s: 0 if s % 4 == 0 else 100), {'util100': True}),
++        ('S4deadscript', dict(draws_fn=d3, n=17000, steps_done=40, input_stop=100.0), {'input': 'VOID'}),
++        ('S5zeroft', dict(draws_fn=d3, n=6000, ft_fn=lambda i: 20.0 if i < 5000 else 0.0,
++                          draws_i=lambda i: 3000 if i >= 5000 else 220), {'cap': 'NODATA', 'span': 'VOID'},
++         ['--anchor-mode', 'first']),
++        # runner effective_cap is an int (240), frames cvar a string: compare numerically
++        ('natdef240ok', dict(draws_fn=d3, n=40000, ft_ms=6.0, native=True, frames_name='native-frames.csv',
++                             run_extra={'effective_cap': 240}), {'cap': 'PASS'}, ['--native-default-ok']),
++        ('natdef240', dict(draws_fn=d3, n=40000, ft_ms=6.0, native=True, frames_name='native-frames.csv',
++                           run_extra={'effective_cap': 240}), {'cap': 'VOID'}),
+     ]
+     for c in cases:
+@@ -703,9 +799,23 @@ def selftest():
+         rd = os.path.join(td, name)
+         _mk(rd, **kw)
+-        r = analyse(rd, aa)
+-        set_rules([r], aa)
+-        got = {k: (r['verdict'] if k == 'verdict' else
+-                   (abs((r['gates']['3d'].get('anchor_t') or 0) - 105.0) < 0.5) if k == 'anchor105' else
+-                   r['gates'][k]['status']) for k in exp}
++        try:
++            r = analyse(rd, aa)
++            set_rules([r], aa)
++            report([r], aa)
++        except Exception as e:  # a crash is a failed case, not a crashed selftest
++            ok = False
++            print('%-12s BAD exception %r' % (name, e))
++            continue
++        def val(k):
++            if k == 'verdict':
++                return r['verdict']
++            if k == 'anchor105':
++                return abs((r['gates']['3d'].get('anchor_t') or 0) - 105.0) < 0.5
++            if k == 'src_native_frames':
++                return str(r['info'].get('draws_source', '')).startswith('native-frames.csv')
++            if k == 'util100':
++                return r['gates']['thermal'].get('util_gpu') == 100
++            return r['gates'][k]['status']
++        got = {k: val(k) for k in exp}
+         good = got == exp
+         ok &= good

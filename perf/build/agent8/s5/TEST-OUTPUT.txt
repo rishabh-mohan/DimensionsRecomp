@@ -1,0 +1,212 @@
+S5 runner tests, 2026-11-25 17:47:50; no game launched
+
+===== A. parse checks =====
+run-timing.ps1 parse errors=0
+run-matrix.ps1 parse errors=0
+window-s5.ps1 parse errors=0
+score3d.py py_compile exit 0
+(exit 0)
+
+===== B1. score3d smoke xenos (default arm, span 120; writes run.json fields: my folder) =====
+20261125-164755-final2-3d-xenos [xenos perf.csv] OK
+   reached(>=600) 78.89 s  start(>=1500, hold 1.0 s) 104.5 s [launch clock 107.98 s; first >=1500 104.5 s]  span 120.022 s (avail 133.02 s)  frames 5473  fps 45.6  median 20.296 ms  p99 51.896 ms  1%low 12.558 fps  draws med 2778  share3d 1.0
+   gpu rows 121 (input_wff): thermal 0.7686 powercap 0.1983 hwslow 0.0  temp med 87.0 max 87.0  gr 1357.0 MHz  power 26.51 W  util 95.0  | cap exp 0 seen 0 (args) | route 43/91 timeouts 0 | cooldown  s  
+(exit 0)
+
+===== B2. score3d smoke native (span 120 -> short_span VOID expected: -Seconds 240 smoke) =====
+20261125-165219-final2-3d-native [native frames.csv] VOID (short_span: 115.1 s of frames after the 3D start (< 120 s))
+   reached(>=600) 117.89 s  start(>=1500, hold 1.0 s) 121.26 s [launch clock 125.49 s; first >=1500 121.26 s]  span 115.069 s (avail 115.07 s)  frames 8676  fps 75.398  median 10.2111 ms  p99 53.8778 ms  1%low 14.01 fps  draws med 555.0  share3d 0.4431
+   gpu rows 115 (input_wff): thermal 0.0 powercap 0.0261 hwslow 0.0  temp med 79.0 max 85.0  gr 1732.0 MHz  power 19.51 W  util 39.0  | cap exp 240 seen 240 (frames_csv) | route 43/91 timeouts 0 | cooldown  s  
+(exit 0)
+
+===== B3. score3d smoke native (span 110; writes run.json fields) =====
+20261125-165219-final2-3d-native [native frames.csv] OK
+   reached(>=600) 117.89 s  start(>=1500, hold 1.0 s) 121.26 s [launch clock 125.49 s; first >=1500 121.26 s]  span 110.001 s (avail 115.07 s)  frames 8446  fps 76.781  median 10.1721 ms  p99 52.4064 ms  1%low 14.365 fps  draws med 555.0  share3d 0.4551
+   gpu rows 110 (input_wff): thermal 0.0 powercap 0.0273 hwslow 0.0  temp med 79.0 max 85.0  gr 1732.0 MHz  power 19.67 W  util 39.5  | cap exp 240 seen 240 (frames_csv) | route 43/91 timeouts 0 | cooldown  s  
+(exit 0)
+
+===== B4. score3d offsf (agent3 run, read-only, no --write-runjson) =====
+20261125-071741-s33-offsf [xenos perf.csv] OK
+   reached(>=600) 97.71 s  start(>=1500, hold 1.0 s) 123.61 s [launch clock 128.48 s; first >=1500 103.73 s]  span 120.019 s (avail 334.83 s)  frames 3712  fps 30.928  median 27.747 ms  p99 107.668 ms  1%low 3.781 fps  draws med 2315.0  share3d 1.0
+   gpu rows 120 (input_wff): thermal 0.6 powercap 0.1083 hwslow 0.0  temp med 86.0 max 87.0  gr 1544.5 MHz  power 24.8 W  util 69.5  | cap exp 0 seen 0 (args) | route 91/91 timeouts 0 | cooldown  s  
+(exit 0)
+
+===== C. expected (M12 gates, launch clock) vs got window_start_s =====
+t-smx: status OK first>=1500 104.5 sustained anchor(frame clock) 104.5 + launch offset 3.48 = window_start_s 107.98; expected 107.98; diff 0.00 s
+t-smn: status OK first>=1500 121.26 sustained anchor(frame clock) 121.26 + launch offset 4.23 = window_start_s 125.49; expected 125.49; diff 0.00 s
+t-off: status OK first>=1500 103.73 sustained anchor(frame clock) 123.61 + launch offset 4.87 = window_start_s 128.48; expected 128.48; diff 0.00 s
+(exit 0)
+
+===== D. M12 s5_gates.py on the smoke runs (run-game run.json; fields written by B1/B3) =====
+# s5_gates: span 120 s, anchor >= 1500 draws, 3D >= 600, cap auto, margin 2 s
+
+== final2-3d-xenos [xenos] verdict FLAG
+  clean    PASS   exit 0, wm_close 0.63 s, no WER/dump
+  cold     PASS   seed_xenos null (cold)
+  3d       PASS   ok
+  span     PASS   covered: 13.0 s of frames after window end; end of 3D not seen
+  input    PASS   presses 3 ok, none in window; steps 43/91 (halted), last step t 240.7
+  cooldown FLAG   no cooldown record in run.json (first gpu.csv temp 58.0 C)
+  thermal  PASS   thermal-limited 0.77 > 0.10 (covariate; set rule: arm outlier -> FLAG)
+  host     NODATA no sys.csv (host-busy, battery, foreground, user input unknown)
+  cap      PASS   fps 45.60
+  align    PASS   ok
+  3d info: t3d 82.26 anchor 107.98 (last press +36.01, 3D +25.73) sustain10 1.00; first >=1500 107.98, sustained 107.98, runner 107.98; first t by draws {'600': 82.26, '1000': 87.3, '1500': 107.98, '2000': 107.98}
+  end of 3D: None (low band None, flat None); window [107.98, 227.98]
+  gpu: util 90.56% gr 1347.13 MHz 26.18 W temp 86.46 C P0 1.00 powercap 0.20 (n 120)
+  window: 5472 frames 120.0 s fps 45.60 med 20.29 p99 51.90 1%low 79.63 max 307.4 ms; >=100 7 >=250 2; at60 0.15
+  axis: first frame 3.48, draws perf.csv, axis-close 0.97 s, vs input perf_rows {'n': 1, 'median': 0.322, 'max_abs': 0.322}
+# s5_gates: span 110 s, anchor >= 1500 draws, 3D >= 600, cap auto, margin 2 s
+
+== final2-3d-native [native] verdict VOID
+  clean    PASS   exit 0, wm_close 0.89 s, no WER/dump
+  cold     PASS   seed_xenos null (cold)
+  3d       PASS   ok
+  span     PASS   covered: 5.1 s of frames after window end; end of 3D not seen
+  input    PASS   presses 3 ok, none in window; steps 43/91 (halted), last step t 241.0
+  cooldown FLAG   no cooldown record in run.json (first gpu.csv temp 70.0 C)
+  thermal  PASS   thermal 0.00, hw 0.00
+  host     NODATA no sys.csv (host-busy, battery, foreground, user input unknown)
+  cap      VOID   reported cap 240 on uncapped arm; fps 76.79
+  align    PASS   ok
+  3d info: t3d 122.11 anchor 125.49 (last press +52.78, 3D +3.38) sustain10 0.87; first >=1500 125.49, sustained 125.49, runner 125.49; first t by draws {'600': 122.11, '1000': 122.11, '1500': 125.49, '2000': 125.49}
+  end of 3D: None (low band None, flat None); window [125.49, 235.49]
+  gpu: util 42.76% gr 1446.45 MHz 17.66 W temp 78.46 C P0 0.83 powercap 0.03 (n 110)
+  window: 8445 frames 110.0 s fps 76.79 med 10.17 p99 52.41 1%low 69.61 max 213.0 ms; >=100 3 >=250 0; at60 0.03
+  axis: first frame 4.23, draws frames.csv offset +1 (median |interval-frame_time| 0.001 ms), axis-close 0.51 s, vs input perf_rows {'n': 1, 'median': -0.464, 'max_abs': 0.464}
+(exit 0)
+
+===== E. run-matrix Add-Score3d / Get-CapCvar / Get-InputScript (AST-extracted) =====
+== smoke xenos as ship60 (cap 60 expected; smoke ran default 0)
+   capCvar 'framerate_limit=60'  input '<workspace>\harness\routes\attract-long.txt'
+   s3d VOID [cap_mismatch: expected 60, args 0] reached 78.89 start 104.5 span 120.022/133.02 fps 45.6 p99 51.896 thermal 0.7686 cap 60/0 (args) route 43/91
+   keys filled: 40/43
+== smoke native as nat60 (cap 60 expected; smoke ran 240 -> cap_mismatch expected)
+   capCvar 'native_fps_limit=60'  input '<workspace>\harness\routes\attract-long.txt'
+   s3d VOID [short_span: 115.1 s of frames after the 3D start (< 120 s); cap_mismatch: expected 60, seen 240 (frames_csv)] reached 117.89 start 121.26 span 115.069/115.07 fps 75.398 p99 53.8778 thermal 0.0 cap 60/240 (frames_csv) route 43/91
+   keys filled: 40/43
+== smoke native, no cap key (default 240 expected)
+   capCvar ''  input '<workspace>\harness\routes\attract-long.txt'
+   s3d VOID [short_span: 115.1 s of frames after the 3D start (< 120 s)] reached 117.89 start 121.26 span 115.069/115.07 fps 75.398 p99 53.8778 thermal 0.0 cap 240/240 (frames_csv) route 43/91
+   keys filled: 40/43
+(exit 0)
+
+===== F. negative validation neg1.json ({ "title": "S5 Phase 0.3 baseline: gameplay route (attract-long pad), 3D-only score, cap60 + one uncapped arm", "reference": "ship60", "warmup_from": "firstframe", "settle_s": 0, "warmup_s": 90, "measure_s": 200, "min_window_after_ff_s": 60, "repeats": 4, "order": "roundrobin", "cold_run": true, "cold_warmup_s": 10, "cold_measure_s": 30, "boot_timeout_s": 240, "close_timeout_s": 60, "cooldown_s": 10, "sys_csv": true, "input_script": "harness/routes/attract-long.txt", "gpu_log": true, "cooldown_temp_c": 20, "cooldown_timeout_s": 120, "cooldown_est_s": 45, "start3d_draws": 1500, "reach3d_draws": 600, "span3d_s": 120, "notes": [ "Every run: attract-long.txt virtual-pad route (START, A, A, then idle: the attract 3D sequence), run ends at first frame + 290 s (warm-up 90 + window 200).", "Score = score3d.py: 3D reached = first frame with \u003e= 600 draws (else VOID); window starts at the first frame with \u003e= 1500 draws (xenos ~104 s, native ~121 s after the first frame in the smoke runs) and spans 120 s of frames (short = VOID).", "Thermals: before each run wait until the GPU is below 65 C (NVML, timeout 120 s, flag cooldown_timeout); gpu.csv 1 Hz; thermal-limited share per run in results.csv (gpu_thermal_share).", "Pinned bins, never modified: devfinal2-bin MANIFEST 4A4A13ED, nativefinal2-bin MANIFEST 4E5E2620 (build/agent2/final2/BIN-PINS.md)." ], "arms": [ { "id": "ship60", "group": "base", "ref": true, "bin": "build/agent2/devfinal2-bin", "frames": "perf", "cap": 60, "note": "Xenos ship default arm, framerate_limit=60", "cvars": [ "framerate_limit=30" ] }, { "id": "nat60", "group": "base", "bin": "build/agent2/nativefinal2-bin", "frames": "native", "cap": -1, "note": "native default arm, native_fps_limit=60 (build default 240)" }, { "id": "natU", "group": "base", "bin": "build/agent2/nativefinal2-bin", "frames": "native", "cap": "x", "note": "native UNCAPPED arm, native_fps_limit=0 (device.cpp:1802 if (limit \u003c= 0) return; vsync off by default)" } ], "cooldown_temp_c2": 1 }) =====
+!!! MATRIX ERROR: arm 'ship60': cap and a framerate_limit/native_fps_limit cvar together (cap sets framerate_limit)
+!!! MATRIX ERROR: arm 'nat60': cap must be a whole number 0-1000 (0 = uncapped)
+!!! MATRIX ERROR: arm 'natU': cap must be a whole number 0-1000 (0 = uncapped)
+matrix C:\Users\<user>\.gemini\antigravity-cli\brain\c60d3f62-29a9-4de6-a5da-de6d5f94e0e0\scratch\neg1.json is not valid: nothing started
+(exit 2)
+
+===== F. negative validation neg2.json ({ "title": "S5 Phase 0.3 baseline: gameplay route (attract-long pad), 3D-only score, cap60 + one uncapped arm", "reference": "ship60", "warmup_from": "firstframe", "settle_s": 0, "warmup_s": 90, "measure_s": 200, "min_window_after_ff_s": 60, "repeats": 4, "order": "roundrobin", "cold_run": true, "cold_warmup_s": 10, "cold_measure_s": 30, "boot_timeout_s": 240, "close_timeout_s": 60, "cooldown_s": 10, "sys_csv": true, "input_script": "harness/routes/nope.txt", "gpu_log": true, "cooldown_temp_c": 65, "cooldown_timeout_s": 120, "cooldown_est_s": 45, "start3d_draws": 500, "reach3d_draws": 600, "span3d_s": 120, "notes": [ "Every run: attract-long.txt virtual-pad route (START, A, A, then idle: the attract 3D sequence), run ends at first frame + 290 s (warm-up 90 + window 200).", "Score = score3d.py: 3D reached = first frame with \u003e= 600 draws (else VOID); window starts at the first frame with \u003e= 1500 draws (xenos ~104 s, native ~121 s after the first frame in the smoke runs) and spans 120 s of frames (short = VOID).", "Thermals: before each run wait until the GPU is below 65 C (NVML, timeout 120 s, flag cooldown_timeout); gpu.csv 1 Hz; thermal-limited share per run in results.csv (gpu_thermal_share).", "Pinned bins, never modified: devfinal2-bin MANIFEST 4A4A13ED, nativefinal2-bin MANIFEST 4E5E2620 (build/agent2/final2/BIN-PINS.md)." ], "arms": [ { "id": "ship60", "group": "base", "ref": true, "bin": "build/agent2/devfinal2-bin", "frames": "perf", "cap": 60, "note": "Xenos ship default arm, framerate_limit=60" }, { "id": "nat60", "group": "base", "bin": "build/agent2/nativefinal2-bin", "frames": "native", "cap": 60, "note": "native default arm, native_fps_limit=60 (build default 240)" }, { "id": "natU", "group": "base", "bin": "build/agent2/nativefinal2-bin", "frames": "native", "cap": 0, "note": "native UNCAPPED arm, native_fps_limit=0 (device.cpp:1802 if (limit \u003c= 0) return; vsync off by default)" } ] }) =====
+!!! MATRIX ERROR: start3d_draws (500) must be >= reach3d_draws (600)
+matrix C:\Users\<user>\.gemini\antigravity-cli\brain\c60d3f62-29a9-4de6-a5da-de6d5f94e0e0\scratch\neg2.json is not valid: nothing started
+(exit 2)
+
+===== F. negative validation neg3.json ({ "title": "S5 Phase 0.3 baseline: gameplay route (attract-long pad), 3D-only score, cap60 + one uncapped arm", "reference": "ship60", "warmup_from": "firstframe", "settle_s": 0, "warmup_s": 90, "measure_s": 200, "min_window_after_ff_s": 60, "repeats": 4, "order": "roundrobin", "cold_run": true, "cold_warmup_s": 10, "cold_measure_s": 30, "boot_timeout_s": 240, "close_timeout_s": 60, "cooldown_s": 10, "sys_csv": true, "input_script": "harness/routes/nope.txt", "gpu_log": true, "cooldown_temp_c": 65, "cooldown_timeout_s": 120, "cooldown_est_s": 45, "start3d_draws": 1500, "reach3d_draws": 600, "span3d_s": 120, "notes": [ "Every run: attract-long.txt virtual-pad route (START, A, A, then idle: the attract 3D sequence), run ends at first frame + 290 s (warm-up 90 + window 200).", "Score = score3d.py: 3D reached = first frame with \u003e= 600 draws (else VOID); window starts at the first frame with \u003e= 1500 draws (xenos ~104 s, native ~121 s after the first frame in the smoke runs) and spans 120 s of frames (short = VOID).", "Thermals: before each run wait until the GPU is below 65 C (NVML, timeout 120 s, flag cooldown_timeout); gpu.csv 1 Hz; thermal-limited share per run in results.csv (gpu_thermal_share).", "Pinned bins, never modified: devfinal2-bin MANIFEST 4A4A13ED, nativefinal2-bin MANIFEST 4E5E2620 (build/agent2/final2/BIN-PINS.md)." ], "arms": [ { "id": "ship60", "group": "base", "ref": true, "bin": "build/agent2/devfinal2-bin", "frames": "perf", "cap": 60, "note": "Xenos ship default arm, framerate_limit=60" }, { "id": "nat60", "group": "base", "bin": "build/agent2/nativefinal2-bin", "frames": "native", "cap": 60, "note": "native default arm, native_fps_limit=60 (build default 240)" }, { "id": "natU", "group": "base", "bin": "build/agent2/nativefinal2-bin", "frames": "native", "cap": 0, "note": "native UNCAPPED arm, native_fps_limit=0 (device.cpp:1802 if (limit \u003c= 0) return; vsync off by default)" } ] }) =====
+!!! FATAL: arm 'ship60': input_script <workspace>\harness\routes\nope.txt not found
+!!! FATAL: arm 'nat60': input_script <workspace>\harness\routes\nope.txt not found
+!!! FATAL: arm 'natU': input_script <workspace>\harness\routes\nope.txt not found
+PlanOnly: nothing started.
+(exit 2)
+
+===== G. run-matrix -PlanOnly matrix-s5-baseline.json -ColdShared =====
+=== timing matrix: S5 Phase 0.3 baseline: gameplay route (attract-long pad), 3D-only score, cap60 + one uncapped arm ===
+matrix   <workspace>\build\agent8\s5\matrix-s5-baseline.json
+note     Every run: attract-long.txt virtual-pad route (START, A, A, then idle: the attract 3D sequence), run ends at first frame + 290 s (warm-up 90 + window 200).
+note     Score = score3d.py: 3D reached = first frame with >= 600 draws (else VOID); window starts at the sustained anchor = first frame of >= 1.0 s with every frame >= 1500 draws (M12 S5-GATES; launch clock xenos 107.98 s, native 125.49 s in the smoke runs, offsf 128.48 s) and spans 120 s of frames (short = VOID); run.json gets window_start_s + effective_cap.
+note     Thermals: before each run wait until the GPU is below 72 C (NVML, timeout 120 s, flag cooldown_timeout; idle floor was 68-71 C at P8 at 17:38, 58 C at 16:47; 3D runs 77-87 C); gpu.csv 1 Hz; thermal-limited share per run in results.csv (gpu_thermal_share).
+note     Pinned bins, never modified: devfinal2-bin MANIFEST 4A4A13ED, nativefinal2-bin MANIFEST 4E5E2620 (build/agent2/final2/BIN-PINS.md).
+settings warm-up from firstframe (boot timeout 240 s, settle 0 s); order roundrobin; close timeout 60 s; cooldown 10 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+s5       gpu.csv ON (NVML 1 Hz); cooldown until GPU < 72 C (timeout 120 s, estimate 30 s per run); 3D score: reached >= 600 draws, start >= 1500 draws, span 120 s (score3d.py; VOID if not reached or short)
+arms:
+       ship60: bin build/agent2/devfinal2-bin; frames perf; x4; warm-up 90 s; window 200 s; group base (ref); cap framerate_limit=60; input attract-long.txt
+         Xenos ship default arm, framerate_limit=60
+       nat60: bin build/agent2/nativefinal2-bin; frames native; x4; warm-up 90 s; window 200 s; group base; cap native_fps_limit=60; input attract-long.txt
+         native default arm, native_fps_limit=60 (build default 240)
+       natU: bin build/agent2/nativefinal2-bin; frames native; x4; warm-up 90 s; window 200 s; group base; cap native_fps_limit=0 (UNCAPPED); input attract-long.txt
+         native UNCAPPED arm, native_fps_limit=0 (device.cpp:1802 if (limit <= 0) return; vsync off by default)
+cold     ship60 (build/agent2/devfinal2-bin): unscored, before round 1 (warm-up 60 s, window 30 s)
+         -ColdShared: one cold run for all 2 bin(s); the other bins first launch as scored round-1 runs
+round 1  ship60 nat60 natU
+round 2  nat60 natU ship60
+round 3  natU ship60 nat60
+round 4  ship60 nat60 natU
+order    ship60 nat60 natU | nat60 natU ship60 | natU ship60 nat60 | ship60 nat60 natU
+estimate 13 runs (1 cold), about 74 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-7ZDGSRB2UCERPXGI3E7ZBYZMTH -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   15.15 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/devfinal2-bin : ok (MANIFEST.txt)
+bin        build/agent2/nativefinal2-bin : ok (MANIFEST.txt)
+screensaver none
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   13 runs, about 74 min: done around 19:01
+!!! These runs will be FUNCTIONAL ONLY (see above): their numbers are not timing results.
+PlanOnly: nothing started.
+(exit 0)
+
+===== H. RUN-WINDOW-S5.cmd dryrun =====
+[window-s5 17:47:59] S5 baseline window DRY RUN (no game); matrix <workspace>\build\agent8\s5\matrix-s5-baseline.json
+[window-s5 17:47:59] WS <workspace>; matrix sha256 86F018157F02FA29; run-matrix sha256 8D64791873696776
+# verify-bins 2026-11-25 17:47:59
+PASS <workspace>\build\agent2\devfinal2-bin: 7 rows, 7 files, 0 FAIL; MANIFEST sha256 4A4A13EDFBFF6A5F32798837A4156256A5A58A2C44579F272B5147768E50982D
+RESULT: 0 FAIL
+[window-s5 17:47:59] build\agent2\devfinal2-bin: MANIFEST sha256 4A4A13EDFBFF6A5F = pin
+# verify-bins 2026-11-25 17:47:59
+PASS <workspace>\build\agent2\nativefinal2-bin: 8 rows, 8 files, 0 FAIL; MANIFEST sha256 4E5E2620F38F7D09E064FB191BA396D7149B27A593C5158EF317CB2D9A31A163
+RESULT: 0 FAIL
+[window-s5 17:48:00] build\agent2\nativefinal2-bin: MANIFEST sha256 4E5E2620F38F7D09 = pin
+[window-s5 17:48:00] day launcher: state      waiting-for-go (since 2026-11-25 13:34:18)
+[window-s5 17:48:00] desktop exebox-7ZDGSRB2UCERPXGI3E7ZBYZMTH (hidden: not visible to the user)
+[window-s5 17:48:00] note (a real run would refuse): not on the interactive desktop (exebox-7ZDGSRB2UCERPXGI3E7ZBYZMTH)
+[window-s5 17:48:00] START 17:48:00: powershell -NoProfile -ExecutionPolicy Bypass -File <workspace>\build\agent8\s5\run-matrix.ps1 -Matrix <workspace>\build\agent8\s5\matrix-s5-baseline.json -NoPrompt -ColdShared -OutDir <workspace>\build\agent8\s5\matrix\20261125-1747 -PlanOnly
+=== timing matrix: S5 Phase 0.3 baseline: gameplay route (attract-long pad), 3D-only score, cap60 + one uncapped arm ===
+matrix   <workspace>\build\agent8\s5\matrix-s5-baseline.json
+note     Every run: attract-long.txt virtual-pad route (START, A, A, then idle: the attract 3D sequence), run ends at first frame + 290 s (warm-up 90 + window 200).
+note     Score = score3d.py: 3D reached = first frame with >= 600 draws (else VOID); window starts at the sustained anchor = first frame of >= 1.0 s with every frame >= 1500 draws (M12 S5-GATES; launch clock xenos 107.98 s, native 125.49 s in the smoke runs, offsf 128.48 s) and spans 120 s of frames (short = VOID); run.json gets window_start_s + effective_cap.
+note     Thermals: before each run wait until the GPU is below 72 C (NVML, timeout 120 s, flag cooldown_timeout; idle floor was 68-71 C at P8 at 17:38, 58 C at 16:47; 3D runs 77-87 C); gpu.csv 1 Hz; thermal-limited share per run in results.csv (gpu_thermal_share).
+note     Pinned bins, never modified: devfinal2-bin MANIFEST 4A4A13ED, nativefinal2-bin MANIFEST 4E5E2620 (build/agent2/final2/BIN-PINS.md).
+settings warm-up from firstframe (boot timeout 240 s, settle 0 s); order roundrobin; close timeout 60 s; cooldown 10 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+s5       gpu.csv ON (NVML 1 Hz); cooldown until GPU < 72 C (timeout 120 s, estimate 30 s per run); 3D score: reached >= 600 draws, start >= 1500 draws, span 120 s (score3d.py; VOID if not reached or short)
+arms:
+       ship60: bin build/agent2/devfinal2-bin; frames perf; x4; warm-up 90 s; window 200 s; group base (ref); cap framerate_limit=60; input attract-long.txt
+         Xenos ship default arm, framerate_limit=60
+       nat60: bin build/agent2/nativefinal2-bin; frames native; x4; warm-up 90 s; window 200 s; group base; cap native_fps_limit=60; input attract-long.txt
+         native default arm, native_fps_limit=60 (build default 240)
+       natU: bin build/agent2/nativefinal2-bin; frames native; x4; warm-up 90 s; window 200 s; group base; cap native_fps_limit=0 (UNCAPPED); input attract-long.txt
+         native UNCAPPED arm, native_fps_limit=0 (device.cpp:1802 if (limit <= 0) return; vsync off by default)
+cold     ship60 (build/agent2/devfinal2-bin): unscored, before round 1 (warm-up 60 s, window 30 s)
+         -ColdShared: one cold run for all 2 bin(s); the other bins first launch as scored round-1 runs
+round 1  ship60 nat60 natU
+round 2  nat60 natU ship60
+round 3  natU ship60 nat60
+round 4  ship60 nat60 natU
+order    ship60 nat60 natU | nat60 natU ship60 | natU ship60 nat60 | ship60 nat60 natU
+estimate 13 runs (1 cold), about 74 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\exebox-7ZDGSRB2UCERPXGI3E7ZBYZMTH -> FUNCTIONAL ONLY: not the interactive desktop (agent command?), timing numbers are not valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   15.07 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent2/devfinal2-bin : ok (MANIFEST.txt)
+bin        build/agent2/nativefinal2-bin : ok (MANIFEST.txt)
+screensaver none
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   13 runs, about 74 min: done around 19:01
+!!! These runs will be FUNCTIONAL ONLY (see above): their numbers are not timing results.
+PlanOnly: nothing started.
+[window-s5 17:48:01] run-matrix exit 0
+[window-s5 17:48:01] WINDOW-S5 DONE exit 0
+[window-s5] exit 0
+(exit 0)

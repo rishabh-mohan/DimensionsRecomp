@@ -1,0 +1,53 @@
+# S5 Phase 0.3 read-out commands (M12). Run AFTER the window has finished and the freeze is lifted.
+# Windows PowerShell 5.1, pasted into one session. The commands only read build\agent8\s5\matrix\<stamp>\.
+# All output goes to build\agent12\s5\p03\. Python is run through Start-Process with stdout/stderr redirected,
+# because PS 5.1 '>' writes UTF-16. Each step prints "<name> exit <code>"; every exit code should be 0 and every
+# *.err.txt should be empty.
+# Matrix: build\agent8\s5\matrix-s5-baseline.json sha8 57255790. 17 runs: 3 cold (unscored), then ship60 x4,
+# nat60 x4, n4bp60 x4, natU x2.
+
+# --- 0. setup ---
+$ws  = '<workspace>'
+$d   = "$ws\build\agent12\s5"
+$out = "$d\p03"
+New-Item -ItemType Directory -Force -Path $out | Out-Null
+$route = "$ws\harness\routes\attract-long.txt"
+# Tonight's matrix out dir: newest build\agent8\s5\matrix\<yyyyMMdd-HHmm>. CHECK the printed name (it should be
+# about 2026112x-18xx, matching window-s5's "out ..." line). If it is wrong, set $mx by hand.
+$mx = (Get-ChildItem "$ws\build\agent8\s5\matrix" -Directory | Sort-Object Name | Select-Object -Last 1).FullName
+"matrix out: $mx"
+function RunP($argList, $o) {
+    $p = Start-Process python -ArgumentList $argList -WorkingDirectory $ws -RedirectStandardOutput "$o.txt" -RedirectStandardError "$o.err.txt" -NoNewWindow -PassThru
+    $null = $p.Handle; try { $p.PriorityClass = 'Idle' } catch {}
+    $p.WaitForExit(); "$(Split-Path $o -Leaf) exit $($p.ExitCode)"
+}
+
+# --- 1. cross-check of the scored set: results.csv should have 14 scored rows (ship60 4, nat60 4, n4bp60 4, natU 2) ---
+Import-Csv "$mx\results.csv" | Group-Object scored, arm | ForEach-Object { '{0,-22} {1}' -f $_.Name, $_.Count }
+Get-ChildItem "$mx\runs" -Directory | ForEach-Object Name
+
+# --- 2. gates, once over the whole scored set. --runs-root keeps the run.json tags <arm>-r<k> and skips cold-* / warm*-*.
+# No --native-default-ok: natU passes native_fps_limit=0 explicitly.
+RunP @('-B', "$d\s5_gates.py", '--runs-root', "$mx\runs", '--span', '120', '--cap', 'auto', '--route', $route, '--json', "$out\p03-gates.json") "$out\p03-gates"
+Get-Content "$out\p03-gates.txt" -TotalCount 2           # expect "14 scored ... 3 skipped: <HHmm>-cold-ship60(cold-ship60), ..."
+Select-String -Path "$out\p03-gates.txt" -Pattern '^== ' | ForEach-Object Line   # one verdict line per scored run
+
+# --- 3. read-out: primary variant (VOID dropped) and sensitivity variant (VOID + FLAG dropped) ---
+RunP @('-B', "$d\s5_readout.py", "$out\p03-gates.json", '--ref', 'devfinal2', '--vs', 'native4bp:nativefinal2', '--json', "$out\p03-readout.json") "$out\p03-readout"
+RunP @('-B', "$d\s5_readout.py", "$out\p03-gates.json", '--ref', 'devfinal2', '--vs', 'native4bp:nativefinal2', '--exclude-flagged', '--json', "$out\p03-readout-noflag.json") "$out\p03-readout-noflag"
+
+# --- 4. optional, info only: anchor sensitivity (literal first frame >= 1500 instead of the sustained anchor) ---
+RunP @('-B', "$d\s5_gates.py", '--runs-root', "$mx\runs", '--span', '120', '--cap', 'auto', '--anchor-mode', 'first', '--route', $route, '--json', "$out\p03-gates-first.json") "$out\p03-gates-first"
+RunP @('-B', "$d\s5_readout.py", "$out\p03-gates-first.json", '--ref', 'devfinal2', '--vs', 'native4bp:nativefinal2', '--json', "$out\p03-readout-first.json") "$out\p03-readout-first"
+
+# --- 5. checks + hashes ---
+Get-ChildItem "$out\*.err.txt" | Where-Object Length -gt 0 | ForEach-Object { "NON-EMPTY: $($_.Name)" }
+Get-ChildItem $out -File | Where-Object { $_.Name -notlike '*.err.txt' } | ForEach-Object { '{0} {1}' -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash.Substring(0, 8), $_.Name }
+
+# What to read (template: READOUT-TEMPLATE-P03.md):
+#  p03-readout.txt header       gate verdicts per arm (PASS/FLAG/VOID), dropped runs with reasons
+#  "== contrast nativefinal2-bin/60 : devfinal2-bin/60"                          PRIMARY nat60 vs ship60
+#  "== contrast native4bp-bin/60 : nativefinal2-bin/60 (secondary ...)"          SECONDARY n4bp60 vs nat60
+#  "== contrast nativefinal2-bin/none : nativefinal2-bin/60 (uncapped ... info)" natU vs nat60, info
+#  "== contrast native4bp-bin/60 : devfinal2-bin/60"                             info
+#  p03-gates.txt                VOID / FLAG reasons per run (lines "  <gate> VOID|FLAG ...")

@@ -1,0 +1,25 @@
+wall,t_sidecar,game_ts,kind,detail
+09:06:19.534,1.01,,run-dir,<workspace>\build\agent3\gameplay\selftest\simruns\20261125-210000-simE
+09:06:19.534,1.01,,ctl-dir,<workspace>\build\agent3\gameplay\selftest\simruns\20261125-210000-simE\toypad-ctl
+09:06:19.534,1.01,21:00:00.000,listener,port 54263
+09:06:19.534,1.01,21:00:00.000,toypad,Toypad listener active on 127.0.0.1:54263
+09:06:19.534,1.01,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit 00 00 16 (on 0 off 0 count 1 speed 16)
+09:06:19.534,1.01,21:00:00.000,prompt,batman fire 1/2: /pad 2 mode 3 lit 00 00 (05|16)/ -> pad 2 in 0.2 s
+09:06:19.534,1.01,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit 00 00 05 (on 0 off 0 count 1 speed 16)
+09:06:19.796,1.27,,load,LOAD batman id=1 pad=2 index=0 path_len=0 -> hangup-ok (0.01 s) [prompt]
+09:06:19.796,1.27,,prompt-done,ok place batman 2: LOAD batman id=1 pad=2 index=0 path_len=0 -> hangup-ok (0.01 s)
+09:06:20.048,1.52,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 18 (on 0 off 0 count 1 speed 15)
+09:06:20.048,1.52,21:00:00.000,zone-t0,pad 3 lit FF 00 18 speed 15 after the prompts
+09:06:20.048,1.52,21:00:00.000,zone,step 1 pad 3 wants wyldstyle: T0 + 1 s; first command in 1.0 s
+09:06:21.053,2.53,,zone,step 1 pad 3 plan: place wyldstyle 3
+09:06:21.072,2.55,,load,LOAD wyldstyle id=3 pad=3 index=2 path_len=0 -> hangup-ok (0.02 s) [zone]
+09:06:21.072,2.55,,zone,step 1 ok: place wyldstyle 3 -> LOAD wyldstyle id=3 pad=3 index=2 path_len=0 -> hangup-ok (0.02 s)
+09:06:23.090,4.57,,zone,step 1 pad 3: no handoff 2 s after the last LOAD: retry
+09:06:23.102,4.58,,remove,REMOVE wyldstyle pad=3 index=2 -> hangup-ok [zone]
+09:06:23.102,4.58,,zone,step 1 ok: remove wyldstyle -> REMOVE wyldstyle pad=3 index=2 -> hangup-ok
+09:06:23.626,5.10,,load,LOAD wyldstyle id=3 pad=3 index=2 path_len=0 -> hangup-ok (0.02 s) [zone]
+09:06:23.626,5.10,,zone,step 1 ok: place wyldstyle 3 -> LOAD wyldstyle id=3 pad=3 index=2 path_len=0 -> hangup-ok (0.02 s)
+09:06:25.641,7.12,,zone-stop,step 1 pad 3: no handoff 2 s after the retry
+09:06:25.892,7.37,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 6E 18 (on 0 off 0 count 1 speed 15)
+09:06:26.908,8.39,,end,run-game finished (summary.json)
+09:06:26.908,8.39,,result,"listener=True boot=none trigger=False placed=True load-confirms=0 then=off remove-confirms=0 prompts=batman:1/1 ctl=0 done/0 err route=0 ok/0 err zone=stopped: step 1 pad 3: no handoff 2 s after the retry (step 1) zone-skips=0 alerts=0 shots=0 slots: batman pad=2 index=0, wyldstyle pad=3 index=2"

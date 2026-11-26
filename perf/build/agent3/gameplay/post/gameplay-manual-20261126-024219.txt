@@ -1,0 +1,46 @@
+== arm native: run <workspace>\build\agent3\gameplay\runs\20261126-024219-gpman-native
+PASS native clean exit: exit 0x00000000 early False close wm_close 1.03 s wer False crash 0 dumps 0
+INFO native desktop Default elapsed 1201.1 s peak_ws 2896 MB exe FA761654D665BC92 steps None/None stopped_by_script None error None
+INFO native input.csv 0 rows, perf.csv 56961 frames, game.log 9200 lines
+INFO native native fingerprint 39129c4c059be5f0
+FAIL native input.csv: 0 rows
+PASS native long waits: 0 of 0 ok
+INFO native front-end state path: none@02:42:23.9 > 7@02:42:51.8 > 0@02:45:18.2 > 12@02:48:22.3 > 58@02:49:15.6 > 40@02:49:15.7 > 13@02:49:15.8 > 35@02:49:36.3 > 0@02:49:36.4 > 17@02:50:25.8 > 34@02:50:52.3 > 40@02:50:52.7 > 47@02:50:54.2 > 49@02:51:16.2 > 52@02:51:21.4 > 53@02:51:25.2 > 54@02:51:26.2 > 55@02:51:49.1 > 0@02:52:12.0
+INFO native level / player control: no reliable marker yet (the orange FF 6E 00 LED cycle is the title screen); furthest front-end state 0; last mark - - check the screenshots
+    n      t_s mark             FE  draws    verts  fps worst_ms LED                  loglns shot
+PASS native toypad tags: listener LOAD 16 REMOVE 13; game saw figure added 3 removed 0
+INFO native stalls (frames > 100 ms): 245 total, no in-level mark
+    frame 56478: 692.0 ms (after mark start)
+    frame 52710: 506.8 ms (after mark start)
+    frame 53734: 470.1 ms (after mark start)
+    frame 12903: 444.4 ms (after mark start)
+    frame 53735: 417.9 ms (after mark start)
+    frame 56477: 415.6 ms (after mark start)
+    frame 55416: 388.8 ms (after mark start)
+    frame 53731: 387.3 ms (after mark start)
+    frame 53732: 373.2 ms (after mark start)
+    frame 30819: 355.9 ms (after mark start)
+INFO native fps whole run: median 59.8, p1 13.3 (56960 frames; functional run, not timing)
+CHECK native missing draws (native trace, whole run): 194277 events in 30964 of 56960 frames
+    VS guest 2890185828: 51832
+    PS guest 2820545584: 25882
+    VS guest 2890458260: 25595
+    VS guest 2818197424: 14625
+    VS guest 2813745104: 13942
+    PS guest 2890512632: 8049
+    PS guest 2820565024: 7756
+    PS guest 2820531248: 6413
+INFO native warning/error line types: 11 (184 lines)
+    [warning] [krnl] [NtCreateFile] FAILED: path='d:\INSTALL#_#.DAT' -> #x# x136
+    [warning] [core] Native GPU: unrecognized vertex shader resource #x# x16
+    [warning] [core] Native GPU: completion callback GPU wait took #.# ms x11
+    [warning] [core] Native GPU: placement vertex shader #x# backing #x# prefix=#x# words=# # # # missing from AOT index x8
+    [warning] [krnl] __imp__XNetLogonGetTitleID STUB x4
+    [warning] [core] Native GPU: shader not present in AOT cache, hash=#x# x2
+    [warning] [krnl] Stub XFileFsDeviceInformation! x2
+    [warning] [krnl] IoDismountVolumeByFileHandle(#x#) - stub x2
+    [warning] [krnl] [NtCreateFile] FAILED: path='d:\INSTALL#_#.HDR' -> #x# x1
+    [warning] [krnl] __imp__XamBackgroundDownloadSetMode STUB x1
+    [warning] [krnl] [NtCreateFile] FAILED: path='ttappdata:\GUI#\CONFIG.XML' -> #x# x1
+PASS native screenshots: 0 in -
+RESULT: FAIL: native input.csv

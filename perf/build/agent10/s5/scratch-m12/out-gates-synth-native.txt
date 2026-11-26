@@ -1,0 +1,14 @@
+# s5_gates: span 110 s, anchor >= 1500 draws, 3D >= 600, cap none, margin 2 s
+
+== final2-3d-native [native] verdict VOID
+  clean    PASS   exit 0, wm_close 0.89 s, no WER/dump
+  cold     PASS   seed_xenos null (cold)
+  3d       VOID   no frame >= 600 draws
+  span     VOID   no anchor, no window
+  input    PASS   presses 3 ok, none in window; steps 43/91 (halted), last step t 241.0
+  cooldown FLAG   no cooldown record in run.json (first gpu.csv temp 70.0 C)
+  thermal  NODATA no window
+  host     NODATA no sys.csv (host-busy, battery, foreground, user input unknown)
+  cap      NODATA no window frames
+  align    PASS   ok
+  axis: first frame 4.23, draws perf.csv, axis-close 0.51 s, vs input perf_rows {'n': 1, 'median': -0.464, 'max_abs': 0.464}

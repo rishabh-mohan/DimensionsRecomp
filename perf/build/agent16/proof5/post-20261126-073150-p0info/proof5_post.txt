@@ -1,0 +1,56 @@
+proof5_post.py sha256 B2B920DC4B8E5E8B855FE995B0EEC8324967B2C8EF37D9C7438D853C13EDE99D
+base trace   F98BF46E04364572CD636A4DF5F6DF2D9DF0A243E7B7E79319E1E11D03756E09 <workspace>\build\agent3\gameplay\trace-native-20261126-054546\events.tsv
+cand trace   40060326FA9A2E860705AA60BCE9DAE6A0D2CC72A674F2BC90CB8962C2AB31CA <workspace>\build\agent3\gameplay\trace-native5-20261126-073150\events.tsv
+base log     4A53519F48B29F04A9568F0B3C25FF4BC84D6509EB8DD1A36F5CA88F648C2D69 <workspace>\build\agent3\gameplay\runs\20261126-054551-gp-native\game.log
+cand log     52574F8573C1943F8BD9AFF21B82818D9647D5D0258D25CC400C322307C57B5C <workspace>\build\agent3\gameplay\runs\20261126-073156-gp5-native\game.log
+cand post    590FB347974DD70B6390E73B5947C135FFAD1296C1457B8C5F940BC5C2343871 <workspace>\build\agent3\gameplay\post\gameplay-20261126-073150.txt
+cand runlog  E04C6695A98304B9744E16902E64009A991C55735B7C55063011F90857882F42 <workspace>\build\agent3\gameplay\logs\gameplay-20261126-073150.txt
+cand sidecar B1F9FB5F661F0CCEF0F2EAFDA27A688308213075F269923DEF0A9FB41AB08A69 <workspace>\build\agent3\gameplay\logs\20261126-073150-native.sidecar.out.txt
+targets      9C18525029FE333D163D34671412A729682B19C85ECF1A09D61DAC13251FB39C <workspace>\build\agent16\pack\DUMP-TARGETS-story.txt
+fingerprint base 39129c4c059be5f0 in game.log: True
+fingerprint cand a349d5292f67b127 in game.log: True
+frames ratio cand/base: 37536 / 40881 = 0.918 (OK; must be within +-10%)
+route completion (cand): OK; clean exit 0 yes; steps 302/302 yes; stop reached (last: done) yes; title gate HIT yes; prompts 3/3 yes; ctl 0 yes; kit exits 0 yes
+base: frames 40881; missing draws 220710 (VS 134404, PS 86306); per 1000 frames 5398.8; missed guests 46; keys 16; miss-cache inserts 64
+cand: frames 37536; missing draws 1649 (VS 1649, PS 0); per 1000 frames 43.9; missed guests 3; keys 1; miss-cache inserts 6
+
+STABLE targets (by address; base -> cand missing draws)
+  PS AC493354      10 ->       0  FIXED
+  PS AC493C6C    2401 ->       0  FIXED
+  PS AC4945A8    2411 ->       0  FIXED
+  PS AC4974EC    2411 ->       0  FIXED
+  PS AC49B8F8    9095 ->       0  FIXED
+  PS AC53D0AC   12997 ->       0  FIXED
+  PS AC54327C     367 ->       0  FIXED
+  PS AC544B3C     780 ->       0  FIXED
+  PS AC556A1C    1233 ->       0  FIXED
+  PS AC5AB10C       0 ->       0  not-in-base
+  VS AC44BC64   38316 ->       0  FIXED
+  VS AC44EF40    1222 ->       0  FIXED
+  VS AC471F18     994 ->       0  FIXED
+  VS AC48CC80     347 ->       0  FIXED
+  VS AC48E494   30604 ->       0  FIXED
+  VS AC5AB248    4822 ->       0  FIXED
+
+FIXED (base keys gone in cand): 15 keys, 144196 cand-or-base draws
+  PS C77B3ABB6F87ACD9 base   65012 cand       0  guests base A81DE360,A81E1B60,A81E6750,A83F85F0,AB131AA0,AC493354,AC493C6C,AC4945A8,AC4974EC,AC53D0AC,AC54327C,AC544B3C,AC556A1C cand -
+  VS 5BB4C8029EB256F2 base   38316 cand       0  guests base AC44BC64 cand -
+  VS @A7FA6480 base   17056 cand       0  guests base A7FA6480 cand -
+  PS E5F38732B2606C55 base    9095 cand       0  guests base AC49B8F8 cand -
+  PS @AAE1D4C0 base    8579 cand       0  guests base AAE1D4C0 cand -
+  PS @AADFFED0 base    2352 cand       0  guests base AADFFED0 cand -
+  PS @AB1755A0 base    1268 cand       0  guests base AB1755A0 cand -
+  VS @A7B566B0 base    1154 cand       0  guests base A7B566B0 cand -
+  VS 98D43959C65B882A base     994 cand       0  guests base AC471F18 cand -
+  VS @A7B6FD70 base     248 cand       0  guests base A7B6FD70 cand -
+  VS @A7B639E0 base      52 cand       0  guests base A7B639E0 cand -
+  VS @A7B51B30 base      48 cand       0  guests base A7B51B30 cand -
+  VS @A7B76ED0 base      12 cand       0  guests base A7B76ED0 cand -
+  VS @A7B5DCF0 base       6 cand       0  guests base A7B5DCF0 cand -
+  VS @A7B549A0 base       4 cand       0  guests base A7B549A0 cand -
+REMAIN (in both): 1 keys, 1649 cand-or-base draws
+  VS C77B3ABB6F87ACD9 base   76514 cand    1649  guests base A7B09640,A7B0D210,A7B52A30,A7B5EC20,A7B5FAB0,A7B61CD0,A7B62B10,A7B65280,A7B65EE0,A7B9C330,A7B9E4F0,A7B9EFD0,A7FA8030,A842F580,AACF5C90,AC44EF40,AC48CC80,AC48E494,AC5AB248 cand A7F7A100,AB64C0E0,AB80F350
+NEW (cand only, prefix-keyed): 0 keys, 0 cand-or-base draws
+NEW @-keyed (cand only, no insert event: possibly REMAIN): 0 keys, 0 cand-or-base draws
+
+RESULT: PASS (per 1000 frames 5398.8 -> 43.9; all base-missed STABLE targets fixed; keys fixed 15, remain 1, new 0, new @-keyed 0)

@@ -1,0 +1,30 @@
+PASS tool pin build\agent2\session3\verify-bins.py 80FF4C5F
+PASS tool pin build\agent2\final\pe-check.py F4368C32
+PASS C1 verify-bins native6pack-bin (exit 0) RESULT: 0 FAIL
+PASS C2 verify-bins native4bp-bin + nativefinal2-bin + native5pack-bin (exit 0) RESULT: 0 FAIL
+PASS C3 pinned build\agent16\pack\native4bp-bin\MANIFEST.txt = C5181520 (got C5181520)
+PASS C3 pinned build\agent16\pack\native4bp-bin\legodimensions.exe = FA761654 (got FA761654)
+PASS C3 pinned build\agent16\pack\native5pack-bin\MANIFEST.txt = 787CD694 (got 787CD694)
+PASS C3 pinned build\agent16\pack\native5pack-bin\legodimensions.exe = 90BF6B45 (got 90BF6B45)
+PASS C3 pinned build\agent2\nativefinal2-bin\MANIFEST.txt = 4E5E2620 (got 4E5E2620)
+PASS C3 pinned build\agent16\pack\LATEST-pack.txt = AC7B9053 (got AC7B9053)
+PASS C3 pinned build\agent16\pack\LATEST-bin.txt = 76D0EFB9 (got 76D0EFB9)
+PASS C4 pe-check native6pack exe vs nf2 exe (exit 0) RESULT: PASS
+PASS C4 pe-check native6pack exe vs native4bp exe (exit 0) RESULT: PASS
+PASS C4 pe-check native6pack exe vs native5pack exe (exit 0) RESULT: PASS
+PASS C5 MANIFEST fingerprint e5c874ca2b87a59d is new
+PASS C5 exe contains e5c874ca2b87a59d
+PASS C5 exe lacks 1616ce65e973c583
+PASS C5 exe lacks 39129c4c059be5f0
+PASS C5 exe lacks a349d5292f67b127
+PASS C6 file set = nativefinal2-bin (8 files)
+PASS C6 FiraSans-Regular.ttf identical to nf2
+PASS C6 TracyClient.dll identical to nf2
+PASS C6 achievement_unlocked.wav identical to nf2
+PASS C6 amd_fidelityfx_dx12.dll identical to nf2
+PASS C6 legodimensions.exe differs from nf2, native4bp and native5pack
+PASS C6 legodimensions.map differs from nf2, native4bp and native5pack
+PASS C6 rexgpu-xenos.dll identical to nf2
+PASS C6 rexruntime.dll identical to nf2
+RESULT: PASS
+report <workspace>\build\agent16\pack\native6pack-check-20261126-085733\native6pack-check.txt 2F4C4723DB848B0999430BE7036C157CAA5C1BBDD0CAF201E18BDD7FBADD33B4

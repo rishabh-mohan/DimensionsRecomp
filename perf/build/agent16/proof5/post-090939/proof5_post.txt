@@ -1,0 +1,41 @@
+proof5_post.py sha256 B2B920DC4B8E5E8B855FE995B0EEC8324967B2C8EF37D9C7438D853C13EDE99D
+base trace   40060326FA9A2E860705AA60BCE9DAE6A0D2CC72A674F2BC90CB8962C2AB31CA <workspace>\build\agent3\gameplay\trace-native5-20261126-073150\events.tsv
+cand trace   E485AC67B69CB6FD5246EEF32074D604613ABB5D7C8C8FA6003ECF57A23A2F28 <workspace>\build\agent3\gameplay\trace-native6-20261126-090939\events.tsv
+base log     52574F8573C1943F8BD9AFF21B82818D9647D5D0258D25CC400C322307C57B5C <workspace>\build\agent3\gameplay\runs\20261126-073156-gp5-native\game.log
+cand log     C4C9C851DE7FF0134FD31C21F5CD837513CB4899A40B616F280766CCE5F962EB <workspace>\build\agent3\gameplay\runs\20261126-090944-gp6-native\game.log
+cand post    6C2A8CE3450EB92AE53B46673EB8391A8CA6EAFAE65F22F74180E256ADB23588 <workspace>\build\agent3\gameplay\post\gameplay-20261126-090939.txt
+cand runlog  D80BF3B21B039F09DAB40F5B67656BDB91833FD02D1A655BB77D9406906BA936 <workspace>\build\agent3\gameplay\logs\gameplay-20261126-090939.txt
+cand sidecar 485D3461326404140797BAF429F3C7C34E58C73A8B005A20C133CD39CE53646F <workspace>\build\agent3\gameplay\logs\20261126-090939-native.sidecar.out.txt
+targets      9C18525029FE333D163D34671412A729682B19C85ECF1A09D61DAC13251FB39C <workspace>\build\agent16\pack\DUMP-TARGETS-story.txt
+fingerprint base a349d5292f67b127 in game.log: True
+fingerprint cand e5c874ca2b87a59d in game.log: True
+frames ratio cand/base: 37232 / 37536 = 0.992 (OK; must be within +-10%)
+route completion (cand): OK; clean exit 0 yes; steps 302/302 yes; stop reached (last: done) yes; title gate HIT yes; prompts 3/3 yes; ctl 0 yes; kit exits 0 yes
+base: frames 37536; missing draws 1649 (VS 1649, PS 0); per 1000 frames 43.9; missed guests 3; keys 1; miss-cache inserts 6
+cand: frames 37232; missing draws 0 (VS 0, PS 0); per 1000 frames 0.0; missed guests 0; keys 0; miss-cache inserts 0
+
+STABLE targets (by address; base -> cand missing draws)
+  PS AC493354       0 ->       0  not-in-base
+  PS AC493C6C       0 ->       0  not-in-base
+  PS AC4945A8       0 ->       0  not-in-base
+  PS AC4974EC       0 ->       0  not-in-base
+  PS AC49B8F8       0 ->       0  not-in-base
+  PS AC53D0AC       0 ->       0  not-in-base
+  PS AC54327C       0 ->       0  not-in-base
+  PS AC544B3C       0 ->       0  not-in-base
+  PS AC556A1C       0 ->       0  not-in-base
+  PS AC5AB10C       0 ->       0  not-in-base
+  VS AC44BC64       0 ->       0  not-in-base
+  VS AC44EF40       0 ->       0  not-in-base
+  VS AC471F18       0 ->       0  not-in-base
+  VS AC48CC80       0 ->       0  not-in-base
+  VS AC48E494       0 ->       0  not-in-base
+  VS AC5AB248       0 ->       0  not-in-base
+
+FIXED (base keys gone in cand): 1 keys, 1649 cand-or-base draws
+  VS C77B3ABB6F87ACD9 base    1649 cand       0  guests base A7F7A100,AB64C0E0,AB80F350 cand -
+REMAIN (in both): 0 keys, 0 cand-or-base draws
+NEW (cand only, prefix-keyed): 0 keys, 0 cand-or-base draws
+NEW @-keyed (cand only, no insert event: possibly REMAIN): 0 keys, 0 cand-or-base draws
+
+RESULT: PASS (per 1000 frames 43.9 -> 0.0; all base-missed STABLE targets fixed; keys fixed 1, remain 0, new 0, new @-keyed 0)

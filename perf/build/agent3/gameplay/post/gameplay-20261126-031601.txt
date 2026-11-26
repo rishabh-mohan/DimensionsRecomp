@@ -1,0 +1,114 @@
+== arm native: run <workspace>\build\agent3\gameplay\runs\20261126-031607-gpexp-native
+PASS native clean exit: exit 0x00000000 early False close wm_close 0.79 s wer False crash 0 dumps 0
+INFO native desktop Default elapsed 1499.99 s peak_ws 2415 MB exe FA761654D665BC92 steps 236/236 stopped_by_script True error None
+INFO native input.csv 238 rows, perf.csv 85116 frames, game.log 6717 lines
+PASS native fingerprint: 39129c4c059be5f0 (expected 39129c4c059be5f0)
+PASS native input.csv: 238 rows
+  wait line 10 current=7 pending=4294967295 120                 ok after 27.4 s: [2026-11-26 03:16:40.62
+  wait line 14 Toypad: pad 3 mode 1 lit FF FF FF 25             ok after 0.0 s: [2026-11-26 03:16:42.951
+  wait line 16 Toypad listener: LOAD -> pad=3 20                ok after 3.7 s: [2026-11-26 03:16:47.163
+  wait line 34 current=12 pending=4294967295 420                ok after 136.9 s: [2026-11-26 03:20:04.7
+  wait line 42 current=0 pending=4294967295 20                  TIMEOUT after 20.1 s
+  wait line 52 current=17 pending=4294967295 20                 TIMEOUT after 20.0 s
+  wait line 67 current=54 pending=4294967295 20                 TIMEOUT after 20.1 s
+  wait line 79 Toypad listener: LOAD -> pad=2 240               TIMEOUT after 240.0 s
+  wait line 83 Toypad listener: LOAD -> pad=3 240               TIMEOUT after 240.0 s
+  wait line 87 Toypad listener: LOAD -> pad=1 240               TIMEOUT after 240.0 s
+FAIL native long waits: 4 of 10 ok
+INFO native front-end state path: none@03:16:12.7 > 7@03:16:40.6 > 0@03:17:00.4 > 12@03:20:04.7 > 58@03:37:52.3 > 40@03:37:52.5 > 13@03:37:52.6 > 35@03:37:58.1 > 0@03:37:58.2 > 17@03:39:23.8 > 19@03:39:34.2 > 17@03:39:37.0 > 0@03:39:47.4 > 17@03:39:50.3 > 23@03:40:00.7 > 17@03:40:03.6 > 34@03:40:14.0 > 40@03:40:14.4 > 47@03:40:15.9 > 17@03:40:16.8 > 19@03:40:27.3 > 17@03:40:30.1 > 0@03:40:40.5 > 17@03:40:43.4 > 23@03:40:53.7 > 17@03:40:56.6
+INFO native level / player control: no reliable marker yet (the orange FF 6E 00 LED cycle is the title screen); furthest front-end state 17; last mark end - check the screenshots
+    n      t_s mark             FE  draws    verts  fps worst_ms LED                  loglns shot
+    1     5.22 first-frame    none    n/a      n/a   63     17.2 -                      385 native-001-first-frame.jpg
+    2    34.61 install-prompt    7    n/a      n/a   60     17.8 pad0 m1 FF FF FF       133 native-002-install-prompt.jpg
+    3    35.44 pads-white        7    n/a      n/a   60     16.9 pad1 m1 FF FF FF        79 native-003-pads-white.jpg
+    4    39.13 tags-placed       7    n/a      n/a   60     17.2 pad1 m1 FF FF FF        20 native-004-tags-placed.jpg
+    5    79.84 intro-start       0    n/a      n/a   60    223.4 pad1 m3 99 42 0E       818 native-005-intro-start.jpg
+    6    99.84 intro-20          0    n/a      n/a   38     55.5 pad1 m3 99 42 0E        30 native-006-intro-20.jpg
+    7   239.75 title            12    n/a      n/a   60    395.4 pad1 m3 00 6E 00      1463 native-007-title.jpg
+    8   257.64 press-start      12    n/a      n/a   60     37.7 pad1 m3 FF 00 18       114 native-008-press-start.jpg
+    9   281.55 updates-panel    12    n/a      n/a   50    357.1 pad1 m3 FF 6E 00       105 native-009-updates-panel.jpg
+   10   300.39 store-notice     12    n/a      n/a   56     33.3 pad1 m3 FF 00 18        66 native-010-store-notice.jpg
+   11   327.10 main-menu        12    n/a      n/a   60     39.2 pad1 m3 00 6E 18        88 native-011-main-menu.jpg
+   12   328.87 menu-newgame     12    n/a      n/a   60     19.7 pad1 m3 00 00 18         4 native-012-menu-newgame.jpg
+   13   347.78 ng-slots         12    n/a      n/a   60     27.4 pad1 m3 00 6E 00        65 native-013-ng-slots.jpg
+   14   366.62 ng-confirm       12    n/a      n/a   60     28.8 pad1 m3 FF 00 00        65 native-014-ng-confirm.jpg
+   15   390.52 ng-autosave      12    n/a      n/a   60     28.6 pad1 m3 00 6E 00        80 native-015-ng-autosave.jpg
+   16   409.36 ng-toypad        12    n/a      n/a   60     47.2 pad1 m3 FF 00 18        60 native-016-ng-toypad.jpg
+   17   428.20 story-00         12    n/a      n/a   60     36.9 pad1 m3 00 6E 18        65 native-017-story-00.jpg
+   18   668.24 s-batman         12    n/a      n/a   60     54.8 pad1 m3 FF 00 18       679 native-018-s-batman.jpg
+   19   678.24 s-batman-10      12    n/a      n/a   60     17.7 pad1 m3 FF 6E 00        24 native-019-s-batman-10.jpg
+   20   918.29 s-gandalf        12    n/a      n/a   60    227.5 pad1 m3 00 6E 18       604 native-020-s-gandalf.jpg
+   21   928.30 s-gandalf-10     12    n/a      n/a   60     17.9 pad1 m3 FF 00 00        27 native-021-s-gandalf-10.jpg
+   22  1168.30 s-wyldstyle      12    n/a      n/a   60     22.6 pad1 m3 00 6E 00       604 native-022-s-wyldstyle.jpg
+   23  1178.31 s-wyldstyle-10   12    n/a      n/a   60     17.6 pad1 m3 00 00 18        25 native-023-s-wyldstyle-10.jpg
+   24  1188.32 o-01             12    n/a      n/a   60     24.1 pad1 m3 FF 00 00        24 native-024-o-01.jpg
+   25  1198.34 o-02             12    n/a      n/a   60     17.7 pad1 m3 00 6E 18        27 native-025-o-02.jpg
+   26  1208.35 o-03             12    n/a      n/a   60     17.7 pad1 m3 FF 00 18        24 native-026-o-03.jpg
+   27  1218.35 o-04             12    n/a      n/a   60     19.0 pad1 m3 FF 6E 00        24 native-027-o-04.jpg
+   28  1228.37 o-05             12    n/a      n/a   60     18.1 pad1 m3 00 00 18        27 native-028-o-05.jpg
+   29  1238.38 o-06             12    n/a      n/a   60     17.6 pad1 m3 FF 00 00        24 native-029-o-06.jpg
+   30  1248.39 o-07             12    n/a      n/a   60     17.9 pad1 m3 00 6E 00        25 native-030-o-07.jpg
+   31  1258.40 o-08             12    n/a      n/a   60     18.1 pad1 m3 FF 00 18        27 native-031-o-08.jpg
+   32  1268.41 o-09             12    n/a      n/a   60     18.0 pad1 m3 FF 6E 00        24 native-032-o-09.jpg
+   33  1278.42 o-10             12    n/a      n/a   60     17.8 pad1 m3 00 6E 18        24 native-033-o-10.jpg
+   34  1288.43 o-11             12    n/a      n/a   60     17.7 pad1 m3 FF 00 00        27 native-034-o-11.jpg
+   35  1298.44 o-12             12    n/a      n/a   60     17.6 pad1 m3 00 6E 00        24 native-035-o-12.jpg
+   36  1304.27 p01-a            12    n/a      n/a   60     17.6 pad1 m3 FF 6E 00        15 native-036-p01-a.jpg
+   37  1310.09 p02-start        13    n/a      n/a   60     17.8 pad1 m3 FF 00 00        34 native-037-p02-start.jpg
+   38  1315.93 p03-b             0    n/a      n/a   60     24.7 pad1 m3 FF 00 18        36 native-038-p03-b.jpg
+   39  1322.95 p04-hold-y        0    n/a      n/a   60     18.0 pad1 m3 FF 00 18        18 native-039-p04-hold-y.jpg
+   40  1329.77 a-01              0    n/a      n/a   60     55.4 pad1 m3 00 00 18        22 native-040-a-01.jpg
+   41  1336.62 a-02              0    n/a      n/a   59     22.8 pad1 m3 00 00 18        18 native-041-a-02.jpg
+   42  1343.45 a-03              0    n/a      n/a   60     19.8 pad1 m3 00 00 18        18 native-042-a-03.jpg
+   43  1350.28 a-04              0    n/a      n/a   60     17.9 pad1 m3 00 6E 18        15 native-043-a-04.jpg
+   44  1357.11 a-05              0    n/a      n/a   60     17.6 pad1 m3 00 6E 18        18 native-044-a-05.jpg
+   45  1363.96 a-06              0    n/a      n/a   60     17.7 pad1 m3 00 6E 18        18 native-045-a-06.jpg
+   46  1370.79 a-07              0    n/a      n/a   60     17.6 pad1 m3 00 6E 00        15 native-046-a-07.jpg
+   47  1377.63 a-08              0    n/a      n/a   60     18.8 pad1 m3 00 6E 00        18 native-047-a-08.jpg
+   48  1377.63 v-replace         0    n/a      n/a   60      0.0 pad1 m3 00 6E 00         0 native-048-v-replace.jpg
+   49  1387.63 r-01              0    n/a      n/a   60     18.6 pad1 m3 00 00 18        30 native-049-r-01.jpg
+   50  1390.90 w01-a             0    n/a      n/a   60     18.2 pad1 m3 FF 6E 00         9 native-050-w01-a.jpg
+   51  1397.25 w01-b            17    n/a      n/a   52     35.4 pad1 m3 FF 00 00        53 native-051-w01-b.jpg
+   52  1404.17 w02-a            17    n/a      n/a   60     20.8 pad1 m3 FF 00 00        23 native-052-w02-a.jpg
+   53  1410.50 w02-b            17    n/a      n/a   60     26.6 pad1 m3 FF 00 00        49 native-053-w02-b.jpg
+   54  1417.41 w03-a            17    n/a      n/a   60     22.3 pad1 m3 FF 00 18        21 native-054-w03-a.jpg
+   55  1423.77 w03-b            17    n/a      n/a   37     62.4 pad1 m3 FF 00 18        87 native-055-w03-b.jpg
+   56  1430.69 w04-a            17    n/a      n/a   60     24.7 pad1 m3 00 00 18        19 native-056-w04-a.jpg
+   57  1437.03 w04-b            17    n/a      n/a   60     23.7 pad1 m3 00 00 18        29 native-057-w04-b.jpg
+   58  1443.93 w05-a            17    n/a      n/a   60     20.4 pad1 m3 00 6E 18        21 native-058-w05-a.jpg
+   59  1450.30 w05-b            17    n/a      n/a   60     21.9 pad1 m3 00 6E 18        38 native-059-w05-b.jpg
+   60  1457.21 w06-a            17    n/a      n/a   60     32.2 pad1 m3 00 6E 00        19 native-060-w06-a.jpg
+   61  1463.57 w06-b            17    n/a      n/a   60     24.9 pad1 m3 00 6E 00        49 native-061-w06-b.jpg
+   62  1470.48 w07-a            17    n/a      n/a   60     26.9 pad1 m3 00 6E 00        24 native-062-w07-a.jpg
+   63  1476.80 w07-b            17    n/a      n/a   53    108.6 pad1 m3 FF 6E 00        22 native-063-w07-b.jpg
+   64  1483.71 w08-a            17    n/a      n/a   60     19.6 pad1 m3 FF 6E 00        21 native-064-w08-a.jpg
+   65  1490.06 w08-b            17    n/a      n/a   58     35.0 pad1 m3 FF 00 00        27 native-065-w08-b.jpg
+   66  1498.72 end              17    n/a      n/a   60     25.2 pad1 m3 FF 6E 00        25 native-066-end.jpg
+PASS native toypad tags: listener LOAD 6 REMOVE 3; game saw figure added 3 removed 0
+INFO native stalls (frames > 100 ms): 100 total, no in-level mark
+    frame 10150: 395.4 ms (after mark intro-20)
+    frame 12135: 357.1 ms (after mark press-start)
+    frame 5410: 252.2 ms (after mark intro-20)
+    frame 37428: 227.5 ms (after mark s-batman-10)
+    frame 3155: 223.4 ms (after mark tags-placed)
+    frame 9901: 211.5 ms (after mark intro-20)
+    frame 9962: 208.7 ms (after mark intro-20)
+    frame 9924: 199.8 ms (after mark intro-20)
+    frame 9961: 199.6 ms (after mark intro-20)
+    frame 9919: 194.5 ms (after mark intro-20)
+INFO native fps whole run: median 59.9, p1 24.3 (85115 frames; functional run, not timing)
+CHECK native missing draws (native trace, whole run): 120366 events in 11353 of 85115 frames
+    VS guest 2890185828: 120366
+INFO native warning/error line types: 10 (170 lines)
+    [warning] [krnl] [NtCreateFile] FAILED: path='d:\INSTALL#_#.DAT' -> #x# x136
+    [warning] [core] Native GPU: unrecognized vertex shader resource #x# x16
+    [warning] [core] Native GPU: placement vertex shader #x# backing #x# prefix=#x# words=# # # # missing from AOT index x8
+    [warning] [core] Native GPU: shader not present in AOT cache, hash=#x# x2
+    [warning] [krnl] Stub XFileFsDeviceInformation! x2
+    [warning] [krnl] IoDismountVolumeByFileHandle(#x#) - stub x2
+    [warning] [krnl] [NtCreateFile] FAILED: path='d:\INSTALL#_#.HDR' -> #x# x1
+    [warning] [krnl] __imp__XamBackgroundDownloadSetMode STUB x1
+    [warning] [krnl] [NtCreateFile] FAILED: path='ttappdata:\GUI#\CONFIG.XML' -> #x# x1
+    [warning] [krnl] __imp__XNetLogonGetTitleID STUB x1
+PASS native screenshots: 66 in <workspace>\build\agent3\gameplay\shots\20261126-031601
+RESULT: FAIL: native long waits

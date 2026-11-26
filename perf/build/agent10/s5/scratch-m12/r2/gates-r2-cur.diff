@@ -1,0 +1,63 @@
+diff --git a/build/agent10/s5/scratch-m12/r2/s5_gates.py b/build/agent10/s5/scratch-m12/r2/cur/s5_gates.py
+index bad8d6c..998d5e5 100644
+--- a/build/agent10/s5/scratch-m12/r2/s5_gates.py
++++ b/build/agent10/s5/scratch-m12/r2/cur/s5_gates.py
+@@ -35,5 +35,5 @@ Usage:  python -B s5_gates.py RUN_DIR [RUN_DIR ...] [--span 120] [--cap 60|none|
+ Stdlib only.
+ """
+-import argparse, csv, json, math, os, statistics, sys, tempfile
++import argparse, csv, json, math, os, re, statistics, sys, tempfile
+ 
+ THERMAL_BITS = 0x20 | 0x40          # SwThermalSlowdown | HwThermalSlowdown
+@@ -672,4 +672,26 @@ def parser():
+ 
+ # ---------------- selftest ----------------
++def scored_dirs(root, a):
++    """Subdirs of a run-matrix runs\\ folder whose run.json tag matches a.scored_tag (dir names are <HHmm>-<tag>, plus
++    -r<i> on a name collision, so the tag is read from run.json, not parsed from the dir name). Sets a.skipped."""
++    rx = re.compile(a.scored_tag)
++    keep, a.skipped = [], []
++    for name in sorted(os.listdir(root)):
++        d = os.path.join(root, name)
++        if not os.path.isdir(d):
++            continue
++        tag = None
++        try:
++            with open(os.path.join(d, 'run.json'), encoding='utf-8-sig') as f:
++                tag = json.load(f).get('tag')
++        except (OSError, ValueError):
++            pass
++        if tag is not None and rx.search(str(tag)):
++            keep.append(os.path.abspath(d))
++        else:
++            a.skipped.append('%s(%s)' % (name, 'no run.json tag' if tag is None else tag))
++    return keep
++
++
+ def _mk(d, draws_fn, n=30000, ft_ms=20.0, run_extra=None, presses=(54, 63, 72), gpu_thr='0x0', sys_rows=True,
+         seconds=None, native=False, cd={'met': True}, ng=1.0, steps_done=91, frames_name='frames.csv', no_perf=False,
+@@ -846,4 +868,16 @@ def selftest():
+     ok &= good
+     print('%-12s %s got %s' % ('thermal-set', 'ok ' if good else 'BAD', got))
++    # --runs-root scored filter: run-matrix dir names <HHmm>-<tag>[-r<i> on collision]; tag read from run.json
++    rr = os.path.join(td, 'runsroot')
++    for dn, tag in (('1840-cold-ship60', 'cold-ship60'), ('1840-cold-ship60-r2', 'cold-ship60'), ('1846-warm1-nat60', 'warm1-nat60'),
++                    ('1850-ship60-r1', 'ship60-r1'), ('1856-n4bp60-r1', 'n4bp60-r1'), ('1902-natU-r2', 'natU-r2'), ('junk', None)):
++        os.makedirs(os.path.join(rr, dn))
++        if tag:
++            with open(os.path.join(rr, dn, 'run.json'), 'w') as f:
++                json.dump({'tag': tag}, f)
++    got = [os.path.basename(x) for x in scored_dirs(rr, a)]
++    good = got == ['1850-ship60-r1', '1856-n4bp60-r1', '1902-natU-r2'] and len(a.skipped) == 4
++    ok &= good
++    print('%-12s %s got %s skipped %s' % ('runs-root', 'ok ' if good else 'BAD', got, a.skipped))
+     print('SELFTEST', 'PASS' if ok else 'FAIL', td)
+     return 0 if ok else 1
+@@ -854,4 +888,7 @@ def main():
+     if a.selftest:
+         return selftest()
++    a.runs = list(a.runs)
++    if a.runs_root:
++        a.runs += scored_dirs(a.runs_root, a)
+     if not a.runs:
+         parser().print_help()

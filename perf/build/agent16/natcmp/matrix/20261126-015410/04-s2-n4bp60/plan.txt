@@ -1,0 +1,26 @@
+﻿=== timing matrix: S5 natcmp (M16): n4bp60 vs ship60 (default) or nat60, back to back, quiet-gated, attract-long pad, 3D-only score (one arm per run-matrix call) ===
+matrix   <workspace>\build\agent16\natcmp\matrix-natcmp.json
+note     Same run settings as matrix-s5-baseline.json (M8, window 20261125-1804) for the ship60, nat60 and n4bp60 arms; only cold_run (false), repeats (1) and order differ.
+note     natcmp\cmp-run.ps1 calls run-matrix once per arm (-Only <arm> -Repeats 1 -NoCold) so it can gate on the nongame CPU load between runs; the ABBA order, the base arm (vs ship|nat) and the unscored primes are set by cmp-run.ps1, not by this file.
+settings warm-up from firstframe (boot timeout 240 s, settle 0 s); order fixed; close timeout 60 s; cooldown 10 s
+floor    every window >= 60 s after the first-frame signal (cold runs too; warm-ups raised to fit, misses flagged window_before_floor); sys.csv ON (1 s system-state log, sys.json per run)
+s5       gpu.csv ON (NVML 1 Hz); cooldown until GPU < 72 C (timeout 90 s, estimate 45 s per run); 3D score: reached >= 600 draws, start >= 1500 draws, span 120 s (score3d.py; VOID if not reached or short)
+arms:
+       n4bp60: bin build/agent16/pack/native4bp-bin; frames native; x1; warm-up 90 s; window 180 s; group base; cap native_fps_limit=60; input attract-long.txt
+         native4bp (nativefinal2 + AOT placement pack, fingerprint 39129c4c059be5f0), native_fps_limit=60 (same as the window's n4bp60)
+round 1  n4bp60
+order    n4bp60
+estimate 1 runs (0 cold), about 6 min (warm boot 12 s, cold boot 25 s, close 5 s per run)
+
+--- preflight ---
+desktop    WinSta0\Default -> interactive desktop: timing can be valid
+LogonUI    not running
+power      AC (Win32_Battery status 2, charge 100 %)
+free RAM   17.17 GB
+game       no legodimensions.exe running
+builds     none (clang* (not clangd/clang-format), lld*, ld.lld, llvm-*, ninja, cmake, dxc*, cl, link, lib, mt, rc, msbuild, rexglue*, codegen*, sccache, ccache, rustc, cargo)
+bin        build/agent16/pack/native4bp-bin : ok (MANIFEST.txt)
+screensaver none
+sys.csv    on: drivers\sys-csv.ps1 logs the system state every 1 s in every run (sys.csv, sys.json)
+estimate   1 runs, about 6 min: done around 02:15
+keep-awake ON (SetThreadExecutionState continuous+system+display until the matrix ends)

@@ -1,0 +1,93 @@
+diff --git a/orig/RUN-RT-SMOKE.cmd b/new/RUN-RT-SMOKE.cmd
+index bc34f58..52b9f0f 100644
+--- a/orig/RUN-RT-SMOKE.cmd
++++ b/new/RUN-RT-SMOKE.cmd
+@@ -26,7 +26,7 @@ for %%A in (%*) do (
+ set "BAD=0"
+ set "PINOK=0"
+ rem PINS-BEGIN (mkpins_rt.py)
+-call :pin "build\agent2\s5\rt-smoke-run.ps1" 9CEBC45BA5A925C4B40553A701F856F227DE93FF2ADD61237C5985A85ED13025
++call :pin "build\agent2\s5\rt-smoke-run.ps1" 4311865FD6ECC5151D3FEBBB097C7C29D5200EFA161A2EF6EA68055EE3146272
+ call :pin "build\agent2\s5\rt_smoke_post.py" 6034CA362A1FDDFAAD8580EE7E7E1308BF9ACA53EF4632ACCA9AA71E5E4F801F
+ call :pin "harness\run-game.ps1" C2533FDFE9A3A4941F14A06C243C2A82875F5C2C93F1EBC95D68B48AB3DFA55F
+ call :pin "harness\guard.ps1" 7A71E72057A0C87F8E7851DB3363B103F6713C520305AFB26E0492036A3E0759
+diff --git a/orig/rt-smoke-run.ps1 b/new/rt-smoke-run.ps1
+index 73d829f..7d00303 100644
+--- a/orig/rt-smoke-run.ps1
++++ b/new/rt-smoke-run.ps1
+@@ -139,6 +139,10 @@ function Cmd-Line($a, [string]$root) { 'powershell ' + ((& $rgArgs $a $root $fal
+ # winhelper's IsBlack is fooled by the title bar and the fps counter. So the job measures the client non-black share
+ # itself; under 5% and with the game window in front, it also copies that window rect from the screen into
+ # shot-NNNs-screen.png (nothing covers it then). The post picks per time by pixels (>= 2% non-black), not by label.
++# Overlay delta (M10 re-rate): a foreground flip/tearing window that nothing overlaps gets independent flip, so a plain
++# screen copy is black too (20261126-022923 run). For the screen copy only, the job shows a click-through, no-activate,
++# topmost layered window at alpha 1/255 over the game window rect for ~0.5 s (forces DWM composition, as computer-cli's
++# red border does), copies the rect, then destroys it. Game keeps foreground; checked before and after the copy.
+ $shotJob = { param($ws, $t0, $times, $timeout, $runsRoot)
+     Add-Type -Path (Join-Path $ws 'harness\winhelper.cs') -ReferencedAssemblies System.Drawing
+     Add-Type -ReferencedAssemblies System.Drawing -TypeDefinition @'
+@@ -149,8 +153,28 @@ using System.Runtime.InteropServices;
+ public static class LdKitCap
+ {
+     [StructLayout(LayoutKind.Sequential)] struct RECT { public int L, T, R, B; }
++    [StructLayout(LayoutKind.Sequential)] struct MSG { public IntPtr hwnd; public uint message; public IntPtr wParam, lParam; public uint time; public int x, y; }
+     [DllImport("user32.dll")] static extern bool GetWindowRect(IntPtr h, out RECT r);
+     [DllImport("user32.dll")] static extern IntPtr GetForegroundWindow();
++    [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern IntPtr CreateWindowExW(uint ex, string cls, string name, uint style, int x, int y, int w, int h, IntPtr parent, IntPtr menu, IntPtr inst, IntPtr param);
++    [DllImport("user32.dll")] static extern bool SetLayeredWindowAttributes(IntPtr h, uint key, byte alpha, uint flags);
++    [DllImport("user32.dll")] static extern bool ShowWindow(IntPtr h, int cmd);
++    [DllImport("user32.dll")] static extern bool DestroyWindow(IntPtr h);
++    [DllImport("user32.dll")] static extern bool PeekMessageW(out MSG m, IntPtr h, uint a, uint b, uint remove);
++    [DllImport("user32.dll")] static extern bool TranslateMessage(ref MSG m);
++    [DllImport("user32.dll")] static extern IntPtr DispatchMessageW(ref MSG m);
++    // WS_EX_LAYERED | WS_EX_TRANSPARENT (click-through) | WS_EX_TOPMOST | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW; WS_POPUP
++    const uint OV_EX = 0x80000 | 0x20 | 0x8 | 0x08000000 | 0x80, OV_STYLE = 0x80000000;
++    public static int SettleMs = 500;  // ~30 frames at 60 fps for DWM to leave independent flip
++    static void Pump(int ms)
++    {
++        var sw = System.Diagnostics.Stopwatch.StartNew(); MSG m;
++        while (sw.ElapsedMilliseconds < ms)
++        {
++            while (PeekMessageW(out m, IntPtr.Zero, 0, 0, 1)) { TranslateMessage(ref m); DispatchMessageW(ref m); }
++            System.Threading.Thread.Sleep(10);
++        }
++    }
+     // share of a 96x96 sample grid below the title bar with R+G+B > 24
+     public static double NonBlack(string path)
+     {
+@@ -166,7 +190,8 @@ public static class LdKitCap
+             return n / (96.0 * 96.0);
+         }
+     }
+-    // copy the foreground window's rect from the screen; only if h is the foreground window (then nothing covers it)
++    // copy the foreground window's rect from the screen; only if h is the foreground window (then nothing opaque covers
++    // it). A click-through, no-activate alpha-1/255 overlay over the rect forces DWM composition during the copy.
+     public static string ScreenCopy(IntPtr h, string path)
+     {
+         if (h == IntPtr.Zero) return "no window";
+@@ -175,11 +200,22 @@ public static class LdKitCap
+         if (!GetWindowRect(h, out r)) return "no window rect";
+         int w = r.R - r.L, ht = r.B - r.T;
+         if (w <= 0 || ht <= 0) return "empty window";
+-        using (var bmp = new Bitmap(w, ht, PixelFormat.Format32bppArgb))
++        IntPtr ov = CreateWindowExW(OV_EX, "STATIC", "ld-kit-compose", OV_STYLE, r.L, r.T, w, ht, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
++        if (ov == IntPtr.Zero) return "no overlay window (no screen copy)";
++        try
+         {
+-            using (var g = Graphics.FromImage(bmp)) g.CopyFromScreen(r.L, r.T, 0, 0, new Size(w, ht));
+-            bmp.Save(path, ImageFormat.Png);
++            SetLayeredWindowAttributes(ov, 0, 1, 2);  // LWA_ALPHA, alpha 1/255
++            ShowWindow(ov, 4);                        // SW_SHOWNOACTIVATE
++            Pump(SettleMs);
++            if (GetForegroundWindow() != h) return "lost front during settle (no screen copy)";
++            using (var bmp = new Bitmap(w, ht, PixelFormat.Format32bppArgb))
++            {
++                using (var g = Graphics.FromImage(bmp)) g.CopyFromScreen(r.L, r.T, 0, 0, new Size(w, ht));
++                if (GetForegroundWindow() != h) return "lost front during copy (discarded)";
++                bmp.Save(path, ImageFormat.Png);
++            }
+         }
++        finally { DestroyWindow(ov); }
+         return "screen copy";
+     }
+ }

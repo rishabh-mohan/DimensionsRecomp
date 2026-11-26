@@ -1,0 +1,106 @@
+# harness/routes/attract-long.txt - task #16 (session 3, 03:40, Agent 3): the front-end idle exit and the no-input 3D
+# attract sequence, with enough idle time to see the sequence twice if it loops. FUNCTIONAL ONLY (hidden desktop, never timed).
+# Route: boot -> title -> START, A, A (the same three presses at the same times as steps 1-11 of b-gate-menus.txt) -> the
+# 220/534 front-end screen. After that there is no input at all until ~472 s after launch (~380 s after after-a2).
+# Known so far (perf-notes/agent3-run-harness.md 7.2-7.4; the b-gate-menus-long.txt pair, OFF builds):
+#   - the idle exit: 220/540 fade for 60 frames, the 4th INSTALL0_*.DAT batch, the profile reads, the Toypad light
+#     ("pad 1 mode 3 lit 99 42 0E"), then 218/222 (a load) and the attract: 625/780 (first 3D frame), 594/2813, 644/2868,
+#     839/31674 ... 788/31613, 2823/366575 (first heavy scene) ... 8019/1043795 ... 5194/879213, then 12390/1397564 (a 4-6 s
+#     pipeline stall) and more 1-2.5 s stalls;
+#   - the exit came ~19-20 s after the last press in 3 of 5 runs, and not within 26 s in the other 2.
+# Questions (harness/attract-report.py and harness/route-report.ps1 answer them after the run): when the idle exit
+# comes after a pure START, A, A route; whether the sequence ends or loops, and its period; a steady heavy segment;
+# whether the scene order repeats across runs and builds.
+#   powershell -NoProfile -ExecutionPolicy Bypass -File harness\run-game.ps1 -BinDir build\agent2\devoff3-bin -Seconds 540 -GpuLog -Tag attract-devoff3 -InputScript harness\routes\attract-long.txt
+#   powershell -NoProfile -ExecutionPolicy Bypass -File harness\run-game.ps1 -BinDir build\agent2\devoffB-bin -Seconds 540 -GpuLog -Tag attract-devoffB -InputScript harness\routes\attract-long.txt
+wait_first_frame 240
+mark first-frame
+sleep 50                         # pre-title (218/222, 219/226) -> title (226/1022)
+mark title
+press START                      # title -> front end (no scene change)
+sleep 8
+mark after-start
+press A                          # -> 220/528
+sleep 8
+mark after-a1
+press A                          # -> 220/534; the last input of the run
+sleep 8
+mark after-a2
+sleep 10
+mark idle-10
+sleep 10
+mark idle-20
+sleep 10
+mark idle-30
+sleep 10
+mark idle-40
+sleep 10
+mark idle-50
+sleep 10
+mark idle-60
+sleep 10
+mark idle-70
+sleep 10
+mark idle-80
+sleep 10
+mark idle-90
+sleep 10
+mark idle-100
+sleep 10
+mark idle-110
+sleep 10
+mark idle-120
+sleep 10
+mark idle-130
+sleep 10
+mark idle-140
+sleep 10
+mark idle-150
+sleep 10
+mark idle-160
+sleep 10
+mark idle-170
+sleep 10
+mark idle-180
+sleep 10
+mark idle-190
+sleep 10
+mark idle-200
+sleep 10
+mark idle-210
+sleep 10
+mark idle-220
+sleep 10
+mark idle-230
+sleep 10
+mark idle-240
+sleep 10
+mark idle-250
+sleep 10
+mark idle-260
+sleep 10
+mark idle-270
+sleep 10
+mark idle-280
+sleep 10
+mark idle-290
+sleep 10
+mark idle-300
+sleep 10
+mark idle-310
+sleep 10
+mark idle-320
+sleep 10
+mark idle-330
+sleep 10
+mark idle-340
+sleep 10
+mark idle-350
+sleep 10
+mark idle-360
+sleep 10
+mark idle-370
+sleep 10
+mark idle-380
+mark end
+stop

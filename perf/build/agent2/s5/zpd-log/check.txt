@@ -1,0 +1,21 @@
+mode: static only (no compiler)
+PASS SDK HEAD == a7e79c0: a7e79c09135f160f63bfaf8634f4e3b9cb760a75
+PASS SDK index clean (== HEAD)
+a7e79c0 blob src/graphics/d3d12/command_processor.cpp 00EA93D3E9115B01FE6C45A28C39CAB72FF53716A11090602B9FBAD05F28E0FA
+PASS base/ == a7e79c0 blob (LF): 00EA93D3E9115B01FE6C45A28C39CAB72FF53716A11090602B9FBAD05F28E0FA
+PASS final2 overlay file (the devfinal2 TU) == a7e79c0 blob (LF-normalised): 00EA93D3E9115B01FE6C45A28C39CAB72FF53716A11090602B9FBAD05F28E0FA
+zpd-log.diff 5CAD04BBCDF20ED36392D14E5485058E04FB344E517664FA7D9EFDA63B2410CE
+PASS diff is LF-only
+PASS diff touches only src/graphics/d3d12/command_processor.cpp
+PASS diff only adds lines
+PASS git apply --check --cached vs a7e79c0: Checking patch src/graphics/d3d12/command_processor.cpp...
+PASS git apply in scratch copy: Checking patch src/graphics/d3d12/command_processor.cpp... | Applied patch src/graphics/d3d12/command_processor.cpp cleanly.
+PASS ov file == a7e79c0 + zpd-log.diff
+PASS ov file is LF-only
+ov file build\agent2\s5\zpd-log\ov\src\graphics\d3d12\command_processor.cpp 6DE509E3FB683A2E0C9D71FC7D5F806930F410D1AC6A3274DE423ECC7BC0D870
+PASS needle in source: REXCVAR_DEFINE_BOOL(d3d12_log_occlusion_queries, false, "GPU/D3D12",
+PASS needle in source: if (!REXCVAR_GET(d3d12_log_occlusion_queries)) {
+PASS needle in source: OcclusionQueryPacketScope occlusion_query_packet_scope(frame_current_)
+PASS needle in source: LogOcclusionQueries("shutdown", frame_current_);
+PASS REXGPU_INFO for the counters only inside LogOcclusionQueries
+RESULT: PASS

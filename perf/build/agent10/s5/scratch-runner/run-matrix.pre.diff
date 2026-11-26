@@ -1,0 +1,191 @@
+﻿diff --git "a/bench\\agent8\\run\\run-matrix.ps1" "b/build\\agent8\\s5\\run-matrix.ps1"
+index b6652fe..9327208 100644
+--- "a/bench\\agent8\\run\\run-matrix.ps1"
++++ "b/build\\agent8\\s5\\run-matrix.ps1"
+@@ -56,15 +56,18 @@ $inv = [Globalization.CultureInfo]::InvariantCulture
+ 
+ $TopKeys = @('title', 'reference', 'warmup_s', 'warmup_from', 'measure_s', 'repeats', 'settle_s', 'cooldown_s', 'boot_timeout_s',
+              'close_timeout_s', 'menu_s', 'cold_run', 'order', 'sys_csv', 'min_window_after_ff_s', 'cold_warmup_s', 'cold_measure_s',
+-             'warmup_runs', 'quick', 'notes', 'arms')
++             'warmup_runs', 'quick', 'notes', 'arms',
++             'input_script', 'gpu_log', 'cooldown_temp_c', 'cooldown_timeout_s', 'cooldown_est_s', 'start3d_draws', 'reach3d_draws', 'span3d_s')
+ $ArmKeys = @('id', 'group', 'ref', 'repeats', 'frames', 'bin', 'cvars', 'env', 'toml', 'seed_cache', 'seed_recipes_only', 'triggers',
+-             'menu', 'menu_s', 'driver', 'profile', 'profile_s', 'note')
++             'menu', 'menu_s', 'driver', 'profile', 'profile_s', 'note', 'input_script', 'cap')
+ $QuickKeys = @('warmup_s', 'measure_s', 'repeats', 'settle_s', 'cooldown_s', 'boot_timeout_s', 'close_timeout_s', 'menu_s', 'profile_s',
+                'min_window_after_ff_s', 'cold_warmup_s', 'cold_measure_s', 'warmup_runs')
+ $NumKeys = @('warmup_s', 'measure_s', 'repeats', 'settle_s', 'cooldown_s', 'boot_timeout_s', 'close_timeout_s', 'menu_s', 'profile_s',
+-             'min_window_after_ff_s', 'cold_warmup_s', 'cold_measure_s', 'warmup_runs')
++             'min_window_after_ff_s', 'cold_warmup_s', 'cold_measure_s', 'warmup_runs',
++             'cooldown_temp_c', 'cooldown_timeout_s', 'cooldown_est_s', 'start3d_draws', 'reach3d_draws', 'span3d_s')
+ $D = @{ warmup_s = 60; measure_s = 120; repeats = 3; settle_s = 20; cooldown_s = 10; boot_timeout_s = 240; close_timeout_s = 60
+-        menu_s = 60; profile_s = 120; min_window_after_ff_s = 60; cold_warmup_s = 10; cold_measure_s = 30; warmup_runs = 0 }
++        menu_s = 60; profile_s = 120; min_window_after_ff_s = 60; cold_warmup_s = 10; cold_measure_s = 30; warmup_runs = 0
++        cooldown_temp_c = 0; cooldown_timeout_s = 600; cooldown_est_s = 0; start3d_draws = 1500; reach3d_draws = 600; span3d_s = 120 }
+ $QD = @{ warmup_s = 10; measure_s = 20; settle_s = 5; menu_s = 20; cooldown_s = 5; min_window_after_ff_s = 0; cold_warmup_s = 5; cold_measure_s = 10; warmup_runs = 0 }
+ # Estimate per run (Agent 8, window 3 runs, 23:45-00:30): warm boot to the first-frame signal ~12 s, first boot of a
+ # build ~25 s, close ~5 s (WM_CLOSE exit seen within ~1-3 s), post-processing ~5 s.
+@@ -134,6 +137,13 @@ function Read-Matrix([string]$Path) {
+     $ord = [string](Get-P $mx 'order' 'roundrobin'); if (@('roundrobin', 'fixed') -notcontains $ord) { $E.Add("order must be roundrobin or fixed, not '$ord'") }
+     $cr = Get-P $mx 'cold_run'; if ($null -ne $cr -and $cr -isnot [bool]) { $E.Add('cold_run must be true or false') }
+     $sc0 = Get-P $mx 'sys_csv'; if ($null -ne $sc0 -and $sc0 -isnot [bool]) { $E.Add('sys_csv must be true or false') }
++    # S5: route input, GPU log, cooldown, 3D scoring.
++    $gl0 = Get-P $mx 'gpu_log'; if ($null -ne $gl0 -and $gl0 -isnot [bool]) { $E.Add('gpu_log must be true or false') }
++    $is0 = Get-P $mx 'input_script'; if ($null -ne $is0 -and ($is0 -isnot [string] -or -not $is0)) { $E.Add('input_script must be a path string') }
++    foreach ($k in @('cooldown_temp_c', 'cooldown_timeout_s', 'cooldown_est_s', 'start3d_draws', 'reach3d_draws', 'span3d_s')) { $v = Get-P $mx $k; if ((Test-Num $v) -and $v -lt 0) { $E.Add("$k must be >= 0") } }
++    $ct0 = Get-P $mx 'cooldown_temp_c'; if ((Test-Num $ct0) -and $ct0 -gt 0 -and ($ct0 -lt 30 -or $ct0 -gt 95)) { $E.Add('cooldown_temp_c must be 0 (off) or 30-95') }
++    $s3 = [double](Get-Val $mx $null 'start3d_draws'); $r3 = [double](Get-Val $mx $null 'reach3d_draws')
++    if ($s3 -lt $r3) { $E.Add("start3d_draws ($s3) must be >= reach3d_draws ($r3)") }
+     foreach ($k in @('min_window_after_ff_s', 'cold_warmup_s', 'cold_measure_s', 'warmup_runs')) { $v = Get-P $mx $k; if ((Test-Num $v) -and $v -lt 0) { $E.Add("$k must be >= 0") } }
+     $wr0 = Get-P $mx 'warmup_runs'; if ((Test-Num $wr0) -and ([double]$wr0 -ne [math]::Floor([double]$wr0) -or $wr0 -gt 20)) { $E.Add('warmup_runs must be a whole number 0-20') }
+     $arms = @(Get-P $mx 'arms' @())
+@@ -161,6 +171,14 @@ function Read-Matrix([string]$Path) {
+         $dr = Get-P $a 'driver'
+         if ($null -ne $dr -and $dr -isnot [string] -and -not (Get-P $dr 'script')) { $E.Add("arm '$id': driver must be a path or {script, args}") }
+         if ($null -ne $dr -and $dr -isnot [string]) { foreach ($pp in $dr.PSObject.Properties) { if (@('script', 'args') -notcontains $pp.Name) { $E.Add("arm '$id': unknown field 'driver.$($pp.Name)' (allowed: script, args)") } } }
++        $isA = Get-P $a 'input_script'; if ($null -ne $isA -and ($isA -isnot [string] -or -not $isA)) { $E.Add("arm '$id': input_script must be a path string") }
++        $cp = Get-P $a 'cap'
++        if ($null -ne $cp) {
++            if (-not (Test-Num $cp) -or [double]$cp -ne [math]::Floor([double]$cp) -or $cp -lt 0 -or $cp -gt 1000) { $E.Add("arm '$id': cap must be a whole number 0-1000 (0 = uncapped)") }
++            $capCv = if ($fr -eq 'native') { 'native_fps_limit' } else { 'framerate_limit' }
++            if (@(@(Get-P $a 'cvars' @()) | Where-Object { "$_" -match '^-*(framerate_limit|native_fps_limit)=' }).Count) { $E.Add("arm '$id': cap and a framerate_limit/native_fps_limit cvar together (cap sets $capCv)") }
++            $evC = Get-P $a 'env'; if ($null -ne $evC -and $evC -is [System.Management.Automation.PSCustomObject] -and $null -ne $evC.PSObject.Properties['LEGO_NATIVE_FPS_LIMIT']) { $E.Add("arm '$id': cap and env LEGO_NATIVE_FPS_LIMIT together") }
++        }
+     }
+     $R.arms = $list.ToArray()
+     $ref = [string](Get-P $mx 'reference' '')
+@@ -219,7 +237,19 @@ function Get-RunEstimate($Mx, $Arm, [bool]$Cold) {
+     if ($Cold) { $wf = 'firstframe'; $meas = [math]::Min($meas, [double](Get-Val $Mx $Arm 'cold_measure_s')) }
+     if ($wf -eq 'launch' -and -not $menu) { $t = [math]::Max($warm, $boot) + $meas }
+     else { $t = $boot + [double](Get-Val $Mx $Arm 'settle_s') + $(if ($menu) { [double](Get-Val $Mx $Arm 'menu_s') } else { 0 }) + $warm + $meas }
+-    return $t + $Est.close_s + $Est.post_s + [double](Get-Val $Mx $Arm 'cooldown_s')
++    return $t + $Est.close_s + $Est.post_s + [double](Get-Val $Mx $Arm 'cooldown_s') + $(if ([double](Get-Val $Mx $Arm 'cooldown_temp_c') -gt 0) { [double](Get-Val $Mx $Arm 'cooldown_est_s') } else { 0 })
++}
++# S5: the route script of an arm (arm input_script, else top-level), resolved like a driver path; '' = none.
++function Get-InputScript($Mx, $Arm) {
++    $p = [string](Get-P $Arm 'input_script' ''); if (-not $p) { $p = [string](Get-P $Mx 'input_script' '') }
++    if (-not $p) { return '' }
++    return (Find-Script $p $R.dir)
++}
++# S5: the cap cvar of an arm ('' = no cap key: the build default stays).
++function Get-CapCvar($Arm) {
++    $cp = Get-P $Arm 'cap'; if ($null -eq $cp) { return '' }
++    $n = if ([string](Get-P $Arm 'frames' 'perf') -eq 'native') { 'native_fps_limit' } else { 'framerate_limit' }
++    return "$n=$([int]$cp)"
+ }
+ 
+ function Build-Plan($R, [string[]]$OnlyIds, [bool]$AssumeBins = $false) {
+@@ -257,6 +287,8 @@ function Build-Plan($R, [string[]]$OnlyIds, [bool]$AssumeBins = $false) {
+             $ai.driver = Find-Script $dp $R.dir
+             if (-not (Test-Path -LiteralPath $ai.driver -PathType Leaf) -and -not $ai.skip) { $ai.skip = "driver $dp not found" }
+         }
++        $ai.input_script = Get-InputScript $mx $a
++        if ($ai.input_script -and -not (Test-Path -LiteralPath $ai.input_script -PathType Leaf)) { $P.errors.Add("arm '$id': input_script $($ai.input_script) not found") }
+         $P.arms[$id] = $ai
+     }
+     $changed = $true
+@@ -329,6 +361,8 @@ function Get-PlanLines($R, $P) {
+     $L.Add("settings warm-up from $wf$(if ($wf -eq 'firstframe') { ' (boot timeout ' + (N (Get-Val $mx $null 'boot_timeout_s') 0) + ' s, settle ' + (N (Get-Val $mx $null 'settle_s') 0) + ' s)' }); order $($P.order); close timeout $(N (Get-Val $mx $null 'close_timeout_s') 0) s; cooldown $(N (Get-Val $mx $null 'cooldown_s') 0) s")
+     $L.Add("floor    every window >= $(N $floor0 0) s after the first-frame signal$(if ($floor0 -le 0) { ' (OFF)' } else { ' (cold runs too; warm-ups raised to fit, misses flagged window_before_floor)' }); sys.csv $(if ([bool](Get-P $mx 'sys_csv' $false)) { 'ON (1 s system-state log, sys.json per run)' } else { 'off' })")
+     if (-not $Quick -and $floor0 -lt 60) { $L.Add("!!! WARNING min_window_after_ff_s is $(N $floor0 0) s: timing windows need >= 60 s after the first frame (Agent 1's floor); fine for functional checks only") }
++    $ct = [double](Get-Val $mx $null 'cooldown_temp_c')
++    $L.Add("s5       gpu.csv $(if ([bool](Get-P $mx 'gpu_log' $false)) { 'ON (NVML 1 Hz)' } else { 'off' }); cooldown $(if ($ct -gt 0) { "until GPU < $(N $ct 0) C (timeout $(N (Get-Val $mx $null 'cooldown_timeout_s') 0) s, estimate $(N (Get-Val $mx $null 'cooldown_est_s') 0) s per run)" } else { 'by temperature OFF' }); 3D score: reached >= $(N (Get-Val $mx $null 'reach3d_draws') 0) draws, start >= $(N (Get-Val $mx $null 'start3d_draws') 0) draws, span $(N (Get-Val $mx $null 'span3d_s') 0) s (score3d.py; VOID if not reached or short)")
+     $L.Add('arms:')
+     foreach ($ai in $P.arms.Values) {
+         $a = $ai.arm
+@@ -344,6 +378,8 @@ function Get-PlanLines($R, $P) {
+         $mn = [string](Get-P $a 'menu' ''); if ($mn) { $bits += "MENU '$mn' ($(N (Get-Val $mx $a 'menu_s') 0) s)" }
+         if ($ai.driver) { $bits += "driver $($ai.driver) $($ai.driver_args -join ' ')" }
+         if ([bool](Get-P $a 'profile' $false)) { $bits += "PROFILE $(N (Get-Val $mx $a 'profile_s') 0) s (not for timing)" }
++        $capC = Get-CapCvar $a; if ($capC) { $bits += "cap $capC$(if ($capC -match '=0$') { ' (UNCAPPED)' })" }
++        if ($ai.input_script) { $bits += "input $(Split-Path -Leaf $ai.input_script)" }
+         $L.Add("  $(if ($ai.skip) { 'SKIP ' } else { '     ' })$($ai.id): $($bits -join '; ')")
+         $nt = [string](Get-P $a 'note' ''); if ($nt) { $L.Add("         $nt") }
+     }
+@@ -494,7 +530,14 @@ function Get-RunSplat($Ai, $Run) {
+     # The floor goes to run-timing.ps1 (it raises the warm-up and records that in run.json), cold runs too.
+     $floor = [double](Get-Val $mx $a 'min_window_after_ff_s'); if ($floor -gt 0) { $s.MinWindowAfterFirstFrame = $floor }
+     if ([bool](Get-P $mx 'sys_csv' $false)) { $s.SysCsv = $true }
+-    $cv = @(@(Get-P $a 'cvars' @()) | ForEach-Object { [string]$_ }); if ($cv.Count) { $s.Cvar = $cv }
++    $cv = @(@(Get-P $a 'cvars' @()) | ForEach-Object { [string]$_ })
++    # S5: cap -> framerate_limit=N (xenos) / native_fps_limit=N (native); route input, GPU log and the cooldown go to
++    # every run (cold runs too: the route is what reaches 3D; the cold run is unscored anyway).
++    $capC = Get-CapCvar $a; if ($capC) { $cv += $capC }
++    if ($cv.Count) { $s.Cvar = $cv }
++    if ($Ai.input_script) { $s.InputScript = $Ai.input_script }
++    if ([bool](Get-P $mx 'gpu_log' $false)) { $s.GpuLog = $true }
++    $ct = [double](Get-Val $mx $a 'cooldown_temp_c'); if ($ct -gt 0) { $s.CooldownTempC = $ct; $s.CooldownTimeoutSec = [int](Get-Val $mx $a 'cooldown_timeout_s') }
+     $ev = Get-P $a 'env'; if ($null -ne $ev) { $l = @(@($ev.PSObject.Properties) | ForEach-Object { "$($_.Name)=$($_.Value)" }); if ($l.Count) { $s.Env = $l } }
+     $tv = Get-P $a 'toml'; if ($null -ne $tv) { $l = @(@($tv.PSObject.Properties) | ForEach-Object { "$($_.Name)=$($_.Value)" }); if ($l.Count) { $s.Toml = $l } }
+     $mn = [string](Get-P $a 'menu' ''); if ($mn) { $s.MenuText = $mn; $s.MenuSec = [int](Get-Val $mx $a 'menu_s') }
+@@ -509,6 +552,32 @@ function Get-RunSplat($Ai, $Run) {
+ function Save-Results {
+     if ($rows.Count) { $rows | ForEach-Object { [pscustomobject]$_ } | Export-Csv -LiteralPath $resultsCsv -NoTypeInformation -Encoding UTF8 }
+ }
++# S5: score3d.py per run (3D-only window, GPU covariates, cap check); its columns (score3d.py CSV_KEYS minus run_dir)
++# are appended to every results.csv row. A scorer failure leaves them blank and sets s3d_status ERROR.
++$score3d = Join-Path $PSScriptRoot 'score3d.py'
++$S3dKeys = @('s3d_status', 's3d_void_reason', 's3d_renderer', 's3d_source', 's3d_reached_s', 's3d_start_s', 's3d_span_s', 's3d_avail_s',
++             's3d_frames', 's3d_fps', 's3d_median_ms', 's3d_p99_ms', 's3d_low1_ms', 's3d_low1_fps', 's3d_over33', 's3d_over100',
++             's3d_draws_med', 's3d_share3d', 'gpu_rows', 'gpu_align', 'gpu_thermal_share', 'gpu_powercap_share', 'gpu_hwslow_share',
++             'gpu_temp_med', 'gpu_temp_max', 'gpu_gr_mhz_med', 'gpu_power_w_med', 'gpu_util_med', 'cap_expected', 'cap_seen', 'cap_source',
++             'cooldown_wait_s', 'cooldown_temp_start_c', 'cooldown_flag', 'route_steps', 'route_timeouts', 's3d_reach_draws',
++             's3d_start_draws', 's3d_span_req_s', 's3d_anchor_hold_s', 's3d_first_start_s', 's3d_launch_offset_s', 's3d_window_start_s')
++function Add-Score3d($Row, [string]$Rd, $Arm) {
++    $jp = Join-Path $Rd 'score3d.json'
++    # --write-runjson: run.json gets window_start_s (launch clock, sustained anchor), effective_cap and score3d
++    # (the fields M12's s5_gates.py cross-checks).
++    $sa = @($score3d, $Rd, '--json', $jp, '--quiet', '--write-runjson', '--reach-draws', [string][int](Get-Val $mx $Arm 'reach3d_draws'),
++            '--start-draws', [string][int](Get-Val $mx $Arm 'start3d_draws'), '--span', (N (Get-Val $mx $Arm 'span3d_s') 3))
++    $cp = Get-P $Arm 'cap'; if ($null -ne $cp) { $sa += @('--expect-cap', [string][int]$cp) }
++    try {
++        if (Test-Path -LiteralPath $jp) { Remove-Item -LiteralPath $jp -Force }
++        $o = & python @sa 2>&1 | Out-String
++        if ($LASTEXITCODE -or -not (Test-Path -LiteralPath $jp)) { throw "score3d.py exit $LASTEXITCODE $($o.Trim())" }
++        $j = [IO.File]::ReadAllText($jp) | ConvertFrom-Json
++        foreach ($k in $S3dKeys) { $v = Get-P $j $k ''; $Row[$k] = [string]$v }
++    } catch {
++        $Row.s3d_status = 'ERROR'; $Row.s3d_void_reason = "scorer: $($_.Exception.Message)"
++    }
++}
+ function Med([double[]]$V) {
+     $s = @($V | Sort-Object); $c = $s.Count
+     if ($c -eq 0) { return $null }
+@@ -655,6 +724,7 @@ try {
+                            idle_min_s = ''; fg_share = ''; eff_mhz = ''
+                            run_dir = ''; log = ''; notes = ''
+                            kind = $(if ($run.cold) { 'cold' } elseif ($run.warm) { 'warm' } else { 'scored' }); over8 = ''; over10 = ''; over16_7 = ''; frames_lt_light = '' }
++        foreach ($k in $S3dKeys) { $row[$k] = '' }
+         $splat = Get-RunSplat $ai $run
+         $skipWhy = $null
+         if (-not $run.cold) {
+@@ -738,6 +808,7 @@ try {
+             $tail = @(); if (Test-Path -LiteralPath $log) { $tail = @(Get-Content -LiteralPath $log | Where-Object { $_ -match '!!!|not start' } | Select-Object -Last 2) }
+             $row.status = 'NOT STARTED'; $row.notes = (@($tail) + @($(if ($err) { $err })) | Where-Object { $_ }) -join ' | '
+         }
++        if ($rd) { Add-Score3d $row $rd $ai.arm }
+         $rows.Add($row); Save-Results
+         $color = if ($row.status -eq 'OK') { 'Green' } else { 'Red' }
+         Write-Host ("--> {0} {1}: {2}  median {3} ms  p99 {4} ms  >33 {5}  >100 {6}  cpu {7}  {8}" -f $run.tag, $(if ($run.cold) { '(cold)' } elseif ($run.warm) { '(warm-up)' } else { '' }), $row.status, $row.median_ms,
+@@ -745,6 +816,9 @@ try {
+         if ($row.notes) { Write-Host "    $($row.notes)" -ForegroundColor $(if ($row.status -eq 'OK') { 'Gray' } else { 'Yellow' }) }
+         if ($row.excluded -eq 'True') { Write-Host "    EXCLUDED from the summary numbers (flags: $($row.flags_excluding))" -ForegroundColor Yellow }
+         if ($row.flags_info -or $row.ff_to_window_s -ne '') { Write-Host "    first frame to window $(if ($row.ff_to_window_s -ne '') { $row.ff_to_window_s + ' s' } else { '-' }); light share $(if ($row.light_share -ne '') { $row.light_share } else { '-' }); info flags: $(if ($row.flags_info) { $row.flags_info } else { 'none' })" -ForegroundColor Gray }
++        if ($row.s3d_status) { Write-Host ("    3D: {0}{1}  reached {2} s  start {3} s  span {4} s  fps {5}  median {6} ms  p99 {7} ms  1%low {8} fps  thermal {9}  temp {10} C  cap {11}/{12}  cooldown {13} s {14}" -f $row.s3d_status, $(if ($row.s3d_void_reason) { " ($($row.s3d_void_reason))" } else { '' }),
++                                             $row.s3d_reached_s, $row.s3d_start_s, $row.s3d_span_s, $row.s3d_fps, $row.s3d_median_ms, $row.s3d_p99_ms, $row.s3d_low1_fps, $row.gpu_thermal_share, $row.gpu_temp_med,
++                                             $row.cap_expected, $row.cap_seen, $row.cooldown_wait_s, $row.cooldown_flag) -ForegroundColor $(if ($row.s3d_status -eq 'OK') { 'Green' } else { 'Yellow' }) }
+         if ($i -lt $P.runs.Count) {
+             $cool = [int](Get-Val $mx $ai.arm 'cooldown_s')
+             if ($cool -gt 0) { Write-Host "cooldown $cool s"; Start-Sleep -Seconds $cool }
+@@ -756,6 +830,11 @@ try {
+     try { if ($awake -like 'ON*') { [void][LdPower.Exec]::SetThreadExecutionState([uint32]2147483648); Write-Host 'keep-awake released' } } catch { }
+     Save-Results
+     try { Write-Summary } catch { Write-Host "!!! summary failed: $($_.Exception.Message) (line $($_.InvocationInfo.ScriptLineNumber))" -ForegroundColor Red }
++    # S5: the 3D-only summary (score3d.py --summary) next to summary.md.
++    if (Test-Path -LiteralPath $resultsCsv) {
++        try { $s3o = & python $score3d --summary $resultsCsv --out (Join-Path $OutDir 'summary3d.md') --quiet 2>&1 | Out-String; if ($LASTEXITCODE) { Write-Host "!!! summary3d failed: $s3o" -ForegroundColor Red } else { Write-Host "summary3d: $(Join-Path $OutDir 'summary3d.md')" } }
++        catch { Write-Host "!!! summary3d failed: $($_.Exception.Message)" -ForegroundColor Red }
++    }
+ }
+ $bad = @($rows | Where-Object { @('OK', 'PROFILE') -notcontains $_.status })
+ if ($bad.Count) { "$($bad.Count) of $($rows.Count) runs not OK"; exit 1 }

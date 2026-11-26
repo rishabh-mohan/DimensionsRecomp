@@ -1,0 +1,30 @@
+09:05:50 prompt sidecar: tag simB, runs <workspace>\build\agent3\gameplay\selftest\simruns, boot none, trigger log 'Toypad: pad 3 mode 1 lit FF FF FF' mark '', 2 prompt trigger(s)
+tags ok: batman id=1 pad=2 index=0, gandalf id=2 pad=1 index=1, wyldstyle id=3 pad=3 index=2
+on: /pad 2 mode 3 lit 00 00 (05|16)/ => batman pad 2
+on: /pad 1 mode 3 lit (F4 00 16|3D 00 05)/ => gandalf pad 1
+zone off; led shots off
+09:05:51.640 run-dir <workspace>\build\agent3\gameplay\selftest\simruns\20261125-210000-simB
+09:05:51.643 ctl-dir <workspace>\build\agent3\gameplay\selftest\simruns\20261125-210000-simB\toypad-ctl
+09:05:51.644 listener port 54233
+09:05:51.644 toypad Toypad listener active on 127.0.0.1:54233
+09:05:51.644 toypad Toypad: pad 3 mode 1 lit FF FF FF (on 0 off 0 count 1 speed 16)
+09:05:52.900 toypad Toypad: pad 2 mode 3 lit 00 00 16 (on 0 off 0 count 1 speed 16)
+09:05:52.901 prompt batman fire 1/2: /pad 2 mode 3 lit 00 00 (05|16)/ -> pad 2 in 0.2 s
+09:05:53.152 toypad Toypad: pad 2 mode 3 lit 00 00 05 (on 0 off 0 count 1 speed 16)
+09:05:53.182 load LOAD batman id=1 pad=2 index=0 path_len=0 -> hangup-ok (0.03 s) [prompt]
+09:05:53.182 prompt-done ok place batman 2: LOAD batman id=1 pad=2 index=0 path_len=0 -> hangup-ok (0.03 s)
+09:05:53.433 toypad Toypad: pad 2 mode 3 lit 00 00 16 (on 0 off 0 count 1 speed 16)
+09:05:53.688 toypad Toypad: pad 2 mode 3 lit 00 00 05 (on 0 off 0 count 1 speed 16)
+09:05:53.944 toypad Toypad: pad 3 mode 3 lit F4 00 16 (on 0 off 0 count 1 speed 16)
+09:05:54.195 toypad Toypad: pad 3 mode 3 lit 3D 00 05 (on 0 off 0 count 1 speed 16)
+09:05:54.448 toypad Toypad: pad 3 mode 3 lit F4 00 16 (on 0 off 0 count 1 speed 16)
+09:05:54.701 toypad Toypad: pad 3 mode 3 lit 3D 00 05 (on 0 off 0 count 1 speed 16)
+09:05:54.953 toypad Toypad: pad 1 mode 3 lit F4 00 16 (on 0 off 0 count 1 speed 16)
+09:05:54.953 prompt gandalf fire 1/2: /pad 1 mode 3 lit (F4 00 16|3D 00 05)/ -> pad 1 in 0.2 s
+09:05:55.205 toypad Toypad: pad 1 mode 3 lit 3D 00 05 (on 0 off 0 count 1 speed 16)
+09:05:55.227 load LOAD gandalf id=2 pad=1 index=1 path_len=0 -> hangup-ok (0.02 s) [prompt]
+09:05:55.227 prompt-done ok place gandalf 1: LOAD gandalf id=2 pad=1 index=1 path_len=0 -> hangup-ok (0.02 s)
+09:05:55.480 toypad Toypad: pad 1 mode 3 lit F4 00 16 (on 0 off 0 count 1 speed 16)
+09:05:55.733 toypad Toypad: pad 1 mode 3 lit 3D 00 05 (on 0 off 0 count 1 speed 16)
+09:05:56.490 end run-game finished (summary.json)
+09:05:56.493 result listener=True boot=none trigger=False placed=True load-confirms=0 then=off remove-confirms=0 prompts=batman:1/1 gandalf:1/1 ctl=0 done/0 err route=0 ok/0 err zone=off zone-skips=0 alerts=0 shots=0 slots: batman pad=2 index=0, gandalf pad=1 index=1

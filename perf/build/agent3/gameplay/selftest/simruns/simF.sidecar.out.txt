@@ -1,0 +1,42 @@
+09:06:27 prompt sidecar: tag simF, runs <workspace>\build\agent3\gameplay\selftest\simruns, boot none, trigger log 'Toypad: pad 3 mode 1 lit FF FF FF' mark '', 1 prompt trigger(s)
+tags ok: batman id=1 pad=2 index=0, gandalf id=2 pad=1 index=1, wyldstyle id=3 pad=3 index=2
+on: /pad 2 mode 3 lit 00 00 (05|16)/ => batman pad 2
+zone ON (delay 1 s, gap 0 s, confirm 2 s); led shots off
+09:06:28.046 run-dir <workspace>\build\agent3\gameplay\selftest\simruns\20261125-210000-simF
+09:06:28.046 ctl-dir <workspace>\build\agent3\gameplay\selftest\simruns\20261125-210000-simF\toypad-ctl
+09:06:28.049 listener port 54270
+09:06:28.050 toypad Toypad listener active on 127.0.0.1:54270
+09:06:28.050 toypad Toypad: pad 2 mode 3 lit 00 00 16 (on 0 off 0 count 1 speed 16)
+09:06:28.050 prompt batman fire 1/2: /pad 2 mode 3 lit 00 00 (05|16)/ -> pad 2 in 0.2 s
+09:06:28.050 toypad Toypad: pad 2 mode 3 lit 00 00 05 (on 0 off 0 count 1 speed 16)
+09:06:28.308 load LOAD batman id=1 pad=2 index=0 path_len=0 -> hangup-ok (0.01 s) [prompt]
+09:06:28.308 prompt-done ok place batman 2: LOAD batman id=1 pad=2 index=0 path_len=0 -> hangup-ok (0.01 s)
+09:06:30.827 toypad Toypad: pad 3 mode 3 lit FF 00 18 (on 0 off 0 count 1 speed 15)
+09:06:30.827 zone-t0 pad 3 lit FF 00 18 speed 15 after the prompts
+09:06:30.827 zone step 1 pad 3 wants wyldstyle: T0 + 1 s; first command in 1.0 s
+09:06:30.827 toypad Toypad: pad 2 mode 3 lit 00 00 16 (on 0 off 0 count 1 speed 16)
+09:06:30.827 prompt batman fire 2/2: /pad 2 mode 3 lit 00 00 (05|16)/ -> pad 2 in 0.2 s
+09:06:30.827 zone prompt after T0: batman fire 2/2 -> pad 2 (zone step 1, state wait)
+09:06:31.079 toypad Toypad: pad 2 mode 3 lit 00 00 05 (on 0 off 0 count 1 speed 16)
+09:06:31.107 remove REMOVE batman pad=2 index=0 -> hangup-ok [prompt]
+09:06:31.231 load LOAD batman id=1 pad=2 index=0 path_len=0 -> hangup-ok (0.02 s) [prompt]
+09:06:31.231 prompt-done ok replace batman: REMOVE batman pad=2 index=0 -> hangup-ok; LOAD batman id=1 pad=2 index=0 path_len=0 -> hangup-ok (0.02 s)
+09:06:31.989 zone step 1 pad 3 plan: place wyldstyle 3
+09:06:32.014 load LOAD wyldstyle id=3 pad=3 index=2 path_len=0 -> hangup-ok (0.02 s) [zone]
+09:06:32.014 zone step 1 ok: place wyldstyle 3 -> LOAD wyldstyle id=3 pad=3 index=2 path_len=0 -> hangup-ok (0.02 s)
+09:06:32.268 toypad Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 15)
+09:06:32.268 zone pad 1 cue FF 00 00 while step 1 (pad 3) was open: skipping to it
+09:06:32.268 zone step 3 pad 1 wants batman: cue pad 1 lit FF 00 00; first command in 0.3 s
+09:06:32.774 zone step 3 pad 1 plan: remove batman; place batman 1
+09:06:32.776 remove REMOVE batman pad=2 index=0 -> hangup-ok [zone]
+09:06:32.776 zone step 3 ok: remove batman -> REMOVE batman pad=2 index=0 -> hangup-ok
+09:06:33.301 load LOAD batman id=1 pad=1 index=0 path_len=0 -> hangup-ok (0.02 s) [zone]
+09:06:33.301 zone step 3 ok: place batman 1 -> LOAD batman id=1 pad=1 index=0 path_len=0 -> hangup-ok (0.02 s)
+09:06:33.556 load-confirm Toypad listener: LOAD -> pad=1 index=0 (path len 0)
+09:06:33.556 toypad Toypad: pad 1 mode 3 lit 99 42 0E (on 0 off 0 count 1 speed 15)
+09:06:33.557 toypad Toypad: pad 2 mode 3 lit 99 42 0E (on 0 off 0 count 1 speed 15)
+09:06:33.557 toypad Toypad: pad 3 mode 3 lit 99 42 0E (on 0 off 0 count 1 speed 15)
+09:06:33.557 zone step 3 pad 1 handoff (all 3 pads 99 42 0E) 0.000 s after the LOAD confirm (game_ts)
+09:06:33.557 zone-done all 3 pads 99 42 0E, T0 + 2.7 s
+09:06:34.568 end run-game finished (summary.json)
+09:06:34.568 result listener=True boot=none trigger=False placed=True load-confirms=1 then=off remove-confirms=0 prompts=batman:2/2 ctl=0 done/0 err route=0 ok/0 err zone=done zone-skips=1 alerts=0 shots=0 slots: batman pad=1 index=0, wyldstyle pad=3 index=2

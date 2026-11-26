@@ -1,0 +1,73 @@
+# Dimensions Recompiled: harness config for running a build tree against game/ (Agent 3).
+#
+# This holds the same keys rexlego-installer writes for a NativeGPU 0.2.0 install
+# (TomlConfig.Plan, plus the forced keys and defaults added by package_native.py),
+# so a build-tree run behaves like an installed game. It leaves out what a build tree does not have:
+#   - mods (mods*, modcli_path), and the modded update copy (install/update-mods)
+#   - the updater (updates_repo, updater_path); updates_check is forced off, as in 0.2.0
+#   - the Toy Pad app (toypad_app_autostart, toypad_app_path); the built-in emulation stays on
+#   - the "Fern" PATCH3.DAT/HDR overlay. The installer builds it from research/fern-patch3, which
+#     is not in the repo. It only adds the Adventure Time DLC charcache.
+#
+# The game reads legodimensions.toml from next to the EXE (rex_app.cpp SetupEnvironment), not
+# from its working directory. It saves it only from the F4 settings overlay (Save/Reset) or the
+# mod menu (the SaveConfig callers), not on exit; run.json records toml_rewritten per run.
+# harness/run-game.ps1 copies this file next to a hard-linked copy of the binaries in every run
+# dir and applies -Cvar overrides there. This file itself is never touched by a run.
+# log_file is not set here: run-game.ps1 passes --log_file=<run dir>\game.log on the command line.
+
+# Paths
+game_data_root = '<workspace>\game\disc'
+update_data_root = '<workspace>\game\tu23'
+user_data_root = '<workspace>\game\user'
+hid_mappings_file = '<workspace>\DimensionsRecomp\rexlego\res\gamecontrollerdb.txt'
+
+# Updates. package_native.py forces this off for the NativeGPU edition.
+updates_check = false
+
+# ToyPad. Turn this off to use a real LEGO portal over USB
+# (needs the libusb driver, installed with Zadig).
+toypad_emulation = true
+
+# Display
+fullscreen = false
+vsync = false
+framerate_limit = 60
+frame_rate = '60'
+present_effect = 'fsr'  # FSR 1 on (N1 test)
+present_fsr_max_upsampling_passes = 1
+present_fsr_quality_mode = 'quality'
+present_fsr_sharpness_reduction = 0.0
+present_dither = true
+swap_post_effect = 'none'
+anisotropic_override = 5
+depth_of_field = false
+texture_cache_memory_limit_render_to_texture = 40
+texture_cache_memory_limit_soft = 400
+texture_cache_memory_limit_hard = 800
+texture_cache_memory_limit_soft_lifetime = 40
+resolution_scale = 1
+
+# Compatibility - these keep the game from crashing on things the
+# recompiled code does not cover yet. Do not change them.
+invalid_function_nonfatal = true
+license_mask = 4294967295
+gpu_plugin = 'xenos'
+gpu_backend = 'd3d12'
+gpu_allow_invalid_fetch_constants = true
+clear_memory_page_state = false
+readback_resolve = 'fast'
+readback_resolve_half_pixel_offset = true
+readback_memexport_fast = false
+readback_memexport_batched = false
+readback_memexport_on_demand = false
+readback_resolve_max_kb = 256
+d3d12_readback_memexport = true
+d3d12_readback_resolve = true
+execute_unclipped_draw_vs_on_cpu = true
+primitive_processor_cache_min_indices = 4096
+non_seamless_cube_map = true
+
+# NativeGPU 0.2.0 defaults (package_native.py)
+native_settings_frontend = true
+native_fsr3 = false

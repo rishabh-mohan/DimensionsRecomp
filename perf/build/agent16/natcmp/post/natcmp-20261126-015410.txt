@@ -1,0 +1,35 @@
+# S5 natcmp report (cmp_post.py): n4bp60 vs ship60
+
+clean second = nongame < 4.0 cores (eff MHz info only); CONFOUNDED > 25 % unclean; verdict threshold +-5 %, >= 2 valid pairs
+note: base ship60 (xenos, devfinal2-bin, perf.csv frames) renders every draw like n4bp60 (M12 p03: GPU ~25 W both, CPU clock ~2250 vs ~2230 MHz), so this is the fair renderer comparison; the window had n4bp60 +5.5 %
+gate timeouts (excluded): none
+
+## Runs
+
+label | ok | fps (recalc) | p99 ms | >100 | 1%low ms | draws | gpu MHz/W/pcap | nongame | eff MHz | game | MsMpEng win/launch-max | clean s | clean fps | PSO n/ms | frames | flags | run dir
+prime-ship60 | OK | 46.35 (46.35) | 52.9 | 7 | 82.1 | 2778 | 1320/26/0.04 | 1.50 | 2552 | 1.16 | 0.01/0.18 | 120/120 | 46.31 | -/- | perf.csv | - | <workspace>\build\agent16\natcmp\matrix\20261126-015410\01-prime-ship60\runs\0154-ship60-r1
+    draw bins n/mean ms 0-500 500-1000 1000-2000 2000-3000 3000-4000 4000-6000 6000-inf: - - 2081/20.7 1411/22.1 139/17.7 762/20.0 1171/24.0
+prime-n4bp60 | OK | 47.04 (47.03) | 69.5 | 10 | 88.4 | 729 | 1642/25/0.13 | 1.53 | 2384 | 1.20 | 0.01/0.29 | 120/120 | 47.15 | 404/136 | native-frames.csv | - | <workspace>\build\agent16\natcmp\matrix\20261126-015410\02-prime-n4bp60\runs\0159-n4bp60-r1
+    draw bins n/mean ms 0-500 500-1000 1000-2000 2000-3000 3000-4000 4000-6000 6000-inf: 2051/17.0 1400/18.4 895/17.5 599/22.6 461/36.5 241/56.2 -
+s1-ship60 | OK | 44.20 (44.20) | 54.0 | 6 | 90.1 | 2527 | 1256/25/0.02 | 1.42 | 2382 | 1.23 | 0.01/0.12 | 120/120 | 44.22 | -/- | perf.csv | - | <workspace>\build\agent16\natcmp\matrix\20261126-015410\03-s1-ship60\runs\0204-ship60-r1
+    draw bins n/mean ms 0-500 500-1000 1000-2000 2000-3000 3000-4000 4000-6000 6000-inf: - - 2019/21.2 1363/22.7 128/22.6 732/20.9 1062/26.5
+s2-n4bp60 | OK | 46.41 (46.41) | 65.5 | 5 | 85.8 | 722 | 1654/26/0.07 | 1.70 | 2284 | 1.18 | 0.01/0.00 | 118/120 | 46.29 | 404/141 | native-frames.csv | - | <workspace>\build\agent16\natcmp\matrix\20261126-015410\04-s2-n4bp60\runs\0209-n4bp60-r1
+    draw bins n/mean ms 0-500 500-1000 1000-2000 2000-3000 3000-4000 4000-6000 6000-inf: 2110/17.1 1411/17.4 806/19.5 545/24.8 466/36.0 231/58.0 -
+s3-n4bp60 | OK | 46.83 (46.83) | 65.3 | 10 | 86.7 | 729 | 1687/26/0.13 | 1.49 | 2342 | 1.19 | 0.01/0.29 | 120/120 | 46.88 | 404/153 | native-frames.csv | - | <workspace>\build\agent16\natcmp\matrix\20261126-015410\05-s3-n4bp60\runs\0214-n4bp60-r1
+    draw bins n/mean ms 0-500 500-1000 1000-2000 2000-3000 3000-4000 4000-6000 6000-inf: 2061/17.3 1409/17.7 864/18.1 585/23.2 472/35.6 232/58.1 -
+s4-ship60 | OK | 44.94 (44.94) | 51.6 | 8 | 86.9 | 2428 | 1252/25/0.05 | 1.37 | 2320 | 1.26 | 0.01/0.11 | 120/120 | 44.95 | -/- | perf.csv | - | <workspace>\build\agent16\natcmp\matrix\20261126-015410\06-s4-ship60\runs\0219-ship60-r1
+    draw bins n/mean ms 0-500 500-1000 1000-2000 2000-3000 3000-4000 4000-6000 6000-inf: - - 2252/21.0 1199/21.1 156/24.9 744/20.5 1042/27.0
+
+## Pairs
+
+pair | ship60 | n4bp60 | fps diff % | p99 diff ms | >100 diff | clean fps diff % | valid
+1 | s1-ship60 | s2-n4bp60 | 5.0 | 11.5 | -1 | 4.7 | yes
+2 | s4-ship60 | s3-n4bp60 | 4.2 | 13.6 | 2 | 4.3 | yes
+
+## Clean-seconds view (info; scored OK runs with >= 30 clean s)
+
+ship60: 2 runs, median clean fps 44.59
+n4bp60: 2 runs, median clean fps 46.58
+clean-seconds diff n4bp60 vs ship60: +4.5 %
+
+RESULT: NO CLEAR DIFFERENCE (n4bp60 vs ship60); valid pairs 2/2; median fps diff +4.6% (range +4.2..+5.0%); base ship60

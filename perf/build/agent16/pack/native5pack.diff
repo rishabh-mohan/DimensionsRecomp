@@ -1,0 +1,90 @@
+diff --git a/native4bp.py b/native5pack.py
+index b3101c4..a0ecf57 100644
+--- a/native4bp.py
++++ b/native5pack.py
+@@ -1,4 +1,7 @@
+ #!/usr/bin/env python3
++# native5pack.py - M16 (S5), derived from native4bp.py 37FD3989 with 4 changes: no LATEST-pack.txt /
++# LATEST-bin.txt writes; bin requires --pack-run (no LATEST fallback); default --bin-out native5pack-bin;
++# names in the log / MANIFEST title / MANIFEST note. Everything else is native4bp.py unchanged.
+ # native4bp.py - E16.1 (S5 phase 0.4b), build/agent16/pack: dumped placement containers -> tools/gpu-aot ->
+ # native4bp AOT pack -> native4bp bin. Launch through native4bp.ps1 (dot-sources env\devshell.ps1 so clang++
+ # and the MSVC env are on PATH; sets Idle priority + affinity 0x3 first so every child inherits them).
+@@ -418,9 +421,8 @@ def do_pack(a, check, stamp):
+             sums.append('%s  %s' % (sha(fp), os.path.relpath(fp, run_)))
+     with open(in_pack(os.path.join(run_, 'SHA256SUMS.txt')), 'w', encoding='utf-8', newline='\n') as f:
+         f.write('\n'.join(sorted(sums, key=lambda s: s[66:])) + '\n')
+-    with open(in_pack(os.path.join(PACK, 'LATEST-pack.txt')), 'w', encoding='utf-8', newline='\n') as f:
+-        f.write('run-%s %s %s containers=%d input=%s\n' % (stamp, verdict, time.strftime('%H:%M:%S'), len(rows),
+-                                                          a.input or '-'))
++    log('LATEST-pack.txt not written (native5pack): run-%s %s containers=%d input=%s' % (
++        stamp, verdict, len(rows), a.input or '-'))
+     log('VERDICT %s (tools: %s; check exit: %s; side effects: %d; pins changed after: %d; wall %.1f s)' % (
+         verdict, failed or 'ok', rc_check, len(diff), bad_after, time.time() - t_all))
+     if verdict == 'PASS':
+@@ -523,7 +525,7 @@ def write_lists(v, x, cache_src, index_src):
+ 
+ def do_bin(a, stamp):
+     t_all = time.time()
+-    pr = os.path.abspath(a.pack_run) if a.pack_run else latest_pack_run()
++    pr = os.path.abspath(a.pack_run) if a.pack_run else None  # native5pack: --pack-run required
+     bw = in_pack(os.path.join(PACK, 'binwork-' + stamp))
+     out_bin = in_pack(os.path.join(PACK, a.bin_out))
+     plan_only = a.mode == 'plan'
+@@ -703,13 +705,13 @@ def do_bin(a, stamp):
+                                                pc['index']['old_rows'], pc['index']['new_rows']),
+             'runtime-linked-dxil-cache.cpp %s; runtime linked-bank.obj %s' % (
+                 sha(x['rlc']), sha(os.path.join(x['emb'], 'linked-bank.obj'))),
+-            'built by build/agent16/pack/native4bp.py bin (sha256 %s): build-final2 nat recipe, recompile.py/relink.py '
++            'built by build/agent16/pack/native5pack.py bin (sha256 %s): build-final2 nat recipe, recompile.py/relink.py '
+             'unchanged on build/agent2/snap1-on objects; work dir %s' % (sha(os.path.abspath(__file__)), rel(bw)),
+             'gates: %s' % '; '.join('%s %s' % ('PASS' if ok else 'FAIL', n) for n, ok in gates),
+         ]
+         cmd = [PY, pin('stage'), '--base', NF2, '--out', out_bin, '--replace', 'legodimensions.exe=' + exe,
+                '--replace', 'legodimensions.map=' + mp, '--title',
+-               'native4bp: nativefinal2 + AOT placement pack (%d containers), native GPU fingerprint %s' % (
++               'native5pack: nativefinal2 + AOT placement pack (%d containers), native GPU fingerprint %s' % (
+                    ncont, x['fp_new'])]
+         for n_ in notes:
+             cmd += ['--note', n_]
+@@ -725,9 +727,8 @@ def do_bin(a, stamp):
+         log('STAGED %s MANIFEST sha256 %s; exe %s; map %s; fingerprint %s' % (
+             rel(out_bin), sha(mf), sha(os.path.join(out_bin, 'legodimensions.exe')),
+             sha(os.path.join(out_bin, 'legodimensions.map')), x['fp_new']))
+-        with open(in_pack(os.path.join(PACK, 'LATEST-bin.txt')), 'w', encoding='utf-8', newline='\n') as f:
+-            f.write('%s PASS %s MANIFEST=%s fingerprint=%s pack=%s\n' % (a.bin_out, time.strftime('%H:%M:%S'),
+-                                                                       sha(mf), x['fp_new'], rel(pr)))
++        log('LATEST-bin.txt not written (native5pack): %s PASS MANIFEST=%s fingerprint=%s pack=%s' % (
++            a.bin_out, sha(mf), x['fp_new'], rel(pr)))
+         log('VERDICT PASS (wall %.1f s)' % (time.time() - t_all))
+         return 0
+     except Exception as ex:  # noqa: BLE001
+@@ -746,8 +747,8 @@ def main():
+                                     'omitted = the 4 s35 containers alone (stand-in)')
+     ap.add_argument('--exclude', action='append', default=[], help='extra NAME to leave out (logged)')
+     ap.add_argument('--no-default-exclude', action='store_true')
+-    ap.add_argument('--pack-run', help='bin: a PASS pack run dir (default: LATEST-pack.txt)')
+-    ap.add_argument('--bin-out', default='native4bp-bin')
++    ap.add_argument('--pack-run', help='bin: a PASS pack run dir (required; no LATEST-pack.txt fallback)')
++    ap.add_argument('--bin-out', default='native5pack-bin')
+     ap.add_argument('--no-ctl', dest='ctl', action='store_false')
+     ap.add_argument('--jobs', type=int, default=2)
+     a = ap.parse_args()
+@@ -766,7 +767,7 @@ def main():
+     pc, aff = self_limit()
+     if a.mode == 'plan':
+         log.open(os.path.join(PACK, 'plan-%s.txt' % stamp))
+-    log('native4bp.py %s pid=%d priority=0x%X affinity=0x%X python=%s sha256=%s' % (
++    log('native5pack.py %s pid=%d priority=0x%X affinity=0x%X python=%s sha256=%s' % (
+         a.mode, os.getpid(), pc, aff, sys.version.split()[0], sha(os.path.abspath(__file__))))
+     if pc != IDLE or aff & ~0x3 or not aff:
+         log('FAIL: not at Idle priority / affinity within 0x3')
+@@ -792,7 +793,7 @@ def main():
+     log('stage %d containers -> runtime-input\\ (+STAGED.tsv), re-verify sha256; check_pack.py precheck' % len(rows))
+     for name, cmd, env, _ in pack_commands(run_dirs(os.path.join(PACK, 'run-<stamp>'))):
+         log('RUN  %s : %s%s' % (name, ' '.join(cmd), ('   env ' + str(env)) if env else ''))
+-    log('check_pack.py post; pins re-check; watched-dir listing diff; SHA256SUMS.txt; LATEST-pack.txt')
++    log('check_pack.py post; pins re-check; watched-dir listing diff; SHA256SUMS.txt (no LATEST-pack.txt)')
+     log('--- bin (outputs under %s, staged %s):' % (rel(os.path.join(PACK, 'binwork-<stamp>')), a.bin_out))
+     a.pack_run = a.pack_run or os.path.join(PACK, 'run-<stamp>')
+     do_bin(a, '<stamp>')

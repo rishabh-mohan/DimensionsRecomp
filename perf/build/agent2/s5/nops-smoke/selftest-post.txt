@@ -1,0 +1,60 @@
+# nops_smoke_post 2026-11-25 18:12:29
+
+--- A1 sync-smoke\runs\20261125-175402-s5sync-on
+bin <workspace>\build\agent2\s5\devs5sync-bin exe 6C8E281156CCE828 cvars {'d3d12_log_sync_pipeline_creation': 'true', 'slow_frame_log_ms': '1'}
+PASS  A1 clean exit (exit 0, not early, wm_close)  [exit 0x00000000 early False close wm_close]
+PASS  A1 no dumps / crash events / WER  [dumps [] crash [] wer False]
+PASS  A1 cvars exactly {'d3d12_log_sync_pipeline_creation': 'true', 'slow_frame_log_ms': '1'}  [{'d3d12_log_sync_pipeline_creation': 'true', 'slow_frame_log_ms': '1'}]
+logs ['game.log'], 9429 lines
+PASS  A1 check-defaults --mode xenos PASS  [exit 0; RESULT PASS]
+PASS  A1 nops Initialize line absent  [0]
+PASS  A1 no "d3d12_async_depth_only_pipelines ignored"  [0]
+PASS  A1 sync-log Initialize line once  [1]
+PASS  A1 no_wait Initialize line absent  [0]
+PASS  A1 no "d3d12_pipeline_creation_no_wait ignored"  [0]
+PASS  A1 0 "Failed to create graphics pipeline"  [0]
+  attribution (D2: logging perturbs timing; counts and joins only)
+  sync lines 45, sum 879.8 ms, max 135.1 ms; movable by the opt-in (ps none, memexport vs 0, host RT) 44; memexport-vs 1; reasons {'no pixel shader': 45}
+  slow-frame lines 9140; total pipeline create 874.0 ms (43x) on the command thread; dropped draws 1254; forced pipeline waits 0.0 ms (0x)
+  top 10 frames by pipeline create: frame ms | create ms (Nx) new | dropped | sync joined n / ms / movable
+    line 7857 frame #7601 945.7 ms | create 458.5 (8x) new 67 | dropped 137 | sync 8 / 458.6 / 8
+    line 8036 frame #7760 196.0 ms | create 118.1 (10x) new 27 | dropped 42 | sync 10 / 118.0 / 10
+    line 7981 frame #7720 126.9 ms | create 86.2 (2x) new 15 | dropped 37 | sync 2 / 86.2 / 2
+    line 7987 frame #7723 97.5 ms | create 59.9 (3x) new 12 | dropped 38 | sync 3 / 59.9 / 3
+    line 9255 frame #8970 95.7 ms | create 42.1 (1x) new 5 | dropped 4 | sync 1 / 42.1 / 1
+    line 1843 frame #1736 57.9 ms | create 37.1 (1x) new 1 | dropped 0 | sync 1 / 37.1 / 0
+    line 6484 frame #6239 201.3 ms | create 29.2 (4x) new 23 | dropped 23 | sync 4 / 29.2 / 4
+    line 8104 frame #7827 225.5 ms | create 24.2 (1x) new 3 | dropped 5 | sync 1 / 24.2 / 1
+    line 6124 frame #5884 333.3 ms | create 17.6 (4x) new 21 | dropped 19 | sync 4 / 17.7 / 4
+    line 8012 frame #7746 71.2 ms | create 0.3 (2x) new 4 | dropped 9 | sync 2 / 0.3 / 2
+  top 5 frames by frame time: frame ms | create ms (Nx) new | dropped | waits
+    line 6805 frame #6557 1438.6 ms | create 0.0 (0x) new 0 | dropped 0 | waits 0.0 (0x)
+    line 7877 frame #7620 1281.8 ms | create 0.0 (0x) new 0 | dropped 0 | waits 0.0 (0x)
+    line 7857 frame #7601 945.7 ms | create 458.5 (8x) new 67 | dropped 137 | waits 0.0 (0x)
+    line 6863 frame #6615 926.2 ms | create 0.0 (0x) new 0 | dropped 0 | waits 0.0 (0x)
+    line 6479 frame #6238 918.0 ms | create 0.0 (0x) new 0 | dropped 0 | waits 0.0 (0x)
+
+--- T1 sync-smoke\runs\20261125-174932-s5sync-off
+bin <workspace>\build\agent2\s5\devs5sync-bin exe 6C8E281156CCE828 cvars {}
+PASS  T1 clean exit (exit 0, not early, wm_close)  [exit 0x00000000 early False close wm_close]
+PASS  T1 no dumps / crash events / WER  [dumps [] crash [] wer False]
+PASS  T1 cvars exactly none  [{}]
+logs ['game.log'], 244 lines
+PASS  T1 check-defaults --mode xenos PASS  [exit 0; RESULT PASS]
+PASS  T1 nops Initialize line absent  [0]
+PASS  T1 no "d3d12_async_depth_only_pipelines ignored"  [0]
+PASS  T1 sync-log Initialize line absent  [0]
+PASS  T1 0 'sync pipeline #' lines  [0]
+PASS  T1 no_wait Initialize line absent  [0]
+PASS  T1 no "d3d12_pipeline_creation_no_wait ignored"  [0]
+PASS  T1 0 "Failed to create graphics pipeline"  [0]
+  timing (perf.csv, 9483 rows; 3D from data row 5423 (0-based) at 90.7 s): 4059 frames mean 35.97 p99 138.3 p99.9 347.2 max 1229.6 ms; >100 ms 135, >250 ms 12; misses 231
+  pipeline-miss bursts (>= 20 misses in a frame): 4
+    data row 5423 at 90.7 s: misses 21, frame 259.1 ms, next-2 114.0 9.0 ms
+    data row 5779 at 98.2 s: misses 23, frame 323.0 ms, next-2 157.4 18.8 ms
+    data row 7545 at 143.3 s: misses 67, frame 940.1 ms, next-2 176.2 153.0 ms
+    data row 7766 at 156.1 s: misses 27, frame 188.8 ms, next-2 96.7 46.9 ms
+
+=== PAIRS (report only; success is judged by the Overseer / user, README section 6) ===
+
+RESULT: SELFTEST (no gates)

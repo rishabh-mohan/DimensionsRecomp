@@ -1,0 +1,265 @@
+diff --git a/rexlego/src/gpu_native/pipeline_library.cpp b/rexlego/src/gpu_native/pipeline_library.cpp
+index 4484038..b555dce 100644
+--- a/rexlego/src/gpu_native/pipeline_library.cpp
++++ b/rexlego/src/gpu_native/pipeline_library.cpp
+@@ -117,6 +117,22 @@ unsigned PreparationThreads() {
+ // Preparation workers run at most this many recipes ahead of the in-order commit.
+ constexpr std::size_t kPrepareWindow = 64;
+ 
++// LEGO_NATIVE_PSO_SAVE_UNLOCKED=1 runs the autosave's Serialize without the
++// library mutex (see SnapshotUnlocked). Unset or 0: the locked copy.
++bool SaveUnlockedRequested() {
++  const char* value = std::getenv("LEGO_NATIVE_PSO_SAVE_UNLOCKED");
++  return value && *value && std::strcmp(value, "0") != 0;
++}
++// LEGO_NATIVE_PSO_AUX_UNLOCKED=1 compiles auxiliary pipelines without the
++// library mutex (see AuxiliaryUnlocked). Unset or 0: the compile holds it.
++bool AuxUnlockedRequested() {
++  const char* value = std::getenv("LEGO_NATIVE_PSO_AUX_UNLOCKED");
++  return value && *value && std::strcmp(value, "0") != 0;
++}
++// Unlocked Serialize attempts that may lose a race with a store before Save()
++// falls back to the locked copy.
++constexpr uint32_t kUnlockedSaveAttempts = 3;
++
+ enum class PrepareResult : uint8_t { kLoaded, kCompiled, kFailed, kRemoved };
+ 
+ struct PreparedPipeline {
+@@ -183,6 +199,14 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+       return false;
+     }
+     REXLOG_INFO("Native GPU: pipeline cache {} opened ({} bytes)", path_.string(), blob_.size());
++    save_unlocked_ = SaveUnlockedRequested();
++    if (save_unlocked_)
++      REXLOG_INFO("Native GPU: pipeline cache saves serialize outside the library lock "
++                  "(LEGO_NATIVE_PSO_SAVE_UNLOCKED)");
++    aux_unlocked_ = AuxUnlockedRequested();
++    if (aux_unlocked_)
++      REXLOG_INFO("Native GPU: auxiliary pipelines compile outside the library lock "
++                  "(LEGO_NATIVE_PSO_AUX_UNLOCKED)");
+     opened(accepted     ? pso_stats::CacheState::kLoaded
+            : file_bytes ? pso_stats::CacheState::kRejected
+                         : pso_stats::CacheState::kNoFile);
+@@ -339,7 +363,12 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+   }
+ 
+   void Stop() {
+-    while (saving_.load()) std::this_thread::sleep_for(std::chrono::milliseconds(5));
++    // Claim saving_ (waiting out a running autosave) so a Frame() after this
++    // point cannot start a second Save(): two Serializes never overlap, which
++    // matters once LEGO_NATIVE_PSO_SAVE_UNLOCKED takes Serialize out of mutex_.
++    // It stays claimed: the library is retired (leaked) after Stop().
++    for (bool expected = false; !saving_.compare_exchange_strong(expected, true); expected = false)
++      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+     Save();
+     std::lock_guard lock(mutex_);
+     warmed_.clear();
+@@ -408,6 +437,7 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+   bool Auxiliary(ID3D12Device* device, const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc,
+                  const void* root_data, std::size_t root_size, ID3D12PipelineState** pipeline) {
+     const auto name = L"aux-" + PipelineName(desc, root_data, root_size);
++    if (aux_unlocked_) return AuxiliaryUnlocked<kStats>(device, desc, name, pipeline);
+     std::lock_guard lock(mutex_);
+     if (SUCCEEDED(library_->LoadGraphicsPipeline(name.c_str(), &desc, IID_PPV_ARGS(pipeline)))) {
+       ++stats_.hits;
+@@ -423,6 +453,34 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+     return true;
+   }
+ 
++  // LEGO_NATIVE_PSO_AUX_UNLOCKED: Auxiliary() with the compile outside mutex_.
++  template <bool kStats>
++  bool AuxiliaryUnlocked(ID3D12Device* device, const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc,
++                         const std::wstring& name, ID3D12PipelineState** pipeline) {
++    {
++      // The load stays under mutex_: two threads must never load one name at once.
++      std::lock_guard lock(mutex_);
++      if (SUCCEEDED(library_->LoadGraphicsPipeline(name.c_str(), &desc, IID_PPV_ARGS(pipeline)))) {
++        ++stats_.hits;
++        if constexpr (kStats) pso_stats::OnAuxiliary(true, true, 0);
++        return true;
++      }
++      ++stats_.misses;
++    }
++    // The compile holds no lock, so draw-time load() and store() never wait
++    // for it. If another thread compiles the same name meanwhile, the second
++    // Store() fails harmlessly, as for any name the library already has.
++    // Each caller then holds its own PSO object for that one aux name; the
++    // callers cache their own pipeline, so that is fine.
++    const uint64_t start = kStats ? pso_stats::Nanos() : 0;
++    const bool compiled = SUCCEEDED(device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(pipeline)));
++    if constexpr (kStats) pso_stats::OnAuxiliary(false, compiled, pso_stats::Nanos() - start);
++    if (!compiled) return false;
++    std::lock_guard lock(mutex_);
++    Store(name, *pipeline);
++    return true;
++  }
++
+   // One startup recipe: the driver library first, then a compile. Several may
+   // run at once: the library and the device are free-threaded, and no two
+   // concurrent calls share a name (ID3D12PipelineLibrary's one restriction).
+@@ -557,28 +615,41 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+     SaveRecipes();
+     const bool stats = pso_stats::Enabled();
+     uint64_t saved = 0;
++    // Runs with mutex_ held.
++    const auto query = [&]() -> std::size_t {
++      if (!unsaved_) return 0;
++      const SIZE_T size = library_->GetSerializedSize();
++      // A library holding real pipelines is never this small; refuse to
++      // overwrite a good file with one that did not actually keep them.
++      if (size <= 1024 || size > kMaxLibraryBytes) {
++        unsaved_ = 0;
++        return 0;
++      }
++      return size;
++    };
++    PipelineSnapshot unlocked;
++    const bool done = save_unlocked_ && SnapshotUnlocked(unlocked, saved, query);
++    if (save_unlocked_ && !done)
++      REXLOG_WARN("Native GPU: unlocked pipeline cache save gave up after {} passes; saving under the lock",
++                  unlocked.passes);
+     // The buffer is allocated outside mutex_; only the size query and Serialize
+     // run under it (see pipeline_snapshot.h). Same bytes, same file.
+-    auto snapshot = SnapshotPipelineLibrary(
+-        mutex_,
+-        [&]() -> std::size_t {
+-          if (!unsaved_) return 0;
+-          const SIZE_T size = library_->GetSerializedSize();
+-          // A library holding real pipelines is never this small; refuse to
+-          // overwrite a good file with one that did not actually keep them.
+-          if (size <= 1024 || size > kMaxLibraryBytes) {
+-            unsaved_ = 0;
+-            return 0;
+-          }
+-          return size;
+-        },
+-        [&](uint8_t* data, std::size_t size) {
+-          if (FAILED(library_->Serialize(data, size))) return false;
+-          saved = unsaved_;
+-          unsaved_ = 0;
+-          ++stats_.saves;
+-          return true;
+-        });
++    auto snapshot = done ? std::move(unlocked)
++                         : SnapshotPipelineLibrary(mutex_, query, [&](uint8_t* data, std::size_t size) {
++                             if (FAILED(library_->Serialize(data, size))) return false;
++                             saved = unsaved_;
++                             unsaved_ = 0;
++                             ++stats_.saves;
++                             return true;
++                           });
++    if (save_unlocked_ && !done) {
++      // Count the abandoned unlocked passes too.
++      snapshot.lock_us += unlocked.lock_us;
++      snapshot.max_lock_us = std::max(snapshot.max_lock_us, unlocked.max_lock_us);
++      snapshot.copy_us += unlocked.copy_us;
++      snapshot.alloc_us += unlocked.alloc_us;
++      snapshot.retries += unlocked.retries;
++    }
+     if (stats)
+       pso_stats::OnSaveSnapshot({uint64_t(snapshot.lock_us) * 1000, uint64_t(snapshot.max_lock_us) * 1000,
+                                  uint64_t(snapshot.copy_us) * 1000, uint64_t(snapshot.alloc_us) * 1000,
+@@ -614,6 +685,94 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+       REXLOG_INFO("Native GPU: pipeline cache saved, {} new pipelines, {} bytes", saved, snapshot.size);
+   }
+ 
++  // LEGO_NATIVE_PSO_SAVE_UNLOCKED: like SnapshotPipelineLibrary, but Serialize
++  // runs without mutex_, so draw-time load()/store() never queue behind the
++  // copy. The library itself is free-threaded; loads proceed during Serialize
++  // and the driver holds back a concurrent StorePipeline until it is done. A
++  // store between GetSerializedSize and Serialize makes Serialize fail with
++  // E_INVALIDARG (bench/agent6/d3d12_library_probe.md), so a copy is accepted
++  // only if Serialize succeeded and the library still has the size it was
++  // queried at; otherwise it is retried with a fresh zero-filled buffer (never
++  // a reused one, see pipeline_snapshot.h). Without a race the bytes are the
++  // ones the locked path writes. Returns false to fall back to the locked path.
++  template <class Query>
++  bool SnapshotUnlocked(PipelineSnapshot& snapshot, uint64_t& saved, Query& query) {
++    using namespace snapshot_detail;
++    const auto held = [&](Clock::time_point locked) {
++      const int64_t micros = Micros(Clock::now() - locked);
++      snapshot.lock_us += micros;
++      if (micros > snapshot.max_lock_us) snapshot.max_lock_us = micros;
++    };
++    // Each attempt is two locked passes: query and allocate, query and copy.
++    const auto give_up = [&] {
++      snapshot.data.reset();
++      snapshot.capacity = 0;
++      snapshot.size = 0;
++      snapshot.status = PipelineSnapshot::Status::kFailed;
++      return false;
++    };
++    bool dirty = false;  // the buffer has been handed to Serialize
++    for (;;) {
++      std::size_t size = 0;
++      uint64_t counted = 0;
++      {
++        std::lock_guard lock(mutex_);
++        const auto locked = Clock::now();
++        ++snapshot.passes;
++        size = query();
++        counted = unsaved_;
++        held(locked);
++      }
++      snapshot.wanted = size;
++      if (!size) {
++        snapshot.status = PipelineSnapshot::Status::kNothing;
++        return true;
++      }
++      if (dirty || size > snapshot.capacity) {
++        if (snapshot.passes >= 2 * kUnlockedSaveAttempts) return give_up();
++        if (snapshot.capacity && !dirty) ++snapshot.retries;
++        snapshot.data.reset();
++        snapshot.capacity = 0;
++        dirty = false;
++        const std::size_t bytes = Capacity(size);
++        const auto start = Clock::now();
++        snapshot.data = Allocate(bytes);
++        snapshot.alloc_us += Micros(Clock::now() - start);
++        if (!snapshot.data) {
++          snapshot.status = PipelineSnapshot::Status::kNoMemory;
++          return true;
++        }
++        snapshot.capacity = bytes;
++        continue;  // The library may have grown during the allocation.
++      }
++      dirty = true;
++      const auto copy_start = Clock::now();
++      const HRESULT serialized = library_->Serialize(snapshot.data.get(), size);
++      snapshot.copy_us += Micros(Clock::now() - copy_start);
++      bool accepted = false;
++      {
++        std::lock_guard lock(mutex_);
++        const auto locked = Clock::now();
++        accepted = SUCCEEDED(serialized) && library_->GetSerializedSize() == size;
++        if (accepted) {
++          // Stores after the query are not in this copy; they stay unsaved.
++          saved = counted;
++          unsaved_ -= std::min(unsaved_, counted);
++          ++stats_.saves;
++        }
++        held(locked);
++      }
++      if (accepted) {
++        snapshot.size = size;
++        snapshot.status = PipelineSnapshot::Status::kCopied;
++        return true;
++      }
++      ++snapshot.retries;
++      if ((FAILED(serialized) && serialized != E_INVALIDARG) || snapshot.passes >= 2 * kUnlockedSaveAttempts)
++        return give_up();
++    }
++  }
++
+   std::filesystem::path path_;
+   std::filesystem::path recipe_path_;
+   std::filesystem::path seed_path_;
+@@ -630,6 +789,8 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+   uint64_t unsaved_ = 0;
+   Clock::time_point last_store_{};
+   std::atomic<bool> saving_{false};
++  bool save_unlocked_ = false;  // LEGO_NATIVE_PSO_SAVE_UNLOCKED, read once in Open()
++  bool aux_unlocked_ = false;   // LEGO_NATIVE_PSO_AUX_UNLOCKED, read once in Open()
+ };
+ 
+ PipelineLibrary* g_library = nullptr;

@@ -1,0 +1,35 @@
+e6_roles.py sha256 CD2EDB821AA0059296A9B54688379C6E5F38213AB211EBA0B3B45B4197BAC577  (INFORMATION ONLY: not a proof tool; E is judged by proof5_post v3 + E-C2..E-C6)
+label run
+trace       038501C466354AD4B25823B75BE0380705F82018A587B727552FE2AD2B9C7116 <workspace>\build\agent16\cg7\selftest\e6\fixtures\miss-cache-off-diag\trace\events.tsv
+trace-start 6CF3BBB4E59232E56955B369839547D6CB78582ACFFE40D73444500A23AF8315 <workspace>\build\agent16\cg7\selftest\e6\fixtures\miss-cache-off-diag\trace\trace-start.json
+game.log    36FCBAC2D6D03230678EA8C07D3564978257DA0CB198ED54ED06E18971B4A202 <workspace>\build\agent16\cg7\selftest\e6\fixtures\miss-cache-off-diag\game.log
+runlog      65B15F8439B9C0437E6B4AEF917F993586DE5D737CFF72FC188ABEF2598FAB3C <workspace>\build\agent16\cg7\selftest\e6\fixtures\miss-cache-off-diag\runlog.txt
+trace start unix_ms 1795708800000 (2026-11-26 10:00:00 local)
+red start (game.log, first pad 1 FF 00 00 speed 18): 2026-11-26 10:01:40.000 -> trace 100000.0 ms
+role rule (first miss row at >= red+40 s, seconds after red, [lo, hi)): A-AB7D1200 [43.0, 44.0), U-ABA99710 [44.0, 45.0), C-A7F79FD0 [58.0, 77.0)
+trace: frames 401; stop (last frame) red+100.0 s; miss-cache inserts 1
+backings known (game.log lines + identity events): 0
+PRE: miss rows before red+40 s: 0
+
+per role (stage guest: miss rows at >= red+40 s [W1a / W1b / W2], unrecognized rows, first..last red+s, backing)
+  A-AB7D1200: VS misses 5, PS misses 0
+    VS class: covered (B container 56F18006)
+    PS class: covered (B container E566393A)
+    VS AB80F350: 5 [5 / 0 / 0], 5, +43.5..+47.5, backing unknown
+  U-ABA99710: VS misses 3, PS misses 0
+    VS class: known uncovered VS, no identity in B
+    PS class: covered (B container 6EE915B0)
+    VS AB64C0E0: 3 [3 / 0 / 0], 3, +44.5..+46.5, backing unknown
+  C-A7F79FD0: VS misses 4, PS misses 0
+    VS class: covered (B container F976B389)
+    PS class: covered (B container 4DB01A8D)
+    VS A7F7A100: 4 [0 / 0 / 4], 4, +75.7..+78.7, backing unknown
+  OTHER: VS misses 0, PS misses 0
+    VS class: OTHER (no role)
+    PS class: OTHER (no role)
+
+E-C4 windows: W1a red+40..59 s 8; W1b red+59..65 s 0; W2 red+65 s..stop 4; TOTAL at >= red+40 s 12; PRE 0; stop red+100.0 s
+ROLES: A-AB7D1200 5 (VS 5, PS 0); U-ABA99710 3 (VS 3, PS 0); C-A7F79FD0 4 (VS 4, PS 0); OTHER 0 (VS 0, PS 0)
+CLASS: known uncovered VS, no identity in B (U-ABA99710 VS) 3; covered-role misses (high priority) 9 [A-AB7D1200 VS 5, C-A7F79FD0 VS 4]; OTHER (no role) 0
+HYGIENE (E-C6 part): game.log shader miss cache OFF; runlog DIAGNOSTIC lines 1
+FLAGS: MISS-CACHE-OFF, DIAGNOSTIC

@@ -1,0 +1,66 @@
+== trace trace-native5-20261126-073150\events.tsv
+first frame (b'52.133', b'2') last frame (b'877092.589', b'37537')
+      930318 texture_fetch_changed
+      170968 texture_color_authority
+       37536 frame
+        5732 unrecognized_shader
+        3815 texture_header_refresh
+        2221 texture_upload_changed
+        1649 draw_missing_vertex_shader
+          85 resolve
+           6 shader_miss_cache_insert
+           1 event
+== samples
+   elapsed_ms	frame	event	anomaly_candidate	details
+   2.624	0	resolve	0	signature_src_dst_flags_level_slice_rect_point_format= 3019c000,aceb073c,00000000,00000000,00000000,00000000,00000000,00000780,00000438,00000000,00000000,18280106, dst_width= 1280 dst_height= 720
+   41.593	1	resolve	0	signature_src_dst_flags_level_slice_rect_point_format= 3019c000,aceb0610,00000000,00000000,00000000,00000000,00000000,00000780,00000438,00000000,00000000,18280106, dst_width= 1280 dst_height= 720
+   816059.562	35359	shader_miss_cache_insert	0	stage= 6 guest= 2877354832 physical= 3978671776 span= 2324 prefix= 14374147212387527897
+   816059.808	35359	shader_miss_cache_insert	0	stage= 7 guest= 2876749184 physical= 3978672352 span= 2024 prefix= 14374147212387527897
+   816059.570	35359	unrecognized_shader	1	guest= 2877354832 stage= 6
+   816059.816	35359	unrecognized_shader	1	guest= 2876749184 stage= 7
+   816059.915	35359	draw_missing_vertex_shader	1	guest_vs= 2877354832
+   816059.934	35359	draw_missing_vertex_shader	1	guest_vs= 2877354832
+== per (event, guest): count, first (frame, ts), last  [draw_missing and unrecognized only, sorted by event,count]
+  draw_missing_vertex_shader   A7F7A100    1007 first (36530, 848257.543) last (37536, 877087.895)
+  draw_missing_vertex_shader   AB80F350     476 first (35359, 816059.915) last (35667, 824416.476)
+  draw_missing_vertex_shader   AB64C0E0     166 first (35396, 817067.71) last (35660, 824244.796)
+  unrecognized_shader          A7F7A100    2014 first (36530, 848257.26) last (37536, 877087.857)
+  unrecognized_shader          A7F79ED0    2014 first (36530, 848257.469) last (37536, 877087.875)
+  unrecognized_shader          AB80F350     520 first (35359, 816059.57) last (35667, 824416.449)
+  unrecognized_shader          AB77B580     520 first (35359, 816059.816) last (35667, 824416.461)
+  unrecognized_shader          AB64C0E0     332 first (35396, 817067.364) last (35660, 824244.768)
+  unrecognized_shader          ABB3F110     332 first (35396, 817067.641) last (35660, 824244.78)
+== inserts (6)
+   816059.562	35359	shader_miss_cache_insert	0	stage= 6 guest= 2877354832 physical= 3978671776 span= 2324 prefix= 14374147212387527897
+   816059.808	35359	shader_miss_cache_insert	0	stage= 7 guest= 2876749184 physical= 3978672352 span= 2024 prefix= 14374147212387527897
+   817067.350	35396	shader_miss_cache_insert	0	stage= 6 guest= 2875506912 physical= 3978672704 span= 2324 prefix= 14374147212387527897
+   817067.631	35396	shader_miss_cache_insert	0	stage= 7 guest= 2880696592 physical= 3978673280 span= 2024 prefix= 14374147212387527897
+   848257.255	36530	shader_miss_cache_insert	0	stage= 6 guest= 2818023680 physical= 3979692480 span= 2324 prefix= 14374147212387527897
+   848257.461	36530	shader_miss_cache_insert	0	stage= 7 guest= 2818023120 physical= 3979693024 span= 2024 prefix= 14374147212387527897
+== identity events (0)
+== wanted guest samples
+   816059.562	35359	shader_miss_cache_insert	0	stage= 6 guest= 2877354832 physical= 3978671776 span= 2324 prefix= 14374147212387527897
+   816059.570	35359	unrecognized_shader	1	guest= 2877354832 stage= 6
+   816059.860	35359	unrecognized_shader	1	guest= 2877354832 stage= 6
+   816086.818	35360	unrecognized_shader	1	guest= 2877354832 stage= 6
+   816059.808	35359	shader_miss_cache_insert	0	stage= 7 guest= 2876749184 physical= 3978672352 span= 2024 prefix= 14374147212387527897
+   816059.816	35359	unrecognized_shader	1	guest= 2876749184 stage= 7
+   816059.891	35359	unrecognized_shader	1	guest= 2876749184 stage= 7
+   816086.878	35360	unrecognized_shader	1	guest= 2876749184 stage= 7
+   816059.915	35359	draw_missing_vertex_shader	1	guest_vs= 2877354832
+   816059.934	35359	draw_missing_vertex_shader	1	guest_vs= 2877354832
+   816086.977	35360	draw_missing_vertex_shader	1	guest_vs= 2877354832
+   817067.350	35396	shader_miss_cache_insert	0	stage= 6 guest= 2875506912 physical= 3978672704 span= 2324 prefix= 14374147212387527897
+   817067.364	35396	unrecognized_shader	1	guest= 2875506912 stage= 6
+   817067.676	35396	unrecognized_shader	1	guest= 2875506912 stage= 6
+   817093.654	35397	unrecognized_shader	1	guest= 2875506912 stage= 6
+   817067.710	35396	draw_missing_vertex_shader	1	guest_vs= 2875506912
+   817093.794	35397	draw_missing_vertex_shader	1	guest_vs= 2875506912
+   817121.135	35398	draw_missing_vertex_shader	1	guest_vs= 2875506912
+   848257.255	36530	shader_miss_cache_insert	0	stage= 6 guest= 2818023680 physical= 3979692480 span= 2324 prefix= 14374147212387527897
+   848257.260	36530	unrecognized_shader	1	guest= 2818023680 stage= 6
+   848257.508	36530	unrecognized_shader	1	guest= 2818023680 stage= 6
+   848283.370	36531	unrecognized_shader	1	guest= 2818023680 stage= 6
+   848257.543	36530	draw_missing_vertex_shader	1	guest_vs= 2818023680
+   848283.486	36531	draw_missing_vertex_shader	1	guest_vs= 2818023680
+   848312.806	36532	draw_missing_vertex_shader	1	guest_vs= 2818023680

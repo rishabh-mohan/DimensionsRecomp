@@ -1,0 +1,150 @@
+wall,t_sidecar,game_ts,kind,detail
+09:05:58.359,1.00,,run-dir,<workspace>\build\agent3\gameplay\selftest\simruns\20261125-210000-simD
+09:05:58.359,1.00,,ctl-dir,<workspace>\build\agent3\gameplay\selftest\simruns\20261125-210000-simD\toypad-ctl
+09:05:58.362,1.01,21:00:00.000,listener,port 54239
+09:05:58.362,1.01,21:00:00.000,toypad,Toypad listener active on 127.0.0.1:54239
+09:05:58.362,1.01,21:00:00.000,toypad,Toypad: pad 3 mode 1 lit FF FF FF (on 0 off 0 count 1 speed 16)
+09:05:58.362,1.01,21:00:00.000,trigger,log /Toypad: pad 3 mode 1 lit FF FF FF/
+09:05:58.869,1.51,,load,LOAD batman id=1 pad=2 index=0 path_len=0 -> hangup-ok (0.00 s) [boot]
+09:05:58.985,1.63,,load,LOAD gandalf id=2 pad=1 index=1 path_len=0 -> hangup-ok (0.02 s) [boot]
+09:05:59.113,1.76,,load,LOAD wyldstyle id=3 pad=3 index=2 path_len=0 -> hangup-ok (0.03 s) [boot]
+09:05:59.363,2.01,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 18 (on 0 off 0 count 1 speed 15)
+09:05:59.615,2.26,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 18 (on 0 off 0 count 1 speed 15)
+09:05:59.866,2.51,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 18 (on 0 off 0 count 1 speed 15)
+09:06:02.131,4.78,,remove,REMOVE gandalf pad=1 index=1 -> hangup-ok [ctl 001.cmd]
+09:06:02.258,4.90,,remove,REMOVE wyldstyle pad=3 index=2 -> hangup-ok [ctl 001.cmd]
+09:06:02.370,5.01,,load,LOAD gandalf id=2 pad=3 index=1 path_len=0 -> hangup-ok (0.01 s) [ctl 001.cmd]
+09:06:02.494,5.14,,load,LOAD wyldstyle id=3 pad=1 index=2 path_len=0 -> hangup-ok (0.02 s) [ctl 001.cmd]
+09:06:02.494,5.14,,ctl,001.cmd ok: swap gandalf wyldstyle -> REMOVE gandalf pad=1 index=1 -> hangup-ok; REMOVE wyldstyle pad=3 index=2 -> hangup-ok; LOAD gandalf id=2 pad=3 index=1 path_len=0 -> hangup-ok (0.01 s); LOAD wyldstyle id=3 pad=1 index=2 path_len=0 -> hangup-ok (0.02 s)
+09:06:02.747,5.39,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit 00 00 16 (on 0 off 0 count 1 speed 16)
+09:06:02.747,5.39,21:00:00.000,prompt,batman fire 1/2: /pad 2 mode 3 lit 00 00 (05|16)/ -> pad 2 in 0.2 s
+09:06:02.998,5.64,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit 00 00 05 (on 0 off 0 count 1 speed 16)
+09:06:03.001,5.65,,remove,REMOVE batman pad=2 index=0 -> hangup-ok [prompt]
+09:06:03.114,5.76,,load,LOAD batman id=1 pad=2 index=0 path_len=0 -> hangup-ok (0.01 s) [prompt]
+09:06:03.114,5.76,,prompt-done,ok replace batman: REMOVE batman pad=2 index=0 -> hangup-ok; LOAD batman id=1 pad=2 index=0 path_len=0 -> hangup-ok (0.01 s)
+09:06:03.366,6.01,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit 00 00 16 (on 0 off 0 count 1 speed 16)
+09:06:03.370,6.01,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit 00 00 05 (on 0 off 0 count 1 speed 16)
+09:06:03.622,6.27,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 18 (on 0 off 0 count 1 speed 16)
+09:06:04.129,6.77,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 18 (on 0 off 0 count 1 speed 15)
+09:06:04.129,6.77,21:00:00.000,zone-t0,pad 3 lit FF 00 18 speed 15 after the prompts
+09:06:04.129,6.77,,shot,zone-t0
+09:06:04.129,6.77,21:00:00.000,zone,step 1 pad 3 wants wyldstyle: T0 + 1 s; first command in 1.0 s
+09:06:05.137,7.78,,zone,step 1 pad 3 plan: remove gandalf; remove wyldstyle; place wyldstyle 3
+09:06:05.156,7.80,,remove,REMOVE gandalf pad=3 index=1 -> hangup-ok [zone]
+09:06:05.156,7.80,,zone,step 1 ok: remove gandalf -> REMOVE gandalf pad=3 index=1 -> hangup-ok
+09:06:05.679,8.32,,remove,REMOVE wyldstyle pad=1 index=2 -> hangup-ok [zone]
+09:06:05.679,8.32,,zone,step 1 ok: remove wyldstyle -> REMOVE wyldstyle pad=1 index=2 -> hangup-ok
+09:06:06.184,8.83,,load,LOAD wyldstyle id=3 pad=3 index=2 path_len=0 -> hangup-ok (0.00 s) [zone]
+09:06:06.184,8.83,,zone,step 1 ok: place wyldstyle 3 -> LOAD wyldstyle id=3 pad=3 index=2 path_len=0 -> hangup-ok (0.00 s)
+09:06:06.440,9.08,21:00:00.000,load-confirm,Toypad listener: LOAD -> pad=3 index=2 (path len 0)
+09:06:06.440,9.08,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 6E 18 (on 0 off 0 count 1 speed 15)
+09:06:06.440,9.08,21:00:00.000,zone,step 1 pad 3 handoff (pad 2 lit FF 6E 18) 0.000 s after the LOAD confirm (game_ts)
+09:06:06.440,9.08,,shot,zone-cue-pad2
+09:06:06.440,9.08,21:00:00.000,zone,step 2 pad 2 wants gandalf: cue pad 2 lit FF 6E 18; first command in 0.3 s
+09:06:06.948,9.59,,zone,step 2 pad 2 plan: remove batman; place gandalf 2
+09:06:06.968,9.61,,remove,REMOVE batman pad=2 index=0 -> hangup-ok [zone]
+09:06:06.968,9.61,,zone,step 2 ok: remove batman -> REMOVE batman pad=2 index=0 -> hangup-ok
+09:06:07.488,10.13,,load,LOAD gandalf id=2 pad=2 index=1 path_len=0 -> hangup-ok (0.02 s) [zone]
+09:06:07.488,10.13,,zone,step 2 ok: place gandalf 2 -> LOAD gandalf id=2 pad=2 index=1 path_len=0 -> hangup-ok (0.02 s)
+09:06:09.501,12.15,,zone,step 2 pad 2: no handoff 2 s after the last LOAD: retry
+09:06:09.516,12.16,,remove,REMOVE gandalf pad=2 index=1 -> hangup-ok [zone]
+09:06:09.516,12.16,,zone,step 2 ok: remove gandalf -> REMOVE gandalf pad=2 index=1 -> hangup-ok
+09:06:10.037,12.68,,load,LOAD gandalf id=2 pad=2 index=1 path_len=0 -> hangup-ok (0.02 s) [zone]
+09:06:10.037,12.68,,zone,step 2 ok: place gandalf 2 -> LOAD gandalf id=2 pad=2 index=1 path_len=0 -> hangup-ok (0.02 s)
+09:06:10.289,12.93,21:00:00.000,load-confirm,Toypad listener: LOAD -> pad=2 index=1 (path len 0)
+09:06:10.289,12.93,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 15)
+09:06:10.289,12.93,21:00:00.000,zone,step 2 pad 2 handoff (pad 1 lit FF 00 00) 0.000 s after the LOAD confirm (game_ts) (after the retry)
+09:06:10.290,12.93,,shot,zone-cue-pad1
+09:06:10.290,12.93,21:00:00.000,zone,step 3 pad 1 wants batman: cue pad 1 lit FF 00 00; first command in 0.3 s
+09:06:10.794,13.44,,zone,step 3 pad 1 plan: place batman 1
+09:06:10.809,13.45,,load,LOAD batman id=1 pad=1 index=0 path_len=0 -> hangup-ok (0.02 s) [zone]
+09:06:10.809,13.45,,zone,step 3 ok: place batman 1 -> LOAD batman id=1 pad=1 index=0 path_len=0 -> hangup-ok (0.02 s)
+09:06:11.065,13.71,21:00:00.000,load-confirm,Toypad listener: LOAD -> pad=1 index=0 (path len 0)
+09:06:11.066,13.71,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit 99 42 0E (on 0 off 0 count 1 speed 15)
+09:06:11.066,13.71,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit 99 42 0E (on 0 off 0 count 1 speed 15)
+09:06:11.066,13.71,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit 99 42 0E (on 0 off 0 count 1 speed 15)
+09:06:11.066,13.71,21:00:00.000,zone,step 3 pad 1 handoff (all 3 pads 99 42 0E) 0.000 s after the LOAD confirm (game_ts)
+09:06:11.066,13.71,21:00:00.000,zone-done,"all 3 pads 99 42 0E, T0 + 6.9 s"
+09:06:11.066,13.71,,shot,zone-done
+09:06:12.073,14.72,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:12.073,14.72,21:00:00.000,alert,pad 1 lit FF 00 00 speed 18: all-pads fast red state 1 starts
+09:06:12.076,14.72,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:12.076,14.72,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:12.331,14.98,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:12.331,14.98,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:12.331,14.98,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:12.585,15.23,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:12.585,15.23,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:12.585,15.23,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:12.837,15.48,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:12.837,15.48,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:12.837,15.48,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:13.089,15.73,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:13.089,15.73,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:13.089,15.73,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:13.341,15.99,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:13.341,15.99,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:13.341,15.99,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:13.593,16.24,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:13.593,16.24,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:13.593,16.24,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:13.844,16.49,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:13.844,16.49,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:13.844,16.49,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:14.097,16.74,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:14.097,16.74,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:14.097,16.74,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:14.350,16.99,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:14.351,17.00,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:14.351,17.00,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:14.601,17.25,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:14.601,17.25,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:14.601,17.25,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:14.854,17.50,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:14.854,17.50,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:14.854,17.50,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:15.106,17.75,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:15.107,17.75,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:15.107,17.75,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:15.107,17.75,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:15.107,17.75,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:15.107,17.75,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:15.358,18.00,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:15.358,18.00,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:15.358,18.00,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:15.611,18.26,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:15.611,18.26,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:15.611,18.26,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:15.863,18.51,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:15.863,18.51,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:15.863,18.51,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:16.116,18.76,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:16.116,18.76,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:16.116,18.76,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:16.371,19.02,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:16.371,19.02,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:16.372,19.02,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:16.623,19.27,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:16.623,19.27,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:16.623,19.27,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:16.874,19.52,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:16.874,19.52,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:16.874,19.52,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:17.127,19.77,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:17.127,19.77,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:17.127,19.77,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:17.127,19.77,,shot,alert1-plus05s
+09:06:17.380,20.03,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:17.382,20.03,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:17.382,20.03,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:17.635,20.28,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:17.635,20.28,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:17.635,20.28,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:17.886,20.53,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:17.886,20.53,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:17.886,20.53,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:18.137,20.78,21:00:00.000,toypad,Toypad: pad 1 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:18.137,20.78,21:00:00.000,toypad,Toypad: pad 2 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:18.137,20.78,21:00:00.000,toypad,Toypad: pad 3 mode 3 lit FF 00 00 (on 0 off 0 count 1 speed 18)
+09:06:18.390,21.03,,end,run-game finished (summary.json)
+09:06:18.390,21.03,,result,"listener=True boot=starter trigger=True placed=True load-confirms=3 then=off remove-confirms=0 prompts=batman:1/1 ctl=1 done/0 err route=0 ok/0 err zone=done zone-skips=0 alerts=1 shots=5 slots: batman pad=1 index=0, gandalf pad=2 index=1, wyldstyle pad=3 index=2"

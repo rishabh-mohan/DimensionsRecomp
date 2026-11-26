@@ -1,0 +1,8 @@
+PASS black only                   pick None                   want None                   060s printwindow 0.4% screen -
+PASS black + screen copy          pick shot-060s-screen.png   want shot-060s-screen.png   060s printwindow 0.4% screen 75.9%
+PASS black + black screen         pick None                   want None                   060s printwindow 0.4% screen 0.4%
+PASS good printwindow             pick shot-060s.png          want shot-060s.png          060s printwindow 75.9% screen 0.4%
+PASS dark real printwindow        pick shot-060s.png          want shot-060s.png          060s printwindow 7.1% screen -
+PASS missing                      pick None                   want None                   060s printwindow - screen -
+black 0.39% good 75.88% dark 7.08% (MIN_NONBLACK 2%)
+SHOT GATE TEST ALL PASS (6 cases)

@@ -1,0 +1,36 @@
+# mapcheck-s4c (Agent 2, run 2 task #1; by name and object, not address)  2026-11-26 08:57:06  mode same
+new: build\agent16\pack\binwork-20261126-085606\on\link\legodimensions.map  43745602 B  mtime 11-26 08:56:59  sha256 21ACBA162501DE3B
+ref: build\agent2\nativefinal2-bin\legodimensions.map  43745602 B  mtime 11-25 16:12:03  sha256 B669786E17B3B09E
+new: publics 358805; sub_ 164786; __imp__sub_ 164786; hooked 109
+ref: publics 358805; sub_ 164786; __imp__sub_ 164786; hooked 109
+PASS sub_ name set equal to ref: 164786 names
+PASS __imp__sub_ name set equal to ref: 164786 names
+PASS hooked set = ref hooked (109) + 0 moved = 109: have 109
+PASS the 109 ref-hooked names keep their sub_ and __imp__ objects
+PASS per-object sub_ sets = ref (458 objects)
+PASS per-object __imp__sub_ sets = ref (438 objects)
+PASS unhooked names: sub_ and __imp__ in the same object: 164677 names
+PASS gpu_wait_backoff.cpp.obj defines exactly the sub_ publics (none): has none
+gpu_wait_backoff.cpp.obj publics (0): none (object not in the map)
+hooked by sub_ object (new map):
+  crash_guards.cpp.obj                  2  sub_82A35B90 sub_83C01C08
+  draw.cpp.obj                          7  sub_83FB33E0 sub_83FBC9D8 sub_83FBCD28 sub_83FBD098 sub_83FBF0D8 sub_83FC6640 sub_83FC6A58
+  hooks_buffer.cpp.obj                  8  sub_82BD2868 sub_83FC49E8 sub_83FC4D58 sub_83FC4E30 sub_83FC53D0 sub_83FC54C8 sub_83FC60D8 sub_83FC6128
+  hooks_device.cpp.obj                 11  sub_83FAF9A0 sub_83FB2F20 sub_83FB6DD0 sub_83FBA420 sub_83FBF8A0 sub_83FBF900 sub_83FC08D0 sub_83FC0C10 sub_83FC0EC0 sub_83FC0F38 sub_83FC5A58
+  hooks_portrait.cpp.obj                2  sub_83373850 sub_833738B8
+  hooks_shader.cpp.obj                  8  sub_83FB67F0 sub_83FB6828 sub_83FB6A30 sub_83FB7528 sub_83FB7658 sub_83FB7750 sub_83FC4CE0 sub_83FC59D8
+  hooks_state.cpp.obj                  16  sub_83FAF5D8 sub_83FB58A8 sub_83FB6C48 sub_83FB6D50 sub_83FBA068 sub_83FBA160 sub_83FBA308 sub_83FBA398 sub_83FBA3E0 sub_83FBA710 sub_83FBA968 sub_83FBA978 sub_83FBAAA8 sub_83FBAE38 sub_83FBB110 sub_83FBCBB8
+  hooks_texture.cpp.obj                 5  sub_83FB5540 sub_83FB5560 sub_83FB5570 sub_83FB5690 sub_83FB57C8
+  main_menu_extras.cpp.obj              3  sub_82F03C40 sub_82FBE7A8 sub_82FE4A80
+  name_trace.cpp.obj                    5  sub_82A3D980 sub_83470AF8 sub_834B8168 sub_836F5AD0 sub_83715F00
+  native_atomics.cpp.obj                3  sub_82A2A0E8 sub_82A2A138 sub_82A2A160
+  native_constants.cpp.obj              1  sub_82B7ABF0
+  native_lock_elide.cpp.obj             7  sub_82A2CAB0 sub_82A2CC20 sub_82A34E28 sub_82A34FE8 sub_82A35D28 sub_82A4CA18 sub_83F99CB8
+  native_markers.cpp.obj                2  sub_82A3E238 sub_82A3E2B8
+  native_memops.cpp.obj                 2  sub_83E45090 sub_83E46040
+  native_skin_diagnostics.cpp.obj       6  sub_82A2AA28 sub_82A33D28 sub_82A34208 sub_82C9A000 sub_82DD3220 sub_82E0F480
+  native_slot_growth.cpp.obj            3  sub_82A3B6D8 sub_82A57FE0 sub_836F9E48
+  queries.cpp.obj                       4  sub_83FB05B0 sub_83FB0738 sub_83FB09E8 sub_83FB2360
+  scene_distance.cpp.obj                2  sub_82C6F428 sub_83A11F50
+  settings_native_hooks.cpp.obj        12  sub_82A435C8 sub_82EFCB70 sub_82EFEFA0 sub_82F0DF30 sub_82F0F8D0 sub_82FB8628 sub_82FCF858 sub_82FD9F40 sub_82FEA350 sub_839C4D08 sub_839D08A0 sub_839D4020
+RESULT: PASS  (109 hooked; 2.1 s)

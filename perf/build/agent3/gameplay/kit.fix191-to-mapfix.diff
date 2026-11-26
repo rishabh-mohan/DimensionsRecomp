@@ -1,0 +1,59 @@
+diff --git a/cur/gameplay-run.ps1 b/map/gameplay-run.ps1
+index 3f8e97d..44b3950 100644
+--- a/cur/gameplay-run.ps1
++++ b/map/gameplay-run.ps1
+@@ -58,8 +58,8 @@ $psc = Join-Path $kit 'prompt_sidecar.py'
+ $pst = Join-Path $kit 'selftest_prompt.py'
+ $fake = Join-Path $ws 'build\agent3\toypad\fake_listener.py'        # read-only: the prompt self-test's stand-in listener
+ # the story's pad prompts (manual run 20261125-204323: each pulses 120 s, then the game's failsafe goes on without it)
+-$onSpecs = @('pad (?P<pad>[123]) mode 3 lit (00 00 16|00 00 05)=>batman@*', 'pad (?P<pad>[123]) mode 3 lit (F4 69 16|3D 1A 05)=>wyldstyle@*',
+-    'pad (?P<pad>[123]) mode 3 lit (F4 00 16|3D 00 05)=>gandalf@*')
++$onSpecs = @('pad (?P<pad>[123]) mode 3 lit (00 00 16|00 00 05)=>batman@*', 'pad (?P<pad>[123]) mode 3 lit (F4 69 16|3D 1A 05)=>gandalf@*',
++    'pad (?P<pad>[123]) mode 3 lit (F4 00 16|3D 00 05)=>wyldstyle@*')
+ $post = Join-Path $kit 'gameplay_post.py'
+ $watch = Join-Path $kit 'gameplay-watch.ps1'
+ $gen = Join-Path $kit 'gen_gameplay_route.py'
+diff --git a/cur/gen_gameplay_route.py b/map/gen_gameplay_route.py
+index 7afd909..79cdf71 100644
+--- a/cur/gen_gameplay_route.py
++++ b/map/gen_gameplay_route.py
+@@ -151,8 +151,8 @@ def explore():
+         "the 3 figure prompts (the prompt sidecar re-places / moves the asked tag; else the game's 120 s failsafe), then",
+         "O = 120 s no input, skip probes, an A ladder, a tag re-place, a walk/fight loop. ~900 s; -Seconds 1500 (cap).",
+         "No tp-* route marks: the prompts are the sidecar's job (--on); a timed-out wait jumps to the log end."])
+-    L.append("# --- S: the story's figure prompts (manual run: pad 2 Batman, pad 3 Wyldstyle, pad 1 Gandalf; 120 s each) ---")
+-    for pad_, who in ((2, "batman"), (3, "wyldstyle"), (1, "gandalf")):
++    L.append("# --- S: the story's figure prompts (manual run: pad 2 Batman, pad 3 Gandalf, pad 1 Wyldstyle; 120 s each) ---")
++    for pad_, who in ((2, "batman"), (3, "gandalf"), (1, "wyldstyle")):
+         L += ['wait_log "Toypad listener: LOAD -> pad=%d" 240' % pad_,
+               "mark s-%s                                 # the sidecar answered (or the wait timed out)" % who,
+               "sleep 10", "mark s-%s-10" % who]
+diff --git a/cur/explore-route.txt b/map/explore-route.txt
+index 816edab..d2f3bdc 100644
+--- a/cur/explore-route.txt
++++ b/map/explore-route.txt
+@@ -75,19 +75,19 @@ press A
+ wait_log "current=55 pending=0" 15              # -> the story (front end 0 from here)
+ sleep 3
+ mark story-00
+-# --- S: the story's figure prompts (manual run: pad 2 Batman, pad 3 Wyldstyle, pad 1 Gandalf; 120 s each) ---
++# --- S: the story's figure prompts (manual run: pad 2 Batman, pad 3 Gandalf, pad 1 Wyldstyle; 120 s each) ---
+ wait_log "Toypad listener: LOAD -> pad=2" 240
+ mark s-batman                                 # the sidecar answered (or the wait timed out)
+ sleep 10
+ mark s-batman-10
+ wait_log "Toypad listener: LOAD -> pad=3" 240
+-mark s-wyldstyle                                 # the sidecar answered (or the wait timed out)
+-sleep 10
+-mark s-wyldstyle-10
+-wait_log "Toypad listener: LOAD -> pad=1" 240
+ mark s-gandalf                                 # the sidecar answered (or the wait timed out)
+ sleep 10
+ mark s-gandalf-10
++wait_log "Toypad listener: LOAD -> pad=1" 240
++mark s-wyldstyle                                 # the sidecar answered (or the wait timed out)
++sleep 10
++mark s-wyldstyle-10
+ # --- O: observe, no input ---
+ sleep 10
+ mark o-01

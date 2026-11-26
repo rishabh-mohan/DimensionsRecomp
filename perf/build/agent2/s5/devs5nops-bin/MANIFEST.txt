@@ -1,0 +1,22 @@
+# build\agent2\s5\devs5nops-bin - Agent 2 (board run 2 task #1). S5 test bin devs5nops: devfinal2 + async depth-only pipelines + occlusion-query log + sync log (cvars default OFF) [M2, build/agent2/s5/nops-bin/build-s5nops.py]
+# staged 2026-11-25 19:47:07 from build\agent2\devfinal2-bin (MANIFEST sha256 4A4A13EDFBFF6A5F32798837A4156256A5A58A2C44579F272B5147768E50982D); every file copied with mtime = now; replaced: rexgpu-xenos.dll <- build\agent2\s5\nops-bin\b\gpu\link-on\rexgpu-xenos.dll.
+# devs5nops = devfinal2-bin (MANIFEST 4A4A13ED) with rexgpu-xenos.dll rebuilt: only d3d12/pipeline_cache.cpp (a7e79c0 + sync-log + nops-async, 9B92AAF92D230C62) and d3d12/command_processor.cpp (a7e79c0 + zpd-log v2, 6DE509E3FB683A2E) changed
+# ratings build/agent10/s5/nops-async-rating.md 6487C0EB (bin SAFE-IF N1-N4), zpd-log-v2-rating.md 294BD7A7 (bin SAFE-IF Z1-Z5)
+# cvars d3d12_async_depth_only_pipelines, d3d12_log_occlusion_queries, d3d12_log_sync_pipeline_creation default OFF (kRequiresRestart); TEST/DIAG bin only, never timed against other bins (N4/Z3/K7)
+# CTL relink == devfinal2-bin rexgpu-xenos.dll except TimeDateStamp; pe-check NEW == REF (b/build-leg.txt)
+# files: name, size, mtime, sha256, source
+FiraSans-Regular.ttf	456996	2026-11-25 19:47:06	C29556A2719BF613EF3D5E070E40D903A8965D9C081BECA1375DC1E6E0F93C23	build\agent2\snap1\DimensionsRecomp\rexlego\res\FiraSans-Regular.ttf
+TracyClient.dll	233472	2026-11-25 19:47:06	85044850B6C663B5CE8722285D13070381C33C9ABC49D06B3E59BA0277F8FF4E	build\agent2\snap1-sdk\install\bin\TracyClient.dll
+achievement_unlocked.wav	191018	2026-11-25 19:47:06	A707019154484B9DE0AD310826668C0B58C22B8A842227293421643901BC29A5	build\agent2\snap1-off\achievement_unlocked.wav
+legodimensions.exe	170350080	2026-11-25 19:47:06	6C8E281156CCE828A217B870F273021202F953F7230C7C7BA6CC3E4EA7F45581	build\agent2\final2\b\xe\link-on\legodimensions.exe
+legodimensions.map	39181726	2026-11-25 19:47:06	3F93A71469556D485142F40FF9FF742CC3E9F031A077774C9C24253C872477E6	build\agent2\final2\b\xe\link-on\legodimensions.map
+rexgpu-xenos.dll	3454464	2026-11-25 19:47:07	55BE4D19142A0EE53B4E2B7570FCA4DE4E9EFC4AC43604F2C0F621274F83D5FE	build\agent2\s5\nops-bin\b\gpu\link-on\rexgpu-xenos.dll
+rexruntime.dll	10911744	2026-11-25 19:47:07	641BD22519921ACDD0D49E25E2A15AA8439DE1675B90734EF5B0D5ED7A498C70	build\agent2\final2\b\rt\link-on\rexruntime.dll
+# checks:
+#   PASS staged copy identical: FiraSans-Regular.ttf
+#   PASS staged copy identical: TracyClient.dll
+#   PASS staged copy identical: achievement_unlocked.wav
+#   PASS staged copy identical: legodimensions.exe
+#   PASS staged copy identical: legodimensions.map
+#   PASS staged copy identical: rexgpu-xenos.dll (replaced: base 9A7CC3F4853A8E8B -> 55BE4D19142A0EE5)
+#   PASS staged copy identical: rexruntime.dll

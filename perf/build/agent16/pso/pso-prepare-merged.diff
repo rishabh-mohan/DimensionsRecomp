@@ -1,0 +1,123 @@
+diff --git a/rexlego/src/gpu_native/pipeline_library.cpp b/rexlego/src/gpu_native/pipeline_library.cpp
+index 4484038..6b22f81 100644
+--- a/rexlego/src/gpu_native/pipeline_library.cpp
++++ b/rexlego/src/gpu_native/pipeline_library.cpp
+@@ -246,7 +246,6 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+       return true;
+     };
+     const auto prepare = [&](const PipelineRecipes& source) {
+-      if (threads > 1) return PrepareParallel(source, threads, stats, prepared, progress, commit);
+       for (const auto& recipe : source.Entries()) {
+         const std::wstring name(recipe->name.begin(), recipe->name.end());
+         if (prepared.contains(name)) continue;
+@@ -258,7 +257,11 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+     };
+     // Seed files are read one at a time. The portable seed does not use the
+     // capacity reserved for recipes learned and saved by this installation.
+-    if (prepare(recipes_)) {
++    // With several threads, PrepareParallel runs the local recipes and every
++    // seed as one ordered pass instead.
++    if (threads > 1) {
++      PrepareParallel(threads, stats, prepared, progress, commit);
++    } else if (prepare(recipes_)) {
+       for (const auto& path : SeedPaths()) {
+         PipelineRecipes seed;
+         if (!ReadRecipes(path, seed)) continue;
+@@ -446,38 +449,73 @@ class PipelineLibrary final : public plume::D3D12GraphicsPipelineCache {
+     return item;
+   }
+ 
+-  // Prepare()'s loop over one source on `threads` threads
+-  // (LEGO_NATIVE_PSO_PREPARE_THREADS). Loads and compiles run on worker
+-  // threads; commit() runs on this thread in recipe order, so the library, the
+-  // resident set and the counts end up as the serial loop leaves them.
++  // Prepare()'s loops on `threads` threads (LEGO_NATIVE_PSO_PREPARE_THREADS),
++  // as one ordered pass over the local recipes and then every seed in
++  // SeedPaths() order, each name once. Every seed is read first, so the
++  // workers never drain at the end of a source while the next file is read.
++  // Loads and compiles run on worker threads; commit() runs on this thread in
++  // that order, so the library, the resident set, the counts and seed_names_
++  // end up as the serial loop leaves them. One difference: a name that failed
++  // in one source is not tried again from a later one (same name, same desc).
+   template <class Progress, class Commit>
+-  bool PrepareParallel(const PipelineRecipes& source, unsigned threads, bool stats,
+-                       const std::unordered_set<std::wstring>& prepared, const Progress& progress,
+-                       const Commit& commit) const {
+-    const auto& entries = source.Entries();
+-    std::vector<std::size_t> pending;
+-    std::vector<std::wstring> names;
+-    std::unordered_set<std::wstring> seen;
+-    pending.reserve(entries.size());
+-    names.reserve(entries.size());
+-    for (std::size_t i = 0; i < entries.size(); ++i) {
+-      std::wstring name(entries[i]->name.begin(), entries[i]->name.end());
+-      // Names are unique within a source; never let two workers load one name.
+-      if (prepared.contains(name) || !seen.insert(name).second) continue;
+-      pending.push_back(i);
+-      names.push_back(std::move(name));
++  void PrepareParallel(unsigned threads, bool stats, std::unordered_set<std::wstring>& prepared,
++                       const Progress& progress, const Commit& commit) {
++    struct Seed {
++      PipelineRecipes recipes;
++      std::size_t first = 0;  // its first job
++    };
++    std::vector<Seed> seeds;
++    for (const auto& path : SeedPaths()) {
++      Seed seed;
++      if (!ReadRecipes(path, seed.recipes)) continue;
++      REXLOG_INFO("Native GPU: using startup pipeline seed {} with {} recipes",
++                  path.string(), seed.recipes.Entries().size());
++      seeds.push_back(std::move(seed));
++    }
++    struct Job {
++      const PipelineRecipes* source;
++      std::size_t entry;
++      std::wstring name;
++    };
++    std::vector<Job> jobs;
++    std::unordered_set<std::wstring> queued;
++    const auto queue = [&](const PipelineRecipes& source) {
++      const auto& entries = source.Entries();
++      for (std::size_t i = 0; i < entries.size(); ++i) {
++        std::wstring name(entries[i]->name.begin(), entries[i]->name.end());
++        // Never let two workers load one name.
++        if (prepared.contains(name) || !queued.insert(name).second) continue;
++        jobs.push_back({&source, i, std::move(name)});
++      }
++    };
++    queue(recipes_);
++    for (auto& seed : seeds) {
++      seed.first = jobs.size();
++      queue(seed.recipes);
+     }
+-    return RunOrdered<PreparedPipeline>(
+-        pending.size(), threads, kPrepareWindow,
++    std::size_t stopped = jobs.size();  // the job that found the device removed
++    RunOrdered<PreparedPipeline>(
++        jobs.size(), threads, kPrepareWindow,
+         [&](std::size_t index) {
++          const auto& job = jobs[index];
+           std::vector<D3D12_INPUT_ELEMENT_DESC> inputs;
+-          const auto desc = source.Describe(*entries[pending[index]], root_, inputs);
+-          return stats ? PrepareOne<true>(names[index], desc) : PrepareOne<false>(names[index], desc);
++          const auto desc = job.source->Describe(*job.source->Entries()[job.entry], root_, inputs);
++          return stats ? PrepareOne<true>(job.name, desc) : PrepareOne<false>(job.name, desc);
+         },
+         [&](std::size_t index, PreparedPipeline&& item) {
+           progress();
+-          return commit(names[index], std::move(item));
++          if (commit(jobs[index].name, std::move(item))) return true;
++          stopped = index;
++          return false;
+         });
++    // The serial loop records the seeds it reached, up to the one it stopped in.
++    for (const auto& seed : seeds) {
++      if (seed.first > stopped) break;
++      for (const auto& recipe : seed.recipes.Entries()) {
++        std::wstring name(recipe->name.begin(), recipe->name.end());
++        if (prepared.contains(name)) seed_names_.insert(std::move(name));
++      }
++    }
+   }
+ 
+   std::vector<std::filesystem::path> SeedPaths() const {

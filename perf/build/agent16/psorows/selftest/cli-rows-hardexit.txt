@@ -1,0 +1,186 @@
+pso_post.py mode rows; expect fingerprint 39129c4c059be5f0
+  arm s0-ref-cold: selftest\fixtures\rows-hardexit\s0-ref-cold
+  arm c-pso-t1: selftest\fixtures\rows-hardexit\c-pso-t1
+  arm c-pso-unl: selftest\fixtures\rows-hardexit\c-pso-unl
+  arm w-ref-t1: selftest\fixtures\rows-hardexit\w-ref-t1
+  arm w-pso-t1: selftest\fixtures\rows-hardexit\w-pso-t1
+  arm w-ref-t4: selftest\fixtures\rows-hardexit\w-ref-t4
+  arm w-pso-t2: selftest\fixtures\rows-hardexit\w-pso-t2
+  arm w-pso-t4: selftest\fixtures\rows-hardexit\w-pso-t4
+  arm w-pso-unl: selftest\fixtures\rows-hardexit\w-pso-unl
+  frame pacing (fps mean, p99 ms, 1% low fps) from: summary.json frames; hitch50/blockfr/worst from the 'PSO frames:' line of the exit summary
+== table
+arm          exit  fp        cache   open_B    L    C   F  R    thr  elapsed  compiles  aux_req  aux_cmp  aux_ms  saves  svfail  held_ms  copy_ms  retry  mwait_wst  sum        hitch50  blockfr  worst  fps    p99   1%low  1st_fr_s
+-----------  ----  --------  ------  --------  ---  --  -  ---  ---  -------  --------  -------  -------  ------  -----  ------  -------  -------  -----  ---------  ---------  -------  -------  -----  -----  ----  -----  --------
+s0-ref-cold  ok    39129c4c  opened  0         -    -   -  -    -    -        -         -        -        -       -      -       -        -        -      -          10s-lines  3        12       85.2   100.0  60.0  12.0   5.0     
+c-pso-t1     ok    39129c4c  opened  0         -    -   -  -    -    -        -         -        -        -       -      -       -        -        -      -          10s-lines  3        12       85.2   100.0  60.0  12.0   5.0     
+c-pso-unl    ok    39129c4c  opened  0         -    -   -  -    -    -        -         -        -        -       -      -       -        -        -      -          10s-lines  3        12       85.2   100.0  60.0  12.0   5.0     
+w-ref-t1     ok    39129c4c  opened  31457280  400  72  0  472  1    1800     -         -        -        -       -      -       -        -        -      -          10s-lines  3        12       85.2   100.0  60.0  12.0   5.0     
+w-pso-t1     ok    39129c4c  opened  31457280  400  72  0  472  1    1800     -         -        -        -       -      -       -        -        -      -          10s-lines  3        12       85.2   100.0  60.0  12.0   5.0     
+w-ref-t4     ok    39129c4c  opened  31457280  400  72  0  472  4    900      -         -        -        -       -      -       -        -        -      -          10s-lines  3        12       85.2   100.0  60.0  12.0   5.0     
+w-pso-t2     ok    39129c4c  opened  31457280  410  62  0  472  2    1200     -         -        -        -       -      -       -        -        -      -          10s-lines  3        12       85.2   100.0  60.0  12.0   5.0     
+w-pso-t4     ok    39129c4c  opened  31457280  400  72  0  472  4    900      -         -        -        -       -      -       -        -        -      -          10s-lines  3        12       85.2   100.0  60.0  12.0   5.0     
+w-pso-unl    ok    39129c4c  opened  31457280  400  72  0  472  1    1800     -         -        -        -       -      -       -        -        -      -          10s-lines  3        12       85.2   100.0  60.0  12.0   5.0     
+== checks
+-- s0-ref-cold
+PASS s0-ref-cold clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS s0-ref-cold route ran: steps 55/91 last halted timeouts 0 error None
+PASS s0-ref-cold fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS s0-ref-cold PSO stats lines: stats-on 1, interval lines 1, summary blocks 0 (none)
+CHECK s0-ref-cold PSO summary block: used 10s-lines (no full summary: the close watchdog hard-exits before StopPipelineLibrary, agent6-pipelines.md L37; create <run>\cache\pso-stats.now before close. Frame metrics come from the 10 s lines; saves/aux/lookups/async totals are unknown)
+PASS s0-ref-cold no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS s0-ref-cold cold confirmed: 'no startup pipeline recipes yet' 1, startup line no, opened 0 bytes, summary cache None
+PASS s0-ref-cold no unlocked env lines (envs unset): save 0, aux 0
+INFO s0-ref-cold Stop(): not reached ('Title terminated; hard-exiting' x1): the shutdown-save check does not apply; cache saves logged 1
+INFO s0-ref-cold PSO saves: no summary block: failed count unknown (write/replace/E_INVALIDARG lines are checked above)
+PASS s0-ref-cold seed written: recipes saved [472], cache saves 1
+-- c-pso-t1
+PASS c-pso-t1 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS c-pso-t1 route ran: steps 55/91 last halted timeouts 0 error None
+PASS c-pso-t1 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS c-pso-t1 PSO stats lines: stats-on 1, interval lines 1, summary blocks 0 (none)
+CHECK c-pso-t1 PSO summary block: used 10s-lines (no full summary: the close watchdog hard-exits before StopPipelineLibrary, agent6-pipelines.md L37; create <run>\cache\pso-stats.now before close. Frame metrics come from the 10 s lines; saves/aux/lookups/async totals are unknown)
+PASS c-pso-t1 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS c-pso-t1 no new hard WARN/ERROR types vs baseline: 0 hard
+PASS c-pso-t1 no new WARN/ERROR types vs baseline: 0 new
+PASS c-pso-t1 cold confirmed: 'no startup pipeline recipes yet' 1, startup line no, opened 0 bytes, summary cache None
+PASS c-pso-t1 no unlocked env lines (envs unset): save 0, aux 0
+INFO c-pso-t1 Stop(): not reached ('Title terminated; hard-exiting' x1): the shutdown-save check does not apply; cache saves logged 1
+INFO c-pso-t1 PSO saves: no summary block: failed count unknown (write/replace/E_INVALIDARG lines are checked above)
+-- c-pso-unl
+PASS c-pso-unl clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS c-pso-unl route ran: steps 55/91 last halted timeouts 0 error None
+PASS c-pso-unl fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS c-pso-unl PSO stats lines: stats-on 1, interval lines 1, summary blocks 0 (none)
+CHECK c-pso-unl PSO summary block: used 10s-lines (no full summary: the close watchdog hard-exits before StopPipelineLibrary, agent6-pipelines.md L37; create <run>\cache\pso-stats.now before close. Frame metrics come from the 10 s lines; saves/aux/lookups/async totals are unknown)
+PASS c-pso-unl no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS c-pso-unl no new hard WARN/ERROR types vs baseline: 0 hard
+PASS c-pso-unl no new WARN/ERROR types vs baseline: 0 new
+PASS c-pso-unl cold confirmed: 'no startup pipeline recipes yet' 1, startup line no, opened 0 bytes, summary cache None
+PASS c-pso-unl SAVE_UNLOCKED and AUX_UNLOCKED env lines: save 1, aux 1
+INFO c-pso-unl Stop(): not reached ('Title terminated; hard-exiting' x1): the shutdown-save check does not apply; cache saves logged 1
+INFO c-pso-unl PSO saves: no summary block: failed count unknown (write/replace/E_INVALIDARG lines are checked above)
+-- w-ref-t1
+PASS w-ref-t1 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS w-ref-t1 route ran: steps 55/91 last halted timeouts 0 error None
+PASS w-ref-t1 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS w-ref-t1 PSO stats lines: stats-on 1, interval lines 1, summary blocks 0 (none)
+CHECK w-ref-t1 PSO summary block: used 10s-lines (no full summary: the close watchdog hard-exits before StopPipelineLibrary, agent6-pipelines.md L37; create <run>\cache\pso-stats.now before close. Frame metrics come from the 10 s lines; saves/aux/lookups/async totals are unknown)
+PASS w-ref-t1 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS w-ref-t1 no new hard WARN/ERROR types vs baseline: 0 hard
+PASS w-ref-t1 no new WARN/ERROR types vs baseline: 0 new
+PASS w-ref-t1 warm cache accepted: opened 31457280 bytes, rejected 0, recipes ignored 0, summary cache None
+PASS w-ref-t1 startup replay: loaded 400 compiled 72 failed 0 resident 472 elapsed_ms 1800
+PASS w-ref-t1 startup failed = 0: failed 0
+PASS w-ref-t1 no unlocked env lines (envs unset): save 0, aux 0
+PASS w-ref-t1 no 'uses N threads' line (threads 1): None
+INFO w-ref-t1 Stop(): not reached ('Title terminated; hard-exiting' x1): the shutdown-save check does not apply; cache saves logged 1
+INFO w-ref-t1 PSO saves: no summary block: failed count unknown (write/replace/E_INVALIDARG lines are checked above)
+INFO w-ref-t1 replay lines: processed [472], seeds [('native-pso-seed.bin', 40)], removed seeded [40]
+-- w-pso-t1
+PASS w-pso-t1 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS w-pso-t1 route ran: steps 55/91 last halted timeouts 0 error None
+PASS w-pso-t1 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS w-pso-t1 PSO stats lines: stats-on 1, interval lines 1, summary blocks 0 (none)
+CHECK w-pso-t1 PSO summary block: used 10s-lines (no full summary: the close watchdog hard-exits before StopPipelineLibrary, agent6-pipelines.md L37; create <run>\cache\pso-stats.now before close. Frame metrics come from the 10 s lines; saves/aux/lookups/async totals are unknown)
+PASS w-pso-t1 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS w-pso-t1 no new hard WARN/ERROR types vs baseline: 0 hard
+PASS w-pso-t1 no new WARN/ERROR types vs baseline: 0 new
+PASS w-pso-t1 warm cache accepted: opened 31457280 bytes, rejected 0, recipes ignored 0, summary cache None
+PASS w-pso-t1 startup replay: loaded 400 compiled 72 failed 0 resident 472 elapsed_ms 1800
+PASS w-pso-t1 startup failed = 0: failed 0
+PASS w-pso-t1 no unlocked env lines (envs unset): save 0, aux 0
+PASS w-pso-t1 no 'uses N threads' line (threads 1): None
+INFO w-pso-t1 Stop(): not reached ('Title terminated; hard-exiting' x1): the shutdown-save check does not apply; cache saves logged 1
+INFO w-pso-t1 PSO saves: no summary block: failed count unknown (write/replace/E_INVALIDARG lines are checked above)
+INFO w-pso-t1 replay lines: processed [472], seeds [('native-pso-seed.bin', 40)], removed seeded [40]
+-- w-ref-t4
+PASS w-ref-t4 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS w-ref-t4 route ran: steps 55/91 last halted timeouts 0 error None
+PASS w-ref-t4 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS w-ref-t4 PSO stats lines: stats-on 1, interval lines 1, summary blocks 0 (none)
+CHECK w-ref-t4 PSO summary block: used 10s-lines (no full summary: the close watchdog hard-exits before StopPipelineLibrary, agent6-pipelines.md L37; create <run>\cache\pso-stats.now before close. Frame metrics come from the 10 s lines; saves/aux/lookups/async totals are unknown)
+PASS w-ref-t4 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS w-ref-t4 no new hard WARN/ERROR types vs baseline: 0 hard
+PASS w-ref-t4 no new WARN/ERROR types vs baseline: 0 new
+PASS w-ref-t4 warm cache accepted: opened 31457280 bytes, rejected 0, recipes ignored 0, summary cache None
+PASS w-ref-t4 startup replay: loaded 400 compiled 72 failed 0 resident 472 elapsed_ms 900
+PASS w-ref-t4 startup failed = 0: failed 0
+PASS w-ref-t4 no unlocked env lines (envs unset): save 0, aux 0
+PASS w-ref-t4 'uses 4 threads' line: [4]
+INFO w-ref-t4 Stop(): not reached ('Title terminated; hard-exiting' x1): the shutdown-save check does not apply; cache saves logged 1
+INFO w-ref-t4 PSO saves: no summary block: failed count unknown (write/replace/E_INVALIDARG lines are checked above)
+INFO w-ref-t4 replay lines: processed [472], seeds [('native-pso-seed.bin', 40)], removed seeded [40]
+-- w-pso-t2
+PASS w-pso-t2 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS w-pso-t2 route ran: steps 55/91 last halted timeouts 0 error None
+PASS w-pso-t2 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS w-pso-t2 PSO stats lines: stats-on 1, interval lines 1, summary blocks 0 (none)
+CHECK w-pso-t2 PSO summary block: used 10s-lines (no full summary: the close watchdog hard-exits before StopPipelineLibrary, agent6-pipelines.md L37; create <run>\cache\pso-stats.now before close. Frame metrics come from the 10 s lines; saves/aux/lookups/async totals are unknown)
+PASS w-pso-t2 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS w-pso-t2 no new hard WARN/ERROR types vs baseline: 0 hard
+PASS w-pso-t2 no new WARN/ERROR types vs baseline: 0 new
+PASS w-pso-t2 warm cache accepted: opened 31457280 bytes, rejected 0, recipes ignored 0, summary cache None
+PASS w-pso-t2 startup replay: loaded 410 compiled 62 failed 0 resident 472 elapsed_ms 1200
+PASS w-pso-t2 startup failed = 0: failed 0
+PASS w-pso-t2 no unlocked env lines (envs unset): save 0, aux 0
+PASS w-pso-t2 'uses 2 threads' line: [2]
+INFO w-pso-t2 Stop(): not reached ('Title terminated; hard-exiting' x1): the shutdown-save check does not apply; cache saves logged 1
+INFO w-pso-t2 PSO saves: no summary block: failed count unknown (write/replace/E_INVALIDARG lines are checked above)
+INFO w-pso-t2 replay lines: processed [472], seeds [('native-pso-seed.bin', 40)], removed seeded [40]
+-- w-pso-t4
+PASS w-pso-t4 clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS w-pso-t4 route ran: steps 55/91 last halted timeouts 0 error None
+PASS w-pso-t4 fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS w-pso-t4 PSO stats lines: stats-on 1, interval lines 1, summary blocks 0 (none)
+CHECK w-pso-t4 PSO summary block: used 10s-lines (no full summary: the close watchdog hard-exits before StopPipelineLibrary, agent6-pipelines.md L37; create <run>\cache\pso-stats.now before close. Frame metrics come from the 10 s lines; saves/aux/lookups/async totals are unknown)
+PASS w-pso-t4 no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS w-pso-t4 no new hard WARN/ERROR types vs baseline: 0 hard
+PASS w-pso-t4 no new WARN/ERROR types vs baseline: 0 new
+PASS w-pso-t4 warm cache accepted: opened 31457280 bytes, rejected 0, recipes ignored 0, summary cache None
+PASS w-pso-t4 startup replay: loaded 400 compiled 72 failed 0 resident 472 elapsed_ms 900
+PASS w-pso-t4 startup failed = 0: failed 0
+PASS w-pso-t4 no unlocked env lines (envs unset): save 0, aux 0
+PASS w-pso-t4 'uses 4 threads' line: [4]
+INFO w-pso-t4 Stop(): not reached ('Title terminated; hard-exiting' x1): the shutdown-save check does not apply; cache saves logged 1
+INFO w-pso-t4 PSO saves: no summary block: failed count unknown (write/replace/E_INVALIDARG lines are checked above)
+INFO w-pso-t4 replay lines: processed [472], seeds [('native-pso-seed.bin', 40)], removed seeded [40]
+-- w-pso-unl
+PASS w-pso-unl clean exit: exit 0x00000000 early False close wm_close 3.1 s wer False crash 0 dumps 0
+PASS w-pso-unl route ran: steps 55/91 last halted timeouts 0 error None
+PASS w-pso-unl fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+PASS w-pso-unl PSO stats lines: stats-on 1, interval lines 1, summary blocks 0 (none)
+CHECK w-pso-unl PSO summary block: used 10s-lines (no full summary: the close watchdog hard-exits before StopPipelineLibrary, agent6-pipelines.md L37; create <run>\cache\pso-stats.now before close. Frame metrics come from the 10 s lines; saves/aux/lookups/async totals are unknown)
+PASS w-pso-unl no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS w-pso-unl no new hard WARN/ERROR types vs baseline: 0 hard
+PASS w-pso-unl no new WARN/ERROR types vs baseline: 0 new
+PASS w-pso-unl warm cache accepted: opened 31457280 bytes, rejected 0, recipes ignored 0, summary cache None
+PASS w-pso-unl startup replay: loaded 400 compiled 72 failed 0 resident 472 elapsed_ms 1800
+PASS w-pso-unl startup failed = 0: failed 0
+PASS w-pso-unl SAVE_UNLOCKED and AUX_UNLOCKED env lines: save 1, aux 1
+PASS w-pso-unl no 'uses N threads' line (threads 1): None
+INFO w-pso-unl Stop(): not reached ('Title terminated; hard-exiting' x1): the shutdown-save check does not apply; cache saves logged 1
+INFO w-pso-unl PSO saves: no summary block: failed count unknown (write/replace/E_INVALIDARG lines are checked above)
+INFO w-pso-unl replay lines: processed [472], seeds [('native-pso-seed.bin', 40)], removed seeded [40]
+== 2.2 recipe replay
+PASS w-pso-t1 vs w-ref-t1 startup counts exactly equal: pso [400, 72, 0, 472] ref [400, 72, 0, 472]
+PASS w-pso-t1 vs w-ref-t1 seed lines and removed-seeded equal: pso ([('native-pso-seed.bin', 40)], [40]) ref ([('native-pso-seed.bin', 40)], [40])
+PASS w-pso-t2 loaded+compiled == w-pso-t1: 472 vs 472 (L/C 410/62 vs 400/72)
+PASS w-pso-t2 resident == min(512, L+C): 472 vs 472
+PASS w-pso-t2 failed <= w-pso-t1: 0 vs 0
+PASS w-pso-t4 loaded+compiled == w-pso-t1: 472 vs 472 (L/C 400/72 vs 400/72)
+PASS w-pso-t4 resident == min(512, L+C): 472 vs 472
+PASS w-pso-t4 failed <= w-pso-t1: 0 vs 0
+INFO w-pso-t1 resident vs min(512, L+C): 472 vs 472
+PASS w-pso-t4 vs w-ref-t4 L+C, failed, resident equal: pso L+C 472 F 0 R 472; ref L+C 472 F 0 R 472
+PASS w-pso-t4 vs w-ref-t4 L/C split equal: 400/72 vs 400/72
+INFO elapsed_ms: w-ref-t1 1800, w-pso-t1 1800, w-pso-t2 1200, w-ref-t4 900, w-pso-t4 900
+PASS w-pso-t4 elapsed_ms < w-pso-t1: 900 vs 1800
+== 2.3 unlocked aux/save
+CHECK c-pso-unl auxiliary counts == c-pso-t1: c-pso-unl req/hits/comp/fail [None, None, None, None] c-pso-t1 [None, None, None, None]; ms None vs None
+INFO c-pso-unl lookups mutex wait vs c-pso-t1: worst None vs None ms, total None vs None ms, waits>=1ms None vs None
+CHECK w-pso-unl auxiliary counts == w-pso-t1: w-pso-unl req/hits/comp/fail [None, None, None, None] w-pso-t1 [None, None, None, None]; ms None vs None
+INFO w-pso-unl lookups mutex wait vs w-pso-t1: worst None vs None ms, total None vs None ms, waits>=1ms None vs None
+PASS w-pso-unl reload of the c-pso-unl cache: opened 31457280 bytes, rejected 0, loaded 400, summary cache None
+INFO c-pso-t1 vs s0-ref-cold (driver cache primed by s0): hitch50 None vs None, compiles None vs None (None vs None ms), p99 60.0 vs 60.0
+RESULT: PASS-WITH-CHECKS: s0-ref-cold PSO summary block; c-pso-t1 PSO summary block; c-pso-unl PSO summary block; w-ref-t1 PSO summary block; w-pso-t1 PSO summary block; w-ref-t4 PSO summary block; w-pso-t2 PSO summary block; w-pso-t4 PSO summary block; w-pso-unl PSO summary block; c-pso-unl auxiliary counts == c-pso-t1; w-pso-unl auxiliary counts == w-pso-t1

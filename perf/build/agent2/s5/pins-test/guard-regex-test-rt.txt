@@ -1,0 +1,15 @@
+PASS want=True got=True powershell.exe: powershell -NoProfile -ExecutionPolicy Bypass -File "C:\ws\build\agent8\s5\<W>.ps1" -Go
+PASS want=True got=True pwsh.exe: pwsh -File C:\ws\harness\<M>.ps1 -Arms a,b
+PASS want=True got=True cmd.exe: C:\WINDOWS\system32\cmd.exe /c ""C:\ws\build\agent8\s5\RUN-<W>-go.cmd" "
+PASS want=False got=False powershell.exe: powershell -Command Select-String -Path C:\ws\build\agent8\s5\<W>.ps1 -Pattern x
+PASS want=False got=False powershell.exe: powershell -Command git grep RUN-<W> C:\ws\build\agent8\s5\RUN-<W>.cmd
+PASS want=False got=False python.exe: python -File C:\ws\harness\<M>.ps1
+PASS want=False got=False Code.exe: Code.exe C:\ws\build\agent8\s5\<W>.ps1
+PASS want=False got=False cmd.exe: cmd /c findstr /s foo C:\ws\harness\<M>.ps1
+PASS want=False got=False powershell.exe: powershell -File C:\ws\build\agent2\s5\nops-smoke-run.ps1 dryrun
+PASS want=False got=False powershell.exe: powershell -NoProfile -ExecutionPolicy Bypass -File "C:\ws\build\agent2\s5\rt-smoke-run.ps1" dryrun
+PASS kit has '(?i)-File\s+"?[^"]*(<W>|<M>)\.ps1'
+PASS kit has '(?i)RUN-<W>[^\s"]*\.cmd'
+PASS kit has '^(?i)(powershell|pwsh|cmd)\.exe$'
+PASS kit has $_.Name -ieq 'cmd.exe'
+GUARD REGEX TEST ALL PASS

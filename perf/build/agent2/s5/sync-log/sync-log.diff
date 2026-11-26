@@ -1,0 +1,130 @@
+diff --git a/src/graphics/d3d12/pipeline_cache.cpp b/src/graphics/d3d12/pipeline_cache.cpp
+--- a/src/graphics/d3d12/pipeline_cache.cpp
++++ b/src/graphics/d3d12/pipeline_cache.cpp
+@@ -14,6 +14,7 @@
+ 
+ #include <algorithm>
+ #include <atomic>
++#include <chrono>
+ #include <cinttypes>
+ #include <cmath>
+ #include <cstring>
+@@ -74,6 +75,17 @@
+                     "async_shader_compilation, pipeline creation threads and bindless resources")
+     .lifecycle(rex::cvar::Lifecycle::kRequiresRestart);
+ 
++// Diagnostics for stalls on the frame path: logs each pipeline that
++// ConfigurePipeline creates synchronously on the GPU command thread (no pixel
++// shader, async_shader_compilation off, or no creation threads), with what the
++// draw is and how long the creation took. Read once, in
++// PipelineCache::Initialize.
++REXCVAR_DEFINE_BOOL(d3d12_log_sync_pipeline_creation, false, "GPU/D3D12",
++                    "Log each pipeline created synchronously on the GPU command thread (the frame "
++                    "path): why it isn't async, shaders, memexport, render target path, duration. "
++                    "At most 32 lines per second")
++    .lifecycle(rex::cvar::Lifecycle::kRequiresRestart);
++
+ REXCVAR_DEFINE_BOOL(d3d12_tessellation_wireframe, false, "GPU/D3D12",
+                     "Render tessellation as wireframe");
+ 
+@@ -97,6 +109,40 @@
+ #include "../shaders/bytecode/d3d12_5_1/tessellation_indexed_vs.h"
+ }  // namespace shaders
+ 
++namespace {
++
++// d3d12_log_sync_pipeline_creation, latched in PipelineCache::Initialize. Only
++// the command thread creates pipelines synchronously (ConfigurePipeline), so
++// the counters and the rate limit below need no locking.
++bool log_sync_pipeline_creation = false;
++constexpr uint32_t kSyncPipelineLogLinesPerSecond = 32;
++uint64_t sync_pipeline_count = 0;
++uint64_t sync_pipeline_total_us = 0;
++int64_t sync_pipeline_log_second = -1;
++uint32_t sync_pipeline_log_lines = 0;
++uint64_t sync_pipeline_log_suppressed = 0;
++
++// Counts a synchronous creation; returns whether it may be logged.
++bool CountSyncPipelineCreation(uint64_t us) {
++  ++sync_pipeline_count;
++  sync_pipeline_total_us += us;
++  int64_t second = std::chrono::duration_cast<std::chrono::seconds>(
++                       std::chrono::steady_clock::now().time_since_epoch())
++                       .count();
++  if (second != sync_pipeline_log_second) {
++    sync_pipeline_log_second = second;
++    sync_pipeline_log_lines = 0;
++  }
++  if (sync_pipeline_log_lines >= kSyncPipelineLogLinesPerSecond) {
++    ++sync_pipeline_log_suppressed;
++    return false;
++  }
++  ++sync_pipeline_log_lines;
++  return true;
++}
++
++}  // namespace
++
+ PipelineCache::PipelineCache(D3D12CommandProcessor& command_processor,
+                              const RegisterFile& register_file,
+                              const D3D12RenderTargetCache& render_target_cache,
+@@ -195,6 +241,13 @@
+     REXGPU_WARN(
+         "d3d12_pipeline_creation_no_wait ignored: it needs async_shader_compilation, pipeline "
+         "creation threads and bindless resources");
++  }
++  log_sync_pipeline_creation = REXCVAR_GET(d3d12_log_sync_pipeline_creation);
++  if (log_sync_pipeline_creation) {
++    REXGPU_INFO(
++        "d3d12_log_sync_pipeline_creation: logging pipelines created on the GPU command thread "
++        "(async_shader_compilation {}, {} creation threads)",
++        bool(REXCVAR_GET(async_shader_compilation)), creation_threads_.size());
+   }
+   return true;
+ }
+@@ -1113,8 +1166,43 @@
+     }
+     creation_request_cond_.notify_one();
+   } else {
+-    frame_stats::Scope create_scope(frame_stats::kPipelineCreate);
+-    new_pipeline->state.store(CreateD3D12Pipeline(runtime_description), std::memory_order_release);
++    std::chrono::steady_clock::time_point create_start;
++    if (log_sync_pipeline_creation) {
++      create_start = std::chrono::steady_clock::now();
++    }
++    {
++      frame_stats::Scope create_scope(frame_stats::kPipelineCreate);
++      new_pipeline->state.store(CreateD3D12Pipeline(runtime_description), std::memory_order_release);
++    }
++    if (log_sync_pipeline_creation) {
++      uint64_t create_us = uint64_t(std::chrono::duration_cast<std::chrono::microseconds>(
++                                        std::chrono::steady_clock::now() - create_start)
++                                        .count());
++      if (CountSyncPipelineCreation(create_us)) {
++        const Shader& vs = vertex_shader->shader();
++        const Shader* ps = pixel_shader ? &pixel_shader->shader() : nullptr;
++        REXGPU_INFO(
++            "sync pipeline #{} {:016X}: {:.1f} ms ({}) | vs {:016X} (host type {}) ps {} | "
++            "memexport vs {:X} ps {:X} | {} | rt bits {:X} color mask {:X} z {} write {} | "
++            "prim {} | {} | total {:.1f} ms, {} lines suppressed",
++            sync_pipeline_count, hash, create_us / 1000.0,
++            !REXCVAR_GET(async_shader_compilation) ? "async_shader_compilation off"
++            : creation_threads_.empty()             ? "no creation threads"
++                                                    : "no pixel shader",
++            vs.ucode_data_hash(), uint32_t(primitive_processing_result.host_vertex_shader_type),
++            ps ? fmt::format("{:016X}", ps->ucode_data_hash()) : std::string("none"),
++            uint32_t(vs.memexport_eM_written()), uint32_t(ps ? ps->memexport_eM_written() : 0),
++            render_target_cache_.GetPath() == RenderTargetCache::Path::kHostRenderTargets
++                ? "host render targets"
++                : "ROV (EDRAM in the pixel shader)",
++            bound_depth_and_color_render_target_bits, normalized_color_mask,
++            uint32_t(normalized_depth_control.z_enable),
++            uint32_t(normalized_depth_control.z_write_enable),
++            uint32_t(primitive_processing_result.host_primitive_type),
++            new_pipeline->state.load(std::memory_order_relaxed) != nullptr ? "ok" : "FAILED",
++            sync_pipeline_total_us / 1000.0, sync_pipeline_log_suppressed);
++      }
++    }
+   }
+ 
+   if (pipeline_storage_file_) {

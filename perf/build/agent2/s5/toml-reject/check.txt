@@ -1,0 +1,24 @@
+PASS SDK HEAD == a7e79c0: a7e79c09135f160f63bfaf8634f4e3b9cb760a75
+PASS src/core/cvar.cpp: overlay LF-only like the blob
+PASS src/core/cvar.cpp: snap1 copy (compiled tree) == a7e79c0 blob
+  base 4434007CE5B64832  new 4C967C64AF26794B
+PASS src/core/logging.cpp: overlay LF-only like the blob
+PASS src/core/logging.cpp: snap1 copy (compiled tree) == a7e79c0 blob
+  base B74A7ADD3D83BDAD  new FBA29918A0C68FE5
+diff build\agent2\s5\toml-reject\toml-reject.diff sha256 31C19232F88DFD6A00CC65DE637E060A9C8BB2803C74248462CB3EB22C3CADBF (+136/-3)
+PASS SDK index clean (== HEAD a7e79c0)
+PASS git apply --check --cached vs a7e79c0: Checking patch src/core/cvar.cpp... | Checking patch src/core/logging.cpp...
+PASS src/core/cvar.cpp: snap1-sdk Release command found: 1 match(es)
+PASS src/core/cvar.cpp fsyntax exit 0 (109.1 s): 0 errors, 0 warnings in cvar.cpp
+PASS src/core/cvar.cpp compile exit 0 (95.3 s): 0 errors, 0 warnings in cvar.cpp
+  obj build\agent2\s5\toml-reject\obj\cvar.cpp.obj 2363897 B B9E94431B6FDEEA8
+PASS src/core/logging.cpp: snap1-sdk Release command found: 1 match(es)
+PASS src/core/logging.cpp fsyntax exit 0 (21.8 s): 0 errors, 0 warnings in logging.cpp
+PASS src/core/logging.cpp compile exit 0 (33.3 s): 0 errors, 0 warnings in logging.cpp
+  obj build\agent2\s5\toml-reject\obj\logging.cpp.obj 872812 B 580E53BC813D1632
+PASS needle in cvar.cpp.obj: reported before logging started
+PASS needle in cvar.cpp.obj: FlushDeferredConfigWarnings
+PASS needle in cvar.cpp.obj: is outside the cvar's constraints
+PASS needle in cvar.cpp.obj: rejected ({}); keeping
+PASS needle in logging.cpp.obj: FlushDeferredConfigWarnings
+RESULT: PASS

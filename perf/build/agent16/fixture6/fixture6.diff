@@ -1,0 +1,22 @@
+diff --git a/pack/native6pack_check.py b/fixture6/native6pack_check_fixture.py
+index e77372e..dda5e2d 100644
+--- a/pack/native6pack_check.py
++++ b/fixture6/native6pack_check_fixture.py
+@@ -22,7 +22,7 @@ import ctypes, datetime, hashlib, os, re, subprocess, sys
+ 
+ W = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..'))
+ PACK = os.path.join(W, 'build', 'agent16', 'pack')
+-NEW = os.path.join(PACK, 'native6pack-bin')
++NEW = os.path.join(PACK, 'native5pack-bin')
+ N4 = os.path.join(PACK, 'native4bp-bin')
+ N5 = os.path.join(PACK, 'native5pack-bin')
+ NF2 = os.path.join(W, 'build', 'agent2', 'nativefinal2-bin')
+@@ -58,7 +58,7 @@ def main():
+     if not os.path.isdir(NEW):
+         print('REFUSED: %s missing' % NEW)
+         return 2
+-    out = os.path.join(PACK, 'native6pack-check-' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S'))
++    out = os.path.join(PACK, 'fixture6-check-' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S'))
+     if not os.path.normcase(out).startswith(os.path.normcase(PACK) + os.sep) or os.path.exists(out):
+         print('REFUSED: bad or existing out dir %s' % out)
+         return 2

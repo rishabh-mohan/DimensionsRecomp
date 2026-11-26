@@ -1,0 +1,136 @@
+pso_post.py mode ab; expect fingerprint 39129c4c059be5f0
+  arm prime: <workspace>\build\agent16\smoke4bp\runs\20261125-174131-smoke-4bp
+  arm c0-1: (not given)  <- MISSING
+  arm c0-2: (not given)  <- MISSING
+  arm c0-3: (not given)  <- MISSING
+  arm c1-1: (not given)  <- MISSING
+  arm c1-2: (not given)  <- MISSING
+  arm c1-3: (not given)  <- MISSING
+  arm w0-1: (not given)  <- MISSING
+  arm w0-2: (not given)  <- MISSING
+  arm w0-3: (not given)  <- MISSING
+  arm w1-1: (not given)  <- MISSING
+  arm w1-2: (not given)  <- MISSING
+  arm w1-3: (not given)  <- MISSING
+  arm w2-1: (not given)  <- MISSING
+  arm w2-2: (not given)  <- MISSING
+  frame pacing (fps mean, p99 ms, 1% low fps) from: summary.json frames; hitch50/blockfr/worst from the 'PSO frames:' line of the exit summary
+== per-arm table
+arm             exit  fp        cache   open_B  L  C  F  R  thr  elapsed  present  async  other  posted  ready  afail  skip  waits  tmo  recipes  sum  hitch50  blockfr  worst  fps   p99   1%low  1st_fr_s
+--------------  ----  --------  ------  ------  -  -  -  -  ---  -------  -------  -----  -----  ------  -----  -----  ----  -----  ---  -------  ---  -------  -------  -----  ----  ----  -----  --------
+prime           ok    39129c4c  opened  0       -  -  -  -  -    -        -        -      -      0       0      0      -     0      0    254      -    -        -        -      96.5  94.8  10.6   5.0     
+c0-1 (MISSING)  -     -         -       -       -  -  -  -  -    -        -        -      -      -       -      -      -     -      -    -        -    -        -        -      -     -     -      -       
+c0-2 (MISSING)  -     -         -       -       -  -  -  -  -    -        -        -      -      -       -      -      -     -      -    -        -    -        -        -      -     -     -      -       
+c0-3 (MISSING)  -     -         -       -       -  -  -  -  -    -        -        -      -      -       -      -      -     -      -    -        -    -        -        -      -     -     -      -       
+c1-1 (MISSING)  -     -         -       -       -  -  -  -  -    -        -        -      -      -       -      -      -     -      -    -        -    -        -        -      -     -     -      -       
+c1-2 (MISSING)  -     -         -       -       -  -  -  -  -    -        -        -      -      -       -      -      -     -      -    -        -    -        -        -      -     -     -      -       
+c1-3 (MISSING)  -     -         -       -       -  -  -  -  -    -        -        -      -      -       -      -      -     -      -    -        -    -        -        -      -     -     -      -       
+w0-1 (MISSING)  -     -         -       -       -  -  -  -  -    -        -        -      -      -       -      -      -     -      -    -        -    -        -        -      -     -     -      -       
+w0-2 (MISSING)  -     -         -       -       -  -  -  -  -    -        -        -      -      -       -      -      -     -      -    -        -    -        -        -      -     -     -      -       
+w0-3 (MISSING)  -     -         -       -       -  -  -  -  -    -        -        -      -      -       -      -      -     -      -    -        -    -        -        -      -     -     -      -       
+w1-1 (MISSING)  -     -         -       -       -  -  -  -  -    -        -        -      -      -       -      -      -     -      -    -        -    -        -        -      -     -     -      -       
+w1-2 (MISSING)  -     -         -       -       -  -  -  -  -    -        -        -      -      -       -      -      -     -      -    -        -    -        -        -      -     -     -      -       
+w1-3 (MISSING)  -     -         -       -       -  -  -  -  -    -        -        -      -      -       -      -      -     -      -    -        -    -        -        -      -     -     -      -       
+w2-1 (MISSING)  -     -         -       -       -  -  -  -  -    -        -        -      -      -       -      -      -     -      -    -        -    -        -        -      -     -     -      -       
+w2-2 (MISSING)  -     -         -       -       -  -  -  -  -    -        -        -      -      -       -      -      -     -      -    -        -    -        -        -      -     -     -      -       
+== median over K per arm type
+type  n  hitch50  blockfr  worst  fps  p99  1%low  elapsed  compiles  present  async  skip  tmo
+----  -  -------  -------  -----  ---  ---  -----  -------  --------  -------  -----  ----  ---
+c0    0  -        -        -      -    -    -      -        -         -        -      -     -  
+c1    0  -        -        -      -    -    -      -        -         -        -      -     -  
+w0    0  -        -        -      -    -    -      -        -         -        -      -     -  
+w1    0  -        -        -      -    -    -      -        -         -        -      -     -  
+w2    0  -        -        -      -    -    -      -        -         -        -      -     -  
+== delta C1 vs C0 (medians)
+metric    C0  C1  delta  pct
+--------  --  --  -----  ---
+hitch50   -   -   -      -  
+blockfr   -   -   -      -  
+worst     -   -   -      -  
+fps       -   -   -      -  
+p99       -   -   -      -  
+1%low     -   -   -      -  
+elapsed   -   -   -      -  
+compiles  -   -   -      -  
+present   -   -   -      -  
+async     -   -   -      -  
+skip      -   -   -      -  
+tmo       -   -   -      -  
+== delta W0 vs C0 (medians)
+metric    C0  W0  delta  pct
+--------  --  --  -----  ---
+hitch50   -   -   -      -  
+blockfr   -   -   -      -  
+worst     -   -   -      -  
+fps       -   -   -      -  
+p99       -   -   -      -  
+1%low     -   -   -      -  
+elapsed   -   -   -      -  
+compiles  -   -   -      -  
+present   -   -   -      -  
+async     -   -   -      -  
+skip      -   -   -      -  
+tmo       -   -   -      -  
+== delta W1 vs C0 (medians)
+metric    C0  W1  delta  pct
+--------  --  --  -----  ---
+hitch50   -   -   -      -  
+blockfr   -   -   -      -  
+worst     -   -   -      -  
+fps       -   -   -      -  
+p99       -   -   -      -  
+1%low     -   -   -      -  
+elapsed   -   -   -      -  
+compiles  -   -   -      -  
+present   -   -   -      -  
+async     -   -   -      -  
+skip      -   -   -      -  
+tmo       -   -   -      -  
+== delta W2 vs W0 (medians)
+metric    W0  W2  delta  pct
+--------  --  --  -----  ---
+hitch50   -   -   -      -  
+blockfr   -   -   -      -  
+worst     -   -   -      -  
+fps       -   -   -      -  
+p99       -   -   -      -  
+1%low     -   -   -      -  
+elapsed   -   -   -      -  
+compiles  -   -   -      -  
+present   -   -   -      -  
+async     -   -   -      -  
+skip      -   -   -      -  
+tmo       -   -   -      -  
+== checks
+FAIL arm c0-1 missing: not given
+FAIL arm c0-2 missing: not given
+FAIL arm c0-3 missing: not given
+FAIL arm c1-1 missing: not given
+FAIL arm c1-2 missing: not given
+FAIL arm c1-3 missing: not given
+FAIL arm w0-1 missing: not given
+FAIL arm w0-2 missing: not given
+FAIL arm w0-3 missing: not given
+FAIL arm w1-1 missing: not given
+FAIL arm w1-2 missing: not given
+FAIL arm w1-3 missing: not given
+FAIL arm w2-1 missing: not given
+FAIL arm w2-2 missing: not given
+INFO warning baseline: no c0 arm: the new-WARN-type check is skipped
+-- prime
+PASS prime clean exit: exit 0x00000000 early False close wm_close 3.17 s wer False crash 0 dumps 0
+PASS prime route ran: steps 55/91 last halted timeouts 0 error None
+PASS prime fingerprint: 39129c4c059be5f0 (want 39129c4c059be5f0)
+FAIL prime PSO stats lines: stats-on 0, interval lines 0, summary blocks 0 (none)
+PASS prime no cache write/replace/E_INVALIDARG/gave-up/unavailable lines: write_fail 0, replace_fail 0, einval 0, gave_up 0, cache_unavailable 0
+PASS prime async off: async-on lines 0
+PASS prime async failed = 0: unknown: no PSO summary block (async off)
+PASS prime cold confirmed: 'no startup pipeline recipes yet' 1, startup line no, opened 0 bytes, summary cache None
+PASS prime recipes saved: [1, 2, 5, 30, 53, 56, 59, 136, 223, 233, 237, 238, 244, 245, 254]
+INFO prime Stop(): not reached ('Title terminated; hard-exiting' x1): the shutdown-save check does not apply; cache saves logged 15
+INFO prime PSO saves: no summary block: failed count unknown (write/replace/E_INVALIDARG lines are checked above)
+== section 6 decision lines (INFO only; n is tiny, no statistics)
+INFO #35 seeded boot: C0 or W0 medians missing
+INFO async: C0 or C1 medians missing
+INFO W2 parallel replay: W0 or W2 medians missing
+RESULT: FAIL: arm c0-1 missing; arm c0-2 missing; arm c0-3 missing; arm c1-1 missing; arm c1-2 missing; arm c1-3 missing; arm w0-1 missing; arm w0-2 missing; arm w0-3 missing; arm w1-1 missing; arm w1-2 missing; arm w1-3 missing; arm w2-1 missing; arm w2-2 missing; prime PSO stats lines

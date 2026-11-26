@@ -1,0 +1,45 @@
+proof5_post.py sha256 0D8FE0ED18F7E55347DA144B320A0C349F54F51161812E8067FA70859A966A0E
+base trace   DC6CEDC7E9DBC3046E4AEA2E80946D2C331E7676B1F94C946C9C92016FEB7CCA C:\Users\<user>\.gemini\antigravity-cli\brain\4105add7-8923-4bac-b5f6-bf8e11333d25\scratch\p5fix2\b.tsv
+cand trace   E28F95C3360B841C1CDF26F6F81A96ED643F68F4ACCEAE1CF5242049C4FC2A12 C:\Users\<user>\.gemini\antigravity-cli\brain\4105add7-8923-4bac-b5f6-bf8e11333d25\scratch\p5fix2\c1.tsv
+base log     9822E456735FDD6F8003541C88C2CD955675F429FD444CFE48867C19D3CDFB91 C:\Users\<user>\.gemini\antigravity-cli\brain\4105add7-8923-4bac-b5f6-bf8e11333d25\scratch\p5fix2\bl.txt
+cand log     9822E456735FDD6F8003541C88C2CD955675F429FD444CFE48867C19D3CDFB91 C:\Users\<user>\.gemini\antigravity-cli\brain\4105add7-8923-4bac-b5f6-bf8e11333d25\scratch\p5fix2\cl_bad.txt
+cand post    72C28256E568461F0FE45FCCA3DCDC9582973E2001736E0C483CF7101DC1CDBF C:\Users\<user>\.gemini\antigravity-cli\brain\4105add7-8923-4bac-b5f6-bf8e11333d25\scratch\p5fix2\post.txt
+cand runlog  AE30185BD9DD29B3D23DDFE88CF07539E72A56E3B3E3103FAFD9F039EB698AD4 C:\Users\<user>\.gemini\antigravity-cli\brain\4105add7-8923-4bac-b5f6-bf8e11333d25\scratch\p5fix2\run.txt
+cand sidecar 5593AAC9CA6A1E5357190F482612AFC22DF7CD9A7E6C3D05E7FA3D5BB3AE2202 C:\Users\<user>\.gemini\antigravity-cli\brain\4105add7-8923-4bac-b5f6-bf8e11333d25\scratch\p5fix2\sc.txt
+targets      9C18525029FE333D163D34671412A729682B19C85ECF1A09D61DAC13251FB39C <workspace>\build\agent16\pack\DUMP-TARGETS-story.txt
+fingerprint base 39129c4c059be5f0 in game.log: True
+fingerprint cand 0123456789abcdef in game.log: False
+frames ratio cand/base: 100 / 100 = 1.000 (OK; must be within +-10%)
+route completion (cand): OK; clean exit 0 yes; steps 302/302 yes; stop reached (last: done) yes; title gate HIT yes; prompts 3/3 yes; ctl 0 yes; kit exits 0 yes
+base: frames 100; missing draws 110 (VS 90, PS 20); per 1000 frames 1100.0; missed guests 4; keys 4; miss-cache inserts 4
+cand: frames 100; missing draws 25 (VS 5, PS 20); per 1000 frames 250.0; missed guests 2; keys 2; miss-cache inserts 2
+
+STABLE targets (by address; base -> cand missing draws)
+  PS AC493354       0 ->       0  not-in-base
+  PS AC493C6C       0 ->       0  not-in-base
+  PS AC4945A8       0 ->       0  not-in-base
+  PS AC4974EC       0 ->       0  not-in-base
+  PS AC49B8F8       0 ->       0  not-in-base
+  PS AC53D0AC       0 ->       0  not-in-base
+  PS AC54327C       0 ->       0  not-in-base
+  PS AC544B3C       0 ->       0  not-in-base
+  PS AC556A1C       0 ->       0  not-in-base
+  PS AC5AB10C       0 ->       0  not-in-base
+  VS AC44BC64      50 ->       0  FIXED
+  VS AC44EF40       0 ->       0  not-in-base
+  VS AC471F18       0 ->       0  not-in-base
+  VS AC48CC80       0 ->       0  not-in-base
+  VS AC48E494      30 ->       0  FIXED
+  VS AC5AB248       0 ->       0  not-in-base
+
+FIXED (base keys gone in cand): 3 keys, 90 cand-or-base draws
+  VS 000000000000000B base      50 cand       0  guests base AC44BC64 cand -
+  VS 000000000000000C base      30 cand       0  guests base AC48E494 cand -
+  VS 000000000000000E base      10 cand       0  guests base A7FA6480 cand -
+REMAIN (in both): 1 keys, 20 cand-or-base draws
+  PS 000000000000000D base      20 cand      20  guests base A81E1B60 cand A81E2000
+NEW (cand only, prefix-keyed): 1 keys, 5 cand-or-base draws
+  VS 0000000000000063 base       0 cand       5  guests base - cand A7FA9000
+NEW @-keyed (cand only, no insert event: possibly REMAIN): 0 keys, 0 cand-or-base draws
+
+RESULT: INVALID (fingerprint check failed: cand)

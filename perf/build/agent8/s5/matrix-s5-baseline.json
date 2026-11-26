@@ -1,0 +1,42 @@
+{
+  "title": "S5 Phase 0.3 baseline: gameplay route (attract-long pad), 3D-only score; ship60, nat60, n4bp60 x4 at cap60 + natU x2 (info)",
+  "reference": "ship60",
+  "warmup_from": "firstframe",
+  "settle_s": 0,
+  "warmup_s": 90,
+  "measure_s": 180,
+  "min_window_after_ff_s": 60,
+  "repeats": 4,
+  "order": "roundrobin",
+  "cold_run": true,
+  "cold_warmup_s": 60,
+  "cold_measure_s": 100,
+  "boot_timeout_s": 240,
+  "close_timeout_s": 60,
+  "cooldown_s": 10,
+  "sys_csv": true,
+  "input_script": "harness/routes/attract-long.txt",
+  "gpu_log": true,
+  "cooldown_temp_c": 72,
+  "cooldown_timeout_s": 90,
+  "cooldown_est_s": 45,
+  "start3d_draws": 1500,
+  "reach3d_draws": 600,
+  "span3d_s": 120,
+  "notes": [
+    "Every run: attract-long.txt virtual-pad route (START, A, A, then idle: the attract 3D sequence), run ends at first frame + 270 s (warm-up 90 + window 180; about 274 s from launch, M12 gate needs >= 270).",
+    "Score = score3d.py: 3D reached = first frame with >= 600 draws (else VOID); window starts at the sustained anchor = first frame of >= 1.0 s with every frame >= 1500 draws (M12 S5-GATES; launch clock xenos 107.98 s, native 125.49 s in the smoke runs, offsf 128.48 s) and spans 120 s of frames (short = VOID); run.json gets window_start_s + effective_cap.",
+    "Thermals: before each run wait until the GPU is below 72 C (NVML, timeout 90 s, flag cooldown_timeout; idle floor was 68-71 C at P8 at 17:38, 58 C at 16:47; 3D runs 77-87 C); gpu.csv 1 Hz; thermal-limited share per run in results.csv (gpu_thermal_share).",
+    "Pinned bins, never modified: devfinal2-bin MANIFEST 4A4A13ED, nativefinal2-bin MANIFEST 4E5E2620 (build/agent2/final2/BIN-PINS.md), native4bp-bin MANIFEST C5181520 (build/agent16/pack, Overseer 17:51). One unscored cold run per bin before round 1, long enough (first frame + 160 s) to pass the 3D anchor so the driver-level shader cache has seen the 3D scene; every run has its own user_data_root, so no run reuses another run's game shader/PSO cache."
+  ],
+  "arms": [
+    { "id": "ship60", "group": "base", "ref": true, "bin": "build/agent2/devfinal2-bin", "frames": "perf", "cap": 60,
+      "note": "Xenos ship default arm, framerate_limit=60" },
+    { "id": "nat60", "group": "base", "bin": "build/agent2/nativefinal2-bin", "frames": "native", "cap": 60,
+      "note": "native default arm, native_fps_limit=60 (build default 240)" },
+    { "id": "n4bp60", "group": "base", "bin": "build/agent16/pack/native4bp-bin", "frames": "native", "cap": 60,
+      "note": "native4bp (nativefinal2 + AOT placement pack, fingerprint 39129c4c059be5f0), native_fps_limit=60" },
+    { "id": "natU", "group": "base", "repeats": 2, "bin": "build/agent2/nativefinal2-bin", "frames": "native", "cap": 0,
+      "note": "native UNCAPPED arm, native_fps_limit=0 (device.cpp:1802 if (limit <= 0) return; vsync off by default); info only, x2" }
+  ]
+}

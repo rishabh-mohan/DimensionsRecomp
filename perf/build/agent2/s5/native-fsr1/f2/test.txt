@@ -1,0 +1,49 @@
+== nativefinal2: real rexruntime.dll (non-FFX a7e79c0-era SDK)
+   build\agent2\nativefinal2-bin\rexruntime.dll sha16 641BD22519921ACD, 10911744 B; classify_present_sdk = (True, [], [], False)
+   [ORIG | harness toml (fsr)] group C PASS
+     INFO rexruntime.dll: a non-FFX SDK (present_effect is there, the FSR 1 cvars aren't), so present_effect is bilinear-only and the toml's 'fsr' is rejected
+   [F2   | harness toml (fsr)] group C PASS
+     INFO rexruntime.dll: a non-FFX SDK (present_effect is there, the FSR cvars aren't), so present_effect is bilinear-only and the toml's 'fsr' is rejected
+   [ORIG | perf-bilinear.toml] group C PASS
+     INFO rexruntime.dll: a non-FFX SDK (present_effect is there, the FSR 1 cvars aren't), so present_effect is bilinear-only and the toml's 'fsr' is rejected
+   [F2   | perf-bilinear.toml] group C PASS
+     INFO rexruntime.dll: a non-FFX SDK (present_effect is there, the FSR cvars aren't), so present_effect is bilinear-only and the toml's 'fsr' is rejected
+   [ORIG | harness toml + '# comment' (N1)] group C PASS
+     INFO rexruntime.dll: a non-FFX SDK (present_effect is there, the FSR 1 cvars aren't), so present_effect is bilinear-only and the toml's 'fsr' is rejected
+   [F2   | harness toml + '# comment' (N1)] group C PASS
+     INFO rexruntime.dll: a non-FFX SDK (present_effect is there, the FSR cvars aren't), so present_effect is bilinear-only and the toml's 'fsr' is rejected
+
+== native-fsr1 obj: stand-in: native-fsr1 presenter.cpp.obj (576388631C60AD65) copied as rexruntime.dll
+   build\agent2\s5\native-fsr1\f2\inputs\native-fsr1-obj\rexruntime.dll sha16 576388631C60AD65, 236512 B; classify_present_sdk = (True, [], ['present_fsr_sharpness_reduction', 'present_fsr_max_upsampling_passes'], False)
+   [ORIG | harness toml (fsr)] group C PASS(1 WARN)
+     WARN rexruntime.dll has present_fsr_sharpness_reduction/present_fsr_max_upsampling_passes: an SDK with the FidelityFX headers (option (b)?), so present_effect='fsr' can be selected and bilinear is not the expected present
+   [F2   | harness toml (fsr)] group C PASS(1 WARN)
+     WARN rexruntime.dll: native FSR 1 cvars (present_fsr_sharpness_reduction/present_fsr_max_upsampling_passes) without the FFX-only ones (native-fsr1 SDK), so present_effect accepts 'fsr' and the native renderer runs its own FSR 1; the toml selects it, so bilinear is not the expected present
+   [ORIG | perf-bilinear.toml] group C PASS(1 WARN)
+     WARN rexruntime.dll has present_fsr_sharpness_reduction/present_fsr_max_upsampling_passes: an SDK with the FidelityFX headers (option (b)?), so present_effect='fsr' can be selected and bilinear is not the expected present
+   [F2   | perf-bilinear.toml] group C PASS
+     INFO rexruntime.dll: native FSR 1 cvars (present_fsr_sharpness_reduction/present_fsr_max_upsampling_passes) without the FFX-only ones (native-fsr1 SDK), so present_effect accepts 'fsr' and the native renderer runs its own FSR 1
+   [ORIG | harness toml + '# comment' (N1)] group C PASS(1 WARN)
+     WARN rexruntime.dll has present_fsr_sharpness_reduction/present_fsr_max_upsampling_passes: an SDK with the FidelityFX headers (option (b)?), so present_effect='fsr' can be selected and bilinear is not the expected present
+   [F2   | harness toml + '# comment' (N1)] group C PASS(1 WARN)
+     WARN rexruntime.dll: native FSR 1 cvars (present_fsr_sharpness_reduction/present_fsr_max_upsampling_passes) without the FFX-only ones (native-fsr1 SDK), so present_effect accepts 'fsr' and the native renderer runs its own FSR 1; the toml selects it, so bilinear is not the expected present
+
+== FFX (synthetic): SYNTHETIC: cvar names of the a7e79c0 FFX branch: present_effect, present_cas_additional_sharpness, present_fsr_max_upsampling_passes, present_fsr_sharpness_reduction, present_fsr_quality_mode
+   build\agent2\s5\native-fsr1\f2\inputs\ffx-synthetic\rexruntime.dll sha16 A1B9782A359EA588, 210 B; classify_present_sdk = (True, ['present_fsr_quality_mode', 'present_cas_additional_sharpness'], ['present_fsr_sharpness_reduction', 'present_fsr_max_upsampling_passes'], False)
+   [ORIG | harness toml (fsr)] group C PASS(1 WARN)
+     WARN rexruntime.dll has present_fsr_sharpness_reduction/present_fsr_max_upsampling_passes: an SDK with the FidelityFX headers (option (b)?), so present_effect='fsr' can be selected and bilinear is not the expected present
+   [F2   | harness toml (fsr)] group C PASS(1 WARN)
+     WARN rexruntime.dll has present_fsr_quality_mode/present_cas_additional_sharpness: an SDK with the FidelityFX headers (option (b)?), so present_effect='fsr' can be selected and bilinear is not the expected present
+   [ORIG | perf-bilinear.toml] group C PASS(1 WARN)
+     WARN rexruntime.dll has present_fsr_sharpness_reduction/present_fsr_max_upsampling_passes: an SDK with the FidelityFX headers (option (b)?), so present_effect='fsr' can be selected and bilinear is not the expected present
+   [F2   | perf-bilinear.toml] group C PASS(1 WARN)
+     WARN rexruntime.dll has present_fsr_quality_mode/present_cas_additional_sharpness: an SDK with the FidelityFX headers (option (b)?), so present_effect='fsr' can be selected and bilinear is not the expected present
+   [ORIG | harness toml + '# comment' (N1)] group C PASS(1 WARN)
+     WARN rexruntime.dll has present_fsr_sharpness_reduction/present_fsr_max_upsampling_passes: an SDK with the FidelityFX headers (option (b)?), so present_effect='fsr' can be selected and bilinear is not the expected present
+   [F2   | harness toml + '# comment' (N1)] group C PASS(1 WARN)
+     WARN rexruntime.dll has present_fsr_quality_mode/present_cas_additional_sharpness: an SDK with the FidelityFX headers (option (b)?), so present_effect='fsr' can be selected and bilinear is not the expected present
+
+== exe, not a check input: build\agent2\nativefinal2-bin\legodimensions.exe classify_present_sdk = (True, [], ['present_fsr_sharpness_reduction', 'present_fsr_max_upsampling_passes'], False)
+   (the exe always has the FSR 1 names (rexlego settings_registry.cpp:41-42, device.cpp:2064/2066), whatever the SDK: probing it would call every non-FFX SDK native-fsr1. The check reads rexruntime.dll, which is right.)
+N1: native-fsr1 obj, F2, toml with a trailing '# comment' gives the same verdict as the plain fsr toml (and not the bilinear one): PASS
+RESULT: PASS (nativefinal2 = non-FFX, native-fsr1 = FSR 1 cvars only, FFX synthetic = FFX, N1)

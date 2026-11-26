@@ -1,0 +1,37 @@
+# s5_gates: span 120 s, anchor >= 1500 draws, 3D >= 600, cap none, margin 2 s
+
+== s33-offsf [xenos] verdict FLAG
+  clean    PASS   exit 0, wm_close 0.68 s, no WER/dump
+  runner   PASS   n/a: no runner status fields (not a run-timing run)
+  cold     PASS   seed_xenos null (cold)
+  3d       PASS   info: first >=1500 frame at 108.6 s is transient; sustained anchor 128.5 s (sustained used)
+  span     PASS   covered: 214.8 s of frames after window end; end of 3D at 284.0 s (35.5 s after window)
+  input    PASS   presses 3 ok, none in window; steps 91/91 (completed), last step t 461.9
+  cooldown FLAG   no cooldown record in run.json (first gpu.csv temp 71.0 C)
+  thermal  PASS   thermal-limited 0.60 > 0.10 (covariate; set rule: arm outlier -> FLAG)
+  host     NODATA no nongame_cores
+  cap      PASS   fps 30.93
+  align    PASS   ok
+  3d info: t3d 102.43 anchor 128.48 (last press +55.11, 3D +26.05) sustain10 1.00; first >=1500 108.6, sustained 128.48, runner None; first t by draws {'600': 102.43, '1000': 107.22, '1500': 108.6, '2000': 108.6}
+  end of 3D: 283.99 (low band 283.99, flat 299.92); window [128.48, 248.48]
+  gpu: util 69.5% gr 1544.5 MHz 24.8 W temp 86.0 C P0 1.00 powercap 0.11 (n 120)
+  window: 3711 frames 120.0 s fps 30.93 med 27.75 p99 107.67 1%low 264.50 max 1761.6 ms; >=100 50 >=250 10; at60 0.04
+  axis: first frame 4.87, draws perf.csv, axis-close 1.26 s, vs input perf_rows {'n': 1, 'median': 0.509, 'max_abs': 0.509}
+
+== s33-ond [xenos] verdict FLAG
+  clean    PASS   exit 0, wm_close 0.69 s, no WER/dump
+  runner   PASS   n/a: no runner status fields (not a run-timing run)
+  cold     PASS   seed_xenos null (cold)
+  3d       PASS   ok
+  span     PASS   covered: 230.8 s of frames after window end; end of 3D at 267.8 s (35.5 s after window)
+  input    PASS   presses 3 ok, none in window; steps 91/91 (completed), last step t 461.3
+  cooldown FLAG   no cooldown record in run.json (first gpu.csv temp 65.0 C)
+  thermal  PASS   thermal-limited 0.62 > 0.10 (covariate; set rule: arm outlier -> FLAG)
+  host     FLAG   hidden-desktop run (mode 'FUNCTIONAL ONLY (hidden desktop exebox-DTPDCJ2KO5E3NY5FKT2YLANBFW), NOT FOR TIMING'): foreground check not applicable; nongame 2.203 cores (set rule applied below)
+  cap      PASS   fps 36.32
+  align    PASS   ok
+  3d info: t3d 86.34 anchor 112.30 (last press +39.45, 3D +25.95) sustain10 1.00; first >=1500 112.3, sustained 112.3, runner None; first t by draws {'600': 86.34, '1000': 89.24, '1500': 112.3, '2000': 112.3}
+  end of 3D: 267.78 (low band 267.78, flat 279.23); window [112.3, 232.3]
+  gpu: util 79.0% gr 1522.0 MHz 26.91 W temp 86.0 C P0 1.00 powercap 0.20 (n 120)
+  window: 4357 frames 120.0 s fps 36.32 med 25.34 p99 77.31 1%low 109.64 max 442.6 ms; >=100 18 >=250 1; at60 0.07
+  axis: first frame 4.36, draws perf.csv, axis-close 1.08 s, vs input perf_rows {'n': 1, 'median': 0.328, 'max_abs': 0.328}

@@ -1,0 +1,14 @@
+parse errors: 0
+PASS  SettleMs default 500  [500]
+PASS  ScreenCopy(0) refuses  []
+test form foreground on this desktop: False (desktop: True)
+SKIP  foreground checks (hidden desktop); overlay mechanics on test-only LdKitCapT
+SKIP  CopyFromScreen itself (hidden desktop: EXCEPTION The handle is invalid; same call as the rated kit, which wrote PNGs on the real desktop in the 02:29 run)
+PASS  took >= SettleMs and < 2 s  [551 ms]
+PASS  overlay seen during the copy  [polls 17]
+PASS  overlay ex-style has layered|transparent|topmost|noactivate|toolwindow  [0x080800A8]
+PASS  overlay destroyed afterwards (also after an exception)  []
+PASS  overlay did not change the foreground window  [lost False]
+SKIP  PNG checks (hidden desktop)
+PASS  real LdKitCap, form not foreground -> refuses, no overlay  [not in front (no screen copy)]
+RESULT: PASS

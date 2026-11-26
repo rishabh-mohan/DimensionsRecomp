@@ -1,0 +1,33 @@
+e6_roles.py sha256 CD2EDB821AA0059296A9B54688379C6E5F38213AB211EBA0B3B45B4197BAC577  (INFORMATION ONLY: not a proof tool; E is judged by proof5_post v3 + E-C2..E-C6)
+label cand6
+trace       E485AC67B69CB6FD5246EEF32074D604613ABB5D7C8C8FA6003ECF57A23A2F28 <workspace>\build\agent3\gameplay\trace-native6-20261126-090939\events.tsv
+trace-start 0278147D663B816A01CE529EAE43E762C3229F5F336B056853436FBDB272BB67 <workspace>\build\agent3\gameplay\trace-native6-20261126-090939\trace-start.json
+game.log    C4C9C851DE7FF0134FD31C21F5CD837513CB4899A40B616F280766CCE5F962EB <workspace>\build\agent3\gameplay\runs\20261126-090944-gp6-native\game.log
+runlog      D80BF3B21B039F09DAB40F5B67656BDB91833FD02D1A655BB77D9406906BA936 <workspace>\build\agent3\gameplay\logs\gameplay-20261126-090939.txt
+fingerprint e5c874ca2b87a59d in game.log: True
+trace start unix_ms 1795705789413 (2026-11-26 09:09:49.413000 local)
+red start (game.log, first pad 1 FF 00 00 speed 18): 2026-11-26 09:22:41.448 -> trace 772035.0 ms
+role rule (first miss row at >= red+40 s, seconds after red, [lo, hi)): A-AB7D1200 [43.0, 44.0), U-ABA99710 [44.0, 45.0), C-A7F79FD0 [58.0, 77.0)
+trace: frames 37232; stop (last frame) red+105.2 s; miss-cache inserts 0
+backings known (game.log lines + identity events): 0
+PRE: miss rows before red+40 s: 0
+
+per role (stage guest: miss rows at >= red+40 s [W1a / W1b / W2], unrecognized rows, first..last red+s, backing)
+  A-AB7D1200: VS misses 0, PS misses 0
+    VS class: covered (B container 56F18006)
+    PS class: covered (B container E566393A)
+  U-ABA99710: VS misses 0, PS misses 0
+    VS class: known uncovered VS, no identity in B
+    PS class: covered (B container 6EE915B0)
+  C-A7F79FD0: VS misses 0, PS misses 0
+    VS class: covered (B container F976B389)
+    PS class: covered (B container 4DB01A8D)
+  OTHER: VS misses 0, PS misses 0
+    VS class: OTHER (no role)
+    PS class: OTHER (no role)
+
+E-C4 windows: W1a red+40..59 s 0; W1b red+59..65 s 0; W2 red+65 s..stop 0; TOTAL at >= red+40 s 0; PRE 0; stop red+105.2 s
+ROLES: A-AB7D1200 0 (VS 0, PS 0); U-ABA99710 0 (VS 0, PS 0); C-A7F79FD0 0 (VS 0, PS 0); OTHER 0 (VS 0, PS 0)
+CLASS: known uncovered VS, no identity in B (U-ABA99710 VS) 0; covered-role misses (high priority) 0; OTHER (no role) 0
+HYGIENE (E-C6 part): game.log shader miss cache ON; runlog DIAGNOSTIC lines 0
+FLAGS: none
